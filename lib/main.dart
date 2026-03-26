@@ -1,122 +1,106 @@
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// PATH: lib/main.dart
+// PURPOSE: Entry point — Hive init, Supabase init, provider registration, runApp
+// PROVIDERS: all
+// HOOKS: none
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 import 'package:flutter/material.dart';
+import 'package:hive_ce_flutter/hive_ce_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:boo_mondai/app.dart';
+import 'package:boo_mondai/controllers/quiz_queue_controller.dart';
+import 'package:boo_mondai/providers/auth_provider.dart';
+import 'package:boo_mondai/providers/card_provider.dart';
+import 'package:boo_mondai/providers/deck_provider.dart';
+import 'package:boo_mondai/providers/fsrs_provider.dart';
+import 'package:boo_mondai/providers/leaderboard_provider.dart';
+import 'package:boo_mondai/providers/quiz_provider.dart';
+import 'package:boo_mondai/providers/research_provider.dart';
+import 'package:boo_mondai/providers/streak_provider.dart';
+import 'package:boo_mondai/services/fsrs_service.dart';
+import 'package:boo_mondai/services/hive_service.dart';
+import 'package:boo_mondai/services/notification_service.dart';
+import 'package:boo_mondai/services/supabase_service.dart';
+import 'package:boo_mondai/shared/env.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  // ── Hive ────────────────────────────────────────────
+  await Hive.initFlutter();
+  final hiveService = HiveService();
+  await hiveService.init();
 
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
+  // ── Supabase ────────────────────────────────────────
+  await Supabase.initialize(
+    url: Env.supabaseUrl,
+    anonKey: Env.supabaseAnonKey,
+  );
+  final supabaseService = SupabaseService();
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  // ── Other services ──────────────────────────────────
+  final fsrsService = FsrsService();
+  final notificationService = NotificationService();
+  await notificationService.init();
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
+  // ── Restore session ─────────────────────────────────
+  final authProvider = AuthProvider(
+    supabaseService: supabaseService,
+    hiveService: hiveService,
+  );
+  await authProvider.restoreSession();
 
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: .center,
-          children: [
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: authProvider),
+        ChangeNotifierProvider(
+          create: (_) => DeckProvider(
+            supabaseService: supabaseService,
+            hiveService: hiveService,
+          ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
-    );
-  }
+        ChangeNotifierProvider(
+          create: (_) => CardProvider(
+            supabaseService: supabaseService,
+            hiveService: hiveService,
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => QuizProvider(
+            supabaseService: supabaseService,
+            hiveService: hiveService,
+            fsrsService: fsrsService,
+            queueController: QuizQueueController(),
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => FsrsProvider(
+            fsrsService: fsrsService,
+            hiveService: hiveService,
+            supabaseService: supabaseService,
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => LeaderboardProvider(
+            supabaseService: supabaseService,
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => StreakProvider(
+            supabaseService: supabaseService,
+            hiveService: hiveService,
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => ResearchProvider(
+            supabaseService: supabaseService,
+          ),
+        ),
+      ],
+      child: const BooMondaiApp(),
+    ),
+  );
 }
