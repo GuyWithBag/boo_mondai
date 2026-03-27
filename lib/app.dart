@@ -8,9 +8,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import 'package:boo_mondai/providers/auth_provider.dart';
 import 'package:boo_mondai/routes.dart';
-import 'package:boo_mondai/shared/main_theme.dart';
+import 'package:boo_mondai/providers/providers.dart';
+import 'package:boo_mondai/shared/shared.dart';
 
 class BooMondaiApp extends StatelessWidget {
   const BooMondaiApp({super.key});
