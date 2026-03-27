@@ -1,11 +1,10 @@
+import 'package:boo_mondai/models/models.dart';
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: test/helpers/fake_fsrs_card_state.dart
 // PURPOSE: Provides fake FsrsCardState instances for unit and widget tests
 // PROVIDERS: none
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-import 'package:boo_mondai/models/fsrs_card_state.dart';
 
 FsrsCardState fakeFsrsCardState({String? cardId, DateTime? due}) =>
     FsrsCardState(

@@ -1,11 +1,10 @@
+import 'package:boo_mondai/models/models.dart';
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: test/helpers/fake_quiz_session.dart
 // PURPOSE: Provides fake QuizSession instances for unit and widget tests
 // PROVIDERS: none
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-import 'package:boo_mondai/models/quiz_session.dart';
 
 QuizSession fakeQuizSession({String? id, bool? completed}) => QuizSession(
       id: id ?? '00000000-0000-0000-0000-000000000040',

@@ -5,19 +5,35 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/models/deck_card.dart';
+import 'package:boo_mondai/models/models.dart';
 
-DeckCard fakeDeckCard({String? id, String? question, String? answer}) =>
-    DeckCard(
-      id: id ?? '00000000-0000-0000-0000-000000000020',
-      deckId: '00000000-0000-0000-0000-000000000010',
-      question: question ?? '犬',
-      answer: answer ?? 'dog, いぬ, inu',
-      questionImageUrl: null,
-      answerImageUrl: null,
-      sortOrder: 0,
-      createdAt: DateTime(2026, 1, 1),
-    );
+/// Creates a [DeckCard] with a single [Note] for use in tests.
+/// [question] maps to Note.frontText; [answer] maps to Note.backText.
+DeckCard fakeDeckCard({
+  String? id,
+  String? question,
+  String? answer,
+}) {
+  final cardId = id ?? '00000000-0000-0000-0000-000000000020';
+  return DeckCard(
+    id: cardId,
+    deckId: '00000000-0000-0000-0000-000000000010',
+    cardType: CardType.normal,
+    questionType: QuestionType.readAndSelect,
+    sortOrder: 0,
+    createdAt: DateTime(2026, 1, 1),
+    notes: [
+      Note(
+        id: '${cardId}_note',
+        cardId: cardId,
+        frontText: question ?? '犬',
+        backText: answer ?? 'dog, いぬ, inu',
+        isReverse: false,
+        createdAt: DateTime(2026, 1, 1),
+      ),
+    ],
+  );
+}
 
 List<DeckCard> fakeDeckCardList({int count = 3}) => List.generate(
       count,

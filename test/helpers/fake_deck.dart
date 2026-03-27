@@ -1,11 +1,10 @@
+import 'package:boo_mondai/models/models.dart';
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: test/helpers/fake_deck.dart
 // PURPOSE: Provides fake Deck instances and lists for unit and widget tests
 // PROVIDERS: none
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-import 'package:boo_mondai/models/deck.dart';
 
 Deck fakeDeck({String? id, bool? isPremade}) => Deck(
       id: id ?? '00000000-0000-0000-0000-000000000010',
