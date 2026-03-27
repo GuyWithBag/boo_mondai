@@ -43,7 +43,6 @@ class ResponsiveScaffold extends HookWidget {
 
       final goTo = _routes[index];
       context.go(goTo);
-      print(goTo);
       if (goTo == '/decks') {
         isCreateDeck.value = true;
       } else {
