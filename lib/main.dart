@@ -10,20 +10,10 @@ import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:boo_mondai/app.dart';
-import 'package:boo_mondai/controllers/quiz_queue_controller.dart';
-import 'package:boo_mondai/providers/auth_provider.dart';
-import 'package:boo_mondai/providers/card_provider.dart';
-import 'package:boo_mondai/providers/deck_provider.dart';
-import 'package:boo_mondai/providers/fsrs_provider.dart';
-import 'package:boo_mondai/providers/leaderboard_provider.dart';
-import 'package:boo_mondai/providers/quiz_provider.dart';
-import 'package:boo_mondai/providers/research_provider.dart';
-import 'package:boo_mondai/providers/streak_provider.dart';
-import 'package:boo_mondai/services/fsrs_service.dart';
-import 'package:boo_mondai/services/hive_service.dart';
-import 'package:boo_mondai/services/notification_service.dart';
-import 'package:boo_mondai/services/supabase_service.dart';
-import 'package:boo_mondai/shared/env.dart';
+import 'package:boo_mondai/controllers/controllers.dart';
+import 'package:boo_mondai/providers/providers.dart';
+import 'package:boo_mondai/services/services.dart';
+import 'package:boo_mondai/shared/shared.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
