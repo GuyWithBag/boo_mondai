@@ -8,11 +8,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
-import 'package:boo_mondai/providers/deck_provider.dart';
-
-import 'package:boo_mondai/shared/app_spacing.dart';
-import 'package:boo_mondai/shared/breakpoints.dart';
-import 'package:boo_mondai/widgets/deck_card_widget.dart';
+import 'package:boo_mondai/providers/providers.dart';
+import 'package:boo_mondai/shared/shared.dart';
+import 'package:boo_mondai/widgets/widgets.dart';
 
 class DeckListPage extends HookWidget {
   const DeckListPage({super.key});
@@ -51,34 +49,33 @@ class DeckListPage extends HookWidget {
             child: deckProvider.isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : filtered.isEmpty
-                    ? const Center(child: Text('No decks found'))
-                    : RefreshIndicator(
-                        onRefresh: () =>
-                            context.read<DeckProvider>().fetchDecks(),
-                        child: LayoutBuilder(
-                          builder: (context, constraints) {
-                            final crossCount =
-                                Breakpoints.isDesktop(constraints.maxWidth)
-                                    ? 3
-                                    : Breakpoints.isTablet(constraints.maxWidth)
-                                        ? 2
-                                        : 1;
-                            return GridView.builder(
-                              padding: const EdgeInsets.all(AppSpacing.md),
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
+                ? const Center(child: Text('No decks found'))
+                : RefreshIndicator(
+                    onRefresh: () => context.read<DeckProvider>().fetchDecks(),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final crossCount =
+                            Breakpoints.isDesktop(constraints.maxWidth)
+                            ? 3
+                            : Breakpoints.isTablet(constraints.maxWidth)
+                            ? 2
+                            : 1;
+                        return GridView.builder(
+                          padding: const EdgeInsets.all(AppSpacing.md),
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: crossCount,
                                 mainAxisSpacing: AppSpacing.md,
                                 crossAxisSpacing: AppSpacing.md,
                                 childAspectRatio: 2.5,
                               ),
-                              itemCount: filtered.length,
-                              itemBuilder: (context, i) =>
-                                  DeckCardWidget(deck: filtered[i]),
-                            );
-                          },
-                        ),
-                      ),
+                          itemCount: filtered.length,
+                          itemBuilder: (context, i) =>
+                              DeckCardWidget(deck: filtered[i]),
+                        );
+                      },
+                    ),
+                  ),
           ),
         ],
       ),
