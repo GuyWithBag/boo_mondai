@@ -2,15 +2,16 @@
 // PATH: lib/pages/login_page.dart
 // PURPOSE: Email/password login screen
 // PROVIDERS: AuthProvider
-// HOOKS: useTextEditingController, useFocusNode
+// HOOKS: useTextEditingController, useFocusNode, useEffect
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:boo_mondai/providers/auth_provider.dart';
-import 'package:boo_mondai/shared/app_spacing.dart';
+import 'package:boo_mondai/providers/providers.dart';
+import 'package:boo_mondai/shared/shared.dart';
+import 'package:boo_mondai/widgets/widgets.dart';
 
 class LoginPage extends HookWidget {
   const LoginPage({super.key});
@@ -29,7 +30,22 @@ class LoginPage extends HookWidget {
       return null;
     }, const []);
 
+    useEffect(() {
+      if (auth.isAuthenticated) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (context.mounted) context.go('/');
+        });
+      }
+      return null;
+    }, [auth.isAuthenticated]);
+
     return Scaffold(
+      appBar: AppBar(
+        // leading: Navigator.canPop(context)
+        //     ? BackButton(onPressed: () => Navigator.pop(context))
+        //     : null,
+        // automaticallyImplyLeading: false,
+      ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -56,8 +72,9 @@ class LoginPage extends HookWidget {
                         prefixIcon: Icon(Icons.email_outlined),
                       ),
                       keyboardType: TextInputType.emailAddress,
-                      validator: (v) =>
-                          v != null && v.contains('@') ? null : 'Enter a valid email',
+                      validator: (v) => v != null && v.contains('@')
+                          ? null
+                          : 'Enter a valid email',
                     ),
                     const SizedBox(height: AppSpacing.md),
                     TextFormField(
@@ -73,10 +90,7 @@ class LoginPage extends HookWidget {
                     ),
                     if (auth.error != null) ...[
                       const SizedBox(height: AppSpacing.sm),
-                      Text(
-                        auth.error!,
-                        style: TextStyle(color: Theme.of(context).colorScheme.error),
-                      ),
+                      ErrorText(auth.error!),
                     ],
                     const SizedBox(height: AppSpacing.lg),
                     FilledButton(
@@ -85,9 +99,9 @@ class LoginPage extends HookWidget {
                           : () {
                               if (formKey.currentState!.validate()) {
                                 context.read<AuthProvider>().signIn(
-                                      emailController.text.trim(),
-                                      passwordController.text,
-                                    );
+                                  emailController.text.trim(),
+                                  passwordController.text,
+                                );
                               }
                             },
                       child: auth.isLoading
@@ -100,7 +114,7 @@ class LoginPage extends HookWidget {
                     ),
                     const SizedBox(height: AppSpacing.md),
                     TextButton(
-                      onPressed: () => context.go('/register'),
+                      onPressed: () => context.push('/register'),
                       child: const Text("Don't have an account? Sign Up"),
                     ),
                   ],
