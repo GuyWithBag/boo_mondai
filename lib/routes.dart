@@ -6,25 +6,9 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:go_router/go_router.dart';
-import 'package:boo_mondai/providers/auth_provider.dart';
-import 'package:boo_mondai/widgets/responsive_scaffold.dart';
-import 'package:boo_mondai/pages/login_page.dart';
-import 'package:boo_mondai/pages/register_page.dart';
-import 'package:boo_mondai/pages/home_page.dart';
-import 'package:boo_mondai/pages/deck_list_page.dart';
-import 'package:boo_mondai/pages/deck_detail_page.dart';
-import 'package:boo_mondai/pages/deck_creator_page.dart';
-import 'package:boo_mondai/pages/card_editor_page.dart';
-import 'package:boo_mondai/pages/quiz_preview_page.dart';
-import 'package:boo_mondai/pages/quiz_session_page.dart';
-import 'package:boo_mondai/pages/quiz_result_page.dart';
-import 'package:boo_mondai/pages/review_page.dart';
-import 'package:boo_mondai/pages/leaderboard_page.dart';
-import 'package:boo_mondai/pages/account_page.dart';
-import 'package:boo_mondai/pages/researcher_dashboard_page.dart';
-import 'package:boo_mondai/pages/research_code_entry_page.dart';
-import 'package:boo_mondai/pages/survey_page.dart';
-import 'package:boo_mondai/pages/vocabulary_test_page.dart';
+import 'package:boo_mondai/pages/pages.dart';
+import 'package:boo_mondai/providers/providers.dart';
+import 'package:boo_mondai/widgets/widgets.dart';
 
 GoRouter createRouter(AuthProvider authProvider) {
   return GoRouter(
@@ -88,6 +72,10 @@ GoRouter createRouter(AuthProvider authProvider) {
             builder: (context, state) => const ReviewPage(),
           ),
           GoRoute(
+            path: '/leaderboard',
+            builder: (context, state) => const LeaderboardPage(),
+          ),
+          GoRoute(
             path: '/account',
             builder: (context, state) => const AccountPage(),
           ),
@@ -147,10 +135,6 @@ GoRouter createRouter(AuthProvider authProvider) {
             QuizResultPage(sessionId: state.pathParameters['sessionId']!),
       ),
       GoRoute(
-        path: '/leaderboard',
-        builder: (context, state) => const LeaderboardPage(),
-      ),
-      GoRoute(
         path: '/research',
         builder: (context, state) => const ResearcherDashboardPage(),
       ),
@@ -177,6 +161,7 @@ GoRouter createRouter(AuthProvider authProvider) {
 int _shellIndex(String location) {
   if (location.startsWith('/decks')) return 1;
   if (location.startsWith('/review')) return 2;
-  if (location.startsWith('/account')) return 3;
+  if (location.startsWith('/leaderboard')) return 3;
+  if (location.startsWith('/account')) return 4;
   return 0; // home
 }
