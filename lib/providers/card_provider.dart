@@ -226,6 +226,7 @@ class CardProvider extends ChangeNotifier {
     try {
       await _supabaseService.deleteCard(cardId);
       _cards = _cards.where((c) => c.id != cardId).toList();
+      await _hiveService.deleteCard(cardId);
       notifyListeners();
     } on AppException catch (e) {
       _error = e.message;

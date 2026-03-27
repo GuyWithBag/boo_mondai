@@ -92,6 +92,10 @@ class HiveService {
     }
   }
 
+  Future<void> deleteCard(String cardId) async {
+    await _cards.delete(cardId);
+  }
+
   List<DeckCard> getCards(String deckId) {
     return _cards.values
         .map((data) => DeckCard.fromJson(Map<String, dynamic>.from(data)))
