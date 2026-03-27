@@ -7,10 +7,10 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
-import 'package:boo_mondai/providers/leaderboard_provider.dart';
-import 'package:boo_mondai/services/app_exception.dart';
 
 import '../helpers/mock_supabase_service.mocks.dart';
+import 'package:boo_mondai/providers/providers.dart';
+import 'package:boo_mondai/services/services.dart';
 
 void main() {
   late LeaderboardProvider provider;

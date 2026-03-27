@@ -7,8 +7,8 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fsrs/fsrs.dart';
-import 'package:boo_mondai/services/fsrs_service.dart';
-import 'package:boo_mondai/models/fsrs_card_state.dart';
+import 'package:boo_mondai/models/models.dart';
+import 'package:boo_mondai/services/services.dart';
 
 void main() {
   late FsrsService service;

@@ -7,12 +7,12 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
-import 'package:boo_mondai/providers/card_provider.dart';
-import 'package:boo_mondai/services/app_exception.dart';
 
 import '../helpers/mock_supabase_service.mocks.dart';
 import '../helpers/mock_hive_service.mocks.dart';
 import '../helpers/fake_deck_card.dart';
+import 'package:boo_mondai/providers/providers.dart';
+import 'package:boo_mondai/services/services.dart';
 
 void main() {
   late CardProvider provider;

@@ -7,15 +7,15 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
-import 'package:boo_mondai/providers/quiz_provider.dart';
-import 'package:boo_mondai/controllers/quiz_queue_controller.dart';
-import 'package:boo_mondai/services/app_exception.dart';
 
 import '../helpers/mock_supabase_service.mocks.dart';
 import '../helpers/mock_hive_service.mocks.dart';
 import '../helpers/mock_fsrs_service.mocks.dart';
 import '../helpers/fake_deck_card.dart';
 import '../helpers/fake_fsrs_card_state.dart';
+import 'package:boo_mondai/controllers/controllers.dart';
+import 'package:boo_mondai/providers/providers.dart';
+import 'package:boo_mondai/services/services.dart';
 
 void main() {
   late QuizProvider provider;

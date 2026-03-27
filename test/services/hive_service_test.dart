@@ -8,13 +8,8 @@
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_ce/hive_ce.dart';
-import 'package:boo_mondai/services/hive_service.dart';
-import 'package:boo_mondai/models/user_profile.dart';
-import 'package:boo_mondai/models/deck.dart';
-import 'package:boo_mondai/models/deck_card.dart';
-import 'package:boo_mondai/models/fsrs_card_state.dart';
-import 'package:boo_mondai/models/streak.dart';
-import 'package:boo_mondai/models/review_log_entry.dart';
+import 'package:boo_mondai/models/models.dart';
+import 'package:boo_mondai/services/services.dart';
 
 void main() {
   late HiveService hiveService;
