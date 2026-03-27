@@ -7,9 +7,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:boo_mondai/models/deck.dart';
-import 'package:boo_mondai/shared/app_spacing.dart';
-import 'package:boo_mondai/shared/theme_constants.dart';
+import 'package:boo_mondai/models/models.dart';
+import 'package:boo_mondai/shared/shared.dart';
 
 class DeckCardWidget extends StatelessWidget {
   final Deck deck;
@@ -20,7 +19,7 @@ class DeckCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: InkWell(
-        onTap: () => context.go('/decks/${deck.id}'),
+        onTap: () => context.push('/decks/${deck.id}'),
         borderRadius: BorderRadius.circular(AppRadii.card),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.md),
