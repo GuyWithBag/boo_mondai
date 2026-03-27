@@ -6,10 +6,8 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:flutter/foundation.dart';
-import 'package:boo_mondai/models/user_profile.dart';
-import 'package:boo_mondai/services/supabase_service.dart';
-import 'package:boo_mondai/services/hive_service.dart';
-import 'package:boo_mondai/services/app_exception.dart';
+import 'package:boo_mondai/models/models.dart';
+import 'package:boo_mondai/services/services.dart';
 
 /// Handles sign-in, sign-up, sign-out, and session restoration.
 class AuthProvider extends ChangeNotifier {
@@ -19,8 +17,8 @@ class AuthProvider extends ChangeNotifier {
   AuthProvider({
     required SupabaseService supabaseService,
     required HiveService hiveService,
-  })  : _supabaseService = supabaseService,
-        _hiveService = hiveService;
+  }) : _supabaseService = supabaseService,
+       _hiveService = hiveService;
 
   UserProfile? _userProfile;
   bool _isLoading = false;
@@ -55,8 +53,7 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> signUp(
-      String email, String password, String displayName) async {
+  Future<void> signUp(String email, String password, String displayName) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
@@ -108,8 +105,7 @@ class AuthProvider extends ChangeNotifier {
     try {
       final session = _supabaseService.currentSession;
       if (session != null) {
-        final profileData =
-            await _supabaseService.getProfile(session.user.id);
+        final profileData = await _supabaseService.getProfile(session.user.id);
         if (profileData != null) {
           _userProfile = UserProfile.fromJson(profileData);
           await _hiveService.saveProfile(_userProfile!);
