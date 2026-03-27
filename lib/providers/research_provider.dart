@@ -6,12 +6,8 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:flutter/foundation.dart';
-import 'package:boo_mondai/models/research_code.dart';
-import 'package:boo_mondai/models/research_user.dart';
-import 'package:boo_mondai/models/survey_response.dart';
-import 'package:boo_mondai/models/vocabulary_test_result.dart';
-import 'package:boo_mondai/services/supabase_service.dart';
-import 'package:boo_mondai/services/app_exception.dart';
+import 'package:boo_mondai/models/models.dart';
+import 'package:boo_mondai/services/services.dart';
 
 /// Handles research study flows: codes, surveys, tests, and researcher data viewing.
 class ResearchProvider extends ChangeNotifier {
@@ -26,6 +22,13 @@ class ResearchProvider extends ChangeNotifier {
   final List<SurveyResponse> _surveyResponses = [];
   List<VocabularyTestResult> _testResults = [];
   List<ResearchUser> _researchUsers = [];
+  List<Map<String, dynamic>> _proficiencyData = [];
+  List<Map<String, dynamic>> _languageInterestData = [];
+  List<Map<String, dynamic>> _experienceSurveyData = [];
+  List<Map<String, dynamic>> _previewUsefulnessData = [];
+  List<Map<String, dynamic>> _fsrsUsefulnessData = [];
+  List<Map<String, dynamic>> _ugcData = [];
+  List<Map<String, dynamic>> _susData = [];
   bool _isLoading = false;
   String? _error;
 
@@ -37,6 +40,18 @@ class ResearchProvider extends ChangeNotifier {
   List<VocabularyTestResult> get testResults =>
       List.unmodifiable(_testResults);
   List<ResearchUser> get researchUsers => List.unmodifiable(_researchUsers);
+  List<Map<String, dynamic>> get proficiencyData =>
+      List.unmodifiable(_proficiencyData);
+  List<Map<String, dynamic>> get languageInterestData =>
+      List.unmodifiable(_languageInterestData);
+  List<Map<String, dynamic>> get experienceSurveyData =>
+      List.unmodifiable(_experienceSurveyData);
+  List<Map<String, dynamic>> get previewUsefulnessData =>
+      List.unmodifiable(_previewUsefulnessData);
+  List<Map<String, dynamic>> get fsrsUsefulnessData =>
+      List.unmodifiable(_fsrsUsefulnessData);
+  List<Map<String, dynamic>> get ugcData => List.unmodifiable(_ugcData);
+  List<Map<String, dynamic>> get susData => List.unmodifiable(_susData);
   bool get isLoading => _isLoading;
   String? get error => _error;
 
@@ -173,6 +188,19 @@ class ResearchProvider extends ChangeNotifier {
       _testResults = (allData['vocabulary_test'] ?? [])
           .map((d) => VocabularyTestResult.fromJson(d))
           .toList();
+      _proficiencyData =
+          List<Map<String, dynamic>>.from(allData['proficiency_screener'] ?? []);
+      _languageInterestData =
+          List<Map<String, dynamic>>.from(allData['language_interest'] ?? []);
+      _experienceSurveyData =
+          List<Map<String, dynamic>>.from(allData['experience_survey'] ?? []);
+      _previewUsefulnessData =
+          List<Map<String, dynamic>>.from(allData['preview_usefulness'] ?? []);
+      _fsrsUsefulnessData =
+          List<Map<String, dynamic>>.from(allData['fsrs_usefulness'] ?? []);
+      _ugcData =
+          List<Map<String, dynamic>>.from(allData['ugc_perception'] ?? []);
+      _susData = List<Map<String, dynamic>>.from(allData['sus'] ?? []);
     } on AppException catch (e) {
       _error = e.message;
     } finally {
