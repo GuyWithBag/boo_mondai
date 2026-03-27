@@ -7,10 +7,8 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
-import 'package:boo_mondai/models/deck.dart';
-import 'package:boo_mondai/services/supabase_service.dart';
-import 'package:boo_mondai/services/hive_service.dart';
-import 'package:boo_mondai/services/app_exception.dart';
+import 'package:boo_mondai/models/models.dart';
+import 'package:boo_mondai/services/services.dart';
 
 /// Manages deck listing, creation, updates, and deletion.
 class DeckProvider extends ChangeNotifier {
