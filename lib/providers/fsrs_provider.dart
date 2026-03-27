@@ -7,13 +7,8 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
-import 'package:boo_mondai/models/deck_card.dart';
-import 'package:boo_mondai/models/fsrs_card_state.dart';
-import 'package:boo_mondai/models/review_log_entry.dart';
-import 'package:boo_mondai/services/fsrs_service.dart';
-import 'package:boo_mondai/services/hive_service.dart';
-import 'package:boo_mondai/services/supabase_service.dart';
-import 'package:boo_mondai/services/app_exception.dart';
+import 'package:boo_mondai/models/models.dart';
+import 'package:boo_mondai/services/services.dart';
 
 /// Manages the FSRS review deck — fetches due cards, handles review ratings.
 class FsrsProvider extends ChangeNotifier {

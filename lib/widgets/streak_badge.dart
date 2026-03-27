@@ -6,8 +6,8 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:flutter/material.dart';
-import 'package:boo_mondai/shared/app_spacing.dart';
-import 'package:boo_mondai/painters/streak_flame_painter.dart';
+import 'package:boo_mondai/painters/painters.dart';
+import 'package:boo_mondai/shared/shared.dart';
 
 class StreakBadge extends StatelessWidget {
   final int currentStreak;

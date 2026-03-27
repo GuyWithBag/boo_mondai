@@ -7,7 +7,7 @@
 
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:boo_mondai/shared/theme_constants.dart';
+import 'package:boo_mondai/shared/shared.dart';
 
 class StreakFlamePainter extends CustomPainter {
   final int streakCount;

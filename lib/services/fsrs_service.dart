@@ -6,7 +6,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:fsrs/fsrs.dart';
-import 'package:boo_mondai/models/fsrs_card_state.dart';
+import 'package:boo_mondai/models/models.dart';
 
 class FsrsService {
   final FSRS _fsrs = FSRS();

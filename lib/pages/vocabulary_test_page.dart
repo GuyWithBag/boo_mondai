@@ -9,10 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:boo_mondai/providers/auth_provider.dart';
-import 'package:boo_mondai/providers/research_provider.dart';
-import 'package:boo_mondai/shared/app_spacing.dart';
-import 'package:boo_mondai/shared/theme_constants.dart';
+import 'package:boo_mondai/providers/providers.dart';
+import 'package:boo_mondai/shared/shared.dart';
+import 'package:boo_mondai/widgets/widgets.dart';
 
 class VocabularyTestPage extends HookWidget {
   const VocabularyTestPage({super.key, required this.testSet});
@@ -122,10 +121,7 @@ class VocabularyTestPage extends HookWidget {
                 if (research.error != null)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                    child: Text(
-                      research.error!,
-                      style: TextStyle(color: Theme.of(context).colorScheme.error),
-                    ),
+                    child: ErrorText(research.error!),
                   ),
                 Padding(
                   padding: const EdgeInsets.all(AppSpacing.md),

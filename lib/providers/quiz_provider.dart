@@ -7,14 +7,9 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
-import 'package:boo_mondai/models/deck_card.dart';
-import 'package:boo_mondai/models/quiz_session.dart';
-import 'package:boo_mondai/models/quiz_answer.dart';
-import 'package:boo_mondai/controllers/quiz_queue_controller.dart';
-import 'package:boo_mondai/services/supabase_service.dart';
-import 'package:boo_mondai/services/hive_service.dart';
-import 'package:boo_mondai/services/fsrs_service.dart';
-import 'package:boo_mondai/services/app_exception.dart';
+import 'package:boo_mondai/controllers/controllers.dart';
+import 'package:boo_mondai/models/models.dart';
+import 'package:boo_mondai/services/services.dart';
 
 /// Manages the full quiz flow: start → answer → rate → complete → FSRS enroll.
 class QuizProvider extends ChangeNotifier {

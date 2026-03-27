@@ -6,8 +6,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:flutter/material.dart';
-import 'package:boo_mondai/shared/app_spacing.dart';
-import 'package:boo_mondai/shared/theme_constants.dart';
+import 'package:boo_mondai/shared/shared.dart';
 
 class SelfRatingButtons extends StatelessWidget {
   final void Function(int rating) onRate;

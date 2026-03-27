@@ -6,7 +6,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:flutter/material.dart';
-import 'package:boo_mondai/shared/app_spacing.dart';
+import 'package:boo_mondai/shared/shared.dart';
 
 class QuizQuestionCard extends StatelessWidget {
   final String question;

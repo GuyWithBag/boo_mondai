@@ -9,10 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:boo_mondai/providers/auth_provider.dart';
-import 'package:boo_mondai/providers/card_provider.dart';
-import 'package:boo_mondai/providers/quiz_provider.dart';
-import 'package:boo_mondai/shared/app_spacing.dart';
+import 'package:boo_mondai/providers/providers.dart';
+import 'package:boo_mondai/shared/shared.dart';
 
 class QuizPreviewPage extends HookWidget {
   const QuizPreviewPage({super.key, required this.deckId});

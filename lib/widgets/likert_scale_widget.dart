@@ -6,7 +6,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:flutter/material.dart';
-import 'package:boo_mondai/shared/app_spacing.dart';
+import 'package:boo_mondai/shared/shared.dart';
 
 class LikertScaleWidget extends StatelessWidget {
   final int index;
