@@ -4,75 +4,104 @@ config:
   theme: base
 ---
 flowchart TB
-    subgraph CLIENT["🌐 Client Layer (Web Browser)"]
+    subgraph CLIENT["📱 Flutter Client (Mobile · Web · Desktop)"]
         direction TB
-        UI["User Interface
-        ─────────────
-        Quiz Session View
-        Preview Screen
-        FSRS Review Deck
-        Leaderboard
-        User Dashboard"]
-    end
- 
-    subgraph SERVER["⚙️ Application Server"]
-        direction TB
-        API["REST API
-        ─────────────
-        Auth Endpoints
-        Quiz Endpoints
-        Deck Endpoints
-        Leaderboard Endpoints"]
- 
-        subgraph MODULES["Core Modules"]
+
+        subgraph UI["UI Layer"]
             direction LR
-            QE["Quiz Engine
-            ──────────
-            Batch loader\nQueue manager
-            Rating handler"]
-            FSRS["FSRS Module
+            PAGES["Pages
+            ─────────────
+            Quiz Session
+            Preview Screen
+            FSRS Review
+            Leaderboard
+            Researcher Dashboard
+            Survey / Vocab Test"]
+            WIDGETS["Widgets
+            ─────────────
+            ResponsiveScaffold
+            DeckCardWidget
+            QuizQuestionCard
+            StreakBadge
+            LikertScaleWidget"]
+        end
+
+        subgraph STATE["State Layer (Provider)"]
+            direction LR
+            AP["AuthProvider"]
+            DP["DeckProvider"]
+            CP["CardProvider"]
+            QP["QuizProvider"]
+            FP["FsrsProvider"]
+            SP["StreakProvider"]
+            LP["LeaderboardProvider"]
+            RP["ResearchProvider"]
+        end
+
+        subgraph LOCAL["Local Storage (Hive CE)"]
+            direction LR
+            HC["Cached Decks & Cards"]
+            HF["FSRS Card States"]
+            HR["Review Logs"]
+            HS["Streaks & Settings"]
+        end
+
+        subgraph LOGIC["Local Logic"]
+            direction LR
+            FSRSLIB["fsrs package
             ──────────
             Interval calc
             Card scheduler
-            Review logger"]
-            RT["Realtime Module
+            (runs on-device)"]
+            QQ["QuizQueueController
             ──────────
-            WebSocket
-            Multiplayer sync
-            Session manager"]
+            Queue manager
+            Requeue on miss
+            Rating handler"]
+            NOTIF["NotificationService
+            ──────────
+            Local notifications
+            Due-day reminders"]
         end
- 
-        API --> QE
-        API --> FSRS
-        API --> RT
     end
- 
-    subgraph DB["🗄️ Database Layer"]
-        direction LR
-        UDB[("Users & 
-        Accounts")]
-        QDB[("Quiz Sets &
-        Questions")]
-        CDB[("FSRS Cards &
-        Review Logs")]
-        LDB[("Leaderboard
-        & Streaks")]
+
+    subgraph SUPABASE["☁️ Supabase (BaaS)"]
+        direction TB
+        AUTH["Auth
+        ─────────────
+        Email sign-up/in
+        JWT sessions
+        Row-Level Security"]
+
+        subgraph PG["PostgreSQL (19 tables + 1 view)"]
+            direction LR
+            UDB[("profiles
+            decks
+            deck_cards")]
+            QDB[("quiz_sessions
+            quiz_answers")]
+            CDB[("fsrs_cards
+            review_logs")]
+            LDB[("streaks
+            leaderboard view")]
+            RDB[("research_users
+            research_codes
+            survey tables")]
+        end
+
+        STORE["Storage
+        ─────────────
+        Card images
+        Avatar images"]
     end
- 
-    subgraph CLOUD["☁️ Cloud Infrastructure"]
-        HOST["Web Host
-        (Static Assets)"]
-        STORE["File Storage
-        (Images & Audio)"]
-    end
- 
-    UI -->|"HTTPS Requests"| API
-    RT -->|"WebSocket"| UI
-    QE --> QDB
-    QE --> CDB
-    FSRS --> CDB
-    API --> UDB
-    API --> LDB
-    UI -->|"Media files"| STORE
-    HOST -->|"Serves app"| UI
+
+    PAGES -->|"watch / read"| STATE
+    STATE -->|"SupabaseService"| AUTH
+    STATE -->|"SupabaseService HTTPS"| PG
+    STATE -->|"HiveService"| LOCAL
+    FP -->|"scheduleCard / reviewCard"| FSRSLIB
+    QP -->|"enqueue / dequeue"| QQ
+    FP -->|"sync on write"| CDB
+    NOTIF -->|"schedules"| LOCAL
+    STATE -->|"uploadImage"| STORE
 ```
