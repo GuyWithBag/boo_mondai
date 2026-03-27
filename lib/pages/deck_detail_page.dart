@@ -9,9 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:boo_mondai/providers/card_provider.dart';
-import 'package:boo_mondai/shared/app_spacing.dart';
-import 'package:boo_mondai/widgets/empty_state_widget.dart';
+import 'package:boo_mondai/providers/providers.dart';
+import 'package:boo_mondai/shared/shared.dart';
+import 'package:boo_mondai/widgets/widgets.dart';
 
 class DeckDetailPage extends HookWidget {
   final String deckId;
@@ -35,7 +35,7 @@ class DeckDetailPage extends HookWidget {
           IconButton(
             icon: const Icon(Icons.edit),
             tooltip: 'Edit deck',
-            onPressed: () => context.go('/decks/$deckId/edit'),
+            onPressed: () => context.push('/decks/$deckId/edit'),
           ),
         ],
       ),
@@ -46,7 +46,7 @@ class DeckDetailPage extends HookWidget {
                   icon: Icons.style_outlined,
                   title: 'No cards yet',
                   actionLabel: 'Add Card',
-                  onAction: () => context.go('/decks/$deckId/cards/add'),
+                  onAction: () => context.push('/decks/$deckId/cards/add'),
                 )
               : Column(
                   children: [
@@ -63,7 +63,7 @@ class DeckDetailPage extends HookWidget {
                               subtitle: Text(card.answer),
                               trailing: IconButton(
                                 icon: const Icon(Icons.edit_outlined),
-                                onPressed: () => context.go(
+                                onPressed: () => context.push(
                                   '/decks/$deckId/cards/${card.id}/edit',
                                 ),
                               ),
@@ -79,7 +79,7 @@ class DeckDetailPage extends HookWidget {
                           Expanded(
                             child: OutlinedButton(
                               onPressed: () =>
-                                  context.go('/quiz/$deckId/preview'),
+                                  context.push('/quiz/$deckId/preview'),
                               child: const Text('Preview'),
                             ),
                           ),
@@ -98,7 +98,7 @@ class DeckDetailPage extends HookWidget {
                 ),
       floatingActionButton: cardProvider.cards.isNotEmpty
           ? FloatingActionButton(
-              onPressed: () => context.go('/decks/$deckId/cards/add'),
+              onPressed: () => context.push('/decks/$deckId/cards/add'),
               child: const Icon(Icons.add),
             )
           : null,

@@ -6,7 +6,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'dart:collection';
-import 'package:boo_mondai/models/deck_card.dart';
+import 'package:boo_mondai/models/models.dart';
 
 class QuizQueueController {
   final Queue<DeckCard> _queue = Queue<DeckCard>();

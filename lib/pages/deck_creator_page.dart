@@ -9,9 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:boo_mondai/providers/auth_provider.dart';
-import 'package:boo_mondai/providers/deck_provider.dart';
-import 'package:boo_mondai/shared/app_spacing.dart';
+import 'package:boo_mondai/providers/providers.dart';
+import 'package:boo_mondai/shared/shared.dart';
+import 'package:boo_mondai/widgets/widgets.dart';
 
 class DeckCreatorPage extends HookWidget {
   const DeckCreatorPage({super.key, this.deckId});
@@ -117,10 +117,7 @@ class DeckCreatorPage extends HookWidget {
                     ),
                     if (deckProvider.error != null) ...[
                       const SizedBox(height: AppSpacing.sm),
-                      Text(
-                        deckProvider.error!,
-                        style: TextStyle(color: Theme.of(context).colorScheme.error),
-                      ),
+                      ErrorText(deckProvider.error!),
                     ],
                     const SizedBox(height: AppSpacing.xl),
                     FilledButton(
