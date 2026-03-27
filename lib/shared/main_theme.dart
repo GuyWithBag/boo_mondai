@@ -75,6 +75,29 @@ abstract final class AppTheme {
             ),
           ),
         ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRadii.button),
+            ),
+          ),
+        ),
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRadii.button),
+            ),
+          ),
+        ),
+        segmentedButtonTheme: SegmentedButtonThemeData(
+          style: SegmentedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRadii.button),
+            ),
+            selectedBackgroundColor: AppColors.primary,
+            selectedForegroundColor: AppColors.onPrimary,
+          ),
+        ),
         snackBarTheme: SnackBarThemeData(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppRadii.button),
@@ -152,6 +175,29 @@ abstract final class AppTheme {
             borderRadius: BorderRadius.vertical(
               top: Radius.circular(AppRadii.bottomSheet),
             ),
+          ),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRadii.button),
+            ),
+          ),
+        ),
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRadii.button),
+            ),
+          ),
+        ),
+        segmentedButtonTheme: SegmentedButtonThemeData(
+          style: SegmentedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRadii.button),
+            ),
+            selectedBackgroundColor: AppColors.primaryDark,
+            selectedForegroundColor: AppColors.onPrimaryDark,
           ),
         ),
         snackBarTheme: SnackBarThemeData(
