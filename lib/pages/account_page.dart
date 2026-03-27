@@ -9,9 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:boo_mondai/providers/auth_provider.dart';
-import 'package:boo_mondai/providers/streak_provider.dart';
-import 'package:boo_mondai/shared/app_spacing.dart';
+import 'package:boo_mondai/providers/providers.dart';
+import 'package:boo_mondai/shared/shared.dart';
 
 class AccountPage extends HookWidget {
   const AccountPage({super.key});
@@ -62,12 +61,12 @@ class UnauthenticatedAccountView extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSpacing.xl),
                 FilledButton(
-                  onPressed: () => context.go('/login'),
+                  onPressed: () => context.push('/login'),
                   child: const Text('Sign In'),
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 OutlinedButton(
-                  onPressed: () => context.go('/register'),
+                  onPressed: () => context.push('/register'),
                   child: const Text('Create Account'),
                 ),
               ],
@@ -164,11 +163,12 @@ class AuthenticatedAccountView extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.md),
-          OutlinedButton.icon(
-            onPressed: () => context.go('/research/code'),
-            icon: const Icon(Icons.vpn_key),
-            label: const Text('Enter Research Code'),
-          ),
+          if (profile.role != 'researcher')
+            OutlinedButton.icon(
+              onPressed: () => context.push('/research/code'),
+              icon: const Icon(Icons.vpn_key),
+              label: const Text('Enter Research Code'),
+            ),
           const SizedBox(height: AppSpacing.xl),
           OutlinedButton.icon(
             onPressed: () async {
