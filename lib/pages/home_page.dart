@@ -9,12 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:boo_mondai/providers/auth_provider.dart';
-import 'package:boo_mondai/providers/fsrs_provider.dart';
-import 'package:boo_mondai/providers/streak_provider.dart';
-import 'package:boo_mondai/shared/app_spacing.dart';
-import 'package:boo_mondai/shared/theme_constants.dart';
-import 'package:boo_mondai/widgets/streak_badge.dart';
+import 'package:boo_mondai/providers/providers.dart';
+import 'package:boo_mondai/shared/shared.dart';
+import 'package:boo_mondai/widgets/widgets.dart';
 
 class HomePage extends HookWidget {
   const HomePage({super.key});
@@ -66,16 +63,10 @@ class HomePage extends HookWidget {
               icon: const Icon(Icons.library_books),
               label: const Text('Browse Decks'),
             ),
-            const SizedBox(height: AppSpacing.sm),
-            OutlinedButton.icon(
-              onPressed: () => context.go('/leaderboard'),
-              icon: const Icon(Icons.leaderboard),
-              label: const Text('Leaderboard'),
-            ),
             if (auth.role == 'researcher') ...[
               const SizedBox(height: AppSpacing.sm),
               OutlinedButton.icon(
-                onPressed: () => context.go('/research'),
+                onPressed: () => context.push('/research'),
                 icon: const Icon(Icons.science),
                 label: const Text('Research Dashboard'),
               ),
