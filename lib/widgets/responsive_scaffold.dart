@@ -6,12 +6,13 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:boo_mondai/providers/providers.dart';
 import 'package:boo_mondai/shared/shared.dart';
 
-class ResponsiveScaffold extends StatelessWidget {
+class ResponsiveScaffold extends HookWidget {
   final int currentIndex;
   final Widget child;
 
@@ -22,27 +23,44 @@ class ResponsiveScaffold extends StatelessWidget {
   });
 
   static const _routes = ['/', '/decks', '/review', '/leaderboard', '/account'];
-
   // Indices 1 (Decks), 2 (Review), 3 (Leaderboard) require auth
   static const _authRequiredIndices = {1, 2, 3};
-
-  void _onTap(BuildContext context, int index) {
-    if (index == currentIndex) return;
-
-    final isAuth = context.read<AuthProvider>().isAuthenticated;
-    if (!isAuth && _authRequiredIndices.contains(index)) {
-      // Redirect to account page to prompt login
-      context.go('/account');
-      return;
-    }
-
-    context.go(_routes[index]);
-  }
 
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
     final isAuth = auth.isAuthenticated;
+    final isCreateDeck = useState(false);
+    void onTap(BuildContext context, int index) {
+      if (index == currentIndex) return;
+
+      final isAuth = context.read<AuthProvider>().isAuthenticated;
+      if (!isAuth && _authRequiredIndices.contains(index)) {
+        // Redirect to account page to prompt login
+        context.go('/account');
+        return;
+      }
+
+      final goTo = _routes[index];
+      context.go(goTo);
+      print(goTo);
+      if (goTo == '/decks') {
+        isCreateDeck.value = true;
+      } else {
+        isCreateDeck.value = false;
+      }
+    }
+
+    FloatingActionButton? getFloatingActionButton() {
+      return isCreateDeck.value
+          ? FloatingActionButton(
+              onPressed: () {
+                context.push('/decks/create');
+              },
+              child: Icon(Icons.add_rounded),
+            )
+          : null;
+    }
 
     // Group B only sees code entry — no shell nav
     if (auth.role == 'group_b_participant') {
@@ -53,12 +71,13 @@ class ResponsiveScaffold extends StatelessWidget {
       builder: (context, constraints) {
         if (Breakpoints.isDesktop(constraints.maxWidth)) {
           return Scaffold(
+            floatingActionButton: getFloatingActionButton(),
             body: Row(
               children: [
                 NavigationRail(
                   extended: constraints.maxWidth > 1200,
                   selectedIndex: currentIndex,
-                  onDestinationSelected: (i) => _onTap(context, i),
+                  onDestinationSelected: (i) => onTap(context, i),
                   destinations: _buildRailDestinations(isAuth),
                 ),
                 const VerticalDivider(width: 1),
@@ -70,9 +89,10 @@ class ResponsiveScaffold extends StatelessWidget {
 
         return Scaffold(
           body: child,
+          floatingActionButton: getFloatingActionButton(),
           bottomNavigationBar: NavigationBar(
             selectedIndex: currentIndex,
-            onDestinationSelected: (i) => _onTap(context, i),
+            onDestinationSelected: (i) => onTap(context, i),
             destinations: _buildNavDestinations(context, isAuth),
           ),
         );
@@ -81,7 +101,9 @@ class ResponsiveScaffold extends StatelessWidget {
   }
 
   List<NavigationDestination> _buildNavDestinations(
-      BuildContext context, bool isAuth) {
+    BuildContext context,
+    bool isAuth,
+  ) {
     final disabledColor = Theme.of(context).disabledColor;
     return [
       const NavigationDestination(
@@ -90,20 +112,23 @@ class ResponsiveScaffold extends StatelessWidget {
         label: 'Home',
       ),
       NavigationDestination(
-        icon: Icon(Icons.library_books_outlined,
-            color: isAuth ? null : disabledColor),
+        icon: Icon(
+          Icons.library_books_outlined,
+          color: isAuth ? null : disabledColor,
+        ),
         selectedIcon: const Icon(Icons.library_books),
         label: 'Decks',
       ),
       NavigationDestination(
-        icon:
-            Icon(Icons.replay_outlined, color: isAuth ? null : disabledColor),
+        icon: Icon(Icons.replay_outlined, color: isAuth ? null : disabledColor),
         selectedIcon: const Icon(Icons.replay),
         label: 'Review',
       ),
       NavigationDestination(
-        icon: Icon(Icons.leaderboard_outlined,
-            color: isAuth ? null : disabledColor),
+        icon: Icon(
+          Icons.leaderboard_outlined,
+          color: isAuth ? null : disabledColor,
+        ),
         selectedIcon: const Icon(Icons.leaderboard),
         label: 'Leaderboard',
       ),
@@ -123,27 +148,36 @@ class ResponsiveScaffold extends StatelessWidget {
         label: Text('Home'),
       ),
       NavigationRailDestination(
-        icon: Icon(Icons.library_books_outlined,
-            color: isAuth ? null : Colors.grey),
+        icon: Icon(
+          Icons.library_books_outlined,
+          color: isAuth ? null : Colors.grey,
+        ),
         selectedIcon: const Icon(Icons.library_books),
-        label: Text('Decks',
-            style: isAuth ? null : const TextStyle(color: Colors.grey)),
+        label: Text(
+          'Decks',
+          style: isAuth ? null : const TextStyle(color: Colors.grey),
+        ),
         disabled: !isAuth,
       ),
       NavigationRailDestination(
-        icon:
-            Icon(Icons.replay_outlined, color: isAuth ? null : Colors.grey),
+        icon: Icon(Icons.replay_outlined, color: isAuth ? null : Colors.grey),
         selectedIcon: const Icon(Icons.replay),
-        label: Text('Review',
-            style: isAuth ? null : const TextStyle(color: Colors.grey)),
+        label: Text(
+          'Review',
+          style: isAuth ? null : const TextStyle(color: Colors.grey),
+        ),
         disabled: !isAuth,
       ),
       NavigationRailDestination(
-        icon: Icon(Icons.leaderboard_outlined,
-            color: isAuth ? null : Colors.grey),
+        icon: Icon(
+          Icons.leaderboard_outlined,
+          color: isAuth ? null : Colors.grey,
+        ),
         selectedIcon: const Icon(Icons.leaderboard),
-        label: Text('Leaderboard',
-            style: isAuth ? null : const TextStyle(color: Colors.grey)),
+        label: Text(
+          'Leaderboard',
+          style: isAuth ? null : const TextStyle(color: Colors.grey),
+        ),
         disabled: !isAuth,
       ),
       const NavigationRailDestination(
