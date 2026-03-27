@@ -23,8 +23,7 @@ class DeckDetailPage extends HookWidget {
     final scrollController = useScrollController();
 
     useEffect(() {
-      Future.microtask(
-          () => context.read<CardProvider>().fetchCards(deckId));
+      Future.microtask(() => context.read<CardProvider>().fetchCards(deckId));
       return null;
     }, [deckId]);
 
@@ -39,69 +38,67 @@ class DeckDetailPage extends HookWidget {
           ),
         ],
       ),
-      body: cardProvider.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : cardProvider.cards.isEmpty
-              ? EmptyStateWidget(
-                  icon: Icons.style_outlined,
-                  title: 'No cards yet',
-                  actionLabel: 'Add Card',
-                  onAction: () => context.push('/decks/$deckId/cards/add'),
-                )
-              : Column(
-                  children: [
-                    Expanded(
-                      child: ListView.builder(
-                        controller: scrollController,
-                        padding: const EdgeInsets.all(AppSpacing.md),
-                        itemCount: cardProvider.cards.length,
-                        itemBuilder: (context, i) {
-                          final card = cardProvider.cards[i];
-                          return Card(
-                            child: ListTile(
-                              title: Text(card.question),
-                              subtitle: Text(card.answer),
-                              trailing: IconButton(
-                                icon: const Icon(Icons.edit_outlined),
-                                onPressed: () => context.push(
-                                  '/decks/$deckId/cards/${card.id}/edit',
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(AppSpacing.md),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: () =>
-                                  context.push('/quiz/$deckId/preview'),
-                              child: const Text('Preview'),
-                            ),
-                          ),
-                          const SizedBox(width: AppSpacing.md),
-                          Expanded(
-                            child: FilledButton(
-                              onPressed: () =>
-                                  context.go('/quiz/$deckId/session'),
-                              child: const Text('Start Quiz'),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
       floatingActionButton: cardProvider.cards.isNotEmpty
           ? FloatingActionButton(
               onPressed: () => context.push('/decks/$deckId/cards/add'),
               child: const Icon(Icons.add),
             )
           : null,
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Row(
+          children: [
+            Expanded(
+              child: OutlinedButton(
+                onPressed: () => context.push('/quiz/$deckId/preview'),
+                child: const Text('Preview'),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: FilledButton(
+                onPressed: () => context.go('/quiz/$deckId/session'),
+                child: const Text('Start Quiz'),
+              ),
+            ),
+          ],
+        ),
+      ),
+      body: cardProvider.isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : cardProvider.cards.isEmpty
+          ? EmptyStateWidget(
+              icon: Icons.style_outlined,
+              title: 'No cards yet',
+              actionLabel: 'Add Card',
+              onAction: () => context.push('/decks/$deckId/cards/add'),
+            )
+          : Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    controller: scrollController,
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    itemCount: cardProvider.cards.length,
+                    itemBuilder: (context, i) {
+                      final card = cardProvider.cards[i];
+                      return Card(
+                        child: ListTile(
+                          title: Text(card.question),
+                          subtitle: Text(card.answer),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.edit_outlined),
+                            onPressed: () => context.push(
+                              '/decks/$deckId/cards/${card.id}/edit',
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
     );
   }
 }
