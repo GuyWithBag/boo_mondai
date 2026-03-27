@@ -8,9 +8,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
-import 'package:boo_mondai/providers/leaderboard_provider.dart';
-import 'package:boo_mondai/shared/app_spacing.dart';
-import 'package:boo_mondai/widgets/leaderboard_tile.dart';
+import 'package:boo_mondai/providers/providers.dart';
+import 'package:boo_mondai/shared/shared.dart';
+import 'package:boo_mondai/widgets/widgets.dart';
 
 class LeaderboardPage extends HookWidget {
   const LeaderboardPage({super.key});

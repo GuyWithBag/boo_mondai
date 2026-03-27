@@ -7,11 +7,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-
 import 'package:provider/provider.dart';
-import 'package:boo_mondai/providers/auth_provider.dart';
-import 'package:boo_mondai/providers/research_provider.dart';
-import 'package:boo_mondai/shared/app_spacing.dart';
+import 'package:boo_mondai/providers/providers.dart';
+import 'package:boo_mondai/shared/shared.dart';
+import 'package:boo_mondai/widgets/widgets.dart';
 
 class ResearchCodeEntryPage extends HookWidget {
   const ResearchCodeEntryPage({super.key});
@@ -58,10 +57,7 @@ class ResearchCodeEntryPage extends HookWidget {
                   ),
                   if (research.error != null) ...[
                     const SizedBox(height: AppSpacing.sm),
-                    Text(
-                      research.error!,
-                      style: TextStyle(color: Theme.of(context).colorScheme.error),
-                    ),
+                    ErrorText(research.error!),
                   ],
                   if (message.value != null) ...[
                     const SizedBox(height: AppSpacing.sm),

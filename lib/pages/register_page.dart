@@ -9,8 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:boo_mondai/providers/auth_provider.dart';
-import 'package:boo_mondai/shared/app_spacing.dart';
+import 'package:boo_mondai/providers/providers.dart';
+import 'package:boo_mondai/shared/shared.dart';
+import 'package:boo_mondai/widgets/widgets.dart';
 
 class RegisterPage extends HookWidget {
   const RegisterPage({super.key});
@@ -84,10 +85,7 @@ class RegisterPage extends HookWidget {
                     ),
                     if (auth.error != null) ...[
                       const SizedBox(height: AppSpacing.sm),
-                      Text(
-                        auth.error!,
-                        style: TextStyle(color: Theme.of(context).colorScheme.error),
-                      ),
+                      ErrorText(auth.error!),
                     ],
                     const SizedBox(height: AppSpacing.lg),
                     FilledButton(
@@ -112,7 +110,7 @@ class RegisterPage extends HookWidget {
                     ),
                     const SizedBox(height: AppSpacing.md),
                     TextButton(
-                      onPressed: () => context.go('/login'),
+                      onPressed: () => context.push('/login'),
                       child: const Text('Already have an account? Sign In'),
                     ),
                   ],
