@@ -116,11 +116,16 @@ class SupabaseService {
   }
 
   // ── Cards ───────────────────────────────────────────
+
+  /// Fetches all cards for [deckId] with their content nodes joined:
+  /// notes, mc_options, fitb_segments, mm_pairs.
   Future<List<Map<String, dynamic>>> fetchCards(String deckId) async {
     try {
       final response = await _client
           .from('deck_cards')
-          .select()
+          .select(
+            '*, notes(*), mc_options(*), fitb_segments(*), mm_pairs!card_id(*)',
+          )
           .eq('deck_id', deckId)
           .order('sort_order');
       return List<Map<String, dynamic>>.from(response);
@@ -150,6 +155,49 @@ class SupabaseService {
   Future<void> deleteCard(String id) async {
     try {
       await _client.from('deck_cards').delete().eq('id', id);
+    } on PostgrestException catch (e) {
+      throw AppException(e.message, code: e.code);
+    }
+  }
+
+  Future<Map<String, dynamic>?> insertNote(Map<String, dynamic> data) async {
+    try {
+      final response =
+          await _client.from('notes').insert(data).select().single();
+      return response;
+    } on PostgrestException catch (e) {
+      throw AppException(e.message, code: e.code);
+    }
+  }
+
+  Future<Map<String, dynamic>?> insertMCOption(
+      Map<String, dynamic> data) async {
+    try {
+      final response =
+          await _client.from('mc_options').insert(data).select().single();
+      return response;
+    } on PostgrestException catch (e) {
+      throw AppException(e.message, code: e.code);
+    }
+  }
+
+  Future<Map<String, dynamic>?> insertFITBSegment(
+      Map<String, dynamic> data) async {
+    try {
+      final response =
+          await _client.from('fitb_segments').insert(data).select().single();
+      return response;
+    } on PostgrestException catch (e) {
+      throw AppException(e.message, code: e.code);
+    }
+  }
+
+  Future<Map<String, dynamic>?> insertMMPair(
+      Map<String, dynamic> data) async {
+    try {
+      final response =
+          await _client.from('mm_pairs').insert(data).select().single();
+      return response;
     } on PostgrestException catch (e) {
       throw AppException(e.message, code: e.code);
     }
@@ -307,7 +355,7 @@ class SupabaseService {
       fetchAllResearchData() async {
     try {
       final results = await Future.wait([
-        _client.from('research_users').select(),
+        _client.from('research_users').select('*, profiles:user_id(display_name)'),
         _client.from('research_codes').select(),
         _client.from('research_proficiency_screener').select(),
         _client.from('research_language_interest').select(),
