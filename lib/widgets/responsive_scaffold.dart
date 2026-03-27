@@ -8,8 +8,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:boo_mondai/providers/auth_provider.dart';
-import 'package:boo_mondai/shared/breakpoints.dart';
+import 'package:boo_mondai/providers/providers.dart';
+import 'package:boo_mondai/shared/shared.dart';
 
 class ResponsiveScaffold extends StatelessWidget {
   final int currentIndex;
@@ -21,10 +21,10 @@ class ResponsiveScaffold extends StatelessWidget {
     required this.child,
   });
 
-  static const _routes = ['/', '/decks', '/review', '/account'];
+  static const _routes = ['/', '/decks', '/review', '/leaderboard', '/account'];
 
-  // Indices 1 (Decks) and 2 (Review) require auth
-  static const _authRequiredIndices = {1, 2};
+  // Indices 1 (Decks), 2 (Review), 3 (Leaderboard) require auth
+  static const _authRequiredIndices = {1, 2, 3};
 
   void _onTap(BuildContext context, int index) {
     if (index == currentIndex) return;
@@ -101,6 +101,12 @@ class ResponsiveScaffold extends StatelessWidget {
         selectedIcon: const Icon(Icons.replay),
         label: 'Review',
       ),
+      NavigationDestination(
+        icon: Icon(Icons.leaderboard_outlined,
+            color: isAuth ? null : disabledColor),
+        selectedIcon: const Icon(Icons.leaderboard),
+        label: 'Leaderboard',
+      ),
       const NavigationDestination(
         icon: Icon(Icons.person_outlined),
         selectedIcon: Icon(Icons.person),
@@ -129,6 +135,14 @@ class ResponsiveScaffold extends StatelessWidget {
             Icon(Icons.replay_outlined, color: isAuth ? null : Colors.grey),
         selectedIcon: const Icon(Icons.replay),
         label: Text('Review',
+            style: isAuth ? null : const TextStyle(color: Colors.grey)),
+        disabled: !isAuth,
+      ),
+      NavigationRailDestination(
+        icon: Icon(Icons.leaderboard_outlined,
+            color: isAuth ? null : Colors.grey),
+        selectedIcon: const Icon(Icons.leaderboard),
+        label: Text('Leaderboard',
             style: isAuth ? null : const TextStyle(color: Colors.grey)),
         disabled: !isAuth,
       ),
