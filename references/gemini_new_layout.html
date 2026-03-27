@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BooMondai - UI/UX Complete Layout</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['"Noto Sans"', 'sans-serif'] },
+                    colors: {
+                        primary: '#5C6BC0', // Indigo
+                        secondary: '#FF7043', // Coral
+                        tertiary: '#26A69A', // Teal
+                        bgLight: '#F8F9FA',
+                        surfaceLight: '#FFFFFF',
+                        borderLight: '#E5E7EB',
+                        // Gamification colors (Accessible in light/dark)
+                        btnGood: '#4CAF50', // Green
+                        btnHard: '#FF9800', // Orange
+                        btnAgain: '#F44336', // Red
+                        btnEasy: '#2196F3', // Blue
+                        streakAmber: '#FFC107', // Amber for fire
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Tactile Gamified Buttons (Duolingo Style) */
+        .btn-tactile {
+            transition: transform 0.05s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.05s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-tactile:active {
+            transform: translateY(4px);
+            box-shadow: 0 0px 0 0 transparent !important;
+        }
+
+        /* 3D Flashcard Flip */
+        .perspective-1000 { perspective: 1000px; }
+        .transform-style-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+        .flip-transition { transition: transform 0.5s cubic-bezier(0.4, 0.2, 0.2, 1); }
+        .is-flipped .flip-inner { transform: rotateY(180deg); }
+
+        /* Smooth View Switching */
+        .animate-fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hide Scrollbar but keep functionality */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-bgLight text-gray-900 font-sans h-screen w-full flex overflow-hidden antialiased selection:bg-primary selection:text-white transition-colors duration-300 pb-24 md:pb-0">
+
+    <aside class="hidden md:flex flex-col w-64 bg-surfaceLight border-r border-borderLight h-full z-20 transition-colors duration-300">
+        <div class="p-6 flex items-center gap-3 cursor-pointer">
+            <div class="w-10 h-10 rounded-xl bg-primary shadow-[0_4px_0_0_#3F498A] flex items-center justify-center text-white text-xl">
+                <i class="fa-solid fa-ghost"></i>
+            </div>
+            <h1 class="text-2xl font-extrabold tracking-tight text-primary">BooMondai</h1>
+        </div>
+
+        <nav class="flex-1 px-4 space-y-2 mt-4">
+            <button onclick="switchView('home')" class="w-full flex items-center gap-4 px-4 py-3 bg-indigo-50 text-primary font-bold rounded-xl border-2 border-primary/10 transition-colors nav-item" id="nav-home">
+                <i class="fa-solid fa-house text-lg w-6"></i> Home
+            </button>
+            <button onclick="switchView('decks')" class="w-full flex items-center gap-4 px-4 py-3 text-gray-500 font-semibold rounded-xl hover:bg-gray-100 transition-colors nav-item" id="nav-decks">
+                <i class="fa-solid fa-layer-group text-lg w-6"></i> Decks
+            </button>
+            <button onclick="switchView('leaderboard')" class="w-full flex items-center gap-4 px-4 py-3 text-gray-500 font-semibold rounded-xl hover:bg-gray-100 transition-colors nav-item" id="nav-leaderboard">
+                <i class="fa-solid fa-trophy text-lg w-6"></i> Leaderboard
+            </button>
+            <button onclick="switchView('research')" class="w-full flex items-center gap-4 px-4 py-3 text-gray-500 font-semibold rounded-xl hover:bg-gray-100 transition-colors nav-item" id="nav-research">
+                <i class="fa-solid fa-chart-line text-lg w-6"></i> Research
+            </button>
+            <button onclick="switchView('survey')" class="w-full flex items-center gap-4 px-4 py-3 text-gray-500 font-semibold rounded-xl hover:bg-gray-100 transition-colors nav-item" id="nav-survey">
+                <i class="fa-solid fa-clipboard-list text-lg w-6"></i> Survey
+            </button>
+        </nav>
+
+        <div class="p-4 border-t border-borderLight">
+            <div onclick="switchView('account')" class="flex items-center gap-3 p-2 rounded-xl hover:bg-gray-100 cursor-pointer transition-colors nav-item" id="nav-account">
+                <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center font-bold text-gray-600 border-2 border-white shadow-sm"> AL </div>
+                <div class="flex-1">
+                    <p class="text-sm font-bold leading-tight">Alex Learner</p>
+                    <p class="text-xs text-gray-500 font-medium">Free Plan</p>
+                </div>
+                <i class="fa-solid fa-gear text-gray-400"></i>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full relative overflow-y-auto no-scrollbar pb-24 md:pb-0">
+        
+        <header class="sticky top-0 z-10 bg-bgLight/80 backdrop-blur-md px-6 py-4 flex items-center justify-between border-b border-gray-200/50">
+            <div class="md:hidden flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center font-bold shadow-[0_2px_0_0_#3F498A]"><i class="fa-solid fa-ghost text-sm"></i></div>
+                <h1 class="text-xl font-extrabold text-primary">BooMondai</h1>
+            </div>
+            <h2 class="hidden md:block text-xl font-bold text-gray-800" id="header-title">Dashboard</h2>
+            
+            <div class="flex items-center gap-4 ml-auto">
+                <div class="flex items-center gap-2 bg-orange-100 px-3 py-1.5 rounded-full border border-orange-200">
+                    <i class="fa-solid fa-fire text-streakAmber"></i>
+                    <span class="font-bold text-orange-600 text-sm">12</span>
+                </div>
+                <button class="w-10 h-10 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-bell"></i>
+                </button>
+            </div>
+        </header>
+
+        <section id="view-home" class="view p-6 max-w-5xl w-full mx-auto space-y-8 animate-fade-in block">
+            <div class="bg-surfaceLight rounded-3xl p-6 md:p-8 border-2 border-borderLight shadow-sm flex flex-col md:flex-row items-center gap-8 relative overflow-hidden">
+                <div class="flex-1 space-y-4 z-10 text-center md:text-left">
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">Ready for your review?</h2>
+                    <p class="text-gray-500 font-medium text-lg">You have <span class="text-primary font-bold">24 cards</span> due in your JLPT N5 deck. Keep your streak alive!</p>
+                </div>
+                <button onclick="switchView('study')" class="btn-tactile w-full md:w-auto bg-primary text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-[0_6px_0_0_#3F498A] hover:bg-indigo-600 z-10 flex items-center justify-center gap-3">
+                    Start Session <i class="fa-solid fa-play"></i>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-surfaceLight rounded-2xl p-4 border border-borderLight shadow-sm">
+                    <div class="text-gray-400 mb-2"><i class="fa-solid fa-bolt text-xl"></i></div>
+                    <div class="text-2xl font-extrabold tracking-tight">1,420</div>
+                    <div class="text-xs font-bold text-gray-500 uppercase tracking-wider">Total XP</div>
+                </div>
+                <div class="bg-surfaceLight rounded-2xl p-4 border border-borderLight shadow-sm">
+                    <div class="text-primary mb-2"><i class="fa-solid fa-brain text-xl"></i></div>
+                    <div class="text-2xl font-extrabold tracking-tight">845</div>
+                    <div class="text-xs font-bold text-gray-500 uppercase tracking-wider">Cards Learned</div>
+                </div>
+                </div>
+        </section>
+
+        <section id="view-decks" class="view p-6 max-w-5xl w-full mx-auto space-y-8 animate-fade-in hidden">
+            <div class="flex items-center gap-4">
+                <div class="relative flex-1">
+                    <i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" placeholder="Search your decks..." class="w-full pl-12 pr-4 py-3 bg-surfaceLight border border-borderLight rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-all">
+                </div>
+                <button class="btn-tactile bg-primary text-white px-6 py-3 rounded-xl font-bold shadow-[0_4px_0_0_#3F498A] hover:bg-indigo-600 flex items-center gap-2">
+                    <i class="fa-solid fa-plus"></i> Create Deck
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-surfaceLight rounded-3xl p-6 border-2 border-borderLight group hover:border-primary transition-colors cursor-pointer relative snap-start">
+                    <span class="absolute top-4 right-4 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full">Premade</span>
+                    <span class="bg-gray-100 text-gray-600 text-xs font-bold px-2 py-1 rounded-md mb-4 inline-block">🇯🇵 Japanese</span>
+                    <h4 class="font-extrabold text-xl group-hover:text-primary transition-colors tracking-tight">JLPT N5 Core Vocab</h4>
+                    <p class="text-sm text-gray-500 mt-1 mb-6">By BooMondai Official</p>
+                    <div class="flex justify-between items-center text-sm font-bold border-t border-borderLight pt-4">
+                        <span class="text-primary">2,000 Cards</span>
+                        <span class="text-green-600">95% Mastery</span>
+                    </div>
+                </div>
+                <div class="bg-surfaceLight rounded-3xl p-6 border-2 border-borderLight group hover:border-primary transition-colors cursor-pointer relative snap-start">
+                    <span class="bg-gray-100 text-gray-600 text-xs font-bold px-2 py-1 rounded-md mb-4 inline-block">🇪🇸 Spanish</span>
+                    <h4 class="font-extrabold text-xl group-hover:text-primary transition-colors tracking-tight">Travel Survival Phrases</h4>
+                    <p class="text-sm text-gray-500 mt-1 mb-6">By You</p>
+                    <div class="flex justify-between items-center text-sm font-bold border-t border-borderLight pt-4">
+                        <span class="text-primary">120 Cards</span>
+                        <span class="text-orange-600">24 Due</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-study" class="view hidden flex-1 bg-bgLight flex flex-col animate-fade-in relative h-full">
+            <div class="px-6 py-4 flex items-center gap-4 border-b border-gray-200/50">
+                <button onclick="switchView('home')" class="text-gray-400 hover:text-gray-700 transition-colors">
+                    <i class="fa-solid fa-xmark text-2xl"></i>
+                </button>
+                <div class="flex-1 h-3 bg-gray-200 rounded-full overflow-hidden">
+                    <div class="h-full bg-primary rounded-full w-2/3 transition-all duration-500 relative">
+                        <div class="absolute top-0.5 left-2 right-2 h-0.5 bg-white/30 rounded-full"></div>
+                    </div>
+                </div>
+                <div class="text-xs font-bold text-gray-400 uppercase tracking-widest">Core 2K</div>
+            </div>
+
+            <div class="flex-1 flex flex-col justify-center px-6 pb-24 max-w-3xl w-full mx-auto perspective-1000">
+                <div id="flashcard" class="w-full aspect-[4/3] md:aspect-video max-h-[400px] cursor-pointer" onclick="flipCard()">
+                    <div class="flip-inner relative w-full h-full flip-transition transform-style-3d shadow-xl rounded-3xl">
+                        <div class="absolute inset-0 backface-hidden bg-surfaceLight border-2 border-borderLight rounded-3xl flex flex-col items-center justify-center p-8">
+                            <h2 class="text-6xl md:text-8xl font-extrabold text-gray-900 mb-4 tracking-tight">勉強</h2>
+                            <p class="text-gray-400 font-medium animate-pulse mt-auto absolute bottom-8">
+                                <i class="fa-solid fa-hand-pointer mr-2"></i> Tap to reveal
+                            </p>
+                        </div>
+                        <div class="absolute inset-0 backface-hidden rotate-y-180 bg-surfaceLight border-2 border-primary rounded-3xl flex flex-col items-center justify-center p-8">
+                            <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-2 tracking-tight">勉強</h2>
+                            <h3 class="text-2xl md:text-3xl font-bold text-primary mb-4">benkyou</h3>
+                            <div class="w-16 h-1 bg-gray-200 rounded-full mb-4"></div>
+                            <p class="text-xl text-gray-600 font-medium">study; studying</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="rating-buttons" class="hidden absolute bottom-0 left-0 right-0 p-6 bg-surfaceLight border-t border-borderLight rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+                <div class="grid grid-cols-4 gap-2 md:gap-4 max-w-2xl mx-auto">
+                    <button class="btn-tactile bg-red-50 text-btnAgain border-2 border-red-200 shadow-[0_4px_0_0_#ffcdd2] rounded-2xl p-3 flex flex-col items-center hover:bg-red-100">
+                        <span class="font-extrabold">Again</span><span class="text-xs opacity-70">1m</span>
+                    </button>
+                    <button class="btn-tactile bg-orange-50 text-btnHard border-2 border-orange-200 shadow-[0_4px_0_0_#ffe0b2] rounded-2xl p-3 flex flex-col items-center hover:bg-orange-100">
+                        <span class="font-extrabold">Hard</span><span class="text-xs opacity-70">6m</span>
+                    </button>
+                    <button class="btn-tactile bg-green-50 text-btnGood border-2 border-green-200 shadow-[0_4px_0_0_#c8e6c9] rounded-2xl p-3 flex flex-col items-center hover:bg-green-100">
+                        <span class="font-extrabold">Good</span><span class="text-xs opacity-70">10m</span>
+                    </button>
+                    <button class="btn-tactile bg-blue-50 text-btnEasy border-2 border-blue-200 shadow-[0_4px_0_0_#bbdefb] rounded-2xl p-3 flex flex-col items-center hover:bg-blue-100">
+                        <span class="font-extrabold">Easy</span><span class="text-xs opacity-70">4d</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-leaderboard" class="view p-6 max-w-5xl w-full mx-auto animate-fade-in hidden">
+            <div class="flex justify-center items-end gap-3 h-52 mb-8 border-b-2 border-borderLight pb-6 snap-start">
+                <div class="flex flex-col items-center w-28 text-center">
+                    <div class="w-16 h-16 rounded-full bg-gray-200 border-4 border-white shadow-md flex items-center justify-center font-bold text-gray-600 mb-2">SJ</div>
+                    <p class="font-bold text-sm">Sarah Jones</p>
+                    <p class="text-xs text-streakAmber font-extrabold">1,410 XP</p>
+                    <div class="w-full h-16 bg-gray-200 opacity-30 rounded-t-lg mt-2"></div>
+                </div>
+                <div class="flex flex-col items-center w-36 text-center">
+                    <i class="fa-solid fa-crown text-3xl text-streakAmber mb-1 drop-shadow-md"></i>
+                    <div class="w-20 h-20 rounded-full bg-surfaceLight border-4 border-streakAmber shadow-lg flex items-center justify-center font-bold text-streakAmber mb-2 text-2xl">Y</div>
+                    <p class="font-extrabold text-primary text-base">Yoda_Master</p>
+                    <p class="text-xs text-streakAmber font-extrabold">1,850 XP</p>
+                    <div class="w-full h-24 bg-streakAmber rounded-t-lg mt-2"></div>
+                </div>
+                <div class="flex flex-col items-center w-28 text-center snap-start">
+                    <div class="w-16 h-16 rounded-full bg-gray-200 border-4 border-white shadow-md flex items-center justify-center font-bold text-gray-600 mb-2">AL</div>
+                    <p class="font-bold text-sm">You (Alex)</p>
+                    <p class="text-xs text-streakAmber font-extrabold">1,405 XP</p>
+                    <div class="w-full h-12 bg-gray-200 opacity-20 rounded-t-lg mt-2"></div>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <div class="bg-surfaceLight p-4 rounded-xl border border-borderLight flex items-center gap-4 shadow-sm snap-start">
+                    <span class="font-bold text-xl text-gray-400 w-6 text-center">4</span>
+                    <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold">K</div>
+                    <p class="font-semibold text-lg flex-1">Kenji_24</p>
+                    <div class="text-right">
+                        <p class="font-extrabold text-gray-900">1,390 XP</p>
+                        <p class="text-xs font-bold text-streakAmber tracking-wide uppercase">🔥 8</p>
+                    </div>
+                </div>
+                <div class="bg-indigo-50 p-4 rounded-xl border-2 border-primary flex items-center gap-4 shadow-sm snap-start">
+                    <span class="font-bold text-xl text-primary w-6 text-center">5</span>
+                    <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold">AL</div>
+                    <p class="font-bold text-lg flex-1 text-primary">Alex Learner (You)</p>
+                    <div class="text-right">
+                        <p class="font-extrabold text-primary">1,405 XP</p>
+                        <p class="text-xs font-bold text-streakAmber tracking-wide uppercase">🔥 12</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-research" class="view p-6 max-w-5xl w-full mx-auto animate-fade-in hidden">
+            <div class="flex gap-2 border-b-2 border-borderLight mb-8">
+                <button class="pb-3 px-1 border-b-4 border-primary text-primary font-bold">Codes</button>
+                <button class="pb-3 px-1 text-gray-500 font-semibold hover:text-gray-900">Participants</button>
+                <button class="pb-3 px-1 text-gray-500 font-semibold hover:text-gray-900">Results</button>
+            </div>
+
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-extrabold text-gray-900 tracking-tight">Active Access Codes</h3>
+                <button class="btn-tactile bg-primary text-white px-5 py-3 rounded-xl font-bold shadow-[0_4px_0_0_#3F498A] hover:bg-indigo-600 flex items-center gap-2">
+                    <i class="fa-solid fa-plus"></i> Generate Code
+                </button>
+            </div>
+
+            <div class="bg-surfaceLight rounded-2xl border border-borderLight overflow-hidden shadow-sm">
+                <table class="w-full text-left">
+                    <thead class="bg-gray-50 border-b border-borderLight">
+                        <tr class="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                            <th class="p-4">Code</th><th class="p-4">Created</th><th class="p-4">Role Unlock</th><th class="p-4">Language</th><th class="p-4">Used</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-borderLight">
+                        <tr>
+                            <td class="p-4 font-mono font-bold text-primary">JPTN5-SR24-A</td><td class="p-4 text-sm">Apr 12</td><td class="p-4"><span class="bg-indigo-50 text-primary px-3 py-1 text-xs font-bold rounded-full border border-indigo-100">Group A (FSRS)</span></td><td class="p-4 text-sm">Japanese</td><td class="p-4 text-sm">12 / 20</td>
+                        </tr>
+                        <tr>
+                            <td class="p-4 font-mono font-bold text-primary">JPTN5-CTRL-B</td><td class="p-4 text-sm">Apr 12</td><td class="p-4"><span class="bg-gray-100 text-gray-600 px-3 py-1 text-xs font-bold rounded-full border border-borderLight">Group B (Control)</span></td><td class="p-4 text-sm">Japanese</td><td class="p-4 text-sm">8 / 20</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="view-survey" class="view p-6 max-w-5xl w-full mx-auto space-y-8 animate-fade-in hidden pb-20">
+            <div class="flex justify-between items-center border-b border-borderLight pb-4">
+                <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight">Experience Survey</h2>
+                <div class="text-sm font-bold text-gray-500">3 of 15 answered</div>
+            </div>
+
+            <p class="text-lg text-gray-600 max-w-3xl font-medium">Please rate your agreement with the following statements. Your input is critical for language learning research.</p>
+
+            <div class="space-y-6">
+                <div class="bg-surfaceLight p-6 md:p-8 rounded-3xl border-2 border-borderLight shadow-sm">
+                    <p class="font-bold text-lg mb-6 text-gray-900">1. I found the spaced repetition system helpful for remembering new words.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-3 max-w-4xl">
+                        <label class="btn-tactile cursor-pointer bg-surfacemix border-2 border-surfacemix rounded-xl p-4 flex flex-col items-center justify-center text-center text-gray-700 hover:border-borderLight">
+                            <input type="radio" name="q1" class="accent-primary w-6 h-6 mb-2">
+                            <span class="text-sm font-semibold">1 - Strongly Disagree</span>
+                        </label>
+                        <label class="btn-tactile cursor-pointer bg-surfacemix border-2 border-borderLight rounded-xl p-4 flex flex-col items-center justify-center text-center text-gray-700 hover:border-borderLight">
+                            <input type="radio" name="q1" class="accent-primary w-6 h-6 mb-2">
+                            <span class="text-sm font-medium opacity-80">2</span>
+                        </label>
+                        <label class="btn-tactile cursor-pointer bg-surfaceLight border-2 border-primary rounded-xl p-4 flex flex-col items-center justify-center text-center text-primary font-bold">
+                            <input type="radio" name="q1" class="accent-primary w-6 h-6 mb-2" checked>
+                            <span class="text-sm">3 - Neutral</span>
+                        </label>
+                        <label class="btn-tactile cursor-pointer bg-surfacemix border-2 border-borderLight rounded-xl p-4 flex flex-col items-center justify-center text-center text-gray-700 hover:border-borderLight">
+                            <input type="radio" name="q1" class="accent-primary w-6 h-6 mb-2">
+                            <span class="text-sm font-medium opacity-80">4</span>
+                        </label>
+                        <label class="btn-tactile cursor-pointer bg-surfacemix border-2 border-surfacemix rounded-xl p-4 flex flex-col items-center justify-center text-center text-gray-700 hover:border-borderLight">
+                            <input type="radio" name="q1" class="accent-primary w-6 h-6 mb-2">
+                            <span class="text-sm font-semibold">5 - Strongly Agree</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-tactile w-full bg-primary text-white p-4 rounded-2xl font-bold text-lg shadow-[0_6px_0_0_#3F498A] hover:bg-indigo-600 opacity-50 cursor-not-allowed">
+                Submit Answers
+            </button>
+        </section>
+
+        <section id="view-account" class="view p-6 max-w-5xl w-full mx-auto space-y-8 animate-fade-in hidden">
+            <div class="bg-surfaceLight rounded-3xl p-8 border border-borderLight shadow-sm flex items-center gap-6">
+                <div class="w-24 h-24 rounded-full bg-primary flex items-center justify-center font-bold text-gray-600 border-4 border-white shadow-md text-3xl">AL</div>
+                <div class="flex-1">
+                    <h2 class="text-3xl font-extrabold tracking-tight">Alex Learner</h2>
+                    <p class="text-gray-500 font-medium">alex.l@boomondai.com</p>
+                    <div class="flex gap-2 mt-3">
+                        <span class="bg-indigo-50 text-primary text-xs font-bold px-3 py-1 rounded-full border border-indigo-100">Group A</span>
+                        <span class="bg-surfacemix text-gray-600 text-xs font-bold px-3 py-1 rounded-full border border-borderLight">🇯🇵 Japanese</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+                <div class="bg-surfaceLight rounded-2xl p-4 border border-borderLight shadow-sm text-center">
+                    <div class="text-3xl text-streakAmber mb-1"><i class="fa-solid fa-fire"></i></div>
+                    <div class="text-2xl font-extrabold tracking-tight">12</div>
+                    <div class="text-xs font-bold text-gray-500 uppercase tracking-wider">Current Streak</div>
+                </div>
+                </div>
+            
+            <button class="btn-tactile w-full bg-red-50 text-red-600 p-4 rounded-xl font-bold border border-red-200 hover:bg-red-100 mt-8">Sign Out</button>
+        </section>
+    </main>
+
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-surfaceLight border-t border-borderLight pb-safe z-50 px-6 py-3 flex justify-between items-center shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+        <button onclick="switchView('home')" class="flex flex-col items-center gap-1 text-primary nav-item-mob active" id="nav-mob-home">
+            <i class="fa-solid fa-house text-xl"></i><span class="text-[10px] font-bold">Home</span>
+        </button>
+        <button onclick="switchView('decks')" class="flex flex-col items-center gap-1 text-gray-400 nav-item-mob" id="nav-mob-decks">
+            <i class="fa-solid fa-layer-group text-xl"></i><span class="text-[10px] font-bold">Decks</span>
+        </button>
+        <button onclick="switchView('study')" class="btn-tactile w-14 h-14 rounded-full bg-primary text-white shadow-[0_4px_0_0_#3F498A] flex items-center justify-center text-2xl -mt-8 border-4 border-surfaceLight nav-item-mob" id="nav-mob-study">
+            <i class="fa-solid fa-play ml-1"></i>
+        </button>
+        <button onclick="switchView('leaderboard')" class="flex flex-col items-center gap-1 text-gray-400 nav-item-mob" id="nav-mob-leaderboard">
+            <i class="fa-solid fa-trophy text-xl"></i><span class="text-[10px] font-bold">Rank</span>
+        </button>
+        <button onclick="switchView('account')" class="flex flex-col items-center gap-1 text-gray-400 nav-item-mob" id="nav-mob-account">
+            <div class="w-6 h-6 rounded-full bg-gray-200 border border-gray-300 flex items-center justify-center text-[10px] font-bold text-gray-600">AL</div>
+            <span class="text-[10px] font-bold">Profile</span>
+        </button>
+    </nav>
+
+    <script>
+        const titles = {
+            'home': 'Home Dashboard', 'decks': 'Your Deck Library', 'study': 'Study Session', 'leaderboard': 'Global Rankings', 'research': 'Researcher Portal', 'survey': 'Research Surveys', 'account': 'Your Account'
+        };
+
+        // Navigation and View Switching Logic
+        function switchView(viewName) {
+            // Hide all views
+            document.querySelectorAll('.view').forEach(el => el.classList.add('hidden'));
+            // Reset flashcard state if leaving study
+            if(viewName !== 'study') {
+                document.getElementById('flashcard').classList.remove('is-flipped');
+                document.getElementById('rating-buttons').classList.add('hidden');
+            }
+            // Show new view
+            const activeView = document.getElementById('view-' + viewName);
+            activeView.classList.remove('hidden');
+            activeView.classList.add('animate-fade-in');
+
+            // Update Header
+            document.getElementById('header-title').innerText = titles[viewName];
+
+            // Update Desktop Nav Active State
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('bg-indigo-50', 'text-primary', 'font-bold'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.add('text-gray-500', 'font-semibold'));
+            const desktopNav = document.getElementById('nav-' + viewName);
+            if(desktopNav){
+                desktopNav.classList.remove('text-gray-500', 'font-semibold');
+                desktopNav.classList.add('bg-indigo-50', 'text-primary', 'font-bold');
+            }
+
+            // Update Mobile Nav Active State
+            document.querySelectorAll('.nav-item-mob').forEach(el => {
+                if(!el.id.includes('study')) el.classList.remove('text-primary'); el.classList.add('text-gray-400');
+            });
+            const mobileNav = document.getElementById('nav-mob-' + viewName);
+            if(mobileNav && !viewName.includes('study')){
+                mobileNav.classList.remove('text-gray-400'); mobileNav.classList.add('text-primary');
+            }
+        }
+
+        // Flashcard Flip Logic
+        function flipCard() {
+            const card = document.getElementById('flashcard');
+            const buttons = document.getElementById('rating-buttons');
+            card.classList.add('is-flipped');
+            setTimeout(() => {
+                buttons.classList.remove('hidden');
+                buttons.classList.add('animate-fade-in');
+            }, 300);
+        }
+    </script>
+</body>
+</html>
