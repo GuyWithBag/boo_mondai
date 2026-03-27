@@ -6,13 +6,8 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:hive_ce/hive_ce.dart';
-import 'package:boo_mondai/models/user_profile.dart';
-import 'package:boo_mondai/models/deck.dart';
-import 'package:boo_mondai/models/deck_card.dart';
-import 'package:boo_mondai/models/fsrs_card_state.dart';
-import 'package:boo_mondai/models/review_log_entry.dart';
-import 'package:boo_mondai/models/streak.dart';
 import 'package:boo_mondai/services/app_exception.dart';
+import 'package:boo_mondai/models/models.dart';
 
 class HiveService {
   static const _profileBox = 'profile';
@@ -93,7 +88,7 @@ class HiveService {
   // ── Cards ───────────────────────────────────────────
   Future<void> saveCards(String deckId, List<DeckCard> cards) async {
     for (final card in cards) {
-      await _cards.put(card.id, Map<String, dynamic>.from(card.toJson()));
+      await _cards.put(card.id, Map<String, dynamic>.from(card.toCacheJson()));
     }
   }
 
