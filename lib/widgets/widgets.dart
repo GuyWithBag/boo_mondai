@@ -7,3 +7,5 @@ export 'quiz_question_card.dart';
 export 'responsive_scaffold.dart';
 export 'self_rating_bottom_sheet.dart';
 export 'streak_badge.dart';
+export 'browser_deck_detail_sheet.dart';
+export 'meta_chip.dart';

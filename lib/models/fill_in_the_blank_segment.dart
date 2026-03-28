@@ -5,8 +5,7 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-/// One segment of a [QuestionType.fillInTheBlanks] or
-/// [QuestionType.readAndComplete] card.
+/// One segment of a [QuestionType.fillInTheBlanks] card.
 ///
 /// [fullText] is the complete sentence. [blankStart] and [blankEnd] are
 /// character indices into [fullText] that mark the hidden word(s).

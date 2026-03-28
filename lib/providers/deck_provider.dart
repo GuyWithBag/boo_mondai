@@ -52,6 +52,17 @@ class DeckProvider extends ChangeNotifier {
     }
   }
 
+  /// Loads the user's decks from Hive synchronously.
+  ///
+  /// Call this on page mount to show cached data immediately without waiting
+  /// for the network. Returns the number of decks loaded so callers can
+  /// decide whether to trigger a network fetch.
+  int loadFromCache(String userId) {
+    _userDecks = _hiveService.getUserDecks(userId);
+    notifyListeners();
+    return _userDecks.length;
+  }
+
   Future<void> fetchUserDecks(String userId) async {
     _isLoading = true;
     _error = null;
@@ -60,6 +71,10 @@ class DeckProvider extends ChangeNotifier {
     try {
       final data = await _supabaseService.fetchUserDecks(userId);
       _userDecks = data.map(Deck.fromJson).toList();
+      // Cache user decks for offline / cache-first access
+      for (final deck in _userDecks) {
+        await _hiveService.saveDeck(deck);
+      }
     } on AppException catch (e) {
       _error = e.message;
     } finally {
@@ -71,9 +86,10 @@ class DeckProvider extends ChangeNotifier {
   Future<Deck?> createDeck(
     String userId,
     String title,
-    String description,
-    String targetLanguage,
-  ) async {
+    String shortDescription,
+    String targetLanguage, {
+    bool isPublic = true,
+  }) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
@@ -84,10 +100,11 @@ class DeckProvider extends ChangeNotifier {
         'id': _uuid.v4(),
         'creator_id': userId,
         'title': title,
-        'description': description,
+        'short_description': shortDescription,
+        'long_description': '',
         'target_language': targetLanguage,
         'is_premade': false,
-        'is_public': true,
+        'is_public': isPublic,
         'card_count': 0,
         'created_at': now.toIso8601String(),
         'updated_at': now.toIso8601String(),
@@ -96,6 +113,7 @@ class DeckProvider extends ChangeNotifier {
       final deck = Deck.fromJson(result);
       _userDecks = [deck, ..._userDecks];
       _decks = [deck, ..._decks];
+      await _hiveService.saveDeck(deck);
       return deck;
     } on AppException catch (e) {
       _error = e.message;
@@ -119,15 +137,129 @@ class DeckProvider extends ChangeNotifier {
     }
   }
 
+  /// Deletes [deckId] from Hive and memory immediately, then attempts a
+  /// remote delete. If offline the remote delete is silently swallowed —
+  /// the sync system will clean it up on the next push.
   Future<void> deleteDeck(String deckId) async {
     _error = null;
+    _decks = _decks.where((d) => d.id != deckId).toList();
+    _userDecks = _userDecks.where((d) => d.id != deckId).toList();
+    await _hiveService.deleteDeck(deckId);
+    notifyListeners();
+
     try {
       await _supabaseService.deleteDeck(deckId);
-      _decks = _decks.where((d) => d.id != deckId).toList();
-      _userDecks = _userDecks.where((d) => d.id != deckId).toList();
-      notifyListeners();
+    } on AppException {
+      // Offline — remote will be deleted on next sync
+    }
+  }
+
+  /// Copies [sourceDeck] into the current user's My Decks.
+  ///
+  /// - Creates a new deck owned by [userId] with the same metadata.
+  /// - Fetches all source cards and inserts copies, each with
+  ///   [DeckCard.sourceCardId] pointing to the original.
+  Future<Deck?> copyDeck(String userId, Deck sourceDeck) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final now = DateTime.now();
+      final newDeckId = _uuid.v4();
+      final deckData = {
+        'id': newDeckId,
+        'creator_id': userId,
+        'title': sourceDeck.title,
+        'short_description': sourceDeck.shortDescription,
+        'long_description': sourceDeck.longDescription,
+        'target_language': sourceDeck.targetLanguage,
+        'tags': sourceDeck.tags,
+        'is_premade': false,
+        'is_public': false,
+        'card_count': 0,
+        'source_deck_id': sourceDeck.id,
+        'created_at': now.toIso8601String(),
+        'updated_at': now.toIso8601String(),
+      };
+      final deckResult = await _supabaseService.insertDeck(deckData);
+      final newDeck = Deck.fromJson(deckResult);
+
+      // Copy cards with source reference
+      final sourceCards =
+          await _supabaseService.fetchCards(sourceDeck.id);
+      for (var i = 0; i < sourceCards.length; i++) {
+        final src = DeckCard.fromJson(sourceCards[i]);
+        final newCardId = _uuid.v4();
+        await _supabaseService.insertCard({
+          'id': newCardId,
+          'deck_id': newDeckId,
+          'card_type': src.cardType.toJson(),
+          'question_type': src.questionType.toJson(),
+          'sort_order': i,
+          'source_card_id': src.id,
+          'created_at': now.toIso8601String(),
+        });
+
+        for (final note in src.notes) {
+          await _supabaseService.insertNote({
+            'id': _uuid.v4(),
+            'card_id': newCardId,
+            'front_text': note.frontText,
+            'back_text': note.backText,
+            'front_image_url': note.frontImageUrl,
+            'back_image_url': note.backImageUrl,
+            'front_audio_url': note.frontAudioUrl,
+            'back_audio_url': note.backAudioUrl,
+            'is_reverse': note.isReverse,
+            'created_at': now.toIso8601String(),
+          });
+        }
+        for (var j = 0; j < src.options.length; j++) {
+          final o = src.options[j];
+          await _supabaseService.insertMCOption({
+            'id': _uuid.v4(),
+            'card_id': newCardId,
+            'option_text': o.optionText,
+            'is_correct': o.isCorrect,
+            'display_order': j,
+          });
+        }
+        for (final seg in src.segments) {
+          await _supabaseService.insertFITBSegment({
+            'id': _uuid.v4(),
+            'card_id': newCardId,
+            'full_text': seg.fullText,
+            'blank_start': seg.blankStart,
+            'blank_end': seg.blankEnd,
+            'correct_answer': seg.correctAnswer,
+          });
+        }
+        for (var j = 0; j < src.pairs.length; j++) {
+          final p = src.pairs[j];
+          await _supabaseService.insertMMPair({
+            'id': _uuid.v4(),
+            'card_id': newCardId,
+            'term': p.term,
+            'match': p.match,
+            'is_auto_picked': false,
+            'display_order': j,
+          });
+        }
+      }
+
+      // Update card_count
+      final cardCount = sourceCards.length;
+      await _supabaseService.updateDeck(
+          newDeckId, {'card_count': cardCount});
+      final updated = newDeck.copyWith(cardCount: cardCount);
+      _userDecks = [updated, ..._userDecks];
+      return updated;
     } on AppException catch (e) {
       _error = e.message;
+      return null;
+    } finally {
+      _isLoading = false;
       notifyListeners();
     }
   }

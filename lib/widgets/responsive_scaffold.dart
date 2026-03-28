@@ -22,9 +22,9 @@ class ResponsiveScaffold extends HookWidget {
     required this.child,
   });
 
-  static const _routes = ['/', '/decks', '/review', '/leaderboard', '/account'];
-  // Indices 1 (Decks), 2 (Review), 3 (Leaderboard) require auth
-  static const _authRequiredIndices = {1, 2, 3};
+  static const _routes = ['/', '/online-deck-browser', '/my-decks', '/review', '/account'];
+  // Indices 2 (My Decks), 3 (Review) require auth; Browse (1) is public
+  static const _authRequiredIndices = {2, 3};
 
   @override
   Widget build(BuildContext context) {
@@ -43,18 +43,14 @@ class ResponsiveScaffold extends HookWidget {
 
       final goTo = _routes[index];
       context.go(goTo);
-      if (goTo == '/decks') {
-        isCreateDeck.value = true;
-      } else {
-        isCreateDeck.value = false;
-      }
+      isCreateDeck.value = goTo == '/my-decks';
     }
 
     FloatingActionButton? getFloatingActionButton() {
       return isCreateDeck.value
           ? FloatingActionButton(
               onPressed: () {
-                context.push('/decks/create');
+                context.push('/my-decks/create');
               },
               child: Icon(Icons.add_rounded),
             )
@@ -110,26 +106,23 @@ class ResponsiveScaffold extends HookWidget {
         selectedIcon: Icon(Icons.home),
         label: 'Home',
       ),
+      const NavigationDestination(
+        icon: Icon(Icons.explore_outlined),
+        selectedIcon: Icon(Icons.explore),
+        label: 'Browse',
+      ),
       NavigationDestination(
         icon: Icon(
           Icons.library_books_outlined,
           color: isAuth ? null : disabledColor,
         ),
         selectedIcon: const Icon(Icons.library_books),
-        label: 'Decks',
+        label: 'My Decks',
       ),
       NavigationDestination(
         icon: Icon(Icons.replay_outlined, color: isAuth ? null : disabledColor),
         selectedIcon: const Icon(Icons.replay),
         label: 'Review',
-      ),
-      NavigationDestination(
-        icon: Icon(
-          Icons.leaderboard_outlined,
-          color: isAuth ? null : disabledColor,
-        ),
-        selectedIcon: const Icon(Icons.leaderboard),
-        label: 'Leaderboard',
       ),
       const NavigationDestination(
         icon: Icon(Icons.person_outlined),
@@ -146,6 +139,11 @@ class ResponsiveScaffold extends HookWidget {
         selectedIcon: Icon(Icons.home),
         label: Text('Home'),
       ),
+      const NavigationRailDestination(
+        icon: Icon(Icons.explore_outlined),
+        selectedIcon: Icon(Icons.explore),
+        label: Text('Browse'),
+      ),
       NavigationRailDestination(
         icon: Icon(
           Icons.library_books_outlined,
@@ -153,7 +151,7 @@ class ResponsiveScaffold extends HookWidget {
         ),
         selectedIcon: const Icon(Icons.library_books),
         label: Text(
-          'Decks',
+          'My Decks',
           style: isAuth ? null : const TextStyle(color: Colors.grey),
         ),
         disabled: !isAuth,
@@ -163,18 +161,6 @@ class ResponsiveScaffold extends HookWidget {
         selectedIcon: const Icon(Icons.replay),
         label: Text(
           'Review',
-          style: isAuth ? null : const TextStyle(color: Colors.grey),
-        ),
-        disabled: !isAuth,
-      ),
-      NavigationRailDestination(
-        icon: Icon(
-          Icons.leaderboard_outlined,
-          color: isAuth ? null : Colors.grey,
-        ),
-        selectedIcon: const Icon(Icons.leaderboard),
-        label: Text(
-          'Leaderboard',
           style: isAuth ? null : const TextStyle(color: Colors.grey),
         ),
         disabled: !isAuth,

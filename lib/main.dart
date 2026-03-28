@@ -45,6 +45,7 @@ Future<void> main() async {
   runApp(
     MultiProvider(
       providers: [
+        Provider<SupabaseService>.value(value: supabaseService),
         ChangeNotifierProvider.value(value: authProvider),
         ChangeNotifierProvider(
           create: (_) => DeckProvider(

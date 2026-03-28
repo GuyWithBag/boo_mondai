@@ -8,7 +8,7 @@
 /// Stores the presentable content of one side of a [DeckCard].
 ///
 /// A [CardType.normal] card generates one Note ([isReverse] = false).
-/// A [CardType.reversible] card generates one Note ([isReverse] = true).
+/// A [CardType.reversed] card generates one Note ([isReverse] = true).
 /// A [CardType.both] card generates two Notes — one with each value of [isReverse].
 ///
 /// [QuestionType.matchMadness] cards do NOT generate Notes.

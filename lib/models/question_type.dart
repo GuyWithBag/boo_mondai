@@ -7,58 +7,63 @@
 
 /// The quiz interaction style presented to the learner.
 ///
-/// - [readAndSelect]    → see the front, type/match the back (default)
-/// - [multipleChoice]   → see the front, pick from [MultipleChoiceOption]s
-/// - [fillInTheBlanks]  → sentence with a single blank; answer from [FillInTheBlankSegment]
-/// - [readAndComplete]  → sentence with multiple blanks; answers from [FillInTheBlankSegment]s
-/// - [listenAndType]    → hear the front audio, type the answer
-/// - [matchMadness]     → drag-and-drop term↔match pairs from [MatchMadnessPair]s
+/// - [flashcard]      → show front, learner reveals back and self-grades (no typing)
+/// - [identification] → show front, learner must type an accepted answer; self-grade follows
+/// - [multipleChoice] → show front, pick from [MultipleChoiceOption]s
+/// - [fillInTheBlanks]→ sentence with one or more blanks; type each missing word
+/// - [wordScramble]   → tap shuffled word chips to reconstruct the original sentence
+/// - [matchMadness]   → drag-and-drop term↔match pairs from [MatchMadnessPair]s
 ///
 /// Constraints:
-/// - [multipleChoice], [fillInTheBlanks], [readAndComplete], [matchMadness]
-///   → CardType must be [CardType.normal] (cannot be reversed)
-/// - [listenAndType] → reversible only when both front & back have audio
-/// - [matchMadness]  → Notes are NOT generated; content lives in [MatchMadnessPair]s only
+/// - Only [flashcard] supports [CardType.reversed] / [CardType.both].
+///   All other types must use [CardType.normal].
+/// - [matchMadness] → Notes are NOT generated; content lives in [MatchMadnessPair]s only.
+/// - [wordScramble] → Note.frontText stores the full sentence; words are split at runtime.
+/// - [identification] → Note.frontText is the prompt; acceptable answers are stored
+///   in [DeckCard.identificationAnswer] (comma-separated), not in Note.backText.
 enum QuestionType {
-  readAndSelect,
+  flashcard,
+  identification,
   multipleChoice,
   fillInTheBlanks,
-  readAndComplete,
-  listenAndType,
+  wordScramble,
   matchMadness;
 
   static const _fromDb = <String, QuestionType>{
-    'read_and_select': readAndSelect,
+    'flashcard': flashcard,
+    'read_and_select': flashcard, // legacy alias — data migrated before rename
+    'identification': identification,
     'multiple_choice': multipleChoice,
     'fill_in_the_blanks': fillInTheBlanks,
-    'read_and_complete': readAndComplete,
-    'listen_and_type': listenAndType,
+    'word_scramble': wordScramble,
     'match_madness': matchMadness,
   };
 
-  static QuestionType fromString(String? s) =>
-      _fromDb[s] ?? readAndSelect;
+  static QuestionType fromString(String? s) => _fromDb[s] ?? flashcard;
 
   String toJson() => switch (this) {
-        readAndSelect => 'read_and_select',
+        flashcard => 'flashcard',
+        identification => 'identification',
         multipleChoice => 'multiple_choice',
         fillInTheBlanks => 'fill_in_the_blanks',
-        readAndComplete => 'read_and_complete',
-        listenAndType => 'listen_and_type',
+        wordScramble => 'word_scramble',
         matchMadness => 'match_madness',
       };
 
-  /// True when the question type supports [CardType.reversible] / [CardType.both].
-  bool get canBeReversible =>
-      this == readAndSelect || this == listenAndType;
+  /// True when this type supports [CardType.reversed] / [CardType.both].
+  /// Currently only [flashcard].
+  bool get canBeReversible => this == flashcard;
 
-  /// True when the card uses [MultipleChoiceOption]s instead of free-text.
+  /// True when the card uses [MultipleChoiceOption]s.
   bool get usesOptions => this == multipleChoice;
 
   /// True when the card uses [FillInTheBlankSegment]s.
-  bool get usesSegments =>
-      this == fillInTheBlanks || this == readAndComplete;
+  bool get usesSegments => this == fillInTheBlanks;
 
   /// True when the card uses [MatchMadnessPair]s (and no Notes).
   bool get usesPairs => this == matchMadness;
+
+  /// True when accepted answers are stored in [DeckCard.identificationAnswer]
+  /// rather than in Note.backText.
+  bool get usesIdentificationAnswer => this == identification;
 }

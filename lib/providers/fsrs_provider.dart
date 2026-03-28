@@ -25,14 +25,23 @@ class FsrsProvider extends ChangeNotifier {
         _hiveService = hiveService,
         _supabaseService = supabaseService;
 
+  static const _earlyReviewWindow = Duration(hours: 1);
+
   List<FsrsCardState> _dueCards = [];
+  List<FsrsCardState> _upcomingCards = [];
   final Map<String, DeckCard> _deckCardCache = {};
   int _currentIndex = 0;
   bool _isLoading = false;
   String? _error;
 
   List<FsrsCardState> get dueCards => List.unmodifiable(_dueCards);
+
+  /// Cards due within the next hour (immediately reviewable).
   int get dueCount => _dueCards.length;
+
+  /// Cards due more than an hour from now (shown with countdown, locked).
+  List<FsrsCardState> get upcomingCards => List.unmodifiable(_upcomingCards);
+
   bool get isLoading => _isLoading;
   String? get error => _error;
 
@@ -54,17 +63,20 @@ class FsrsProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _dueCards = _hiveService.getDueCards(userId, DateTime.now());
+      final now = DateTime.now();
+      final windowEnd = now.add(_earlyReviewWindow);
+      final all = _hiveService.getAllFsrsCards(userId);
 
-      // Load associated DeckCards
-      for (final fsrsCard in _dueCards) {
-        if (!_deckCardCache.containsKey(fsrsCard.cardId)) {
-          final cards = _hiveService.getCards(''); // search all
-          for (final dc in cards) {
-            _deckCardCache[dc.id] = dc;
-          }
-          break; // only need to load once
-        }
+      _dueCards = all.where((c) => !c.due.isAfter(windowEnd)).toList();
+      _upcomingCards = all
+          .where((c) => c.due.isAfter(windowEnd))
+          .toList()
+        ..sort((a, b) => a.due.compareTo(b.due));
+
+      // Load all cached DeckCards once
+      final allDeckCards = _hiveService.getCards('');
+      for (final dc in allDeckCards) {
+        _deckCardCache[dc.id] = dc;
       }
     } on AppException catch (e) {
       _error = e.message;

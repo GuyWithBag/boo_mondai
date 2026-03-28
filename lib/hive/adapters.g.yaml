@@ -23,7 +23,7 @@ types:
         index: 6
   Deck:
     typeId: 1
-    nextIndex: 10
+    nextIndex: 19
     fields:
       id:
         index: 0
@@ -31,7 +31,7 @@ types:
         index: 1
       title:
         index: 2
-      description:
+      shortDescription:
         index: 3
       targetLanguage:
         index: 4
@@ -45,6 +45,23 @@ types:
         index: 8
       updatedAt:
         index: 9
+      longDescription:
+        index: 10
+      isUneditable:
+        index: 11
+      version:
+        index: 12
+      buildNumber:
+        index: 13
+      tags:
+        index: 14
+      sourceDeckCreatorId:
+        index: 15
+      sourceDeckId:
+        index: 16
+      # index 17 reserved (was sourceDeckCreatorName — no longer used)
+      hiddenInBrowser:
+        index: 18
   DeckCard:
     typeId: 2
     nextIndex: 14

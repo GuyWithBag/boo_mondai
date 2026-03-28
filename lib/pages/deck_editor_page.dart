@@ -1,6 +1,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// PATH: lib/pages/card_editor_page.dart
-// PURPOSE: Add or edit a card — supports all six question types
+// PATH: lib/pages/deck_editor_page.dart
+// PURPOSE: Edit all cards in a deck — sidebar shows all cards, clicking
+//          one selects it; "+" creates a blank card and immediately selects it
 // PROVIDERS: CardProvider
 // HOOKS: useState, useEffect, useMemoized, useFocusNode, useTextEditingController, useListenable
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -30,21 +31,27 @@ List<MultipleChoiceOption> _buildOptions(List<_McOpt> opts) => [
       ),
 ];
 
-List<FillInTheBlankSegment> _buildSegment(String sentence, String answer) {
+/// Splits [raw] on commas, trims whitespace, drops empty entries.
+List<String> _splitFitbAnswers(String raw) =>
+    raw.split(',').map((a) => a.trim()).where((a) => a.isNotEmpty).toList();
+
+List<FillInTheBlankSegment> _buildSegments(String sentence, String answersRaw) {
   final s = sentence.trim();
-  final a = answer.trim();
-  if (s.isEmpty || a.isEmpty) return [];
-  final idx = s.toLowerCase().indexOf(a.toLowerCase());
-  if (idx < 0) return [];
+  if (s.isEmpty) return [];
+  final answers = _splitFitbAnswers(answersRaw);
+  if (answers.isEmpty) return [];
+  final sl = s.toLowerCase();
   return [
-    FillInTheBlankSegment(
-      id: '',
-      cardId: '',
-      fullText: s,
-      blankStart: idx,
-      blankEnd: idx + a.length,
-      correctAnswer: a,
-    ),
+    for (final a in answers)
+      if (sl.contains(a.toLowerCase()))
+        FillInTheBlankSegment(
+          id: '',
+          cardId: '',
+          fullText: s,
+          blankStart: sl.indexOf(a.toLowerCase()),
+          blankEnd: sl.indexOf(a.toLowerCase()) + a.length,
+          correctAnswer: a,
+        ),
   ];
 }
 
@@ -63,19 +70,26 @@ List<MatchMadnessPair> _buildPairs(List<_Pair> ps) => [
 
 // ── Main page ─────────────────────────────────────────────────────
 
-class CardEditorPage extends HookWidget {
-  const CardEditorPage({super.key, required this.deckId, this.cardId});
+class DeckEditorPage extends HookWidget {
+  /// [initialCardId] optionally pre-selects a card when the page opens
+  /// (e.g. when navigating from the deck detail card list).
+  const DeckEditorPage({super.key, required this.deckId, this.initialCardId});
 
   final String deckId;
-  final String? cardId;
+  final String? initialCardId;
 
   @override
   Widget build(BuildContext context) {
     final cardProvider = context.watch<CardProvider>();
-    final isEdit = cardId != null;
     final formKey = useMemoized(GlobalKey<FormState>.new);
     final frontFocus = useFocusNode();
-    final qType = useState(QuestionType.readAndSelect);
+
+    // Active card is tracked as internal state — no URL param needed
+    final activeCardId = useState<String?>(initialCardId);
+    final isAdding = useState(false);
+
+    // Form state
+    final qType = useState(QuestionType.flashcard);
     final cType = useState(CardType.normal);
     final frontCtrl = useTextEditingController();
     final backCtrl = useTextEditingController();
@@ -86,87 +100,170 @@ class CardEditorPage extends HookWidget {
     ]);
     final fitbSentCtrl = useTextEditingController();
     final fitbAnsCtrl = useTextEditingController();
+    final identificationAnsCtrl = useTextEditingController();
     final matchPairs = useState<List<_Pair>>([
       (term: '', match: ''),
       (term: '', match: ''),
       (term: '', match: ''),
     ]);
 
+    // Reload form whenever the active card changes
     useEffect(() {
-      frontFocus.requestFocus();
-      if (!isEdit) return null;
-      final card = cardProvider.cards.where((c) => c.id == cardId).firstOrNull;
+      final cid = activeCardId.value;
+      if (cid == null) return null;
+      final card = cardProvider.cards.where((c) => c.id == cid).firstOrNull;
       if (card == null) return null;
+
       qType.value = card.questionType;
       cType.value = card.cardType;
       frontCtrl.text = card.question;
       backCtrl.text = card.answer;
+      identificationAnsCtrl.text = card.identificationAnswer;
+
       if (card.options.isNotEmpty) {
         mcOpts.value = card.options
             .map((o) => (text: o.optionText, isCorrect: o.isCorrect))
             .toList();
+      } else {
+        mcOpts.value = [
+          (text: '', isCorrect: true),
+          (text: '', isCorrect: false),
+          (text: '', isCorrect: false),
+        ];
       }
       if (card.segments.isNotEmpty) {
         fitbSentCtrl.text = card.segments.first.fullText;
-        fitbAnsCtrl.text = card.segments.first.correctAnswer;
+        // Re-encode: escape commas inside each answer, then join with ','
+        fitbAnsCtrl.text = card.segments
+            .map((seg) => seg.correctAnswer.replaceAll(',', r'\,'))
+            .join(',');
+      } else {
+        fitbSentCtrl.clear();
+        fitbAnsCtrl.clear();
       }
       if (card.pairs.isNotEmpty) {
         matchPairs.value =
             card.pairs.map((p) => (term: p.term, match: p.match)).toList();
-      }
-      return null;
-    }, [cardId]);
-
-    Future<void> save() async {
-      if (!formKey.currentState!.validate()) return;
-      if (isEdit) {
-        final card =
-            cardProvider.cards.where((c) => c.id == cardId).firstOrNull;
-        if (card == null) return;
-        final updatedNotes = card.notes
-            .map((n) => n == card.primaryNote
-                ? n.copyWith(
-                    frontText: frontCtrl.text.trim(),
-                    backText: backCtrl.text.trim())
-                : n)
-            .toList();
-        await context.read<CardProvider>().updateCard(
-              card.copyWith(
-                  notes: updatedNotes,
-                  cardType: cType.value,
-                  questionType: qType.value),
-            );
       } else {
-        await context.read<CardProvider>().addCard(
-              deckId,
+        matchPairs.value = [
+          (term: '', match: ''),
+          (term: '', match: ''),
+          (term: '', match: ''),
+        ];
+      }
+
+      WidgetsBinding.instance
+          .addPostFrameCallback((_) => frontFocus.requestFocus());
+      return null;
+    }, [activeCardId.value]);
+
+    // Creates a blank card in DB, adds it to the sidebar, and selects it
+    Future<void> addBlankCard() async {
+      isAdding.value = true;
+      final newCard = await context.read<CardProvider>().addCard(
+            deckId,
+            cardType: CardType.normal,
+            questionType: QuestionType.flashcard,
+          );
+      isAdding.value = false;
+      if (newCard != null) {
+        activeCardId.value = newCard.id;
+      }
+    }
+
+    // Save always updates (card already exists after addBlankCard)
+    Future<void> save() async {
+      if (activeCardId.value == null) return;
+      if (!formKey.currentState!.validate()) return;
+      final card = cardProvider.cards
+          .where((c) => c.id == activeCardId.value)
+          .firstOrNull;
+      if (card == null) return;
+
+      // identification and wordScramble only use frontText; backText is not shown
+      // and should not be written back (keeps the field clean).
+      final backTextForSave = qType.value.usesIdentificationAnswer ||
+              qType.value == QuestionType.wordScramble
+          ? ''
+          : backCtrl.text.trim();
+
+      final updatedNotes = card.notes
+          .map((n) => n == card.primaryNote
+              ? n.copyWith(
+                  frontText: frontCtrl.text.trim(),
+                  backText: backTextForSave)
+              : n)
+          .toList();
+
+      await context.read<CardProvider>().updateCard(
+            card.copyWith(
+              notes: updatedNotes,
               cardType: cType.value,
               questionType: qType.value,
-              frontText: frontCtrl.text.trim(),
-              backText: backCtrl.text.trim(),
-              options:
-                  qType.value.usesOptions ? _buildOptions(mcOpts.value) : [],
+              identificationAnswer: qType.value.usesIdentificationAnswer
+                  ? identificationAnsCtrl.text.trim()
+                  : '',
+              options: qType.value.usesOptions
+                  ? _buildOptions(mcOpts.value)
+                  : card.options,
               segments: qType.value.usesSegments
-                  ? _buildSegment(fitbSentCtrl.text, fitbAnsCtrl.text)
-                  : [],
-              pairs:
-                  qType.value.usesPairs ? _buildPairs(matchPairs.value) : [],
-            );
+                  ? _buildSegments(fitbSentCtrl.text, fitbAnsCtrl.text)
+                  : card.segments,
+              pairs: qType.value.usesPairs
+                  ? _buildPairs(matchPairs.value)
+                  : card.pairs,
+            ),
+          );
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(const SnackBar(
+            content: Text('Card saved'),
+            duration: Duration(seconds: 1),
+          ));
       }
-      if (context.mounted) Navigator.pop(context);
     }
+
+    final hasActiveCard = activeCardId.value != null;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEdit ? 'Edit Card' : 'New Card'),
+        title: const Text('Edit Deck'),
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: AppSpacing.md),
-            child: FilledButton(
-              onPressed: cardProvider.isLoading ? null : save,
-              child: const Text('Save Card'),
+          if (cardProvider.isDirty(deckId))
+            _PushButton(
+              isPushing: cardProvider.isPushing,
+              onPressed: cardProvider.isPushing
+                  ? null
+                  : () => context.read<CardProvider>().pushDeck(deckId),
             ),
-          ),
+          if (hasActiveCard)
+            Padding(
+              padding: const EdgeInsets.only(right: AppSpacing.md),
+              child: FilledButton(
+                onPressed: cardProvider.isLoading ? null : save,
+                child: const Text('Save Card'),
+              ),
+            ),
         ],
+      ),
+      // On mobile (no sidebar), FAB lets the user add a new card
+      floatingActionButton: LayoutBuilder(
+        builder: (ctx, constraints) {
+          final showSidebar = constraints.maxWidth >= 960;
+          if (showSidebar) return const SizedBox.shrink();
+          return FloatingActionButton(
+            onPressed: isAdding.value ? null : addBlankCard,
+            tooltip: 'Add new card',
+            child: isAdding.value
+                ? const SizedBox.square(
+                    dimension: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.add),
+          );
+        },
       ),
       body: Form(
         key: formKey,
@@ -178,53 +275,66 @@ class CardEditorPage extends HookWidget {
               children: [
                 if (showSidebar)
                   _EditorSidebar(
-                      cards: cardProvider.cards, activeCardId: cardId),
-                Expanded(
-                  child: _EditorMain(
-                    qType: qType.value,
-                    cType: cType.value,
-                    frontCtrl: frontCtrl,
-                    backCtrl: backCtrl,
-                    frontFocus: frontFocus,
-                    mcOpts: mcOpts.value,
-                    fitbSentCtrl: fitbSentCtrl,
-                    fitbAnsCtrl: fitbAnsCtrl,
-                    matchPairs: matchPairs.value,
-                    error: cardProvider.error,
-                    onTypeChanged: (t) {
-                      qType.value = t;
-                      if (!t.canBeReversible) cType.value = CardType.normal;
-                    },
-                    onCardTypeChanged: (ct) => cType.value = ct,
-                    onMcAdd: () => mcOpts.value = [
-                      ...mcOpts.value,
-                      (text: '', isCorrect: false),
-                    ],
-                    onMcRemove: (i) {
-                      final l = [...mcOpts.value];
-                      l.removeAt(i);
-                      mcOpts.value = l;
-                    },
-                    onMcUpdate: (i, o) {
-                      final l = [...mcOpts.value];
-                      l[i] = o;
-                      mcOpts.value = l;
-                    },
-                    onMatchAdd: () => matchPairs.value = [
-                      ...matchPairs.value,
-                      (term: '', match: ''),
-                    ],
-                    onMatchRemove: (i) {
-                      final l = [...matchPairs.value];
-                      l.removeAt(i);
-                      matchPairs.value = l;
-                    },
-                    onMatchUpdate: (i, p) {
-                      final l = [...matchPairs.value];
-                      l[i] = p;
-                      matchPairs.value = l;
-                    },
+                    cards: cardProvider.cards,
+                    activeCardId: activeCardId.value,
+                    isAdding: isAdding.value,
+                    onSelect: (id) => activeCardId.value = id,
+                    onAdd: addBlankCard,
                   ),
+                Expanded(
+                  child: !hasActiveCard
+                      ? _NoCardSelected(
+                          onAdd: addBlankCard,
+                          isAdding: isAdding.value,
+                        )
+                      : _EditorMain(
+                          qType: qType.value,
+                          cType: cType.value,
+                          frontCtrl: frontCtrl,
+                          backCtrl: backCtrl,
+                          identificationAnsCtrl: identificationAnsCtrl,
+                          frontFocus: frontFocus,
+                          mcOpts: mcOpts.value,
+                          fitbSentCtrl: fitbSentCtrl,
+                          fitbAnsCtrl: fitbAnsCtrl,
+                          matchPairs: matchPairs.value,
+                          error: cardProvider.error,
+                          onTypeChanged: (t) {
+                            qType.value = t;
+                            if (!t.canBeReversible) {
+                              cType.value = CardType.normal;
+                            }
+                          },
+                          onCardTypeChanged: (ct) => cType.value = ct,
+                          onMcAdd: () => mcOpts.value = [
+                            ...mcOpts.value,
+                            (text: '', isCorrect: false),
+                          ],
+                          onMcRemove: (i) {
+                            final l = [...mcOpts.value];
+                            l.removeAt(i);
+                            mcOpts.value = l;
+                          },
+                          onMcUpdate: (i, o) {
+                            final l = [...mcOpts.value];
+                            l[i] = o;
+                            mcOpts.value = l;
+                          },
+                          onMatchAdd: () => matchPairs.value = [
+                            ...matchPairs.value,
+                            (term: '', match: ''),
+                          ],
+                          onMatchRemove: (i) {
+                            final l = [...matchPairs.value];
+                            l.removeAt(i);
+                            matchPairs.value = l;
+                          },
+                          onMatchUpdate: (i, p) {
+                            final l = [...matchPairs.value];
+                            l[i] = p;
+                            matchPairs.value = l;
+                          },
+                        ),
                 ),
               ],
             );
@@ -235,13 +345,101 @@ class CardEditorPage extends HookWidget {
   }
 }
 
+// ── Push button ───────────────────────────────────────────────────
+
+class _PushButton extends StatelessWidget {
+  const _PushButton({required this.isPushing, required this.onPressed});
+
+  final bool isPushing;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(right: AppSpacing.sm),
+      child: Tooltip(
+        message: 'Push changes to cloud',
+        child: OutlinedButton.icon(
+          onPressed: onPressed,
+          icon: isPushing
+              ? const SizedBox.square(
+                  dimension: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Icon(Icons.cloud_upload_outlined, size: 18),
+          label: const Text('Push'),
+        ),
+      ),
+    );
+  }
+}
+
+// ── No card selected state ────────────────────────────────────────
+
+class _NoCardSelected extends StatelessWidget {
+  const _NoCardSelected({required this.onAdd, required this.isAdding});
+
+  final VoidCallback onAdd;
+  final bool isAdding;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.style_outlined,
+            size: 64,
+            color: AppColors.textSecondary.withValues(alpha: 0.4),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Text(
+            'No card selected',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            'Pick a card from the sidebar, or create a new one',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          FilledButton.icon(
+            onPressed: isAdding ? null : onAdd,
+            icon: isAdding
+                ? const SizedBox.square(
+                    dimension: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.add),
+            label: const Text('New Card'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 // ── Sidebar ───────────────────────────────────────────────────────
 
 class _EditorSidebar extends StatelessWidget {
-  const _EditorSidebar({required this.cards, this.activeCardId});
+  const _EditorSidebar({
+    required this.cards,
+    required this.activeCardId,
+    required this.isAdding,
+    required this.onSelect,
+    required this.onAdd,
+  });
 
   final List<DeckCard> cards;
   final String? activeCardId;
+  final bool isAdding;
+  final void Function(String cardId) onSelect;
+  final VoidCallback onAdd;
 
   @override
   Widget build(BuildContext context) {
@@ -257,15 +455,35 @@ class _EditorSidebar extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header: "Cards (N)" + add button
           Padding(
             padding: const EdgeInsets.fromLTRB(
-                AppSpacing.md, AppSpacing.md, AppSpacing.md, AppSpacing.sm),
-            child: Text(
-              'Cards in Deck (${cards.length})',
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: AppColors.textSecondary,
-                    fontWeight: FontWeight.w600,
+                AppSpacing.md, AppSpacing.sm, AppSpacing.xs, AppSpacing.sm),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Cards (${cards.length})',
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w600,
+                        ),
                   ),
+                ),
+                IconButton(
+                  icon: isAdding
+                      ? const SizedBox.square(
+                          dimension: 16,
+                          child:
+                              CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.add, size: 18),
+                  tooltip: 'Add new card',
+                  visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.zero,
+                  onPressed: isAdding ? null : onAdd,
+                ),
+              ],
             ),
           ),
           const Divider(height: 1),
@@ -283,6 +501,7 @@ class _EditorSidebar extends StatelessWidget {
                     itemBuilder: (ctx, i) => _SidebarItem(
                       card: cards[i],
                       isActive: cards[i].id == activeCardId,
+                      onTap: () => onSelect(cards[i].id),
                     ),
                   ),
           ),
@@ -293,47 +512,55 @@ class _EditorSidebar extends StatelessWidget {
 }
 
 class _SidebarItem extends StatelessWidget {
-  const _SidebarItem({required this.card, required this.isActive});
+  const _SidebarItem({
+    required this.card,
+    required this.isActive,
+    required this.onTap,
+  });
 
   final DeckCard card;
   final bool isActive;
+  final VoidCallback onTap;
 
   static const _icons = <QuestionType, IconData>{
-    QuestionType.readAndSelect: Icons.visibility_outlined,
+    QuestionType.flashcard: Icons.visibility_outlined,
+    QuestionType.identification: Icons.border_color_outlined,
     QuestionType.multipleChoice: Icons.checklist_outlined,
     QuestionType.fillInTheBlanks: Icons.edit_note_outlined,
-    QuestionType.readAndComplete: Icons.spellcheck_outlined,
-    QuestionType.listenAndType: Icons.headphones_outlined,
+    QuestionType.wordScramble: Icons.shuffle_outlined,
     QuestionType.matchMadness: Icons.compare_arrows_outlined,
   };
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    return Container(
-      color: isActive ? scheme.primary.withValues(alpha: 0.08) : null,
-      padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md, vertical: AppSpacing.sm + 2),
-      child: Row(
-        children: [
-          Icon(
-            _icons[card.questionType] ?? Icons.help_outline,
-            size: 15,
-            color: isActive ? scheme.primary : AppColors.textSecondary,
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Text(
-              card.question.isNotEmpty ? card.question : '(empty)',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: isActive ? scheme.primary : null,
-                    fontWeight: isActive ? FontWeight.w600 : null,
-                  ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
+    return InkWell(
+      onTap: isActive ? null : onTap,
+      child: Container(
+        color: isActive ? scheme.primary.withValues(alpha: 0.08) : null,
+        padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md, vertical: AppSpacing.sm + 2),
+        child: Row(
+          children: [
+            Icon(
+              _icons[card.questionType] ?? Icons.help_outline,
+              size: 15,
+              color: isActive ? scheme.primary : AppColors.textSecondary,
             ),
-          ),
-        ],
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: Text(
+                card.question.isNotEmpty ? card.question : '(empty)',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: isActive ? scheme.primary : null,
+                      fontWeight: isActive ? FontWeight.w600 : null,
+                    ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -347,6 +574,7 @@ class _EditorMain extends StatelessWidget {
     required this.cType,
     required this.frontCtrl,
     required this.backCtrl,
+    required this.identificationAnsCtrl,
     required this.frontFocus,
     required this.mcOpts,
     required this.fitbSentCtrl,
@@ -367,6 +595,7 @@ class _EditorMain extends StatelessWidget {
   final CardType cType;
   final TextEditingController frontCtrl;
   final TextEditingController backCtrl;
+  final TextEditingController identificationAnsCtrl;
   final FocusNode frontFocus;
   final List<_McOpt> mcOpts;
   final TextEditingController fitbSentCtrl;
@@ -414,6 +643,7 @@ class _EditorMain extends StatelessWidget {
                   qType: qType,
                   frontCtrl: frontCtrl,
                   backCtrl: backCtrl,
+                  identificationAnsCtrl: identificationAnsCtrl,
                   frontFocus: frontFocus,
                   mcOpts: mcOpts,
                   onMcAdd: onMcAdd,
@@ -442,9 +672,14 @@ class _TypeBar extends StatelessWidget {
 
   static const _types = [
     (
-      QuestionType.readAndSelect,
-      'Read & Select',
+      QuestionType.flashcard,
+      'Flashcard',
       Icons.visibility_outlined
+    ),
+    (
+      QuestionType.identification,
+      'Identification',
+      Icons.border_color_outlined
     ),
     (
       QuestionType.multipleChoice,
@@ -457,14 +692,14 @@ class _TypeBar extends StatelessWidget {
       Icons.edit_note_outlined
     ),
     (
+      QuestionType.wordScramble,
+      'Word Scramble',
+      Icons.shuffle_outlined
+    ),
+    (
       QuestionType.matchMadness,
       'Match Madness',
       Icons.compare_arrows_outlined
-    ),
-    (
-      QuestionType.listenAndType,
-      'Listen & Type',
-      Icons.headphones_outlined
     ),
   ];
 
@@ -603,8 +838,8 @@ class _DirectionBar extends StatelessWidget {
                   label: Text('Normal'),
                   icon: Icon(Icons.arrow_forward, size: 16)),
               ButtonSegment(
-                  value: CardType.reversible,
-                  label: Text('Reversible'),
+                  value: CardType.reversed,
+                  label: Text('Reversed'),
                   icon: Icon(Icons.swap_horiz, size: 16)),
               ButtonSegment(
                   value: CardType.both,
@@ -678,6 +913,7 @@ class _LeftPanel extends StatelessWidget {
     required this.qType,
     required this.frontCtrl,
     required this.backCtrl,
+    required this.identificationAnsCtrl,
     required this.frontFocus,
     required this.mcOpts,
     required this.onMcAdd,
@@ -688,6 +924,7 @@ class _LeftPanel extends StatelessWidget {
   final QuestionType qType;
   final TextEditingController frontCtrl;
   final TextEditingController backCtrl;
+  final TextEditingController identificationAnsCtrl;
   final FocusNode frontFocus;
   final List<_McOpt> mcOpts;
   final VoidCallback onMcAdd;
@@ -697,43 +934,61 @@ class _LeftPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isMc = qType == QuestionType.multipleChoice;
+    final isIdentification = qType == QuestionType.identification;
+    final isWordScramble = qType == QuestionType.wordScramble;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _InputCard(
-          label: qType == QuestionType.listenAndType ? 'AUDIO PROMPT' : 'FRONT',
+          label: isWordScramble ? 'SENTENCE' : 'FRONT',
           child: TextFormField(
             controller: frontCtrl,
             focusNode: frontFocus,
             maxLines: 3,
             decoration: InputDecoration(
-              hintText: qType == QuestionType.listenAndType
-                  ? 'Text for audio playback'
+              hintText: isWordScramble
+                  ? 'e.g. The dog barked at the cat'
                   : 'e.g. 犬',
+              helperText: isWordScramble
+                  ? 'Each word becomes a chip the learner taps to reconstruct this sentence'
+                  : null,
             ),
             validator: (v) =>
                 (v == null || v.trim().isEmpty) ? 'Required' : null,
           ),
         ),
-        const SizedBox(height: AppSpacing.md),
-        _InputCard(
-          label: isMc ? 'HINT (OPTIONAL)' : 'BACK',
-          child: TextFormField(
-            controller: backCtrl,
-            maxLines: isMc ? 2 : 3,
-            decoration: InputDecoration(
-              hintText: isMc
-                  ? 'Optional hint shown after answering'
-                  : 'e.g. dog, いぬ, inu',
-              helperText:
-                  isMc ? null : 'Separate multiple accepted answers with commas',
+        // wordScramble has no back/answer field — the sentence itself is the answer
+        if (!isWordScramble) ...[
+          const SizedBox(height: AppSpacing.md),
+          _InputCard(
+            label: isIdentification
+                ? 'ANSWERS'
+                : isMc
+                    ? 'HINT (OPTIONAL)'
+                    : 'BACK',
+            child: TextFormField(
+              controller: isIdentification ? identificationAnsCtrl : backCtrl,
+              maxLines: isMc ? 2 : 3,
+              decoration: InputDecoration(
+                hintText: isIdentification
+                    ? 'e.g. dog, いぬ, inu'
+                    : isMc
+                        ? 'Optional hint shown after answering'
+                        : 'e.g. dog, いぬ, inu',
+                helperText: isIdentification
+                    ? 'Separate multiple accepted answers with commas'
+                    : isMc
+                        ? null
+                        : 'Separate multiple accepted answers with commas',
+              ),
+              validator: (isIdentification || !isMc)
+                  ? (v) =>
+                      (v == null || v.trim().isEmpty) ? 'Required' : null
+                  : null,
             ),
-            validator: isMc
-                ? null
-                : (v) =>
-                    (v == null || v.trim().isEmpty) ? 'Required' : null,
           ),
-        ),
+        ],
         if (isMc) ...[
           const SizedBox(height: AppSpacing.md),
           _McPanel(
@@ -947,18 +1202,22 @@ class _FitbEditor extends HookWidget {
         ),
         const SizedBox(height: AppSpacing.md),
         _InputCard(
-          label: 'ANSWER WORD',
+          label: 'ANSWERS',
           child: TextFormField(
             controller: ansCtrl,
             decoration: const InputDecoration(
-              hintText: 'e.g. fish',
-              helperText: 'This exact word will be replaced with a blank',
+              hintText: 'e.g. fish,dog',
+              helperText: 'Separate multiple blanks with commas',
             ),
             validator: (v) {
               if (v == null || v.trim().isEmpty) return 'Required';
+              final answers = _splitFitbAnswers(v);
+              if (answers.isEmpty) return 'Required';
               final sentence = sentCtrl.text.trim().toLowerCase();
-              if (!sentence.contains(v.trim().toLowerCase())) {
-                return 'Word not found in the sentence above';
+              for (final a in answers) {
+                if (!sentence.contains(a.toLowerCase())) {
+                  return '"$a" not found in the sentence above';
+                }
               }
               return null;
             },
@@ -966,7 +1225,7 @@ class _FitbEditor extends HookWidget {
         ),
         if (hasContent) ...[
           const SizedBox(height: AppSpacing.md),
-          _FitbPreview(sentence: sentCtrl.text, answer: ansCtrl.text),
+          _FitbPreview(sentence: sentCtrl.text, answersRaw: ansCtrl.text),
         ],
       ],
     );
@@ -974,25 +1233,34 @@ class _FitbEditor extends HookWidget {
 }
 
 class _FitbPreview extends StatelessWidget {
-  const _FitbPreview({required this.sentence, required this.answer});
+  const _FitbPreview({required this.sentence, required this.answersRaw});
 
   final String sentence;
-  final String answer;
+  final String answersRaw;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final idx =
-        sentence.toLowerCase().indexOf(answer.trim().toLowerCase());
+    final answers = _splitFitbAnswers(answersRaw);
+    final s = sentence.trim();
+    final sl = s.toLowerCase();
 
-    if (idx < 0) {
+    // Collect all (start, end) blank ranges, skipping answers not found
+    final ranges = <(int, int)>[];
+    for (final a in answers) {
+      final idx = sl.indexOf(a.toLowerCase());
+      if (idx >= 0) ranges.add((idx, idx + a.length));
+    }
+    // Sort by start position
+    ranges.sort((a, b) => a.$1.compareTo(b.$1));
+
+    if (ranges.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
           color: AppColors.incorrect.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(AppRadii.card),
-          border:
-              Border.all(color: AppColors.incorrect.withValues(alpha: 0.25)),
+          border: Border.all(color: AppColors.incorrect.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -1000,7 +1268,7 @@ class _FitbPreview extends StatelessWidget {
                 size: 16, color: AppColors.incorrect),
             const SizedBox(width: AppSpacing.sm),
             Text(
-              'Answer word not found in sentence',
+              'No answers found in sentence',
               style: Theme.of(context)
                   .textTheme
                   .bodySmall
@@ -1011,17 +1279,30 @@ class _FitbPreview extends StatelessWidget {
       );
     }
 
-    final before = sentence.substring(0, idx);
-    final blank = '＿' * (answer.trim().length.clamp(3, 12));
-    final after = sentence.substring(idx + answer.trim().length);
+    // Build RichText spans, replacing each range with a blank
+    final blankStyle = TextStyle(
+      color: scheme.primary,
+      fontWeight: FontWeight.bold,
+      decoration: TextDecoration.underline,
+      decorationColor: scheme.primary,
+      decorationThickness: 2,
+    );
+    final spans = <TextSpan>[];
+    var cursor = 0;
+    for (final (start, end) in ranges) {
+      if (start > cursor) spans.add(TextSpan(text: s.substring(cursor, start)));
+      final blankLen = (end - start).clamp(3, 12);
+      spans.add(TextSpan(text: '＿' * blankLen, style: blankStyle));
+      cursor = end;
+    }
+    if (cursor < s.length) spans.add(TextSpan(text: s.substring(cursor)));
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: scheme.primary.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(AppRadii.card),
-        border:
-            Border.all(color: scheme.primary.withValues(alpha: 0.2)),
+        border: Border.all(color: scheme.primary.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1037,24 +1318,8 @@ class _FitbPreview extends StatelessWidget {
           const SizedBox(height: AppSpacing.sm),
           RichText(
             text: TextSpan(
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(height: 1.6),
-              children: [
-                TextSpan(text: before),
-                TextSpan(
-                  text: blank,
-                  style: TextStyle(
-                    color: scheme.primary,
-                    fontWeight: FontWeight.bold,
-                    decoration: TextDecoration.underline,
-                    decorationColor: scheme.primary,
-                    decorationThickness: 2,
-                  ),
-                ),
-                TextSpan(text: after),
-              ],
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(height: 1.6),
+              children: spans,
             ),
           ),
         ],

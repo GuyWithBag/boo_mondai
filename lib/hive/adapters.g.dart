@@ -77,20 +77,30 @@ class DeckAdapter extends TypeAdapter<Deck> {
       id: fields[0] as String,
       creatorId: fields[1] as String,
       title: fields[2] as String,
-      description: fields[3] as String,
+      shortDescription: fields[3] as String? ?? '',
       targetLanguage: fields[4] as String,
       isPremade: fields[5] as bool,
       isPublic: fields[6] as bool,
       cardCount: (fields[7] as num).toInt(),
       createdAt: fields[8] as DateTime,
       updatedAt: fields[9] as DateTime,
+      longDescription: fields[10] as String? ?? '',
+      isUneditable: fields[11] as bool? ?? false,
+      version: fields[12] as String? ?? '1.0.0',
+      buildNumber: (fields[13] as num?)?.toInt() ?? 1,
+      tags: (fields[14] as List?)?.cast<String>() ?? const [],
+      // index 15: sourceDeckCreatorId (was creatorName — same String? type)
+      sourceDeckCreatorId: fields[15] as String?,
+      sourceDeckId: fields[16] as String?,
+      // index 17: legacy (was sourceDeckCreatorName) — no longer written/used
+      hiddenInBrowser: fields[18] as bool? ?? false,
     );
   }
 
   @override
   void write(BinaryWriter writer, Deck obj) {
     writer
-      ..writeByte(10)
+      ..writeByte(18)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -98,7 +108,7 @@ class DeckAdapter extends TypeAdapter<Deck> {
       ..writeByte(2)
       ..write(obj.title)
       ..writeByte(3)
-      ..write(obj.description)
+      ..write(obj.shortDescription)
       ..writeByte(4)
       ..write(obj.targetLanguage)
       ..writeByte(5)
@@ -110,7 +120,24 @@ class DeckAdapter extends TypeAdapter<Deck> {
       ..writeByte(8)
       ..write(obj.createdAt)
       ..writeByte(9)
-      ..write(obj.updatedAt);
+      ..write(obj.updatedAt)
+      ..writeByte(10)
+      ..write(obj.longDescription)
+      ..writeByte(11)
+      ..write(obj.isUneditable)
+      ..writeByte(12)
+      ..write(obj.version)
+      ..writeByte(13)
+      ..write(obj.buildNumber)
+      ..writeByte(14)
+      ..write(obj.tags)
+      ..writeByte(15) // sourceDeckCreatorId (was creatorName — same String? type)
+      ..write(obj.sourceDeckCreatorId)
+      ..writeByte(16)
+      ..write(obj.sourceDeckId)
+      // index 17 no longer written (was sourceDeckCreatorName)
+      ..writeByte(18)
+      ..write(obj.hiddenInBrowser);
   }
 
   @override

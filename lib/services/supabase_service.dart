@@ -65,7 +65,9 @@ class SupabaseService {
   // ── Decks ───────────────────────────────────────────
   Future<List<Map<String, dynamic>>> fetchDecks({bool publicOnly = true}) async {
     try {
-      var query = _client.from('decks').select();
+      var query = _client.from('decks').select(
+            '*, source_deck:decks!source_deck_id(creator_id)',
+          );
       if (publicOnly) {
         query = query.eq('is_public', true);
       }
@@ -154,7 +156,11 @@ class SupabaseService {
 
   Future<void> deleteCard(String id) async {
     try {
-      await _client.from('deck_cards').delete().eq('id', id);
+      final deleted =
+          await _client.from('deck_cards').delete().eq('id', id).select();
+      if (deleted.isEmpty) {
+        throw AppException('Card not found or permission denied');
+      }
     } on PostgrestException catch (e) {
       throw AppException(e.message, code: e.code);
     }
@@ -203,6 +209,88 @@ class SupabaseService {
     }
   }
 
+  // ── Local-first deck push helpers ────────────────────
+
+  /// Upserts a single deck_card row. Does NOT touch child tables.
+  Future<void> upsertCardRow(Map<String, dynamic> data) async {
+    try {
+      await _client.from('deck_cards').upsert(data);
+    } on PostgrestException catch (e) {
+      throw AppException(e.message, code: e.code);
+    }
+  }
+
+  /// Deletes all content-node rows (notes, mc_options, fitb_segments,
+  /// mm_pairs) for [cardId] in one parallel batch.
+  Future<void> deleteChildrenByCardId(String cardId) async {
+    try {
+      await Future.wait([
+        _client.from('notes').delete().eq('card_id', cardId),
+        _client.from('mc_options').delete().eq('card_id', cardId),
+        _client.from('fitb_segments').delete().eq('card_id', cardId),
+        _client.from('mm_pairs').delete().eq('card_id', cardId),
+      ]);
+    } on PostgrestException catch (e) {
+      throw AppException(e.message, code: e.code);
+    }
+  }
+
+  /// Deletes remote deck_cards for [deckId] whose IDs are NOT in [keepIds].
+  Future<void> deleteOrphanCards(
+      String deckId, List<String> keepIds) async {
+    try {
+      final remote = await _client
+          .from('deck_cards')
+          .select('id')
+          .eq('deck_id', deckId);
+      final remoteIds =
+          List<Map<String, dynamic>>.from(remote).map((r) => r['id'] as String).toList();
+      final toDelete =
+          remoteIds.where((id) => !keepIds.contains(id)).toList();
+      if (toDelete.isEmpty) return;
+      await _client.from('deck_cards').delete().inFilter('id', toDelete);
+    } on PostgrestException catch (e) {
+      throw AppException(e.message, code: e.code);
+    }
+  }
+
+  Future<void> batchInsertNotes(List<Map<String, dynamic>> data) async {
+    if (data.isEmpty) return;
+    try {
+      await _client.from('notes').insert(data);
+    } on PostgrestException catch (e) {
+      throw AppException(e.message, code: e.code);
+    }
+  }
+
+  Future<void> batchInsertMCOptions(List<Map<String, dynamic>> data) async {
+    if (data.isEmpty) return;
+    try {
+      await _client.from('mc_options').insert(data);
+    } on PostgrestException catch (e) {
+      throw AppException(e.message, code: e.code);
+    }
+  }
+
+  Future<void> batchInsertFITBSegments(
+      List<Map<String, dynamic>> data) async {
+    if (data.isEmpty) return;
+    try {
+      await _client.from('fitb_segments').insert(data);
+    } on PostgrestException catch (e) {
+      throw AppException(e.message, code: e.code);
+    }
+  }
+
+  Future<void> batchInsertMMPairs(List<Map<String, dynamic>> data) async {
+    if (data.isEmpty) return;
+    try {
+      await _client.from('mm_pairs').insert(data);
+    } on PostgrestException catch (e) {
+      throw AppException(e.message, code: e.code);
+    }
+  }
+
   // ── Quiz ────────────────────────────────────────────
   Future<Map<String, dynamic>> insertQuizSession(
       Map<String, dynamic> data) async {
@@ -227,6 +315,17 @@ class SupabaseService {
   Future<void> insertQuizAnswer(Map<String, dynamic> data) async {
     try {
       await _client.from('quiz_answers').insert(data);
+    } on PostgrestException catch (e) {
+      throw AppException(e.message, code: e.code);
+    }
+  }
+
+  /// Inserts multiple quiz answers in a single round-trip.
+  Future<void> batchInsertQuizAnswers(
+      List<Map<String, dynamic>> answers) async {
+    if (answers.isEmpty) return;
+    try {
+      await _client.from('quiz_answers').insert(answers);
     } on PostgrestException catch (e) {
       throw AppException(e.message, code: e.code);
     }

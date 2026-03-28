@@ -25,7 +25,7 @@ class FsrsService {
   /// Converts an FsrsCardState to an fsrs Card, schedules it, and returns updated state.
   FsrsCardState reviewCard(FsrsCardState state, int ratingValue) {
     final card = _stateToCard(state);
-    final rating = Rating.values[ratingValue]; // 1=again, 2=hard, 3=good, 4=easy
+    final rating = Rating.values[ratingValue - 1]; // 1=again, 2=hard, 3=good, 4=easy
     final result = scheduleCard(card, rating);
     return _cardToState(result.card, state.userId, state.cardId);
   }
@@ -33,7 +33,7 @@ class FsrsService {
   /// Creates an initial FsrsCardState from a new card after first quiz rating.
   FsrsCardState enrollCard(String userId, String cardId, int ratingValue) {
     final card = createNewCard();
-    final rating = Rating.values[ratingValue];
+    final rating = Rating.values[ratingValue - 1];
     final result = scheduleCard(card, rating);
     return _cardToState(result.card, userId, cardId);
   }

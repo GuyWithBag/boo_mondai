@@ -1,8 +1,8 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/pages/deck_creator_page.dart
-// PURPOSE: Create or edit a deck with title, description, and target language
-// PROVIDERS: DeckProvider, AuthProvider
-// HOOKS: useTextEditingController, useEffect
+// PURPOSE: Create or edit a deck with title, short/long description, target language, and publish toggle
+// PROVIDERS: DeckProvider, AuthProvider, CardProvider
+// HOOKS: useTextEditingController, useEffect, useState
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:flutter/material.dart';
@@ -21,22 +21,28 @@ class DeckCreatorPage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final titleController = useTextEditingController();
-    final descController = useTextEditingController();
+    final shortDescController = useTextEditingController();
+    final longDescController = useTextEditingController();
     final langController = useTextEditingController(text: 'japanese');
     final formKey = useMemoized(GlobalKey<FormState>.new);
+    final isPublic = useState(true);
+    final wasPublicInitially = useState(true);
     final deckProvider = context.watch<DeckProvider>();
     final auth = context.read<AuthProvider>();
     final isEdit = deckId != null;
 
     useEffect(() {
       if (isEdit) {
-        final existing = deckProvider.decks
+        final existing = deckProvider.userDecks
             .where((d) => d.id == deckId)
             .firstOrNull;
         if (existing != null) {
           titleController.text = existing.title;
-          descController.text = existing.description;
+          shortDescController.text = existing.shortDescription;
+          longDescController.text = existing.longDescription;
           langController.text = existing.targetLanguage;
+          isPublic.value = existing.isPublic;
+          wasPublicInitially.value = existing.isPublic;
         }
       }
       return null;
@@ -47,30 +53,57 @@ class DeckCreatorPage extends HookWidget {
       final userId = auth.userProfile?.id;
       if (userId == null) return;
 
+      String? savedDeckId;
+
       if (isEdit) {
-        final existing = deckProvider.decks
+        final existing = deckProvider.userDecks
             .where((d) => d.id == deckId)
             .firstOrNull;
         if (existing != null) {
           await context.read<DeckProvider>().updateDeck(
                 existing.copyWith(
                   title: titleController.text.trim(),
-                  description: descController.text.trim(),
+                  shortDescription: shortDescController.text.trim(),
+                  longDescription: longDescController.text.trim(),
                   targetLanguage: langController.text.trim(),
+                  isPublic: isPublic.value,
                   updatedAt: DateTime.now(),
                 ),
               );
+          savedDeckId = deckId;
         }
       } else {
-        await context.read<DeckProvider>().createDeck(
+        final newDeck = await context.read<DeckProvider>().createDeck(
               userId,
               titleController.text.trim(),
-              descController.text.trim(),
+              shortDescController.text.trim(),
               langController.text.trim(),
+              isPublic: isPublic.value,
             );
+        savedDeckId = newDeck?.id;
       }
 
-      if (context.mounted) context.pop();
+      if (!context.mounted) return;
+
+      // Show snackbar when publishing for the first time
+      final beingPublished =
+          isPublic.value && (!isEdit || !wasPublicInitially.value);
+      if (beingPublished && savedDeckId != null) {
+        final capturedCardProv = context.read<CardProvider>();
+        final capturedDeckId = savedDeckId;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(
+                'Your deck will be published after your next sync.'),
+            action: SnackBarAction(
+              label: 'Sync Now',
+              onPressed: () => capturedCardProv.pushDeck(capturedDeckId),
+            ),
+          ),
+        );
+      }
+
+      context.pop();
     }
 
     return Scaffold(
@@ -94,16 +127,27 @@ class DeckCreatorPage extends HookWidget {
                         hintText: 'e.g. JLPT N5 Vocabulary',
                       ),
                       validator: (v) =>
-                          (v == null || v.trim().isEmpty) ? 'Title is required' : null,
+                          (v == null || v.trim().isEmpty)
+                              ? 'Title is required'
+                              : null,
                     ),
                     const SizedBox(height: AppSpacing.md),
                     TextFormField(
-                      controller: descController,
+                      controller: shortDescController,
                       decoration: const InputDecoration(
-                        labelText: 'Description',
-                        hintText: 'Optional description',
+                        labelText: 'Short Description',
+                        hintText: 'One-line summary shown in list tiles',
                       ),
-                      maxLines: 3,
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    TextFormField(
+                      controller: longDescController,
+                      decoration: const InputDecoration(
+                        labelText: 'Long Description',
+                        hintText:
+                            'Full description shown on the deck detail page',
+                      ),
+                      maxLines: 4,
                     ),
                     const SizedBox(height: AppSpacing.md),
                     TextFormField(
@@ -113,7 +157,14 @@ class DeckCreatorPage extends HookWidget {
                         hintText: 'e.g. japanese',
                       ),
                       validator: (v) =>
-                          (v == null || v.trim().isEmpty) ? 'Language is required' : null,
+                          (v == null || v.trim().isEmpty)
+                              ? 'Language is required'
+                              : null,
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    _PublishToggle(
+                      value: isPublic.value,
+                      onChanged: (v) => isPublic.value = v,
                     ),
                     if (deckProvider.error != null) ...[
                       const SizedBox(height: AppSpacing.sm),
@@ -135,6 +186,40 @@ class DeckCreatorPage extends HookWidget {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Publish toggle row ────────────────────────────────────────────
+
+class _PublishToggle extends StatelessWidget {
+  const _PublishToggle({required this.value, required this.onChanged});
+
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Card(
+      color: scheme.surfaceContainerHighest,
+      child: SwitchListTile(
+        value: value,
+        onChanged: onChanged,
+        title: const Text('Publish to public browser'),
+        subtitle: Text(
+          value
+              ? 'Anyone can find and copy this deck'
+              : 'Only you can see this deck',
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: AppColors.textSecondary,
+              ),
+        ),
+        secondary: Icon(
+          value ? Icons.public : Icons.lock_outline,
+          color: value ? scheme.primary : AppColors.textSecondary,
         ),
       ),
     );

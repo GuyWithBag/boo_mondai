@@ -19,11 +19,12 @@ class AccountPage extends HookWidget {
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
 
-    if (!auth.isAuthenticated) {
-      return const UnauthenticatedAccountView();
-    }
-
-    return AuthenticatedAccountView(auth: auth);
+    return Scaffold(
+      appBar: AppBar(title: const Text('Account')),
+      body: auth.isAuthenticated
+          ? AuthenticatedAccountView(auth: auth)
+          : const UnauthenticatedAccountView(),
+    );
   }
 }
 

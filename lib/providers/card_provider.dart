@@ -1,6 +1,6 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/providers/card_provider.dart
-// PURPOSE: CRUD operations for cards within a deck
+// PURPOSE: Local-first CRUD for cards — Hive is source of truth; pushDeck syncs to Supabase
 // PROVIDERS: none
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -11,34 +11,59 @@ import 'package:boo_mondai/models/models.dart';
 import 'package:boo_mondai/services/services.dart';
 
 /// Manages cards within a specific deck.
+///
+/// All mutations (add / update / delete / reorder) write to Hive only and
+/// mark the deck dirty. Call [pushDeck] to batch-sync a deck to Supabase.
 class CardProvider extends ChangeNotifier {
   final SupabaseService _supabaseService;
   final HiveService _hiveService;
   static const _uuid = Uuid();
 
+  List<DeckCard> _cards = [];
+  String? _currentDeckId;
+  final Set<String> _dirtyDeckIds = {};
+  bool _isLoading = false;
+  bool _isPushing = false;
+  bool _isSyncing = false;
+  bool _cancelSync = false;
+  DateTime? _lastSyncedAt;
+  String? _error;
+
   CardProvider({
     required SupabaseService supabaseService,
     required HiveService hiveService,
   })  : _supabaseService = supabaseService,
-        _hiveService = hiveService;
-
-  List<DeckCard> _cards = [];
-  String? _currentDeckId;
-  bool _isLoading = false;
-  String? _error;
+        _hiveService = hiveService {
+    _lastSyncedAt = hiveService.getLastSyncedAt();
+  }
 
   List<DeckCard> get cards => List.unmodifiable(_cards);
   String? get currentDeckId => _currentDeckId;
   bool get isLoading => _isLoading;
+
+  /// True while [pushDeck] is running.
+  bool get isPushing => _isPushing;
+
+  /// True while [syncAll] is running.
+  bool get isSyncing => _isSyncing;
+
+  /// Timestamp of the last completed [syncAll]. Null until first sync.
+  DateTime? get lastSyncedAt => _lastSyncedAt;
+
   String? get error => _error;
+
+  /// Returns true when [deckId] has local changes not yet pushed to Supabase.
+  bool isDirty(String deckId) => _dirtyDeckIds.contains(deckId);
 
   void clearError() {
     _error = null;
     notifyListeners();
   }
 
-  /// Fetches all cards for [deckId], including notes/options/segments/pairs
-  /// via Supabase joins. Falls back to Hive cache on network failure.
+  // ── Fetch (network + cache) ──────────────────────────────────────
+
+  /// Fetches all cards for [deckId] from Supabase (with nested joins),
+  /// caches them in Hive, and clears the dirty flag.
   Future<void> fetchCards(String deckId) async {
     _isLoading = true;
     _error = null;
@@ -49,6 +74,7 @@ class CardProvider extends ChangeNotifier {
       final data = await _supabaseService.fetchCards(deckId);
       _cards = data.map(DeckCard.fromJson).toList();
       await _hiveService.saveCards(deckId, _cards);
+      _dirtyDeckIds.remove(deckId);
     } on AppException catch (e) {
       _error = e.message;
       _cards = _hiveService.getCards(deckId);
@@ -58,8 +84,9 @@ class CardProvider extends ChangeNotifier {
     }
   }
 
-  /// Convenience method — adds a [QuestionType.readAndSelect] card,
-  /// the most common type.
+  // ── Local writes (Hive only, mark dirty) ────────────────────────
+
+  /// Convenience wrapper for the most common card type.
   Future<DeckCard?> addSimpleCard(
     String deckId, {
     required String frontText,
@@ -73,7 +100,7 @@ class CardProvider extends ChangeNotifier {
       addCard(
         deckId,
         cardType: cardType,
-        questionType: QuestionType.readAndSelect,
+        questionType: QuestionType.flashcard,
         frontText: frontText,
         backText: backText,
         frontImageUrl: frontImageUrl,
@@ -82,12 +109,8 @@ class CardProvider extends ChangeNotifier {
         backAudioUrl: backAudioUrl,
       );
 
-  /// Full card-creation method. Inserts the card row then inserts all
-  /// content nodes (notes, options, segments, or pairs) in order.
-  ///
-  /// Notes are generated automatically from [frontText]/[backText] for all
-  /// question types except [QuestionType.matchMadness].
-  /// When [cardType] is [CardType.both] a second reversed Note is also created.
+  /// Creates a new card fully in memory, saves it to Hive, and marks the
+  /// deck dirty. No Supabase call is made here — use [pushDeck] to sync.
   Future<DeckCard?> addCard(
     String deckId, {
     required CardType cardType,
@@ -108,19 +131,11 @@ class CardProvider extends ChangeNotifier {
       final cardId = _uuid.v4();
       final now = DateTime.now();
 
-      await _supabaseService.insertCard({
-        'id': cardId,
-        'deck_id': deckId,
-        'card_type': cardType.toJson(),
-        'question_type': questionType.toJson(),
-        'sort_order': _cards.length,
-        'created_at': now.toIso8601String(),
-      });
-
-      // Notes (skipped for matchMadness)
-      final insertedNotes = <Note>[];
+      // Build notes in memory
+      final builtNotes = <Note>[];
       if (!questionType.usesPairs) {
-        final fwd = await _insertNote(
+        builtNotes.add(Note(
+          id: _uuid.v4(),
           cardId: cardId,
           frontText: frontText,
           backText: backText,
@@ -130,12 +145,10 @@ class CardProvider extends ChangeNotifier {
           backAudioUrl: backAudioUrl,
           isReverse: false,
           createdAt: now,
-        );
-        if (fwd != null) insertedNotes.add(fwd);
-
-        // Second reversed note for CardType.both
+        ));
         if (cardType == CardType.both) {
-          final rev = await _insertNote(
+          builtNotes.add(Note(
+            id: _uuid.v4(),
             cardId: cardId,
             frontText: backText,
             backText: frontText,
@@ -145,46 +158,29 @@ class CardProvider extends ChangeNotifier {
             backAudioUrl: frontAudioUrl,
             isReverse: true,
             createdAt: now,
-          );
-          if (rev != null) insertedNotes.add(rev);
+          ));
         }
       }
 
-      // Multiple-choice options
-      final insertedOptions = <MultipleChoiceOption>[];
-      for (var i = 0; i < options.length; i++) {
-        final raw = await _supabaseService.insertMCOption({
-          ...options[i].toJson(),
-          'card_id': cardId,
-          'display_order': i,
-        });
-        if (raw != null) {
-          insertedOptions.add(MultipleChoiceOption.fromJson(raw));
-        }
-      }
-
-      // Fill-in-the-blank segments
-      final insertedSegments = <FillInTheBlankSegment>[];
-      for (final seg in segments) {
-        final raw = await _supabaseService.insertFITBSegment({
-          ...seg.toJson(),
-          'card_id': cardId,
-        });
-        if (raw != null) {
-          insertedSegments.add(FillInTheBlankSegment.fromJson(raw));
-        }
-      }
-
-      // Match-madness pairs
-      final insertedPairs = <MatchMadnessPair>[];
-      for (var i = 0; i < pairs.length; i++) {
-        final raw = await _supabaseService.insertMMPair({
-          ...pairs[i].toJson(),
-          'card_id': cardId,
-          'display_order': i,
-        });
-        if (raw != null) insertedPairs.add(MatchMadnessPair.fromJson(raw));
-      }
+      // Assign stable UUIDs to children that come in without them
+      final builtOptions = [
+        for (var i = 0; i < options.length; i++)
+          options[i].id.isEmpty
+              ? options[i].copyWith(id: _uuid.v4(), cardId: cardId, displayOrder: i)
+              : options[i].copyWith(cardId: cardId, displayOrder: i),
+      ];
+      final builtSegments = [
+        for (final seg in segments)
+          seg.id.isEmpty
+              ? seg.copyWith(id: _uuid.v4(), cardId: cardId)
+              : seg.copyWith(cardId: cardId),
+      ];
+      final builtPairs = [
+        for (var i = 0; i < pairs.length; i++)
+          pairs[i].id.isEmpty
+              ? pairs[i].copyWith(id: _uuid.v4(), cardId: cardId, displayOrder: i)
+              : pairs[i].copyWith(cardId: cardId, displayOrder: i),
+      ];
 
       final card = DeckCard(
         id: cardId,
@@ -193,13 +189,15 @@ class CardProvider extends ChangeNotifier {
         questionType: questionType,
         sortOrder: _cards.length,
         createdAt: now,
-        notes: insertedNotes,
-        options: insertedOptions,
-        segments: insertedSegments,
-        pairs: insertedPairs,
+        notes: builtNotes,
+        options: builtOptions,
+        segments: builtSegments,
+        pairs: builtPairs,
       );
 
       _cards = [..._cards, card];
+      await _hiveService.saveCards(deckId, [card]);
+      _dirtyDeckIds.add(deckId);
       notifyListeners();
       return card;
     } on AppException catch (e) {
@@ -209,74 +207,155 @@ class CardProvider extends ChangeNotifier {
     }
   }
 
+  /// Updates [card] in memory and Hive. No Supabase call.
   Future<void> updateCard(DeckCard card) async {
     _error = null;
-    try {
-      await _supabaseService.updateCard(card.id, card.toJson());
-      _cards = [for (final c in _cards) c.id == card.id ? card : c];
-      notifyListeners();
-    } on AppException catch (e) {
-      _error = e.message;
-      notifyListeners();
-    }
+    final normalized = _normalizeChildIds(card);
+    _cards = [for (final c in _cards) c.id == normalized.id ? normalized : c];
+    await _hiveService.saveCards(normalized.deckId, [normalized]);
+    _dirtyDeckIds.add(normalized.deckId);
+    notifyListeners();
   }
 
+  /// Removes [cardId] from memory and Hive. No Supabase call.
   Future<void> deleteCard(String cardId) async {
     _error = null;
-    try {
-      await _supabaseService.deleteCard(cardId);
-      _cards = _cards.where((c) => c.id != cardId).toList();
-      await _hiveService.deleteCard(cardId);
-      notifyListeners();
-    } on AppException catch (e) {
-      _error = e.message;
-      notifyListeners();
-    }
+    final card = _cards.where((c) => c.id == cardId).firstOrNull;
+    if (card == null) return;
+    _cards = _cards.where((c) => c.id != cardId).toList();
+    await _hiveService.deleteCard(cardId);
+    _dirtyDeckIds.add(card.deckId);
+    notifyListeners();
   }
 
+  /// Updates [sortOrder] for all cards in memory and Hive. No Supabase call.
   Future<void> reorderCards(List<DeckCard> reordered) async {
     _error = null;
-    _cards = reordered;
+    final reindexed = [
+      for (var i = 0; i < reordered.length; i++)
+        reordered[i].copyWith(sortOrder: i),
+    ];
+    _cards = reindexed;
+    await _hiveService.saveCards(
+        reindexed.first.deckId, reindexed);
+    if (reindexed.isNotEmpty) _dirtyDeckIds.add(reindexed.first.deckId);
+    notifyListeners();
+  }
+
+  // ── Push (Hive → Supabase) ────────────────────────────────────────
+
+  /// Syncs all local cards for [deckId] to Supabase.
+  ///
+  /// For each card: upserts the card row, replaces all child records.
+  /// Deletes any remote cards that no longer exist locally.
+  Future<void> pushDeck(String deckId) async {
+    _isPushing = true;
+    _error = null;
     notifyListeners();
 
     try {
-      for (var i = 0; i < reordered.length; i++) {
-        await _supabaseService.updateCard(
-          reordered[i].id,
-          {'sort_order': i},
-        );
-      }
+      await _pushDeckBody(deckId);
     } on AppException catch (e) {
       _error = e.message;
+    } finally {
+      _isPushing = false;
       notifyListeners();
     }
   }
 
-  // ── Private helpers ──────────────────────────────────────────────────
+  /// Pushes all [deckIds] to Supabase in order.
+  ///
+  /// Returns `true` if all decks were pushed, `false` if cancelled or errored.
+  /// Call [cancelSync] to interrupt the loop between deck pushes.
+  Future<bool> syncAll(List<String> deckIds) async {
+    _isSyncing = true;
+    _cancelSync = false;
+    _error = null;
+    notifyListeners();
 
-  Future<Note?> _insertNote({
-    required String cardId,
-    required String frontText,
-    required String backText,
-    required bool isReverse,
-    required DateTime createdAt,
-    String? frontImageUrl,
-    String? backImageUrl,
-    String? frontAudioUrl,
-    String? backAudioUrl,
-  }) async {
-    final raw = await _supabaseService.insertNote({
-      'id': _uuid.v4(),
-      'card_id': cardId,
-      'front_text': frontText,
-      'back_text': backText,
-      'front_image_url': frontImageUrl,
-      'back_image_url': backImageUrl,
-      'front_audio_url': frontAudioUrl,
-      'back_audio_url': backAudioUrl,
-      'is_reverse': isReverse,
-      'created_at': createdAt.toIso8601String(),
-    });
-    return raw != null ? Note.fromJson(raw) : null;
+    var completed = true;
+    try {
+      for (final deckId in deckIds) {
+        if (_cancelSync) {
+          completed = false;
+          break;
+        }
+        await _pushDeckBody(deckId);
+      }
+      if (completed) {
+        _lastSyncedAt = DateTime.now();
+        await _hiveService.setLastSyncedAt(_lastSyncedAt!);
+      }
+    } on AppException catch (e) {
+      _error = e.message;
+      completed = false;
+    } finally {
+      _isSyncing = false;
+      _cancelSync = false;
+      notifyListeners();
+    }
+    return completed;
+  }
+
+  /// Signals [syncAll] to stop after the current deck push completes.
+  void cancelSync() {
+    _cancelSync = true;
+  }
+
+  // ── Private helpers ──────────────────────────────────────────────
+
+  /// Pushes all local cards for [deckId] to Supabase without touching loading flags.
+  Future<void> _pushDeckBody(String deckId) async {
+    final localCards = _cards.where((c) => c.deckId == deckId).toList();
+    final localIds = localCards.map((c) => c.id).toList();
+
+    await _supabaseService.deleteOrphanCards(deckId, localIds);
+
+    for (final card in localCards) {
+      await _supabaseService.upsertCardRow(card.toJson());
+      await _supabaseService.deleteChildrenByCardId(card.id);
+      await Future.wait([
+        _supabaseService.batchInsertNotes(
+            card.notes.map((n) => n.toJson()).toList()),
+        _supabaseService.batchInsertMCOptions(
+            card.options.map((o) => o.toJson()).toList()),
+        _supabaseService.batchInsertFITBSegments(
+            card.segments.map((s) => s.toJson()).toList()),
+        _supabaseService.batchInsertMMPairs(
+            card.pairs.map((p) => p.toJson()).toList()),
+      ]);
+    }
+
+    _dirtyDeckIds.remove(deckId);
+  }
+
+  /// Ensures every child record has a non-empty [id] and the correct [cardId].
+  DeckCard _normalizeChildIds(DeckCard card) {
+    final notes = card.notes
+        .map((n) => n.id.isEmpty
+            ? n.copyWith(id: _uuid.v4(), cardId: card.id)
+            : n)
+        .toList();
+    final options = [
+      for (var i = 0; i < card.options.length; i++)
+        card.options[i].id.isEmpty
+            ? card.options[i]
+                .copyWith(id: _uuid.v4(), cardId: card.id, displayOrder: i)
+            : card.options[i],
+    ];
+    final segments = card.segments
+        .map((s) => s.id.isEmpty
+            ? s.copyWith(id: _uuid.v4(), cardId: card.id)
+            : s)
+        .toList();
+    final pairs = [
+      for (var i = 0; i < card.pairs.length; i++)
+        card.pairs[i].id.isEmpty
+            ? card.pairs[i]
+                .copyWith(id: _uuid.v4(), cardId: card.id, displayOrder: i)
+            : card.pairs[i],
+    ];
+    return card.copyWith(
+        notes: notes, options: options, segments: segments, pairs: pairs);
   }
 }

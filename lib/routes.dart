@@ -23,10 +23,9 @@ GoRouter createRouter(AuthProvider authProvider) {
 
       // Auth-required routes: redirect to /account if not logged in
       if (!isAuth) {
-        final requiresAuth = loc.startsWith('/decks') ||
+        final requiresAuth = loc.startsWith('/my-decks') ||
             loc.startsWith('/quiz') ||
             loc.startsWith('/review') ||
-            loc.startsWith('/leaderboard') ||
             loc.startsWith('/research');
         if (requiresAuth) return '/account';
       }
@@ -64,16 +63,16 @@ GoRouter createRouter(AuthProvider authProvider) {
             },
           ),
           GoRoute(
-            path: '/decks',
+            path: '/online-deck-browser',
+            builder: (context, state) => const OnlineDeckBrowserPage(),
+          ),
+          GoRoute(
+            path: '/my-decks',
             builder: (context, state) => const DeckListPage(),
           ),
           GoRoute(
             path: '/review',
             builder: (context, state) => const ReviewPage(),
-          ),
-          GoRoute(
-            path: '/leaderboard',
-            builder: (context, state) => const LeaderboardPage(),
           ),
           GoRoute(
             path: '/account',
@@ -94,29 +93,24 @@ GoRouter createRouter(AuthProvider authProvider) {
 
       // ── Non-shell routes ──────────────────────────────
       GoRoute(
-        path: '/decks/create',
+        path: '/my-decks/create',
         builder: (context, state) => const DeckCreatorPage(),
       ),
       GoRoute(
-        path: '/decks/:deckId',
+        path: '/my-decks/:deckId',
         builder: (context, state) =>
             DeckDetailPage(deckId: state.pathParameters['deckId']!),
       ),
       GoRoute(
-        path: '/decks/:deckId/edit',
+        path: '/my-decks/:deckId/edit',
         builder: (context, state) =>
             DeckCreatorPage(deckId: state.pathParameters['deckId']),
       ),
       GoRoute(
-        path: '/decks/:deckId/cards/add',
-        builder: (context, state) =>
-            CardEditorPage(deckId: state.pathParameters['deckId']!),
-      ),
-      GoRoute(
-        path: '/decks/:deckId/cards/:cardId/edit',
-        builder: (context, state) => CardEditorPage(
+        path: '/my-decks/:deckId/cards/edit',
+        builder: (context, state) => DeckEditorPage(
           deckId: state.pathParameters['deckId']!,
-          cardId: state.pathParameters['cardId'],
+          initialCardId: state.uri.queryParameters['cardId'],
         ),
       ),
       GoRoute(
@@ -139,6 +133,10 @@ GoRouter createRouter(AuthProvider authProvider) {
         builder: (context, state) => const ResearcherDashboardPage(),
       ),
       GoRoute(
+        path: '/leaderboard',
+        builder: (context, state) => const LeaderboardPage(),
+      ),
+      GoRoute(
         path: '/research/code',
         builder: (context, state) => const ResearchCodeEntryPage(),
       ),
@@ -159,9 +157,9 @@ GoRouter createRouter(AuthProvider authProvider) {
 }
 
 int _shellIndex(String location) {
-  if (location.startsWith('/decks')) return 1;
-  if (location.startsWith('/review')) return 2;
-  if (location.startsWith('/leaderboard')) return 3;
+  if (location.startsWith('/online-deck-browser')) return 1;
+  if (location.startsWith('/my-decks')) return 2;
+  if (location.startsWith('/review')) return 3;
   if (location.startsWith('/account')) return 4;
   return 0; // home
 }

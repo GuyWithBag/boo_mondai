@@ -79,10 +79,26 @@ class HiveService {
     }
   }
 
+  Future<void> saveDeck(Deck deck) async {
+    await _decks.put(deck.id, Map<String, dynamic>.from(deck.toJson()));
+  }
+
+  Future<void> deleteDeck(String deckId) async {
+    await _decks.delete(deckId);
+  }
+
   List<Deck> getDecks() {
     return _decks.values
         .map((data) => Deck.fromJson(Map<String, dynamic>.from(data)))
         .toList();
+  }
+
+  List<Deck> getUserDecks(String userId) {
+    return _decks.values
+        .map((data) => Deck.fromJson(Map<String, dynamic>.from(data)))
+        .where((d) => d.creatorId == userId)
+        .toList()
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
   }
 
   // ── Cards ───────────────────────────────────────────
@@ -155,6 +171,16 @@ class HiveService {
 
   Future<void> setNotificationHour(int hour) async {
     await _settings.put('notification_hour', hour);
+  }
+
+  DateTime? getLastSyncedAt() {
+    final val = _settings.get('last_synced_at') as String?;
+    if (val == null) return null;
+    return DateTime.tryParse(val);
+  }
+
+  Future<void> setLastSyncedAt(DateTime dt) async {
+    await _settings.put('last_synced_at', dt.toIso8601String());
   }
 
   // ── Clear ───────────────────────────────────────────

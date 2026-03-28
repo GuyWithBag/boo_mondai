@@ -30,16 +30,30 @@ CREATE TRIGGER set_updated_at BEFORE UPDATE ON profiles FOR EACH ROW EXECUTE FUN
 
 -- ── decks ──────────────────────────────────────────────
 CREATE TABLE decks (
-  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  creator_id      uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-  title           text NOT NULL,
-  description     text NOT NULL DEFAULT '',
-  target_language text NOT NULL,
-  is_premade      bool NOT NULL DEFAULT false,
-  is_public       bool NOT NULL DEFAULT true,
-  card_count      int  NOT NULL DEFAULT 0,
-  created_at      timestamptz NOT NULL DEFAULT now(),
-  updated_at      timestamptz NOT NULL DEFAULT now()
+  id                uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  creator_id        uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  title             text NOT NULL,
+  short_description text NOT NULL DEFAULT '',
+  long_description  text NOT NULL DEFAULT '',
+  target_language   text NOT NULL,
+  tags              text[] NOT NULL DEFAULT '{}',
+  is_premade        bool NOT NULL DEFAULT false,
+  is_public         bool NOT NULL DEFAULT true,
+  is_uneditable     bool NOT NULL DEFAULT false,
+  -- When true the deck is excluded from the public online browser.
+  -- Researchers use this to distribute premade decks via codes only.
+  hidden_in_browser bool NOT NULL DEFAULT false,
+  card_count        int  NOT NULL DEFAULT 0,
+  version           text NOT NULL DEFAULT '1.0.0',
+  build_number      int  NOT NULL DEFAULT 1,
+  -- When non-null this deck was copied from another public deck.
+  -- Enables "Original by …" attribution in the online browser.
+  source_deck_id    uuid REFERENCES decks(id) ON DELETE SET NULL,
+  -- When true the deck is visible in the online browser and sync-able.
+  -- Flipping to true queues the deck for the next manual sync.
+  is_published      bool NOT NULL DEFAULT false,
+  created_at        timestamptz NOT NULL DEFAULT now(),
+  updated_at        timestamptz NOT NULL DEFAULT now()
 );
 ALTER TABLE decks ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "decks: anyone reads public" ON decks FOR SELECT USING (is_public = true OR auth.uid() = creator_id);
@@ -47,26 +61,40 @@ CREATE POLICY "decks: users manage own"    ON decks FOR ALL    USING (auth.uid()
 CREATE INDEX ON decks (creator_id);
 CREATE INDEX ON decks (target_language);
 CREATE INDEX ON decks (is_public);
+CREATE INDEX ON decks (source_deck_id);
+CREATE INDEX ON decks USING gin (tags);
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON decks FOR EACH ROW EXECUTE FUNCTION moddatetime(updated_at);
 
 -- ── deck_cards ─────────────────────────────────────────
 -- Stores type metadata only. All content lives in child tables.
+--
+-- question_type values:
+--   flashcard       → show front, reveal back, self-grade (no typing)
+--   identification  → show front, learner types answer; accepted answers in identification_answer
+--   multiple_choice → pick from mc_options
+--   fill_in_the_blanks → type missing words from fitb_segments (supports 1+ blanks)
+--   word_scramble   → tap chips to reconstruct the sentence stored in note.front_text
+--   match_madness   → drag-drop pairs from mm_pairs; no notes generated
 CREATE TABLE deck_cards (
-  id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  deck_id       uuid NOT NULL REFERENCES decks(id) ON DELETE CASCADE,
-  card_type     text NOT NULL DEFAULT 'normal'
-                CHECK (card_type IN ('normal', 'reversible', 'both')),
-  question_type text NOT NULL DEFAULT 'read_and_select'
-                CHECK (question_type IN (
-                  'read_and_select',
-                  'multiple_choice',
-                  'fill_in_the_blanks',
-                  'read_and_complete',
-                  'listen_and_type',
-                  'match_madness'
-                )),
-  sort_order    int  NOT NULL DEFAULT 0,
-  created_at    timestamptz NOT NULL DEFAULT now()
+  id                   uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  deck_id              uuid NOT NULL REFERENCES decks(id) ON DELETE CASCADE,
+  card_type            text NOT NULL DEFAULT 'normal'
+                       CHECK (card_type IN ('normal', 'reversed', 'both')),
+  question_type        text NOT NULL DEFAULT 'flashcard'
+                       CHECK (question_type IN (
+                         'flashcard',
+                         'identification',
+                         'multiple_choice',
+                         'fill_in_the_blanks',
+                         'word_scramble',
+                         'match_madness'
+                       )),
+  -- Comma-separated acceptable answers for question_type = 'identification'.
+  -- NULL for all other types.
+  identification_answer text,
+  sort_order            int  NOT NULL DEFAULT 0,
+  source_card_id        uuid REFERENCES deck_cards(id) ON DELETE SET NULL,
+  created_at            timestamptz NOT NULL DEFAULT now()
 );
 ALTER TABLE deck_cards ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "deck_cards: readable if deck accessible" ON deck_cards FOR SELECT
@@ -79,6 +107,7 @@ CREATE POLICY "deck_cards: creator manages" ON deck_cards FOR ALL
   USING (EXISTS (SELECT 1 FROM decks WHERE decks.id = deck_cards.deck_id AND decks.creator_id = auth.uid()))
   WITH CHECK (EXISTS (SELECT 1 FROM decks WHERE decks.id = deck_cards.deck_id AND decks.creator_id = auth.uid()));
 CREATE INDEX ON deck_cards (deck_id);
+CREATE INDEX ON deck_cards (source_card_id);
 
 -- ── notes ──────────────────────────────────────────────
 -- Content node for a card. A normal/reversible card has 1 note;
@@ -517,3 +546,50 @@ CREATE POLICY "research_sus: group_a insert own" ON research_sus FOR INSERT WITH
 CREATE POLICY "research_sus: read" ON research_sus FOR SELECT
   USING (auth.uid() = user_id OR EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'researcher'));
 CREATE INDEX ON research_sus (user_id);
+
+-- ══════════════════════════════════════════════════════
+-- MIGRATIONS
+-- Run these if you applied schema.sql before these columns
+-- were added. Safe to run multiple times (IF NOT EXISTS).
+-- ══════════════════════════════════════════════════════
+
+-- ── decks — columns added after initial schema ─────────
+ALTER TABLE decks
+  ADD COLUMN IF NOT EXISTS short_description text NOT NULL DEFAULT '',
+  ADD COLUMN IF NOT EXISTS long_description  text NOT NULL DEFAULT '',
+  ADD COLUMN IF NOT EXISTS tags              text[] NOT NULL DEFAULT '{}',
+  ADD COLUMN IF NOT EXISTS is_uneditable     bool NOT NULL DEFAULT false,
+  ADD COLUMN IF NOT EXISTS hidden_in_browser bool NOT NULL DEFAULT false,
+  ADD COLUMN IF NOT EXISTS version           text NOT NULL DEFAULT '1.0.0',
+  ADD COLUMN IF NOT EXISTS build_number      int  NOT NULL DEFAULT 1,
+  ADD COLUMN IF NOT EXISTS source_deck_id    uuid REFERENCES decks(id) ON DELETE SET NULL;
+
+CREATE INDEX IF NOT EXISTS decks_source_deck_id_idx ON decks (source_deck_id);
+CREATE INDEX IF NOT EXISTS decks_tags_idx            ON decks USING gin (tags);
+
+-- ── deck_cards — columns added after initial schema ────
+ALTER TABLE deck_cards
+  ADD COLUMN IF NOT EXISTS source_card_id uuid REFERENCES deck_cards(id) ON DELETE SET NULL;
+
+-- ── deck_cards — question_type system overhaul ─────────
+-- Removes: read_and_complete (merged into fill_in_the_blanks), type_answer column
+-- Adds:    identification, word_scramble question types; identification_answer column
+ALTER TABLE deck_cards
+  DROP COLUMN IF EXISTS type_answer,
+  ADD COLUMN IF NOT EXISTS identification_answer text;
+
+-- Re-create the question_type CHECK constraint with the new valid values.
+-- DROP + ADD is the portable Postgres way to replace a CHECK constraint.
+ALTER TABLE deck_cards
+  DROP CONSTRAINT IF EXISTS deck_cards_question_type_check;
+
+ALTER TABLE deck_cards
+  ADD CONSTRAINT deck_cards_question_type_check
+  CHECK (question_type IN (
+    'flashcard',
+    'identification',
+    'multiple_choice',
+    'fill_in_the_blanks',
+    'word_scramble',
+    'match_madness'
+  ));

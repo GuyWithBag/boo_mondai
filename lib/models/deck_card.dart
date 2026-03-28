@@ -17,14 +17,14 @@ import 'package:boo_mondai/models/question_type.dart';
 /// The card itself stores only type metadata. All presentable content
 /// lives in its associated content nodes:
 ///
-/// | [questionType]         | Content nodes present                          |
-/// |------------------------|------------------------------------------------|
-/// | readAndSelect          | [notes] (1–2 depending on [cardType])          |
-/// | listenAndType          | [notes] with audio URLs                        |
-/// | multipleChoice         | [notes] (prompt) + [options]                   |
-/// | fillInTheBlanks        | [segments] (one blank each)                    |
-/// | readAndComplete        | [segments] (multiple blanks)                   |
-/// | matchMadness           | [pairs] only — no [notes]                      |
+/// | [questionType]   | Content nodes present                                       |
+/// |------------------|-------------------------------------------------------------|
+/// | flashcard        | [notes] (1–2 depending on [cardType])                      |
+/// | identification   | [notes] (frontText = prompt) + [identificationAnswer]       |
+/// | multipleChoice   | [notes] (frontText = prompt) + [options]                   |
+/// | fillInTheBlanks  | [segments] (1+ blanks)                                     |
+/// | wordScramble     | [notes] (frontText = full sentence to reconstruct)         |
+/// | matchMadness     | [pairs] only — no [notes]                                  |
 class DeckCard {
   final String id;
   final String deckId;
@@ -33,15 +33,27 @@ class DeckCard {
   final int sortOrder;
   final DateTime createdAt;
 
+  /// When non-null, this card was copied from another user's deck.
+  /// Points to the original card's ID so the consumer can fetch and apply
+  /// the author's latest changes via the "Update" button.
+  final String? sourceCardId;
+
+  /// Comma-separated acceptable answers for [QuestionType.identification].
+  ///
+  /// Matching is case-insensitive and trims whitespace around each entry.
+  /// Example: `"dog, いぬ, inu"` accepts any of the three.
+  /// Empty string for all other question types.
+  final String identificationAnswer;
+
   /// Notes for this card. [CardType.both] produces two entries
   /// (isReverse=false and isReverse=true).
+  /// Empty for [QuestionType.matchMadness].
   final List<Note> notes;
 
   /// Populated when [questionType] is [QuestionType.multipleChoice].
   final List<MultipleChoiceOption> options;
 
-  /// Populated when [questionType] is [QuestionType.fillInTheBlanks]
-  /// or [QuestionType.readAndComplete].
+  /// Populated when [questionType] is [QuestionType.fillInTheBlanks].
   final List<FillInTheBlankSegment> segments;
 
   /// Populated when [questionType] is [QuestionType.matchMadness].
@@ -51,9 +63,11 @@ class DeckCard {
     required this.id,
     required this.deckId,
     this.cardType = CardType.normal,
-    this.questionType = QuestionType.readAndSelect,
+    this.questionType = QuestionType.flashcard,
     required this.sortOrder,
     required this.createdAt,
+    this.sourceCardId,
+    this.identificationAnswer = '',
     this.notes = const [],
     this.options = const [],
     this.segments = const [],
@@ -69,7 +83,8 @@ class DeckCard {
   /// The question prompt shown to the learner.
   String get question => primaryNote?.frontText ?? '';
 
-  /// The accepted answer text (comma-separated for readAndSelect).
+  /// The answer text from the primary note (used by [QuestionType.flashcard]).
+  /// For [QuestionType.identification] use [identificationAnswer] instead.
   String get answer => primaryNote?.backText ?? '';
 
   /// Front image URL from the primary note.
@@ -80,33 +95,45 @@ class DeckCard {
 
   // ── Answer checking ──────────────────────────────────────────────────
 
-  /// Accepted answers for [QuestionType.readAndSelect] and
-  /// [QuestionType.listenAndType] — back text split on commas,
+  /// Accepted answers for [QuestionType.flashcard] — back text split on commas,
   /// trimmed, lower-cased.
   List<String> get acceptedAnswers =>
       answer.split(',').map((a) => a.trim().toLowerCase()).toList();
 
+  /// Accepted answers for [QuestionType.identification] — [identificationAnswer]
+  /// split on commas, trimmed, lower-cased, empty entries removed.
+  List<String> get acceptedIdentificationAnswers =>
+      identificationAnswer
+          .split(',')
+          .map((a) => a.trim().toLowerCase())
+          .where((a) => a.isNotEmpty)
+          .toList();
+
   /// Returns true if [userAnswer] is correct for this card's [questionType].
   ///
-  /// - readAndSelect / listenAndType → comma-separated match in [answer]
-  /// - multipleChoice → matches a correct [MultipleChoiceOption] by id or text
-  /// - fillInTheBlanks / readAndComplete → any segment's [correctAnswer] matches
-  /// - matchMadness → always false (matching handled by the game UI)
+  /// - flashcard       → comma-separated match in Note.backText
+  /// - identification  → comma-separated match in [identificationAnswer]
+  /// - multipleChoice  → matches a correct [MultipleChoiceOption] by id or text
+  /// - fillInTheBlanks → any segment's [correctAnswer] matches
+  /// - wordScramble    → exact case-insensitive match against the full sentence
+  /// - matchMadness    → always false (matching handled by the game UI)
   bool checkAnswer(String userAnswer) {
     final trimmed = userAnswer.trim().toLowerCase();
     return switch (questionType) {
-      QuestionType.readAndSelect ||
-      QuestionType.listenAndType =>
+      QuestionType.flashcard =>
         acceptedAnswers.contains(trimmed),
+      QuestionType.identification =>
+        acceptedIdentificationAnswers.contains(trimmed),
       QuestionType.multipleChoice => options.any(
           (o) =>
               o.isCorrect &&
               (o.id == userAnswer.trim() ||
                   o.optionText.trim().toLowerCase() == trimmed),
         ),
-      QuestionType.fillInTheBlanks ||
-      QuestionType.readAndComplete =>
+      QuestionType.fillInTheBlanks =>
         segments.any((s) => s.checkAnswer(userAnswer)),
+      QuestionType.wordScramble =>
+        trimmed == question.trim().toLowerCase(),
       QuestionType.matchMadness => false,
     };
   }
@@ -121,20 +148,24 @@ class DeckCard {
             QuestionType.fromString(json['question_type'] as String?),
         sortOrder: json['sort_order'] as int? ?? 0,
         createdAt: DateTime.parse(json['created_at'] as String),
+        sourceCardId: json['source_card_id'] as String?,
+        identificationAnswer:
+            json['identification_answer'] as String? ?? '',
         notes: (json['notes'] as List<dynamic>? ?? [])
-            .map((n) => Note.fromJson(n as Map<String, dynamic>))
+            .map((n) => Note.fromJson(
+                Map<String, dynamic>.from(n as Map)))
             .toList(),
         options: (json['mc_options'] as List<dynamic>? ?? [])
-            .map((o) =>
-                MultipleChoiceOption.fromJson(o as Map<String, dynamic>))
+            .map((o) => MultipleChoiceOption.fromJson(
+                Map<String, dynamic>.from(o as Map)))
             .toList(),
         segments: (json['fitb_segments'] as List<dynamic>? ?? [])
-            .map((s) =>
-                FillInTheBlankSegment.fromJson(s as Map<String, dynamic>))
+            .map((s) => FillInTheBlankSegment.fromJson(
+                Map<String, dynamic>.from(s as Map)))
             .toList(),
         pairs: (json['mm_pairs'] as List<dynamic>? ?? [])
-            .map((p) =>
-                MatchMadnessPair.fromJson(p as Map<String, dynamic>))
+            .map((p) => MatchMadnessPair.fromJson(
+                Map<String, dynamic>.from(p as Map)))
             .toList(),
       );
 
@@ -147,6 +178,9 @@ class DeckCard {
         'question_type': questionType.toJson(),
         'sort_order': sortOrder,
         'created_at': createdAt.toIso8601String(),
+        if (sourceCardId != null) 'source_card_id': sourceCardId,
+        'identification_answer':
+            identificationAnswer.isEmpty ? null : identificationAnswer,
       };
 
   /// Serialises the full card — including nested content nodes — for Hive cache.
@@ -167,6 +201,8 @@ class DeckCard {
     QuestionType? questionType,
     int? sortOrder,
     DateTime? createdAt,
+    Object? sourceCardId = _sentinel,
+    String? identificationAnswer,
     List<Note>? notes,
     List<MultipleChoiceOption>? options,
     List<FillInTheBlankSegment>? segments,
@@ -179,6 +215,9 @@ class DeckCard {
         questionType: questionType ?? this.questionType,
         sortOrder: sortOrder ?? this.sortOrder,
         createdAt: createdAt ?? this.createdAt,
+        sourceCardId:
+            sourceCardId == _sentinel ? this.sourceCardId : sourceCardId as String?,
+        identificationAnswer: identificationAnswer ?? this.identificationAnswer,
         notes: notes ?? this.notes,
         options: options ?? this.options,
         segments: segments ?? this.segments,
@@ -197,3 +236,6 @@ class DeckCard {
   String toString() =>
       'DeckCard(id: $id, type: ${questionType.toJson()}, question: $question)';
 }
+
+// Sentinel so copyWith can explicitly set sourceCardId to null.
+const Object _sentinel = Object();

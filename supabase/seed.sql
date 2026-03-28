@@ -43,30 +43,49 @@ INSERT INTO profiles (id, email, display_name, role, target_language) VALUES
 ON CONFLICT (id) DO NOTHING;
 
 -- ── Decks ──────────────────────────────────────────────
-INSERT INTO decks (id, creator_id, title, description, target_language, is_premade, card_count) VALUES
-  ('00000000-0000-0000-0000-000000000010', researcher_id, 'JLPT N5 Vocabulary', 'Premade deck for the study — basic Japanese vocabulary', 'japanese', true,  5),
-  ('00000000-0000-0000-0000-000000000011', alice_id,      'My Extra Vocab',      'Alice''s user-generated deck',                           'japanese', false, 2)
+INSERT INTO decks (id, creator_id, title, short_description, long_description, target_language, tags, is_premade, is_uneditable, card_count) VALUES
+  ('00000000-0000-0000-0000-000000000010', researcher_id, 'JLPT N5 Vocabulary',
+    'Basic Japanese vocabulary for beginners',
+    'A curated set of 5 essential JLPT N5 words covering animals and nature. Includes flashcards, multiple-choice, and fill-in-the-blank question types.',
+    'japanese', ARRAY['jlpt-n5', 'animals', 'nature'], true, true, 5),
+  ('00000000-0000-0000-0000-000000000011', alice_id, 'My Extra Vocab',
+    'Alice''s personal vocabulary deck',
+    'Extra words Alice has been studying alongside the N5 deck.',
+    'japanese', ARRAY['nature'], false, false, 2),
+  -- Bob's deck: a private copy of the N5 premade deck (source_card_id set on cards below)
+  ('00000000-0000-0000-0000-000000000012', bob_id, 'N5 Copy',
+    'My copy of the N5 premade deck',
+    'Bob''s personal copy of the N5 deck with source_card_id links for future updates.',
+    'japanese', ARRAY['jlpt-n5', 'animals', 'nature'], false, false, 2)
 ON CONFLICT (id) DO NOTHING;
 
 -- ── Deck Cards ─────────────────────────────────────────
 -- Columns: id, deck_id, card_type, question_type, sort_order
 --
--- Card 20 — 犬 (dog)        : normal read_and_select  → 1 Note
--- Card 21 — 猫 (cat)        : both   read_and_select  → 2 Notes (fwd + reversed)
--- Card 22 — 鳥 (bird)       : normal multiple_choice  → 1 Note + 4 mc_options
--- Card 23 — 魚 (fish)       : normal fill_in_the_blanks → 1 fitb_segment
--- Card 24 — 花 (flower)     : normal read_and_select  → 1 Note
--- Card 25 — 空 (sky)        : normal read_and_select  → 1 Note
--- Card 26 — 海 (sea)        : reversible read_and_select → 1 Note
+-- Card 20 — 犬 (dog)        : normal   flashcard        → 1 Note
+-- Card 21 — 猫 (cat)        : both     flashcard        → 2 Notes (fwd + reversed)
+-- Card 22 — 鳥 (bird)       : normal   multiple_choice  → 1 Note + 4 mc_options
+-- Card 23 — 魚 (fish)       : normal   fill_in_the_blanks → 1 fitb_segment
+-- Card 24 — 花 (flower)     : normal   flashcard        → 1 Note
+-- Card 25 — 空 (sky)        : normal   flashcard        → 1 Note
+-- Card 26 — 海 (sea)        : reversed flashcard        → 1 Note
 INSERT INTO deck_cards (id, deck_id, card_type, question_type, sort_order) VALUES
-  ('00000000-0000-0000-0000-000000000020', '00000000-0000-0000-0000-000000000010', 'normal',     'read_and_select',    0),
-  ('00000000-0000-0000-0000-000000000021', '00000000-0000-0000-0000-000000000010', 'both',        'read_and_select',    1),
-  ('00000000-0000-0000-0000-000000000022', '00000000-0000-0000-0000-000000000010', 'normal',     'multiple_choice',    2),
-  ('00000000-0000-0000-0000-000000000023', '00000000-0000-0000-0000-000000000010', 'normal',     'fill_in_the_blanks', 3),
-  ('00000000-0000-0000-0000-000000000024', '00000000-0000-0000-0000-000000000010', 'normal',     'read_and_select',    4),
-  ('00000000-0000-0000-0000-000000000025', '00000000-0000-0000-0000-000000000011', 'normal',     'read_and_select',    0),
-  ('00000000-0000-0000-0000-000000000026', '00000000-0000-0000-0000-000000000011', 'reversible', 'read_and_select',    1)
+  ('00000000-0000-0000-0000-000000000020', '00000000-0000-0000-0000-000000000010', 'normal',   'flashcard',          0),
+  ('00000000-0000-0000-0000-000000000021', '00000000-0000-0000-0000-000000000010', 'both',     'flashcard',          1),
+  ('00000000-0000-0000-0000-000000000022', '00000000-0000-0000-0000-000000000010', 'normal',   'multiple_choice',    2),
+  ('00000000-0000-0000-0000-000000000023', '00000000-0000-0000-0000-000000000010', 'normal',   'fill_in_the_blanks', 3),
+  ('00000000-0000-0000-0000-000000000024', '00000000-0000-0000-0000-000000000010', 'normal',   'flashcard',          4),
+  ('00000000-0000-0000-0000-000000000025', '00000000-0000-0000-0000-000000000011', 'normal',   'flashcard',          0),
+  ('00000000-0000-0000-0000-000000000026', '00000000-0000-0000-0000-000000000011', 'reversed', 'flashcard',          1),
+  -- Bob's copied cards (source_card_id → original cards 20 and 21 from the N5 deck)
+  ('00000000-0000-0000-0000-000000000027', '00000000-0000-0000-0000-000000000012', 'normal',   'flashcard',          0),
+  ('00000000-0000-0000-0000-000000000028', '00000000-0000-0000-0000-000000000012', 'both',     'flashcard',          1)
 ON CONFLICT (id) DO NOTHING;
+
+-- Set source_card_id for Bob's copied cards (must be done in a second statement
+-- because the rows need to exist first when there is a self-referencing FK)
+UPDATE deck_cards SET source_card_id = '00000000-0000-0000-0000-000000000020' WHERE id = '00000000-0000-0000-0000-000000000027';
+UPDATE deck_cards SET source_card_id = '00000000-0000-0000-0000-000000000021' WHERE id = '00000000-0000-0000-0000-000000000028';
 
 -- ── Notes ──────────────────────────────────────────────
 -- Each read_and_select / multiple_choice card needs at least one Note.
@@ -85,7 +104,11 @@ INSERT INTO notes (id, card_id, front_text, back_text, is_reverse, created_at) V
   -- Card 25 — 空
   ('00000000-0000-0000-0000-000000000125', '00000000-0000-0000-0000-000000000025', '空',   'sky, そら, sora',      false, now()),
   -- Card 26 — 海 (reversible: learner can flip direction in settings)
-  ('00000000-0000-0000-0000-000000000126', '00000000-0000-0000-0000-000000000026', '海',   'sea, うみ, umi',       false, now())
+  ('00000000-0000-0000-0000-000000000126', '00000000-0000-0000-0000-000000000026', '海',   'sea, うみ, umi',       false, now()),
+  -- Bob's copied cards (identical content to the originals at copy time)
+  ('00000000-0000-0000-0000-000000000127', '00000000-0000-0000-0000-000000000027', '犬',   'dog, いぬ, inu',       false, now()),
+  ('00000000-0000-0000-0000-000000000128', '00000000-0000-0000-0000-000000000028', '猫',   'cat, ねこ, neko',      false, now()),
+  ('00000000-0000-0000-0000-000000000129', '00000000-0000-0000-0000-000000000028', 'cat',  '猫, ねこ',             true,  now())
 ON CONFLICT (id) DO NOTHING;
 
 -- ── Multiple Choice Options (card 22 — 鳥) ─────────────

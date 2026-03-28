@@ -1,10 +1,11 @@
 export 'account_page.dart';
-export 'card_editor_page.dart';
 export 'deck_creator_page.dart';
+export 'deck_editor_page.dart';
 export 'deck_detail_page.dart';
 export 'deck_list_page.dart';
 export 'home_page.dart';
 export 'leaderboard_page.dart';
+export 'online_deck_browser_page.dart';
 export 'login_page.dart';
 export 'quiz_preview_page.dart';
 export 'quiz_result_page.dart';
