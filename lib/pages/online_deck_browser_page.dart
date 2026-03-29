@@ -8,10 +8,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
-import 'package:boo_mondai/models/models.dart';
-import 'package:boo_mondai/providers/providers.dart';
-import 'package:boo_mondai/shared/shared.dart';
-import 'package:boo_mondai/widgets/widgets.dart';
+import 'package:boo_mondai/models/models.barrel.dart';
+import 'package:boo_mondai/providers/providers.barrel.dart';
+import 'package:boo_mondai/shared/shared.barrel.dart';
+import 'package:boo_mondai/widgets/widgets.barrel.dart';
 
 class OnlineDeckBrowserPage extends HookWidget {
   const OnlineDeckBrowserPage({super.key});
@@ -37,7 +37,9 @@ class OnlineDeckBrowserPage extends HookWidget {
     }, [searchController]);
 
     // Exclude decks the researcher has hidden from the public browser
-    final allDecks = deckProvider.decks.where((d) => !d.hiddenInBrowser).toList();
+    final allDecks = deckProvider.decks
+        .where((d) => !d.hiddenInBrowser)
+        .toList();
 
     // Collect all unique tags and languages from available decks
     final allTags = {for (final d in allDecks) ...d.tags}.toList()..sort();

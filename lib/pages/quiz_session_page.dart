@@ -10,13 +10,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:boo_mondai/providers/providers.dart';
-import 'package:boo_mondai/shared/shared.dart';
-import 'package:boo_mondai/widgets/widgets.dart';
-import 'package:boo_mondai/pages/quiz_session/anki_counter.dart';
-import 'package:boo_mondai/pages/quiz_session/strike_chip.dart';
-import 'package:boo_mondai/pages/quiz_session/quiz_interaction.dart';
-import 'package:boo_mondai/pages/quiz_session/first_pass_screen.dart';
+import 'package:boo_mondai/providers/providers.barrel.dart';
+import 'package:boo_mondai/shared/shared.barrel.dart';
+import 'package:boo_mondai/widgets/widgets.barrel.dart';
 
 class QuizSessionPage extends HookWidget {
   const QuizSessionPage({super.key, required this.deckId});
@@ -28,23 +24,24 @@ class QuizSessionPage extends HookWidget {
     final quiz = context.watch<QuizProvider>();
     final cardProvider = context.read<CardProvider>();
     final auth = context.read<AuthProvider>();
-    final shakeController =
-        useAnimationController(duration: const Duration(milliseconds: 400));
+    final shakeController = useAnimationController(
+      duration: const Duration(milliseconds: 400),
+    );
 
     useEffect(() {
       if (quiz.session == null && !quiz.isLoading) {
         final userId = auth.userProfile?.id;
         if (userId != null) {
           Future.microtask(() {
-                if (context.mounted) {
-                  context.read<QuizProvider>().startSession(
-                        deckId,
-                        userId,
-                        cardProvider.cards,
-                        false,
-                      );
-                }
-              });
+            if (context.mounted) {
+              context.read<QuizProvider>().startSession(
+                deckId,
+                userId,
+                cardProvider.cards,
+                false,
+              );
+            }
+          });
         }
       }
       return null;
@@ -83,7 +80,8 @@ class QuizSessionPage extends HookWidget {
         builder: (ctx) => AlertDialog(
           title: const Text('Discard Current Session?'),
           content: const Text(
-              'Your progress will be lost. Are you sure you want to quit?'),
+            'Your progress will be lost. Are you sure you want to quit?',
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx, false),
@@ -92,7 +90,8 @@ class QuizSessionPage extends HookWidget {
             FilledButton(
               onPressed: () => Navigator.pop(ctx, true),
               style: FilledButton.styleFrom(
-                  backgroundColor: Theme.of(ctx).colorScheme.error),
+                backgroundColor: Theme.of(ctx).colorScheme.error,
+              ),
               child: const Text('Discard'),
             ),
           ],
@@ -118,9 +117,10 @@ class QuizSessionPage extends HookWidget {
       child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
-              icon: const Icon(Icons.close),
-              tooltip: 'Quit quiz',
-              onPressed: onDiscard),
+            icon: const Icon(Icons.close),
+            tooltip: 'Quit quiz',
+            onPressed: onDiscard,
+          ),
           title: AnkiCounter(
             newCount: quiz.newCount,
             learningCount: quiz.learningCount,
@@ -140,16 +140,16 @@ class QuizSessionPage extends HookWidget {
                 child: Column(
                   children: [
                     if (quiz.currentCardStrikeCount > 0)
-                      StrikeChip(
-                          strikes: quiz.currentCardStrikeCount,
-                          max: 3),
+                      StrikeChip(strikes: quiz.currentCardStrikeCount, max: 3),
                     const SizedBox(height: AppSpacing.sm),
                     Expanded(
                       child: AnimatedBuilder(
                         animation: shakeController,
                         builder: (_, child) => Transform.translate(
                           offset: Offset(
-                              sin(shakeController.value * pi * 3) * 4, 0),
+                            sin(shakeController.value * pi * 3) * 4,
+                            0,
+                          ),
                           child: child,
                         ),
                         child: QuizQuestionCard(

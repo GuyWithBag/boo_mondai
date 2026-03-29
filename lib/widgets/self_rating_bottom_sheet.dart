@@ -6,17 +6,14 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:flutter/material.dart';
-import 'package:boo_mondai/shared/shared.dart';
+import 'package:boo_mondai/shared/shared.barrel.dart';
+import 'package:boo_mondai/widgets/rating_button.dart';
 
 class SelfRatingButtons extends StatelessWidget {
   final void Function(int rating) onRate;
   final String? promptText;
 
-  const SelfRatingButtons({
-    super.key,
-    required this.onRate,
-    this.promptText,
-  });
+  const SelfRatingButtons({super.key, required this.onRate, this.promptText});
 
   @override
   Widget build(BuildContext context) {
@@ -24,10 +21,7 @@ class SelfRatingButtons extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         if (promptText != null) ...[
-          Text(
-            promptText!,
-            style: Theme.of(context).textTheme.bodyLarge,
-          ),
+          Text(promptText!, style: Theme.of(context).textTheme.bodyLarge),
           const SizedBox(height: AppSpacing.sm),
         ],
         Row(
@@ -62,38 +56,6 @@ class SelfRatingButtons extends StatelessWidget {
           ],
         ),
       ],
-    );
-  }
-}
-
-class RatingButton extends StatelessWidget {
-  final String label;
-  final Color color;
-  final String shortcut;
-  final VoidCallback onTap;
-
-  const RatingButton({
-    super.key,
-    required this.label,
-    required this.color,
-    required this.shortcut,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Tooltip(
-        message: 'Press $shortcut',
-        child: FilledButton(
-          onPressed: onTap,
-          style: FilledButton.styleFrom(
-            backgroundColor: color.withValues(alpha: 0.15),
-            foregroundColor: color,
-          ),
-          child: Text(label),
-        ),
-      ),
     );
   }
 }

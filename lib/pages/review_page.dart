@@ -10,13 +10,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
-import 'package:boo_mondai/providers/providers.dart';
-import 'package:boo_mondai/shared/shared.dart';
-import 'package:boo_mondai/widgets/widgets.dart';
-import 'package:boo_mondai/pages/review/flip_card.dart';
-import 'package:boo_mondai/pages/review/upcoming_count.dart';
-import 'package:boo_mondai/pages/review/all_caught_up.dart';
-import 'package:boo_mondai/pages/review/upcoming_only_view.dart';
+import 'package:boo_mondai/providers/providers.barrel.dart';
+import 'package:boo_mondai/shared/shared.barrel.dart';
+import 'package:boo_mondai/widgets/widgets.barrel.dart';
 
 class ReviewPage extends HookWidget {
   const ReviewPage({super.key});
@@ -27,8 +23,9 @@ class ReviewPage extends HookWidget {
     final fsrs = context.watch<FsrsProvider>();
     final userId = auth.userProfile?.id;
 
-    final flipController =
-        useAnimationController(duration: const Duration(milliseconds: 400));
+    final flipController = useAnimationController(
+      duration: const Duration(milliseconds: 400),
+    );
     final isFlipped = useState(false);
     // Ticker increments every second to drive countdown re-renders.
     final tick = useState(0);
@@ -47,8 +44,10 @@ class ReviewPage extends HookWidget {
     // Start ticker only when there are upcoming cards to count down.
     useEffect(() {
       if (fsrs.upcomingCards.isEmpty) return null;
-      final timer =
-          Timer.periodic(const Duration(seconds: 1), (_) => tick.value++);
+      final timer = Timer.periodic(
+        const Duration(seconds: 1),
+        (_) => tick.value++,
+      );
       return timer.cancel;
     }, [fsrs.upcomingCards.length]);
 
@@ -62,7 +61,9 @@ class ReviewPage extends HookWidget {
 
     if (fsrs.isReviewComplete && fsrs.upcomingCards.isNotEmpty) {
       return UpcomingOnlyView(
-          upcomingCards: fsrs.upcomingCards, tick: tick.value);
+        upcomingCards: fsrs.upcomingCards,
+        tick: tick.value,
+      );
     }
 
     final deckCard = fsrs.currentDeckCard;
@@ -92,18 +93,17 @@ class ReviewPage extends HookWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Review (${fsrs.dueCount} remaining)'),
-      ),
+      appBar: AppBar(title: Text('Review (${fsrs.dueCount} remaining)')),
       body: SafeArea(
         child: Shortcuts(
           shortcuts: const {
-            SingleActivator(LogicalKeyboardKey.space): ActivateIntent()
+            SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
           },
           child: Actions(
             actions: {
               ActivateIntent: CallbackAction<ActivateIntent>(
-                  onInvoke: (_) => flip()),
+                onInvoke: (_) => flip(),
+              ),
             },
             child: Focus(
               autofocus: true,
@@ -134,11 +134,8 @@ class ReviewPage extends HookWidget {
                             padding: const EdgeInsets.all(AppSpacing.md),
                             child: Text(
                               'Tap to reveal • Space',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium
-                                  ?.copyWith(
-                                      color: AppColors.textSecondary),
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(color: AppColors.textSecondary),
                             ),
                           ),
                         if (fsrs.upcomingCards.isNotEmpty) ...[

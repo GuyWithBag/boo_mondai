@@ -7,7 +7,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:boo_mondai/widgets/streak_badge.dart';
-import 'package:boo_mondai/shared/shared.dart';
+import 'package:boo_mondai/shared/shared.barrel.dart';
 
 class LeaderboardTileWidget extends StatelessWidget {
   final int rank;

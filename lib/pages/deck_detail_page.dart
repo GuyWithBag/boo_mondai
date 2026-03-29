@@ -9,10 +9,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:boo_mondai/models/models.dart';
-import 'package:boo_mondai/providers/providers.dart';
-import 'package:boo_mondai/shared/shared.dart';
-import 'package:boo_mondai/widgets/widgets.dart';
+import 'package:boo_mondai/models/models.barrel.dart';
+import 'package:boo_mondai/providers/providers.barrel.dart';
+import 'package:boo_mondai/shared/shared.barrel.dart';
+import 'package:boo_mondai/widgets/widgets.barrel.dart';
 
 class DeckDetailPage extends HookWidget {
   final String deckId;
@@ -51,10 +51,12 @@ class DeckDetailPage extends HookWidget {
             if (context.mounted) {
               ScaffoldMessenger.of(context)
                 ..hideCurrentSnackBar()
-                ..showSnackBar(SnackBar(
-                  content: Text(err),
-                  backgroundColor: Theme.of(context).colorScheme.error,
-                ));
+                ..showSnackBar(
+                  SnackBar(
+                    content: Text(err),
+                    backgroundColor: Theme.of(context).colorScheme.error,
+                  ),
+                );
               context.read<CardProvider>().clearError();
             }
           });
@@ -81,10 +83,7 @@ class DeckDetailPage extends HookWidget {
             ),
             TextButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: const Text(
-                'Delete',
-                style: TextStyle(color: Colors.red),
-              ),
+              child: const Text('Delete', style: TextStyle(color: Colors.red)),
             ),
           ],
         ),
@@ -116,7 +115,7 @@ class DeckDetailPage extends HookWidget {
 
     return Scaffold(
       appBar: isSelecting
-          ? _SelectionAppBar(
+          ? SelectionAppBar(
               count: selectedIds.value.length,
               onCancel: () => selectedIds.value = {},
               onDelete: deleteSelected,
@@ -130,18 +129,20 @@ class DeckDetailPage extends HookWidget {
                         ? 'Pushing…'
                         : 'Push local changes to cloud',
                     child: Padding(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.xs,
+                      ),
                       child: TextButton.icon(
                         onPressed: cardProvider.isPushing
                             ? null
                             : () =>
-                                context.read<CardProvider>().pushDeck(deckId),
+                                  context.read<CardProvider>().pushDeck(deckId),
                         icon: cardProvider.isPushing
                             ? const SizedBox.square(
                                 dimension: 14,
-                                child:
-                                    CircularProgressIndicator(strokeWidth: 2),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
                               )
                             : const Icon(Icons.cloud_upload_outlined, size: 18),
                         label: const Text('Push'),
@@ -163,11 +164,16 @@ class DeckDetailPage extends HookWidget {
                       value: 'delete',
                       child: Row(
                         children: [
-                          Icon(Icons.delete_outline,
-                              size: 18, color: Colors.red),
+                          Icon(
+                            Icons.delete_outline,
+                            size: 18,
+                            color: Colors.red,
+                          ),
                           SizedBox(width: 8),
-                          Text('Delete deck',
-                              style: TextStyle(color: Colors.red)),
+                          Text(
+                            'Delete deck',
+                            style: TextStyle(color: Colors.red),
+                          ),
                         ],
                       ),
                     ),
@@ -177,8 +183,7 @@ class DeckDetailPage extends HookWidget {
             ),
       floatingActionButton: !isSelecting && cardProvider.cards.isNotEmpty
           ? FloatingActionButton(
-              onPressed: () =>
-                  context.push('/my-decks/$deckId/cards/edit'),
+              onPressed: () => context.push('/my-decks/$deckId/cards/edit'),
               child: const Icon(Icons.add),
             )
           : null,
@@ -219,7 +224,7 @@ class DeckDetailPage extends HookWidget {
               itemCount: cardProvider.cards.length,
               itemBuilder: (context, i) {
                 final card = cardProvider.cards[i];
-                return _CardTile(
+                return CardTile(
                   card: card,
                   isSelecting: isSelecting,
                   isSelected: selectedIds.value.contains(card.id),
@@ -227,153 +232,12 @@ class DeckDetailPage extends HookWidget {
                   onTap: () => isSelecting
                       ? toggleSelection(card.id)
                       : context.push(
-                          '/my-decks/$deckId/cards/edit?cardId=${card.id}'),
+                          '/my-decks/$deckId/cards/edit?cardId=${card.id}',
+                        ),
                   onLongPress: () => toggleSelection(card.id),
                 );
               },
             ),
-    );
-  }
-}
-
-// ── Selection app bar ─────────────────────────────────────────────
-
-class _SelectionAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const _SelectionAppBar({
-    required this.count,
-    required this.onCancel,
-    required this.onDelete,
-  });
-
-  final int count;
-  final VoidCallback onCancel;
-  final VoidCallback onDelete;
-
-  @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return AppBar(
-      backgroundColor: scheme.primaryContainer,
-      leading: IconButton(
-        icon: const Icon(Icons.close),
-        tooltip: 'Cancel selection',
-        onPressed: onCancel,
-      ),
-      title: Text(
-        '$count selected',
-        style: TextStyle(color: scheme.onPrimaryContainer),
-      ),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.delete_outline),
-          tooltip: 'Delete selected',
-          color: scheme.error,
-          onPressed: onDelete,
-        ),
-      ],
-    );
-  }
-}
-
-// ── Card tile ─────────────────────────────────────────────────────
-
-class _CardTile extends StatelessWidget {
-  const _CardTile({
-    required this.card,
-    required this.isSelecting,
-    required this.isSelected,
-    required this.isUneditable,
-    required this.onTap,
-    required this.onLongPress,
-  });
-
-  final DeckCard card;
-  final bool isSelecting;
-  final bool isSelected;
-  final bool isUneditable;
-  final VoidCallback onTap;
-  final VoidCallback onLongPress;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Card(
-      color: isSelected ? scheme.primaryContainer : null,
-      child: ListTile(
-        leading: isSelecting
-            ? AnimatedContainer(
-                duration: const Duration(milliseconds: 150),
-                width: 24,
-                height: 24,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: isSelected ? scheme.primary : Colors.transparent,
-                  border: Border.all(
-                    color: isSelected
-                        ? scheme.primary
-                        : AppColors.textSecondary,
-                    width: 2,
-                  ),
-                ),
-                child: isSelected
-                    ? Icon(Icons.check, size: 14, color: scheme.onPrimary)
-                    : null,
-              )
-            : null,
-        title: Row(
-          children: [
-            Expanded(
-              child: Text(
-                card.question.isNotEmpty ? card.question : '(no question)',
-              ),
-            ),
-            if (isUneditable) ...[
-              const SizedBox(width: AppSpacing.xs),
-              _UneditableChip(),
-            ],
-          ],
-        ),
-        subtitle: Text(
-          card.answer.isNotEmpty ? card.answer : '(no answer)',
-        ),
-        trailing: isSelecting
-            ? null
-            : IconButton(
-                icon: const Icon(Icons.edit_outlined),
-                onPressed: onTap,
-              ),
-        onTap: onTap,
-        onLongPress: onLongPress,
-      ),
-    );
-  }
-}
-
-// ── Uneditable badge ──────────────────────────────────────────────
-
-class _UneditableChip extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.xs,
-        vertical: 2,
-      ),
-      decoration: BoxDecoration(
-        color: scheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: scheme.outlineVariant),
-      ),
-      child: Text(
-        'Uneditable',
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: AppColors.textSecondary,
-            ),
-      ),
     );
   }
 }

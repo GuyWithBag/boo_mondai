@@ -6,9 +6,9 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:go_router/go_router.dart';
-import 'package:boo_mondai/pages/pages.dart';
-import 'package:boo_mondai/providers/providers.dart';
-import 'package:boo_mondai/widgets/widgets.dart';
+import 'package:boo_mondai/pages/pages.barrel.dart';
+import 'package:boo_mondai/providers/providers.barrel.dart';
+import 'package:boo_mondai/widgets/widgets.barrel.dart';
 
 GoRouter createRouter(AuthProvider authProvider) {
   return GoRouter(
@@ -23,7 +23,8 @@ GoRouter createRouter(AuthProvider authProvider) {
 
       // Auth-required routes: redirect to /account if not logged in
       if (!isAuth) {
-        final requiresAuth = loc.startsWith('/my-decks') ||
+        final requiresAuth =
+            loc.startsWith('/my-decks') ||
             loc.startsWith('/quiz') ||
             loc.startsWith('/review') ||
             loc.startsWith('/research');
@@ -47,10 +48,7 @@ GoRouter createRouter(AuthProvider authProvider) {
       ShellRoute(
         builder: (context, state, child) {
           final index = _shellIndex(state.matchedLocation);
-          return ResponsiveScaffold(
-            currentIndex: index,
-            child: child,
-          );
+          return ResponsiveScaffold(currentIndex: index, child: child);
         },
         routes: [
           GoRoute(
@@ -82,10 +80,7 @@ GoRouter createRouter(AuthProvider authProvider) {
       ),
 
       // ── Auth routes (no shell) ────────────────────────
-      GoRoute(
-        path: '/login',
-        builder: (context, state) => const LoginPage(),
-      ),
+      GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
       GoRoute(
         path: '/register',
         builder: (context, state) => const RegisterPage(),

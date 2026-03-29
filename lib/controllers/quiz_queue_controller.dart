@@ -6,7 +6,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'dart:collection';
-import 'package:boo_mondai/models/models.dart';
+import 'package:boo_mondai/models/models.barrel.dart';
 
 class QuizQueueController {
   static const int maxStrikes = 3;

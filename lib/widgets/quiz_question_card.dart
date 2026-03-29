@@ -6,17 +6,13 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:flutter/material.dart';
-import 'package:boo_mondai/shared/shared.dart';
+import 'package:boo_mondai/shared/shared.barrel.dart';
 
 class QuizQuestionCard extends StatelessWidget {
   final String question;
   final String? imageUrl;
 
-  const QuizQuestionCard({
-    super.key,
-    required this.question,
-    this.imageUrl,
-  });
+  const QuizQuestionCard({super.key, required this.question, this.imageUrl});
 
   @override
   Widget build(BuildContext context) {

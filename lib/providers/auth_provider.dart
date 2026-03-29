@@ -6,8 +6,8 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:flutter/foundation.dart';
-import 'package:boo_mondai/models/models.dart';
-import 'package:boo_mondai/services/services.dart';
+import 'package:boo_mondai/models/models.barrel.dart';
+import 'package:boo_mondai/services/services.barrel.dart';
 
 /// Handles sign-in, sign-up, sign-out, and session restoration.
 class AuthProvider extends ChangeNotifier {

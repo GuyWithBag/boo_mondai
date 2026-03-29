@@ -8,9 +8,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
-import 'package:boo_mondai/providers/providers.dart';
-import 'package:boo_mondai/shared/shared.dart';
-import 'package:boo_mondai/widgets/widgets.dart';
+import 'package:boo_mondai/providers/providers.barrel.dart';
+import 'package:boo_mondai/shared/shared.barrel.dart';
+import 'package:boo_mondai/widgets/widgets.barrel.dart';
 
 class LeaderboardPage extends HookWidget {
   const LeaderboardPage({super.key});
@@ -22,7 +22,8 @@ class LeaderboardPage extends HookWidget {
 
     useEffect(() {
       Future.microtask(
-          () => context.read<LeaderboardProvider>().fetchLeaderboard());
+        () => context.read<LeaderboardProvider>().fetchLeaderboard(),
+      );
       return null;
     }, const []);
 
@@ -36,14 +37,8 @@ class LeaderboardPage extends HookWidget {
             onSelected: (lang) =>
                 context.read<LeaderboardProvider>().setLanguageFilter(lang),
             itemBuilder: (_) => [
-              const PopupMenuItem(
-                value: null,
-                child: Text('All languages'),
-              ),
-              const PopupMenuItem(
-                value: 'japanese',
-                child: Text('Japanese'),
-              ),
+              const PopupMenuItem(value: null, child: Text('All languages')),
+              const PopupMenuItem(value: 'japanese', child: Text('Japanese')),
             ],
           ),
         ],
@@ -51,28 +46,28 @@ class LeaderboardPage extends HookWidget {
       body: leaderboard.isLoading
           ? const Center(child: CircularProgressIndicator())
           : leaderboard.entries.isEmpty
-              ? const Center(child: Text('No entries yet'))
-              : RefreshIndicator(
-                  onRefresh: () => context
-                      .read<LeaderboardProvider>()
-                      .fetchLeaderboard(
-                          targetLanguage: leaderboard.filteredLanguage),
-                  child: ListView.builder(
-                    controller: scrollController,
-                    padding: const EdgeInsets.all(AppSpacing.md),
-                    itemCount: leaderboard.entries.length,
-                    itemBuilder: (context, i) {
-                      final entry = leaderboard.entries[i];
-                      return LeaderboardTileWidget(
-                        rank: i + 1,
-                        displayName: entry.displayName,
-                        quizScore: entry.quizScore,
-                        reviewCount: entry.reviewCount,
-                        currentStreak: entry.currentStreak,
-                      );
-                    },
+          ? const Center(child: Text('No entries yet'))
+          : RefreshIndicator(
+              onRefresh: () =>
+                  context.read<LeaderboardProvider>().fetchLeaderboard(
+                    targetLanguage: leaderboard.filteredLanguage,
                   ),
-                ),
+              child: ListView.builder(
+                controller: scrollController,
+                padding: const EdgeInsets.all(AppSpacing.md),
+                itemCount: leaderboard.entries.length,
+                itemBuilder: (context, i) {
+                  final entry = leaderboard.entries[i];
+                  return LeaderboardTileWidget(
+                    rank: i + 1,
+                    displayName: entry.displayName,
+                    quizScore: entry.quizScore,
+                    reviewCount: entry.reviewCount,
+                    currentStreak: entry.currentStreak,
+                  );
+                },
+              ),
+            ),
     );
   }
 }

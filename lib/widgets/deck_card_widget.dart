@@ -7,8 +7,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:boo_mondai/models/models.dart';
-import 'package:boo_mondai/shared/shared.dart';
+import 'package:boo_mondai/models/models.barrel.dart';
+import 'package:boo_mondai/shared/shared.barrel.dart';
+import 'package:boo_mondai/widgets/widgets.barrel.dart';
 
 class DeckCardWidget extends StatelessWidget {
   final Deck deck;
@@ -77,16 +78,15 @@ class DeckCardWidget extends StatelessWidget {
                     ),
                   ),
                   if (!isSelecting) ...[
-                    if (deck.isPremade) const PremadeBadge(),
-                    if (isDirty) _UnsyncedBadge(isPushing: isPushing),
+                    if (deck.isPremade) const StatusBadge.premade(),
+                    if (isDirty) UnsyncedBadge(isPushing: isPushing),
                     if (onDelete != null || onPush != null)
-                      _DeckPopupMenu(
+                      DeckPopupMenu(
                         onDelete: onDelete,
                         onPush: isPushing ? null : onPush,
                       ),
                   ],
-                  if (isSelecting)
-                    _SelectionIndicator(isSelected: isSelected),
+                  if (isSelecting) SelectionIndicator(isSelected: isSelected),
                 ],
               ),
               const SizedBox(height: AppSpacing.xs),
@@ -96,131 +96,6 @@ class DeckCardWidget extends StatelessWidget {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _DeckPopupMenu extends StatelessWidget {
-  const _DeckPopupMenu({this.onDelete, this.onPush});
-  final VoidCallback? onDelete;
-  final VoidCallback? onPush;
-
-  @override
-  Widget build(BuildContext context) {
-    return PopupMenuButton<String>(
-      iconSize: 18,
-      padding: EdgeInsets.zero,
-      tooltip: 'Deck options',
-      onSelected: (value) {
-        if (value == 'push') onPush?.call();
-        if (value == 'delete') onDelete?.call();
-      },
-      itemBuilder: (context) => [
-        if (onPush != null)
-          const PopupMenuItem(
-            value: 'push',
-            child: Row(
-              children: [
-                Icon(Icons.cloud_upload_outlined, size: 18),
-                SizedBox(width: 8),
-                Text('Push changes'),
-              ],
-            ),
-          ),
-        if (onDelete != null)
-          const PopupMenuItem(
-            value: 'delete',
-            child: Row(
-              children: [
-                Icon(Icons.delete_outline, size: 18, color: Colors.red),
-                SizedBox(width: 8),
-                Text('Delete', style: TextStyle(color: Colors.red)),
-              ],
-            ),
-          ),
-      ],
-    );
-  }
-}
-
-class _UnsyncedBadge extends StatelessWidget {
-  const _UnsyncedBadge({required this.isPushing});
-
-  final bool isPushing;
-
-  @override
-  Widget build(BuildContext context) {
-    return Tooltip(
-      message: isPushing ? 'Pushing to cloud…' : 'Unsynced local changes',
-      child: Padding(
-        padding: const EdgeInsets.only(right: AppSpacing.xs),
-        child: isPushing
-            ? const SizedBox.square(
-                dimension: 14,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              )
-            : Icon(
-                Icons.cloud_upload_outlined,
-                size: 16,
-                color: Theme.of(context)
-                    .colorScheme
-                    .primary
-                    .withValues(alpha: 0.7),
-              ),
-      ),
-    );
-  }
-}
-
-class _SelectionIndicator extends StatelessWidget {
-  const _SelectionIndicator({required this.isSelected});
-
-  final bool isSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 150),
-      width: 22,
-      height: 22,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: isSelected ? scheme.primary : Colors.transparent,
-        border: Border.all(
-          color: isSelected ? scheme.primary : AppColors.textSecondary,
-          width: 2,
-        ),
-      ),
-      child: isSelected
-          ? Icon(Icons.check, size: 13, color: scheme.onPrimary)
-          : null,
-    );
-  }
-}
-
-class PremadeBadge extends StatelessWidget {
-  const PremadeBadge({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: AppSpacing.xs,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.secondary.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(AppRadii.badge),
-      ),
-      child: const Text(
-        'Premade',
-        style: TextStyle(
-          color: AppColors.secondary,
-          fontSize: 11,
-          fontWeight: FontWeight.w500,
         ),
       ),
     );

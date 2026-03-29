@@ -1,11 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-// ignore_for_file: depend_on_referenced_packages
-
 part of 'adapters.dart';
-
-// ignore: directives_ordering
-import 'dart:convert';
 
 // **************************************************************************
 // AdaptersGenerator
@@ -77,23 +72,21 @@ class DeckAdapter extends TypeAdapter<Deck> {
       id: fields[0] as String,
       creatorId: fields[1] as String,
       title: fields[2] as String,
-      shortDescription: fields[3] as String? ?? '',
+      shortDescription: fields[3] == null ? '' : fields[3] as String,
+      longDescription: fields[10] == null ? '' : fields[10] as String,
       targetLanguage: fields[4] as String,
+      tags: fields[14] == null ? const [] : (fields[14] as List).cast<String>(),
       isPremade: fields[5] as bool,
       isPublic: fields[6] as bool,
+      isUneditable: fields[11] == null ? false : fields[11] as bool,
       cardCount: (fields[7] as num).toInt(),
+      version: fields[12] == null ? '1.0.0' : fields[12] as String,
+      buildNumber: fields[13] == null ? 1 : (fields[13] as num).toInt(),
       createdAt: fields[8] as DateTime,
       updatedAt: fields[9] as DateTime,
-      longDescription: fields[10] as String? ?? '',
-      isUneditable: fields[11] as bool? ?? false,
-      version: fields[12] as String? ?? '1.0.0',
-      buildNumber: (fields[13] as num?)?.toInt() ?? 1,
-      tags: (fields[14] as List?)?.cast<String>() ?? const [],
-      // index 15: sourceDeckCreatorId (was creatorName — same String? type)
-      sourceDeckCreatorId: fields[15] as String?,
       sourceDeckId: fields[16] as String?,
-      // index 17: legacy (was sourceDeckCreatorName) — no longer written/used
-      hiddenInBrowser: fields[18] as bool? ?? false,
+      sourceDeckCreatorId: fields[15] as String?,
+      hiddenInBrowser: fields[18] == null ? false : fields[18] as bool,
     );
   }
 
@@ -131,11 +124,10 @@ class DeckAdapter extends TypeAdapter<Deck> {
       ..write(obj.buildNumber)
       ..writeByte(14)
       ..write(obj.tags)
-      ..writeByte(15) // sourceDeckCreatorId (was creatorName — same String? type)
+      ..writeByte(15)
       ..write(obj.sourceDeckCreatorId)
       ..writeByte(16)
       ..write(obj.sourceDeckId)
-      // index 17 no longer written (was sourceDeckCreatorName)
       ..writeByte(18)
       ..write(obj.hiddenInBrowser);
   }
@@ -161,34 +153,34 @@ class DeckCardAdapter extends TypeAdapter<DeckCard> {
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-
-    List<T> _decodeList<T>(int index, T Function(Map<String, dynamic>) fromJson) {
-      final raw = fields[index] as String?;
-      if (raw == null || raw.isEmpty) return [];
-      return (jsonDecode(raw) as List<dynamic>)
-          .map((e) => fromJson(e as Map<String, dynamic>))
-          .toList();
-    }
-
     return DeckCard(
       id: fields[0] as String,
       deckId: fields[1] as String,
-      // indices 2–5 were old question/answer/image fields — skipped
+      cardType: fields[8] == null ? CardType.normal : fields[8] as CardType,
+      questionType: fields[9] == null
+          ? QuestionType.flashcard
+          : fields[9] as QuestionType,
       sortOrder: (fields[6] as num).toInt(),
       createdAt: fields[7] as DateTime,
-      cardType: CardType.fromString(fields[8] as String?),
-      questionType: QuestionType.fromString(fields[9] as String?),
-      notes: _decodeList(10, Note.fromJson),
-      options: _decodeList(11, MultipleChoiceOption.fromJson),
-      segments: _decodeList(12, FillInTheBlankSegment.fromJson),
-      pairs: _decodeList(13, MatchMadnessPair.fromJson),
+      sourceCardId: fields[14] as String?,
+      identificationAnswer: fields[15] == null ? '' : fields[15] as String,
+      notes: fields[16] == null ? const [] : (fields[16] as List).cast<Note>(),
+      options: fields[17] == null
+          ? const []
+          : (fields[17] as List).cast<MultipleChoiceOption>(),
+      segments: fields[18] == null
+          ? const []
+          : (fields[18] as List).cast<FillInTheBlankSegment>(),
+      pairs: fields[19] == null
+          ? const []
+          : (fields[19] as List).cast<MatchMadnessPair>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, DeckCard obj) {
     writer
-      ..writeByte(10)
+      ..writeByte(12)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -198,17 +190,21 @@ class DeckCardAdapter extends TypeAdapter<DeckCard> {
       ..writeByte(7)
       ..write(obj.createdAt)
       ..writeByte(8)
-      ..write(obj.cardType.toJson())
+      ..write(obj.cardType)
       ..writeByte(9)
-      ..write(obj.questionType.toJson())
-      ..writeByte(10)
-      ..write(jsonEncode(obj.notes.map((n) => n.toJson()).toList()))
-      ..writeByte(11)
-      ..write(jsonEncode(obj.options.map((o) => o.toJson()).toList()))
-      ..writeByte(12)
-      ..write(jsonEncode(obj.segments.map((s) => s.toJson()).toList()))
-      ..writeByte(13)
-      ..write(jsonEncode(obj.pairs.map((p) => p.toJson()).toList()));
+      ..write(obj.questionType)
+      ..writeByte(14)
+      ..write(obj.sourceCardId)
+      ..writeByte(15)
+      ..write(obj.identificationAnswer)
+      ..writeByte(16)
+      ..write(obj.notes)
+      ..writeByte(17)
+      ..write(obj.options)
+      ..writeByte(18)
+      ..write(obj.segments)
+      ..writeByte(19)
+      ..write(obj.pairs);
   }
 
   @override

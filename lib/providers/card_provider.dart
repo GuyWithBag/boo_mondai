@@ -7,8 +7,8 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
-import 'package:boo_mondai/models/models.dart';
-import 'package:boo_mondai/services/services.dart';
+import 'package:boo_mondai/models/models.barrel.dart';
+import 'package:boo_mondai/services/services.barrel.dart';
 
 /// Manages cards within a specific deck.
 ///
@@ -32,8 +32,8 @@ class CardProvider extends ChangeNotifier {
   CardProvider({
     required SupabaseService supabaseService,
     required HiveService hiveService,
-  })  : _supabaseService = supabaseService,
-        _hiveService = hiveService {
+  }) : _supabaseService = supabaseService,
+       _hiveService = hiveService {
     _lastSyncedAt = hiveService.getLastSyncedAt();
   }
 
@@ -96,18 +96,17 @@ class CardProvider extends ChangeNotifier {
     String? backImageUrl,
     String? frontAudioUrl,
     String? backAudioUrl,
-  }) =>
-      addCard(
-        deckId,
-        cardType: cardType,
-        questionType: QuestionType.flashcard,
-        frontText: frontText,
-        backText: backText,
-        frontImageUrl: frontImageUrl,
-        backImageUrl: backImageUrl,
-        frontAudioUrl: frontAudioUrl,
-        backAudioUrl: backAudioUrl,
-      );
+  }) => addCard(
+    deckId,
+    cardType: cardType,
+    questionType: QuestionType.flashcard,
+    frontText: frontText,
+    backText: backText,
+    frontImageUrl: frontImageUrl,
+    backImageUrl: backImageUrl,
+    frontAudioUrl: frontAudioUrl,
+    backAudioUrl: backAudioUrl,
+  );
 
   /// Creates a new card fully in memory, saves it to Hive, and marks the
   /// deck dirty. No Supabase call is made here — use [pushDeck] to sync.
@@ -134,31 +133,35 @@ class CardProvider extends ChangeNotifier {
       // Build notes in memory
       final builtNotes = <Note>[];
       if (!questionType.usesPairs) {
-        builtNotes.add(Note(
-          id: _uuid.v4(),
-          cardId: cardId,
-          frontText: frontText,
-          backText: backText,
-          frontImageUrl: frontImageUrl,
-          backImageUrl: backImageUrl,
-          frontAudioUrl: frontAudioUrl,
-          backAudioUrl: backAudioUrl,
-          isReverse: false,
-          createdAt: now,
-        ));
-        if (cardType == CardType.both) {
-          builtNotes.add(Note(
+        builtNotes.add(
+          Note(
             id: _uuid.v4(),
             cardId: cardId,
-            frontText: backText,
-            backText: frontText,
-            frontImageUrl: backImageUrl,
-            backImageUrl: frontImageUrl,
-            frontAudioUrl: backAudioUrl,
-            backAudioUrl: frontAudioUrl,
-            isReverse: true,
+            frontText: frontText,
+            backText: backText,
+            frontImageUrl: frontImageUrl,
+            backImageUrl: backImageUrl,
+            frontAudioUrl: frontAudioUrl,
+            backAudioUrl: backAudioUrl,
+            isReverse: false,
             createdAt: now,
-          ));
+          ),
+        );
+        if (cardType == CardType.both) {
+          builtNotes.add(
+            Note(
+              id: _uuid.v4(),
+              cardId: cardId,
+              frontText: backText,
+              backText: frontText,
+              frontImageUrl: backImageUrl,
+              backImageUrl: frontImageUrl,
+              frontAudioUrl: backAudioUrl,
+              backAudioUrl: frontAudioUrl,
+              isReverse: true,
+              createdAt: now,
+            ),
+          );
         }
       }
 
@@ -166,7 +169,11 @@ class CardProvider extends ChangeNotifier {
       final builtOptions = [
         for (var i = 0; i < options.length; i++)
           options[i].id.isEmpty
-              ? options[i].copyWith(id: _uuid.v4(), cardId: cardId, displayOrder: i)
+              ? options[i].copyWith(
+                  id: _uuid.v4(),
+                  cardId: cardId,
+                  displayOrder: i,
+                )
               : options[i].copyWith(cardId: cardId, displayOrder: i),
       ];
       final builtSegments = [
@@ -178,7 +185,11 @@ class CardProvider extends ChangeNotifier {
       final builtPairs = [
         for (var i = 0; i < pairs.length; i++)
           pairs[i].id.isEmpty
-              ? pairs[i].copyWith(id: _uuid.v4(), cardId: cardId, displayOrder: i)
+              ? pairs[i].copyWith(
+                  id: _uuid.v4(),
+                  cardId: cardId,
+                  displayOrder: i,
+                )
               : pairs[i].copyWith(cardId: cardId, displayOrder: i),
       ];
 
@@ -236,8 +247,7 @@ class CardProvider extends ChangeNotifier {
         reordered[i].copyWith(sortOrder: i),
     ];
     _cards = reindexed;
-    await _hiveService.saveCards(
-        reindexed.first.deckId, reindexed);
+    await _hiveService.saveCards(reindexed.first.deckId, reindexed);
     if (reindexed.isNotEmpty) _dirtyDeckIds.add(reindexed.first.deckId);
     notifyListeners();
   }
@@ -316,13 +326,17 @@ class CardProvider extends ChangeNotifier {
       await _supabaseService.deleteChildrenByCardId(card.id);
       await Future.wait([
         _supabaseService.batchInsertNotes(
-            card.notes.map((n) => n.toJson()).toList()),
+          card.notes.map((n) => n.toJson()).toList(),
+        ),
         _supabaseService.batchInsertMCOptions(
-            card.options.map((o) => o.toJson()).toList()),
+          card.options.map((o) => o.toJson()).toList(),
+        ),
         _supabaseService.batchInsertFITBSegments(
-            card.segments.map((s) => s.toJson()).toList()),
+          card.segments.map((s) => s.toJson()).toList(),
+        ),
         _supabaseService.batchInsertMMPairs(
-            card.pairs.map((p) => p.toJson()).toList()),
+          card.pairs.map((p) => p.toJson()).toList(),
+        ),
       ]);
     }
 
@@ -332,30 +346,40 @@ class CardProvider extends ChangeNotifier {
   /// Ensures every child record has a non-empty [id] and the correct [cardId].
   DeckCard _normalizeChildIds(DeckCard card) {
     final notes = card.notes
-        .map((n) => n.id.isEmpty
-            ? n.copyWith(id: _uuid.v4(), cardId: card.id)
-            : n)
+        .map(
+          (n) => n.id.isEmpty ? n.copyWith(id: _uuid.v4(), cardId: card.id) : n,
+        )
         .toList();
     final options = [
       for (var i = 0; i < card.options.length; i++)
         card.options[i].id.isEmpty
-            ? card.options[i]
-                .copyWith(id: _uuid.v4(), cardId: card.id, displayOrder: i)
+            ? card.options[i].copyWith(
+                id: _uuid.v4(),
+                cardId: card.id,
+                displayOrder: i,
+              )
             : card.options[i],
     ];
     final segments = card.segments
-        .map((s) => s.id.isEmpty
-            ? s.copyWith(id: _uuid.v4(), cardId: card.id)
-            : s)
+        .map(
+          (s) => s.id.isEmpty ? s.copyWith(id: _uuid.v4(), cardId: card.id) : s,
+        )
         .toList();
     final pairs = [
       for (var i = 0; i < card.pairs.length; i++)
         card.pairs[i].id.isEmpty
-            ? card.pairs[i]
-                .copyWith(id: _uuid.v4(), cardId: card.id, displayOrder: i)
+            ? card.pairs[i].copyWith(
+                id: _uuid.v4(),
+                cardId: card.id,
+                displayOrder: i,
+              )
             : card.pairs[i],
     ];
     return card.copyWith(
-        notes: notes, options: options, segments: segments, pairs: pairs);
+      notes: notes,
+      options: options,
+      segments: segments,
+      pairs: pairs,
+    );
   }
 }

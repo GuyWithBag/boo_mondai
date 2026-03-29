@@ -7,8 +7,8 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
-import 'package:boo_mondai/models/models.dart';
-import 'package:boo_mondai/services/services.dart';
+import 'package:boo_mondai/models/models.barrel.dart';
+import 'package:boo_mondai/services/services.barrel.dart';
 
 /// Manages deck listing, creation, updates, and deletion.
 class DeckProvider extends ChangeNotifier {
@@ -19,8 +19,8 @@ class DeckProvider extends ChangeNotifier {
   DeckProvider({
     required SupabaseService supabaseService,
     required HiveService hiveService,
-  })  : _supabaseService = supabaseService,
-        _hiveService = hiveService;
+  }) : _supabaseService = supabaseService,
+       _hiveService = hiveService;
 
   List<Deck> _decks = [];
   List<Deck> _userDecks = [];
@@ -29,8 +29,7 @@ class DeckProvider extends ChangeNotifier {
 
   List<Deck> get decks => List.unmodifiable(_decks);
   List<Deck> get userDecks => List.unmodifiable(_userDecks);
-  List<Deck> get premadeDecks =>
-      _decks.where((d) => d.isPremade).toList();
+  List<Deck> get premadeDecks => _decks.where((d) => d.isPremade).toList();
   bool get isLoading => _isLoading;
   String? get error => _error;
 
@@ -186,8 +185,7 @@ class DeckProvider extends ChangeNotifier {
       final newDeck = Deck.fromJson(deckResult);
 
       // Copy cards with source reference
-      final sourceCards =
-          await _supabaseService.fetchCards(sourceDeck.id);
+      final sourceCards = await _supabaseService.fetchCards(sourceDeck.id);
       for (var i = 0; i < sourceCards.length; i++) {
         final src = DeckCard.fromJson(sourceCards[i]);
         final newCardId = _uuid.v4();
@@ -250,8 +248,7 @@ class DeckProvider extends ChangeNotifier {
 
       // Update card_count
       final cardCount = sourceCards.length;
-      await _supabaseService.updateDeck(
-          newDeckId, {'card_count': cardCount});
+      await _supabaseService.updateDeck(newDeckId, {'card_count': cardCount});
       final updated = newDeck.copyWith(cardCount: cardCount);
       _userDecks = [updated, ..._userDecks];
       return updated;

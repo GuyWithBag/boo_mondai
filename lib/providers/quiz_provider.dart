@@ -8,8 +8,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 import 'package:boo_mondai/controllers/controllers.dart';
-import 'package:boo_mondai/models/models.dart';
-import 'package:boo_mondai/services/services.dart';
+import 'package:boo_mondai/models/models.barrel.dart';
+import 'package:boo_mondai/services/services.barrel.dart';
 
 /// Manages the full quiz flow: start → answer → rate → complete → FSRS enroll.
 ///
@@ -27,10 +27,10 @@ class QuizProvider extends ChangeNotifier {
     required HiveService hiveService,
     required FsrsService fsrsService,
     required QuizQueueController queueController,
-  })  : _supabaseService = supabaseService,
-        _hiveService = hiveService,
-        _fsrsService = fsrsService,
-        _queueController = queueController;
+  }) : _supabaseService = supabaseService,
+       _hiveService = hiveService,
+       _fsrsService = fsrsService,
+       _queueController = queueController;
 
   static const _earlyReviewWindow = Duration(hours: 1);
 
@@ -59,9 +59,9 @@ class QuizProvider extends ChangeNotifier {
 
   /// Cards enrolled this session that are due within the next hour — reviewable now.
   int get reviewableNowCount => _enrolledCards.where((fs) {
-        final dueIn = fs.due.difference(DateTime.now());
-        return dueIn <= _earlyReviewWindow;
-      }).length;
+    final dueIn = fs.due.difference(DateTime.now());
+    return dueIn <= _earlyReviewWindow;
+  }).length;
 
   /// Cards enrolled this session due more than an hour away.
   int get reviewLaterCount => _enrolledCards.length - reviewableNowCount;
@@ -162,15 +162,17 @@ class QuizProvider extends ChangeNotifier {
 
       if (ejected) {
         _ejectedCardIds.add(_currentCard!.id);
-        _answers.add(QuizAnswer(
-          id: _uuid.v4(),
-          sessionId: _session!.id,
-          cardId: _currentCard!.id,
-          userAnswer: userAnswer,
-          isCorrect: false,
-          selfRating: 1,
-          answeredAt: DateTime.now(),
-        ));
+        _answers.add(
+          QuizAnswer(
+            id: _uuid.v4(),
+            sessionId: _session!.id,
+            cardId: _currentCard!.id,
+            userAnswer: userAnswer,
+            isCorrect: false,
+            selfRating: 1,
+            answeredAt: DateTime.now(),
+          ),
+        );
 
         if (_queueController.isEmpty) {
           notifyListeners();
@@ -197,7 +199,8 @@ class QuizProvider extends ChangeNotifier {
   Future<void> submitFitbAnswers(List<String> answers) async {
     if (_currentCard == null || _session == null) return;
     final segments = _currentCard!.segments;
-    final allCorrect = answers.length == segments.length &&
+    final allCorrect =
+        answers.length == segments.length &&
         List.generate(
           segments.length,
           (i) => segments[i].checkAnswer(answers[i]),
@@ -208,15 +211,17 @@ class QuizProvider extends ChangeNotifier {
       final ejected = _queueController.recordWrong(_currentCard!.id);
       if (ejected) {
         _ejectedCardIds.add(_currentCard!.id);
-        _answers.add(QuizAnswer(
-          id: _uuid.v4(),
-          sessionId: _session!.id,
-          cardId: _currentCard!.id,
-          userAnswer: answers.join('|'),
-          isCorrect: false,
-          selfRating: 1,
-          answeredAt: DateTime.now(),
-        ));
+        _answers.add(
+          QuizAnswer(
+            id: _uuid.v4(),
+            sessionId: _session!.id,
+            cardId: _currentCard!.id,
+            userAnswer: answers.join('|'),
+            isCorrect: false,
+            selfRating: 1,
+            answeredAt: DateTime.now(),
+          ),
+        );
         if (_queueController.isEmpty) {
           notifyListeners();
           await _completeSession();
@@ -252,15 +257,17 @@ class QuizProvider extends ChangeNotifier {
 
       if (ejected) {
         _ejectedCardIds.add(_currentCard!.id);
-        _answers.add(QuizAnswer(
-          id: _uuid.v4(),
-          sessionId: _session!.id,
-          cardId: _currentCard!.id,
-          userAnswer: userAnswer,
-          isCorrect: false,
-          selfRating: 1,
-          answeredAt: DateTime.now(),
-        ));
+        _answers.add(
+          QuizAnswer(
+            id: _uuid.v4(),
+            sessionId: _session!.id,
+            cardId: _currentCard!.id,
+            userAnswer: userAnswer,
+            isCorrect: false,
+            selfRating: 1,
+            answeredAt: DateTime.now(),
+          ),
+        );
 
         if (_queueController.isEmpty) {
           notifyListeners();
@@ -294,15 +301,17 @@ class QuizProvider extends ChangeNotifier {
 
     // All ratings record an answer and advance — Again (1) is not a requeue,
     // it just enrolls the card in FSRS with a low rating so it comes back soon.
-    _answers.add(QuizAnswer(
-      id: _uuid.v4(),
-      sessionId: _session!.id,
-      cardId: _currentCard!.id,
-      userAnswer: _lastUserAnswer ?? '',
-      isCorrect: rating != 1,
-      selfRating: rating,
-      answeredAt: DateTime.now(),
-    ));
+    _answers.add(
+      QuizAnswer(
+        id: _uuid.v4(),
+        sessionId: _session!.id,
+        cardId: _currentCard!.id,
+        userAnswer: _lastUserAnswer ?? '',
+        isCorrect: rating != 1,
+        selfRating: rating,
+        answeredAt: DateTime.now(),
+      ),
+    );
 
     if (_queueController.isEmpty) {
       await _completeSession();

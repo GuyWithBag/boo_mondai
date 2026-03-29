@@ -6,15 +6,15 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:flutter/foundation.dart';
-import 'package:boo_mondai/models/models.dart';
-import 'package:boo_mondai/services/services.dart';
+import 'package:boo_mondai/models/models.barrel.dart';
+import 'package:boo_mondai/services/services.barrel.dart';
 
 /// Handles research study flows: codes, surveys, tests, and researcher data viewing.
 class ResearchProvider extends ChangeNotifier {
   final SupabaseService _supabaseService;
 
   ResearchProvider({required SupabaseService supabaseService})
-      : _supabaseService = supabaseService;
+    : _supabaseService = supabaseService;
 
   ResearchUser? _researchUser;
   List<ResearchCode> _codes = [];
@@ -37,8 +37,7 @@ class ResearchProvider extends ChangeNotifier {
   List<String> get unlockedFlows => List.unmodifiable(_unlockedFlows);
   List<SurveyResponse> get surveyResponses =>
       List.unmodifiable(_surveyResponses);
-  List<VocabularyTestResult> get testResults =>
-      List.unmodifiable(_testResults);
+  List<VocabularyTestResult> get testResults => List.unmodifiable(_testResults);
   List<ResearchUser> get researchUsers => List.unmodifiable(_researchUsers);
   List<Map<String, dynamic>> get proficiencyData =>
       List.unmodifiable(_proficiencyData);
@@ -76,7 +75,10 @@ class ResearchProvider extends ChangeNotifier {
   }
 
   Future<ResearchCode?> generateCode(
-      String createdBy, String targetRole, String unlocks) async {
+    String createdBy,
+    String targetRole,
+    String unlocks,
+  ) async {
     _error = null;
 
     try {
@@ -122,12 +124,14 @@ class ResearchProvider extends ChangeNotifier {
 
       // Compute SUS score if applicable
       if (surveyType == 'sus') {
-        final oddSum = (responses['item_1'] ?? 0) +
+        final oddSum =
+            (responses['item_1'] ?? 0) +
             (responses['item_3'] ?? 0) +
             (responses['item_5'] ?? 0) +
             (responses['item_7'] ?? 0) +
             (responses['item_9'] ?? 0);
-        final evenSum = (responses['item_2'] ?? 0) +
+        final evenSum =
+            (responses['item_2'] ?? 0) +
             (responses['item_4'] ?? 0) +
             (responses['item_6'] ?? 0) +
             (responses['item_8'] ?? 0) +
@@ -188,18 +192,24 @@ class ResearchProvider extends ChangeNotifier {
       _testResults = (allData['vocabulary_test'] ?? [])
           .map((d) => VocabularyTestResult.fromJson(d))
           .toList();
-      _proficiencyData =
-          List<Map<String, dynamic>>.from(allData['proficiency_screener'] ?? []);
-      _languageInterestData =
-          List<Map<String, dynamic>>.from(allData['language_interest'] ?? []);
-      _experienceSurveyData =
-          List<Map<String, dynamic>>.from(allData['experience_survey'] ?? []);
-      _previewUsefulnessData =
-          List<Map<String, dynamic>>.from(allData['preview_usefulness'] ?? []);
-      _fsrsUsefulnessData =
-          List<Map<String, dynamic>>.from(allData['fsrs_usefulness'] ?? []);
-      _ugcData =
-          List<Map<String, dynamic>>.from(allData['ugc_perception'] ?? []);
+      _proficiencyData = List<Map<String, dynamic>>.from(
+        allData['proficiency_screener'] ?? [],
+      );
+      _languageInterestData = List<Map<String, dynamic>>.from(
+        allData['language_interest'] ?? [],
+      );
+      _experienceSurveyData = List<Map<String, dynamic>>.from(
+        allData['experience_survey'] ?? [],
+      );
+      _previewUsefulnessData = List<Map<String, dynamic>>.from(
+        allData['preview_usefulness'] ?? [],
+      );
+      _fsrsUsefulnessData = List<Map<String, dynamic>>.from(
+        allData['fsrs_usefulness'] ?? [],
+      );
+      _ugcData = List<Map<String, dynamic>>.from(
+        allData['ugc_perception'] ?? [],
+      );
       _susData = List<Map<String, dynamic>>.from(allData['sus'] ?? []);
     } on AppException catch (e) {
       _error = e.message;
@@ -210,7 +220,10 @@ class ResearchProvider extends ChangeNotifier {
   }
 
   Future<void> addResearchUser(
-      String userId, String role, String targetLanguage) async {
+    String userId,
+    String role,
+    String targetLanguage,
+  ) async {
     _error = null;
 
     try {

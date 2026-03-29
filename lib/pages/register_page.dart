@@ -9,9 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:boo_mondai/providers/providers.dart';
-import 'package:boo_mondai/shared/shared.dart';
-import 'package:boo_mondai/widgets/widgets.dart';
+import 'package:boo_mondai/providers/providers.barrel.dart';
+import 'package:boo_mondai/shared/shared.barrel.dart';
+import 'package:boo_mondai/widgets/widgets.barrel.dart';
 
 class RegisterPage extends HookWidget {
   const RegisterPage({super.key});
@@ -56,8 +56,9 @@ class RegisterPage extends HookWidget {
                         labelText: 'Display Name',
                         prefixIcon: Icon(Icons.person_outlined),
                       ),
-                      validator: (v) =>
-                          v != null && v.isNotEmpty ? null : 'Enter a display name',
+                      validator: (v) => v != null && v.isNotEmpty
+                          ? null
+                          : 'Enter a display name',
                     ),
                     const SizedBox(height: AppSpacing.md),
                     TextFormField(
@@ -68,8 +69,9 @@ class RegisterPage extends HookWidget {
                         prefixIcon: Icon(Icons.email_outlined),
                       ),
                       keyboardType: TextInputType.emailAddress,
-                      validator: (v) =>
-                          v != null && v.contains('@') ? null : 'Enter a valid email',
+                      validator: (v) => v != null && v.contains('@')
+                          ? null
+                          : 'Enter a valid email',
                     ),
                     const SizedBox(height: AppSpacing.md),
                     TextFormField(
@@ -94,10 +96,10 @@ class RegisterPage extends HookWidget {
                           : () {
                               if (formKey.currentState!.validate()) {
                                 context.read<AuthProvider>().signUp(
-                                      emailController.text.trim(),
-                                      passwordController.text,
-                                      nameController.text.trim(),
-                                    );
+                                  emailController.text.trim(),
+                                  passwordController.text,
+                                  nameController.text.trim(),
+                                );
                               }
                             },
                       child: auth.isLoading

@@ -8,9 +8,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
-import 'package:boo_mondai/providers/providers.dart';
-import 'package:boo_mondai/shared/shared.dart';
-import 'package:boo_mondai/widgets/widgets.dart';
+import 'package:boo_mondai/providers/providers.barrel.dart';
+import 'package:boo_mondai/shared/shared.barrel.dart';
+import 'package:boo_mondai/widgets/widgets.barrel.dart';
 
 class DeckListPage extends HookWidget {
   const DeckListPage({super.key});
@@ -89,10 +89,7 @@ class DeckListPage extends HookWidget {
             ),
             TextButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: const Text(
-                'Delete',
-                style: TextStyle(color: Colors.red),
-              ),
+              child: const Text('Delete', style: TextStyle(color: Colors.red)),
             ),
           ],
         ),
@@ -148,7 +145,11 @@ class DeckListPage extends HookWidget {
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.md, AppSpacing.md, AppSpacing.md, AppSpacing.sm),
+                AppSpacing.md,
+                AppSpacing.md,
+                AppSpacing.md,
+                AppSpacing.sm,
+              ),
               child: TextField(
                 controller: searchController,
                 decoration: const InputDecoration(
@@ -167,19 +168,19 @@ class DeckListPage extends HookWidget {
                         builder: (context, constraints) {
                           final crossCount =
                               Breakpoints.isDesktop(constraints.maxWidth)
-                                  ? 3
-                                  : Breakpoints.isTablet(constraints.maxWidth)
-                                      ? 2
-                                      : 1;
+                              ? 3
+                              : Breakpoints.isTablet(constraints.maxWidth)
+                              ? 2
+                              : 1;
                           return GridView.builder(
                             padding: const EdgeInsets.all(AppSpacing.md),
                             gridDelegate:
                                 SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: crossCount,
-                              mainAxisSpacing: AppSpacing.md,
-                              crossAxisSpacing: AppSpacing.md,
-                              childAspectRatio: 2.5,
-                            ),
+                                  crossAxisCount: crossCount,
+                                  mainAxisSpacing: AppSpacing.md,
+                                  crossAxisSpacing: AppSpacing.md,
+                                  childAspectRatio: 2.5,
+                                ),
                             itemCount: filtered.length,
                             itemBuilder: (context, i) {
                               final deck = filtered[i];
@@ -189,22 +190,21 @@ class DeckListPage extends HookWidget {
                                 isDirty: dirty,
                                 isPushing: dirty && cardProvider.isPushing,
                                 isSelecting: isSelecting,
-                                isSelected:
-                                    selectedIds.value.contains(deck.id),
+                                isSelected: selectedIds.value.contains(deck.id),
                                 onSelect: () => toggleSelection(deck.id),
                                 onLongPress: () => toggleSelection(deck.id),
                                 onPush: dirty && !cardProvider.isPushing
                                     ? () => context
-                                        .read<CardProvider>()
-                                        .pushDeck(deck.id)
+                                          .read<CardProvider>()
+                                          .pushDeck(deck.id)
                                     : null,
                                 onDelete: isSelecting
                                     ? null
                                     : () => _confirmDeleteSingle(
-                                          context,
-                                          deck.id,
-                                          deck.title,
-                                        ),
+                                        context,
+                                        deck.id,
+                                        deck.title,
+                                      ),
                               );
                             },
                           );
@@ -235,10 +235,7 @@ class DeckListPage extends HookWidget {
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text(
-              'Delete',
-              style: TextStyle(color: Colors.red),
-            ),
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -308,9 +305,9 @@ class _SyncTimeLabel extends StatelessWidget {
         padding: const EdgeInsets.only(right: AppSpacing.xs),
         child: Text(
           _formatSyncTime(syncedAt),
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.textSecondary,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
         ),
       ),
     );
@@ -326,8 +323,18 @@ String _formatSyncTime(DateTime dt) {
     return 'Synced $hour:$min $ampm';
   }
   const months = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
   ];
   return 'Synced ${months[dt.month - 1]} ${dt.day}';
 }

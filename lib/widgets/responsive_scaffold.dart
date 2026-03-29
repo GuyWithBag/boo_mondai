@@ -9,8 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:boo_mondai/providers/providers.dart';
-import 'package:boo_mondai/shared/shared.dart';
+import 'package:boo_mondai/providers/providers.barrel.dart';
+import 'package:boo_mondai/shared/shared.barrel.dart';
 
 class ResponsiveScaffold extends HookWidget {
   final int currentIndex;
@@ -22,7 +22,13 @@ class ResponsiveScaffold extends HookWidget {
     required this.child,
   });
 
-  static const _routes = ['/', '/online-deck-browser', '/my-decks', '/review', '/account'];
+  static const _routes = [
+    '/',
+    '/online-deck-browser',
+    '/my-decks',
+    '/review',
+    '/account',
+  ];
   // Indices 2 (My Decks), 3 (Review) require auth; Browse (1) is public
   static const _authRequiredIndices = {2, 3};
 

@@ -7,7 +7,7 @@
 
 import 'package:hive_ce/hive_ce.dart';
 import 'package:boo_mondai/services/app_exception.dart';
-import 'package:boo_mondai/models/models.dart';
+import 'package:boo_mondai/models/models.barrel.dart';
 
 class HiveService {
   static const _profileBox = 'profile';
@@ -122,8 +122,7 @@ class HiveService {
 
   // ── FSRS Cards ──────────────────────────────────────
   Future<void> saveFsrsCard(FsrsCardState card) async {
-    await _fsrsCards.put(
-        card.id, Map<String, dynamic>.from(card.toJson()));
+    await _fsrsCards.put(card.id, Map<String, dynamic>.from(card.toJson()));
   }
 
   FsrsCardState? getFsrsCard(String compositeKey) {
@@ -135,9 +134,11 @@ class HiveService {
   List<FsrsCardState> getDueCards(String userId, DateTime now) {
     return _fsrsCards.values
         .map((data) => FsrsCardState.fromJson(Map<String, dynamic>.from(data)))
-        .where((card) =>
-            card.userId == userId &&
-            (card.due.isBefore(now) || card.due.isAtSameMomentAs(now)))
+        .where(
+          (card) =>
+              card.userId == userId &&
+              (card.due.isBefore(now) || card.due.isAtSameMomentAs(now)),
+        )
         .toList();
   }
 
@@ -150,14 +151,15 @@ class HiveService {
 
   // ── Review Logs ─────────────────────────────────────
   Future<void> saveReviewLog(ReviewLogEntry log) async {
-    await _reviewLogs.put(
-        log.id, Map<String, dynamic>.from(log.toJson()));
+    await _reviewLogs.put(log.id, Map<String, dynamic>.from(log.toJson()));
   }
 
   // ── Streaks ─────────────────────────────────────────
   Future<void> saveStreak(Streak streak) async {
     await _streaks.put(
-        streak.userId, Map<String, dynamic>.from(streak.toJson()));
+      streak.userId,
+      Map<String, dynamic>.from(streak.toJson()),
+    );
   }
 
   Streak? getStreak(String userId) {
@@ -167,7 +169,8 @@ class HiveService {
   }
 
   // ── Settings ────────────────────────────────────────
-  int getNotificationHour() => _settings.get('notification_hour', defaultValue: 9) as int;
+  int getNotificationHour() =>
+      _settings.get('notification_hour', defaultValue: 9) as int;
 
   Future<void> setNotificationHour(int hour) async {
     await _settings.put('notification_hour', hour);

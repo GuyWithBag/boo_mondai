@@ -6,7 +6,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:flutter/material.dart';
-import 'package:boo_mondai/shared/shared.dart';
+import 'package:boo_mondai/shared/shared.barrel.dart';
 
 class EmptyStateWidget extends StatelessWidget {
   final IconData icon;

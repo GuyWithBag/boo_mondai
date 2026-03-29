@@ -9,8 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:boo_mondai/providers/providers.dart';
-import 'package:boo_mondai/shared/shared.dart';
+import 'package:boo_mondai/providers/providers.barrel.dart';
+import 'package:boo_mondai/shared/shared.barrel.dart';
 
 class QuizPreviewPage extends HookWidget {
   const QuizPreviewPage({super.key, required this.deckId});
@@ -24,8 +24,7 @@ class QuizPreviewPage extends HookWidget {
 
     useEffect(() {
       if (cardProvider.currentDeckId != deckId) {
-        Future.microtask(
-            () => context.read<CardProvider>().fetchCards(deckId));
+        Future.microtask(() => context.read<CardProvider>().fetchCards(deckId));
       }
       return null;
     }, [deckId]);
@@ -36,50 +35,50 @@ class QuizPreviewPage extends HookWidget {
         child: cardProvider.isLoading
             ? const Center(child: CircularProgressIndicator())
             : cardProvider.cards.isEmpty
-                ? const Center(child: Text('No cards in this deck'))
-                : Column(
-                    children: [
-                      Expanded(
-                        child: ListView.builder(
-                          controller: scrollController,
-                          padding: const EdgeInsets.all(AppSpacing.md),
-                          itemCount: cardProvider.cards.length,
-                          itemBuilder: (context, i) {
-                            final card = cardProvider.cards[i];
-                            return PreviewCardTile(
-                              index: i + 1,
-                              question: card.question,
-                              answer: card.answer,
-                            );
-                          },
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(AppSpacing.md),
-                        child: SizedBox(
-                          width: double.infinity,
-                          child: FilledButton(
-                            onPressed: () async {
-                              final auth = context.read<AuthProvider>();
-                              final userId = auth.userProfile?.id;
-                              if (userId == null) return;
-
-                              await context.read<QuizProvider>().startSession(
-                                    deckId,
-                                    userId,
-                                    cardProvider.cards,
-                                    true,
-                                  );
-                              if (context.mounted) {
-                                context.go('/quiz/$deckId/session');
-                              }
-                            },
-                            child: const Text('Start Quiz'),
-                          ),
-                        ),
-                      ),
-                    ],
+            ? const Center(child: Text('No cards in this deck'))
+            : Column(
+                children: [
+                  Expanded(
+                    child: ListView.builder(
+                      controller: scrollController,
+                      padding: const EdgeInsets.all(AppSpacing.md),
+                      itemCount: cardProvider.cards.length,
+                      itemBuilder: (context, i) {
+                        final card = cardProvider.cards[i];
+                        return PreviewCardTile(
+                          index: i + 1,
+                          question: card.question,
+                          answer: card.answer,
+                        );
+                      },
+                    ),
                   ),
+                  Padding(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: FilledButton(
+                        onPressed: () async {
+                          final auth = context.read<AuthProvider>();
+                          final userId = auth.userProfile?.id;
+                          if (userId == null) return;
+
+                          await context.read<QuizProvider>().startSession(
+                            deckId,
+                            userId,
+                            cardProvider.cards,
+                            true,
+                          );
+                          if (context.mounted) {
+                            context.go('/quiz/$deckId/session');
+                          }
+                        },
+                        child: const Text('Start Quiz'),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
       ),
     );
   }
@@ -121,8 +120,8 @@ class PreviewCardTile extends StatelessWidget {
                   Text(
                     answer,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ],
               ),

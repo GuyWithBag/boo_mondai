@@ -9,9 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:boo_mondai/providers/providers.dart';
-import 'package:boo_mondai/shared/shared.dart';
-import 'package:boo_mondai/widgets/widgets.dart';
+import 'package:boo_mondai/providers/providers.barrel.dart';
+import 'package:boo_mondai/shared/shared.barrel.dart';
+import 'package:boo_mondai/widgets/widgets.barrel.dart';
 
 class VocabularyTestPage extends HookWidget {
   const VocabularyTestPage({super.key, required this.testSet});
@@ -23,7 +23,7 @@ class VocabularyTestPage extends HookWidget {
     final scrollController = useScrollController();
     final research = context.watch<ResearchProvider>();
     final auth = context.read<AuthProvider>();
-    final items = useMemoized(() => _buildTestItems(testSet), [testSet]);
+    final items = useMemoized(() => buildTestItems(testSet), [testSet]);
     final answers = useState(<String, String>{});
     final submitted = useState(false);
     final score = useState(0);
@@ -44,11 +44,11 @@ class VocabularyTestPage extends HookWidget {
       score.value = correct;
 
       await context.read<ResearchProvider>().submitVocabularyTest(
-            userId,
-            testSet,
-            correct,
-            Map<String, dynamic>.from(answers.value),
-          );
+        userId,
+        testSet,
+        correct,
+        Map<String, dynamic>.from(answers.value),
+      );
 
       if (context.mounted) {
         submitted.value = true;
@@ -62,7 +62,11 @@ class VocabularyTestPage extends HookWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.check_circle, size: 64, color: AppColors.correct),
+              const Icon(
+                Icons.check_circle,
+                size: 64,
+                color: AppColors.correct,
+              ),
               const SizedBox(height: AppSpacing.md),
               Text(
                 'Score: ${score.value} / ${items.length}',
@@ -80,9 +84,7 @@ class VocabularyTestPage extends HookWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Vocabulary Test — Set $testSet'),
-      ),
+      appBar: AppBar(title: Text('Vocabulary Test — Set $testSet')),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
@@ -109,10 +111,7 @@ class VocabularyTestPage extends HookWidget {
                         item: item,
                         selectedOption: answers.value[item.id],
                         onSelected: (option) {
-                          answers.value = {
-                            ...answers.value,
-                            item.id: option,
-                          };
+                          answers.value = {...answers.value, item.id: option};
                         },
                       );
                     },
@@ -120,7 +119,9 @@ class VocabularyTestPage extends HookWidget {
                 ),
                 if (research.error != null)
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                    ),
                     child: ErrorText(research.error!),
                   ),
                 Padding(
@@ -138,7 +139,8 @@ class VocabularyTestPage extends HookWidget {
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
                           : Text(
-                              '${answers.value.length}/${items.length} answered — Submit'),
+                              '${answers.value.length}/${items.length} answered — Submit',
+                            ),
                     ),
                   ),
                 ),
@@ -148,110 +150,5 @@ class VocabularyTestPage extends HookWidget {
         ),
       ),
     );
-  }
-}
-
-class VocabTestItem extends StatelessWidget {
-  final int index;
-  final VocabTestItemData item;
-  final String? selectedOption;
-  final ValueChanged<String> onSelected;
-
-  const VocabTestItem({
-    super.key,
-    required this.index,
-    required this.item,
-    this.selectedOption,
-    required this.onSelected,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '$index. ${item.prompt}',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            RadioGroup<String>(
-              groupValue: selectedOption,
-              onChanged: (v) {
-                if (v != null && v.isNotEmpty) onSelected(v);
-              },
-              child: Column(
-                children: item.options.entries
-                    .map(
-                      (e) => RadioListTile<String>(
-                        value: e.key,
-                        title: Text('${e.key}) ${e.value}'),
-                        dense: true,
-                      ),
-                    )
-                    .toList(),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ── Test item model ─────────────────────────────────
-
-class VocabTestItemData {
-  final String id;
-  final String prompt;
-  final Map<String, String> options; // A, B, C, D
-  final String correctOption;
-
-  const VocabTestItemData({
-    required this.id,
-    required this.prompt,
-    required this.options,
-    required this.correctOption,
-  });
-}
-
-// ── Placeholder test items ──────────────────────────
-// In production, these would come from Supabase or a local JSON asset.
-// For now, we provide sample items for development.
-
-List<VocabTestItemData> _buildTestItems(String testSet) {
-  if (testSet == 'A') {
-    return List.generate(30, (i) {
-      final idx = i + 1;
-      return VocabTestItemData(
-        id: 'a_$idx',
-        prompt: 'What is the meaning of word A-$idx?',
-        options: const {
-          'A': 'Option A',
-          'B': 'Option B',
-          'C': 'Option C',
-          'D': 'Option D',
-        },
-        correctOption: 'A',
-      );
-    });
-  } else {
-    return List.generate(30, (i) {
-      final idx = i + 1;
-      return VocabTestItemData(
-        id: 'b_$idx',
-        prompt: 'What is the meaning of word B-$idx?',
-        options: const {
-          'A': 'Option A',
-          'B': 'Option B',
-          'C': 'Option C',
-          'D': 'Option D',
-        },
-        correctOption: 'B',
-      );
-    });
   }
 }

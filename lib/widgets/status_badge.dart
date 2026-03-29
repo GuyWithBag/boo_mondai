@@ -6,7 +6,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:flutter/material.dart';
-import 'package:boo_mondai/shared/shared.dart';
+import 'package:boo_mondai/shared/shared.barrel.dart';
 
 class StatusBadge extends StatelessWidget {
   const StatusBadge({
@@ -26,37 +26,37 @@ class StatusBadge extends StatelessWidget {
 
   /// Orange "Premade" badge.
   const StatusBadge.premade({super.key})
-      : label = 'Premade',
-        color = AppColors.secondary,
-        showBorder = false,
-        fontWeight = FontWeight.w500,
-        backgroundOpacity = 0.15;
+    : label = 'Premade',
+      color = AppColors.secondary,
+      showBorder = false,
+      fontWeight = FontWeight.w500,
+      backgroundOpacity = 0.15;
 
   /// FSRS state badge (0=New, 1=Learning, 2=Review, 3=Relearning).
   StatusBadge.fsrsState({super.key, required int state})
-      : label = switch (state) {
-          0 => 'New',
-          1 => 'Learning',
-          2 => 'Review',
-          3 => 'Relearning',
-          _ => '',
-        },
-        color = switch (state) {
-          0 => AppColors.easy,
-          2 => AppColors.correct,
-          _ => AppColors.incorrect,
-        },
-        showBorder = true,
-        fontWeight = FontWeight.bold,
-        backgroundOpacity = 0.12;
+    : label = switch (state) {
+        0 => 'New',
+        1 => 'Learning',
+        2 => 'Review',
+        3 => 'Relearning',
+        _ => '',
+      },
+      color = switch (state) {
+        0 => AppColors.easy,
+        2 => AppColors.correct,
+        _ => AppColors.incorrect,
+      },
+      showBorder = true,
+      fontWeight = FontWeight.bold,
+      backgroundOpacity = 0.12;
 
   /// Grey "Uneditable" badge.
   StatusBadge.uneditable({super.key})
-      : label = 'Uneditable',
-        color = AppColors.textSecondary,
-        showBorder = true,
-        fontWeight = FontWeight.bold,
-        backgroundOpacity = 0.0;
+    : label = 'Uneditable',
+      color = AppColors.textSecondary,
+      showBorder = true,
+      fontWeight = FontWeight.bold,
+      backgroundOpacity = 0.0;
 
   @override
   Widget build(BuildContext context) {
@@ -79,9 +79,9 @@ class StatusBadge extends StatelessWidget {
       child: Text(
         label,
         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: backgroundOpacity > 0 ? color : AppColors.textSecondary,
-              fontWeight: fontWeight,
-            ),
+          color: backgroundOpacity > 0 ? color : AppColors.textSecondary,
+          fontWeight: fontWeight,
+        ),
       ),
     );
   }

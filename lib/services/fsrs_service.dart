@@ -6,7 +6,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:fsrs/fsrs.dart';
-import 'package:boo_mondai/models/models.dart';
+import 'package:boo_mondai/models/models.barrel.dart';
 
 class FsrsService {
   final FSRS _fsrs = FSRS();
@@ -25,7 +25,8 @@ class FsrsService {
   /// Converts an FsrsCardState to an fsrs Card, schedules it, and returns updated state.
   FsrsCardState reviewCard(FsrsCardState state, int ratingValue) {
     final card = _stateToCard(state);
-    final rating = Rating.values[ratingValue - 1]; // 1=again, 2=hard, 3=good, 4=easy
+    final rating =
+        Rating.values[ratingValue - 1]; // 1=again, 2=hard, 3=good, 4=easy
     final result = scheduleCard(card, rating);
     return _cardToState(result.card, state.userId, state.cardId);
   }

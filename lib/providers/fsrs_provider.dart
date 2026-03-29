@@ -7,8 +7,8 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
-import 'package:boo_mondai/models/models.dart';
-import 'package:boo_mondai/services/services.dart';
+import 'package:boo_mondai/models/models.barrel.dart';
+import 'package:boo_mondai/services/services.barrel.dart';
 
 /// Manages the FSRS review deck — fetches due cards, handles review ratings.
 class FsrsProvider extends ChangeNotifier {
@@ -21,9 +21,9 @@ class FsrsProvider extends ChangeNotifier {
     required FsrsService fsrsService,
     required HiveService hiveService,
     required SupabaseService supabaseService,
-  })  : _fsrsService = fsrsService,
-        _hiveService = hiveService,
-        _supabaseService = supabaseService;
+  }) : _fsrsService = fsrsService,
+       _hiveService = hiveService,
+       _supabaseService = supabaseService;
 
   static const _earlyReviewWindow = Duration(hours: 1);
 
@@ -68,9 +68,7 @@ class FsrsProvider extends ChangeNotifier {
       final all = _hiveService.getAllFsrsCards(userId);
 
       _dueCards = all.where((c) => !c.due.isAfter(windowEnd)).toList();
-      _upcomingCards = all
-          .where((c) => c.due.isAfter(windowEnd))
-          .toList()
+      _upcomingCards = all.where((c) => c.due.isAfter(windowEnd)).toList()
         ..sort((a, b) => a.due.compareTo(b.due));
 
       // Load all cached DeckCards once

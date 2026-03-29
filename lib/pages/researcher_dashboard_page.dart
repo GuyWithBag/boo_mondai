@@ -5,14 +5,11 @@
 // HOOKS: useEffect
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/widgets/widgets.barrel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
-import 'package:boo_mondai/providers/providers.dart';
-import 'package:boo_mondai/pages/researcher_dashboard/dashboard_tab_bar.dart';
-import 'package:boo_mondai/pages/researcher_dashboard/codes_tab.dart';
-import 'package:boo_mondai/pages/researcher_dashboard/participants_tab.dart';
-import 'package:boo_mondai/pages/researcher_dashboard/results_tab.dart';
+import 'package:boo_mondai/providers/providers.barrel.dart';
 
 class ResearcherDashboardPage extends HookWidget {
   const ResearcherDashboardPage({super.key});
@@ -25,14 +22,13 @@ class ResearcherDashboardPage extends HookWidget {
 
     useEffect(() {
       Future.microtask(
-          () => context.read<ResearchProvider>().fetchAllResearchData());
+        () => context.read<ResearchProvider>().fetchAllResearchData(),
+      );
       return null;
     }, const []);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Research Dashboard'),
-      ),
+      appBar: AppBar(title: const Text('Research Dashboard')),
       body: research.isLoading
           ? const Center(child: CircularProgressIndicator())
           : Column(
@@ -49,9 +45,7 @@ class ResearcherDashboardPage extends HookWidget {
                         codes: research.codes,
                         researcherId: auth.userProfile?.id ?? '',
                       ),
-                      ParticipantsTab(
-                        participants: research.researchUsers,
-                      ),
+                      ParticipantsTab(participants: research.researchUsers),
                       ResultsTab(
                         testResults: research.testResults,
                         proficiencyData: research.proficiencyData,

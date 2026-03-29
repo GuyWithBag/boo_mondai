@@ -59,18 +59,16 @@ types:
         index: 15
       sourceDeckId:
         index: 16
-      # index 17 reserved (was sourceDeckCreatorName — no longer used)
       hiddenInBrowser:
         index: 18
   DeckCard:
     typeId: 2
-    nextIndex: 14
+    nextIndex: 20
     fields:
       id:
         index: 0
       deckId:
         index: 1
-      # indices 2–5 reserved (old question/answer/image fields — removed)
       sortOrder:
         index: 6
       createdAt:
@@ -79,14 +77,18 @@ types:
         index: 8
       questionType:
         index: 9
-      notesJson:
-        index: 10
-      optionsJson:
-        index: 11
-      segmentsJson:
-        index: 12
-      pairsJson:
-        index: 13
+      sourceCardId:
+        index: 14
+      identificationAnswer:
+        index: 15
+      notes:
+        index: 16
+      options:
+        index: 17
+      segments:
+        index: 18
+      pairs:
+        index: 19
   FsrsCardState:
     typeId: 3
     nextIndex: 12

@@ -6,7 +6,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:flutter/material.dart';
-import 'package:boo_mondai/shared/shared.dart';
+import 'package:boo_mondai/shared/shared.barrel.dart';
 
 class LikertScaleWidget extends StatelessWidget {
   final int index;
@@ -43,9 +43,11 @@ class LikertScaleWidget extends StatelessWidget {
             const SizedBox(height: AppSpacing.sm),
             Row(
               children: [
-                Text(lowLabel,
-                    style: const TextStyle(fontSize: 10),
-                    textAlign: TextAlign.center),
+                Text(
+                  lowLabel,
+                  style: const TextStyle(fontSize: 10),
+                  textAlign: TextAlign.center,
+                ),
                 Expanded(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -59,9 +61,11 @@ class LikertScaleWidget extends StatelessWidget {
                     }),
                   ),
                 ),
-                Text(highLabel,
-                    style: const TextStyle(fontSize: 10),
-                    textAlign: TextAlign.center),
+                Text(
+                  highLabel,
+                  style: const TextStyle(fontSize: 10),
+                  textAlign: TextAlign.center,
+                ),
               ],
             ),
           ],

@@ -5,16 +5,18 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:barrel_annotation/barrel_annotation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:boo_mondai/app.dart';
 import 'package:boo_mondai/controllers/controllers.dart';
-import 'package:boo_mondai/providers/providers.dart';
-import 'package:boo_mondai/services/services.dart';
-import 'package:boo_mondai/shared/shared.dart';
+import 'package:boo_mondai/providers/providers.barrel.dart';
+import 'package:boo_mondai/services/services.barrel.dart';
+import 'package:boo_mondai/shared/shared.barrel.dart';
 
+@BarrelConfig(exclude: ['lib/lib.barrel.dart', 'lib/hive/hive.barrel.dart'])
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -24,10 +26,7 @@ Future<void> main() async {
   await hiveService.init();
 
   // ── Supabase ────────────────────────────────────────
-  await Supabase.initialize(
-    url: Env.supabaseUrl,
-    anonKey: Env.supabaseAnonKey,
-  );
+  await Supabase.initialize(url: Env.supabaseUrl, anonKey: Env.supabaseAnonKey);
   final supabaseService = SupabaseService();
 
   // ── Other services ──────────────────────────────────
@@ -75,9 +74,7 @@ Future<void> main() async {
           ),
         ),
         ChangeNotifierProvider(
-          create: (_) => LeaderboardProvider(
-            supabaseService: supabaseService,
-          ),
+          create: (_) => LeaderboardProvider(supabaseService: supabaseService),
         ),
         ChangeNotifierProvider(
           create: (_) => StreakProvider(
@@ -86,9 +83,7 @@ Future<void> main() async {
           ),
         ),
         ChangeNotifierProvider(
-          create: (_) => ResearchProvider(
-            supabaseService: supabaseService,
-          ),
+          create: (_) => ResearchProvider(supabaseService: supabaseService),
         ),
       ],
       child: const BooMondaiApp(),

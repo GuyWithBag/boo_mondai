@@ -7,8 +7,8 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
-import 'package:boo_mondai/models/models.dart';
-import 'package:boo_mondai/services/services.dart';
+import 'package:boo_mondai/models/models.barrel.dart';
+import 'package:boo_mondai/services/services.barrel.dart';
 
 /// Manages streak state. Activity = completing at least one FSRS review per day.
 class StreakProvider extends ChangeNotifier {
@@ -19,8 +19,8 @@ class StreakProvider extends ChangeNotifier {
   StreakProvider({
     required SupabaseService supabaseService,
     required HiveService hiveService,
-  })  : _supabaseService = supabaseService,
-        _hiveService = hiveService;
+  }) : _supabaseService = supabaseService,
+       _hiveService = hiveService;
 
   Streak? _streak;
   bool _isLoading = false;
@@ -83,8 +83,9 @@ class StreakProvider extends ChangeNotifier {
           final newCurrent = _streak!.currentStreak + 1;
           _streak = _streak!.copyWith(
             currentStreak: newCurrent,
-            longestStreak:
-                newCurrent > _streak!.longestStreak ? newCurrent : null,
+            longestStreak: newCurrent > _streak!.longestStreak
+                ? newCurrent
+                : null,
             lastActivityDate: todayDate,
           );
         } else {

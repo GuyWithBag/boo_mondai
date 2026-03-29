@@ -3,72 +3,16 @@
 // PURPOSE: Edit all cards in a deck — sidebar shows all cards, clicking
 //          one selects it; "+" creates a blank card and immediately selects it
 // PROVIDERS: CardProvider
-// HOOKS: useState, useEffect, useMemoized, useFocusNode, useTextEditingController, useListenable
+// HOOKS: useState, useEffect, useMemoized, useFocusNode, useTextEditingController
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
-import 'package:boo_mondai/models/models.dart';
-import 'package:boo_mondai/providers/providers.dart';
-import 'package:boo_mondai/shared/shared.dart';
-import 'package:boo_mondai/widgets/widgets.dart';
-
-typedef _McOpt = ({String text, bool isCorrect});
-typedef _Pair = ({String term, String match});
-
-// ── Module-level data helpers ─────────────────────────────────────
-
-List<MultipleChoiceOption> _buildOptions(List<_McOpt> opts) => [
-  for (var i = 0; i < opts.length; i++)
-    if (opts[i].text.trim().isNotEmpty)
-      MultipleChoiceOption(
-        id: '',
-        cardId: '',
-        optionText: opts[i].text.trim(),
-        isCorrect: opts[i].isCorrect,
-        displayOrder: i,
-      ),
-];
-
-/// Splits [raw] on commas, trims whitespace, drops empty entries.
-List<String> _splitFitbAnswers(String raw) =>
-    raw.split(',').map((a) => a.trim()).where((a) => a.isNotEmpty).toList();
-
-List<FillInTheBlankSegment> _buildSegments(String sentence, String answersRaw) {
-  final s = sentence.trim();
-  if (s.isEmpty) return [];
-  final answers = _splitFitbAnswers(answersRaw);
-  if (answers.isEmpty) return [];
-  final sl = s.toLowerCase();
-  return [
-    for (final a in answers)
-      if (sl.contains(a.toLowerCase()))
-        FillInTheBlankSegment(
-          id: '',
-          cardId: '',
-          fullText: s,
-          blankStart: sl.indexOf(a.toLowerCase()),
-          blankEnd: sl.indexOf(a.toLowerCase()) + a.length,
-          correctAnswer: a,
-        ),
-  ];
-}
-
-List<MatchMadnessPair> _buildPairs(List<_Pair> ps) => [
-  for (var i = 0; i < ps.length; i++)
-    if (ps[i].term.trim().isNotEmpty && ps[i].match.trim().isNotEmpty)
-      MatchMadnessPair(
-        id: '',
-        cardId: '',
-        term: ps[i].term.trim(),
-        match: ps[i].match.trim(),
-        isAutoPicked: false,
-        displayOrder: i,
-      ),
-];
-
-// ── Main page ─────────────────────────────────────────────────────
+import 'package:boo_mondai/models/models.barrel.dart';
+import 'package:boo_mondai/providers/providers.barrel.dart';
+import 'package:boo_mondai/shared/shared.barrel.dart';
+import 'package:boo_mondai/widgets/widgets.barrel.dart';
 
 class DeckEditorPage extends HookWidget {
   /// [initialCardId] optionally pre-selects a card when the page opens
@@ -93,7 +37,7 @@ class DeckEditorPage extends HookWidget {
     final cType = useState(CardType.normal);
     final frontCtrl = useTextEditingController();
     final backCtrl = useTextEditingController();
-    final mcOpts = useState<List<_McOpt>>([
+    final mcOpts = useState<List<McOpt>>([
       (text: '', isCorrect: true),
       (text: '', isCorrect: false),
       (text: '', isCorrect: false),
@@ -101,7 +45,7 @@ class DeckEditorPage extends HookWidget {
     final fitbSentCtrl = useTextEditingController();
     final fitbAnsCtrl = useTextEditingController();
     final identificationAnsCtrl = useTextEditingController();
-    final matchPairs = useState<List<_Pair>>([
+    final matchPairs = useState<List<Pair>>([
       (term: '', match: ''),
       (term: '', match: ''),
       (term: '', match: ''),
@@ -142,8 +86,9 @@ class DeckEditorPage extends HookWidget {
         fitbAnsCtrl.clear();
       }
       if (card.pairs.isNotEmpty) {
-        matchPairs.value =
-            card.pairs.map((p) => (term: p.term, match: p.match)).toList();
+        matchPairs.value = card.pairs
+            .map((p) => (term: p.term, match: p.match))
+            .toList();
       } else {
         matchPairs.value = [
           (term: '', match: ''),
@@ -152,8 +97,9 @@ class DeckEditorPage extends HookWidget {
         ];
       }
 
-      WidgetsBinding.instance
-          .addPostFrameCallback((_) => frontFocus.requestFocus());
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => frontFocus.requestFocus(),
+      );
       return null;
     }, [activeCardId.value]);
 
@@ -161,10 +107,10 @@ class DeckEditorPage extends HookWidget {
     Future<void> addBlankCard() async {
       isAdding.value = true;
       final newCard = await context.read<CardProvider>().addCard(
-            deckId,
-            cardType: CardType.normal,
-            questionType: QuestionType.flashcard,
-          );
+        deckId,
+        cardType: CardType.normal,
+        questionType: QuestionType.flashcard,
+      );
       isAdding.value = false;
       if (newCard != null) {
         activeCardId.value = newCard.id;
@@ -182,46 +128,52 @@ class DeckEditorPage extends HookWidget {
 
       // identification and wordScramble only use frontText; backText is not shown
       // and should not be written back (keeps the field clean).
-      final backTextForSave = qType.value.usesIdentificationAnswer ||
+      final backTextForSave =
+          qType.value.usesIdentificationAnswer ||
               qType.value == QuestionType.wordScramble
           ? ''
           : backCtrl.text.trim();
 
       final updatedNotes = card.notes
-          .map((n) => n == card.primaryNote
-              ? n.copyWith(
-                  frontText: frontCtrl.text.trim(),
-                  backText: backTextForSave)
-              : n)
+          .map(
+            (n) => n == card.primaryNote
+                ? n.copyWith(
+                    frontText: frontCtrl.text.trim(),
+                    backText: backTextForSave,
+                  )
+                : n,
+          )
           .toList();
 
       await context.read<CardProvider>().updateCard(
-            card.copyWith(
-              notes: updatedNotes,
-              cardType: cType.value,
-              questionType: qType.value,
-              identificationAnswer: qType.value.usesIdentificationAnswer
-                  ? identificationAnsCtrl.text.trim()
-                  : '',
-              options: qType.value.usesOptions
-                  ? _buildOptions(mcOpts.value)
-                  : card.options,
-              segments: qType.value.usesSegments
-                  ? _buildSegments(fitbSentCtrl.text, fitbAnsCtrl.text)
-                  : card.segments,
-              pairs: qType.value.usesPairs
-                  ? _buildPairs(matchPairs.value)
-                  : card.pairs,
-            ),
-          );
+        card.copyWith(
+          notes: updatedNotes,
+          cardType: cType.value,
+          questionType: qType.value,
+          identificationAnswer: qType.value.usesIdentificationAnswer
+              ? identificationAnsCtrl.text.trim()
+              : '',
+          options: qType.value.usesOptions
+              ? buildOptions(mcOpts.value)
+              : card.options,
+          segments: qType.value.usesSegments
+              ? buildSegments(fitbSentCtrl.text, fitbAnsCtrl.text)
+              : card.segments,
+          pairs: qType.value.usesPairs
+              ? buildPairs(matchPairs.value)
+              : card.pairs,
+        ),
+      );
 
       if (context.mounted) {
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
-          ..showSnackBar(const SnackBar(
-            content: Text('Card saved'),
-            duration: Duration(seconds: 1),
-          ));
+          ..showSnackBar(
+            const SnackBar(
+              content: Text('Card saved'),
+              duration: Duration(seconds: 1),
+            ),
+          );
       }
     }
 
@@ -232,7 +184,7 @@ class DeckEditorPage extends HookWidget {
         title: const Text('Edit Deck'),
         actions: [
           if (cardProvider.isDirty(deckId))
-            _PushButton(
+            EditorPushButton(
               isPushing: cardProvider.isPushing,
               onPressed: cardProvider.isPushing
                   ? null
@@ -274,7 +226,7 @@ class DeckEditorPage extends HookWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (showSidebar)
-                  _EditorSidebar(
+                  EditorSidebar(
                     cards: cardProvider.cards,
                     activeCardId: activeCardId.value,
                     isAdding: isAdding.value,
@@ -283,11 +235,11 @@ class DeckEditorPage extends HookWidget {
                   ),
                 Expanded(
                   child: !hasActiveCard
-                      ? _NoCardSelected(
+                      ? NoCardSelected(
                           onAdd: addBlankCard,
                           isAdding: isAdding.value,
                         )
-                      : _EditorMain(
+                      : EditorMain(
                           qType: qType.value,
                           cType: cType.value,
                           frontCtrl: frontCtrl,
@@ -340,1186 +292,6 @@ class DeckEditorPage extends HookWidget {
             );
           },
         ),
-      ),
-    );
-  }
-}
-
-// ── Push button ───────────────────────────────────────────────────
-
-class _PushButton extends StatelessWidget {
-  const _PushButton({required this.isPushing, required this.onPressed});
-
-  final bool isPushing;
-  final VoidCallback? onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(right: AppSpacing.sm),
-      child: Tooltip(
-        message: 'Push changes to cloud',
-        child: OutlinedButton.icon(
-          onPressed: onPressed,
-          icon: isPushing
-              ? const SizedBox.square(
-                  dimension: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : const Icon(Icons.cloud_upload_outlined, size: 18),
-          label: const Text('Push'),
-        ),
-      ),
-    );
-  }
-}
-
-// ── No card selected state ────────────────────────────────────────
-
-class _NoCardSelected extends StatelessWidget {
-  const _NoCardSelected({required this.onAdd, required this.isAdding});
-
-  final VoidCallback onAdd;
-  final bool isAdding;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.style_outlined,
-            size: 64,
-            color: AppColors.textSecondary.withValues(alpha: 0.4),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Text(
-            'No card selected',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Text(
-            'Pick a card from the sidebar, or create a new one',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          FilledButton.icon(
-            onPressed: isAdding ? null : onAdd,
-            icon: isAdding
-                ? const SizedBox.square(
-                    dimension: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Icon(Icons.add),
-            label: const Text('New Card'),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ── Sidebar ───────────────────────────────────────────────────────
-
-class _EditorSidebar extends StatelessWidget {
-  const _EditorSidebar({
-    required this.cards,
-    required this.activeCardId,
-    required this.isAdding,
-    required this.onSelect,
-    required this.onAdd,
-  });
-
-  final List<DeckCard> cards;
-  final String? activeCardId;
-  final bool isAdding;
-  final void Function(String cardId) onSelect;
-  final VoidCallback onAdd;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Container(
-      width: 220,
-      decoration: BoxDecoration(
-        color: scheme.surface,
-        border: Border(
-          right: BorderSide(color: scheme.surfaceContainerHighest),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header: "Cards (N)" + add button
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-                AppSpacing.md, AppSpacing.sm, AppSpacing.xs, AppSpacing.sm),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Cards (${cards.length})',
-                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                          color: AppColors.textSecondary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                  ),
-                ),
-                IconButton(
-                  icon: isAdding
-                      ? const SizedBox.square(
-                          dimension: 16,
-                          child:
-                              CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Icon(Icons.add, size: 18),
-                  tooltip: 'Add new card',
-                  visualDensity: VisualDensity.compact,
-                  padding: EdgeInsets.zero,
-                  onPressed: isAdding ? null : onAdd,
-                ),
-              ],
-            ),
-          ),
-          const Divider(height: 1),
-          Expanded(
-            child: cards.isEmpty
-                ? const Center(
-                    child: Text(
-                      'No cards yet',
-                      style: TextStyle(
-                          color: AppColors.textSecondary, fontSize: 13),
-                    ),
-                  )
-                : ListView.builder(
-                    itemCount: cards.length,
-                    itemBuilder: (ctx, i) => _SidebarItem(
-                      card: cards[i],
-                      isActive: cards[i].id == activeCardId,
-                      onTap: () => onSelect(cards[i].id),
-                    ),
-                  ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SidebarItem extends StatelessWidget {
-  const _SidebarItem({
-    required this.card,
-    required this.isActive,
-    required this.onTap,
-  });
-
-  final DeckCard card;
-  final bool isActive;
-  final VoidCallback onTap;
-
-  static const _icons = <QuestionType, IconData>{
-    QuestionType.flashcard: Icons.visibility_outlined,
-    QuestionType.identification: Icons.border_color_outlined,
-    QuestionType.multipleChoice: Icons.checklist_outlined,
-    QuestionType.fillInTheBlanks: Icons.edit_note_outlined,
-    QuestionType.wordScramble: Icons.shuffle_outlined,
-    QuestionType.matchMadness: Icons.compare_arrows_outlined,
-  };
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return InkWell(
-      onTap: isActive ? null : onTap,
-      child: Container(
-        color: isActive ? scheme.primary.withValues(alpha: 0.08) : null,
-        padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md, vertical: AppSpacing.sm + 2),
-        child: Row(
-          children: [
-            Icon(
-              _icons[card.questionType] ?? Icons.help_outline,
-              size: 15,
-              color: isActive ? scheme.primary : AppColors.textSecondary,
-            ),
-            const SizedBox(width: AppSpacing.sm),
-            Expanded(
-              child: Text(
-                card.question.isNotEmpty ? card.question : '(empty)',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: isActive ? scheme.primary : null,
-                      fontWeight: isActive ? FontWeight.w600 : null,
-                    ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ── Editor main content ───────────────────────────────────────────
-
-class _EditorMain extends StatelessWidget {
-  const _EditorMain({
-    required this.qType,
-    required this.cType,
-    required this.frontCtrl,
-    required this.backCtrl,
-    required this.identificationAnsCtrl,
-    required this.frontFocus,
-    required this.mcOpts,
-    required this.fitbSentCtrl,
-    required this.fitbAnsCtrl,
-    required this.matchPairs,
-    this.error,
-    required this.onTypeChanged,
-    required this.onCardTypeChanged,
-    required this.onMcAdd,
-    required this.onMcRemove,
-    required this.onMcUpdate,
-    required this.onMatchAdd,
-    required this.onMatchRemove,
-    required this.onMatchUpdate,
-  });
-
-  final QuestionType qType;
-  final CardType cType;
-  final TextEditingController frontCtrl;
-  final TextEditingController backCtrl;
-  final TextEditingController identificationAnsCtrl;
-  final FocusNode frontFocus;
-  final List<_McOpt> mcOpts;
-  final TextEditingController fitbSentCtrl;
-  final TextEditingController fitbAnsCtrl;
-  final List<_Pair> matchPairs;
-  final String? error;
-  final void Function(QuestionType) onTypeChanged;
-  final void Function(CardType) onCardTypeChanged;
-  final VoidCallback onMcAdd;
-  final void Function(int) onMcRemove;
-  final void Function(int, _McOpt) onMcUpdate;
-  final VoidCallback onMatchAdd;
-  final void Function(int) onMatchRemove;
-  final void Function(int, _Pair) onMatchUpdate;
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 800),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _TypeBar(selected: qType, onChanged: onTypeChanged),
-              if (qType.canBeReversible) ...[
-                const SizedBox(height: AppSpacing.lg),
-                _DirectionBar(
-                    selected: cType, onChanged: onCardTypeChanged),
-              ],
-              const SizedBox(height: AppSpacing.xl),
-              if (qType.usesSegments)
-                _FitbEditor(
-                    sentCtrl: fitbSentCtrl, ansCtrl: fitbAnsCtrl)
-              else if (qType.usesPairs)
-                _MatchEditor(
-                  pairs: matchPairs,
-                  onAdd: onMatchAdd,
-                  onRemove: onMatchRemove,
-                  onUpdate: onMatchUpdate,
-                )
-              else
-                _LeftPanel(
-                  qType: qType,
-                  frontCtrl: frontCtrl,
-                  backCtrl: backCtrl,
-                  identificationAnsCtrl: identificationAnsCtrl,
-                  frontFocus: frontFocus,
-                  mcOpts: mcOpts,
-                  onMcAdd: onMcAdd,
-                  onMcRemove: onMcRemove,
-                  onMcUpdate: onMcUpdate,
-                ),
-              if (error != null) ...[
-                const SizedBox(height: AppSpacing.md),
-                ErrorText(error!),
-              ],
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ── Type selector ─────────────────────────────────────────────────
-
-class _TypeBar extends StatelessWidget {
-  const _TypeBar({required this.selected, required this.onChanged});
-
-  final QuestionType selected;
-  final void Function(QuestionType) onChanged;
-
-  static const _types = [
-    (
-      QuestionType.flashcard,
-      'Flashcard',
-      Icons.visibility_outlined
-    ),
-    (
-      QuestionType.identification,
-      'Identification',
-      Icons.border_color_outlined
-    ),
-    (
-      QuestionType.multipleChoice,
-      'Multiple Choice',
-      Icons.checklist_outlined
-    ),
-    (
-      QuestionType.fillInTheBlanks,
-      'Fill in Blank',
-      Icons.edit_note_outlined
-    ),
-    (
-      QuestionType.wordScramble,
-      'Word Scramble',
-      Icons.shuffle_outlined
-    ),
-    (
-      QuestionType.matchMadness,
-      'Match Madness',
-      Icons.compare_arrows_outlined
-    ),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Question Type',
-          style: Theme.of(context)
-              .textTheme
-              .titleMedium
-              ?.copyWith(fontWeight: FontWeight.w600),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: _types
-                .map((e) => Padding(
-                      padding: const EdgeInsets.only(right: AppSpacing.sm),
-                      child: _TypeButton(
-                        label: e.$2,
-                        icon: e.$3,
-                        selected: selected == e.$1,
-                        onTap: () => onChanged(e.$1),
-                      ),
-                    ))
-                .toList(),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _TypeButton extends StatelessWidget {
-  const _TypeButton({
-    required this.label,
-    required this.icon,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String label;
-  final IconData icon;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final bg = selected ? scheme.primary : scheme.surfaceContainerHighest;
-    final fg = selected ? scheme.onPrimary : AppColors.textSecondary;
-    return Tooltip(
-      message: label,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppRadii.card),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 180),
-          curve: Curves.easeInOut,
-          width: 96,
-          padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.sm, vertical: AppSpacing.md),
-          decoration: BoxDecoration(
-            color: bg,
-            borderRadius: BorderRadius.circular(AppRadii.card),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, color: fg, size: 26),
-              const SizedBox(height: AppSpacing.xs + 2),
-              Text(
-                label,
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: fg,
-                      fontWeight:
-                          selected ? FontWeight.w700 : FontWeight.w500,
-                      height: 1.2,
-                    ),
-                textAlign: TextAlign.center,
-                maxLines: 2,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ── Card direction bar ────────────────────────────────────────────
-
-class _DirectionBar extends StatelessWidget {
-  const _DirectionBar({required this.selected, required this.onChanged});
-
-  final CardType selected;
-  final void Function(CardType) onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: scheme.surface,
-        borderRadius: BorderRadius.circular(AppRadii.card),
-        border: Border.all(color: scheme.surfaceContainerHighest),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Card Direction',
-            style: Theme.of(context)
-                .textTheme
-                .titleSmall
-                ?.copyWith(fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            'Choose how this card will be quizzed',
-            style: Theme.of(context)
-                .textTheme
-                .bodySmall
-                ?.copyWith(color: AppColors.textSecondary),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          SegmentedButton<CardType>(
-            segments: const [
-              ButtonSegment(
-                  value: CardType.normal,
-                  label: Text('Normal'),
-                  icon: Icon(Icons.arrow_forward, size: 16)),
-              ButtonSegment(
-                  value: CardType.reversed,
-                  label: Text('Reversed'),
-                  icon: Icon(Icons.swap_horiz, size: 16)),
-              ButtonSegment(
-                  value: CardType.both,
-                  label: Text('Both'),
-                  icon: Icon(Icons.sync_alt, size: 16)),
-            ],
-            selected: {selected},
-            onSelectionChanged: (s) => onChanged(s.first),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ── Input card panel ──────────────────────────────────────────────
-
-class _InputCard extends StatelessWidget {
-  const _InputCard({required this.label, required this.child});
-
-  final String label;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: scheme.surface,
-        borderRadius: BorderRadius.circular(AppRadii.card),
-        border: Border.all(color: scheme.surfaceContainerHighest),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: AppColors.textSecondary,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.4,
-                ),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Theme(
-            data: Theme.of(context).copyWith(
-              inputDecorationTheme: const InputDecorationTheme(
-                border: InputBorder.none,
-                enabledBorder: InputBorder.none,
-                focusedBorder: InputBorder.none,
-                errorBorder: InputBorder.none,
-                focusedErrorBorder: InputBorder.none,
-                filled: false,
-                contentPadding: EdgeInsets.zero,
-                isDense: true,
-              ),
-            ),
-            child: child,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ── Left panel (R&S / MC / Listen) ───────────────────────────────
-
-class _LeftPanel extends StatelessWidget {
-  const _LeftPanel({
-    required this.qType,
-    required this.frontCtrl,
-    required this.backCtrl,
-    required this.identificationAnsCtrl,
-    required this.frontFocus,
-    required this.mcOpts,
-    required this.onMcAdd,
-    required this.onMcRemove,
-    required this.onMcUpdate,
-  });
-
-  final QuestionType qType;
-  final TextEditingController frontCtrl;
-  final TextEditingController backCtrl;
-  final TextEditingController identificationAnsCtrl;
-  final FocusNode frontFocus;
-  final List<_McOpt> mcOpts;
-  final VoidCallback onMcAdd;
-  final void Function(int) onMcRemove;
-  final void Function(int, _McOpt) onMcUpdate;
-
-  @override
-  Widget build(BuildContext context) {
-    final isMc = qType == QuestionType.multipleChoice;
-    final isIdentification = qType == QuestionType.identification;
-    final isWordScramble = qType == QuestionType.wordScramble;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _InputCard(
-          label: isWordScramble ? 'SENTENCE' : 'FRONT',
-          child: TextFormField(
-            controller: frontCtrl,
-            focusNode: frontFocus,
-            maxLines: 3,
-            decoration: InputDecoration(
-              hintText: isWordScramble
-                  ? 'e.g. The dog barked at the cat'
-                  : 'e.g. 犬',
-              helperText: isWordScramble
-                  ? 'Each word becomes a chip the learner taps to reconstruct this sentence'
-                  : null,
-            ),
-            validator: (v) =>
-                (v == null || v.trim().isEmpty) ? 'Required' : null,
-          ),
-        ),
-        // wordScramble has no back/answer field — the sentence itself is the answer
-        if (!isWordScramble) ...[
-          const SizedBox(height: AppSpacing.md),
-          _InputCard(
-            label: isIdentification
-                ? 'ANSWERS'
-                : isMc
-                    ? 'HINT (OPTIONAL)'
-                    : 'BACK',
-            child: TextFormField(
-              controller: isIdentification ? identificationAnsCtrl : backCtrl,
-              maxLines: isMc ? 2 : 3,
-              decoration: InputDecoration(
-                hintText: isIdentification
-                    ? 'e.g. dog, いぬ, inu'
-                    : isMc
-                        ? 'Optional hint shown after answering'
-                        : 'e.g. dog, いぬ, inu',
-                helperText: isIdentification
-                    ? 'Separate multiple accepted answers with commas'
-                    : isMc
-                        ? null
-                        : 'Separate multiple accepted answers with commas',
-              ),
-              validator: (isIdentification || !isMc)
-                  ? (v) =>
-                      (v == null || v.trim().isEmpty) ? 'Required' : null
-                  : null,
-            ),
-          ),
-        ],
-        if (isMc) ...[
-          const SizedBox(height: AppSpacing.md),
-          _McPanel(
-            options: mcOpts,
-            onAdd: onMcAdd,
-            onRemove: onMcRemove,
-            onUpdate: onMcUpdate,
-          ),
-        ],
-      ],
-    );
-  }
-}
-
-// ── Multiple choice panel ─────────────────────────────────────────
-
-class _McPanel extends StatelessWidget {
-  const _McPanel({
-    required this.options,
-    required this.onAdd,
-    required this.onRemove,
-    required this.onUpdate,
-  });
-
-  final List<_McOpt> options;
-  final VoidCallback onAdd;
-  final void Function(int) onRemove;
-  final void Function(int, _McOpt) onUpdate;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: scheme.surface,
-        borderRadius: BorderRadius.circular(AppRadii.card),
-        border: Border.all(color: scheme.surfaceContainerHighest),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text(
-                'ANSWER OPTIONS',
-                style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      color: AppColors.textSecondary,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.4,
-                    ),
-              ),
-              const Spacer(),
-              if (options.length < 6)
-                TextButton.icon(
-                  onPressed: onAdd,
-                  icon: const Icon(Icons.add, size: 16),
-                  label: const Text('Add'),
-                  style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.sm)),
-                ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          ...options.asMap().entries.map(
-                (e) => _McRow(
-                  index: e.key,
-                  option: e.value,
-                  canRemove: options.length > 2,
-                  onRemove: () => onRemove(e.key),
-                  onChanged: (o) => onUpdate(e.key, o),
-                ),
-              ),
-        ],
-      ),
-    );
-  }
-}
-
-class _McRow extends HookWidget {
-  const _McRow({
-    required this.index,
-    required this.option,
-    required this.canRemove,
-    required this.onRemove,
-    required this.onChanged,
-  });
-
-  final int index;
-  final _McOpt option;
-  final bool canRemove;
-  final VoidCallback onRemove;
-  final void Function(_McOpt) onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final ctrl = useTextEditingController(text: option.text);
-    useEffect(() {
-      if (ctrl.text != option.text) {
-        ctrl.text = option.text;
-        ctrl.selection =
-            TextSelection.collapsed(offset: option.text.length);
-      }
-      return null;
-    }, [option.text]);
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-      child: Row(
-        children: [
-          Tooltip(
-            message:
-                option.isCorrect ? 'Correct answer' : 'Mark as correct',
-            child: GestureDetector(
-              onTap: () =>
-                  onChanged((text: option.text, isCorrect: !option.isCorrect)),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 150),
-                width: 28,
-                height: 28,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: option.isCorrect
-                      ? AppColors.correct.withValues(alpha: 0.15)
-                      : Colors.transparent,
-                  border: Border.all(
-                    color: option.isCorrect
-                        ? AppColors.correct
-                        : AppColors.textSecondary.withValues(alpha: 0.4),
-                    width: 2,
-                  ),
-                ),
-                child: option.isCorrect
-                    ? const Icon(Icons.check,
-                        size: 16, color: AppColors.correct)
-                    : null,
-              ),
-            ),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Theme(
-              data: Theme.of(context).copyWith(
-                inputDecorationTheme: const InputDecorationTheme(
-                  border: InputBorder.none,
-                  enabledBorder: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                  filled: false,
-                  contentPadding: EdgeInsets.zero,
-                  isDense: true,
-                ),
-              ),
-              child: TextField(
-                controller: ctrl,
-                decoration:
-                    InputDecoration(hintText: 'Option ${index + 1}'),
-                onChanged: (v) =>
-                    onChanged((text: v, isCorrect: option.isCorrect)),
-              ),
-            ),
-          ),
-          if (canRemove)
-            IconButton(
-              icon: const Icon(Icons.close, size: 18),
-              onPressed: onRemove,
-              tooltip: 'Remove',
-              color: AppColors.textSecondary,
-              visualDensity: VisualDensity.compact,
-            )
-          else
-            const SizedBox(width: 40),
-        ],
-      ),
-    );
-  }
-}
-
-// ── Fill in the Blank editor ──────────────────────────────────────
-
-class _FitbEditor extends HookWidget {
-  const _FitbEditor({required this.sentCtrl, required this.ansCtrl});
-
-  final TextEditingController sentCtrl;
-  final TextEditingController ansCtrl;
-
-  @override
-  Widget build(BuildContext context) {
-    useListenable(sentCtrl);
-    useListenable(ansCtrl);
-
-    final hasContent =
-        sentCtrl.text.trim().isNotEmpty && ansCtrl.text.trim().isNotEmpty;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _InputCard(
-          label: 'FULL SENTENCE',
-          child: TextFormField(
-            controller: sentCtrl,
-            maxLines: 4,
-            decoration: const InputDecoration(
-              hintText: 'e.g. 魚 means fish in English',
-              helperText:
-                  'Write the complete sentence — include the answer word',
-            ),
-            validator: (v) =>
-                (v == null || v.trim().isEmpty) ? 'Required' : null,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        _InputCard(
-          label: 'ANSWERS',
-          child: TextFormField(
-            controller: ansCtrl,
-            decoration: const InputDecoration(
-              hintText: 'e.g. fish,dog',
-              helperText: 'Separate multiple blanks with commas',
-            ),
-            validator: (v) {
-              if (v == null || v.trim().isEmpty) return 'Required';
-              final answers = _splitFitbAnswers(v);
-              if (answers.isEmpty) return 'Required';
-              final sentence = sentCtrl.text.trim().toLowerCase();
-              for (final a in answers) {
-                if (!sentence.contains(a.toLowerCase())) {
-                  return '"$a" not found in the sentence above';
-                }
-              }
-              return null;
-            },
-          ),
-        ),
-        if (hasContent) ...[
-          const SizedBox(height: AppSpacing.md),
-          _FitbPreview(sentence: sentCtrl.text, answersRaw: ansCtrl.text),
-        ],
-      ],
-    );
-  }
-}
-
-class _FitbPreview extends StatelessWidget {
-  const _FitbPreview({required this.sentence, required this.answersRaw});
-
-  final String sentence;
-  final String answersRaw;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final answers = _splitFitbAnswers(answersRaw);
-    final s = sentence.trim();
-    final sl = s.toLowerCase();
-
-    // Collect all (start, end) blank ranges, skipping answers not found
-    final ranges = <(int, int)>[];
-    for (final a in answers) {
-      final idx = sl.indexOf(a.toLowerCase());
-      if (idx >= 0) ranges.add((idx, idx + a.length));
-    }
-    // Sort by start position
-    ranges.sort((a, b) => a.$1.compareTo(b.$1));
-
-    if (ranges.isEmpty) {
-      return Container(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        decoration: BoxDecoration(
-          color: AppColors.incorrect.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(AppRadii.card),
-          border: Border.all(color: AppColors.incorrect.withValues(alpha: 0.25)),
-        ),
-        child: Row(
-          children: [
-            const Icon(Icons.warning_amber_rounded,
-                size: 16, color: AppColors.incorrect),
-            const SizedBox(width: AppSpacing.sm),
-            Text(
-              'No answers found in sentence',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodySmall
-                  ?.copyWith(color: AppColors.incorrect),
-            ),
-          ],
-        ),
-      );
-    }
-
-    // Build RichText spans, replacing each range with a blank
-    final blankStyle = TextStyle(
-      color: scheme.primary,
-      fontWeight: FontWeight.bold,
-      decoration: TextDecoration.underline,
-      decorationColor: scheme.primary,
-      decorationThickness: 2,
-    );
-    final spans = <TextSpan>[];
-    var cursor = 0;
-    for (final (start, end) in ranges) {
-      if (start > cursor) spans.add(TextSpan(text: s.substring(cursor, start)));
-      final blankLen = (end - start).clamp(3, 12);
-      spans.add(TextSpan(text: '＿' * blankLen, style: blankStyle));
-      cursor = end;
-    }
-    if (cursor < s.length) spans.add(TextSpan(text: s.substring(cursor)));
-
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: scheme.primary.withValues(alpha: 0.06),
-        borderRadius: BorderRadius.circular(AppRadii.card),
-        border: Border.all(color: scheme.primary.withValues(alpha: 0.2)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'PREVIEW',
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: scheme.primary,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.8,
-                ),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          RichText(
-            text: TextSpan(
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(height: 1.6),
-              children: spans,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ── Match Madness editor ──────────────────────────────────────────
-
-class _MatchEditor extends StatelessWidget {
-  const _MatchEditor({
-    required this.pairs,
-    required this.onAdd,
-    required this.onRemove,
-    required this.onUpdate,
-  });
-
-  final List<_Pair> pairs;
-  final VoidCallback onAdd;
-  final void Function(int) onRemove;
-  final void Function(int, _Pair) onUpdate;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(
-              'Match Pairs',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(fontWeight: FontWeight.w600),
-            ),
-            const Spacer(),
-            FilledButton.tonal(
-              onPressed: onAdd,
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.add, size: 16),
-                  SizedBox(width: AppSpacing.xs),
-                  Text('Add Pair'),
-                ],
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        Text(
-          'Each term will be matched to its corresponding answer',
-          style: Theme.of(context)
-              .textTheme
-              .bodySmall
-              ?.copyWith(color: AppColors.textSecondary),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        ...pairs.asMap().entries.map(
-              (e) => Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                child: _MatchRow(
-                  index: e.key,
-                  pair: e.value,
-                  canRemove: pairs.length > 2,
-                  onRemove: () => onRemove(e.key),
-                  onChanged: (p) => onUpdate(e.key, p),
-                ),
-              ),
-            ),
-      ],
-    );
-  }
-}
-
-class _MatchRow extends HookWidget {
-  const _MatchRow({
-    required this.index,
-    required this.pair,
-    required this.canRemove,
-    required this.onRemove,
-    required this.onChanged,
-  });
-
-  final int index;
-  final _Pair pair;
-  final bool canRemove;
-  final VoidCallback onRemove;
-  final void Function(_Pair) onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final termCtrl = useTextEditingController(text: pair.term);
-    final matchCtrl = useTextEditingController(text: pair.match);
-    useEffect(() {
-      if (termCtrl.text != pair.term) {
-        termCtrl.text = pair.term;
-        termCtrl.selection =
-            TextSelection.collapsed(offset: pair.term.length);
-      }
-      if (matchCtrl.text != pair.match) {
-        matchCtrl.text = pair.match;
-        matchCtrl.selection =
-            TextSelection.collapsed(offset: pair.match.length);
-      }
-      return null;
-    }, [pair.term, pair.match]);
-
-    final scheme = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md, vertical: AppSpacing.sm + 2),
-      decoration: BoxDecoration(
-        color: scheme.surface,
-        borderRadius: BorderRadius.circular(AppRadii.card),
-        border: Border.all(color: scheme.surfaceContainerHighest),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 28,
-            height: 28,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: scheme.primary.withValues(alpha: 0.12),
-              shape: BoxShape.circle,
-            ),
-            child: Text(
-              '${index + 1}',
-              style: TextStyle(
-                color: scheme.primary,
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Theme(
-              data: Theme.of(context).copyWith(
-                inputDecorationTheme: const InputDecorationTheme(
-                  border: InputBorder.none,
-                  enabledBorder: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                  filled: false,
-                  contentPadding: EdgeInsets.zero,
-                  isDense: true,
-                ),
-              ),
-              child: TextField(
-                controller: termCtrl,
-                decoration:
-                    const InputDecoration(hintText: 'Term'),
-                onChanged: (v) =>
-                    onChanged((term: v, match: pair.match)),
-              ),
-            ),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          Icon(
-            Icons.compare_arrows,
-            color: scheme.primary.withValues(alpha: 0.5),
-            size: 22,
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Theme(
-              data: Theme.of(context).copyWith(
-                inputDecorationTheme: const InputDecorationTheme(
-                  border: InputBorder.none,
-                  enabledBorder: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                  filled: false,
-                  contentPadding: EdgeInsets.zero,
-                  isDense: true,
-                ),
-              ),
-              child: TextField(
-                controller: matchCtrl,
-                decoration:
-                    const InputDecoration(hintText: 'Match'),
-                onChanged: (v) =>
-                    onChanged((term: pair.term, match: v)),
-              ),
-            ),
-          ),
-          const SizedBox(width: AppSpacing.xs),
-          if (canRemove)
-            IconButton(
-              icon: const Icon(Icons.close, size: 18),
-              onPressed: onRemove,
-              tooltip: 'Remove pair',
-              color: AppColors.textSecondary,
-              visualDensity: VisualDensity.compact,
-            )
-          else
-            const SizedBox(width: 40),
-        ],
       ),
     );
   }
