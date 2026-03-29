@@ -17,7 +17,7 @@ import 'package:boo_mondai/services/services.barrel.dart';
 class CardProvider extends ChangeNotifier {
   final SupabaseService _supabaseService;
   final HiveService _hiveService;
-  static const _uuid = Uuid();
+  static const uuid = Uuid();
 
   List<DeckCard> _cards = [];
   String? _currentDeckId;
@@ -127,50 +127,37 @@ class CardProvider extends ChangeNotifier {
     _error = null;
 
     try {
-      final cardId = _uuid.v4();
+      final cardId = uuid.v4();
       final now = DateTime.now();
 
+      final newNote = Note(
+        id: uuid.v4(),
+        cardId: cardId,
+        frontText: frontText,
+        backText: backText,
+        frontImageUrl: frontImageUrl,
+        backImageUrl: backImageUrl,
+        frontAudioUrl: frontAudioUrl,
+        backAudioUrl: backAudioUrl,
+        isReverse: false,
+        createdAt: now,
+      );
       // Build notes in memory
       final builtNotes = <Note>[];
       if (!questionType.usesPairs) {
-        builtNotes.add(
-          Note(
-            id: _uuid.v4(),
-            cardId: cardId,
-            frontText: frontText,
-            backText: backText,
-            frontImageUrl: frontImageUrl,
-            backImageUrl: backImageUrl,
-            frontAudioUrl: frontAudioUrl,
-            backAudioUrl: backAudioUrl,
-            isReverse: false,
-            createdAt: now,
-          ),
-        );
+        builtNotes.add(newNote);
         if (cardType == CardType.both) {
-          builtNotes.add(
-            Note(
-              id: _uuid.v4(),
-              cardId: cardId,
-              frontText: backText,
-              backText: frontText,
-              frontImageUrl: backImageUrl,
-              backImageUrl: frontImageUrl,
-              frontAudioUrl: backAudioUrl,
-              backAudioUrl: frontAudioUrl,
-              isReverse: true,
-              createdAt: now,
-            ),
-          );
+          builtNotes.add(newNote.reverse());
         }
       }
 
-      // Assign stable UUIDs to children that come in without them
+      // Assign stable UUIDs to children that come in without them.
+      // These children are the answer values for each question type. 
       final builtOptions = [
         for (var i = 0; i < options.length; i++)
           options[i].id.isEmpty
               ? options[i].copyWith(
-                  id: _uuid.v4(),
+                  id: uuid.v4(),
                   cardId: cardId,
                   displayOrder: i,
                 )
@@ -179,14 +166,14 @@ class CardProvider extends ChangeNotifier {
       final builtSegments = [
         for (final seg in segments)
           seg.id.isEmpty
-              ? seg.copyWith(id: _uuid.v4(), cardId: cardId)
+              ? seg.copyWith(id: uuid.v4(), cardId: cardId)
               : seg.copyWith(cardId: cardId),
       ];
       final builtPairs = [
         for (var i = 0; i < pairs.length; i++)
           pairs[i].id.isEmpty
               ? pairs[i].copyWith(
-                  id: _uuid.v4(),
+                  id: uuid.v4(),
                   cardId: cardId,
                   displayOrder: i,
                 )
@@ -347,14 +334,14 @@ class CardProvider extends ChangeNotifier {
   DeckCard _normalizeChildIds(DeckCard card) {
     final notes = card.notes
         .map(
-          (n) => n.id.isEmpty ? n.copyWith(id: _uuid.v4(), cardId: card.id) : n,
+          (n) => n.id.isEmpty ? n.copyWith(id: uuid.v4(), cardId: card.id) : n,
         )
         .toList();
     final options = [
       for (var i = 0; i < card.options.length; i++)
         card.options[i].id.isEmpty
             ? card.options[i].copyWith(
-                id: _uuid.v4(),
+                id: uuid.v4(),
                 cardId: card.id,
                 displayOrder: i,
               )
@@ -362,14 +349,14 @@ class CardProvider extends ChangeNotifier {
     ];
     final segments = card.segments
         .map(
-          (s) => s.id.isEmpty ? s.copyWith(id: _uuid.v4(), cardId: card.id) : s,
+          (s) => s.id.isEmpty ? s.copyWith(id: uuid.v4(), cardId: card.id) : s,
         )
         .toList();
     final pairs = [
       for (var i = 0; i < card.pairs.length; i++)
         card.pairs[i].id.isEmpty
             ? card.pairs[i].copyWith(
-                id: _uuid.v4(),
+                id: uuid.v4(),
                 cardId: card.id,
                 displayOrder: i,
               )

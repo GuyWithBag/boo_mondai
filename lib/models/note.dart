@@ -5,6 +5,8 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/providers/providers.barrel.dart';
+
 /// Stores the presentable content of one side of a [DeckCard].
 ///
 /// A [CardType.normal] card generates one Note ([isReverse] = false).
@@ -40,30 +42,30 @@ class Note {
   });
 
   factory Note.fromJson(Map<String, dynamic> json) => Note(
-        id: json['id'] as String,
-        cardId: json['card_id'] as String,
-        frontText: json['front_text'] as String? ?? '',
-        backText: json['back_text'] as String? ?? '',
-        frontAudioUrl: json['front_audio_url'] as String?,
-        backAudioUrl: json['back_audio_url'] as String?,
-        frontImageUrl: json['front_image_url'] as String?,
-        backImageUrl: json['back_image_url'] as String?,
-        isReverse: json['is_reverse'] as bool? ?? false,
-        createdAt: DateTime.parse(json['created_at'] as String),
-      );
+    id: json['id'] as String,
+    cardId: json['card_id'] as String,
+    frontText: json['front_text'] as String? ?? '',
+    backText: json['back_text'] as String? ?? '',
+    frontAudioUrl: json['front_audio_url'] as String?,
+    backAudioUrl: json['back_audio_url'] as String?,
+    frontImageUrl: json['front_image_url'] as String?,
+    backImageUrl: json['back_image_url'] as String?,
+    isReverse: json['is_reverse'] as bool? ?? false,
+    createdAt: DateTime.parse(json['created_at'] as String),
+  );
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'card_id': cardId,
-        'front_text': frontText,
-        'back_text': backText,
-        'front_audio_url': frontAudioUrl,
-        'back_audio_url': backAudioUrl,
-        'front_image_url': frontImageUrl,
-        'back_image_url': backImageUrl,
-        'is_reverse': isReverse,
-        'created_at': createdAt.toIso8601String(),
-      };
+    'id': id,
+    'card_id': cardId,
+    'front_text': frontText,
+    'back_text': backText,
+    'front_audio_url': frontAudioUrl,
+    'back_audio_url': backAudioUrl,
+    'front_image_url': frontImageUrl,
+    'back_image_url': backImageUrl,
+    'is_reverse': isReverse,
+    'created_at': createdAt.toIso8601String(),
+  };
 
   Note copyWith({
     String? id,
@@ -76,19 +78,33 @@ class Note {
     String? backImageUrl,
     bool? isReverse,
     DateTime? createdAt,
-  }) =>
-      Note(
-        id: id ?? this.id,
-        cardId: cardId ?? this.cardId,
-        frontText: frontText ?? this.frontText,
-        backText: backText ?? this.backText,
-        frontAudioUrl: frontAudioUrl ?? this.frontAudioUrl,
-        backAudioUrl: backAudioUrl ?? this.backAudioUrl,
-        frontImageUrl: frontImageUrl ?? this.frontImageUrl,
-        backImageUrl: backImageUrl ?? this.backImageUrl,
-        isReverse: isReverse ?? this.isReverse,
-        createdAt: createdAt ?? this.createdAt,
-      );
+  }) => Note(
+    id: id ?? this.id,
+    cardId: cardId ?? this.cardId,
+    frontText: frontText ?? this.frontText,
+    backText: backText ?? this.backText,
+    frontAudioUrl: frontAudioUrl ?? this.frontAudioUrl,
+    backAudioUrl: backAudioUrl ?? this.backAudioUrl,
+    frontImageUrl: frontImageUrl ?? this.frontImageUrl,
+    backImageUrl: backImageUrl ?? this.backImageUrl,
+    isReverse: isReverse ?? this.isReverse,
+    createdAt: createdAt ?? this.createdAt,
+  );
+
+  Note reverse() {
+    return Note(
+      id: CardProvider.uuid.v4(),
+      cardId: cardId,
+      frontText: backText,
+      backText: frontText,
+      frontImageUrl: backImageUrl,
+      backImageUrl: frontImageUrl,
+      frontAudioUrl: backAudioUrl,
+      backAudioUrl: frontAudioUrl,
+      isReverse: true,
+      createdAt: DateTime.now(),
+    );
+  }
 
   @override
   bool operator ==(Object other) =>
