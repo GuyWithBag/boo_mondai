@@ -77,8 +77,7 @@ class DeckCard {
   // ── Convenience getters (quiz-system compatibility) ──────────────────
 
   /// The primary (non-reverse) Note. Null for [QuestionType.matchMadness].
-  Note? get primaryNote =>
-      notes.where((n) => !n.isReverse).firstOrNull;
+  Note? get primaryNote => notes.where((n) => !n.isReverse).firstOrNull;
 
   /// The question prompt shown to the learner.
   String get question => primaryNote?.frontText ?? '';
@@ -102,12 +101,11 @@ class DeckCard {
 
   /// Accepted answers for [QuestionType.identification] — [identificationAnswer]
   /// split on commas, trimmed, lower-cased, empty entries removed.
-  List<String> get acceptedIdentificationAnswers =>
-      identificationAnswer
-          .split(',')
-          .map((a) => a.trim().toLowerCase())
-          .where((a) => a.isNotEmpty)
-          .toList();
+  List<String> get acceptedIdentificationAnswers => identificationAnswer
+      .split(',')
+      .map((a) => a.trim().toLowerCase())
+      .where((a) => a.isNotEmpty)
+      .toList();
 
   /// Returns true if [userAnswer] is correct for this card's [questionType].
   ///
@@ -120,20 +118,20 @@ class DeckCard {
   bool checkAnswer(String userAnswer) {
     final trimmed = userAnswer.trim().toLowerCase();
     return switch (questionType) {
-      QuestionType.flashcard =>
-        acceptedAnswers.contains(trimmed),
-      QuestionType.identification =>
-        acceptedIdentificationAnswers.contains(trimmed),
+      QuestionType.flashcard => acceptedAnswers.contains(trimmed),
+      QuestionType.identification => acceptedIdentificationAnswers.contains(
+        trimmed,
+      ),
       QuestionType.multipleChoice => options.any(
-          (o) =>
-              o.isCorrect &&
-              (o.id == userAnswer.trim() ||
-                  o.optionText.trim().toLowerCase() == trimmed),
-        ),
-      QuestionType.fillInTheBlanks =>
-        segments.any((s) => s.checkAnswer(userAnswer)),
-      QuestionType.wordScramble =>
-        trimmed == question.trim().toLowerCase(),
+        (o) =>
+            o.isCorrect &&
+            (o.id == userAnswer.trim() ||
+                o.optionText.trim().toLowerCase() == trimmed),
+      ),
+      QuestionType.fillInTheBlanks => segments.any(
+        (s) => s.checkAnswer(userAnswer),
+      ),
+      QuestionType.wordScramble => trimmed == question.trim().toLowerCase(),
       QuestionType.matchMadness => false,
     };
   }
@@ -141,58 +139,63 @@ class DeckCard {
   // ── Serialisation ────────────────────────────────────────────────────
 
   factory DeckCard.fromJson(Map<String, dynamic> json) => DeckCard(
-        id: json['id'] as String,
-        deckId: json['deck_id'] as String,
-        cardType: CardType.fromString(json['card_type'] as String?),
-        questionType:
-            QuestionType.fromString(json['question_type'] as String?),
-        sortOrder: json['sort_order'] as int? ?? 0,
-        createdAt: DateTime.parse(json['created_at'] as String),
-        sourceCardId: json['source_card_id'] as String?,
-        identificationAnswer:
-            json['identification_answer'] as String? ?? '',
-        notes: (json['notes'] as List<dynamic>? ?? [])
-            .map((n) => Note.fromJson(
-                Map<String, dynamic>.from(n as Map)))
-            .toList(),
-        options: (json['mc_options'] as List<dynamic>? ?? [])
-            .map((o) => MultipleChoiceOption.fromJson(
-                Map<String, dynamic>.from(o as Map)))
-            .toList(),
-        segments: (json['fitb_segments'] as List<dynamic>? ?? [])
-            .map((s) => FillInTheBlankSegment.fromJson(
-                Map<String, dynamic>.from(s as Map)))
-            .toList(),
-        pairs: (json['mm_pairs'] as List<dynamic>? ?? [])
-            .map((p) => MatchMadnessPair.fromJson(
-                Map<String, dynamic>.from(p as Map)))
-            .toList(),
-      );
+    id: json['id'] as String,
+    deckId: json['deck_id'] as String,
+    cardType: CardType.fromString(json['card_type'] as String?),
+    questionType: QuestionType.fromString(json['question_type'] as String?),
+    sortOrder: json['sort_order'] as int? ?? 0,
+    createdAt: DateTime.parse(json['created_at'] as String),
+    sourceCardId: json['source_card_id'] as String?,
+    identificationAnswer: json['identification_answer'] as String? ?? '',
+    notes: (json['notes'] as List<dynamic>? ?? [])
+        .map((n) => Note.fromJson(Map<String, dynamic>.from(n as Map)))
+        .toList(),
+    options: (json['mc_options'] as List<dynamic>? ?? [])
+        .map(
+          (o) => MultipleChoiceOption.fromJson(
+            Map<String, dynamic>.from(o as Map),
+          ),
+        )
+        .toList(),
+    segments: (json['fitb_segments'] as List<dynamic>? ?? [])
+        .map(
+          (s) => FillInTheBlankSegment.fromJson(
+            Map<String, dynamic>.from(s as Map),
+          ),
+        )
+        .toList(),
+    pairs: (json['mm_pairs'] as List<dynamic>? ?? [])
+        .map(
+          (p) => MatchMadnessPair.fromJson(Map<String, dynamic>.from(p as Map)),
+        )
+        .toList(),
+  );
 
   /// Serialises only the columns that belong to the `deck_cards` table.
   /// Use this when writing to Supabase.
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'deck_id': deckId,
-        'card_type': cardType.toJson(),
-        'question_type': questionType.toJson(),
-        'sort_order': sortOrder,
-        'created_at': createdAt.toIso8601String(),
-        if (sourceCardId != null) 'source_card_id': sourceCardId,
-        'identification_answer':
-            identificationAnswer.isEmpty ? null : identificationAnswer,
-      };
+    'id': id,
+    'deck_id': deckId,
+    'card_type': cardType.toJson(),
+    'question_type': questionType.toJson(),
+    'sort_order': sortOrder,
+    'created_at': createdAt.toIso8601String(),
+    if (sourceCardId != null) 'source_card_id': sourceCardId,
+    'identification_answer': identificationAnswer.isEmpty
+        ? null
+        : identificationAnswer,
+  };
 
   /// Serialises the full card — including nested content nodes — for Hive cache.
   /// The nested lists use the same keys as the Supabase join response so
   /// [fromJson] can deserialise both sources without branching.
   Map<String, dynamic> toCacheJson() => {
-        ...toJson(),
-        'notes': notes.map((n) => n.toJson()).toList(),
-        'mc_options': options.map((o) => o.toJson()).toList(),
-        'fitb_segments': segments.map((s) => s.toJson()).toList(),
-        'mm_pairs': pairs.map((p) => p.toJson()).toList(),
-      };
+    ...toJson(),
+    'notes': notes.map((n) => n.toJson()).toList(),
+    'mc_options': options.map((o) => o.toJson()).toList(),
+    'fitb_segments': segments.map((s) => s.toJson()).toList(),
+    'mm_pairs': pairs.map((p) => p.toJson()).toList(),
+  };
 
   DeckCard copyWith({
     String? id,
@@ -207,22 +210,22 @@ class DeckCard {
     List<MultipleChoiceOption>? options,
     List<FillInTheBlankSegment>? segments,
     List<MatchMadnessPair>? pairs,
-  }) =>
-      DeckCard(
-        id: id ?? this.id,
-        deckId: deckId ?? this.deckId,
-        cardType: cardType ?? this.cardType,
-        questionType: questionType ?? this.questionType,
-        sortOrder: sortOrder ?? this.sortOrder,
-        createdAt: createdAt ?? this.createdAt,
-        sourceCardId:
-            sourceCardId == _sentinel ? this.sourceCardId : sourceCardId as String?,
-        identificationAnswer: identificationAnswer ?? this.identificationAnswer,
-        notes: notes ?? this.notes,
-        options: options ?? this.options,
-        segments: segments ?? this.segments,
-        pairs: pairs ?? this.pairs,
-      );
+  }) => DeckCard(
+    id: id ?? this.id,
+    deckId: deckId ?? this.deckId,
+    cardType: cardType ?? this.cardType,
+    questionType: questionType ?? this.questionType,
+    sortOrder: sortOrder ?? this.sortOrder,
+    createdAt: createdAt ?? this.createdAt,
+    sourceCardId: sourceCardId == _sentinel
+        ? this.sourceCardId
+        : sourceCardId as String?,
+    identificationAnswer: identificationAnswer ?? this.identificationAnswer,
+    notes: notes ?? this.notes,
+    options: options ?? this.options,
+    segments: segments ?? this.segments,
+    pairs: pairs ?? this.pairs,
+  );
 
   @override
   bool operator ==(Object other) =>
