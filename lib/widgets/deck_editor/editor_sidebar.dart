@@ -16,15 +16,15 @@ class EditorSidebar extends StatelessWidget {
     required this.cards,
     required this.activeCardId,
     required this.isAdding,
-    required this.onSelect,
     required this.onAdd,
+    this.children,
   });
 
   final List<DeckCard> cards;
   final String? activeCardId;
   final bool isAdding;
-  final void Function(String cardId) onSelect;
   final VoidCallback onAdd;
+  final List<Widget>? children;
 
   @override
   Widget build(BuildContext context) {
@@ -76,8 +76,9 @@ class EditorSidebar extends StatelessWidget {
           ),
           const Divider(height: 1),
           Expanded(
-            child: cards.isEmpty
-                ? const Center(
+            child: children != null
+                ? ListView(children: children!)
+                : const Center(
                     child: Text(
                       'No cards yet',
                       style: TextStyle(
@@ -85,15 +86,25 @@ class EditorSidebar extends StatelessWidget {
                         fontSize: 13,
                       ),
                     ),
-                  )
-                : ListView.builder(
-                    itemCount: cards.length,
-                    itemBuilder: (ctx, i) => SidebarItem(
-                      card: cards[i],
-                      isActive: cards[i].id == activeCardId,
-                      onTap: () => onSelect(cards[i].id),
-                    ),
                   ),
+            // child: cards.isEmpty
+            //     ? const Center(
+            //         child: Text(
+            //           'No cards yet',
+            //           style: TextStyle(
+            //             color: AppColors.textSecondary,
+            //             fontSize: 13,
+            //           ),
+            //         ),
+            //       )
+            //     : ListView.builder(
+            //         itemCount: cards.length,
+            //         itemBuilder: (ctx, i) => SidebarItem(
+            //           card: cards[i],
+            //           isActive: cards[i].id == activeCardId,
+            //           onTap: () => onSelect(cards[i].id),
+            //         ),
+            //       ),
           ),
         ],
       ),

@@ -11,7 +11,6 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
 import 'package:boo_mondai/models/models.barrel.dart';
 import 'package:boo_mondai/providers/providers.barrel.dart';
-import 'package:boo_mondai/shared/shared.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
 
 class DeckEditorPage extends HookWidget {
@@ -30,6 +29,7 @@ class DeckEditorPage extends HookWidget {
 
     // Active card is tracked as internal state — no URL param needed
     final activeCardId = useState<String?>(initialCardId);
+    final previousActiveCardId = useState<String?>(initialCardId);
     final isAdding = useState(false);
 
     // Form state
@@ -118,12 +118,10 @@ class DeckEditorPage extends HookWidget {
     }
 
     // Save always updates (card already exists after addBlankCard)
-    Future<void> save() async {
-      if (activeCardId.value == null) return;
+    Future<void> save(String? cardId) async {
+      if (cardId == null) return;
       if (!formKey.currentState!.validate()) return;
-      final card = cardProvider.cards
-          .where((c) => c.id == activeCardId.value)
-          .firstOrNull;
+      final card = cardProvider.cards.where((c) => c.id == cardId).firstOrNull;
       if (card == null) return;
 
       // identification and wordScramble only use frontText; backText is not shown
@@ -190,14 +188,6 @@ class DeckEditorPage extends HookWidget {
                   ? null
                   : () => context.read<CardProvider>().pushDeck(deckId),
             ),
-          if (hasActiveCard)
-            Padding(
-              padding: const EdgeInsets.only(right: AppSpacing.md),
-              child: FilledButton(
-                onPressed: cardProvider.isLoading ? null : save,
-                child: const Text('Save Card'),
-              ),
-            ),
         ],
       ),
       // On mobile (no sidebar), FAB lets the user add a new card
@@ -230,8 +220,21 @@ class DeckEditorPage extends HookWidget {
                     cards: cardProvider.cards,
                     activeCardId: activeCardId.value,
                     isAdding: isAdding.value,
-                    onSelect: (id) => activeCardId.value = id,
+
                     onAdd: addBlankCard,
+                    children: [
+                      for (int i = 0; i < cardProvider.cards.length; i++)
+                        SidebarItem(
+                          card: cardProvider.cards[i],
+                          isActive:
+                              cardProvider.cards[i].id == activeCardId.value,
+                          onTap: () {
+                            previousActiveCardId.value = activeCardId.value;
+                            activeCardId.value = cardProvider.cards[i].id;
+                            save(previousActiveCardId.value);
+                          },
+                        ),
+                    ],
                   ),
                 Expanded(
                   child: !hasActiveCard
