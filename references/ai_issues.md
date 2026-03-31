@@ -9,4 +9,4 @@
 
 ## Fixing
 1. Let's do repositories first
-2. 
+2. Fix the multiple ways to transfer data

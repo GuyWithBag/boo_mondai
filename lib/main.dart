@@ -22,8 +22,8 @@ Future<void> main() async {
 
   // ── Hive ────────────────────────────────────────────
   await Hive.initFlutter();
-  final hiveService = HiveService();
-  await hiveService.init();
+  // final hiveService = HiveService();
+  // await hiveService.init();
 
   // ── Supabase ────────────────────────────────────────
   await Supabase.initialize(url: Env.supabaseUrl, anonKey: Env.supabaseAnonKey);
@@ -37,35 +37,35 @@ Future<void> main() async {
   // ── Restore session ─────────────────────────────────
   final authProvider = AuthProvider(
     supabaseService: supabaseService,
-    hiveService: hiveService,
+    // hiveService: hiveService,
   );
   await authProvider.restoreSession();
 
   runApp(
     MultiProvider(
       providers: [
-        Provider<HiveService>.value(value: hiveService),
+        // Provider<HiveService>.value(value: hiveService),
         Provider<SupabaseService>.value(value: supabaseService),
         ChangeNotifierProvider.value(value: authProvider),
-        ChangeNotifierProvider(
-          create: (_) => DeckProvider(
-            supabaseService: supabaseService,
-            hiveService: hiveService,
-          ),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => CardProvider(
-            supabaseService: supabaseService,
-            hiveService: hiveService,
-          ),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => ViewDeckController(hiveService: hiveService),
-        ),
+        // ChangeNotifierProvider(
+        //   create: (_) => DeckProvider(
+        //     supabaseService: supabaseService,
+        //     hiveService: hiveService,
+        //   ),
+        // ),
+        // ChangeNotifierProvider(
+        //   create: (_) => CardProvider(
+        //     supabaseService: supabaseService,
+        //     hiveService: hiveService,
+        //   ),
+        // ),
+        // ChangeNotifierProvider(
+        //   create: (_) => ViewDeckController(hiveService: hiveService),
+        // ),
         ChangeNotifierProvider(
           create: (_) => QuizProvider(
             supabaseService: supabaseService,
-            hiveService: hiveService,
+            // hiveService: hiveService,
             fsrsService: fsrsService,
             queueController: QuizQueueController(),
           ),
@@ -73,7 +73,7 @@ Future<void> main() async {
         ChangeNotifierProvider(
           create: (_) => FsrsProvider(
             fsrsService: fsrsService,
-            hiveService: hiveService,
+            // hiveService: hiveService,
             supabaseService: supabaseService,
           ),
         ),
@@ -83,7 +83,7 @@ Future<void> main() async {
         ChangeNotifierProvider(
           create: (_) => StreakProvider(
             supabaseService: supabaseService,
-            hiveService: hiveService,
+            // hiveService: hiveService,
           ),
         ),
         ChangeNotifierProvider(

@@ -11,7 +11,7 @@ import 'package:boo_mondai/models/models.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
 
-class DeckCardWidget extends StatelessWidget {
+class DeckCardTile extends StatelessWidget {
   final Deck deck;
 
   /// When non-null, a delete option appears in the card's popup menu.
@@ -38,7 +38,7 @@ class DeckCardWidget extends StatelessWidget {
   /// Called when the card is long-pressed (triggers selection mode entry).
   final VoidCallback? onLongPress;
 
-  const DeckCardWidget({
+  const DeckCardTile({
     super.key,
     required this.deck,
     this.onDelete,
