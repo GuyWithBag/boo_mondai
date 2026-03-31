@@ -28,7 +28,19 @@ import 'package:boo_mondai/models/streak.dart';
   AdapterSpec<FsrsCardState>(),
   AdapterSpec<ReviewLogEntry>(),
   AdapterSpec<Streak>(),
+  AdapterSpec<Deck>(),
+  AdapterSpec<DeckCard>(),
+  AdapterSpec<Note>(),
+  AdapterSpec<MultipleChoiceOption>(),
+  AdapterSpec<FillInTheBlankSegment>(),
+  AdapterSpec<MatchMadnessPair>(),
+  // AdapterSpec<QuizSession>(),
+  // AdapterSpec<QuizAnswer>(),
+  AdapterSpec<FsrsCardState>(),
+  AdapterSpec<ReviewLogEntry>(),
+  AdapterSpec<Streak>(),
+  AdapterSpec<CardType>(),
+  AdapterSpec<QuestionType>(),
 ])
 // ignore: unused_element
-
 part 'adapters.g.dart';

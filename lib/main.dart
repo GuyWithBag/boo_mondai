@@ -16,7 +16,7 @@ import 'package:boo_mondai/providers/providers.barrel.dart';
 import 'package:boo_mondai/services/services.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 
-@BarrelConfig(exclude: ['lib/lib.barrel.dart', 'lib/hive/hive.barrel.dart'])
+@BarrelConfig(exclude: ['lib/hive/hive.barrel.dart'])
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
