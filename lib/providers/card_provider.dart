@@ -239,6 +239,25 @@ class CardProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // ── Commit (editor draft → Hive) ──────────────────────────────────
+
+  /// Replaces all cards for [deckId] in Hive with [cards] and marks dirty.
+  /// Called by the editor page when the user explicitly saves their draft.
+  Future<void> commitCards(String deckId, List<DeckCard> cards) async {
+    _error = null;
+    try {
+      final normalized = [for (final c in cards) _normalizeChildIds(c)];
+      await _hiveService.replaceCardsForDeck(deckId, normalized);
+      _cards = normalized;
+      _currentDeckId = deckId;
+      _dirtyDeckIds.add(deckId);
+      notifyListeners();
+    } on AppException catch (e) {
+      _error = e.message;
+      notifyListeners();
+    }
+  }
+
   // ── Push (Hive → Supabase) ────────────────────────────────────────
 
   /// Syncs all local cards for [deckId] to Supabase.

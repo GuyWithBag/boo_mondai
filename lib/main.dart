@@ -11,7 +11,7 @@ import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:boo_mondai/app.dart';
-import 'package:boo_mondai/controllers/controllers.dart';
+import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/providers/providers.barrel.dart';
 import 'package:boo_mondai/services/services.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
@@ -44,6 +44,7 @@ Future<void> main() async {
   runApp(
     MultiProvider(
       providers: [
+        Provider<HiveService>.value(value: hiveService),
         Provider<SupabaseService>.value(value: supabaseService),
         ChangeNotifierProvider.value(value: authProvider),
         ChangeNotifierProvider(
@@ -57,6 +58,9 @@ Future<void> main() async {
             supabaseService: supabaseService,
             hiveService: hiveService,
           ),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => ViewDeckController(hiveService: hiveService),
         ),
         ChangeNotifierProvider(
           create: (_) => QuizProvider(

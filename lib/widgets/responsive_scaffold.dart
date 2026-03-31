@@ -52,17 +52,6 @@ class ResponsiveScaffold extends HookWidget {
       isCreateDeck.value = goTo == '/my-decks';
     }
 
-    FloatingActionButton? getFloatingActionButton() {
-      return isCreateDeck.value
-          ? FloatingActionButton(
-              onPressed: () {
-                context.push('/my-decks/create');
-              },
-              child: Icon(Icons.add_rounded),
-            )
-          : null;
-    }
-
     // Group B only sees code entry — no shell nav
     if (auth.role == 'group_b_participant') {
       return Scaffold(body: child);
@@ -72,7 +61,6 @@ class ResponsiveScaffold extends HookWidget {
       builder: (context, constraints) {
         if (Breakpoints.isDesktop(constraints.maxWidth)) {
           return Scaffold(
-            floatingActionButton: getFloatingActionButton(),
             body: Row(
               children: [
                 NavigationRail(
@@ -90,7 +78,6 @@ class ResponsiveScaffold extends HookWidget {
 
         return Scaffold(
           body: child,
-          floatingActionButton: getFloatingActionButton(),
           bottomNavigationBar: NavigationBar(
             selectedIndex: currentIndex,
             onDestinationSelected: (i) => onTap(context, i),

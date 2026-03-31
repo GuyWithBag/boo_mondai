@@ -109,6 +109,14 @@ class SupabaseService {
     }
   }
 
+  Future<void> upsertDeck(Map<String, dynamic> data) async {
+    try {
+      await _client.from('decks').upsert(data);
+    } on PostgrestException catch (e) {
+      throw AppException(e.message, code: e.code);
+    }
+  }
+
   Future<void> deleteDeck(String id) async {
     try {
       await _client.from('decks').delete().eq('id', id);

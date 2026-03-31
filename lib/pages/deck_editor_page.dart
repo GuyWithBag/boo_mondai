@@ -1,21 +1,21 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/pages/deck_editor_page.dart
-// PURPOSE: Edit all cards in a deck — sidebar shows all cards, clicking
-//          one selects it; "+" creates a blank card and immediately selects it
-// PROVIDERS: CardProvider
+// PURPOSE: Edit cards in a deck. Cards come from ViewDeckController.
+//          The currently selected card is copied into a local useState(draftCard).
+//          Saving a card writes draftCard back to ViewDeckController.
+//          Saving the deck writes ViewDeckController → Hive.
+// PROVIDERS: ViewDeckController
 // HOOKS: useState, useEffect, useMemoized, useFocusNode, useTextEditingController
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
+import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/models/models.barrel.dart';
-import 'package:boo_mondai/providers/providers.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
 
 class DeckEditorPage extends HookWidget {
-  /// [initialCardId] optionally pre-selects a card when the page opens
-  /// (e.g. when navigating from the deck detail card list).
   const DeckEditorPage({super.key, required this.deckId, this.initialCardId});
 
   final String deckId;
@@ -23,14 +23,14 @@ class DeckEditorPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cardProvider = context.watch<CardProvider>();
+    final vdc = context.watch<ViewDeckController>();
     final formKey = useMemoized(GlobalKey<FormState>.new);
     final frontFocus = useFocusNode();
 
-    // Active card is tracked as internal state — no URL param needed
-    final activeCardId = useState<String?>(initialCardId);
-    final previousActiveCardId = useState<String?>(initialCardId);
-    final isAdding = useState(false);
+    // ── Selection + draft state ──────────────────────────────────────
+    final selectedCardId = useState<String?>(initialCardId);
+    final draftCard = useState<DeckCard?>(null);
+    final isSaving = useState(false);
 
     // Form state
     final qType = useState(QuestionType.flashcard);
@@ -51,13 +51,18 @@ class DeckEditorPage extends HookWidget {
       (term: '', match: ''),
     ]);
 
-    // Reload form whenever the active card changes
+    // When selectedCardId changes, copy the card from VDC into draftCard
+    // and populate form fields.
     useEffect(() {
-      final cid = activeCardId.value;
-      if (cid == null) return null;
-      final card = cardProvider.cards.where((c) => c.id == cid).firstOrNull;
+      final cid = selectedCardId.value;
+      if (cid == null) {
+        draftCard.value = null;
+        return null;
+      }
+      final card = vdc.cards.where((c) => c.id == cid).firstOrNull;
       if (card == null) return null;
 
+      draftCard.value = card;
       qType.value = card.questionType;
       cType.value = card.cardType;
       frontCtrl.text = card.question;
@@ -77,7 +82,6 @@ class DeckEditorPage extends HookWidget {
       }
       if (card.segments.isNotEmpty) {
         fitbSentCtrl.text = card.segments.first.fullText;
-        // Re-encode: escape commas inside each answer, then join with ','
         fitbAnsCtrl.text = card.segments
             .map((seg) => seg.correctAnswer.replaceAll(',', r'\,'))
             .join(',');
@@ -101,31 +105,13 @@ class DeckEditorPage extends HookWidget {
         (_) => frontFocus.requestFocus(),
       );
       return null;
-    }, [activeCardId.value]);
+    }, [selectedCardId.value]);
 
-    // Creates a blank card in DB, adds it to the sidebar, and selects it
-    Future<void> addBlankCard() async {
-      isAdding.value = true;
-      final newCard = await context.read<CardProvider>().addCard(
-        deckId,
-        cardType: CardType.normal,
-        questionType: QuestionType.flashcard,
-      );
-      isAdding.value = false;
-      if (newCard != null) {
-        activeCardId.value = newCard.id;
-      }
-    }
+    // Build the updated DeckCard from current form state + draftCard
+    DeckCard? buildCardFromForm() {
+      final card = draftCard.value;
+      if (card == null) return null;
 
-    // Save always updates (card already exists after addBlankCard)
-    Future<void> save(String? cardId) async {
-      if (cardId == null) return;
-      if (!formKey.currentState!.validate()) return;
-      final card = cardProvider.cards.where((c) => c.id == cardId).firstOrNull;
-      if (card == null) return;
-
-      // identification and wordScramble only use frontText; backText is not shown
-      // and should not be written back (keeps the field clean).
       final backTextForSave =
           qType.value.usesIdentificationAnswer ||
               qType.value == QuestionType.wordScramble
@@ -143,67 +129,96 @@ class DeckEditorPage extends HookWidget {
           )
           .toList();
 
-      await context.read<CardProvider>().updateCard(
-        card.copyWith(
-          notes: updatedNotes,
-          cardType: cType.value,
-          questionType: qType.value,
-          identificationAnswer: qType.value.usesIdentificationAnswer
-              ? identificationAnsCtrl.text.trim()
-              : '',
-          options: qType.value.usesOptions
-              ? buildOptions(mcOpts.value)
-              : card.options,
-          segments: qType.value.usesSegments
-              ? buildSegments(fitbSentCtrl.text, fitbAnsCtrl.text)
-              : card.segments,
-          pairs: qType.value.usesPairs
-              ? buildPairs(matchPairs.value)
-              : card.pairs,
-        ),
+      return card.copyWith(
+        notes: updatedNotes,
+        cardType: cType.value,
+        questionType: qType.value,
+        identificationAnswer: qType.value.usesIdentificationAnswer
+            ? identificationAnsCtrl.text.trim()
+            : '',
+        options: qType.value.usesOptions
+            ? buildOptions(mcOpts.value)
+            : card.options,
+        segments: qType.value.usesSegments
+            ? buildSegments(fitbSentCtrl.text, fitbAnsCtrl.text)
+            : card.segments,
+        pairs: qType.value.usesPairs
+            ? buildPairs(matchPairs.value)
+            : card.pairs,
       );
+    }
+
+    // Save the current draftCard back into ViewDeckController
+    void saveCardToController() {
+      if (!formKey.currentState!.validate()) return;
+      final updated = buildCardFromForm();
+      if (updated == null) return;
+      context.read<ViewDeckController>().updateCard(updated);
+      draftCard.value = updated;
+    }
+
+    // Add a blank card to VDC and select it
+    void addBlankCard() {
+      // Save current card first if one is selected
+      if (selectedCardId.value != null) saveCardToController();
+
+      final newCard = buildNewCard(
+        deckId,
+        cardType: CardType.normal,
+        questionType: QuestionType.flashcard,
+        sortOrder: vdc.cards.length,
+      );
+      context.read<ViewDeckController>().addCard(newCard);
+      selectedCardId.value = newCard.id;
+    }
+
+    // Save entire deck: write VDC draft → Hive
+    Future<void> saveDeck() async {
+      // Save current card to controller first
+      if (selectedCardId.value != null) saveCardToController();
+
+      isSaving.value = true;
+      await context.read<ViewDeckController>().save();
+      isSaving.value = false;
 
       if (context.mounted) {
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
           ..showSnackBar(
             const SnackBar(
-              content: Text('Card saved'),
+              content: Text('Deck saved'),
               duration: Duration(seconds: 1),
             ),
           );
       }
     }
 
-    final hasActiveCard = activeCardId.value != null;
+    final hasActiveCard = selectedCardId.value != null;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit Deck'),
         actions: [
-          if (cardProvider.isDirty(deckId))
-            EditorPushButton(
-              isPushing: cardProvider.isPushing,
-              onPressed: cardProvider.isPushing
-                  ? null
-                  : () => context.read<CardProvider>().pushDeck(deckId),
+          if (vdc.isDirty)
+            TextButton(
+              onPressed: isSaving.value ? null : saveDeck,
+              child: isSaving.value
+                  ? const SizedBox.square(
+                      dimension: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text('Save'),
             ),
         ],
       ),
-      // On mobile (no sidebar), FAB lets the user add a new card
       floatingActionButton: LayoutBuilder(
         builder: (ctx, constraints) {
           final showSidebar = constraints.maxWidth >= 960;
           if (showSidebar) return const SizedBox.shrink();
           return FloatingActionButton(
-            onPressed: isAdding.value ? null : addBlankCard,
+            onPressed: addBlankCard,
             tooltip: 'Add new card',
-            child: isAdding.value
-                ? const SizedBox.square(
-                    dimension: 24,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Icon(Icons.add),
+            child: const Icon(Icons.add),
           );
         },
       ),
@@ -217,21 +232,21 @@ class DeckEditorPage extends HookWidget {
               children: [
                 if (showSidebar)
                   EditorSidebar(
-                    cards: cardProvider.cards,
-                    activeCardId: activeCardId.value,
-                    isAdding: isAdding.value,
-
+                    cards: vdc.cards,
+                    activeCardId: selectedCardId.value,
+                    isAdding: false,
                     onAdd: addBlankCard,
                     children: [
-                      for (int i = 0; i < cardProvider.cards.length; i++)
+                      for (int i = 0; i < vdc.cards.length; i++)
                         SidebarItem(
-                          card: cardProvider.cards[i],
-                          isActive:
-                              cardProvider.cards[i].id == activeCardId.value,
+                          card: vdc.cards[i],
+                          isActive: vdc.cards[i].id == selectedCardId.value,
                           onTap: () {
-                            previousActiveCardId.value = activeCardId.value;
-                            activeCardId.value = cardProvider.cards[i].id;
-                            save(previousActiveCardId.value);
+                            // Save current card before switching
+                            if (selectedCardId.value != null) {
+                              saveCardToController();
+                            }
+                            selectedCardId.value = vdc.cards[i].id;
                           },
                         ),
                     ],
@@ -240,7 +255,7 @@ class DeckEditorPage extends HookWidget {
                   child: !hasActiveCard
                       ? NoCardSelected(
                           onAdd: addBlankCard,
-                          isAdding: isAdding.value,
+                          isAdding: false,
                         )
                       : EditorMain(
                           qType: qType.value,
@@ -253,7 +268,7 @@ class DeckEditorPage extends HookWidget {
                           fitbSentCtrl: fitbSentCtrl,
                           fitbAnsCtrl: fitbAnsCtrl,
                           matchPairs: matchPairs.value,
-                          error: cardProvider.error,
+                          error: null,
                           onTypeChanged: (t) {
                             qType.value = t;
                             if (!t.canBeReversible) {

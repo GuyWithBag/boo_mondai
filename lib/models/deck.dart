@@ -22,6 +22,7 @@ class Deck {
   final List<String> tags;
 
   final bool isPremade;
+  // TODO: Change this to isPublished
   final bool isPublic;
 
   /// When true the deck is locked — consumers cannot edit or delete its cards.
@@ -84,8 +85,8 @@ class Deck {
     final sourceDeckJoin = sourceDeckRaw is Map<String, dynamic>
         ? sourceDeckRaw
         : (sourceDeckRaw is List && sourceDeckRaw.isNotEmpty)
-            ? sourceDeckRaw.first as Map<String, dynamic>?
-            : null;
+        ? sourceDeckRaw.first as Map<String, dynamic>?
+        : null;
 
     return Deck(
       id: json['id'] as String,
@@ -112,24 +113,24 @@ class Deck {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'creator_id': creatorId,
-        'title': title,
-        'short_description': shortDescription,
-        'long_description': longDescription,
-        'target_language': targetLanguage,
-        'tags': tags,
-        'is_premade': isPremade,
-        'is_public': isPublic,
-        'is_uneditable': isUneditable,
-        'hidden_in_browser': hiddenInBrowser,
-        'card_count': cardCount,
-        'version': version,
-        'build_number': buildNumber,
-        'created_at': createdAt.toIso8601String(),
-        'updated_at': updatedAt.toIso8601String(),
-        if (sourceDeckId != null) 'source_deck_id': sourceDeckId,
-      };
+    'id': id,
+    'creator_id': creatorId,
+    'title': title,
+    'short_description': shortDescription,
+    'long_description': longDescription,
+    'target_language': targetLanguage,
+    'tags': tags,
+    'is_premade': isPremade,
+    'is_public': isPublic,
+    'is_uneditable': isUneditable,
+    'hidden_in_browser': hiddenInBrowser,
+    'card_count': cardCount,
+    'version': version,
+    'build_number': buildNumber,
+    'created_at': createdAt.toIso8601String(),
+    'updated_at': updatedAt.toIso8601String(),
+    if (sourceDeckId != null) 'source_deck_id': sourceDeckId,
+  };
 
   Deck copyWith({
     String? id,
@@ -150,30 +151,30 @@ class Deck {
     DateTime? updatedAt,
     Object? sourceDeckId = _sentinel,
     Object? sourceDeckCreatorId = _sentinel,
-  }) =>
-      Deck(
-        id: id ?? this.id,
-        creatorId: creatorId ?? this.creatorId,
-        title: title ?? this.title,
-        shortDescription: shortDescription ?? this.shortDescription,
-        longDescription: longDescription ?? this.longDescription,
-        targetLanguage: targetLanguage ?? this.targetLanguage,
-        tags: tags ?? this.tags,
-        isPremade: isPremade ?? this.isPremade,
-        isPublic: isPublic ?? this.isPublic,
-        isUneditable: isUneditable ?? this.isUneditable,
-        hiddenInBrowser: hiddenInBrowser ?? this.hiddenInBrowser,
-        cardCount: cardCount ?? this.cardCount,
-        version: version ?? this.version,
-        buildNumber: buildNumber ?? this.buildNumber,
-        createdAt: createdAt ?? this.createdAt,
-        updatedAt: updatedAt ?? this.updatedAt,
-        sourceDeckId:
-            sourceDeckId == _sentinel ? this.sourceDeckId : sourceDeckId as String?,
-        sourceDeckCreatorId: sourceDeckCreatorId == _sentinel
-            ? this.sourceDeckCreatorId
-            : sourceDeckCreatorId as String?,
-      );
+  }) => Deck(
+    id: id ?? this.id,
+    creatorId: creatorId ?? this.creatorId,
+    title: title ?? this.title,
+    shortDescription: shortDescription ?? this.shortDescription,
+    longDescription: longDescription ?? this.longDescription,
+    targetLanguage: targetLanguage ?? this.targetLanguage,
+    tags: tags ?? this.tags,
+    isPremade: isPremade ?? this.isPremade,
+    isPublic: isPublic ?? this.isPublic,
+    isUneditable: isUneditable ?? this.isUneditable,
+    hiddenInBrowser: hiddenInBrowser ?? this.hiddenInBrowser,
+    cardCount: cardCount ?? this.cardCount,
+    version: version ?? this.version,
+    buildNumber: buildNumber ?? this.buildNumber,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    sourceDeckId: sourceDeckId == _sentinel
+        ? this.sourceDeckId
+        : sourceDeckId as String?,
+    sourceDeckCreatorId: sourceDeckCreatorId == _sentinel
+        ? this.sourceDeckCreatorId
+        : sourceDeckCreatorId as String?,
+  );
 
   @override
   bool operator ==(Object other) =>
@@ -184,8 +185,7 @@ class Deck {
   int get hashCode => id.hashCode;
 
   @override
-  String toString() =>
-      'Deck(id: $id, title: $title, v$version+$buildNumber)';
+  String toString() => 'Deck(id: $id, title: $title, v$version+$buildNumber)';
 }
 
 const Object _sentinel = Object();

@@ -7,6 +7,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:boo_mondai/providers/providers.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
@@ -32,8 +33,7 @@ class DeckListPage extends HookWidget {
       final deckProv = context.read<DeckProvider>();
       Future.microtask(() {
         if (!context.mounted) return;
-        final cachedCount = deckProv.loadFromCache(userId);
-        if (cachedCount == 0) deckProv.fetchUserDecks(userId);
+        deckProv.loadUserDecks(userId);
       });
       return null;
     }, [auth.userProfile?.id]);
@@ -46,7 +46,7 @@ class DeckListPage extends HookWidget {
     void refresh() {
       final uid = auth.userProfile?.id;
       if (uid == null) return;
-      context.read<DeckProvider>().fetchUserDecks(uid);
+      context.read<DeckProvider>().loadUserDecks(uid);
     }
 
     Future<void> startSync() async {
@@ -114,6 +114,12 @@ class DeckListPage extends HookWidget {
     }
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          context.push('/create');
+        },
+        child: Icon(Icons.add_rounded),
+      ),
       appBar: isSelecting
           ? _DeckListSelectionAppBar(
               count: selectedIds.value.length,

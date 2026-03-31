@@ -89,17 +89,17 @@ GoRouter createRouter(AuthProvider authProvider) {
       // ── Non-shell routes ──────────────────────────────
       GoRoute(
         path: '/my-decks/create',
-        builder: (context, state) => const DeckCreatorPage(),
+        builder: (context, state) => const CreateDeckPage(),
       ),
       GoRoute(
         path: '/my-decks/:deckId',
         builder: (context, state) =>
-            DeckDetailPage(deckId: state.pathParameters['deckId']!),
+            ViewDeckPage(deckId: state.pathParameters['deckId']!),
       ),
       GoRoute(
         path: '/my-decks/:deckId/edit',
         builder: (context, state) =>
-            DeckCreatorPage(deckId: state.pathParameters['deckId']),
+            CreateDeckPage(deckId: state.pathParameters['deckId']),
       ),
       GoRoute(
         path: '/my-decks/:deckId/cards/edit',

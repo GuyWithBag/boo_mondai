@@ -13,8 +13,8 @@ import 'package:boo_mondai/providers/providers.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
 
-class DeckCreatorPage extends HookWidget {
-  const DeckCreatorPage({super.key, this.deckId});
+class CreateDeckPage extends HookWidget {
+  const CreateDeckPage({super.key, this.deckId});
 
   final String? deckId;
 
@@ -25,7 +25,7 @@ class DeckCreatorPage extends HookWidget {
     final longDescController = useTextEditingController();
     final langController = useTextEditingController(text: 'japanese');
     final formKey = useMemoized(GlobalKey<FormState>.new);
-    final isPublic = useState(true);
+    final isPublished = useState(true);
     final wasPublicInitially = useState(true);
     final deckProvider = context.watch<DeckProvider>();
     final auth = context.read<AuthProvider>();
@@ -41,12 +41,24 @@ class DeckCreatorPage extends HookWidget {
           shortDescController.text = existing.shortDescription;
           longDescController.text = existing.longDescription;
           langController.text = existing.targetLanguage;
-          isPublic.value = existing.isPublic;
+          isPublished.value = existing.isPublic;
           wasPublicInitially.value = existing.isPublic;
         }
       }
       return null;
     }, [deckId]);
+
+    void create() {
+      final userId = auth.userProfile?.id;
+      if (userId == null) return;
+      deckProvider.createDeck(
+        userId,
+        titleController.text.trim(),
+        shortDescController.text.trim(),
+        langController.text.trim(),
+        isPublic: isPublished.value,
+      );
+    }
 
     Future<void> save() async {
       if (!formKey.currentState!.validate()) return;
@@ -60,46 +72,46 @@ class DeckCreatorPage extends HookWidget {
             .where((d) => d.id == deckId)
             .firstOrNull;
         if (existing != null) {
-          await context.read<DeckProvider>().updateDeck(
+          await deckProvider.updateDeck(
             existing.copyWith(
               title: titleController.text.trim(),
               shortDescription: shortDescController.text.trim(),
               longDescription: longDescController.text.trim(),
               targetLanguage: langController.text.trim(),
-              isPublic: isPublic.value,
+
+              isPublic: isPublished.value,
               updatedAt: DateTime.now(),
             ),
           );
           savedDeckId = deckId;
         }
       } else {
-        final newDeck = await context.read<DeckProvider>().createDeck(
-          userId,
-          titleController.text.trim(),
-          shortDescController.text.trim(),
-          langController.text.trim(),
-          isPublic: isPublic.value,
-        );
-        savedDeckId = newDeck?.id;
+        // final newDeck = await context.read<DeckProvider>().createDeck(
+        //   userId,
+        //   titleController.text.trim(),
+        //   shortDescController.text.trim(),
+        //   langController.text.trim(),
+        //   isPublished: isPublished.value,
+        // );
+        // savedDeckId = newDeck?.id;
       }
 
       if (!context.mounted) return;
 
       // Show snackbar when publishing for the first time
       final beingPublished =
-          isPublic.value && (!isEdit || !wasPublicInitially.value);
+          isPublished.value && (!isEdit || !wasPublicInitially.value);
       if (beingPublished && savedDeckId != null) {
-        final capturedCardProv = context.read<CardProvider>();
-        final capturedDeckId = savedDeckId;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text(
               'Your deck will be published after your next sync.',
             ),
-            action: SnackBarAction(
-              label: 'Sync Now',
-              onPressed: () => capturedCardProv.pushDeck(capturedDeckId),
-            ),
+            // TODO: Sync button should be the global one.
+            // action: SnackBarAction(
+            //   label: 'Sync Now',
+            //   onPressed: () => capturedCardProv.pushDeck(capturedDeckId),
+            // ),
           ),
         );
       }
@@ -160,8 +172,8 @@ class DeckCreatorPage extends HookWidget {
                     ),
                     const SizedBox(height: AppSpacing.md),
                     PublishToggle(
-                      value: isPublic.value,
-                      onChanged: (v) => isPublic.value = v,
+                      value: isPublished.value,
+                      onChanged: (v) => isPublished.value = v,
                     ),
                     if (deckProvider.error != null) ...[
                       const SizedBox(height: AppSpacing.sm),
@@ -169,7 +181,11 @@ class DeckCreatorPage extends HookWidget {
                     ],
                     const SizedBox(height: AppSpacing.xl),
                     FilledButton(
-                      onPressed: deckProvider.isLoading ? null : save,
+                      onPressed: deckProvider.isLoading
+                          ? null
+                          : isEdit
+                          ? save
+                          : create,
                       child: deckProvider.isLoading
                           ? const SizedBox(
                               height: 20,

@@ -5,10 +5,87 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:uuid/uuid.dart';
 import 'package:boo_mondai/models/models.barrel.dart';
 
 typedef McOpt = ({String text, bool isCorrect});
 typedef Pair = ({String term, String match});
+
+const _uuid = Uuid();
+
+/// Pure function that builds a [DeckCard] in memory with no side effects.
+/// Used by the editor page to create cards in local draft state.
+DeckCard buildNewCard(
+  String deckId, {
+  required CardType cardType,
+  required QuestionType questionType,
+  int sortOrder = 0,
+  String frontText = '',
+  String backText = '',
+  String? frontImageUrl,
+  String? backImageUrl,
+  String? frontAudioUrl,
+  String? backAudioUrl,
+  List<MultipleChoiceOption> options = const [],
+  List<FillInTheBlankSegment> segments = const [],
+  List<MatchMadnessPair> pairs = const [],
+}) {
+  final cardId = _uuid.v4();
+  final now = DateTime.now();
+
+  final newNote = Note(
+    id: _uuid.v4(),
+    cardId: cardId,
+    frontText: frontText,
+    backText: backText,
+    frontImageUrl: frontImageUrl,
+    backImageUrl: backImageUrl,
+    frontAudioUrl: frontAudioUrl,
+    backAudioUrl: backAudioUrl,
+    isReverse: false,
+    createdAt: now,
+  );
+
+  final builtNotes = <Note>[];
+  if (!questionType.usesPairs) {
+    builtNotes.add(newNote);
+    if (cardType == CardType.both) {
+      builtNotes.add(newNote.reverse());
+    }
+  }
+
+  final builtOptions = [
+    for (var i = 0; i < options.length; i++)
+      options[i].id.isEmpty
+          ? options[i].copyWith(id: _uuid.v4(), cardId: cardId, displayOrder: i)
+          : options[i].copyWith(cardId: cardId, displayOrder: i),
+  ];
+  final builtSegments = [
+    for (final seg in segments)
+      seg.id.isEmpty
+          ? seg.copyWith(id: _uuid.v4(), cardId: cardId)
+          : seg.copyWith(cardId: cardId),
+  ];
+  final builtPairs = [
+    for (var i = 0; i < pairs.length; i++)
+      pairs[i].id.isEmpty
+          ? pairs[i].copyWith(id: _uuid.v4(), cardId: cardId, displayOrder: i)
+          : pairs[i].copyWith(cardId: cardId, displayOrder: i),
+  ];
+
+  return DeckCard(
+    id: cardId,
+    deckId: deckId,
+    cardType: cardType,
+    questionType: questionType,
+    sortOrder: sortOrder,
+    createdAt: now,
+    notes: builtNotes,
+    options: builtOptions,
+    segments: builtSegments,
+    pairs: builtPairs,
+  );
+}
 
 // ── Module-level data helpers ─────────────────────────────────────
 

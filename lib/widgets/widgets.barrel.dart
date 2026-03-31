@@ -34,3 +34,4 @@ export 'selection_app_bar.dart';
 export 'self_rating_bottom_sheet.dart';
 export 'status_badge.dart';
 export 'streak_badge.dart';
+export 'deck_details.dart';

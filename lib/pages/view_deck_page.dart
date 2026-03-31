@@ -1,7 +1,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// PATH: lib/pages/deck_detail_page.dart
+// PATH: lib/pages/view_deck_page.dart
 // PURPOSE: View a deck's cards and start quiz or preview
-// PROVIDERS: CardProvider, DeckProvider
+// PROVIDERS: ViewDeckController, DeckProvider
 // HOOKS: useEffect, useScrollController, useState
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -9,64 +9,58 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:boo_mondai/models/models.barrel.dart';
+import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/providers/providers.barrel.dart';
+import 'package:boo_mondai/services/services.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
 
-class DeckDetailPage extends HookWidget {
+class ViewDeckPage extends HookWidget {
   final String deckId;
-  const DeckDetailPage({super.key, required this.deckId});
+  const ViewDeckPage({super.key, required this.deckId});
 
   @override
   Widget build(BuildContext context) {
-    final cardProvider = context.watch<CardProvider>();
+    final vdc = context.watch<ViewDeckController>();
     final deckProvider = context.watch<DeckProvider>();
     final scrollController = useScrollController();
     final selectedIds = useState<Set<String>>({});
 
-    final deck = deckProvider.userDecks
-        .where((d) => d.id == deckId)
-        .firstOrNull;
-
+    final deck = vdc.currentDeck;
     final isSelecting = selectedIds.value.isNotEmpty;
 
+    // Profile info for DeckDetails — Hive first, Supabase fallback
+    final authorProfile = useState<ProfileInfo?>(null);
+    final originalAuthorProfile = useState<ProfileInfo?>(null);
+
+    // Load deck + cards from Hive into ViewDeckController on mount
     useEffect(() {
-      final provider = context.read<CardProvider>();
-      // Skip Supabase fetch if cards for this deck are already in memory
-      // (e.g. returning from the editor with unsaved local changes).
-      if (provider.currentDeckId == deckId && provider.cards.isNotEmpty) {
-        return null;
-      }
-      Future.microtask(() => provider.fetchCards(deckId));
+      Future.microtask(
+        () => vdc.loadDeck(deckId, fromDecks: deckProvider.userDecks),
+      );
       return null;
     }, [deckId]);
 
-    // Show a snackbar whenever an error is set on CardProvider
+    // Fetch author profiles: Hive cache first, Supabase fallback + cache
     useEffect(() {
-      void listener() {
-        final err = context.read<CardProvider>().error;
-        if (err != null) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (context.mounted) {
-              ScaffoldMessenger.of(context)
-                ..hideCurrentSnackBar()
-                ..showSnackBar(
-                  SnackBar(
-                    content: Text(err),
-                    backgroundColor: Theme.of(context).colorScheme.error,
-                  ),
-                );
-              context.read<CardProvider>().clearError();
-            }
-          });
-        }
+      if (deck == null) return null;
+      final hive = context.read<HiveService>();
+
+      ProfileInfo? resolveProfile(String userId) {
+        final cached = hive.getProfileInfo(userId);
+        return cached;
       }
 
-      final provider = context.read<CardProvider>();
-      provider.addListener(listener);
-      return () => provider.removeListener(listener);
-    }, const []);
+      Future.microtask(() {
+        authorProfile.value = resolveProfile(deck.creatorId);
+        if (deck.sourceDeckCreatorId != null) {
+          originalAuthorProfile.value = resolveProfile(
+            deck.sourceDeckCreatorId!,
+          );
+        }
+      });
+      return null;
+    }, [deck?.creatorId, deck?.sourceDeckCreatorId]);
 
     Future<void> confirmDeleteDeck() async {
       final deckProv = context.read<DeckProvider>();
@@ -94,12 +88,12 @@ class DeckDetailPage extends HookWidget {
       }
     }
 
-    Future<void> deleteSelected() async {
+    void deleteSelected() {
       final toDelete = {...selectedIds.value};
       selectedIds.value = {};
-      final provider = context.read<CardProvider>();
+      final controller = context.read<ViewDeckController>();
       for (final id in toDelete) {
-        await provider.deleteCard(id);
+        controller.deleteCard(id);
       }
     }
 
@@ -123,36 +117,31 @@ class DeckDetailPage extends HookWidget {
           : AppBar(
               title: const Text('Deck'),
               actions: [
-                if (cardProvider.isDirty(deckId))
+                if (vdc.isDirty)
                   Tooltip(
-                    message: cardProvider.isPushing
-                        ? 'Pushing…'
-                        : 'Push local changes to cloud',
+                    message: 'Unsaved changes',
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.xs,
                       ),
                       child: TextButton.icon(
-                        onPressed: cardProvider.isPushing
-                            ? null
-                            : () =>
-                                  context.read<CardProvider>().pushDeck(deckId),
-                        icon: cardProvider.isPushing
-                            ? const SizedBox.square(
-                                dimension: 14,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : const Icon(Icons.cloud_upload_outlined, size: 18),
-                        label: const Text('Push'),
+                        onPressed: () async {
+                          await context.read<ViewDeckController>().save();
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Saved')),
+                            );
+                          }
+                        },
+                        icon: const Icon(Icons.save_outlined, size: 18),
+                        label: const Text('Save'),
                       ),
                     ),
                   ),
                 IconButton(
                   icon: const Icon(Icons.edit),
                   tooltip: 'Edit deck',
-                  onPressed: () => context.push('/my-decks/$deckId/edit'),
+                  onPressed: () => context.push('/my-decks/$deckId/cards/edit'),
                 ),
                 PopupMenuButton<String>(
                   tooltip: 'More options',
@@ -181,10 +170,10 @@ class DeckDetailPage extends HookWidget {
                 ),
               ],
             ),
-      floatingActionButton: !isSelecting && cardProvider.cards.isNotEmpty
+      floatingActionButton: !isSelecting && vdc.cards.isNotEmpty
           ? FloatingActionButton(
               onPressed: () => context.push('/my-decks/$deckId/cards/edit'),
-              child: const Icon(Icons.add),
+              child: const Icon(Icons.edit_rounded),
             )
           : null,
       bottomNavigationBar: isSelecting
@@ -209,34 +198,12 @@ class DeckDetailPage extends HookWidget {
                 ],
               ),
             ),
-      body: cardProvider.isLoading
+      body: deck == null
           ? const Center(child: CircularProgressIndicator())
-          : cardProvider.cards.isEmpty
-          ? EmptyStateWidget(
-              icon: Icons.style_outlined,
-              title: 'No cards yet',
-              actionLabel: 'Add Card',
-              onAction: () => context.push('/my-decks/$deckId/cards/edit'),
-            )
-          : ListView.builder(
-              controller: scrollController,
-              padding: const EdgeInsets.all(AppSpacing.md),
-              itemCount: cardProvider.cards.length,
-              itemBuilder: (context, i) {
-                final card = cardProvider.cards[i];
-                return CardTile(
-                  card: card,
-                  isSelecting: isSelecting,
-                  isSelected: selectedIds.value.contains(card.id),
-                  isUneditable: deck?.isUneditable ?? false,
-                  onTap: () => isSelecting
-                      ? toggleSelection(card.id)
-                      : context.push(
-                          '/my-decks/$deckId/cards/edit?cardId=${card.id}',
-                        ),
-                  onLongPress: () => toggleSelection(card.id),
-                );
-              },
+          : DeckDetails(
+              deck: deck,
+              authorProfile: authorProfile.value,
+              originalAuthorProfile: originalAuthorProfile.value,
             ),
     );
   }

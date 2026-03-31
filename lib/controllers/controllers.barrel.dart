@@ -3,3 +3,4 @@
 // Other files
 export 'controllers.dart';
 export 'quiz_queue_controller.dart';
+export 'view_deck_controller.dart';

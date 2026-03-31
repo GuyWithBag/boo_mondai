@@ -593,3 +593,31 @@ ALTER TABLE deck_cards
     'word_scramble',
     'match_madness'
   ));
+
+-- ── deck card_count trigger ──────────────────────────
+-- Keeps decks.card_count in sync with the actual number of deck_cards rows.
+CREATE OR REPLACE FUNCTION update_deck_card_count() RETURNS trigger AS $$
+BEGIN
+  IF TG_OP = 'INSERT' THEN
+    UPDATE decks SET card_count = (
+      SELECT count(*) FROM deck_cards WHERE deck_id = NEW.deck_id
+    ) WHERE id = NEW.deck_id;
+  ELSIF TG_OP = 'DELETE' THEN
+    UPDATE decks SET card_count = (
+      SELECT count(*) FROM deck_cards WHERE deck_id = OLD.deck_id
+    ) WHERE id = OLD.deck_id;
+  ELSIF TG_OP = 'UPDATE' AND NEW.deck_id IS DISTINCT FROM OLD.deck_id THEN
+    UPDATE decks SET card_count = (
+      SELECT count(*) FROM deck_cards WHERE deck_id = OLD.deck_id
+    ) WHERE id = OLD.deck_id;
+    UPDATE decks SET card_count = (
+      SELECT count(*) FROM deck_cards WHERE deck_id = NEW.deck_id
+    ) WHERE id = NEW.deck_id;
+  END IF;
+  RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_deck_card_count
+  AFTER INSERT OR UPDATE OR DELETE ON deck_cards
+  FOR EACH ROW EXECUTE FUNCTION update_deck_card_count();

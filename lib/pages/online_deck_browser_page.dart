@@ -26,7 +26,10 @@ class OnlineDeckBrowserPage extends HookWidget {
 
     useEffect(() {
       final provider = context.read<DeckProvider>();
-      Future.microtask(() => provider.fetchDecks());
+      Future.microtask(() {
+        provider.loadDecks();
+        provider.pullPublicDecks();
+      });
       return null;
     }, const []);
 
@@ -113,7 +116,7 @@ class OnlineDeckBrowserPage extends HookWidget {
                         )
                       : RefreshIndicator(
                           onRefresh: () =>
-                              context.read<DeckProvider>().fetchDecks(),
+                              context.read<DeckProvider>().pullPublicDecks(),
                           child: ListView.builder(
                             padding: const EdgeInsets.all(AppSpacing.md),
                             itemCount: filtered.length,
