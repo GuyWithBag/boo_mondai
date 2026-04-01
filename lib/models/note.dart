@@ -6,6 +6,8 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/providers/providers.barrel.dart';
+import 'package:boo_mondai/repositories/repositories.barrel.dart';
+import 'package:boo_mondai/services/services.barrel.dart';
 
 /// Stores the presentable content of one side of a [DeckCard].
 ///
@@ -93,7 +95,7 @@ class Note {
 
   Note reverse() {
     return Note(
-      id: CardProvider.uuid.v4(),
+      id: UuidService.uuid.v4(),
       cardId: cardId,
       frontText: backText,
       backText: frontText,

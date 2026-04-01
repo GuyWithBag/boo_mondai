@@ -7,10 +7,16 @@ import 'package:boo_mondai/hive/adapters.dart';
 
 extension HiveRegistrar on HiveInterface {
   void registerAdapters() {
+    registerAdapter(CardAdapter());
+    registerAdapter(CardTypeAdapter());
     registerAdapter(DeckAdapter());
     registerAdapter(DeckCardAdapter());
-    registerAdapter(FsrsCardStateAdapter());
-    registerAdapter(ReviewLogEntryAdapter());
+    registerAdapter(FillInTheBlankSegmentAdapter());
+    registerAdapter(MatchMadnessPairAdapter());
+    registerAdapter(MultipleChoiceOptionAdapter());
+    registerAdapter(NoteAdapter());
+    registerAdapter(QuestionTypeAdapter());
+    registerAdapter(ReviewLogAdapter());
     registerAdapter(StreakAdapter());
     registerAdapter(UserProfileAdapter());
   }
@@ -18,10 +24,16 @@ extension HiveRegistrar on HiveInterface {
 
 extension IsolatedHiveRegistrar on IsolatedHiveInterface {
   void registerAdapters() {
+    registerAdapter(CardAdapter());
+    registerAdapter(CardTypeAdapter());
     registerAdapter(DeckAdapter());
     registerAdapter(DeckCardAdapter());
-    registerAdapter(FsrsCardStateAdapter());
-    registerAdapter(ReviewLogEntryAdapter());
+    registerAdapter(FillInTheBlankSegmentAdapter());
+    registerAdapter(MatchMadnessPairAdapter());
+    registerAdapter(MultipleChoiceOptionAdapter());
+    registerAdapter(NoteAdapter());
+    registerAdapter(QuestionTypeAdapter());
+    registerAdapter(ReviewLogAdapter());
     registerAdapter(StreakAdapter());
     registerAdapter(UserProfileAdapter());
   }

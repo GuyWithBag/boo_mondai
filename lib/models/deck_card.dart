@@ -5,12 +5,15 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:fsrs/fsrs.dart';
+import 'package:uuid/uuid.dart';
 import 'package:boo_mondai/models/card_type.dart';
 import 'package:boo_mondai/models/fill_in_the_blank_segment.dart';
 import 'package:boo_mondai/models/match_madness_pair.dart';
 import 'package:boo_mondai/models/multiple_choice_option.dart';
 import 'package:boo_mondai/models/note.dart';
 import 'package:boo_mondai/models/question_type.dart';
+import 'package:fsrs/fsrs.dart' as fsrs;
 
 /// A card inside a [Deck].
 ///
@@ -74,6 +77,89 @@ class DeckCard {
     this.pairs = const [],
   });
 
+  /// Creates a new [DeckCard] with generated UUIDs for the card and its
+  /// sub-models (notes, options, segments, pairs).
+  ///
+  /// Handles the [CardType.both] → reverse-note logic and assigns
+  /// [cardId] to every child automatically.
+  factory DeckCard.create({
+    required String deckId,
+    CardType cardType = CardType.normal,
+    QuestionType questionType = QuestionType.flashcard,
+    int sortOrder = 0,
+    String frontText = '',
+    String backText = '',
+    String? frontImageUrl,
+    String? backImageUrl,
+    String? frontAudioUrl,
+    String? backAudioUrl,
+    List<MultipleChoiceOption> options = const [],
+    List<FillInTheBlankSegment> segments = const [],
+    List<MatchMadnessPair> pairs = const [],
+  }) {
+    final cardId = _uuid.v4();
+    final now = DateTime.now();
+
+    final newNote = Note(
+      id: _uuid.v4(),
+      cardId: cardId,
+      frontText: frontText,
+      backText: backText,
+      frontImageUrl: frontImageUrl,
+      backImageUrl: backImageUrl,
+      frontAudioUrl: frontAudioUrl,
+      backAudioUrl: backAudioUrl,
+      isReverse: false,
+      createdAt: now,
+    );
+
+    final builtNotes = <Note>[];
+    if (!questionType.usesPairs) {
+      builtNotes.add(newNote);
+      if (cardType == CardType.both) {
+        builtNotes.add(newNote.reverse());
+      }
+    }
+
+    final builtOptions = [
+      for (var i = 0; i < options.length; i++)
+        options[i].id.isEmpty
+            ? options[i].copyWith(
+                id: _uuid.v4(),
+                cardId: cardId,
+                displayOrder: i,
+              )
+            : options[i].copyWith(cardId: cardId, displayOrder: i),
+    ];
+    final builtSegments = [
+      for (final seg in segments)
+        seg.id.isEmpty
+            ? seg.copyWith(id: _uuid.v4(), cardId: cardId)
+            : seg.copyWith(cardId: cardId),
+    ];
+    final builtPairs = [
+      for (var i = 0; i < pairs.length; i++)
+        pairs[i].id.isEmpty
+            ? pairs[i].copyWith(id: _uuid.v4(), cardId: cardId, displayOrder: i)
+            : pairs[i].copyWith(cardId: cardId, displayOrder: i),
+    ];
+
+    return DeckCard(
+      id: cardId,
+      deckId: deckId,
+      cardType: cardType,
+      questionType: questionType,
+      sortOrder: sortOrder,
+      createdAt: now,
+      notes: builtNotes,
+      options: builtOptions,
+      segments: builtSegments,
+      pairs: builtPairs,
+    );
+  }
+
+  static const _uuid = Uuid();
+
   // ── Convenience getters (quiz-system compatibility) ──────────────────
 
   /// The primary (non-reverse) Note. Null for [QuestionType.matchMadness].
@@ -136,6 +222,7 @@ class DeckCard {
     };
   }
 
+  // TODO: Turn into dart_mappable
   // ── Serialisation ────────────────────────────────────────────────────
 
   factory DeckCard.fromJson(Map<String, dynamic> json) => DeckCard(

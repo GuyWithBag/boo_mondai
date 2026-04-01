@@ -7,7 +7,7 @@
 
 class Deck {
   final String id;
-  final String creatorId;
+  final String authorId;
   final String title;
 
   /// One-line summary shown in list tiles and the online browser.
@@ -22,8 +22,8 @@ class Deck {
   final List<String> tags;
 
   final bool isPremade;
-  // TODO: Change this to isPublished
   final bool isPublic;
+  final bool isPublished;
 
   /// When true the deck is locked — consumers cannot edit or delete its cards.
   /// Intended for capstone-study premade decks.
@@ -49,7 +49,7 @@ class Deck {
   /// The user ID of the original deck's creator. Populated from a Supabase
   /// join on [sourceDeckId] — null when [sourceDeckId] is null or when
   /// loaded from Hive cache.
-  final String? sourceDeckCreatorId;
+  final String? sourceAuthorId;
 
   /// When true the deck is hidden from the public online browser.
   /// Used by researchers to distribute premade/uneditable decks via codes
@@ -58,7 +58,7 @@ class Deck {
 
   const Deck({
     required this.id,
-    required this.creatorId,
+    required this.authorId,
     required this.title,
     this.shortDescription = '',
     this.longDescription = '',
@@ -73,8 +73,9 @@ class Deck {
     required this.createdAt,
     required this.updatedAt,
     this.sourceDeckId,
-    this.sourceDeckCreatorId,
+    this.sourceAuthorId,
     this.hiddenInBrowser = false,
+    required this.isPublished,
   });
 
   factory Deck.fromJson(Map<String, dynamic> json) {
@@ -90,7 +91,7 @@ class Deck {
 
     return Deck(
       id: json['id'] as String,
-      creatorId: json['creator_id'] as String,
+      authorId: json['creator_id'] as String,
       title: json['title'] as String,
       shortDescription: json['short_description'] as String? ?? '',
       longDescription: json['long_description'] as String? ?? '',
@@ -100,6 +101,7 @@ class Deck {
           .toList(),
       isPremade: json['is_premade'] as bool? ?? false,
       isPublic: json['is_public'] as bool? ?? true,
+      isPublished: json['is_public'] as bool? ?? true,
       isUneditable: json['is_uneditable'] as bool? ?? false,
       cardCount: json['card_count'] as int? ?? 0,
       version: json['version'] as String? ?? '1.0.0',
@@ -107,14 +109,14 @@ class Deck {
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
       sourceDeckId: json['source_deck_id'] as String?,
-      sourceDeckCreatorId: sourceDeckJoin?['creator_id'] as String?,
+      sourceAuthorId: sourceDeckJoin?['creator_id'] as String?,
       hiddenInBrowser: json['hidden_in_browser'] as bool? ?? false,
     );
   }
 
   Map<String, dynamic> toJson() => {
     'id': id,
-    'creator_id': creatorId,
+    'creator_id': authorId,
     'title': title,
     'short_description': shortDescription,
     'long_description': longDescription,
@@ -134,7 +136,7 @@ class Deck {
 
   Deck copyWith({
     String? id,
-    String? creatorId,
+    String? authorId,
     String? title,
     String? shortDescription,
     String? longDescription,
@@ -150,10 +152,10 @@ class Deck {
     DateTime? createdAt,
     DateTime? updatedAt,
     Object? sourceDeckId = _sentinel,
-    Object? sourceDeckCreatorId = _sentinel,
+    Object? sourceAuthorId = _sentinel,
   }) => Deck(
     id: id ?? this.id,
-    creatorId: creatorId ?? this.creatorId,
+    authorId: authorId ?? this.authorId,
     title: title ?? this.title,
     shortDescription: shortDescription ?? this.shortDescription,
     longDescription: longDescription ?? this.longDescription,
@@ -161,6 +163,7 @@ class Deck {
     tags: tags ?? this.tags,
     isPremade: isPremade ?? this.isPremade,
     isPublic: isPublic ?? this.isPublic,
+    isPublished: isPublished,
     isUneditable: isUneditable ?? this.isUneditable,
     hiddenInBrowser: hiddenInBrowser ?? this.hiddenInBrowser,
     cardCount: cardCount ?? this.cardCount,
@@ -171,9 +174,9 @@ class Deck {
     sourceDeckId: sourceDeckId == _sentinel
         ? this.sourceDeckId
         : sourceDeckId as String?,
-    sourceDeckCreatorId: sourceDeckCreatorId == _sentinel
-        ? this.sourceDeckCreatorId
-        : sourceDeckCreatorId as String?,
+    sourceAuthorId: sourceAuthorId == _sentinel
+        ? this.sourceAuthorId
+        : sourceAuthorId as String?,
   );
 
   @override
