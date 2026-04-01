@@ -5,64 +5,34 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:fsrs/fsrs.dart';
 import 'package:boo_mondai/models/models.barrel.dart';
+import 'package:boo_mondai/repositories/repositories.dart';
+import 'package:boo_mondai/services/services.barrel.dart';
+import 'package:fsrs/fsrs.dart';
 
 class FsrsService {
-  final FSRS _fsrs = FSRS();
+  final Scheduler scheduler = Scheduler();
 
-  /// Creates a fresh FSRS Card (state=new).
-  Card createNewCard() => Card();
+  // FsrsCard enrollCard(String userId, String cardId, Rating rating) async {
+  //   final card = await Card.create();
+  //   final result = scheduleCard(card, rating);
+  //   return _cardToState(result.card, userId, cardId);
+  // }
 
-  /// Schedules a card for the given rating and returns the resulting card + log.
-  ({Card card, ReviewLog log}) scheduleCard(Card card, Rating rating) {
-    final now = DateTime.now();
-    final result = _fsrs.repeat(card, now);
-    final scheduled = result[rating]!;
-    return (card: scheduled.card, log: scheduled.reviewLog);
+  // Reviews card and puts it in the Repository
+  void enrollCard({required FsrsCard card, required Rating rating}) {
+    final res = scheduler.reviewCard(card.state, rating);
+    final newCard = card.copyWith(state: res.card);
+    final newLog = FsrsReviewLog(
+      state: res.reviewLog,
+      id: UuidService.uuid.v4(),
+    );
+    Repositories.fsrsCard.save(newCard);
+    Repositories.reviewLog.save(newLog);
   }
 
-  /// Converts an FsrsCardState to an fsrs Card, schedules it, and returns updated state.
-  FsrsCardState reviewCard(FsrsCardState state, int ratingValue) {
-    final card = _stateToCard(state);
-    final rating =
-        Rating.values[ratingValue - 1]; // 1=again, 2=hard, 3=good, 4=easy
-    final result = scheduleCard(card, rating);
-    return _cardToState(result.card, state.userId, state.cardId);
-  }
-
-  /// Creates an initial FsrsCardState from a new card after first quiz rating.
-  FsrsCardState enrollCard(String userId, String cardId, int ratingValue) {
-    final card = createNewCard();
-    final rating = Rating.values[ratingValue - 1];
-    final result = scheduleCard(card, rating);
-    return _cardToState(result.card, userId, cardId);
-  }
-
-  Card _stateToCard(FsrsCardState state) => Card()
-    ..due = state.due
-    ..stability = state.stability
-    ..difficulty = state.difficulty
-    ..elapsedDays = state.elapsedDays
-    ..scheduledDays = state.scheduledDays
-    ..reps = state.reps
-    ..lapses = state.lapses
-    ..state = State.values[state.state]
-    ..lastReview = state.lastReview ?? DateTime.now().toUtc();
-
-  FsrsCardState _cardToState(Card card, String userId, String cardId) =>
-      FsrsCardState(
-        id: '${userId}_$cardId',
-        userId: userId,
-        cardId: cardId,
-        due: card.due,
-        stability: card.stability,
-        difficulty: card.difficulty,
-        elapsedDays: card.elapsedDays,
-        scheduledDays: card.scheduledDays,
-        reps: card.reps,
-        lapses: card.lapses,
-        state: card.state.index,
-        lastReview: card.lastReview,
-      );
+  // ({Card card, ReviewLog reviewLog}) reviewCard(Card card, Rating rating) {
+  //   final res = scheduler.reviewCard(card, rating);
+  //   return (card: res.card, reviewLog: res.reviewLog);
+  // }
 }
