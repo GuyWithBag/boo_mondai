@@ -1,29 +1,21 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// PATH: lib/providers/deck_editor_page_controller.dart
+// PATH: lib/controllers/deck_editor_page_controller.dart
 // PURPOSE: Manages the working copy of a Deck and its DeckCards during editing
 // PROVIDERS: DeckEditorPageController
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/models/models.barrel.dart';
+import 'package:boo_mondai/repositories/repositories.barrel.dart';
+import 'package:boo_mondai/services/services.barrel.dart';
 import 'package:flutter/foundation.dart';
-import 'package:uuid/uuid.dart';
-import '../models/deck.dart';
-import '../models/deck_card.dart';
-import '../repositories/deck_repository.dart';
-import '../repositories/deck_card_repository.dart';
+import 'deck_editor_types.dart';
 
 /// Drives the Deck Editor page — holds a working copy of the [Deck] and its
 /// [DeckCard]s, tracks dirtiness, and persists via [save].
 class DeckEditorPageController extends ChangeNotifier {
-  DeckEditorPageController({
-    required DeckRepository deckRepository,
-    required DeckCardRepository deckCardRepository,
-  })  : _deckRepository = deckRepository,
-        _deckCardRepository = deckCardRepository;
-
-  final DeckRepository _deckRepository;
-  final DeckCardRepository _deckCardRepository;
-  static const _uuid = Uuid();
+  final DeckRepository _deckRepository = Repositories.deck;
+  final DeckCardRepository _deckCardRepository = Repositories.deckCard;
 
   // ── private state ────────────────────────────────────────
 
@@ -41,7 +33,7 @@ class DeckEditorPageController extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get error => _error;
 
-  // ── methods ──────────────────────────────────────────────
+  // ── deck + card CRUD ─────────────────────────────────────
 
   /// Loads an existing deck and its cards from the repositories.
   Future<void> load(String deckId) async {
@@ -67,8 +59,8 @@ class DeckEditorPageController extends ChangeNotifier {
   void loadNew() {
     final now = DateTime.now();
     _deck = Deck(
-      id: _uuid.v4(),
-      creatorId: 'local',
+      id: UuidService.uuid.v4(),
+      authorId: 'local',
       title: '',
       shortDescription: '',
       longDescription: '',
@@ -98,6 +90,19 @@ class DeckEditorPageController extends ChangeNotifier {
     _deck = updated;
     _isDirty = true;
     notifyListeners();
+  }
+
+  /// Creates a blank flashcard, appends it to the working list, and returns
+  /// the new card's id so the page can select it.
+  DeckCard createBlankCard(String deckId) {
+    final card = DeckCard.create(
+      deckId: deckId,
+      cardType: CardType.normal,
+      questionType: QuestionType.flashcard,
+      sortOrder: _cards.length,
+    );
+    addCard(card);
+    return card;
   }
 
   /// Appends [card] to the working card list and marks the controller dirty.
@@ -182,4 +187,126 @@ class DeckEditorPageController extends ChangeNotifier {
     _error = null;
     notifyListeners();
   }
+
+  // ── Form ↔ DeckCard helpers ────────────────────────────────────
+
+  /// Populates every field in [form] from [card]'s data.
+  /// Called when the user selects a different card in the sidebar.
+  void populateFormFromCard(DeckCard card, DeckCardForm form) {
+    form.qType.value = card.questionType;
+    form.cType.value = card.cardType;
+    form.frontCtrl.text = card.question;
+    form.backCtrl.text = card.answer;
+    form.identificationAnsCtrl.text = card.identificationAnswer;
+
+    form.mcOpts.value = card.options.isNotEmpty
+        ? card.options
+              .map((o) => (text: o.optionText, isCorrect: o.isCorrect))
+              .toList()
+        : [...defaultMcOpts];
+
+    if (card.segments.isNotEmpty) {
+      form.fitbSentCtrl.text = card.segments.first.fullText;
+      form.fitbAnsCtrl.text = card.segments
+          .map((seg) => seg.correctAnswer.replaceAll(',', r'\,'))
+          .join(',');
+    } else {
+      form.fitbSentCtrl.clear();
+      form.fitbAnsCtrl.clear();
+    }
+
+    form.matchPairs.value = card.pairs.isNotEmpty
+        ? card.pairs.map((p) => (term: p.term, match: p.match)).toList()
+        : [...defaultMatchPairs];
+  }
+
+  /// Merges the current [form] values back into [draft], producing an
+  /// updated [DeckCard]. Returns null when [draft] is null (no card selected).
+  DeckCard? mergeFormIntoDraft(DeckCard? draft, DeckCardForm form) {
+    if (draft == null) return null;
+
+    final qType = form.qType.value;
+
+    final backTextForSave =
+        qType.usesIdentificationAnswer || qType == QuestionType.wordScramble
+        ? ''
+        : form.backCtrl.text.trim();
+
+    final updatedNotes = draft.notes
+        .map(
+          (n) => n == draft.primaryNote
+              ? n.copyWith(
+                  frontText: form.frontCtrl.text.trim(),
+                  backText: backTextForSave,
+                )
+              : n,
+        )
+        .toList();
+
+    return draft.copyWith(
+      notes: updatedNotes,
+      cardType: form.cType.value,
+      questionType: qType,
+      identificationAnswer: qType.usesIdentificationAnswer
+          ? form.identificationAnsCtrl.text.trim()
+          : '',
+      options: qType.usesOptions
+          ? _buildOptions(form.mcOpts.value)
+          : draft.options,
+      segments: qType.usesSegments
+          ? _buildSegments(form.fitbSentCtrl.text, form.fitbAnsCtrl.text)
+          : draft.segments,
+      pairs: qType.usesPairs ? _buildPairs(form.matchPairs.value) : draft.pairs,
+    );
+  }
+
+  // ── Private editor-specific converters ───────────────────────
+
+  static List<MultipleChoiceOption> _buildOptions(List<McOpt> opts) => [
+    for (var i = 0; i < opts.length; i++)
+      if (opts[i].text.trim().isNotEmpty)
+        MultipleChoiceOption(
+          id: '',
+          cardId: '',
+          optionText: opts[i].text.trim(),
+          isCorrect: opts[i].isCorrect,
+          displayOrder: i,
+        ),
+  ];
+
+  static List<FillInTheBlankSegment> _buildSegments(
+    String sentence,
+    String answersRaw,
+  ) {
+    final s = sentence.trim();
+    if (s.isEmpty) return [];
+    final answers = splitFitbAnswers(answersRaw);
+    if (answers.isEmpty) return [];
+    final sl = s.toLowerCase();
+    return [
+      for (final a in answers)
+        if (sl.contains(a.toLowerCase()))
+          FillInTheBlankSegment(
+            id: '',
+            cardId: '',
+            fullText: s,
+            blankStart: sl.indexOf(a.toLowerCase()),
+            blankEnd: sl.indexOf(a.toLowerCase()) + a.length,
+            correctAnswer: a,
+          ),
+    ];
+  }
+
+  static List<MatchMadnessPair> _buildPairs(List<Pair> ps) => [
+    for (var i = 0; i < ps.length; i++)
+      if (ps[i].term.trim().isNotEmpty && ps[i].match.trim().isNotEmpty)
+        MatchMadnessPair(
+          id: '',
+          cardId: '',
+          term: ps[i].term.trim(),
+          match: ps[i].match.trim(),
+          isAutoPicked: false,
+          displayOrder: i,
+        ),
+  ];
 }
