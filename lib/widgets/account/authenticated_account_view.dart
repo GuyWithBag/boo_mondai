@@ -18,7 +18,7 @@ class AuthenticatedAccountView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final streakProv = context.watch<StreakProvider>();
+    // final streakProv = context.watch<StreakProvider>();
     final profile = auth.userProfile!;
 
     return SafeArea(
@@ -29,8 +29,8 @@ class AuthenticatedAccountView extends StatelessWidget {
             child: CircleAvatar(
               radius: 48,
               child: Text(
-                profile.displayName.isNotEmpty
-                    ? profile.displayName[0].toUpperCase()
+                profile.userName.isNotEmpty
+                    ? profile.userName[0].toUpperCase()
                     : '?',
                 style: Theme.of(context).textTheme.displayLarge,
               ),
@@ -39,16 +39,16 @@ class AuthenticatedAccountView extends StatelessWidget {
           const SizedBox(height: AppSpacing.md),
           Center(
             child: Text(
-              profile.displayName,
+              profile.userName,
               style: Theme.of(context).textTheme.headlineMedium,
             ),
           ),
-          Center(
-            child: Text(
-              profile.email,
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-          ),
+          // Center(
+          //   child: Text(
+          //     profile.email,
+          //     style: Theme.of(context).textTheme.bodyMedium,
+          //   ),
+          // ),
           const SizedBox(height: AppSpacing.sm),
           Center(
             child: Wrap(
@@ -61,40 +61,40 @@ class AuthenticatedAccountView extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.xl),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Column(
-                    children: [
-                      Text(
-                        '${streakProv.currentStreak}',
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      Text(
-                        'Current Streak',
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      Text(
-                        '${streakProv.longestStreak}',
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      Text(
-                        'Longest Streak',
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
+          // Card(
+          //   child: Padding(
+          //     padding: const EdgeInsets.all(AppSpacing.md),
+          //     child: Row(
+          //       mainAxisAlignment: MainAxisAlignment.spaceAround,
+          //       children: [
+          //         Column(
+          //           children: [
+          //             Text(
+          //               '${streakProv.currentStreak}',
+          //               style: Theme.of(context).textTheme.titleLarge,
+          //             ),
+          //             Text(
+          //               'Current Streak',
+          //               style: Theme.of(context).textTheme.bodyMedium,
+          //             ),
+          //           ],
+          //         ),
+          //         Column(
+          //           children: [
+          //             Text(
+          //               '${streakProv.longestStreak}',
+          //               style: Theme.of(context).textTheme.titleLarge,
+          //             ),
+          //             Text(
+          //               'Longest Streak',
+          //               style: Theme.of(context).textTheme.bodyMedium,
+          //             ),
+          //           ],
+          //         ),
+          //       ],
+          //     ),
+          //   ),
+          // ),
           const SizedBox(height: AppSpacing.md),
           if (profile.role != 'researcher')
             OutlinedButton.icon(

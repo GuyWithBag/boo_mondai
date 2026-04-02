@@ -57,7 +57,7 @@
 //         UserProfile(
 //           id: 'local',
 //           email: '',
-//           displayName: '',
+//           userName: '',
 //           createdAt: DateTime.now(),
 //           themeMode: _themeModeToString(mode),
 //         );

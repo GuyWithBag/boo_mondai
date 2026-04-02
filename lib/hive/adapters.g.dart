@@ -18,12 +18,12 @@ class UserProfileAdapter extends TypeAdapter<UserProfile> {
     };
     return UserProfile(
       id: fields[0] as String,
-      email: fields[1] as String,
-      displayName: fields[2] as String,
-      role: fields[3] as String,
-      avatarUrl: fields[4] as String?,
-      targetLanguage: fields[5] as String?,
-      createdAt: fields[6] as DateTime,
+      userName: fields[1] as String,
+      role: fields[2] as String,
+      avatarUrl: fields[3] as String?,
+      targetLanguage: fields[4] as String?,
+      createdAt: fields[5] as DateTime,
+      userId: fields[6] as String?,
     );
   }
 
@@ -34,17 +34,17 @@ class UserProfileAdapter extends TypeAdapter<UserProfile> {
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.email)
+      ..write(obj.userName)
       ..writeByte(2)
-      ..write(obj.displayName)
-      ..writeByte(3)
       ..write(obj.role)
-      ..writeByte(4)
+      ..writeByte(3)
       ..write(obj.avatarUrl)
-      ..writeByte(5)
+      ..writeByte(4)
       ..write(obj.targetLanguage)
+      ..writeByte(5)
+      ..write(obj.createdAt)
       ..writeByte(6)
-      ..write(obj.createdAt);
+      ..write(obj.userId);
   }
 
   @override
@@ -76,9 +76,9 @@ class DeckAdapter extends TypeAdapter<Deck> {
       longDescription: fields[4] == null ? '' : fields[4] as String,
       targetLanguage: fields[5] as String,
       tags: fields[6] == null ? const [] : (fields[6] as List).cast<String>(),
-      isPremade: fields[7] as bool,
+      isPremade: fields[7] == null ? false : fields[7] as bool,
       isPublic: fields[8] as bool,
-      isUneditable: fields[10] == null ? false : fields[10] as bool,
+      isEditable: fields[19] == null ? true : fields[19] as bool,
       cardCount: (fields[11] as num).toInt(),
       version: fields[12] == null ? '1.0.0' : fields[12] as String,
       buildNumber: fields[13] == null ? 1 : (fields[13] as num).toInt(),
@@ -86,7 +86,6 @@ class DeckAdapter extends TypeAdapter<Deck> {
       updatedAt: fields[15] as DateTime,
       sourceDeckId: fields[16] as String?,
       sourceAuthorId: fields[17] as String?,
-      hiddenInBrowser: fields[18] == null ? false : fields[18] as bool,
       isPublished: fields[9] as bool,
     );
   }
@@ -94,7 +93,7 @@ class DeckAdapter extends TypeAdapter<Deck> {
   @override
   void write(BinaryWriter writer, Deck obj) {
     writer
-      ..writeByte(19)
+      ..writeByte(18)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -115,8 +114,6 @@ class DeckAdapter extends TypeAdapter<Deck> {
       ..write(obj.isPublic)
       ..writeByte(9)
       ..write(obj.isPublished)
-      ..writeByte(10)
-      ..write(obj.isUneditable)
       ..writeByte(11)
       ..write(obj.cardCount)
       ..writeByte(12)
@@ -131,8 +128,8 @@ class DeckAdapter extends TypeAdapter<Deck> {
       ..write(obj.sourceDeckId)
       ..writeByte(17)
       ..write(obj.sourceAuthorId)
-      ..writeByte(18)
-      ..write(obj.hiddenInBrowser);
+      ..writeByte(19)
+      ..write(obj.isEditable);
   }
 
   @override
@@ -429,6 +426,101 @@ class MatchMadnessPairAdapter extends TypeAdapter<MatchMadnessPair> {
           typeId == other.typeId;
 }
 
+class CardAdapter extends TypeAdapter<Card> {
+  @override
+  final typeId = 7;
+
+  @override
+  Card read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return Card(
+      cardId: (fields[0] as num).toInt(),
+      state: fields[1] == null ? State.learning : fields[1] as State,
+      step: (fields[2] as num?)?.toInt(),
+      stability: (fields[3] as num?)?.toDouble(),
+      difficulty: (fields[4] as num?)?.toDouble(),
+      due: fields[5] as DateTime?,
+      lastReview: fields[6] as DateTime?,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, Card obj) {
+    writer
+      ..writeByte(7)
+      ..writeByte(0)
+      ..write(obj.cardId)
+      ..writeByte(1)
+      ..write(obj.state)
+      ..writeByte(2)
+      ..write(obj.step)
+      ..writeByte(3)
+      ..write(obj.stability)
+      ..writeByte(4)
+      ..write(obj.difficulty)
+      ..writeByte(5)
+      ..write(obj.due)
+      ..writeByte(6)
+      ..write(obj.lastReview);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CardAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class ReviewLogAdapter extends TypeAdapter<ReviewLog> {
+  @override
+  final typeId = 8;
+
+  @override
+  ReviewLog read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return ReviewLog(
+      cardId: (fields[0] as num).toInt(),
+      rating: fields[1] as Rating,
+      reviewDateTime: fields[2] as DateTime,
+      reviewDuration: (fields[3] as num?)?.toInt(),
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, ReviewLog obj) {
+    writer
+      ..writeByte(4)
+      ..writeByte(0)
+      ..write(obj.cardId)
+      ..writeByte(1)
+      ..write(obj.rating)
+      ..writeByte(2)
+      ..write(obj.reviewDateTime)
+      ..writeByte(3)
+      ..write(obj.reviewDuration);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ReviewLogAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
 class StreakAdapter extends TypeAdapter<Streak> {
   @override
   final typeId = 9;
@@ -569,45 +661,36 @@ class QuestionTypeAdapter extends TypeAdapter<QuestionType> {
           typeId == other.typeId;
 }
 
-class CardAdapter extends TypeAdapter<Card> {
+class CachedProfileAdapter extends TypeAdapter<CachedProfile> {
   @override
-  final typeId = 13;
+  final typeId = 12;
 
   @override
-  Card read(BinaryReader reader) {
+  CachedProfile read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Card(
-      cardId: (fields[0] as num).toInt(),
-      state: fields[1] == null ? State.learning : fields[1] as State,
-      step: (fields[2] as num?)?.toInt(),
-      stability: (fields[3] as num?)?.toDouble(),
-      difficulty: (fields[4] as num?)?.toDouble(),
-      due: fields[5] as DateTime?,
-      lastReview: fields[6] as DateTime?,
+    return CachedProfile(
+      id: fields[0] as String,
+      userName: fields[1] as String,
+      avatarUrl: fields[2] as String?,
+      createdAt: fields[3] as DateTime,
     );
   }
 
   @override
-  void write(BinaryWriter writer, Card obj) {
+  void write(BinaryWriter writer, CachedProfile obj) {
     writer
-      ..writeByte(7)
-      ..writeByte(0)
-      ..write(obj.cardId)
-      ..writeByte(1)
-      ..write(obj.state)
-      ..writeByte(2)
-      ..write(obj.step)
-      ..writeByte(3)
-      ..write(obj.stability)
       ..writeByte(4)
-      ..write(obj.difficulty)
-      ..writeByte(5)
-      ..write(obj.due)
-      ..writeByte(6)
-      ..write(obj.lastReview);
+      ..writeByte(0)
+      ..write(obj.id)
+      ..writeByte(1)
+      ..write(obj.userName)
+      ..writeByte(2)
+      ..write(obj.avatarUrl)
+      ..writeByte(3)
+      ..write(obj.createdAt);
   }
 
   @override
@@ -616,50 +699,7 @@ class CardAdapter extends TypeAdapter<Card> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is CardAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
-}
-
-class ReviewLogAdapter extends TypeAdapter<ReviewLog> {
-  @override
-  final typeId = 14;
-
-  @override
-  ReviewLog read(BinaryReader reader) {
-    final numOfFields = reader.readByte();
-    final fields = <int, dynamic>{
-      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
-    };
-    return ReviewLog(
-      cardId: (fields[0] as num).toInt(),
-      rating: fields[1] as Rating,
-      reviewDateTime: fields[2] as DateTime,
-      reviewDuration: (fields[3] as num?)?.toInt(),
-    );
-  }
-
-  @override
-  void write(BinaryWriter writer, ReviewLog obj) {
-    writer
-      ..writeByte(4)
-      ..writeByte(0)
-      ..write(obj.cardId)
-      ..writeByte(1)
-      ..write(obj.rating)
-      ..writeByte(2)
-      ..write(obj.reviewDateTime)
-      ..writeByte(3)
-      ..write(obj.reviewDuration);
-  }
-
-  @override
-  int get hashCode => typeId.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ReviewLogAdapter &&
+      other is CachedProfileAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

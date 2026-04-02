@@ -13,6 +13,7 @@ import 'package:hive_ce/hive_ce.dart';
 
 @GenerateAdapters([
   AdapterSpec<UserProfile>(),
+  AdapterSpec<CachedProfile>(),
   AdapterSpec<Deck>(),
   AdapterSpec<DeckCard>(),
   AdapterSpec<Note>(),

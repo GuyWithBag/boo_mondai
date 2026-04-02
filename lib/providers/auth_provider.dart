@@ -5,21 +5,13 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/services/services.barrel.dart';
 import 'package:flutter/foundation.dart';
 import 'package:boo_mondai/models/models.barrel.dart';
-import 'package:boo_mondai/services/services.barrel.dart';
+import 'package:boo_mondai/repositories/repositories.dart';
 
 /// Handles sign-in, sign-up, sign-out, and session restoration.
 class AuthProvider extends ChangeNotifier {
-  final SupabaseService _supabaseService;
-  final HiveService _hiveService;
-
-  AuthProvider({
-    required SupabaseService supabaseService,
-    required HiveService hiveService,
-  }) : _supabaseService = supabaseService,
-       _hiveService = hiveService;
-
   UserProfile? _userProfile;
   bool _isLoading = false;
   String? _error;
@@ -36,13 +28,13 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _supabaseService.signIn(email, password);
-      final user = _supabaseService.currentUser;
+      await Services.auth.signIn(email, password);
+      final user = Services.auth.currentUser;
       if (user != null) {
-        final profileData = await _supabaseService.getProfile(user.id);
+        final profileData = await Services.auth.getProfile(user.id);
         if (profileData != null) {
-          _userProfile = UserProfile.fromJson(profileData);
-          await _hiveService.saveProfile(_userProfile!);
+          _userProfile = UserProfileMapper.fromMap(profileData);
+          await Repositories.userProfile.save(_userProfile!);
         }
       }
     } on AppException catch (e) {
@@ -53,25 +45,24 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> signUp(String email, String password, String displayName) async {
+  Future<void> signUp(String email, String password, String userName) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
-      final response = await _supabaseService.signUp(email, password);
+      final profile = UserProfile(
+        id: UuidService.uuid.v4(),
+        userName: userName,
+        role: 'group_a_participant',
+        createdAt: DateTime.now(),
+      );
+      final response = await Services.auth.signUp(email, password, profile);
       final user = response.user;
       if (user != null) {
-        final profile = UserProfile(
-          id: user.id,
-          email: email,
-          displayName: displayName,
-          role: 'group_a_participant',
-          createdAt: DateTime.now(),
-        );
-        await _supabaseService.upsertProfile(profile.toJson());
+        await Services.auth.upsertProfile(profile.toMap());
         _userProfile = profile;
-        await _hiveService.saveProfile(profile);
+        await Repositories.userProfile.save(profile);
       }
     } on AppException catch (e) {
       _error = e.message;
@@ -81,15 +72,27 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  void mockSignIn() {
+    final mockData = UserProfile(
+      id: UuidService.uuid.v4(),
+      role: 'group_a_participant',
+      userName: 'TestUser',
+      createdAt: DateTime.now(),
+    );
+    Repositories.userProfile.save(mockData);
+    _userProfile = mockData;
+    notifyListeners();
+  }
+
   Future<void> signOut() async {
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
-      await _supabaseService.signOut();
+      await Services.auth.signOut();
       _userProfile = null;
-      await _hiveService.clearAll();
+      await Repositories.userProfile.clear();
     } on AppException catch (e) {
       _error = e.message;
     } finally {
@@ -103,18 +106,18 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final session = _supabaseService.currentSession;
+      final session = Services.auth.currentSession;
       if (session != null) {
-        final profileData = await _supabaseService.getProfile(session.user.id);
+        final profileData = await Services.auth.getProfile(session.user.id);
         if (profileData != null) {
-          _userProfile = UserProfile.fromJson(profileData);
-          await _hiveService.saveProfile(_userProfile!);
+          _userProfile = UserProfileMapper.fromMap(profileData);
+          await Repositories.userProfile.save(_userProfile!);
         }
       } else {
-        _userProfile = _hiveService.getProfile();
+        _userProfile = Repositories.userProfile.getAll().firstOrNull;
       }
-    } on AppException {
-      _userProfile = _hiveService.getProfile();
+      // } on AppException {
+      //   _userProfile = Repositories.userProfile.getAll().firstOrNull;
     } finally {
       _isLoading = false;
       notifyListeners();

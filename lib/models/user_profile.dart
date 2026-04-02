@@ -5,10 +5,15 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-class UserProfile {
+import 'package:dart_mappable/dart_mappable.dart';
+
+part 'user_profile.mapper.dart';
+
+@MappableClass()
+class UserProfile with UserProfileMappable {
   final String id;
-  final String email;
-  final String displayName;
+  final String? userId;
+  final String userName;
   final String role;
   final String? avatarUrl;
   final String? targetLanguage;
@@ -16,78 +21,11 @@ class UserProfile {
 
   const UserProfile({
     required this.id,
-    required this.email,
-    required this.displayName,
+    required this.userName,
     required this.role,
     this.avatarUrl,
     this.targetLanguage,
     required this.createdAt,
+    this.userId,
   });
-
-  factory UserProfile.fromJson(Map<String, dynamic> json) => UserProfile(
-        id: json['id'] as String,
-        email: json['email'] as String,
-        displayName: json['display_name'] as String,
-        role: json['role'] as String,
-        avatarUrl: json['avatar_url'] as String?,
-        targetLanguage: json['target_language'] as String?,
-        createdAt: DateTime.parse(json['created_at'] as String),
-      );
-
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'email': email,
-        'display_name': displayName,
-        'role': role,
-        'avatar_url': avatarUrl,
-        'target_language': targetLanguage,
-        'created_at': createdAt.toIso8601String(),
-      };
-
-  UserProfile copyWith({
-    String? id,
-    String? email,
-    String? displayName,
-    String? role,
-    String? avatarUrl,
-    String? targetLanguage,
-    DateTime? createdAt,
-  }) =>
-      UserProfile(
-        id: id ?? this.id,
-        email: email ?? this.email,
-        displayName: displayName ?? this.displayName,
-        role: role ?? this.role,
-        avatarUrl: avatarUrl ?? this.avatarUrl,
-        targetLanguage: targetLanguage ?? this.targetLanguage,
-        createdAt: createdAt ?? this.createdAt,
-      );
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is UserProfile &&
-          runtimeType == other.runtimeType &&
-          id == other.id &&
-          email == other.email &&
-          displayName == other.displayName &&
-          role == other.role &&
-          avatarUrl == other.avatarUrl &&
-          targetLanguage == other.targetLanguage &&
-          createdAt == other.createdAt;
-
-  @override
-  int get hashCode => Object.hash(
-        id,
-        email,
-        displayName,
-        role,
-        avatarUrl,
-        targetLanguage,
-        createdAt,
-      );
-
-  @override
-  String toString() =>
-      'UserProfile(id: $id, email: $email, displayName: $displayName, role: $role)';
 }
