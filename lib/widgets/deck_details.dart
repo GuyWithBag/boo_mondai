@@ -7,13 +7,13 @@ class DeckDetails extends StatelessWidget {
   const DeckDetails({
     super.key,
     required this.deck,
-    required this.authorProfile,
-    required this.originalAuthorProfile,
+    this.author,
+    this.sourceAuthor,
   });
 
   final Deck deck;
-  final ProfileInfo? authorProfile;
-  final ProfileInfo? originalAuthorProfile;
+  final CachedProfile? author;
+  final CachedProfile? sourceAuthor;
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -44,11 +44,7 @@ class DeckDetails extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.md),
         // Author avatars row
-        AuthorAvatarRow(
-          authorProfile: authorProfile,
-          originalAuthorProfile: originalAuthorProfile,
-          hasOriginal: deck.sourceDeckCreatorId != null,
-        ),
+        AuthorAvatarRow(author: author, sourceAuthor: sourceAuthor),
         const SizedBox(height: AppSpacing.sm),
         // Metadata chips
         Wrap(
@@ -77,7 +73,6 @@ class DeckDetails extends StatelessWidget {
           Text(deck.longDescription, style: theme.textTheme.bodyMedium),
           const SizedBox(height: AppSpacing.lg),
         ],
-        const Divider(),
       ],
     );
   }

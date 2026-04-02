@@ -77,6 +77,11 @@ class DeckCardTile extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
+                  Text(
+                    deck.id,
+                    style: Theme.of(context).textTheme.titleMedium,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                   if (!isSelecting) ...[
                     if (deck.isPremade) const StatusBadge.premade(),
                     if (isDirty) UnsyncedBadge(isPushing: isPushing),

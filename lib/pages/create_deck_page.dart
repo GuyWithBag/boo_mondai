@@ -5,6 +5,9 @@
 // HOOKS: useTextEditingController, useEffect, useState
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/controllers/my_decks_page_controller.dart';
+import 'package:boo_mondai/models/models.barrel.dart';
+import 'package:boo_mondai/repositories/repositories.barrel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
@@ -12,6 +15,9 @@ import 'package:provider/provider.dart';
 import 'package:boo_mondai/providers/providers.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
+
+// ... imports remains the same
+// ... imports ...
 
 class CreateDeckPage extends HookWidget {
   const CreateDeckPage({super.key, this.deckId});
@@ -25,98 +31,96 @@ class CreateDeckPage extends HookWidget {
     final longDescController = useTextEditingController();
     final langController = useTextEditingController(text: 'japanese');
     final formKey = useMemoized(GlobalKey<FormState>.new);
+
     final isPublished = useState(true);
     final wasPublicInitially = useState(true);
-    final deckProvider = context.watch<DeckProvider>();
+    final isPublic = useState(false);
+
     final auth = context.read<AuthProvider>();
     final isEdit = deckId != null;
+    final deckRepo = Repositories.deck;
 
+    // Load existing data if editing
     useEffect(() {
       if (isEdit) {
-        final existing = deckProvider.userDecks
+        final existing = deckRepo
+            .getByCurrentUser()
             .where((d) => d.id == deckId)
             .firstOrNull;
+
         if (existing != null) {
           titleController.text = existing.title;
           shortDescController.text = existing.shortDescription;
           longDescController.text = existing.longDescription;
           langController.text = existing.targetLanguage;
-          isPublished.value = existing.isPublic;
+          isPublished.value = existing.isPublished;
+          isPublic.value = existing.isPublic;
           wasPublicInitially.value = existing.isPublic;
         }
       }
       return null;
     }, [deckId]);
 
-    void create() {
-      final userId = auth.userProfile?.id;
-      if (userId == null) return;
-      deckProvider.createDeck(
-        userId,
-        titleController.text.trim(),
-        shortDescController.text.trim(),
-        langController.text.trim(),
-        isPublic: isPublished.value,
-      );
-    }
-
-    Future<void> save() async {
+    Future<void> handleSave() async {
       if (!formKey.currentState!.validate()) return;
+
       final userId = auth.userProfile?.id;
       if (userId == null) return;
 
-      String? savedDeckId;
+      String? finalDeckId;
 
       if (isEdit) {
-        final existing = deckProvider.userDecks
+        final existing = deckRepo
+            .getByCurrentUser()
             .where((d) => d.id == deckId)
             .firstOrNull;
-        if (existing != null) {
-          await deckProvider.updateDeck(
-            existing.copyWith(
-              title: titleController.text.trim(),
-              shortDescription: shortDescController.text.trim(),
-              longDescription: longDescController.text.trim(),
-              targetLanguage: langController.text.trim(),
 
-              isPublic: isPublished.value,
-              updatedAt: DateTime.now(),
-            ),
+        if (existing != null) {
+          final updated = existing.copyWith(
+            title: titleController.text.trim(),
+            shortDescription: shortDescController.text.trim(),
+            longDescription: longDescController.text.trim(),
+            targetLanguage: langController.text.trim(),
+            isPublic: isPublic.value,
+            isPublished: isPublished.value,
+            updatedAt: DateTime.now(), // Manual update for edit
           );
-          savedDeckId = deckId;
+          await deckRepo.save(updated);
+          finalDeckId = existing.id;
         }
       } else {
-        // final newDeck = await context.read<DeckProvider>().createDeck(
-        //   userId,
-        //   titleController.text.trim(),
-        //   shortDescController.text.trim(),
-        //   langController.text.trim(),
-        //   isPublished: isPublished.value,
-        // );
-        // savedDeckId = newDeck?.id;
+        // Use the factory for New Decks (Auto-UUID & Auto-Timestamps)
+        final newDeck = Deck.createNow(
+          authorId: userId,
+          title: titleController.text.trim(),
+          shortDescription: shortDescController.text.trim(),
+          longDescription: longDescController.text.trim(),
+          targetLanguage: langController.text.trim(),
+          isPremade: false,
+          isPublic: isPublic.value,
+          isPublished: isPublished.value,
+          cardCount: 0,
+        );
+
+        await deckRepo.save(newDeck);
+        finalDeckId = newDeck.id;
       }
 
       if (!context.mounted) return;
 
-      // Show snackbar when publishing for the first time
+      // SnackBar logic for first-time publishing
       final beingPublished =
           isPublished.value && (!isEdit || !wasPublicInitially.value);
-      if (beingPublished && savedDeckId != null) {
+      if (beingPublished && finalDeckId != null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text(
-              'Your deck will be published after your next sync.',
-            ),
-            // TODO: Sync button should be the global one.
-            // action: SnackBarAction(
-            //   label: 'Sync Now',
-            //   onPressed: () => capturedCardProv.pushDeck(capturedDeckId),
-            // ),
+          const SnackBar(
+            content: Text('Your deck will be published after your next sync.'),
           ),
         );
       }
 
       context.pop();
+      context.read<MyDecksPageController>().load();
     }
 
     return Scaffold(
@@ -133,10 +137,7 @@ class CreateDeckPage extends HookWidget {
                   children: [
                     TextFormField(
                       controller: titleController,
-                      decoration: const InputDecoration(
-                        labelText: 'Title',
-                        hintText: 'e.g. JLPT N5 Vocabulary',
-                      ),
+                      decoration: const InputDecoration(labelText: 'Title'),
                       validator: (v) => (v == null || v.trim().isEmpty)
                           ? 'Title is required'
                           : null,
@@ -146,7 +147,6 @@ class CreateDeckPage extends HookWidget {
                       controller: shortDescController,
                       decoration: const InputDecoration(
                         labelText: 'Short Description',
-                        hintText: 'One-line summary shown in list tiles',
                       ),
                     ),
                     const SizedBox(height: AppSpacing.md),
@@ -154,8 +154,6 @@ class CreateDeckPage extends HookWidget {
                       controller: longDescController,
                       decoration: const InputDecoration(
                         labelText: 'Long Description',
-                        hintText:
-                            'Full description shown on the deck detail page',
                       ),
                       maxLines: 4,
                     ),
@@ -164,7 +162,6 @@ class CreateDeckPage extends HookWidget {
                       controller: langController,
                       decoration: const InputDecoration(
                         labelText: 'Target Language',
-                        hintText: 'e.g. japanese',
                       ),
                       validator: (v) => (v == null || v.trim().isEmpty)
                           ? 'Language is required'
@@ -175,24 +172,10 @@ class CreateDeckPage extends HookWidget {
                       value: isPublished.value,
                       onChanged: (v) => isPublished.value = v,
                     ),
-                    if (deckProvider.error != null) ...[
-                      const SizedBox(height: AppSpacing.sm),
-                      ErrorText(deckProvider.error!),
-                    ],
                     const SizedBox(height: AppSpacing.xl),
                     FilledButton(
-                      onPressed: deckProvider.isLoading
-                          ? null
-                          : isEdit
-                          ? save
-                          : create,
-                      child: deckProvider.isLoading
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : Text(isEdit ? 'Save' : 'Create'),
+                      onPressed: handleSave,
+                      child: Text(isEdit ? 'Save' : 'Create'),
                     ),
                   ],
                 ),

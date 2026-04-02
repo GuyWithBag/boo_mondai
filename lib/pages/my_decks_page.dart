@@ -6,6 +6,8 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/controllers/controllers.barrel.dart';
+import 'package:boo_mondai/models/models.barrel.dart';
+import 'package:boo_mondai/shared/shared.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -14,14 +16,10 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-import '../models/deck.dart';
-import '../shared/app_spacing.dart';
-import '../shared/theme_constants.dart';
-
-typedef MyDecksWidgetController = ({
-  ScrollController scrollController,
-  TextEditingController searchController,
-});
+// typedef MyDecksWidgetController = ({
+//   ScrollController scrollController,
+//   TextEditingController searchController,
+// });
 
 class MyDecksPage extends HookWidget {
   const MyDecksPage({super.key});
@@ -29,7 +27,7 @@ class MyDecksPage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<MyDecksPageController>();
-    final scrollController = useScrollController();
+    // final scrollController = useScrollController();
     final searchController = useTextEditingController();
     final searchQuery = useState('');
 
@@ -53,13 +51,13 @@ class MyDecksPage extends HookWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('My Decks')),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push('/decks/new'),
+        onPressed: () => context.push('/my-decks/create'),
         tooltip: 'New Deck',
         child: const Icon(Icons.add),
       ),
       body: Column(
         children: [
-          _SearchBar(controller: searchController),
+          SearchBar(controller: searchController),
           Expanded(
             child: _DeckListBody(
               isLoading: controller.isLoading,
@@ -70,43 +68,6 @@ class MyDecksPage extends HookWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-// ── _SearchBar ────────────────────────────────────────────────────────────────
-
-class _SearchBar extends StatelessWidget {
-  const _SearchBar({required this.controller});
-
-  final TextEditingController controller;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: AppSpacing.md.w,
-        vertical: AppSpacing.sm.h,
-      ),
-      child: TextField(
-        controller: controller,
-        decoration: InputDecoration(
-          hintText: 'Search decks…',
-          prefixIcon: const Icon(Icons.search),
-          suffixIcon: ValueListenableBuilder<TextEditingValue>(
-            valueListenable: controller,
-            builder: (context, value, _) {
-              if (value.text.isEmpty) return const SizedBox.shrink();
-              return IconButton(
-                icon: const Icon(Icons.clear),
-                onPressed: controller.clear,
-              );
-            },
-          ),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
-          contentPadding: EdgeInsets.symmetric(vertical: AppSpacing.sm.h),
-        ),
       ),
     );
   }
@@ -156,9 +117,9 @@ class _DeckListBody extends StatelessWidget {
         title: 'No decks yet',
         message: 'Create your first deck to get started',
         action: Builder(
-          builder: (context) => PrimaryButton(
-            text: 'Create Deck',
-            onPressed: () => context.push('/decks/new'),
+          builder: (context) => ElevatedButton(
+            child: Text('Create Deck'),
+            onPressed: () => context.push('/my-decks/create'),
           ),
         ),
       );
@@ -173,9 +134,19 @@ class _DeckListBody extends StatelessWidget {
       separatorBuilder: (_, __) => SizedBox(height: AppSpacing.sm.h),
       itemBuilder: (context, index) {
         final deck = decks[index];
-        return _DismissibleDeckTile(
-          deck: deck,
-          onDismissed: () => onDeleteDeck(deck.id),
+        return Dismissible(
+          key: ValueKey(deck.id),
+          direction: DismissDirection.horizontal,
+          // background: _DismissBackground(alignment: Alignment.centerLeft),
+          // secondaryBackground: _DismissBackground(
+          //   alignment: Alignment.centerRight,
+          // ),
+          onDismissed: (_) => onDeleteDeck(deck.id),
+          child: DeckCardTile(
+            deck: deck,
+            // onTap: () => context.push('/decks/${deck.id}'),
+            // onStartQuiz: () => context.push('/quiz/${deck.id}'),
+          ),
         );
       },
     );
@@ -221,48 +192,23 @@ class _PlaceholderDeckTile extends StatelessWidget {
   }
 }
 
-// ── _DismissibleDeckTile ──────────────────────────────────────────────────────
+// // ── _DismissBackground ────────────────────────────────────────────────────────
 
-class _DismissibleDeckTile extends StatelessWidget {
-  const _DismissibleDeckTile({required this.deck, required this.onDismissed});
+// class _DismissBackground extends StatelessWidget {
+//   const _DismissBackground({required this.alignment});
 
-  final Deck deck;
-  final VoidCallback onDismissed;
+//   final Alignment alignment;
 
-  @override
-  Widget build(BuildContext context) {
-    return Dismissible(
-      key: ValueKey(deck.id),
-      direction: DismissDirection.horizontal,
-      background: _DismissBackground(alignment: Alignment.centerLeft),
-      secondaryBackground: _DismissBackground(alignment: Alignment.centerRight),
-      onDismissed: (_) => onDismissed(),
-      child: DeckCardTile(
-        deck: deck,
-        // onTap: () => context.push('/decks/${deck.id}'),
-        // onStartQuiz: () => context.push('/quiz/${deck.id}'),
-      ),
-    );
-  }
-}
-
-// ── _DismissBackground ────────────────────────────────────────────────────────
-
-class _DismissBackground extends StatelessWidget {
-  const _DismissBackground({required this.alignment});
-
-  final Alignment alignment;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.incorrect,
-        borderRadius: BorderRadius.circular(16.r),
-      ),
-      alignment: alignment,
-      padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg.w),
-      child: const Icon(Icons.delete_outline, color: Colors.white),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       decoration: BoxDecoration(
+//         color: AppColors.incorrect,
+//         borderRadius: BorderRadius.circular(16.r),
+//       ),
+//       alignment: alignment,
+//       padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg.w),
+//       child: const Icon(Icons.delete_outline, color: Colors.white),
+//     );
+//   }
+// }

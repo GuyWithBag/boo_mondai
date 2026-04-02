@@ -5,18 +5,21 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/lib.barrel.dart';
 import 'package:flutter/foundation.dart';
-import '../models/deck.dart';
-import '../repositories/deck_repository.dart';
+import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 
 /// Drives the My Decks page — loads all decks sorted by [updatedAt] descending
 /// and exposes delete operations.
 class MyDecksPageController extends ChangeNotifier {
-  MyDecksPageController({required DeckRepository deckRepository})
-      : _deckRepository = deckRepository;
-
-  final DeckRepository _deckRepository;
-
+  final DeckRepository _deckRepository = Repositories.deck;
+  // Inside your Controller
+  void init() {
+    // Listen to Hive changes directly
+    Repositories.deck.box.listenable().addListener(() {
+      load(); // Automatically refresh whenever the box changes
+    });
+  }
   // ── private state ────────────────────────────────────────
 
   List<Deck> _decks = [];
@@ -32,7 +35,7 @@ class MyDecksPageController extends ChangeNotifier {
   // ── methods ──────────────────────────────────────────────
 
   /// Loads all decks from the repository, sorted by [updatedAt] descending.
-  Future<void> load() async {
+  void load() {
     _isLoading = true;
     _error = null;
     notifyListeners();
@@ -53,11 +56,9 @@ class MyDecksPageController extends ChangeNotifier {
   Future<void> deleteDeck(String id) async {
     _isLoading = true;
     _error = null;
-    notifyListeners();
-
     try {
       await _deckRepository.delete(id);
-      await load();
+      load();
     } on Exception catch (e) {
       _error = e.toString();
       _isLoading = false;
