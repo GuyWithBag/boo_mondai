@@ -1,6 +1,6 @@
 name: boo_mondai
 description: "BooMondai — Gamified language learning with FSRS spaced repetition."
-publish_to: 'none'
+publish_to: "none"
 version: 1.0.0+1
 
 environment:
@@ -43,18 +43,20 @@ dependencies:
   go_router: 17.0.1
 
   # ── Project-specific ─────────────────────────────────────
-  fsrs: ^1.1.0                 # FSRS spaced repetition algorithm
-  uuid: ^4.5.1                 # client-side UUID generation for offline-first
+  fsrs: ^2.0.1 # FSRS spaced repetition algorithm
+  uuid: ^4.5.1 # client-side UUID generation for offline-first
+  dart_mappable: ^4.7.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
   mockito: ^5.4.4
-  build_runner: ^2.4.13
+  build_runner: ^2.5.4
   barrel_generator: ^1.0.4
   hive_ce_generator: ^1.0.0
   flutter_launcher_icons: "^0.14.4"
+  dart_mappable_builder: ^4.5.0
 
 flutter:
   uses-material-design: true
