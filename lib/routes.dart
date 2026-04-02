@@ -60,18 +60,18 @@ GoRouter createRouter(AuthProvider authProvider) {
               return const HomePage();
             },
           ),
-          GoRoute(
-            path: '/online-deck-browser',
-            builder: (context, state) => const OnlineDeckBrowserPage(),
-          ),
+          // GoRoute(
+          //   path: '/online-deck-browser',
+          //   builder: (context, state) => const OnlineDeckBrowserPage(),
+          // ),
           GoRoute(
             path: '/my-decks',
-            builder: (context, state) => const DeckListPage(),
+            builder: (context, state) => const MyDecksPage(),
           ),
-          GoRoute(
-            path: '/review',
-            builder: (context, state) => const ReviewPage(),
-          ),
+          // GoRoute(
+          //   path: '/review',
+          //   builder: (context, state) => const ReviewPage(),
+          // ),
           GoRoute(
             path: '/account',
             builder: (context, state) => const AccountPage(),
@@ -93,41 +93,31 @@ GoRouter createRouter(AuthProvider authProvider) {
       ),
       GoRoute(
         path: '/my-decks/:deckId',
-        builder: (context, state) => ViewDeckPage(
-          // deckId: state.pathParameters['deckId']!
-        ),
+        builder: (context, state) =>
+            ViewDeckPage(deckId: state.pathParameters['deckId']),
       ),
       GoRoute(
         path: '/my-decks/:deckId/edit',
-        builder: (context, state) => CreateDeckPage(
-          // deckId: state.pathParameters['deckId']
-        ),
-      ),
-      GoRoute(
-        path: '/my-decks/:deckId/cards/edit',
         builder: (context, state) => DeckEditorPage(
-          // deckId: state.pathParameters['deckId']!,
-          // initialCardId: state.uri.queryParameters['cardId'],
+          deckId: state.pathParameters['deckId']!,
+          initialCardId: state.uri.queryParameters['cardId'],
         ),
       ),
-      GoRoute(
-        path: '/quiz/:deckId/preview',
-        builder: (context, state) => QuizPreviewPage(
-          // deckId: state.pathParameters['deckId']!
-        ),
-      ),
+      // GoRoute(
+      //   path: '/my-decks/:deckId/preview',
+      //   builder: (context, state) =>
+      //       QuizPreviewPage(deckId: state.pathParameters['deckId']!),
+      // ),
       GoRoute(
         path: '/quiz/:deckId/session',
-        builder: (context, state) => QuizSessionPage(
-          // deckId: state.pathParameters['deckId']!
-        ),
+        builder: (context, state) =>
+            QuizSessionPage(deckId: state.pathParameters['deckId']),
       ),
-      GoRoute(
-        path: '/quiz/:sessionId/result',
-        builder: (context, state) => QuizResultPage(
-          // sessionId: state.pathParameters['sessionId']!
-        ),
-      ),
+      // GoRoute(
+      //   path: '/quiz/:sessionId/result',
+      //   builder: (context, state) =>
+      //       QuizResultPage(sessionId: state.pathParameters['sessionId']!),
+      // ),
       GoRoute(
         path: '/research',
         builder: (context, state) => const ResearcherDashboardPage(),
@@ -143,15 +133,14 @@ GoRouter createRouter(AuthProvider authProvider) {
       GoRoute(
         path: '/research/survey/:surveyType',
         builder: (context, state) => SurveyPage(
-          // surveyType: state.pathParameters['surveyType']!,
-          // timePoint: state.uri.queryParameters['timePoint'],
+          surveyType: state.pathParameters['surveyType']!,
+          timePoint: state.uri.queryParameters['timePoint'],
         ),
       ),
       GoRoute(
         path: '/research/test/:testSet',
-        builder: (context, state) => VocabularyTestPage(
-          // testSet: state.pathParameters['testSet']!
-        ),
+        builder: (context, state) =>
+            VocabularyTestPage(testSet: state.pathParameters['testSet']!),
       ),
     ],
   );
