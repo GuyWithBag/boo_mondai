@@ -1,5 +1,5 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// PATH: lib/pages/deck_editor/match_row.dart
+// PATH: lib/widgets/deck_editor/match_row.dart
 // PURPOSE: Single term-match pair row with inline text editing
 // PROVIDERS: none
 // HOOKS: useTextEditingController, useEffect
@@ -9,7 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
+import 'package:boo_mondai/models/models.barrel.dart';
 
+/// A single row representing a term-match pair within the [MatchEditor].
 class MatchRow extends HookWidget {
   const MatchRow({
     super.key,
@@ -20,61 +22,78 @@ class MatchRow extends HookWidget {
     required this.onChanged,
   });
 
+  /// The position of this pair in the list (1-indexed for display).
   final int index;
-  final Pair pair;
+
+  /// The raw data for this pair.
+  final MatchPairData pair;
+
+  /// Whether this pair can be removed from the list (usually requires at least 2 pairs).
   final bool canRemove;
+
+  /// Callback to remove this pair.
   final VoidCallback onRemove;
-  final void Function(Pair) onChanged;
+
+  /// Callback when the term or match text changes.
+  final void Function(MatchPairData updatedPair) onChanged;
 
   @override
   Widget build(BuildContext context) {
-    final termCtrl = useTextEditingController(text: pair.term);
-    final matchCtrl = useTextEditingController(text: pair.match);
+    final termController = useTextEditingController(text: pair.term);
+    final matchController = useTextEditingController(text: pair.match);
+
+    // Sync controllers if the pair data changes externally (e.g., when switching cards).
     useEffect(() {
-      if (termCtrl.text != pair.term) {
-        termCtrl.text = pair.term;
-        termCtrl.selection = TextSelection.collapsed(offset: pair.term.length);
+      if (termController.text != pair.term) {
+        termController.text = pair.term;
+        termController.selection = TextSelection.collapsed(
+          offset: pair.term.length,
+        );
       }
-      if (matchCtrl.text != pair.match) {
-        matchCtrl.text = pair.match;
-        matchCtrl.selection = TextSelection.collapsed(
+      if (matchController.text != pair.match) {
+        matchController.text = pair.match;
+        matchController.selection = TextSelection.collapsed(
           offset: pair.match.length,
         );
       }
       return null;
     }, [pair.term, pair.match]);
 
-    final scheme = Theme.of(context).colorScheme;
+    final themeColorScheme = Theme.of(context).colorScheme;
+
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.md,
         vertical: AppSpacing.sm + 2,
       ),
       decoration: BoxDecoration(
-        color: scheme.surface,
+        color: themeColorScheme.surface,
         borderRadius: BorderRadius.circular(AppRadii.card),
-        border: Border.all(color: scheme.surfaceContainerHighest),
+        border: Border.all(color: themeColorScheme.surfaceContainerHighest),
       ),
       child: Row(
         children: [
+          // Row number indicator.
           Container(
             width: 28,
             height: 28,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: scheme.primary.withValues(alpha: 0.12),
+              color: themeColorScheme.primary.withValues(alpha: 0.12),
               shape: BoxShape.circle,
             ),
             child: Text(
               '${index + 1}',
               style: TextStyle(
-                color: scheme.primary,
+                color: themeColorScheme.primary,
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
               ),
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
+
+          // Term input field.
           Expanded(
             child: Theme(
               data: Theme.of(context).copyWith(
@@ -88,19 +107,23 @@ class MatchRow extends HookWidget {
                 ),
               ),
               child: TextField(
-                controller: termCtrl,
+                controller: termController,
                 decoration: const InputDecoration(hintText: 'Term'),
-                onChanged: (v) => onChanged((term: v, match: pair.match)),
+                onChanged: (value) =>
+                    onChanged((term: value, match: pair.match)),
               ),
             ),
           ),
+
           const SizedBox(width: AppSpacing.sm),
           Icon(
             Icons.compare_arrows,
-            color: scheme.primary.withValues(alpha: 0.5),
+            color: themeColorScheme.primary.withValues(alpha: 0.5),
             size: 22,
           ),
           const SizedBox(width: AppSpacing.sm),
+
+          // Match input field.
           Expanded(
             child: Theme(
               data: Theme.of(context).copyWith(
@@ -114,12 +137,14 @@ class MatchRow extends HookWidget {
                 ),
               ),
               child: TextField(
-                controller: matchCtrl,
+                controller: matchController,
                 decoration: const InputDecoration(hintText: 'Match'),
-                onChanged: (v) => onChanged((term: pair.term, match: v)),
+                onChanged: (value) =>
+                    onChanged((term: pair.term, match: value)),
               ),
             ),
           ),
+
           const SizedBox(width: AppSpacing.xs),
           if (canRemove)
             IconButton(

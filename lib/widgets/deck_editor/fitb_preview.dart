@@ -1,5 +1,5 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// PATH: lib/pages/deck_editor/fitb_preview.dart
+// PATH: lib/widgets/deck_editor/fitb_preview.dart
 // PURPOSE: Live preview of fill-in-the-blank sentence with blanks highlighted
 // PROVIDERS: none
 // HOOKS: none
@@ -7,8 +7,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
-import 'package:boo_mondai/widgets/widgets.barrel.dart';
+import 'package:boo_mondai/models/models.barrel.dart';
 
+/// Shows a live preview of how a "Fill in the Blank" sentence will look to the user.
 class FitbPreview extends StatelessWidget {
   const FitbPreview({
     super.key,
@@ -16,26 +17,33 @@ class FitbPreview extends StatelessWidget {
     required this.answersRaw,
   });
 
+  /// The full sentence containing the words to be blanked.
   final String sentence;
+
+  /// The raw comma-separated list of answers that should be blanked.
   final String answersRaw;
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final answers = splitFitbAnswers(answersRaw);
-    final s = sentence.trim();
-    final sl = s.toLowerCase();
+    final themeColorScheme = Theme.of(context).colorScheme;
+    final answers = splitFillInTheBlankAnswers(answersRaw);
+    final trimmedSentence = sentence.trim();
+    final lowerSentence = trimmedSentence.toLowerCase();
 
-    // Collect all (start, end) blank ranges, skipping answers not found
-    final ranges = <(int, int)>[];
-    for (final a in answers) {
-      final idx = sl.indexOf(a.toLowerCase());
-      if (idx >= 0) ranges.add((idx, idx + a.length));
+    // Identify the start and end indices of each answer within the sentence.
+    final blankRanges = <(int, int)>[];
+    for (final answer in answers) {
+      final startIndex = lowerSentence.indexOf(answer.toLowerCase());
+      if (startIndex >= 0) {
+        blankRanges.add((startIndex, startIndex + answer.length));
+      }
     }
-    // Sort by start position
-    ranges.sort((a, b) => a.$1.compareTo(b.$1));
 
-    if (ranges.isEmpty) {
+    // Sort ranges by their starting position to ensure we process the sentence linearly.
+    blankRanges.sort((a, b) => a.$1.compareTo(b.$1));
+
+    // Handle the case where no answers are found in the sentence.
+    if (blankRanges.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
@@ -64,30 +72,48 @@ class FitbPreview extends StatelessWidget {
       );
     }
 
-    // Build RichText spans, replacing each range with a blank
-    final blankStyle = TextStyle(
-      color: scheme.primary,
+    // Build the RichText content by replacing the answer ranges with underscores.
+    final blankTextStyle = TextStyle(
+      color: themeColorScheme.primary,
       fontWeight: FontWeight.bold,
       decoration: TextDecoration.underline,
-      decorationColor: scheme.primary,
+      decorationColor: themeColorScheme.primary,
       decorationThickness: 2,
     );
-    final spans = <TextSpan>[];
-    var cursor = 0;
-    for (final (start, end) in ranges) {
-      if (start > cursor) spans.add(TextSpan(text: s.substring(cursor, start)));
-      final blankLen = (end - start).clamp(3, 12);
-      spans.add(TextSpan(text: '\u{FF3F}' * blankLen, style: blankStyle));
-      cursor = end;
+
+    final textSpans = <TextSpan>[];
+    var cursorPosition = 0;
+
+    for (final (rangeStart, rangeEnd) in blankRanges) {
+      // Add the plain text before the blank.
+      if (rangeStart > cursorPosition) {
+        textSpans.add(
+          TextSpan(text: trimmedSentence.substring(cursorPosition, rangeStart)),
+        );
+      }
+
+      // Add the blank (underscores).
+      final blankLength = (rangeEnd - rangeStart).clamp(3, 12);
+      textSpans.add(
+        TextSpan(text: '\u{FF3F}' * blankLength, style: blankTextStyle),
+      );
+
+      cursorPosition = rangeEnd;
     }
-    if (cursor < s.length) spans.add(TextSpan(text: s.substring(cursor)));
+
+    // Add any remaining text after the last blank.
+    if (cursorPosition < trimmedSentence.length) {
+      textSpans.add(TextSpan(text: trimmedSentence.substring(cursorPosition)));
+    }
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: scheme.primary.withValues(alpha: 0.06),
+        color: themeColorScheme.primary.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(AppRadii.card),
-        border: Border.all(color: scheme.primary.withValues(alpha: 0.2)),
+        border: Border.all(
+          color: themeColorScheme.primary.withValues(alpha: 0.2),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -95,7 +121,7 @@ class FitbPreview extends StatelessWidget {
           Text(
             'PREVIEW',
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: scheme.primary,
+              color: themeColorScheme.primary,
               fontWeight: FontWeight.w700,
               letterSpacing: 0.8,
             ),
@@ -106,7 +132,7 @@ class FitbPreview extends StatelessWidget {
               style: Theme.of(
                 context,
               ).textTheme.bodyMedium?.copyWith(height: 1.6),
-              children: spans,
+              children: textSpans,
             ),
           ),
         ],

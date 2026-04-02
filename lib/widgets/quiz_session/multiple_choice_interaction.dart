@@ -1,26 +1,26 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/pages/quiz_session/multiple_choice_interaction.dart
 // PURPOSE: Multiple choice option buttons with correct/incorrect highlighting
-// PROVIDERS: QuizProvider
+// PROVIDERS: QuizSessionPageController
 // HOOKS: useState
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
+import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/models/models.barrel.dart';
-import 'package:boo_mondai/providers/providers.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 
 class MultipleChoiceInteraction extends HookWidget {
   const MultipleChoiceInteraction({
     super.key,
     required this.card,
-    required this.quiz,
+    required this.controller,
     required this.shakeController,
   });
   final DeckCard card;
-  final QuizProvider quiz;
+  final QuizSessionPageController controller;
   final AnimationController shakeController;
 
   @override
@@ -33,7 +33,10 @@ class MultipleChoiceInteraction extends HookWidget {
       if (!option.isCorrect) shakeController.forward(from: 0);
       await Future<void>.delayed(const Duration(milliseconds: 800));
       if (context.mounted) {
-        await context.read<QuizProvider>().submitAnswer(option.optionText);
+        context.read<QuizSessionPageController>().submitAnswer(
+          option.optionText,
+          option.isCorrect,
+        );
         selected.value = null;
       }
     }

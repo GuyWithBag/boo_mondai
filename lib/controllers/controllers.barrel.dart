@@ -4,7 +4,6 @@
 export 'account_page_controller.dart';
 export 'dashboard_page_controller.dart';
 export 'deck_editor_page_controller.dart';
-export 'deck_editor_types.dart';
 export 'my_decks_page_controller.dart';
 export 'quiz_session_page_controller.dart';
 export 'reviews_page_controller.dart';

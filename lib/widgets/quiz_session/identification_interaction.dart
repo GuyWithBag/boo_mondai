@@ -1,7 +1,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/pages/quiz_session/identification_interaction.dart
 // PURPOSE: Text input interaction for identification question type
-// PROVIDERS: QuizProvider
+// PROVIDERS: QuizSessionPageController
 // HOOKS: useTextEditingController
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -9,18 +9,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
+import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/models/models.barrel.dart';
-import 'package:boo_mondai/providers/providers.barrel.dart';
 
 class IdentificationInteraction extends HookWidget {
   const IdentificationInteraction({
     super.key,
     required this.card,
-    required this.quiz,
+    required this.controller,
     required this.shakeController,
   });
   final DeckCard card;
-  final QuizProvider quiz;
+  final QuizSessionPageController controller;
   final AnimationController shakeController;
 
   @override
@@ -32,7 +32,7 @@ class IdentificationInteraction extends HookWidget {
       if (answer.isEmpty) return;
       final isCorrect = card.checkAnswer(answer);
       if (!isCorrect) shakeController.forward(from: 0);
-      context.read<QuizProvider>().submitIdentificationAnswer(answer);
+      context.read<QuizSessionPageController>().submitAnswer(answer, isCorrect);
       controller.clear();
     }
 

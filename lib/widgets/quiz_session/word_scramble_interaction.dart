@@ -1,7 +1,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/pages/quiz_session/word_scramble_interaction.dart
 // PURPOSE: Word scramble interaction with drag-to-order word chips
-// PROVIDERS: QuizProvider
+// PROVIDERS: QuizSessionPageController
 // HOOKS: useMemoized, useState
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -9,8 +9,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
+import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/models/models.barrel.dart';
-import 'package:boo_mondai/providers/providers.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
 
@@ -18,11 +18,11 @@ class WordScrambleInteraction extends HookWidget {
   const WordScrambleInteraction({
     super.key,
     required this.card,
-    required this.quiz,
+    required this.controller,
     required this.shakeController,
   });
   final DeckCard card;
-  final QuizProvider quiz;
+  final QuizSessionPageController controller;
   final AnimationController shakeController;
 
   @override
@@ -52,7 +52,7 @@ class WordScrambleInteraction extends HookWidget {
       if (placed.value.isEmpty) return;
       final isCorrect = card.checkAnswer(answer);
       if (!isCorrect) shakeController.forward(from: 0);
-      context.read<QuizProvider>().submitAnswer(answer);
+      context.read<QuizSessionPageController>().submitAnswer(answer, isCorrect);
     }
 
     return Column(

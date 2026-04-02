@@ -6,22 +6,22 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:flutter/material.dart';
+import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/models/models.barrel.dart';
-import 'package:boo_mondai/providers/providers.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 
 class IdentificationFeedback extends StatelessWidget {
   const IdentificationFeedback({
     super.key,
     required this.card,
-    required this.quiz,
+    required this.controller,
   });
   final DeckCard card;
-  final QuizProvider quiz;
+  final QuizSessionPageController controller;
 
   @override
   Widget build(BuildContext context) {
-    final wrong = quiz.lastAnswerWrong;
+    final wrong = controller.lastAnswerWrong;
     final color = wrong ? AppColors.incorrect : AppColors.correct;
     return Card(
       color: color.withValues(alpha: 0.08),

@@ -4,11 +4,9 @@
 export 'direction_bar.dart';
 export 'editor_main.dart';
 export 'editor_sidebar.dart';
-export 'editor_types.dart';
 export 'fitb_editor.dart';
 export 'fitb_preview.dart';
 export 'input_card.dart';
-export 'left_panel.dart';
 export 'match_editor.dart';
 export 'match_row.dart';
 export 'mc_panel.dart';
@@ -16,5 +14,6 @@ export 'mc_row.dart';
 export 'no_card_selected.dart';
 export 'push_button.dart';
 export 'sidebar_item.dart';
+export 'standard_editor_fields.dart';
 export 'type_bar.dart';
 export 'type_button.dart';
