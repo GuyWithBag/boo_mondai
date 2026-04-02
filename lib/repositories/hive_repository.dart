@@ -14,7 +14,13 @@ import 'package:hive_ce/hive.dart';
 abstract class HiveRepository<T> {
   String get boxName;
 
-  Box<T> get box => Hive.box<T>(boxName);
+  late final Box<T> box;
+
+  Future<HiveRepository<T>> init() async {
+    // Hive.deleteBoxFromDisk(boxName);
+    box = await Hive.openBox<T>(boxName);
+    return this;
+  }
 
   /// Extracts the String key used for Hive put/get from an item.
   String getId(T item);
