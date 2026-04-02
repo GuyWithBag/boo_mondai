@@ -1,26 +1,26 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/pages/quiz_session/fitb_interaction.dart
 // PURPOSE: Fill-in-the-blanks interaction with multiple text fields
-// PROVIDERS: QuizProvider
+// PROVIDERS: QuizSessionPageController
 // HOOKS: useMemoized, useEffect
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
+import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/models/models.barrel.dart';
-import 'package:boo_mondai/providers/providers.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 
 class FitbInteraction extends HookWidget {
   const FitbInteraction({
     super.key,
     required this.card,
-    required this.quiz,
+    required this.controller,
     required this.shakeController,
   });
   final DeckCard card;
-  final QuizProvider quiz;
+  final QuizSessionPageController controller;
   final AnimationController shakeController;
 
   @override
@@ -46,7 +46,10 @@ class FitbInteraction extends HookWidget {
         (i) => segments[i].checkAnswer(answers[i]),
       ).every((ok) => ok);
       if (!allOk) shakeController.forward(from: 0);
-      context.read<QuizProvider>().submitFitbAnswers(answers);
+      context.read<QuizSessionPageController>().submitAnswer(
+        answers.join('|'),
+        allOk,
+      );
       for (final c in controllers) {
         c.clear();
       }
