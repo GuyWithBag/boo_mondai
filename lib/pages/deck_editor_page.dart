@@ -9,10 +9,14 @@ import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
 
 class DeckEditorPage extends HookWidget {
-  const DeckEditorPage({super.key, required this.deckId, this.initialCardId});
+  const DeckEditorPage({
+    super.key,
+    required this.deckId,
+    this.initialTemplateId,
+  });
 
   final String? deckId;
-  final String? initialCardId;
+  final String? initialTemplateId; // <-- Renamed from initialCardId
 
   @override
   Widget build(BuildContext context) {
@@ -26,12 +30,13 @@ class DeckEditorPage extends HookWidget {
           final controller = context.watch<DeckEditorPageController>();
           final formKey = useMemoized(GlobalKey<FormState>.new);
 
-          // Auto-select initial card on first render if provided
+          // Auto-select initial template on first render if provided
           useEffect(() {
             controller.loadDeck(deckId!);
-            if (initialCardId != null && controller.activeCardId == null) {
+            if (initialTemplateId != null &&
+                controller.activeTemplateId == null) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                controller.selectCard(initialCardId);
+                controller.selectTemplate(initialTemplateId); // <-- Updated
               });
             }
             return null;
@@ -53,7 +58,8 @@ class DeckEditorPage extends HookWidget {
             }
           }
 
-          final hasActiveCard = controller.activeCardId != null;
+          final hasActiveTemplate =
+              controller.activeTemplateId != null; // <-- Updated
 
           return Scaffold(
             appBar: AppBar(
@@ -77,7 +83,7 @@ class DeckEditorPage extends HookWidget {
                 return FloatingActionButton(
                   onPressed: () {
                     if (formKey.currentState?.validate() ?? true) {
-                      controller.addBlankCard();
+                      controller.addBlankTemplate(); // <-- Updated
                     }
                   },
                   tooltip: 'Add new card',
@@ -95,35 +101,39 @@ class DeckEditorPage extends HookWidget {
                     children: [
                       if (showSidebar)
                         EditorSidebar(
-                          cards: controller.cards,
-                          activeCardId: controller.activeCardId,
+                          templates: controller.templates, // <-- Updated
+                          activeTemplateId:
+                              controller.activeTemplateId, // <-- Updated
                           isAdding: false,
                           onAdd: () {
                             if (formKey.currentState?.validate() ?? true) {
-                              controller.addBlankCard();
+                              controller.addBlankTemplate(); // <-- Updated
                             }
                           },
                           children: [
-                            for (final card in controller.cards)
+                            for (final template
+                                in controller.templates) // <-- Updated
                               SidebarItem(
-                                card: card,
-                                isActive: card.id == controller.activeCardId,
+                                template: template, // <-- Updated
+                                isActive:
+                                    template.id == controller.activeTemplateId,
                                 onTap: () {
                                   if (formKey.currentState?.validate() ??
                                       true) {
-                                    controller.selectCard(card.id);
+                                    controller.selectTemplate(template.id);
                                   }
                                 },
                               ),
                           ],
                         ),
                       Expanded(
-                        child: !hasActiveCard
+                        child: !hasActiveTemplate
                             ? NoCardSelected(
-                                onAdd: controller.addBlankCard,
+                                onAdd:
+                                    controller.addBlankTemplate, // <-- Updated
                                 isAdding: false,
                               )
-                            : const EditorMain(), // Super clean! Needs 0 arguments now.
+                            : const EditorMain(),
                       ),
                     ],
                   );

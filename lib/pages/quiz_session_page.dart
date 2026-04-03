@@ -1,171 +1,107 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/pages/quiz_session_page.dart
-// PURPOSE: Active quiz session — 6 question type UIs, 3-strike tracking, Anki counter
-// PROVIDERS: QuizProvider, CardProvider, AuthProvider
-// HOOKS: useAnimationController, useEffect
+// PURPOSE: Main quiz loop shell, progress tracking, and error handling
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'dart:math';
+import 'package:boo_mondai/controllers/controllers.barrel.dart';
+import 'package:boo_mondai/shared/shared.barrel.dart';
+import 'package:boo_mondai/pages/quiz_result_page.dart';
+import 'package:boo_mondai/widgets/widgets.barrel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:boo_mondai/providers/providers.barrel.dart';
-import 'package:boo_mondai/shared/shared.barrel.dart';
-import 'package:boo_mondai/widgets/widgets.barrel.dart';
 
 class QuizSessionPage extends HookWidget {
   const QuizSessionPage({super.key, required this.deckId});
 
-  final String deckId;
+  final String? deckId;
 
   @override
   Widget build(BuildContext context) {
-    final quiz = context.watch<QuizProvider>();
-    final cardProvider = context.read<CardProvider>();
-    final auth = context.read<AuthProvider>();
+    if (deckId == null) {
+      return ErrorState(message: 'Deck Id not found');
+    }
+    final ctrl = context.watch<QuizSessionPageController>();
+
     final shakeController = useAnimationController(
       duration: const Duration(milliseconds: 400),
     );
 
+    // ── KICK OFF THE SESSION ──────────────────────────────
     useEffect(() {
-      if (quiz.session == null && !quiz.isLoading) {
-        final userId = auth.userProfile?.id;
-        if (userId != null) {
-          Future.microtask(() {
-            if (context.mounted) {
-              context.read<QuizProvider>().startSession(
-                deckId,
-                userId,
-                cardProvider.cards,
-                false,
-              );
-            }
-          });
+      // We use context.read here because we only want to call this once,
+      // not every time the controller updates.
+      final controller = context.read<QuizSessionPageController>();
+
+      // We wrap it in a post-frame callback to avoid "setState() or markNeedsBuild()
+      // called during build" errors from Provider.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (controller.session == null) {
+          controller.startSession(deckId!);
         }
-      }
-      return null;
-    }, const []);
+      });
 
-    useEffect(() {
-      if (quiz.isComplete && quiz.session != null) {
-        Future.microtask(() {
-          if (context.mounted) {
-            context.go('/quiz/${quiz.session!.id}/result');
-          }
-        });
-      }
       return null;
-    }, [quiz.isComplete]);
+    }, [deckId]); // Re-run if the route changes to a completely different deck
 
-    if (quiz.isLoading && quiz.currentCard == null) {
+    // 1. Handle Errors
+    if (ctrl.error != null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Error')),
+        body: Center(child: Text(ctrl.error!)),
+      );
+    }
+
+    // 2. Handle Completion (Redirects to Result Page inline)
+    if (ctrl.isComplete && ctrl.session != null) {
+      return QuizResultPage(sessionId: ctrl.session!.id);
+    }
+
+    // 3. Extract our decoupled data
+    final template = ctrl.currentTemplate;
+    final reviewCard = ctrl.currentReviewCard;
+
+    // 4. Handle Loading State
+    if (template == null || reviewCard == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    if (quiz.showingFirstPassComplete) {
-      return FirstPassScreen(
-        incorrectCount: quiz.queueLength,
-        onContinue: () => context.read<QuizProvider>().acknowledgeFirstPass(),
-      );
-    }
-
-    final card = quiz.currentCard;
-    if (card == null) {
-      return const Scaffold(body: Center(child: Text('No cards')));
-    }
-
-    Future<bool> confirmDiscard() async {
-      final confirmed = await showDialog<bool>(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Discard Current Session?'),
-          content: const Text(
-            'Your progress will be lost. Are you sure you want to quit?',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Keep Going'),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.pop(ctx, true),
-              style: FilledButton.styleFrom(
-                backgroundColor: Theme.of(ctx).colorScheme.error,
-              ),
-              child: const Text('Discard'),
-            ),
-          ],
-        ),
-      );
-      return confirmed ?? false;
-    }
-
-    void onDiscard() async {
-      final discard = await confirmDiscard();
-      if (discard && context.mounted) {
-        context.read<QuizProvider>().reset();
-        context.go('/');
-      }
-    }
-
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, _) async {
-        if (didPop) return;
-        onDiscard();
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
+    // 5. The Main UI
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: LinearProgressIndicator(value: ctrl.progress),
+        actions: [
+          IconButton(
             icon: const Icon(Icons.close),
-            tooltip: 'Quit quiz',
-            onPressed: onDiscard,
+            onPressed: () {
+              ctrl.reset();
+              Navigator.of(context).pop();
+            },
           ),
-          title: AnkiCounter(
-            newCount: quiz.newCount,
-            learningCount: quiz.learningCount,
-            reviewCount: quiz.reviewCount,
-          ),
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(4),
-            child: LinearProgressIndicator(value: quiz.progress),
-          ),
-        ),
-        body: SafeArea(
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 600),
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.md),
-                child: Column(
-                  children: [
-                    if (quiz.currentCardStrikeCount > 0)
-                      StrikeChip(strikes: quiz.currentCardStrikeCount, max: 3),
-                    const SizedBox(height: AppSpacing.sm),
-                    Expanded(
-                      child: AnimatedBuilder(
-                        animation: shakeController,
-                        builder: (_, child) => Transform.translate(
-                          offset: Offset(
-                            sin(shakeController.value * pi * 3) * 4,
-                            0,
-                          ),
-                          child: child,
-                        ),
-                        child: QuizQuestionCard(
-                          question: card.question,
-                          imageUrl: card.questionImageUrl,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    QuizInteraction(
-                      card: card,
-                      quiz: quiz,
+        ],
+      ),
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 600),
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Column(
+                children: [
+                  // You can add your Anki counters (new, learning, due) here!
+                  const SizedBox(height: AppSpacing.md),
+
+                  // The interaction router
+                  Expanded(
+                    child: QuizInteraction(
+                      template: template,
+                      reviewCard: reviewCard,
+                      controller: ctrl,
                       shakeController: shakeController,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),

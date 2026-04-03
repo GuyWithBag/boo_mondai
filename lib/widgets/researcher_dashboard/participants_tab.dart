@@ -28,7 +28,7 @@ class ParticipantsTab extends StatelessWidget {
       itemCount: participants.length,
       itemBuilder: (context, i) {
         final p = participants[i];
-        final name = p.displayName ?? 'Unknown';
+        final name = p.userName ?? 'Unknown';
         final shortId = p.userId.length > 8
             ? '${p.userId.substring(0, 8)}…'
             : p.userId;

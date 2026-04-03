@@ -20,26 +20,30 @@ class FsrsCardMapper extends ClassMapperBase<FsrsCard> {
   @override
   final String id = 'FsrsCard';
 
-  static String _$deckCardId(FsrsCard v) => v.deckCardId;
-  static const Field<FsrsCard, String> _f$deckCardId =
-      Field('deckCardId', _$deckCardId);
-  static Card _$state(FsrsCard v) => v.state;
-  static const Field<FsrsCard, Card> _f$state = Field('state', _$state);
   static String _$id(FsrsCard v) => v.id;
   static const Field<FsrsCard, String> _f$id = Field('id', _$id);
+  static String _$userId(FsrsCard v) => v.userId;
+  static const Field<FsrsCard, String> _f$userId = Field('userId', _$userId);
+  static String _$reviewCardId(FsrsCard v) => v.reviewCardId;
+  static const Field<FsrsCard, String> _f$reviewCardId =
+      Field('reviewCardId', _$reviewCardId);
+  static Card _$state(FsrsCard v) => v.state;
+  static const Field<FsrsCard, Card> _f$state = Field('state', _$state);
 
   @override
   final MappableFields<FsrsCard> fields = const {
-    #deckCardId: _f$deckCardId,
-    #state: _f$state,
     #id: _f$id,
+    #userId: _f$userId,
+    #reviewCardId: _f$reviewCardId,
+    #state: _f$state,
   };
 
   static FsrsCard _instantiate(DecodingData data) {
     return FsrsCard(
-        deckCardId: data.dec(_f$deckCardId),
-        state: data.dec(_f$state),
-        id: data.dec(_f$id));
+        id: data.dec(_f$id),
+        userId: data.dec(_f$userId),
+        reviewCardId: data.dec(_f$reviewCardId),
+        state: data.dec(_f$state));
   }
 
   @override
@@ -92,7 +96,7 @@ extension FsrsCardValueCopy<$R, $Out> on ObjectCopyWith<$R, FsrsCard, $Out> {
 
 abstract class FsrsCardCopyWith<$R, $In extends FsrsCard, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  $R call({String? deckCardId, Card? state, String? id});
+  $R call({String? id, String? userId, String? reviewCardId, Card? state});
   FsrsCardCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -105,17 +109,19 @@ class _FsrsCardCopyWithImpl<$R, $Out>
   late final ClassMapperBase<FsrsCard> $mapper =
       FsrsCardMapper.ensureInitialized();
   @override
-  $R call({String? deckCardId, Card? state, String? id}) =>
+  $R call({String? id, String? userId, String? reviewCardId, Card? state}) =>
       $apply(FieldCopyWithData({
-        if (deckCardId != null) #deckCardId: deckCardId,
-        if (state != null) #state: state,
-        if (id != null) #id: id
+        if (id != null) #id: id,
+        if (userId != null) #userId: userId,
+        if (reviewCardId != null) #reviewCardId: reviewCardId,
+        if (state != null) #state: state
       }));
   @override
   FsrsCard $make(CopyWithData data) => FsrsCard(
-      deckCardId: data.get(#deckCardId, or: $value.deckCardId),
-      state: data.get(#state, or: $value.state),
-      id: data.get(#id, or: $value.id));
+      id: data.get(#id, or: $value.id),
+      userId: data.get(#userId, or: $value.userId),
+      reviewCardId: data.get(#reviewCardId, or: $value.reviewCardId),
+      state: data.get(#state, or: $value.state));
 
   @override
   FsrsCardCopyWith<$R2, FsrsCard, $Out2> $chain<$R2, $Out2>(

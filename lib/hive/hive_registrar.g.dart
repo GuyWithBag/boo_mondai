@@ -11,14 +11,20 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(CardAdapter());
     registerAdapter(CardTypeAdapter());
     registerAdapter(DeckAdapter());
-    registerAdapter(DeckCardAdapter());
     registerAdapter(FillInTheBlankSegmentAdapter());
+    registerAdapter(FillInTheBlanksTemplateAdapter());
+    registerAdapter(FlashcardTemplateAdapter());
+    registerAdapter(IdentificationTemplateAdapter());
     registerAdapter(MatchMadnessPairAdapter());
+    registerAdapter(MatchMadnessTemplateAdapter());
     registerAdapter(MultipleChoiceOptionAdapter());
-    registerAdapter(NoteAdapter());
+    registerAdapter(MultipleChoiceTemplateAdapter());
     registerAdapter(QuestionTypeAdapter());
+    registerAdapter(QuizSessionAdapter());
+    registerAdapter(ReviewCardAdapter());
     registerAdapter(ReviewLogAdapter());
     registerAdapter(StreakAdapter());
+    registerAdapter(UserDeckProgressAdapter());
     registerAdapter(UserProfileAdapter());
   }
 }
@@ -29,14 +35,20 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(CardAdapter());
     registerAdapter(CardTypeAdapter());
     registerAdapter(DeckAdapter());
-    registerAdapter(DeckCardAdapter());
     registerAdapter(FillInTheBlankSegmentAdapter());
+    registerAdapter(FillInTheBlanksTemplateAdapter());
+    registerAdapter(FlashcardTemplateAdapter());
+    registerAdapter(IdentificationTemplateAdapter());
     registerAdapter(MatchMadnessPairAdapter());
+    registerAdapter(MatchMadnessTemplateAdapter());
     registerAdapter(MultipleChoiceOptionAdapter());
-    registerAdapter(NoteAdapter());
+    registerAdapter(MultipleChoiceTemplateAdapter());
     registerAdapter(QuestionTypeAdapter());
+    registerAdapter(QuizSessionAdapter());
+    registerAdapter(ReviewCardAdapter());
     registerAdapter(ReviewLogAdapter());
     registerAdapter(StreakAdapter());
+    registerAdapter(UserDeckProgressAdapter());
     registerAdapter(UserProfileAdapter());
   }
 }

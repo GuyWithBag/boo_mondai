@@ -11,7 +11,7 @@ import 'package:boo_mondai/shared/shared.barrel.dart';
 
 class LeaderboardTileWidget extends StatelessWidget {
   final int rank;
-  final String displayName;
+  final String userName;
   final int quizScore;
   final int reviewCount;
   final int currentStreak;
@@ -19,7 +19,7 @@ class LeaderboardTileWidget extends StatelessWidget {
   const LeaderboardTileWidget({
     super.key,
     required this.rank,
-    required this.displayName,
+    required this.userName,
     required this.quizScore,
     required this.reviewCount,
     required this.currentStreak,
@@ -42,10 +42,7 @@ class LeaderboardTileWidget extends StatelessWidget {
             ),
           ),
         ),
-        title: Text(
-          displayName,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
+        title: Text(userName, style: Theme.of(context).textTheme.titleMedium),
         subtitle: Text(
           '$quizScore pts  ·  $reviewCount reviews',
           style: Theme.of(context).textTheme.bodySmall,

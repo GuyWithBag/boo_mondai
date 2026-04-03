@@ -15,21 +15,28 @@ import 'package:boo_mondai/shared/shared.barrel.dart';
 class FitbInteraction extends HookWidget {
   const FitbInteraction({
     super.key,
-    required this.card,
+    required this.template, // <-- Changed from card
+    required this.isReversed, // <-- Added flip state
     required this.controller,
     required this.shakeController,
   });
-  final DeckCard card;
+
+  final FillInTheBlanksTemplate template; // <-- Now uses the specific blueprint
+  final bool isReversed;
   final QuizSessionPageController controller;
   final AnimationController shakeController;
 
   @override
   Widget build(BuildContext context) {
-    final segments = card.segments;
+    // 1. Pull segments from the new template
+    final segments = template.segments;
+
+    // 2. Tie the memory hook to the template.id
     final controllers = useMemoized(
       () => List.generate(segments.length, (_) => TextEditingController()),
-      [card.id],
+      [template.id],
     );
+
     useEffect(() {
       return () {
         for (final c in controllers) {
@@ -41,15 +48,20 @@ class FitbInteraction extends HookWidget {
     void submit() {
       final answers = controllers.map((c) => c.text.trim()).toList();
       if (answers.any((a) => a.isEmpty)) return;
+
       final allOk = List.generate(
         segments.length,
         (i) => segments[i].checkAnswer(answers[i]),
       ).every((ok) => ok);
+
       if (!allOk) shakeController.forward(from: 0);
+
+      // Map boolean to enum
       context.read<QuizSessionPageController>().submitAnswer(
         answers.join('|'),
-        allOk,
+        allOk ? QuizAnswerType.good : QuizAnswerType.incorrect,
       );
+
       for (final c in controllers) {
         c.clear();
       }

@@ -2,7 +2,7 @@
 // PATH: lib/pages/quiz_session/word_scramble_interaction.dart
 // PURPOSE: Word scramble interaction with drag-to-order word chips
 // PROVIDERS: QuizSessionPageController
-// HOOKS: useMemoized, useState
+// HOOKS: useMemoized, useState, useEffect
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'dart:math';
@@ -17,23 +17,35 @@ import 'package:boo_mondai/widgets/widgets.barrel.dart';
 class WordScrambleInteraction extends HookWidget {
   const WordScrambleInteraction({
     super.key,
-    required this.card,
+    required this.template, // <-- NEW: Specific template
+    required this.isReversed, // <-- NEW: Passed from router
     required this.controller,
     required this.shakeController,
   });
-  final DeckCard card;
+
+  final WordScrambleTemplate template;
+  final bool isReversed;
   final QuizSessionPageController controller;
   final AnimationController shakeController;
 
   @override
   Widget build(BuildContext context) {
+    // Generate the shuffled array based on the template's sentence
     final shuffled = useMemoized(() {
-      final words = card.question.split(' ');
+      final words = template.sentenceToScramble.split(' ');
       words.shuffle(Random());
       return words;
-    }, [card.id]);
+    }, [template.id]);
+
     final placed = useState<List<String>>([]);
     final remaining = useState<List<String>>(List.from(shuffled));
+
+    // Reset board when template changes
+    useEffect(() {
+      placed.value = [];
+      remaining.value = List.from(shuffled);
+      return null;
+    }, [template.id, shuffled]);
 
     void tapRemaining(int index) {
       final word = remaining.value[index];
@@ -50,9 +62,16 @@ class WordScrambleInteraction extends HookWidget {
     void submit() {
       final answer = placed.value.join(' ');
       if (placed.value.isEmpty) return;
-      final isCorrect = card.checkAnswer(answer);
+
+      // Auto-grade using the new template logic
+      final isCorrect = template.checkAnswer(answer, isReversed: isReversed);
+
       if (!isCorrect) shakeController.forward(from: 0);
-      context.read<QuizSessionPageController>().submitAnswer(answer, isCorrect);
+
+      context.read<QuizSessionPageController>().submitAnswer(
+        answer,
+        isCorrect ? QuizAnswerType.good : QuizAnswerType.incorrect,
+      );
     }
 
     return Column(

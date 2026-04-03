@@ -7,7 +7,7 @@
 
 class LeaderboardEntry {
   final String userId;
-  final String displayName;
+  final String userName;
   final String? targetLanguage;
   final int quizScore;
   final int reviewCount;
@@ -15,7 +15,7 @@ class LeaderboardEntry {
 
   const LeaderboardEntry({
     required this.userId,
-    required this.displayName,
+    required this.userName,
     this.targetLanguage,
     required this.quizScore,
     required this.reviewCount,
@@ -25,7 +25,7 @@ class LeaderboardEntry {
   factory LeaderboardEntry.fromJson(Map<String, dynamic> json) =>
       LeaderboardEntry(
         userId: json['user_id'] as String,
-        displayName: json['display_name'] as String,
+        userName: json['display_name'] as String,
         targetLanguage: json['target_language'] as String?,
         quizScore: json['quiz_score'] as int? ?? 0,
         reviewCount: json['review_count'] as int? ?? 0,
@@ -44,5 +44,5 @@ class LeaderboardEntry {
 
   @override
   String toString() =>
-      'LeaderboardEntry(userId: $userId, displayName: $displayName, quizScore: $quizScore)';
+      'LeaderboardEntry(userId: $userId, userName: $userName, quizScore: $quizScore)';
 }

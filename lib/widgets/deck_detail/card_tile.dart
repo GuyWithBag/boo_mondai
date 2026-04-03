@@ -1,6 +1,6 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/pages/deck_detail/card_tile.dart
-// PURPOSE: List tile for a card in the deck detail view with selection support
+// PURPOSE: List tile for a template in the deck detail view with selection support
 // PROVIDERS: none
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -13,7 +13,7 @@ import 'package:boo_mondai/widgets/widgets.barrel.dart';
 class CardTile extends StatelessWidget {
   const CardTile({
     super.key,
-    required this.card,
+    required this.template, // <-- CHANGED
     required this.isSelecting,
     required this.isSelected,
     required this.isUneditable,
@@ -21,16 +21,47 @@ class CardTile extends StatelessWidget {
     required this.onLongPress,
   });
 
-  final DeckCard card;
+  final CardTemplate template; // <-- CHANGED
   final bool isSelecting;
   final bool isSelected;
   final bool isUneditable;
   final VoidCallback onTap;
   final VoidCallback onLongPress;
 
+  // Pattern matching to safely extract a title
+  String _getTitle() {
+    final text = switch (template) {
+      FlashcardTemplate f => f.frontText,
+      IdentificationTemplate i => i.promptText,
+      MultipleChoiceTemplate m => m.questionPrompt,
+      FillInTheBlanksTemplate fb =>
+        fb.segments.isNotEmpty ? fb.segments.first.fullText : '',
+      WordScrambleTemplate ws => ws.sentenceToScramble,
+      MatchMadnessTemplate mm =>
+        mm.pairs.isNotEmpty ? 'Match: ${mm.pairs.first.term}' : 'Match Pairs',
+      _ => '',
+    };
+    return text.trim().isNotEmpty ? text : '(no question)';
+  }
+
+  // Pattern matching to safely extract a subtitle
+  String _getSubtitle() {
+    final text = switch (template) {
+      FlashcardTemplate f => f.backText,
+      IdentificationTemplate i => i.acceptedAnswers,
+      MultipleChoiceTemplate m => '${m.options.length} options',
+      FillInTheBlanksTemplate _ => 'Fill in the blanks',
+      WordScrambleTemplate _ => 'Word scramble',
+      MatchMadnessTemplate mm => '${mm.pairs.length} pairs',
+      _ => '',
+    };
+    return text.trim().isNotEmpty ? text : '(no answer)';
+  }
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+
     return Card(
       color: isSelected ? scheme.primaryContainer : null,
       child: ListTile(
@@ -58,7 +89,9 @@ class CardTile extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                card.question.isNotEmpty ? card.question : '(no question)',
+                _getTitle(), // <-- Extracts specific template title
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
             if (isUneditable) ...[
@@ -67,7 +100,11 @@ class CardTile extends StatelessWidget {
             ],
           ],
         ),
-        subtitle: Text(card.answer.isNotEmpty ? card.answer : '(no answer)'),
+        subtitle: Text(
+          _getSubtitle(), // <-- Extracts specific template subtitle
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
         trailing: isSelecting
             ? null
             : IconButton(

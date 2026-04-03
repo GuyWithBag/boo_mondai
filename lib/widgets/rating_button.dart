@@ -1,46 +1,44 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/widgets/rating_button.dart
+// PURPOSE: Individual button for submitting an FSRS rating
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/controllers/controllers.barrel.dart';
+import 'package:boo_mondai/models/models.barrel.dart'; // Needed for QuizAnswerType
 import 'package:boo_mondai/shared/theme_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:fsrs/fsrs.dart';
 
 class RatingButton extends StatelessWidget {
-  final Rating rating;
+  final QuizAnswerType type;
   final VoidCallback onTap;
 
-  // We no longer need to pass the string in the constructor!
-  const RatingButton(this.rating, {super.key, required this.onTap});
+  const RatingButton(this.type, {super.key, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    // 1. Connect directly to the controller
     final ctrl = context.watch<QuizSessionPageController>();
-
-    // 2. Grab the pre-calculated time for this specific rating (fallback to '-' if loading)
-    final reviewTime = ctrl.nextIntervals[rating] ?? '-';
+    final reviewTime = ctrl.nextIntervals[type] ?? '-';
 
     late final String shortcut;
     late final Color color;
     late final String label;
 
-    switch (rating) {
-      case Rating.again:
+    switch (type) {
+      case QuizAnswerType.again:
+      case QuizAnswerType.incorrect: // Fallback just in case
         label = 'Again';
         shortcut = '1';
         color = AppColors.incorrect;
-      case Rating.hard:
+      case QuizAnswerType.hard:
         label = 'Hard';
         shortcut = '2';
         color = AppColors.hard;
-      case Rating.good:
+      case QuizAnswerType.good:
         label = 'Good';
         shortcut = '3';
         color = AppColors.correct;
-      case Rating.easy:
+      case QuizAnswerType.easy:
         label = 'Easy';
         shortcut = '4';
         color = AppColors.easy;
@@ -60,7 +58,7 @@ class RatingButton extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                reviewTime, // 3. Display the controller's time
+                reviewTime,
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,

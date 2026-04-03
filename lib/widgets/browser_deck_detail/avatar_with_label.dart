@@ -5,27 +5,26 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/lib.barrel.dart';
 import 'package:flutter/material.dart';
-import 'package:boo_mondai/shared/shared.barrel.dart';
-import 'package:boo_mondai/widgets/browser_deck_detail/profile_info.dart';
 
 class AvatarWithLabel extends StatelessWidget {
   const AvatarWithLabel({
     super.key,
     required this.profile,
     required this.label,
-    this.isOriginal = false,
+    this.isSourceAuthor = false,
   });
 
-  final ProfileInfo? profile;
+  final CachedProfile? profile;
   final String label;
-  final bool isOriginal;
+  final bool isSourceAuthor;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final name = profile?.displayName ?? '…';
+    final name = profile?.userName ?? '…';
     final initials = name.isNotEmpty ? name[0].toUpperCase() : '?';
 
     return Row(
@@ -33,8 +32,8 @@ class AvatarWithLabel extends StatelessWidget {
         Stack(
           children: [
             CircleAvatar(
-              radius: isOriginal ? 16 : 18,
-              backgroundColor: isOriginal
+              radius: isSourceAuthor ? 16 : 18,
+              backgroundColor: isSourceAuthor
                   ? scheme.tertiaryContainer
                   : scheme.primaryContainer,
               backgroundImage: profile?.avatarUrl != null
@@ -44,7 +43,7 @@ class AvatarWithLabel extends StatelessWidget {
                   ? Text(
                       initials,
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color: isOriginal
+                        color: isSourceAuthor
                             ? scheme.onTertiaryContainer
                             : scheme.onPrimaryContainer,
                         fontWeight: FontWeight.bold,
@@ -52,7 +51,7 @@ class AvatarWithLabel extends StatelessWidget {
                     )
                   : null,
             ),
-            if (isOriginal)
+            if (isSourceAuthor)
               Positioned(
                 right: 0,
                 bottom: 0,

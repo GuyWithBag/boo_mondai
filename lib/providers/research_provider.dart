@@ -7,14 +7,12 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:boo_mondai/models/models.barrel.dart';
-import 'package:boo_mondai/services/services.barrel.dart';
+import 'package:boo_mondai/services/services.dart';
+import 'package:boo_mondai/services/app_exception.dart';
 
 /// Handles research study flows: codes, surveys, tests, and researcher data viewing.
 class ResearchProvider extends ChangeNotifier {
-  final SupabaseService _supabaseService;
-
-  ResearchProvider({required SupabaseService supabaseService})
-    : _supabaseService = supabaseService;
+  final _supabaseService = Services.research;
 
   ResearchUser? _researchUser;
   List<ResearchCode> _codes = [];

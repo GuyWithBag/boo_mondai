@@ -4,7 +4,6 @@
 export 'anki_counter.dart';
 export 'first_pass_screen.dart';
 export 'fitb_interaction.dart';
-export 'flashcard_answer.dart';
 export 'flashcard_interaction.dart';
 export 'identification_feedback.dart';
 export 'identification_interaction.dart';

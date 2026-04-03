@@ -5,75 +5,64 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-class QuizAnswer {
+import 'package:boo_mondai/models/quiz_answer_type.dart';
+import 'package:boo_mondai/services/services.barrel.dart';
+import 'package:dart_mappable/dart_mappable.dart';
+import 'package:fsrs/fsrs.dart';
+
+part 'quiz_answer.mapper.dart';
+
+@MappableClass()
+class QuizAnswer with QuizAnswerMappable {
   final String id;
   final String sessionId;
   final String cardId;
   final String userAnswer;
-  final bool isCorrect;
-  final int? selfRating; // 1=Again, 2=Hard, 3=Good, 4=Easy
-  final DateTime answeredAt;
+  final QuizAnswerType type;
+  final DateTime createdAt;
 
   const QuizAnswer({
     required this.id,
     required this.sessionId,
     required this.cardId,
     required this.userAnswer,
-    required this.isCorrect,
-    this.selfRating,
-    required this.answeredAt,
+    required this.type,
+    required this.createdAt,
   });
 
-  factory QuizAnswer.fromJson(Map<String, dynamic> json) => QuizAnswer(
-        id: json['id'] as String,
-        sessionId: json['session_id'] as String,
-        cardId: json['card_id'] as String,
-        userAnswer: json['user_answer'] as String,
-        isCorrect: json['is_correct'] as bool,
-        selfRating: json['self_rating'] as int?,
-        answeredAt: DateTime.parse(json['answered_at'] as String),
-      );
+  factory QuizAnswer.create({
+    required String sessionId,
+    required String cardId,
+    required String userAnswer,
+    required QuizAnswerType type,
+  }) {
+    final val = QuizAnswer(
+      id: UuidService.uuid.v4(),
+      createdAt: DateTime.now(),
+      sessionId: sessionId,
+      type: type,
+      userAnswer: userAnswer,
+      cardId: cardId,
+    );
+    return val;
+  }
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'session_id': sessionId,
-        'card_id': cardId,
-        'user_answer': userAnswer,
-        'is_correct': isCorrect,
-        'self_rating': selfRating,
-        'answered_at': answeredAt.toIso8601String(),
-      };
+  bool isCorrect() {
+    // FIX: Must include the enum name
+    return type != QuizAnswerType.incorrect;
+  }
 
-  QuizAnswer copyWith({
-    String? id,
-    String? sessionId,
-    String? cardId,
-    String? userAnswer,
-    bool? isCorrect,
-    int? selfRating,
-    DateTime? answeredAt,
-  }) =>
-      QuizAnswer(
-        id: id ?? this.id,
-        sessionId: sessionId ?? this.sessionId,
-        cardId: cardId ?? this.cardId,
-        userAnswer: userAnswer ?? this.userAnswer,
-        isCorrect: isCorrect ?? this.isCorrect,
-        selfRating: selfRating ?? this.selfRating,
-        answeredAt: answeredAt ?? this.answeredAt,
-      );
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is QuizAnswer &&
-          runtimeType == other.runtimeType &&
-          id == other.id;
-
-  @override
-  int get hashCode => id.hashCode;
-
-  @override
-  String toString() =>
-      'QuizAnswer(id: $id, isCorrect: $isCorrect, selfRating: $selfRating)';
+  static QuizAnswerType fromRatingToType(Rating rating) {
+    // FIX: Must include the 'Rating' enum name on every case
+    switch (rating) {
+      case Rating.again:
+        return QuizAnswerType.again;
+      case Rating.hard:
+        return QuizAnswerType.hard;
+      case Rating.good:
+        return QuizAnswerType.good;
+      case Rating.easy:
+        return QuizAnswerType.easy;
+    }
+  }
 }

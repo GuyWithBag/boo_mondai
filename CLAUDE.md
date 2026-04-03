@@ -257,7 +257,7 @@ Model: UserProfile
 Fields:
   - id (String, non-null) — Supabase auth.users UUID
   - email (String, non-null)
-  - displayName (String, non-null)
+  - userName (String, non-null)
   - role (String, non-null) — 'group_a_participant' | 'group_b_participant' | 'researcher'
   - avatarUrl (String?, nullable)
   - targetLanguage (String?, nullable)
@@ -374,7 +374,7 @@ Relationships: belongs to UserProfile, belongs to DeckCard
 Model: LeaderboardEntry
 Fields:
   - userId (String, non-null)
-  - displayName (String, non-null)
+  - userName (String, non-null)
   - targetLanguage (String?, nullable)
   - quizScore (int, non-null) — total correct across all sessions
   - reviewCount (int, non-null) — total FSRS reviews completed
@@ -483,7 +483,7 @@ Public methods:
     Notifies: yes, after profile loaded
     Error handling: sets _error
 
-  - signUp(email, password, displayName) → Future<void>
+  - signUp(email, password, userName) → Future<void>
     Does: calls SupabaseService.signUp, creates profile row, caches in Hive
     Notifies: yes
     Error handling: sets _error
@@ -855,7 +855,7 @@ Hooks:
 
 Screen: RegisterPage
 Hooks:
-  - useTextEditingController → email, password, displayName fields
+  - useTextEditingController → email, password, userName fields
   - useFocusNode → email field
 
 Screen: HomePage
@@ -908,7 +908,7 @@ Hooks:
 
 Screen: AccountPage
 Hooks:
-  - useTextEditingController → displayName edit field
+  - useTextEditingController → userName edit field
 
 Screen: ResearcherDashboardPage
 Hooks:
@@ -1651,7 +1651,7 @@ DART MOCK HELPERS:
 UserProfile fakeUserProfile({String? id, String? role}) => UserProfile(
   id: id ?? '00000000-0000-0000-0000-000000000002',
   email: 'alice@test.com',
-  displayName: 'Alice',
+  userName: 'Alice',
   role: role ?? 'group_a_participant',
   avatarUrl: null,
   targetLanguage: 'japanese',

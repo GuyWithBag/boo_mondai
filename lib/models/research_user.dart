@@ -8,7 +8,7 @@
 class ResearchUser {
   final String id;
   final String userId;
-  final String? displayName;
+  final String? userName;
   final String role;
   final String targetLanguage;
   final DateTime createdAt;
@@ -16,29 +16,29 @@ class ResearchUser {
   const ResearchUser({
     required this.id,
     required this.userId,
-    this.displayName,
+    this.userName,
     required this.role,
     required this.targetLanguage,
     required this.createdAt,
   });
 
   factory ResearchUser.fromJson(Map<String, dynamic> json) => ResearchUser(
-        id: json['id'] as String,
-        userId: json['user_id'] as String,
-        displayName: (json['profiles'] as Map<String, dynamic>?)?['display_name']
-            as String?,
-        role: json['role'] as String,
-        targetLanguage: json['target_language'] as String,
-        createdAt: DateTime.parse(json['created_at'] as String),
-      );
+    id: json['id'] as String,
+    userId: json['user_id'] as String,
+    userName:
+        (json['profiles'] as Map<String, dynamic>?)?['display_name'] as String?,
+    role: json['role'] as String,
+    targetLanguage: json['target_language'] as String,
+    createdAt: DateTime.parse(json['created_at'] as String),
+  );
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'user_id': userId,
-        'role': role,
-        'target_language': targetLanguage,
-        'created_at': createdAt.toIso8601String(),
-      };
+    'id': id,
+    'user_id': userId,
+    'role': role,
+    'target_language': targetLanguage,
+    'created_at': createdAt.toIso8601String(),
+  };
 
   @override
   bool operator ==(Object other) =>

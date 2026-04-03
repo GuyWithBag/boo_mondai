@@ -1,16 +1,17 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/pages/quiz_result_page.dart
 // PURPOSE: Display quiz results with score animation and FSRS review prompt
-// PROVIDERS: QuizProvider
+// PROVIDERS: QuizSessionPageController
 // HOOKS: useAnimationController, useEffect
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/controllers/controllers.barrel.dart';
+import 'package:boo_mondai/models/models.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:boo_mondai/providers/providers.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 
 class QuizResultPage extends HookWidget {
@@ -20,8 +21,9 @@ class QuizResultPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final quiz = context.watch<QuizProvider>();
-    final session = quiz.session;
+    final ctrl = context.watch<QuizSessionPageController>();
+    final session = ctrl.session;
+
     final scoreAnim = useAnimationController(
       duration: const Duration(milliseconds: 600),
     );
@@ -39,12 +41,21 @@ class QuizResultPage extends HookWidget {
     }
 
     void goHome() {
-      quiz.reset();
+      ctrl.reset();
       context.go('/');
     }
 
-    void goReview() {
-      context.go('/review');
+    // 1. Enrolled Count: FSRS now takes everything except auto-graded typos
+    final enrolledCount = ctrl.answers
+        .where((a) => a.type != QuizAnswerType.incorrect)
+        .length;
+
+    // 2. Calculate the detailed breakdown of answers by their type
+    final breakdown = <QuizAnswerType, int>{
+      for (final type in QuizAnswerType.values) type: 0,
+    };
+    for (final a in ctrl.answers) {
+      breakdown[a.type] = (breakdown[a.type] ?? 0) + 1;
     }
 
     return Scaffold(
@@ -61,26 +72,30 @@ class QuizResultPage extends HookWidget {
               child: Column(
                 children: [
                   const SizedBox(height: AppSpacing.xl),
+
+                  // The new animated breakdown widget
                   ScoreReveal(
                     animation: scoreAnim,
-                    correct: session.correctCount,
+                    breakdown: breakdown,
                     total: session.totalQuestions,
-                    percent: session.scorePercent,
                   ),
+
                   const SizedBox(height: AppSpacing.lg),
-                  if (quiz.answers.isNotEmpty)
+
+                  // The list of individual answers
+                  if (ctrl.answers.isNotEmpty)
                     Expanded(
                       child: ListView.separated(
-                        itemCount: quiz.answers.length,
+                        itemCount: ctrl.answers.length,
                         separatorBuilder: (context, i) =>
                             const SizedBox(height: AppSpacing.sm),
                         itemBuilder: (context, i) {
-                          final a = quiz.answers[i];
+                          final a = ctrl.answers[i];
+
                           return AnswerResultTile(
                             userAnswer: a.userAnswer,
-                            isCorrect: a.isCorrect,
-                            selfRating: a.selfRating,
-                            isEjected: quiz.ejectedCardIds.contains(a.cardId),
+                            type: a.type,
+                            isEjected: false,
                           );
                         },
                       ),
@@ -90,14 +105,14 @@ class QuizResultPage extends HookWidget {
                       child: Center(child: Text('No answers recorded')),
                     ),
                   const SizedBox(height: AppSpacing.md),
-                  if (quiz.enrolledCards.isNotEmpty)
+
+                  // The action buttons at the bottom
+                  if (enrolledCount > 0)
                     ReviewPrompt(
                       deckId: session.deckId,
-                      reviewableNow: quiz.reviewableNowCount,
-                      reviewLater: quiz.reviewLaterCount,
-                      onReviewNow: quiz.reviewableNowCount > 0
-                          ? goReview
-                          : null,
+                      reviewableNow: 0,
+                      reviewLater: enrolledCount,
+                      onReviewNow: null,
                       onMaybeLater: goHome,
                     )
                   else

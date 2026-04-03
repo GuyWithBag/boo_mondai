@@ -1,27 +1,26 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/pages/deck_editor/editor_sidebar.dart
-// PURPOSE: Sidebar listing all cards in the deck with add button
+// PURPOSE: Sidebar listing all templates in the deck with add button
 // PROVIDERS: none
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:flutter/material.dart';
-import 'package:boo_mondai/models/models.barrel.dart';
+import 'package:boo_mondai/models/models.barrel.dart'; // Added to ensure template types are visible
 import 'package:boo_mondai/shared/shared.barrel.dart';
-import 'package:boo_mondai/widgets/widgets.barrel.dart';
 
 class EditorSidebar extends StatelessWidget {
   const EditorSidebar({
     super.key,
-    required this.cards,
-    required this.activeCardId,
+    required this.templates, // <-- CHANGED
+    required this.activeTemplateId, // <-- CHANGED
     required this.isAdding,
     required this.onAdd,
     this.children,
   });
 
-  final List<DeckCard> cards;
-  final String? activeCardId;
+  final List<CardTemplate> templates; // <-- CHANGED
+  final String? activeTemplateId; // <-- CHANGED
   final bool isAdding;
   final VoidCallback onAdd;
   final List<Widget>? children;
@@ -52,7 +51,7 @@ class EditorSidebar extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    'Cards (${cards.length})',
+                    'Cards (${templates.length})', // <-- CHANGED
                     style: Theme.of(context).textTheme.labelMedium?.copyWith(
                       color: AppColors.textSecondary,
                       fontWeight: FontWeight.w600,
@@ -76,7 +75,7 @@ class EditorSidebar extends StatelessWidget {
           ),
           const Divider(height: 1),
           Expanded(
-            child: children != null
+            child: children != null && children!.isNotEmpty
                 ? ListView(children: children!)
                 : const Center(
                     child: Text(
@@ -87,24 +86,6 @@ class EditorSidebar extends StatelessWidget {
                       ),
                     ),
                   ),
-            // child: cards.isEmpty
-            //     ? const Center(
-            //         child: Text(
-            //           'No cards yet',
-            //           style: TextStyle(
-            //             color: AppColors.textSecondary,
-            //             fontSize: 13,
-            //           ),
-            //         ),
-            //       )
-            //     : ListView.builder(
-            //         itemCount: cards.length,
-            //         itemBuilder: (ctx, i) => SidebarItem(
-            //           card: cards[i],
-            //           isActive: cards[i].id == activeCardId,
-            //           onTap: () => onSelect(cards[i].id),
-            //         ),
-            //       ),
           ),
         ],
       ),

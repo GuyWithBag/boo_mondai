@@ -1,11 +1,9 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/pages/view_deck_page.dart
-// PURPOSE: View a deck's cards and start quiz or preview
-// PROVIDERS: ViewDeckController, DeckProvider
-// HOOKS: useEffect, useScrollController, useState
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/repositories/repositories.barrel.dart';
+import 'package:boo_mondai/services/services.barrel.dart'; // <-- Ensure services are imported
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
@@ -21,6 +19,7 @@ class ViewDeckPage extends HookWidget {
     if (deckId == null) {
       return Center(child: ErrorText('Error 404: deck Id not found'));
     }
+
     final deckRepo = Repositories.deck;
     final currentDeck = deckRepo.getById(deckId!);
     final cachedProfsRepo = Repositories.cachedProfile;
@@ -28,6 +27,13 @@ class ViewDeckPage extends HookWidget {
     final sourceAuthor = cachedProfsRepo.getById(
       currentDeck.sourceAuthorId ?? '',
     );
+
+    // ── NEW: Calculate Eligibility ───────────────────────────
+    final userId = Services.auth.currentUser!.id;
+    final eligibleCards = QuizService.getEligibleQuizCards(deckId!, userId);
+    final availableCount = eligibleCards.length;
+    final canQuiz = availableCount > 0;
+    // ─────────────────────────────────────────────────────────
 
     Future<void> deleteDeckDialog() async {
       final title = currentDeck.title;
@@ -50,7 +56,6 @@ class ViewDeckPage extends HookWidget {
       );
       if (confirmed == true && context.mounted) {
         // await deckProv.deleteDeck(deckId);
-
         if (context.mounted) context.pop();
       }
     }
@@ -73,8 +78,13 @@ class ViewDeckPage extends HookWidget {
             const SizedBox(width: AppSpacing.md),
             Expanded(
               child: FilledButton(
-                onPressed: () => context.go('/quiz/$deckId/session'),
-                child: const Text('Start Quiz'),
+                // Disable the button if there are no eligible cards
+                onPressed: canQuiz
+                    ? () => context.go('/quiz/$deckId/session')
+                    : null,
+                child: Text(
+                  canQuiz ? 'Start Quiz ($availableCount)' : 'Completed',
+                ),
               ),
             ),
           ],
@@ -83,60 +93,17 @@ class ViewDeckPage extends HookWidget {
       appBar: AppBar(
         title: Text(currentDeck.title),
         actions: [
-          // if (vdc.isDirty)
-          //   Tooltip(
-          //     message: 'Unsaved changes',
-          //     child: Padding(
-          //       padding: const EdgeInsets.symmetric(
-          //         horizontal: AppSpacing.xs,
-          //       ),
-          //       child: TextButton.icon(
-          //         onPressed: () async {
-          //           await context.read<ViewDeckController>().save();
-          //           if (context.mounted) {
-          //             ScaffoldMessenger.of(context).showSnackBar(
-          //               const SnackBar(content: Text('Saved')),
-          //             );
-          //           }
-          //         },
-          //         icon: const Icon(Icons.save_outlined, size: 18),
-          //         label: const Text('Save'),
-          //       ),
-          //     ),
-          //   ),
           IconButton(
             icon: const Icon(Icons.edit),
             tooltip: 'Edit deck',
             onPressed: () => context.push('/my-decks/$deckId/edit'),
           ),
-
           IconButton(
-            onPressed: () {
-              deleteDeckDialog();
-            },
-            icon: Icon(Icons.delete_outline, size: 18, color: Colors.red),
+            onPressed: deleteDeckDialog,
+            icon: const Icon(Icons.delete_outline, size: 18, color: Colors.red),
           ),
-          // PopupMenuButton<String>(
-          //   tooltip: 'More options',
-          //   onSelected: (value) {
-          //     if (value == 'delete') confirmDeleteDeck();
-          //   },
-          //   itemBuilder: (context) => const [
-          //     PopupMenuItem(
-          //       value: 'delete',
-          //       child: Row(
-          //         children: [
-          //           Icon(Icons.delete_outline, size: 18, color: Colors.red),
-          //           SizedBox(width: 8),
-          //           Text('Delete deck', style: TextStyle(color: Colors.red)),
-          //         ],
-          //       ),
-          //     ),
-          //   ],
-          // ),
         ],
       ),
-
       body: DeckDetails(
         deck: currentDeck,
         author: author,

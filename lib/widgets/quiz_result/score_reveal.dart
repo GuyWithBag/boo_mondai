@@ -1,59 +1,115 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// PATH: lib/pages/quiz_result/score_reveal.dart
-// PURPOSE: Animated score count-up with scale bounce for quiz results
-// PROVIDERS: none
-// HOOKS: none
+// PATH: lib/widgets/score_reveal.dart
+// PURPOSE: Animated breakdown of quiz performance by FSRS rating
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:flutter/material.dart';
+import 'package:boo_mondai/models/models.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 
 class ScoreReveal extends StatelessWidget {
   const ScoreReveal({
     super.key,
     required this.animation,
-    required this.correct,
+    required this.breakdown,
     required this.total,
-    required this.percent,
   });
 
   final Animation<double> animation;
-  final int correct;
+  final Map<QuizAnswerType, int> breakdown;
   final int total;
-  final double percent;
+
+  String _getLabel(QuizAnswerType type) {
+    return switch (type) {
+      QuizAnswerType.again => 'Again',
+      QuizAnswerType.hard => 'Hard',
+      QuizAnswerType.good => 'Good',
+      QuizAnswerType.easy => 'Easy',
+      QuizAnswerType.incorrect => 'Incorrect',
+    };
+  }
+
+  Color _getColor(QuizAnswerType type) {
+    return switch (type) {
+      QuizAnswerType.incorrect => AppColors.incorrect,
+      QuizAnswerType.again => AppColors.incorrect,
+      QuizAnswerType.hard => AppColors.hard,
+      QuizAnswerType.good => AppColors.correct,
+      QuizAnswerType.easy => AppColors.correct,
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: animation,
-      builder: (context, child) {
-        final scale =
-            1.0 + (1.2 - 1.0) * Curves.elasticOut.transform(animation.value);
-        final displayCount = (correct * animation.value).round();
-        return Transform.scale(
-          scale: animation.value < 1.0 ? scale : 1.0,
-          child: Column(
+    // Determine the order we want to display them in
+    const displayOrder = [
+      QuizAnswerType.incorrect,
+      QuizAnswerType.again,
+      QuizAnswerType.hard,
+      QuizAnswerType.good,
+      QuizAnswerType.easy,
+    ];
+
+    if (total == 0) return const SizedBox.shrink();
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: displayOrder.map((type) {
+        final count = breakdown[type] ?? 0;
+
+        // Hide rows with 0 answers to keep the UI clean
+        if (count == 0) return const SizedBox.shrink();
+
+        final percent = count / total;
+        final color = _getColor(type);
+
+        return Padding(
+          padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+          child: Row(
             children: [
-              Text(
-                '$displayCount / $total',
-                style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: percent >= 0.7
-                      ? AppColors.correct
-                      : percent >= 0.4
-                      ? AppColors.hard
-                      : AppColors.incorrect,
+              // Label
+              SizedBox(
+                width: 80,
+                child: Text(
+                  _getLabel(type),
+                  style: TextStyle(fontWeight: FontWeight.bold, color: color),
                 ),
               ),
-              const SizedBox(height: AppSpacing.sm),
-              Text(
-                '${(percent * 100).round()}% correct',
-                style: Theme.of(context).textTheme.titleLarge,
+
+              // Animated Progress Bar
+              Expanded(
+                child: AnimatedBuilder(
+                  animation: animation,
+                  builder: (context, child) {
+                    return ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: LinearProgressIndicator(
+                        value: percent * animation.value,
+                        backgroundColor: color.withValues(alpha: 0.15),
+                        color: color,
+                        minHeight: 8,
+                      ),
+                    );
+                  },
+                ),
+              ),
+
+              // Stats Text (e.g. "1/3  (33%)")
+              SizedBox(
+                width: 80,
+                child: Text(
+                  '$count/$total  (${(percent * 100).round()}%)',
+                  textAlign: TextAlign.right,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
               ),
             ],
           ),
         );
-      },
+      }).toList(),
     );
   }
 }

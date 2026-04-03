@@ -2,12 +2,16 @@
 
 // Other files
 export 'cached_profile_repository.dart';
-export 'deck_card_repository.dart';
+export 'card_template_repository.dart';
 export 'deck_repository.dart';
 export 'fsrs_card_repository.dart';
 export 'hive_repository.dart';
+export 'in_memory_repository.dart';
 export 'profile_repository.dart';
+export 'quiz_answer_repository.dart';
 export 'quiz_session_repository.dart';
 export 'repositories.dart';
+export 'review_card_repository.dart';
 export 'review_log_repository.dart';
 export 'streak_repository.dart';
+export 'user_deck_progress_repository.dart';

@@ -9,7 +9,7 @@ export 'providers/providers.barrel.dart';
 export 'repositories/repositories.barrel.dart';
 export 'services/services.barrel.dart';
 export 'shared/shared.barrel.dart';
-// export 'widgets/widgets.barrel.dart';
+export 'widgets/widgets.barrel.dart';
 // Other files
 export 'app.dart';
 export 'main.dart';

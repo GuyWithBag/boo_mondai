@@ -20,16 +20,16 @@ class HomePage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
-    final fsrs = context.watch<FsrsProvider>();
-    final streakProv = context.watch<StreakProvider>();
+    // final fsrs = context.watch<FsrsProvider>();
+    // final streakProv = context.watch<StreakProvider>();
     final leaderboard = context.watch<LeaderboardProvider>();
     final userId = auth.userProfile?.id;
 
     useEffect(() {
       if (userId != null) {
         Future.microtask(() {
-          context.read<FsrsProvider>().fetchDueCards(userId);
-          context.read<StreakProvider>().fetchStreak(userId);
+          // context.read<FsrsProvider>().fetchDueCards(userId);
+          // context.read<StreakProvider>().fetchStreak(userId);
           context.read<LeaderboardProvider>().fetchLeaderboard(
             targetLanguage: auth.userProfile?.targetLanguage,
           );
@@ -45,8 +45,8 @@ class HomePage extends HookWidget {
           onRefresh: () async {
             if (userId != null) {
               await Future.wait([
-                context.read<FsrsProvider>().fetchDueCards(userId),
-                context.read<StreakProvider>().fetchStreak(userId),
+                // context.read<FsrsProvider>().fetchDueCards(userId),
+                // context.read<StreakProvider>().fetchStreak(userId),
                 context.read<LeaderboardProvider>().fetchLeaderboard(
                   targetLanguage: auth.userProfile?.targetLanguage,
                 ),
@@ -57,16 +57,16 @@ class HomePage extends HookWidget {
             padding: const EdgeInsets.all(AppSpacing.md),
             children: [
               Text(
-                'Welcome, ${auth.userProfile?.displayName ?? 'Learner'}!',
+                'Welcome, ${auth.userProfile?.userName ?? 'Learner'}!',
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
               const SizedBox(height: AppSpacing.lg),
-              StreakBadge(currentStreak: streakProv.currentStreak),
+              // StreakBadge(currentStreak: streakProv.currentStreak),
               const SizedBox(height: AppSpacing.md),
-              DueReviewCard(
-                dueCount: fsrs.dueCount,
-                onTap: () => context.go('/review'),
-              ),
+              // DueReviewCard(
+              //   dueCount: fsrs.dueCount,
+              //   onTap: () => context.go('/review'),
+              // ),
               const SizedBox(height: AppSpacing.lg),
               FilledButton.icon(
                 onPressed: () => context.go('/my-decks'),

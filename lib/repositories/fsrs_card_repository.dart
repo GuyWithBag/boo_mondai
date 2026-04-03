@@ -6,7 +6,6 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/models/models.barrel.dart';
-
 import 'hive_repository.dart';
 
 class FsrsCardRepository extends HiveRepository<FsrsCard> {
@@ -16,12 +15,31 @@ class FsrsCardRepository extends HiveRepository<FsrsCard> {
   @override
   String getId(FsrsCard item) => item.id.toString();
 
-  FsrsCard? getByDeckCardId(String cardId) =>
-      box.values.where((s) => s.deckCardId == cardId).firstOrNull;
+  // ── Domain Queries ──────────────────────────────────────
 
-  List<FsrsCard> getDueCards(DateTime now) => box.values
-      .where(
-        (s) => s.state.due.isBefore(now) || s.state.due.isAtSameMomentAs(now),
-      )
-      .toList();
+  /// Renamed to match the new ReviewCard nomenclature
+  FsrsCard? getByReviewCardId(String reviewCardId) {
+    return box.values.where((s) => s.reviewCardId == reviewCardId).firstOrNull;
+  }
+
+  /// Gets all cards for a specific user
+  List<FsrsCard> getByUserId(String userId) {
+    return box.values.where((s) => s.userId == userId).toList();
+  }
+
+  /// Highly optimized: Returns just a Set of IDs.
+  /// Perfect for checking if a card is already enrolled!
+  Set<String> getEnrolledReviewCardIds(String userId) {
+    return box.values
+        .where((s) => s.userId == userId)
+        .map((s) => s.reviewCardId)
+        .toSet();
+  }
+
+  /// Gets cards that are ready to be reviewed right now
+  List<FsrsCard> getDueCards(DateTime now) {
+    return box.values.where((s) {
+      return s.state.due.isBefore(now) || s.state.due.isAtSameMomentAs(now);
+    }).toList();
+  }
 }

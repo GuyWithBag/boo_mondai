@@ -1,8 +1,6 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/pages/quiz_session/quiz_interaction.dart
-// PURPOSE: Dispatches to the correct interaction widget based on question type
-// PROVIDERS: QuizSessionPageController
-// HOOKS: none
+// PURPOSE: Dispatches to the correct interaction widget based on template type
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:flutter/material.dart';
@@ -13,48 +11,60 @@ import 'package:boo_mondai/widgets/widgets.barrel.dart';
 class QuizInteraction extends StatelessWidget {
   const QuizInteraction({
     super.key,
-    required this.card,
+    required this.template,
+    required this.reviewCard,
     required this.controller,
     required this.shakeController,
   });
 
-  final DeckCard card;
+  final CardTemplate template;
+  final ReviewCard reviewCard;
   final QuizSessionPageController controller;
   final AnimationController shakeController;
 
   @override
   Widget build(BuildContext context) {
-    if (controller.awaitingRating) {
-      return RatingArea(card: card, controller: controller);
-    }
-    return switch (card.questionType) {
-      QuestionType.flashcard => FlashcardInteraction(
-        card: card,
+    return switch (template) {
+      FlashcardTemplate f => FlashcardInteraction(
+        template: f,
+        isReversed: reviewCard.isReversed,
         controller: controller,
       ),
-      QuestionType.identification => IdentificationInteraction(
-        card: card,
+      IdentificationTemplate i => IdentificationInteraction(
+        template: i,
+        isReversed: reviewCard.isReversed,
         controller: controller,
         shakeController: shakeController,
       ),
-      QuestionType.multipleChoice => MultipleChoiceInteraction(
-        card: card,
+      MultipleChoiceTemplate m => MultipleChoiceInteraction(
+        template: m,
+        isReversed: reviewCard.isReversed,
         controller: controller,
         shakeController: shakeController,
       ),
-      QuestionType.fillInTheBlanks => FitbInteraction(
-        card: card,
+      FillInTheBlanksTemplate fb => FitbInteraction(
+        template: fb,
+        isReversed: reviewCard.isReversed,
         controller: controller,
         shakeController: shakeController,
       ),
-      QuestionType.wordScramble => WordScrambleInteraction(
-        card: card,
+      WordScrambleTemplate ws => WordScrambleInteraction(
+        template: ws,
+        isReversed: reviewCard.isReversed,
         controller: controller,
         shakeController: shakeController,
       ),
-      QuestionType.matchMadness => MatchMadnessInteraction(
-        card: card,
+      MatchMadnessTemplate mm => MatchMadnessInteraction(
+        template: mm,
         controller: controller,
+      ),
+
+      // <-- NEW: The wildcard fallback required for abstract classes
+      _ => Center(
+        child: Text(
+          'Unsupported card type: ${template.runtimeType}',
+          style: const TextStyle(color: Colors.red),
+        ),
       ),
     };
   }

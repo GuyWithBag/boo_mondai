@@ -161,7 +161,7 @@ classDiagram
     class UserProfile {
         +String id
         +String email
-        +String displayName
+        +String userName
         +String role
         +String? avatarUrl
         +String? targetLanguage
@@ -240,7 +240,7 @@ classDiagram
 
     class LeaderboardEntry {
         +String userId
-        +String displayName
+        +String userName
         +String? targetLanguage
         +int quizScore
         +int reviewCount
@@ -388,7 +388,7 @@ classDiagram
         +bool isAuthenticated
         +String? role
         +signIn(email, password) Future
-        +signUp(email, password, displayName) Future
+        +signUp(email, password, userName) Future
         +signOut() Future
         +restoreSession() Future
         +clearError() void

@@ -2,9 +2,11 @@ import 'package:boo_mondai/repositories/repositories.barrel.dart';
 
 class Repositories {
   static late final DeckRepository deck;
-  static late final DeckCardRepository deckCard;
+  static late final CardTemplateRepository cardTemplate;
+  static late final ReviewCardRepository reviewCard;
   static late final FsrsCardRepository fsrsCard;
   static late final QuizSessionRepository quizSession;
+  static late final QuizAnswerRepository quizAnswer;
   static late final ReviewLogRepository reviewLog;
   // static late final StreakRepository streak;
   static late final ProfileRepository userProfile;
@@ -15,17 +17,20 @@ class Repositories {
     cachedProfile =
         await CachedProfileRepository().init() as CachedProfileRepository;
     deck = await DeckRepository().init() as DeckRepository;
-    deckCard = await DeckCardRepository().init() as DeckCardRepository;
+    cardTemplate =
+        await CardTemplateRepository().init() as CardTemplateRepository;
+    reviewCard = await ReviewCardRepository().init() as ReviewCardRepository;
     fsrsCard = await FsrsCardRepository().init() as FsrsCardRepository;
     quizSession = await QuizSessionRepository().init() as QuizSessionRepository;
     reviewLog = await ReviewLogRepository().init() as ReviewLogRepository;
+    quizAnswer = await QuizAnswerRepository().init() as QuizAnswerRepository;
     // streak = StreakRepository();
     // Repositories.clearAll();
   }
 
   static void clearAll() {
     deck.clear();
-    deckCard.clear();
+    cardTemplate.clear();
     fsrsCard.clear();
     quizSession.clear();
     reviewLog.clear();

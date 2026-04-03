@@ -5,9 +5,8 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/repositories/repositories.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:boo_mondai/providers/providers.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
 
@@ -29,15 +28,26 @@ class ReviewPrompt extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final deckProvider = context.read<DeckProvider>();
+    final deckProvider = Repositories.deck;
+
+    // Safely look up the deck across both public and user decks
     final deck = [
-      ...deckProvider.decks,
-      ...deckProvider.userDecks,
+      ...deckProvider.getAll(),
+      ...deckProvider.getByCurrentUser(),
     ].where((d) => d.id == deckId).firstOrNull;
+
     final deckTitle = deck?.title ?? 'Your deck';
 
+    // Check if the button is disabled to show a helpful tooltip
+    final isReviewDisabled = onReviewNow == null;
+
     return Card(
+      elevation: 0,
       color: AppColors.primary.withValues(alpha: 0.06),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppSpacing.md),
+        side: BorderSide(color: AppColors.primary.withValues(alpha: 0.2)),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.md),
         child: Column(
@@ -47,12 +57,13 @@ class ReviewPrompt extends StatelessWidget {
             Row(
               children: [
                 const Icon(Icons.schedule, size: 18, color: AppColors.primary),
-                const SizedBox(width: 6),
+                const SizedBox(width: AppSpacing.xs),
                 Text(
                   'Cards enrolled in FSRS',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleMedium?.copyWith(color: AppColors.primary),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),
@@ -73,10 +84,15 @@ class ReviewPrompt extends StatelessWidget {
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
-                  child: FilledButton.icon(
-                    onPressed: onReviewNow,
-                    icon: const Icon(Icons.play_arrow),
-                    label: const Text('Review Now'),
+                  child: Tooltip(
+                    message: isReviewDisabled
+                        ? 'Cards need time to settle before their first review.'
+                        : 'Start your spaced repetition review.',
+                    child: FilledButton.icon(
+                      onPressed: onReviewNow,
+                      icon: const Icon(Icons.play_arrow),
+                      label: const Text('Review Now'),
+                    ),
                   ),
                 ),
               ],

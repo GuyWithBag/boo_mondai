@@ -7,5 +7,6 @@ export 'app_exception.dart';
 export 'fsrs_service.dart';
 export 'hive_service.dart';
 export 'notification_service.dart';
+export 'quiz_service.dart';
 export 'services.dart';
 export 'uuid_service.dart';

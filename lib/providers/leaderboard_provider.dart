@@ -7,15 +7,11 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:boo_mondai/models/models.barrel.dart';
-import 'package:boo_mondai/services/services.barrel.dart';
+import 'package:boo_mondai/services/services.dart';
+import 'package:boo_mondai/services/app_exception.dart';
 
 /// Provides ranked leaderboard entries, globally or filtered by language.
 class LeaderboardProvider extends ChangeNotifier {
-  final SupabaseService _supabaseService;
-
-  LeaderboardProvider({required SupabaseService supabaseService})
-    : _supabaseService = supabaseService;
-
   List<LeaderboardEntry> _entries = [];
   String? _filteredLanguage;
   bool _isLoading = false;
@@ -33,7 +29,7 @@ class LeaderboardProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final data = await _supabaseService.fetchLeaderboard(
+      final data = await Services.leaderboard.fetchLeaderboard(
         targetLanguage: targetLanguage,
       );
       _entries = data.map(LeaderboardEntry.fromJson).toList();

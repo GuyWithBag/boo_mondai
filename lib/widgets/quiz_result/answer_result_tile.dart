@@ -6,28 +6,31 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:flutter/material.dart';
+import 'package:boo_mondai/models/models.barrel.dart'; // <-- Import to access QuizAnswerType
 import 'package:boo_mondai/shared/shared.barrel.dart';
 
 class AnswerResultTile extends StatelessWidget {
   const AnswerResultTile({
     super.key,
     required this.userAnswer,
-    required this.isCorrect,
-    this.selfRating,
+    required this.type, // <-- Replaced `isCorrect` and `selfRating`
     this.isEjected = false,
   });
 
   final String userAnswer;
-  final bool isCorrect;
-  final int? selfRating;
+  final QuizAnswerType type; // <-- The clean enum
   final bool isEjected;
 
-  String get _ratingLabel => switch (selfRating) {
-    1 => 'Again',
-    2 => 'Hard',
-    3 => 'Good',
-    4 => 'Easy',
-    _ => '',
+  // Helper to determine pass/fail for the leading icon
+  bool get _isCorrect => type != QuizAnswerType.incorrect;
+
+  // Helper to grab the correct display text based on the enum
+  String get _ratingLabel => switch (type) {
+    QuizAnswerType.again => 'Again',
+    QuizAnswerType.hard => 'Hard',
+    QuizAnswerType.good => 'Good',
+    QuizAnswerType.easy => 'Easy',
+    QuizAnswerType.incorrect => '',
   };
 
   @override
@@ -35,8 +38,8 @@ class AnswerResultTile extends StatelessWidget {
     return Card(
       child: ListTile(
         leading: Icon(
-          isCorrect ? Icons.check_circle : Icons.cancel,
-          color: isCorrect ? AppColors.correct : AppColors.incorrect,
+          _isCorrect ? Icons.check_circle : Icons.cancel,
+          color: _isCorrect ? AppColors.correct : AppColors.incorrect,
         ),
         title: Text(userAnswer.isEmpty ? '(no answer)' : userAnswer),
         trailing: isEjected
@@ -53,7 +56,8 @@ class AnswerResultTile extends StatelessWidget {
                   visualDensity: VisualDensity.compact,
                 ),
               )
-            : selfRating != null
+            // If it's correct (not a typo), show the FSRS rating they gave it
+            : type != QuizAnswerType.incorrect
             ? Chip(label: Text(_ratingLabel))
             : null,
       ),

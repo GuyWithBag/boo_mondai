@@ -100,7 +100,7 @@ GoRouter createRouter(AuthProvider authProvider) {
         path: '/my-decks/:deckId/edit',
         builder: (context, state) => DeckEditorPage(
           deckId: state.pathParameters['deckId']!,
-          initialCardId: state.uri.queryParameters['cardId'],
+          initialTemplateId: state.uri.queryParameters['initialTemplateId'],
         ),
       ),
       // GoRoute(
@@ -113,11 +113,11 @@ GoRouter createRouter(AuthProvider authProvider) {
         builder: (context, state) =>
             QuizSessionPage(deckId: state.pathParameters['deckId']),
       ),
-      // GoRoute(
-      //   path: '/quiz/:sessionId/result',
-      //   builder: (context, state) =>
-      //       QuizResultPage(sessionId: state.pathParameters['sessionId']!),
-      // ),
+      GoRoute(
+        path: '/quiz/:sessionId/result',
+        builder: (context, state) =>
+            QuizResultPage(sessionId: state.pathParameters['sessionId']!),
+      ),
       GoRoute(
         path: '/research',
         builder: (context, state) => const ResearcherDashboardPage(),
