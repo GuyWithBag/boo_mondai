@@ -5,6 +5,7 @@ export 'all_caught_up.dart';
 export 'all_done_header.dart';
 export 'flip_card.dart';
 export 'review_card_back.dart';
+export 'review_deck_tile.dart';
 export 'upcoming_card_tile.dart';
 export 'upcoming_count.dart';
 export 'upcoming_only_view.dart';

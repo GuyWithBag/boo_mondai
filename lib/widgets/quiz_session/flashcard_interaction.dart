@@ -20,7 +20,7 @@ class FlashcardInteraction extends HookWidget {
 
   final FlashcardTemplate template;
   final bool isReversed;
-  final QuizSessionPageController controller;
+  final SessionController controller;
 
   @override
   Widget build(BuildContext context) {
@@ -36,9 +36,7 @@ class FlashcardInteraction extends HookWidget {
       if (isRevealed.value) return;
 
       // Calculate intervals using the tracking ID!
-      await context.read<QuizSessionPageController>().calculateNextIntervals(
-        controller.currentReviewCard!.id,
-      );
+      await controller.calculateNextIntervals();
 
       isRevealed.value = true;
     }

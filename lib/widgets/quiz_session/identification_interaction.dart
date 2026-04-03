@@ -25,7 +25,7 @@ class IdentificationInteraction extends HookWidget {
 
   final IdentificationTemplate template;
   final bool isReversed;
-  final QuizSessionPageController controller;
+  final SessionController controller;
   final AnimationController shakeController;
 
   @override
@@ -43,13 +43,12 @@ class IdentificationInteraction extends HookWidget {
     // 2. The action triggered by the button or Enter key
     Future<void> handleReveal() async {
       if (isRevealed.value) return;
-      if (textController.text.trim().isEmpty)
-        return; // Optional: prevent blank submissions
+      if (textController.text.trim().isEmpty) {
+        return;
+      } // Optional: prevent blank submissions
 
       // Pre-calculate the FSRS intervals for the RatingArea UI
-      await context.read<QuizSessionPageController>().calculateNextIntervals(
-        controller.currentReviewCard!.id,
-      );
+      await controller.calculateNextIntervals();
 
       // Update local state to show the Rating Area
       isRevealed.value = true;

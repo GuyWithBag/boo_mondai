@@ -12,8 +12,8 @@ class ReviewLogRepository extends HiveRepository<FsrsReviewLog> {
   String get boxName => 'review_log_box';
 
   @override
-  String getId(FsrsReviewLog item) => item.state.cardId.toString();
+  String getId(FsrsReviewLog item) => item.log.cardId.toString();
 
   List<FsrsReviewLog> getByCardId(String cardId) =>
-      box.values.where((e) => e.state.cardId.toString() == cardId).toList();
+      box.values.where((e) => e.log.cardId.toString() == cardId).toList();
 }

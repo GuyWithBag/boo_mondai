@@ -19,7 +19,7 @@ class QuizInteraction extends StatelessWidget {
 
   final CardTemplate template;
   final ReviewCard reviewCard;
-  final QuizSessionPageController controller;
+  final SessionController controller;
   final AnimationController shakeController;
 
   @override

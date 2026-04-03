@@ -23,6 +23,7 @@ export 'card_type.dart';
 export 'deck.dart';
 export 'deck_card_form_state.dart';
 export 'deck_editor_types.dart';
+export 'deck_review_stats.dart';
 export 'fill_in_the_blanks_template.dart';
 export 'fill_in_the_blank_segment.dart';
 export 'flashcard_template.dart';

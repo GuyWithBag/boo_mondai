@@ -16,6 +16,7 @@ class FillInTheBlanksTemplateMapper
       MapperContainer.globals
           .use(_instance = FillInTheBlanksTemplateMapper._());
       CardTemplateMapper.ensureInitialized().addSubMapper(_instance!);
+      FillInTheBlankSegmentMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -129,9 +130,11 @@ abstract class FillInTheBlanksTemplateCopyWith<
     $R,
     $In extends FillInTheBlanksTemplate,
     $Out> implements CardTemplateCopyWith<$R, $In, $Out> {
-  ListCopyWith<$R, FillInTheBlankSegment,
-          ObjectCopyWith<$R, FillInTheBlankSegment, FillInTheBlankSegment>>
-      get segments;
+  ListCopyWith<
+      $R,
+      FillInTheBlankSegment,
+      FillInTheBlankSegmentCopyWith<$R, FillInTheBlankSegment,
+          FillInTheBlankSegment>> get segments;
   @override
   $R call(
       {String? id,
@@ -154,10 +157,12 @@ class _FillInTheBlanksTemplateCopyWithImpl<$R, $Out>
   late final ClassMapperBase<FillInTheBlanksTemplate> $mapper =
       FillInTheBlanksTemplateMapper.ensureInitialized();
   @override
-  ListCopyWith<$R, FillInTheBlankSegment,
-          ObjectCopyWith<$R, FillInTheBlankSegment, FillInTheBlankSegment>>
-      get segments => ListCopyWith($value.segments,
-          (v, t) => ObjectCopyWith(v, $identity, t), (v) => call(segments: v));
+  ListCopyWith<
+      $R,
+      FillInTheBlankSegment,
+      FillInTheBlankSegmentCopyWith<$R, FillInTheBlankSegment,
+          FillInTheBlankSegment>> get segments => ListCopyWith($value.segments,
+      (v, t) => v.copyWith.$chain(t), (v) => call(segments: v));
   @override
   $R call(
           {String? id,

@@ -20,7 +20,7 @@ class MatchMadnessInteraction extends HookWidget {
   });
 
   final MatchMadnessTemplate template;
-  final QuizSessionPageController controller;
+  final SessionController controller;
 
   @override
   Widget build(BuildContext context) {

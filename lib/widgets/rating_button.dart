@@ -7,17 +7,21 @@ import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/models/models.barrel.dart'; // Needed for QuizAnswerType
 import 'package:boo_mondai/shared/theme_constants.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class RatingButton extends StatelessWidget {
   final QuizAnswerType type;
   final VoidCallback onTap;
+  final SessionController ctrl;
 
-  const RatingButton(this.type, {super.key, required this.onTap});
+  const RatingButton(
+    this.type, {
+    super.key,
+    required this.onTap,
+    required this.ctrl,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final ctrl = context.watch<QuizSessionPageController>();
     final reviewTime = ctrl.nextIntervals[type] ?? '-';
 
     late final String shortcut;

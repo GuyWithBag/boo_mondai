@@ -23,7 +23,7 @@ class MultipleChoiceInteraction extends HookWidget {
 
   final MultipleChoiceTemplate template;
   final bool isReversed;
-  final QuizSessionPageController controller;
+  final SessionController controller;
   final AnimationController shakeController;
 
   @override

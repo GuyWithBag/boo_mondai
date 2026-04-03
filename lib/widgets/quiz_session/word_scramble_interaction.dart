@@ -25,7 +25,7 @@ class WordScrambleInteraction extends HookWidget {
 
   final WordScrambleTemplate template;
   final bool isReversed;
-  final QuizSessionPageController controller;
+  final SessionController controller;
   final AnimationController shakeController;
 
   @override

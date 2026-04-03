@@ -29,7 +29,7 @@ class RatingArea extends StatelessWidget {
 
   final CardTemplate template;
   final bool isReversed;
-  final QuizSessionPageController controller;
+  final SessionController controller;
   final String answer;
 
   @override
@@ -87,21 +87,25 @@ class RatingArea extends StatelessWidget {
               children: [
                 RatingButton(
                   QuizAnswerType.again,
+                  ctrl: controller,
                   onTap: () => onTap(QuizAnswerType.again),
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 RatingButton(
                   QuizAnswerType.hard,
+                  ctrl: controller,
                   onTap: () => onTap(QuizAnswerType.hard),
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 RatingButton(
+                  ctrl: controller,
                   QuizAnswerType.good,
                   onTap: () => onTap(QuizAnswerType.good),
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 RatingButton(
                   QuizAnswerType.easy,
+                  ctrl: controller,
                   onTap: () => onTap(QuizAnswerType.easy),
                 ),
               ],

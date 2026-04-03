@@ -23,7 +23,7 @@ class FitbInteraction extends HookWidget {
 
   final FillInTheBlanksTemplate template; // <-- Now uses the specific blueprint
   final bool isReversed;
-  final QuizSessionPageController controller;
+  final SessionController controller;
   final AnimationController shakeController;
 
   @override
