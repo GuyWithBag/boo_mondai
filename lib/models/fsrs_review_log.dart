@@ -4,9 +4,13 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart';
+import 'package:dart_mappable/dart_mappable.dart';
 import 'package:fsrs/fsrs.dart';
 
-class FsrsReviewLog {
+part 'fsrs_review_log.mapper.dart';
+
+@MappableClass()
+class FsrsReviewLog with FsrsReviewLogMappable {
   final String id;
 
   // Our database's String UUID linking it to the specific FsrsCard

@@ -5,8 +5,8 @@ class Repositories {
   static late final CardTemplateRepository cardTemplate;
   static late final ReviewCardRepository reviewCard;
   static late final FsrsCardRepository fsrsCard;
-  static late final QuizSessionRepository quizSession;
-  static late final QuizAnswerRepository quizAnswer;
+  static late final DrillSessionRepository quizSession;
+  static late final DrillAnswerRepository quizAnswer;
   static late final ReviewLogRepository reviewLog;
   // static late final StreakRepository streak;
   static late final ProfileRepository userProfile;
@@ -21,9 +21,10 @@ class Repositories {
         await CardTemplateRepository().init() as CardTemplateRepository;
     reviewCard = await ReviewCardRepository().init() as ReviewCardRepository;
     fsrsCard = await FsrsCardRepository().init() as FsrsCardRepository;
-    quizSession = await QuizSessionRepository().init() as QuizSessionRepository;
+    quizSession =
+        await DrillSessionRepository().init() as DrillSessionRepository;
     reviewLog = await ReviewLogRepository().init() as ReviewLogRepository;
-    quizAnswer = await QuizAnswerRepository().init() as QuizAnswerRepository;
+    quizAnswer = await DrillAnswerRepository().init() as DrillAnswerRepository;
     // streak = StreakRepository();
     // Repositories.clearAll();
   }

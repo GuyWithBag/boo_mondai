@@ -5,14 +5,7 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:flutter/material.dart';
 import 'package:boo_mondai/models/models.barrel.dart';
-
-/// Represents the raw data for a multiple-choice option during editing.
-typedef MultipleChoiceOptionData = ({String text, bool isCorrect});
-
-/// Represents the raw data for a matching pair during editing.
-typedef MatchPairData = ({String term, String match});
 
 /// A collection of controllers and notifiers that represent the state of the
 /// card editor form. This allows us to pass the entire form state between
@@ -22,16 +15,16 @@ typedef MatchPairData = ({String term, String match});
 
 /// Default options provided when creating a new multiple-choice card.
 const List<MultipleChoiceOptionData> defaultMultipleChoiceOptions = [
-  (text: '', isCorrect: true),
-  (text: '', isCorrect: false),
-  (text: '', isCorrect: false),
+  MultipleChoiceOptionData(text: '', isCorrect: true),
+  MultipleChoiceOptionData(text: '', isCorrect: false),
+  MultipleChoiceOptionData(text: '', isCorrect: false),
 ];
 
 /// Default pairs provided when creating a new matching card.
 const List<MatchPairData> defaultMatchPairs = [
-  (term: '', match: ''),
-  (term: '', match: ''),
-  (term: '', match: ''),
+  MatchPairData(term: '', match: ''),
+  MatchPairData(term: '', match: ''),
+  MatchPairData(term: '', match: ''),
 ];
 
 // ── Helpers ──────────────────────────────────────────────────────

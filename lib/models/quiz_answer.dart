@@ -13,15 +13,15 @@ import 'package:fsrs/fsrs.dart';
 part 'quiz_answer.mapper.dart';
 
 @MappableClass()
-class QuizAnswer with QuizAnswerMappable {
+class DrillAnswer with DrillAnswerMappable {
   final String id;
   final String sessionId;
   final String cardId;
   final String userAnswer;
-  final QuizAnswerType type;
+  final StudyRating type;
   final DateTime createdAt;
 
-  const QuizAnswer({
+  const DrillAnswer({
     required this.id,
     required this.sessionId,
     required this.cardId,
@@ -30,13 +30,13 @@ class QuizAnswer with QuizAnswerMappable {
     required this.createdAt,
   });
 
-  factory QuizAnswer.create({
+  factory DrillAnswer.create({
     required String sessionId,
     required String cardId,
     required String userAnswer,
-    required QuizAnswerType type,
+    required StudyRating type,
   }) {
-    final val = QuizAnswer(
+    final val = DrillAnswer(
       id: UuidService.uuid.v4(),
       createdAt: DateTime.now(),
       sessionId: sessionId,
@@ -49,20 +49,20 @@ class QuizAnswer with QuizAnswerMappable {
 
   bool isCorrect() {
     // FIX: Must include the enum name
-    return type != QuizAnswerType.incorrect;
+    return type != StudyRating.incorrect;
   }
 
-  static QuizAnswerType fromRatingToType(Rating rating) {
+  static StudyRating fromRatingToType(Rating rating) {
     // FIX: Must include the 'Rating' enum name on every case
     switch (rating) {
       case Rating.again:
-        return QuizAnswerType.again;
+        return StudyRating.again;
       case Rating.hard:
-        return QuizAnswerType.hard;
+        return StudyRating.hard;
       case Rating.good:
-        return QuizAnswerType.good;
+        return StudyRating.good;
       case Rating.easy:
-        return QuizAnswerType.easy;
+        return StudyRating.easy;
     }
   }
 }

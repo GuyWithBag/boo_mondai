@@ -16,7 +16,7 @@ class UserDeckProgress with UserDeckProgressMappable {
   final int newCardsCount;
   final int learningCardsCount;
   final int reviewCardsCount;
-  final int totalQuizzed; // Total cards ever seen/enrolled
+  final int totalDrilled; // Total cards ever seen/enrolled
 
   final DateTime lastStudiedAt;
 
@@ -27,10 +27,10 @@ class UserDeckProgress with UserDeckProgressMappable {
     this.newCardsCount = 0,
     this.learningCardsCount = 0,
     this.reviewCardsCount = 0,
-    this.totalQuizzed = 0,
+    this.totalDrilled = 0,
     required this.lastStudiedAt,
   });
 
   /// True if the user has started studying this deck
-  bool get hasStartedQuizzing => totalQuizzed > 0;
+  bool get hasStartedDrillzing => totalDrilled > 0;
 }

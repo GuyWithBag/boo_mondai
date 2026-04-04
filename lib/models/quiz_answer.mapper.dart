@@ -6,39 +6,38 @@
 
 part of 'quiz_answer.dart';
 
-class QuizAnswerMapper extends ClassMapperBase<QuizAnswer> {
-  QuizAnswerMapper._();
+class DrillAnswerMapper extends ClassMapperBase<DrillAnswer> {
+  DrillAnswerMapper._();
 
-  static QuizAnswerMapper? _instance;
-  static QuizAnswerMapper ensureInitialized() {
+  static DrillAnswerMapper? _instance;
+  static DrillAnswerMapper ensureInitialized() {
     if (_instance == null) {
-      MapperContainer.globals.use(_instance = QuizAnswerMapper._());
+      MapperContainer.globals.use(_instance = DrillAnswerMapper._());
     }
     return _instance!;
   }
 
   @override
-  final String id = 'QuizAnswer';
+  final String id = 'DrillAnswer';
 
-  static String _$id(QuizAnswer v) => v.id;
-  static const Field<QuizAnswer, String> _f$id = Field('id', _$id);
-  static String _$sessionId(QuizAnswer v) => v.sessionId;
-  static const Field<QuizAnswer, String> _f$sessionId =
+  static String _$id(DrillAnswer v) => v.id;
+  static const Field<DrillAnswer, String> _f$id = Field('id', _$id);
+  static String _$sessionId(DrillAnswer v) => v.sessionId;
+  static const Field<DrillAnswer, String> _f$sessionId =
       Field('sessionId', _$sessionId);
-  static String _$cardId(QuizAnswer v) => v.cardId;
-  static const Field<QuizAnswer, String> _f$cardId = Field('cardId', _$cardId);
-  static String _$userAnswer(QuizAnswer v) => v.userAnswer;
-  static const Field<QuizAnswer, String> _f$userAnswer =
+  static String _$cardId(DrillAnswer v) => v.cardId;
+  static const Field<DrillAnswer, String> _f$cardId = Field('cardId', _$cardId);
+  static String _$userAnswer(DrillAnswer v) => v.userAnswer;
+  static const Field<DrillAnswer, String> _f$userAnswer =
       Field('userAnswer', _$userAnswer);
-  static QuizAnswerType _$type(QuizAnswer v) => v.type;
-  static const Field<QuizAnswer, QuizAnswerType> _f$type =
-      Field('type', _$type);
-  static DateTime _$createdAt(QuizAnswer v) => v.createdAt;
-  static const Field<QuizAnswer, DateTime> _f$createdAt =
+  static StudyRating _$type(DrillAnswer v) => v.type;
+  static const Field<DrillAnswer, StudyRating> _f$type = Field('type', _$type);
+  static DateTime _$createdAt(DrillAnswer v) => v.createdAt;
+  static const Field<DrillAnswer, DateTime> _f$createdAt =
       Field('createdAt', _$createdAt);
 
   @override
-  final MappableFields<QuizAnswer> fields = const {
+  final MappableFields<DrillAnswer> fields = const {
     #id: _f$id,
     #sessionId: _f$sessionId,
     #cardId: _f$cardId,
@@ -47,8 +46,8 @@ class QuizAnswerMapper extends ClassMapperBase<QuizAnswer> {
     #createdAt: _f$createdAt,
   };
 
-  static QuizAnswer _instantiate(DecodingData data) {
-    return QuizAnswer(
+  static DrillAnswer _instantiate(DecodingData data) {
+    return DrillAnswer(
         id: data.dec(_f$id),
         sessionId: data.dec(_f$sessionId),
         cardId: data.dec(_f$cardId),
@@ -60,80 +59,80 @@ class QuizAnswerMapper extends ClassMapperBase<QuizAnswer> {
   @override
   final Function instantiate = _instantiate;
 
-  static QuizAnswer fromMap(Map<String, dynamic> map) {
-    return ensureInitialized().decodeMap<QuizAnswer>(map);
+  static DrillAnswer fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<DrillAnswer>(map);
   }
 
-  static QuizAnswer fromJson(String json) {
-    return ensureInitialized().decodeJson<QuizAnswer>(json);
+  static DrillAnswer fromJson(String json) {
+    return ensureInitialized().decodeJson<DrillAnswer>(json);
   }
 }
 
-mixin QuizAnswerMappable {
+mixin DrillAnswerMappable {
   String toJson() {
-    return QuizAnswerMapper.ensureInitialized()
-        .encodeJson<QuizAnswer>(this as QuizAnswer);
+    return DrillAnswerMapper.ensureInitialized()
+        .encodeJson<DrillAnswer>(this as DrillAnswer);
   }
 
   Map<String, dynamic> toMap() {
-    return QuizAnswerMapper.ensureInitialized()
-        .encodeMap<QuizAnswer>(this as QuizAnswer);
+    return DrillAnswerMapper.ensureInitialized()
+        .encodeMap<DrillAnswer>(this as DrillAnswer);
   }
 
-  QuizAnswerCopyWith<QuizAnswer, QuizAnswer, QuizAnswer> get copyWith =>
-      _QuizAnswerCopyWithImpl<QuizAnswer, QuizAnswer>(
-          this as QuizAnswer, $identity, $identity);
+  DrillAnswerCopyWith<DrillAnswer, DrillAnswer, DrillAnswer> get copyWith =>
+      _DrillAnswerCopyWithImpl<DrillAnswer, DrillAnswer>(
+          this as DrillAnswer, $identity, $identity);
   @override
   String toString() {
-    return QuizAnswerMapper.ensureInitialized()
-        .stringifyValue(this as QuizAnswer);
+    return DrillAnswerMapper.ensureInitialized()
+        .stringifyValue(this as DrillAnswer);
   }
 
   @override
   bool operator ==(Object other) {
-    return QuizAnswerMapper.ensureInitialized()
-        .equalsValue(this as QuizAnswer, other);
+    return DrillAnswerMapper.ensureInitialized()
+        .equalsValue(this as DrillAnswer, other);
   }
 
   @override
   int get hashCode {
-    return QuizAnswerMapper.ensureInitialized().hashValue(this as QuizAnswer);
+    return DrillAnswerMapper.ensureInitialized().hashValue(this as DrillAnswer);
   }
 }
 
-extension QuizAnswerValueCopy<$R, $Out>
-    on ObjectCopyWith<$R, QuizAnswer, $Out> {
-  QuizAnswerCopyWith<$R, QuizAnswer, $Out> get $asQuizAnswer =>
-      $base.as((v, t, t2) => _QuizAnswerCopyWithImpl<$R, $Out>(v, t, t2));
+extension DrillAnswerValueCopy<$R, $Out>
+    on ObjectCopyWith<$R, DrillAnswer, $Out> {
+  DrillAnswerCopyWith<$R, DrillAnswer, $Out> get $asDrillAnswer =>
+      $base.as((v, t, t2) => _DrillAnswerCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
-abstract class QuizAnswerCopyWith<$R, $In extends QuizAnswer, $Out>
+abstract class DrillAnswerCopyWith<$R, $In extends DrillAnswer, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   $R call(
       {String? id,
       String? sessionId,
       String? cardId,
       String? userAnswer,
-      QuizAnswerType? type,
+      StudyRating? type,
       DateTime? createdAt});
-  QuizAnswerCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+  DrillAnswerCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
-class _QuizAnswerCopyWithImpl<$R, $Out>
-    extends ClassCopyWithBase<$R, QuizAnswer, $Out>
-    implements QuizAnswerCopyWith<$R, QuizAnswer, $Out> {
-  _QuizAnswerCopyWithImpl(super.value, super.then, super.then2);
+class _DrillAnswerCopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, DrillAnswer, $Out>
+    implements DrillAnswerCopyWith<$R, DrillAnswer, $Out> {
+  _DrillAnswerCopyWithImpl(super.value, super.then, super.then2);
 
   @override
-  late final ClassMapperBase<QuizAnswer> $mapper =
-      QuizAnswerMapper.ensureInitialized();
+  late final ClassMapperBase<DrillAnswer> $mapper =
+      DrillAnswerMapper.ensureInitialized();
   @override
   $R call(
           {String? id,
           String? sessionId,
           String? cardId,
           String? userAnswer,
-          QuizAnswerType? type,
+          StudyRating? type,
           DateTime? createdAt}) =>
       $apply(FieldCopyWithData({
         if (id != null) #id: id,
@@ -144,7 +143,7 @@ class _QuizAnswerCopyWithImpl<$R, $Out>
         if (createdAt != null) #createdAt: createdAt
       }));
   @override
-  QuizAnswer $make(CopyWithData data) => QuizAnswer(
+  DrillAnswer $make(CopyWithData data) => DrillAnswer(
       id: data.get(#id, or: $value.id),
       sessionId: data.get(#sessionId, or: $value.sessionId),
       cardId: data.get(#cardId, or: $value.cardId),
@@ -153,7 +152,7 @@ class _QuizAnswerCopyWithImpl<$R, $Out>
       createdAt: data.get(#createdAt, or: $value.createdAt));
 
   @override
-  QuizAnswerCopyWith<$R2, QuizAnswer, $Out2> $chain<$R2, $Out2>(
+  DrillAnswerCopyWith<$R2, DrillAnswer, $Out2> $chain<$R2, $Out2>(
           Then<$Out2, $R2> t) =>
-      _QuizAnswerCopyWithImpl<$R2, $Out2>($value, $cast, t);
+      _DrillAnswerCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }

@@ -2,6 +2,8 @@
 // PATH: lib/models/deck_review_stats.dart
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+// The are not passed to Supabase, these are local ONLY.
+
 class DeckDueStats {
   final int dueNew;
   final int dueLearning;

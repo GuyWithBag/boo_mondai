@@ -14,4 +14,3 @@ export 'repositories.dart';
 export 'review_card_repository.dart';
 export 'review_log_repository.dart';
 export 'streak_repository.dart';
-export 'user_deck_progress_repository.dart';

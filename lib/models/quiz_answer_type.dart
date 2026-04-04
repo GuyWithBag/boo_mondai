@@ -1,1 +1,1 @@
-enum QuizAnswerType { incorrect, again, easy, good, hard }
+enum StudyRating { incorrect, again, easy, good, hard }

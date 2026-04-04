@@ -5,7 +5,12 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-class LeaderboardEntry {
+import 'package:dart_mappable/dart_mappable.dart';
+
+part 'leaderboard_entry.mapper.dart';
+
+@MappableClass()
+class LeaderboardEntry with LeaderboardEntryMappable {
   final String userId;
   final String userName;
   final String? targetLanguage;
@@ -21,28 +26,4 @@ class LeaderboardEntry {
     required this.reviewCount,
     required this.currentStreak,
   });
-
-  factory LeaderboardEntry.fromJson(Map<String, dynamic> json) =>
-      LeaderboardEntry(
-        userId: json['user_id'] as String,
-        userName: json['display_name'] as String,
-        targetLanguage: json['target_language'] as String?,
-        quizScore: json['quiz_score'] as int? ?? 0,
-        reviewCount: json['review_count'] as int? ?? 0,
-        currentStreak: json['current_streak'] as int? ?? 0,
-      );
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is LeaderboardEntry &&
-          runtimeType == other.runtimeType &&
-          userId == other.userId;
-
-  @override
-  int get hashCode => userId.hashCode;
-
-  @override
-  String toString() =>
-      'LeaderboardEntry(userId: $userId, userName: $userName, quizScore: $quizScore)';
 }

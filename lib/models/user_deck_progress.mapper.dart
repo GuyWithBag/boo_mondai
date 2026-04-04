@@ -37,9 +37,9 @@ class UserDeckProgressMapper extends ClassMapperBase<UserDeckProgress> {
   static int _$reviewCardsCount(UserDeckProgress v) => v.reviewCardsCount;
   static const Field<UserDeckProgress, int> _f$reviewCardsCount =
       Field('reviewCardsCount', _$reviewCardsCount, opt: true, def: 0);
-  static int _$totalQuizzed(UserDeckProgress v) => v.totalQuizzed;
-  static const Field<UserDeckProgress, int> _f$totalQuizzed =
-      Field('totalQuizzed', _$totalQuizzed, opt: true, def: 0);
+  static int _$totalDrilled(UserDeckProgress v) => v.totalDrilled;
+  static const Field<UserDeckProgress, int> _f$totalDrilled =
+      Field('totalDrilled', _$totalDrilled, opt: true, def: 0);
   static DateTime _$lastStudiedAt(UserDeckProgress v) => v.lastStudiedAt;
   static const Field<UserDeckProgress, DateTime> _f$lastStudiedAt =
       Field('lastStudiedAt', _$lastStudiedAt);
@@ -52,7 +52,7 @@ class UserDeckProgressMapper extends ClassMapperBase<UserDeckProgress> {
     #newCardsCount: _f$newCardsCount,
     #learningCardsCount: _f$learningCardsCount,
     #reviewCardsCount: _f$reviewCardsCount,
-    #totalQuizzed: _f$totalQuizzed,
+    #totalDrilled: _f$totalDrilled,
     #lastStudiedAt: _f$lastStudiedAt,
   };
 
@@ -64,7 +64,7 @@ class UserDeckProgressMapper extends ClassMapperBase<UserDeckProgress> {
         newCardsCount: data.dec(_f$newCardsCount),
         learningCardsCount: data.dec(_f$learningCardsCount),
         reviewCardsCount: data.dec(_f$reviewCardsCount),
-        totalQuizzed: data.dec(_f$totalQuizzed),
+        totalDrilled: data.dec(_f$totalDrilled),
         lastStudiedAt: data.dec(_f$lastStudiedAt));
   }
 
@@ -130,7 +130,7 @@ abstract class UserDeckProgressCopyWith<$R, $In extends UserDeckProgress, $Out>
       int? newCardsCount,
       int? learningCardsCount,
       int? reviewCardsCount,
-      int? totalQuizzed,
+      int? totalDrilled,
       DateTime? lastStudiedAt});
   UserDeckProgressCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
       Then<$Out2, $R2> t);
@@ -152,7 +152,7 @@ class _UserDeckProgressCopyWithImpl<$R, $Out>
           int? newCardsCount,
           int? learningCardsCount,
           int? reviewCardsCount,
-          int? totalQuizzed,
+          int? totalDrilled,
           DateTime? lastStudiedAt}) =>
       $apply(FieldCopyWithData({
         if (id != null) #id: id,
@@ -161,7 +161,7 @@ class _UserDeckProgressCopyWithImpl<$R, $Out>
         if (newCardsCount != null) #newCardsCount: newCardsCount,
         if (learningCardsCount != null) #learningCardsCount: learningCardsCount,
         if (reviewCardsCount != null) #reviewCardsCount: reviewCardsCount,
-        if (totalQuizzed != null) #totalQuizzed: totalQuizzed,
+        if (totalDrilled != null) #totalDrilled: totalDrilled,
         if (lastStudiedAt != null) #lastStudiedAt: lastStudiedAt
       }));
   @override
@@ -174,7 +174,7 @@ class _UserDeckProgressCopyWithImpl<$R, $Out>
           data.get(#learningCardsCount, or: $value.learningCardsCount),
       reviewCardsCount:
           data.get(#reviewCardsCount, or: $value.reviewCardsCount),
-      totalQuizzed: data.get(#totalQuizzed, or: $value.totalQuizzed),
+      totalDrilled: data.get(#totalDrilled, or: $value.totalDrilled),
       lastStudiedAt: data.get(#lastStudiedAt, or: $value.lastStudiedAt));
 
   @override
