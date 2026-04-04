@@ -38,13 +38,8 @@ sequenceDiagram
                 QE->>U: Prompt self-rating
                 note right of U: Again / Hard / Good / Easy
  
-                alt Rated Again
-                    U->>QE: Again
-                    QE->>QE: Reinsert card into queue
-                else Rated Hard, Good, or Easy
-                    U->>QE: Hard / Good / Easy
-                    QE->>QE: Save card + rating, remove from queue
-                end
+                U->>QE: Again, Hard / Good / Easy
+                QE->>QE: Save card + rating, remove from queue
             end
         end
 
@@ -60,7 +55,7 @@ sequenceDiagram
  
 
         Note over U,FS: Ongoing Spaced Review
-        loop On each scheduled review day
+        loop On each scheduled review day or if the scheduled review date <1d
             FS->>U: Notify — cards due for review today
             U->>FS: Review card
             U->>FS: Rate (Again / Hard / Good / Easy)
