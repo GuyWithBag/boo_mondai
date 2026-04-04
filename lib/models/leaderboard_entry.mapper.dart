@@ -29,9 +29,9 @@ class LeaderboardEntryMapper extends ClassMapperBase<LeaderboardEntry> {
   static String? _$targetLanguage(LeaderboardEntry v) => v.targetLanguage;
   static const Field<LeaderboardEntry, String> _f$targetLanguage =
       Field('targetLanguage', _$targetLanguage, opt: true);
-  static int _$quizScore(LeaderboardEntry v) => v.quizScore;
-  static const Field<LeaderboardEntry, int> _f$quizScore =
-      Field('quizScore', _$quizScore);
+  static int _$drillScore(LeaderboardEntry v) => v.drillScore;
+  static const Field<LeaderboardEntry, int> _f$drillScore =
+      Field('drillScore', _$drillScore);
   static int _$reviewCount(LeaderboardEntry v) => v.reviewCount;
   static const Field<LeaderboardEntry, int> _f$reviewCount =
       Field('reviewCount', _$reviewCount);
@@ -44,7 +44,7 @@ class LeaderboardEntryMapper extends ClassMapperBase<LeaderboardEntry> {
     #userId: _f$userId,
     #userName: _f$userName,
     #targetLanguage: _f$targetLanguage,
-    #quizScore: _f$quizScore,
+    #drillScore: _f$drillScore,
     #reviewCount: _f$reviewCount,
     #currentStreak: _f$currentStreak,
   };
@@ -54,7 +54,7 @@ class LeaderboardEntryMapper extends ClassMapperBase<LeaderboardEntry> {
         userId: data.dec(_f$userId),
         userName: data.dec(_f$userName),
         targetLanguage: data.dec(_f$targetLanguage),
-        quizScore: data.dec(_f$quizScore),
+        drillScore: data.dec(_f$drillScore),
         reviewCount: data.dec(_f$reviewCount),
         currentStreak: data.dec(_f$currentStreak));
   }
@@ -118,7 +118,7 @@ abstract class LeaderboardEntryCopyWith<$R, $In extends LeaderboardEntry, $Out>
       {String? userId,
       String? userName,
       String? targetLanguage,
-      int? quizScore,
+      int? drillScore,
       int? reviewCount,
       int? currentStreak});
   LeaderboardEntryCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
@@ -138,14 +138,14 @@ class _LeaderboardEntryCopyWithImpl<$R, $Out>
           {String? userId,
           String? userName,
           Object? targetLanguage = $none,
-          int? quizScore,
+          int? drillScore,
           int? reviewCount,
           int? currentStreak}) =>
       $apply(FieldCopyWithData({
         if (userId != null) #userId: userId,
         if (userName != null) #userName: userName,
         if (targetLanguage != $none) #targetLanguage: targetLanguage,
-        if (quizScore != null) #quizScore: quizScore,
+        if (drillScore != null) #drillScore: drillScore,
         if (reviewCount != null) #reviewCount: reviewCount,
         if (currentStreak != null) #currentStreak: currentStreak
       }));
@@ -154,7 +154,7 @@ class _LeaderboardEntryCopyWithImpl<$R, $Out>
       userId: data.get(#userId, or: $value.userId),
       userName: data.get(#userName, or: $value.userName),
       targetLanguage: data.get(#targetLanguage, or: $value.targetLanguage),
-      quizScore: data.get(#quizScore, or: $value.quizScore),
+      drillScore: data.get(#drillScore, or: $value.drillScore),
       reviewCount: data.get(#reviewCount, or: $value.reviewCount),
       currentStreak: data.get(#currentStreak, or: $value.currentStreak));
 

@@ -35,7 +35,7 @@ class ReviewDashboardPage extends HookWidget {
       return Scaffold(
         appBar: AppBar(title: const Text('FSRS Reviews')),
         body: const Center(
-          child: Text('No enrolled cards yet. Go take a quiz!'),
+          child: Text('No enrolled cards yet. Go take a drill!'),
         ),
       );
     }

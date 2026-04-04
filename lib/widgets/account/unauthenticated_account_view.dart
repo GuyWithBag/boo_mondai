@@ -37,7 +37,7 @@ class UnauthenticatedAccountView extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
-                  'Create decks, take quizzes, track your progress, and compete on the leaderboard.',
+                  'Create decks, take drillzes, track your progress, and compete on the leaderboard.',
                   style: Theme.of(context).textTheme.bodyMedium,
                   textAlign: TextAlign.center,
                 ),

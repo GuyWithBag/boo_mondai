@@ -12,7 +12,7 @@ import 'package:boo_mondai/shared/shared.barrel.dart';
 class LeaderboardTileWidget extends StatelessWidget {
   final int rank;
   final String userName;
-  final int quizScore;
+  final int drillScore;
   final int reviewCount;
   final int currentStreak;
 
@@ -20,7 +20,7 @@ class LeaderboardTileWidget extends StatelessWidget {
     super.key,
     required this.rank,
     required this.userName,
-    required this.quizScore,
+    required this.drillScore,
     required this.reviewCount,
     required this.currentStreak,
   });
@@ -44,7 +44,7 @@ class LeaderboardTileWidget extends StatelessWidget {
         ),
         title: Text(userName, style: Theme.of(context).textTheme.titleMedium),
         subtitle: Text(
-          '$quizScore pts  ·  $reviewCount reviews',
+          '$drillScore pts  ·  $reviewCount reviews',
           style: Theme.of(context).textTheme.bodySmall,
         ),
         trailing: currentStreak > 0

@@ -36,7 +36,7 @@ The palette uses a vibrant indigo as the primary brand color to inspire focus, p
 | **headlineMedium**| 28px / Bold (700) | 1.3 | Screen titles, bottom sheet headers |
 | **titleLarge** | 22px / SemiBold (600)| 1.3 | Card titles, deck names |
 | **titleMedium** | 16px / SemiBold (600)| 1.4 | Section headers, list items |
-| **bodyLarge** | 16px / Regular (400) | 1.5 | Main reading text, quiz questions |
+| **bodyLarge** | 16px / Regular (400) | 1.5 | Main reading text, drill questions |
 | **bodyMedium** | 14px / Regular (400) | 1.5 | Secondary text, survey descriptions |
 | **labelLarge** | 14px / Medium (500) | 1.0 | Primary buttons, tabs |
 | **labelSmall** | 11px / Medium (500) | 1.0 | Badges, overline text, bottom nav labels|
@@ -60,7 +60,7 @@ Based on a strict 4px grid to maintain visual rhythm.
 
 To balance "playful" and "clear," we use rounded corners, slight borders on surfaces, and crisp shadows.
 
-* **Cards (Decks, Quiz, Leaderboard)**
+* **Cards (Decks, Drill, Leaderboard)**
     * *Border Radius:* `16px`
     * *Background:* Surface color (`#FFFFFF` or `#1E1E1E`)
     * *Border:* `1px` solid `Surface Variant` (adds Notion-like crispness)
@@ -103,7 +103,7 @@ To balance "playful" and "clear," we use rounded corners, slight borders on surf
 * **Deck List**
     * *Layout:* 2-column Grid view with `md` (16px) spacing.
     * *Deck Card Items:* Deck title (`titleLarge`), subtext with card count (`bodyMedium`), and a small circular progress indicator in the bottom right.
-* **Quiz Session**
+* **Drill Session**
     * *Top Bar:* Close button (left), Progress Bar spanning the center width (filled with Primary color).
     * *Center:* Large Question Card (elevated, white background) displaying the target word/sentence (`displayLarge`).
     * *Bottom:* Input field or multiple-choice buttons. Primary "Check" button anchored to the bottom padding.

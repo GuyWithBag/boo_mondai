@@ -11,7 +11,7 @@ import 'package:boo_mondai/shared/shared.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
 
 class ParticipantsTab extends StatelessWidget {
-  final List<ResearchUser> participants;
+  final List<ResearchProfile> participants;
 
   const ParticipantsTab({super.key, required this.participants});
 

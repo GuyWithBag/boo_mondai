@@ -11,6 +11,8 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(CardAdapter());
     registerAdapter(CardTypeAdapter());
     registerAdapter(DeckAdapter());
+    registerAdapter(DrillAnswerAdapter());
+    registerAdapter(DrillSessionAdapter());
     registerAdapter(FillInTheBlankSegmentAdapter());
     registerAdapter(FillInTheBlanksTemplateAdapter());
     registerAdapter(FlashcardTemplateAdapter());
@@ -22,15 +24,12 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(MultipleChoiceOptionAdapter());
     registerAdapter(MultipleChoiceTemplateAdapter());
     registerAdapter(QuestionTypeAdapter());
-    registerAdapter(QuizAnswerAdapter());
-    registerAdapter(QuizAnswerTypeAdapter());
-    registerAdapter(QuizSessionAdapter());
     registerAdapter(RatingAdapter());
     registerAdapter(ReviewCardAdapter());
     registerAdapter(ReviewLogAdapter());
     registerAdapter(StateAdapter());
     registerAdapter(StreakAdapter());
-    registerAdapter(UserDeckProgressAdapter());
+    registerAdapter(StudyRatingAdapter());
     registerAdapter(UserProfileAdapter());
     registerAdapter(WordScrambleTemplateAdapter());
   }
@@ -42,6 +41,8 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(CardAdapter());
     registerAdapter(CardTypeAdapter());
     registerAdapter(DeckAdapter());
+    registerAdapter(DrillAnswerAdapter());
+    registerAdapter(DrillSessionAdapter());
     registerAdapter(FillInTheBlankSegmentAdapter());
     registerAdapter(FillInTheBlanksTemplateAdapter());
     registerAdapter(FlashcardTemplateAdapter());
@@ -53,15 +54,12 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(MultipleChoiceOptionAdapter());
     registerAdapter(MultipleChoiceTemplateAdapter());
     registerAdapter(QuestionTypeAdapter());
-    registerAdapter(QuizAnswerAdapter());
-    registerAdapter(QuizAnswerTypeAdapter());
-    registerAdapter(QuizSessionAdapter());
     registerAdapter(RatingAdapter());
     registerAdapter(ReviewCardAdapter());
     registerAdapter(ReviewLogAdapter());
     registerAdapter(StateAdapter());
     registerAdapter(StreakAdapter());
-    registerAdapter(UserDeckProgressAdapter());
+    registerAdapter(StudyRatingAdapter());
     registerAdapter(UserProfileAdapter());
     registerAdapter(WordScrambleTemplateAdapter());
   }

@@ -6,10 +6,10 @@ sequenceDiagram
     autonumber
     participant U as 👤 User
     participant BD as 🖥️ Boomondai
-    participant QE as ⚙️ Quiz Engine
+    participant QE as ⚙️ Drill Engine
     participant FS as 🧠 FSRS Scheduler
  
-    U->>BD: Start Quiz Session
+    U->>BD: Start Drill Session
  
 
         Note over U,BD: Optional Preview Phase
@@ -19,14 +19,14 @@ sequenceDiagram
             BD->>U: Display all Q&A pairs (scrollable list)
             U->>BD: Finished reviewing
         else Skips Preview
-            U->>BD: No — go straight to quiz
+            U->>BD: No — go straight to drill
         end
 
  
     BD->>QE: Load question batch (10–20 items)
  
     
-        Note over U,QE: Quiz Session Loop
+        Note over U,QE: Drill Session Loop
         loop Until batch queue is empty
             QE->>U: Display question
  

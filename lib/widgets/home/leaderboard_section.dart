@@ -61,7 +61,7 @@ class LeaderboardSection extends StatelessWidget {
           const Center(child: CircularProgressIndicator())
         else if (entries.isEmpty)
           Text(
-            'No scores yet — complete a quiz to appear here!',
+            'No scores yet — complete a drill to appear here!',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: AppColors.textSecondary,
             ),
@@ -71,7 +71,7 @@ class LeaderboardSection extends StatelessWidget {
             (e) => LeaderboardTileWidget(
               rank: e.key + 1,
               userName: e.value.userName,
-              quizScore: e.value.quizScore,
+              drillScore: e.value.drillScore,
               reviewCount: e.value.reviewCount,
               currentStreak: e.value.currentStreak,
             ),

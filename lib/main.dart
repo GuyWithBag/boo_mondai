@@ -66,7 +66,7 @@ Future<void> main() async {
         // ChangeNotifierProvider(
         //   create: (_) => ViewDeckController(hiveService: hiveService),
         // ),
-        ChangeNotifierProvider(create: (_) => QuizSessionPageController()),
+        ChangeNotifierProvider(create: (_) => DrillSessionController()),
         ChangeNotifierProvider(create: (_) => ReviewDashboardController()),
         ChangeNotifierProvider(create: (_) => ReviewSessionController()),
         ChangeNotifierProvider(create: (_) => MyDecksPageController()),

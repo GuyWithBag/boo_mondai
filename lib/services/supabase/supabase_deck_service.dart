@@ -13,12 +13,12 @@ class SupabaseDeckService extends SupabaseService {
   }) =>
       guard(() async {
         var query = client.from('decks').select(
-              '*, source_deck:decks!source_deck_id(creator_id)',
+              '*, source_deck:decks!sourceDeckId(authorId)',
             );
         if (publicOnly) {
-          query = query.eq('is_public', true);
+          query = query.eq('isPublic', true);
         }
-        final response = await query.order('created_at', ascending: false);
+        final response = await query.order('createdAt', ascending: false);
         return List<Map<String, dynamic>>.from(response);
       });
 
@@ -27,8 +27,8 @@ class SupabaseDeckService extends SupabaseService {
         final response = await client
             .from('decks')
             .select()
-            .eq('creator_id', userId)
-            .order('created_at', ascending: false);
+            .eq('authorId', userId)
+            .order('createdAt', ascending: false);
         return List<Map<String, dynamic>>.from(response);
       });
 

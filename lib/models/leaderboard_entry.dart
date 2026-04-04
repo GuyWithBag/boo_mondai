@@ -14,7 +14,7 @@ class LeaderboardEntry with LeaderboardEntryMappable {
   final String userId;
   final String userName;
   final String? targetLanguage;
-  final int quizScore;
+  final int drillScore;
   final int reviewCount;
   final int currentStreak;
 
@@ -22,7 +22,7 @@ class LeaderboardEntry with LeaderboardEntryMappable {
     required this.userId,
     required this.userName,
     this.targetLanguage,
-    required this.quizScore,
+    required this.drillScore,
     required this.reviewCount,
     required this.currentStreak,
   });

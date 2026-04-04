@@ -22,9 +22,9 @@ DROP TABLE IF EXISTS research_proficiency_screener  CASCADE;
 DROP TABLE IF EXISTS research_codes                 CASCADE;
 DROP TABLE IF EXISTS research_users                 CASCADE;
 
--- ── Quiz ─────────────────────────────────────────────
-DROP TABLE IF EXISTS quiz_answers   CASCADE;
-DROP TABLE IF EXISTS quiz_sessions  CASCADE;
+-- ── Drill ─────────────────────────────────────────────
+DROP TABLE IF EXISTS drill_answers   CASCADE;
+DROP TABLE IF EXISTS drill_sessions  CASCADE;
 
 -- ── FSRS / review ────────────────────────────────────
 DROP TABLE IF EXISTS review_logs  CASCADE;

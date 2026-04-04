@@ -22,9 +22,9 @@ class ScoringInfoDialog extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const ScoreRow(
-            icon: Icons.quiz_outlined,
-            label: 'Quiz score',
-            detail: 'Total correct answers across all quiz sessions.',
+            icon: Icons.drill_outlined,
+            label: 'Drill score',
+            detail: 'Total correct answers across all drill sessions.',
           ),
           const SizedBox(height: AppSpacing.md),
           const ScoreRow(
@@ -40,7 +40,7 @@ class ScoringInfoDialog extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.lg),
           Text(
-            'Rankings are sorted by quiz score. Keep quizzing and reviewing '
+            'Rankings are sorted by drill score. Keep drillzing and reviewing '
             'every day to climb higher!',
             style: theme.textTheme.bodySmall?.copyWith(
               color: AppColors.textSecondary,

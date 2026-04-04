@@ -40,7 +40,7 @@ class DirectionBar extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
-            'Choose how this card will be quizzed',
+            'Choose how this card will be drillzed',
             style: Theme.of(
               context,
             ).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),

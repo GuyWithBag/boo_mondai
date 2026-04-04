@@ -4,9 +4,9 @@
 export 'supabase_auth_service.dart';
 export 'supabase_card_service.dart';
 export 'supabase_deck_service.dart';
+export 'supabase_drill_service.dart';
 export 'supabase_fsrs_service.dart';
 export 'supabase_leaderboard_service.dart';
-export 'supabase_quiz_service.dart';
 export 'supabase_research_service.dart';
 export 'supabase_service.dart';
 export 'supabase_storage_service.dart';

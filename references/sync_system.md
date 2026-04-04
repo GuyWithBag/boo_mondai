@@ -27,22 +27,22 @@ use (except on first load when the Hive cache is empty).
 |---|---|---|
 | Card edits (add/update/delete/reorder) | Hive only → Supabase on demand | "Push" button per deck |
 | Deck CRUD | Hive immediate, Supabase best-effort | Delete: fire-and-forget. Create/Update: Supabase on next push |
-| Quiz answers + session | Memory during quiz, Supabase on complete | Auto on `completeSession()` |
+| Drill answers + session | Memory during drill, Supabase on complete | Auto on `completeSession()` |
 | FSRS card states | Hive primary, Supabase on review | Auto on `submitReview()` |
 | Review logs | Hive primary, Supabase on review | Auto on `submitReview()` |
 | Streaks | Hive primary, Supabase on activity | Auto on `recordActivity()` |
 
 ---
 
-## Flow 1 — Quiz session (start → answer → complete → sync)
+## Flow 1 — Drill session (start → answer → complete → sync)
 
 ```
-User                  QuizProvider              Hive          Supabase
+User                  DrillProvider              Hive          Supabase
  │                         │                     │               │
  │── startSession() ──────►│                     │               │
- │                         │ build QuizSession    │               │
+ │                         │ build DrillSession    │               │
  │                         │ in memory (no DB)    │               │
- │                         │ init QuizQueueController             │
+ │                         │ init DrillQueueController             │
  │                         │                     │               │
  │── submitAnswer(wrong) ──►│                     │               │
  │                         │ increment wrongCount │               │
@@ -50,7 +50,7 @@ User                  QuizProvider              Hive          Supabase
  │                         │                     │               │
  │── submitAnswer(wrong, 3rd time) ──────────────►│               │
  │                         │ auto-eject card      │               │
- │                         │ record QuizAnswer    │               │
+ │                         │ record DrillAnswer    │               │
  │                         │   (isCorrect:false,  │               │
  │                         │    selfRating:1)     │               │
  │                         │ in-memory _answers   │               │
@@ -59,7 +59,7 @@ User                  QuizProvider              Hive          Supabase
  │                         │ await self-rating    │               │
  │                         │                     │               │
  │── submitSelfRating(3) ──►│                     │               │
- │                         │ record QuizAnswer    │               │
+ │                         │ record DrillAnswer    │               │
  │                         │   (selfRating:3)     │               │
  │                         │ advance queue        │               │
  │                         │                     │               │
@@ -67,10 +67,10 @@ User                  QuizProvider              Hive          Supabase
  │                         │── _completeSession() │               │
  │                         │   set completedAt    │               │
  │                         │   ──────────────────────────────────►│
- │                         │   insertQuizSession()                 │
- │                         │   batchInsertQuizAnswers()            │
+ │                         │   insertDrillSession()                 │
+ │                         │   batchInsertDrillAnswers()            │
  │                         │                     │               │
- │                         │── enrollCardsFromQuiz()              │
+ │                         │── enrollCardsFromDrill()              │
  │                         │   for each rated card:               │
  │                         │   FsrsService.reviewCard()           │
  │                         │   ─────────────────►│               │
@@ -84,7 +84,7 @@ User                  QuizProvider              Hive          Supabase
 ```
 
 **Key invariant:** No Supabase call is made until `_completeSession()`. This
-eliminates per-answer network latency. If Supabase fails, the quiz result is lost
+eliminates per-answer network latency. If Supabase fails, the drill result is lost
 for the remote but FSRS state is already saved in Hive.
 
 ---
@@ -249,5 +249,5 @@ This is a **separate explicit user action**, not automatic:
 |---|---|
 | Supabase unreachable during `pushDeck` | `_error` is set; deck stays dirty; user can retry |
 | Supabase unreachable during FSRS sync | Silently swallowed; Hive data preserved |
-| Supabase unreachable during quiz complete | Quiz session + answers lost remotely; FSRS saved locally |
+| Supabase unreachable during drill complete | Drill session + answers lost remotely; FSRS saved locally |
 | `deleteOrphanCards` fails | `pushDeck` aborts early; deck stays dirty |

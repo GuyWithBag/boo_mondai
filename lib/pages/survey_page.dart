@@ -47,20 +47,26 @@ class SurveyPage extends HookWidget {
       if (userId == null) return;
 
       final data = Map<String, int>.from(responses.value);
-      if (isProficiency && proficiencyLevel.value != null) {
-        // proficiency_level goes through a separate key
-      }
 
       await context.read<ResearchProvider>().submitSurvey(
         userId,
         surveyType,
         timePoint,
         data,
+        extras: isProficiency && proficiencyLevel.value != null
+            ? {'proficiency_level': proficiencyLevel.value!}
+            : null,
       );
 
-      if (context.mounted) {
-        submitted.value = true;
+      if (!context.mounted) return;
+
+      // Chain proficiency screener → language interest
+      if (isProficiency && context.read<ResearchProvider>().error == null) {
+        context.go('/research/survey/language_interest');
+        return;
       }
+
+      submitted.value = true;
     }
 
     if (submitted.value) {

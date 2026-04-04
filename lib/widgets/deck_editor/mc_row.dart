@@ -60,8 +60,12 @@ class McRow extends HookWidget {
           Tooltip(
             message: option.isCorrect ? 'Correct answer' : 'Mark as correct',
             child: GestureDetector(
-              onTap: () =>
-                  onChanged((text: option.text, isCorrect: !option.isCorrect)),
+              onTap: () => onChanged(
+                MultipleChoiceOptionData(
+                  text: option.text,
+                  isCorrect: !option.isCorrect,
+                ),
+              ),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 150),
                 width: 28,
@@ -106,8 +110,12 @@ class McRow extends HookWidget {
               child: TextField(
                 controller: textController,
                 decoration: InputDecoration(hintText: 'Option ${index + 1}'),
-                onChanged: (value) =>
-                    onChanged((text: value, isCorrect: option.isCorrect)),
+                onChanged: (value) => onChanged(
+                  MultipleChoiceOptionData(
+                    text: value,
+                    isCorrect: option.isCorrect,
+                  ),
+                ),
               ),
             ),
           ),

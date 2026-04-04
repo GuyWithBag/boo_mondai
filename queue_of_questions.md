@@ -1,11 +1,11 @@
-Massive Quiz Overhaul because I never tested it:
+Massive Drill Overhaul because I never tested it:
 
   So for JLPT N5 Vocabulary, for Tori, it doesnt work recognize that my answer is correct like とり.
 
   Also when you get the card wrong a total of 3 times, it should just continue in the review section
 
   It takes too long after I press the self rating part of the cards, is it because it waits for the supabase CRUD? it shouldn't do that. It should only update the deck AFTER the user is done with the
-  quiz session.
+  drill session.
 
   SO its also clear there should be a sync system, so make me a sequence diagram for that. Ask me questions for clarifications first.
 
@@ -18,7 +18,7 @@ Massive Quiz Overhaul because I never tested it:
 
   Syncing to supabase should only happen AFTER pressing the sync button that I newly introduced.
 
-  I dont think the review page works, when I finish a quiz with good, it should appear on review with the fsrs indicator of when it will appear (10 mins or something, depends on the fsrs) (you can also
+  I dont think the review page works, when I finish a drill with good, it should appear on review with the fsrs indicator of when it will appear (10 mins or something, depends on the fsrs) (you can also
   take this ahead of time and you dont have to actually wait 10 mins)
 
   @deck_list_page: you should be able to delete just like in @online_deck_browser

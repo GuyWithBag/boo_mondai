@@ -4,14 +4,14 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/controllers/controllers.barrel.dart';
-import 'package:boo_mondai/models/models.barrel.dart'; // Needed for QuizAnswerType
+import 'package:boo_mondai/models/models.barrel.dart'; // Needed for StudyRating
 import 'package:boo_mondai/shared/theme_constants.dart';
 import 'package:flutter/material.dart';
 
 class RatingButton extends StatelessWidget {
-  final QuizAnswerType type;
+  final StudyRating type;
   final VoidCallback onTap;
-  final SessionController ctrl;
+  final StudySessionController ctrl;
 
   const RatingButton(
     this.type, {
@@ -29,20 +29,20 @@ class RatingButton extends StatelessWidget {
     late final String label;
 
     switch (type) {
-      case QuizAnswerType.again:
-      case QuizAnswerType.incorrect: // Fallback just in case
+      case StudyRating.again:
+      case StudyRating.incorrect: // Fallback just in case
         label = 'Again';
         shortcut = '1';
         color = AppColors.incorrect;
-      case QuizAnswerType.hard:
+      case StudyRating.hard:
         label = 'Hard';
         shortcut = '2';
         color = AppColors.hard;
-      case QuizAnswerType.good:
+      case StudyRating.good:
         label = 'Good';
         shortcut = '3';
         color = AppColors.correct;
-      case QuizAnswerType.easy:
+      case StudyRating.easy:
         label = 'Easy';
         shortcut = '4';
         color = AppColors.easy;

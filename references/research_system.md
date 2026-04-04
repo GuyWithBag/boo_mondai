@@ -1,7 +1,7 @@
 # BooMondai — AI Agent Research Summary
 
 ## What BooMondai Is
-A web-based gamified language learning platform that combines user-generated quizzes, optional vocabulary preview, FSRS-based spaced repetition, leaderboards, streaks, and single-player or optional multiplayer quiz modes.
+A web-based gamified language learning platform that combines user-generated drillzes, optional vocabulary preview, FSRS-based spaced repetition, leaderboards, streaks, and single-player or optional multiplayer drill modes.
 
 ---
 
@@ -21,9 +21,9 @@ A web-based gamified language learning platform that combines user-generated qui
 | Platform | BooMondai (full system) | Anki |
 | Premade deck | ✅ Researcher-provided vocabulary set preloaded | ✅ Same vocabulary set in Anki |
 | Learning materials | ✅ PDF provided | ✅ Same PDF provided |
-| Preview | ✅ Optional pre-quiz deck view | ❌ Not available |
-| Quiz | ✅ Gamified quiz session with FSRS self-rating | ❌ Card-by-card only |
-| FSRS | ✅ Seeded from quiz self-ratings | ✅ Standard manual ratings |
+| Preview | ✅ Optional pre-drill deck view | ❌ Not available |
+| Drill | ✅ Gamified drill session with FSRS self-rating | ❌ Card-by-card only |
+| FSRS | ✅ Seeded from drill self-ratings | ✅ Standard manual ratings |
 | Gamification | ✅ Leaderboards, streaks | ❌ None |
 | UGC | ✅ Fully enabled for additional decks only | ❌ Not available |
 | Surveys & tests | ✅ Inside the app via researcher codes | ✅ Inside the app via researcher codes |
@@ -124,6 +124,6 @@ A web-based gamified language learning platform that combines user-generated qui
 - Preview usefulness, FSRS usefulness, and SUS are **Group A only**
 - UGC perception is **both groups**
 - All research data is stored in `research_*` tables, separate from platform app data
-- Group B participants only access the app for retention tests and surveys via researcher codes — they do not use BooMondai quiz or FSRS features
+- Group B participants only access the app for retention tests and surveys via researcher codes — they do not use BooMondai drill or FSRS features
 - `submitted_at` is recorded for every submission
 - `UNIQUE` constraints prevent duplicate submissions

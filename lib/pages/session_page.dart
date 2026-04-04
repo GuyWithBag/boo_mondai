@@ -1,19 +1,19 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/pages/session_page.dart
-// PURPOSE: Unified session interface for both Quiz and Review modes
+// PURPOSE: Unified session interface for both Drill and Review modes
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
-import 'package:boo_mondai/pages/quiz_result_page.dart';
+import 'package:boo_mondai/pages/drill_result_page.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 
-enum SessionMode { quiz, review }
+enum SessionMode { drill, review }
 
 class SessionPage extends HookWidget {
   const SessionPage({super.key, required this.deckId, required this.mode});
@@ -27,11 +27,11 @@ class SessionPage extends HookWidget {
       return const ErrorState(message: 'Deck Id not found');
     }
 
-    final SessionController ctrl;
+    final StudySessionController ctrl;
     final ReviewDashboardController? dashboardController;
 
-    if (mode == SessionMode.quiz) {
-      ctrl = context.watch<QuizSessionPageController>();
+    if (mode == SessionMode.drill) {
+      ctrl = context.watch<DrillSessionController>();
       dashboardController = null;
     } else {
       ctrl = context.watch<ReviewSessionController>();
@@ -45,10 +45,10 @@ class SessionPage extends HookWidget {
     // ── KICK OFF THE SESSION ──────────────────────────────
     useEffect(() {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mode == SessionMode.quiz) {
-          final quizCtrl = ctrl as QuizSessionPageController;
-          if (quizCtrl.session == null) {
-            quizCtrl.startSession(deckId!);
+        if (mode == SessionMode.drill) {
+          final drillCtrl = ctrl as DrillSessionController;
+          if (drillCtrl.session == null) {
+            drillCtrl.startSession(deckId!);
           }
         } else {
           final reviewCtrl = ctrl as ReviewSessionController;
@@ -61,7 +61,7 @@ class SessionPage extends HookWidget {
       return null;
     }, [deckId, mode]);
 
-    // 1. Handle Loading (Review only has isLoading, Quiz uses null session or missing template)
+    // 1. Handle Loading (Review only has isLoading, Drill uses null session or missing template)
 
     // 2. Handle Errors
     if (ctrl.error != null) {
@@ -95,10 +95,10 @@ class SessionPage extends HookWidget {
 
     // 3. Handle Completion
     if (ctrl.isComplete) {
-      if (mode == SessionMode.quiz) {
-        final quizCtrl = ctrl as QuizSessionPageController;
-        if (quizCtrl.session != null) {
-          return QuizResultPage(sessionId: quizCtrl.session!.id);
+      if (mode == SessionMode.drill) {
+        final drillCtrl = ctrl as DrillSessionController;
+        if (drillCtrl.session != null) {
+          return DrillResultPage(sessionId: drillCtrl.session!.id);
         }
       } else {
         return Scaffold(
@@ -135,8 +135,8 @@ class SessionPage extends HookWidget {
     }
 
     // 5. The Main UI
-    final String appBarTitle = mode == SessionMode.quiz
-        ? 'Quiz Session'
+    final String appBarTitle = mode == SessionMode.drill
+        ? 'Drill Session'
         : '${(ctrl as ReviewSessionController).remainingCount} remaining';
 
     SubmissionStyle getSubmissionStyle() {
@@ -159,7 +159,7 @@ class SessionPage extends HookWidget {
           return Scaffold(
             appBar: AppBar(
               automaticallyImplyLeading: false,
-              title: mode == SessionMode.quiz
+              title: mode == SessionMode.drill
                   ? LinearProgressIndicator(value: ctrl.progress)
                   : Text(appBarTitle),
               actions: [

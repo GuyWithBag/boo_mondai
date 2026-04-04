@@ -376,102 +376,47 @@ class MatchMadnessPairAdapter extends TypeAdapter<MatchMadnessPair> {
           typeId == other.typeId;
 }
 
-class UserDeckProgressAdapter extends TypeAdapter<UserDeckProgress> {
-  @override
-  final typeId = 8;
-
-  @override
-  UserDeckProgress read(BinaryReader reader) {
-    final numOfFields = reader.readByte();
-    final fields = <int, dynamic>{
-      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
-    };
-    return UserDeckProgress(
-      id: fields[0] as String,
-      userId: fields[1] as String,
-      deckId: fields[2] as String,
-      newCardsCount: fields[3] == null ? 0 : (fields[3] as num).toInt(),
-      learningCardsCount: fields[4] == null ? 0 : (fields[4] as num).toInt(),
-      reviewCardsCount: fields[5] == null ? 0 : (fields[5] as num).toInt(),
-      totalQuizzed: fields[6] == null ? 0 : (fields[6] as num).toInt(),
-      lastStudiedAt: fields[7] as DateTime,
-    );
-  }
-
-  @override
-  void write(BinaryWriter writer, UserDeckProgress obj) {
-    writer
-      ..writeByte(8)
-      ..writeByte(0)
-      ..write(obj.id)
-      ..writeByte(1)
-      ..write(obj.userId)
-      ..writeByte(2)
-      ..write(obj.deckId)
-      ..writeByte(3)
-      ..write(obj.newCardsCount)
-      ..writeByte(4)
-      ..write(obj.learningCardsCount)
-      ..writeByte(5)
-      ..write(obj.reviewCardsCount)
-      ..writeByte(6)
-      ..write(obj.totalQuizzed)
-      ..writeByte(7)
-      ..write(obj.lastStudiedAt);
-  }
-
-  @override
-  int get hashCode => typeId.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is UserDeckProgressAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
-}
-
-class QuizSessionAdapter extends TypeAdapter<QuizSession> {
+class DrillSessionAdapter extends TypeAdapter<DrillSession> {
   @override
   final typeId = 9;
 
   @override
-  QuizSession read(BinaryReader reader) {
+  DrillSession read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return QuizSession(
-      id: fields[0] as String,
-      userId: fields[1] as String,
-      deckId: fields[2] as String,
-      previewed: fields[3] as bool,
+    return DrillSession(
+      id: fields[8] as String,
+      userId: fields[9] as String,
+      deckId: fields[10] as String?,
+      startedAt: fields[11] as DateTime,
+      completedAt: fields[12] as DateTime?,
+      previewed: fields[3] == null ? false : fields[3] as bool,
       totalQuestions: (fields[4] as num).toInt(),
-      correctCount: (fields[5] as num).toInt(),
-      startedAt: fields[6] as DateTime,
-      completedAt: fields[7] as DateTime?,
+      correctCount: fields[5] == null ? 0 : (fields[5] as num).toInt(),
     );
   }
 
   @override
-  void write(BinaryWriter writer, QuizSession obj) {
+  void write(BinaryWriter writer, DrillSession obj) {
     writer
       ..writeByte(8)
-      ..writeByte(0)
-      ..write(obj.id)
-      ..writeByte(1)
-      ..write(obj.userId)
-      ..writeByte(2)
-      ..write(obj.deckId)
       ..writeByte(3)
       ..write(obj.previewed)
       ..writeByte(4)
       ..write(obj.totalQuestions)
       ..writeByte(5)
       ..write(obj.correctCount)
-      ..writeByte(6)
+      ..writeByte(8)
+      ..write(obj.id)
+      ..writeByte(9)
+      ..write(obj.userId)
+      ..writeByte(10)
+      ..write(obj.deckId)
+      ..writeByte(11)
       ..write(obj.startedAt)
-      ..writeByte(7)
+      ..writeByte(12)
       ..write(obj.completedAt);
   }
 
@@ -481,7 +426,7 @@ class QuizSessionAdapter extends TypeAdapter<QuizSession> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is QuizSessionAdapter &&
+      other is DrillSessionAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
@@ -1002,28 +947,28 @@ class IdentificationTemplateAdapter
           typeId == other.typeId;
 }
 
-class QuizAnswerAdapter extends TypeAdapter<QuizAnswer> {
+class DrillAnswerAdapter extends TypeAdapter<DrillAnswer> {
   @override
   final typeId = 20;
 
   @override
-  QuizAnswer read(BinaryReader reader) {
+  DrillAnswer read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return QuizAnswer(
+    return DrillAnswer(
       id: fields[0] as String,
       sessionId: fields[1] as String,
       cardId: fields[2] as String,
       userAnswer: fields[3] as String,
-      type: fields[4] as QuizAnswerType,
+      type: fields[4] as StudyRating,
       createdAt: fields[5] as DateTime,
     );
   }
 
   @override
-  void write(BinaryWriter writer, QuizAnswer obj) {
+  void write(BinaryWriter writer, DrillAnswer obj) {
     writer
       ..writeByte(6)
       ..writeByte(0)
@@ -1046,45 +991,45 @@ class QuizAnswerAdapter extends TypeAdapter<QuizAnswer> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is QuizAnswerAdapter &&
+      other is DrillAnswerAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
 
-class QuizAnswerTypeAdapter extends TypeAdapter<QuizAnswerType> {
+class StudyRatingAdapter extends TypeAdapter<StudyRating> {
   @override
   final typeId = 21;
 
   @override
-  QuizAnswerType read(BinaryReader reader) {
+  StudyRating read(BinaryReader reader) {
     switch (reader.readByte()) {
       case 0:
-        return QuizAnswerType.incorrect;
+        return StudyRating.incorrect;
       case 1:
-        return QuizAnswerType.again;
+        return StudyRating.again;
       case 2:
-        return QuizAnswerType.easy;
+        return StudyRating.easy;
       case 3:
-        return QuizAnswerType.good;
+        return StudyRating.good;
       case 4:
-        return QuizAnswerType.hard;
+        return StudyRating.hard;
       default:
-        return QuizAnswerType.incorrect;
+        return StudyRating.incorrect;
     }
   }
 
   @override
-  void write(BinaryWriter writer, QuizAnswerType obj) {
+  void write(BinaryWriter writer, StudyRating obj) {
     switch (obj) {
-      case QuizAnswerType.incorrect:
+      case StudyRating.incorrect:
         writer.writeByte(0);
-      case QuizAnswerType.again:
+      case StudyRating.again:
         writer.writeByte(1);
-      case QuizAnswerType.easy:
+      case StudyRating.easy:
         writer.writeByte(2);
-      case QuizAnswerType.good:
+      case StudyRating.good:
         writer.writeByte(3);
-      case QuizAnswerType.hard:
+      case StudyRating.hard:
         writer.writeByte(4);
     }
   }
@@ -1095,7 +1040,7 @@ class QuizAnswerTypeAdapter extends TypeAdapter<QuizAnswerType> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is QuizAnswerTypeAdapter &&
+      other is StudyRatingAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

@@ -15,24 +15,24 @@ class SupabaseCardService extends SupabaseService {
   Future<List<Map<String, dynamic>>> fetchCards(String deckId) =>
       guard(() async {
         final response = await client
-            .from('deck_cards')
+            .from('card_templates')
             .select(
               '*, notes(*), mc_options(*), fitb_segments(*), mm_pairs!card_id(*)',
             )
-            .eq('deck_id', deckId)
-            .order('sort_order');
+            .eq('deckId', deckId)
+            .order('sortOrder');
         return List<Map<String, dynamic>>.from(response);
       });
 
   Future<Map<String, dynamic>> insertCard(Map<String, dynamic> data) =>
-      guard(() => client.from('deck_cards').insert(data).select().single());
+      guard(() => client.from('card_templates').insert(data).select().single());
 
   Future<void> updateCard(String id, Map<String, dynamic> data) =>
-      guard(() => client.from('deck_cards').update(data).eq('id', id));
+      guard(() => client.from('card_templates').update(data).eq('id', id));
 
   Future<void> deleteCard(String id) => guard(() async {
         final deleted = await client
-            .from('deck_cards')
+            .from('card_templates')
             .delete()
             .eq('id', id)
             .select();
@@ -43,22 +43,22 @@ class SupabaseCardService extends SupabaseService {
 
   /// Upserts a single deck_card row. Does NOT touch child tables.
   Future<void> upsertCardRow(Map<String, dynamic> data) =>
-      guard(() => client.from('deck_cards').upsert(data));
+      guard(() => client.from('card_templates').upsert(data));
 
-  /// Deletes remote deck_cards for [deckId] whose IDs are NOT in [keepIds].
+  /// Deletes remote card_templates for [deckId] whose IDs are NOT in [keepIds].
   Future<void> deleteOrphanCards(String deckId, List<String> keepIds) =>
       guard(() async {
         final remote = await client
-            .from('deck_cards')
+            .from('card_templates')
             .select('id')
-            .eq('deck_id', deckId);
+            .eq('deckId', deckId);
         final remoteIds = List<Map<String, dynamic>>.from(remote)
             .map((r) => r['id'] as String)
             .toList();
         final toDelete =
             remoteIds.where((id) => !keepIds.contains(id)).toList();
         if (toDelete.isEmpty) return;
-        await client.from('deck_cards').delete().inFilter('id', toDelete);
+        await client.from('card_templates').delete().inFilter('id', toDelete);
       });
 
   // ── Content node CRUD ─────────────────────────────────

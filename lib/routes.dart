@@ -25,7 +25,7 @@ GoRouter createRouter(AuthProvider authProvider) {
       if (!isAuth) {
         final requiresAuth =
             loc.startsWith('/my-decks') ||
-            loc.startsWith('/quiz') ||
+            loc.startsWith('/drill') ||
             loc.startsWith('/review') ||
             loc.startsWith('/research');
         if (requiresAuth) return '/account';
@@ -106,19 +106,19 @@ GoRouter createRouter(AuthProvider authProvider) {
       // GoRoute(
       //   path: '/my-decks/:deckId/preview',
       //   builder: (context, state) =>
-      //       QuizPreviewPage(deckId: state.pathParameters['deckId']!),
+      //       DrillPreviewPage(deckId: state.pathParameters['deckId']!),
       // ),
       GoRoute(
-        path: '/quiz/:deckId/session',
+        path: '/drill/:deckId/session',
         builder: (context, state) => SessionPage(
           deckId: state.pathParameters['deckId'],
-          mode: SessionMode.quiz,
+          mode: SessionMode.drill,
         ),
       ),
       GoRoute(
-        path: '/quiz/:sessionId/result',
+        path: '/drill/:sessionId/result',
         builder: (context, state) =>
-            QuizResultPage(sessionId: state.pathParameters['sessionId']!),
+            DrillResultPage(sessionId: state.pathParameters['sessionId']!),
       ),
 
       // 1. Global Review (Study everything due)
@@ -130,7 +130,7 @@ GoRouter createRouter(AuthProvider authProvider) {
         ),
       ),
 
-      // 2. Deck-Specific Review (Matches your Quiz pattern)
+      // 2. Deck-Specific Review (Matches your Drill pattern)
       GoRoute(
         path: '/review/:deckId/session',
         builder: (context, state) => SessionPage(

@@ -4,9 +4,9 @@
 export 'supabase/supabase.barrel.dart';
 // Other files
 export 'app_exception.dart';
+export 'drill_service.dart';
 export 'fsrs_service.dart';
 export 'hive_service.dart';
 export 'notification_service.dart';
-export 'quiz_service.dart';
 export 'services.dart';
 export 'uuid_service.dart';

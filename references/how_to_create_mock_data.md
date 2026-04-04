@@ -7,7 +7,7 @@ This document tells an AI (with zero codebase context) exactly how to generate a
 ## What you are generating
 
 A single PostgreSQL SQL file that:
-- Seeds test users, decks, cards, quiz history, FSRS state, streaks, and research data
+- Seeds test users, decks, cards, drill history, FSRS state, streaks, and research data
 - Can be pasted into the Supabase SQL Editor and run in one shot
 - Uses hard-coded UUIDs (not `gen_random_uuid()`) so the data is predictable and re-runnable
 - Starts with `TRUNCATE ... CASCADE` to wipe existing seed data first
@@ -39,7 +39,7 @@ The `profiles.role` column has three valid values:
 | Role | Purpose |
 |---|---|
 | `researcher` | Admin — can manage research codes, view all research data |
-| `group_a_participant` | Study participant with gamified experience (quizzes, FSRS, leaderboard) |
+| `group_a_participant` | Study participant with gamified experience (drillzes, FSRS, leaderboard) |
 | `group_b_participant` | Control group — only sees code entry and surveys, no gamification |
 
 Seed at minimum: 1 researcher, 2+ group_a participants, 1+ group_b participant.
@@ -58,8 +58,8 @@ Always insert in this exact order:
 6. `mc_options`
 7. `fitb_segments`
 8. `mm_pairs`
-9. `quiz_sessions`
-10. `quiz_answers`
+9. `drill_sessions`
+10. `drill_answers`
 11. `fsrs_cards`
 12. `review_logs`
 13. `streaks`
@@ -207,16 +207,16 @@ INSERT INTO mm_pairs (id, card_id, term, match, is_auto_picked, display_order) V
 
 ---
 
-## Step 6 — quiz_sessions and quiz_answers
+## Step 6 — drill_sessions and drill_answers
 
 ```sql
-INSERT INTO quiz_sessions (id, user_id, deck_id, previewed, total_questions,
+INSERT INTO drill_sessions (id, user_id, deck_id, previewed, total_questions,
                             correct_count, started_at, completed_at)
 VALUES (
   'session-uuid',
   'user-uuid',
   'deck-uuid',
-  true,           -- previewed: did user preview before quizzing?
+  true,           -- previewed: did user preview before drillzing?
   5,              -- total_questions: how many cards were in the queue
   4,              -- correct_count: how many were answered correctly
   '2026-03-20 09:00:00+00',
@@ -224,12 +224,12 @@ VALUES (
 );
 ```
 
-For `quiz_answers`:
+For `drill_answers`:
 - `self_rating` is 1–4 (1=Again, 2=Hard, 3=Good, 4=Easy) — only set when `is_correct = true`
 - For incorrect attempts, `self_rating` should be NULL
 
 ```sql
-INSERT INTO quiz_answers (id, session_id, card_id, user_answer, is_correct, self_rating, answered_at)
+INSERT INTO drill_answers (id, session_id, card_id, user_answer, is_correct, self_rating, answered_at)
 VALUES
   ('ans-1', 'session-uuid', 'card-1-uuid', 'dog',  true,  3, '2026-03-20 09:01:00+00'),
   ('ans-2', 'session-uuid', 'card-2-uuid', 'neko', false, NULL, '2026-03-20 09:02:00+00');
@@ -262,7 +262,7 @@ VALUES (
 );
 ```
 
-For a newly enrolled card (after first quiz): `stability ≈ 1.3`, `difficulty ≈ 5.0`, `reps = 1`, `state = 1`.
+For a newly enrolled card (after first drill): `stability ≈ 1.3`, `difficulty ≈ 5.0`, `reps = 1`, `state = 1`.
 For a well-reviewed card: `stability ≈ 10–30`, `reps = 5+`, `state = 2`.
 
 ---
@@ -438,8 +438,8 @@ Notes: 00000000-0000-0000-0000-0000000003XX
 MC options: 00000000-0000-0000-0000-0000000004XX
 FITB segments: 00000000-0000-0000-0000-0000000005XX
 MM pairs: 00000000-0000-0000-0000-0000000006XX
-Quiz sessions: 00000000-0000-0000-0000-0000000007XX
-Quiz answers: 00000000-0000-0000-0000-0000000008XX
+Drill sessions: 00000000-0000-0000-0000-0000000007XX
+Drill answers: 00000000-0000-0000-0000-0000000008XX
 FSRS cards: text PK format only (see Step 7)
 Review logs: 00000000-0000-0000-0000-0000000009XX
 Streaks: 00000000-0000-0000-0000-0000000010XX
@@ -465,7 +465,7 @@ TRUNCATE TABLE
   research_preview_usefulness, research_experience_survey,
   research_vocabulary_test, research_language_interest,
   research_proficiency_screener, research_codes, research_users,
-  review_logs, fsrs_cards, quiz_answers, quiz_sessions,
+  review_logs, fsrs_cards, drill_answers, drill_sessions,
   streaks, mm_pairs, fitb_segments, mc_options, notes,
   deck_cards, decks, profiles
 CASCADE;
@@ -487,9 +487,9 @@ INSERT INTO decks (...) VALUES (...);
 -- Insert all cards for deck 1, then all their notes/options/segments/pairs.
 -- Then cards for deck 2, etc.
 
--- ── quiz data ──────────────────────────────────────────
-INSERT INTO quiz_sessions (...) VALUES (...);
-INSERT INTO quiz_answers  (...) VALUES (...);
+-- ── drill data ──────────────────────────────────────────
+INSERT INTO drill_sessions (...) VALUES (...);
+INSERT INTO drill_answers  (...) VALUES (...);
 
 -- ── FSRS state ─────────────────────────────────────────
 INSERT INTO fsrs_cards  (...) VALUES (...);
@@ -516,7 +516,7 @@ Unless told otherwise, generate:
 | Decks | 1 premade (is_premade=true, is_uneditable=true, is_public=true) with 20 cards + 1 UGC deck per group_a user |
 | Cards in premade deck | 20 cards, mix of question types: ~8 flashcard, 3 identification, 3 multiple_choice, 2 fill_in_the_blanks, 2 word_scramble, 2 match_madness |
 | Cards in UGC decks | 5 flashcard cards each |
-| Quiz sessions | 2 completed sessions per group_a user |
+| Drill sessions | 2 completed sessions per group_a user |
 | FSRS cards | 1 fsrs_cards row per card reviewed (at minimum, all premade deck cards for user alice) |
 | Review logs | 1–2 review log entries per FSRS card |
 | Streaks | 1 row per group_a user |

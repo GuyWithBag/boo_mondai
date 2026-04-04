@@ -85,7 +85,7 @@ class FlipCard extends StatelessWidget {
             ..setEntry(3, 2, 0.001)
             ..rotateY(angle),
           child: isFront
-              ? QuizQuestionCard(
+              ? DrillQuestionCard(
                   question: _getFrontText(), // <-- Extracted
                   imageUrl: _getFrontImage(), // <-- Extracted
                 )

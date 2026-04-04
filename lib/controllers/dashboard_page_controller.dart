@@ -7,30 +7,30 @@
 
 // import 'package:flutter/foundation.dart';
 // import '../models/streak.dart';
-// import '../models/quiz_session.dart';
+// import '../models/drill_session.dart';
 // import '../repositories/streak_repository.dart';
-// import '../repositories/quiz_session_repository.dart';
+// import '../repositories/drill_session_repository.dart';
 
 // /// Drives the Dashboard page — exposes streak, due-card count, and recent
-// /// quiz sessions to the UI via [ChangeNotifier].
+// /// drill sessions to the UI via [ChangeNotifier].
 // class DashboardPageController extends ChangeNotifier {
 //   DashboardPageController({
 //     required StreakRepository streakRepository,
 //     required FsrsCardRepository fsrsRepository,
-//     required QuizSessionRepository quizSessionRepository,
+//     required DrillSessionRepository drillSessionRepository,
 //   }) : _streakRepository = streakRepository,
 //        _fsrsRepository = fsrsRepository,
-//        _quizSessionRepository = quizSessionRepository;
+//        _drillSessionRepository = drillSessionRepository;
 
 //   final StreakRepository _streakRepository;
 //   final FsrsCardRepository _fsrsRepository;
-//   final QuizSessionRepository _quizSessionRepository;
+//   final DrillSessionRepository _drillSessionRepository;
 
 //   // ── private state ────────────────────────────────────────
 
 //   Streak? _streak;
 //   int _dueCardCount = 0;
-//   List<QuizSession> _recentSessions = [];
+//   List<DrillSession> _recentSessions = [];
 //   bool _isLoading = false;
 //   String? _error;
 
@@ -38,7 +38,7 @@
 
 //   Streak? get streak => _streak;
 //   int get dueCardCount => _dueCardCount;
-//   List<QuizSession> get recentSessions => List.unmodifiable(_recentSessions);
+//   List<DrillSession> get recentSessions => List.unmodifiable(_recentSessions);
 //   bool get isLoading => _isLoading;
 //   String? get error => _error;
 
@@ -53,7 +53,7 @@
 //     try {
 //       _streak = _streakRepository.get();
 //       _dueCardCount = _fsrsRepository.getDueCards(DateTime.now()).length;
-//       _recentSessions = _quizSessionRepository.getRecent(5);
+//       _recentSessions = _drillSessionRepository.getRecent(5);
 //     } on Exception catch (e) {
 //       _error = e.toString();
 //     } finally {

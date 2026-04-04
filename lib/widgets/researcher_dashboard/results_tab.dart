@@ -11,37 +11,45 @@ import 'package:boo_mondai/shared/shared.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
 
 class ResultsTab extends StatelessWidget {
+  final List<SurveyResponse> surveyResponses;
   final List<VocabularyTestResult> testResults;
-  final List<Map<String, dynamic>> proficiencyData;
-  final List<Map<String, dynamic>> languageInterestData;
-  final List<Map<String, dynamic>> experienceSurveyData;
-  final List<Map<String, dynamic>> previewUsefulnessData;
-  final List<Map<String, dynamic>> fsrsUsefulnessData;
-  final List<Map<String, dynamic>> ugcData;
-  final List<Map<String, dynamic>> susData;
 
   const ResultsTab({
     super.key,
+    required this.surveyResponses,
     required this.testResults,
-    required this.proficiencyData,
-    required this.languageInterestData,
-    required this.experienceSurveyData,
-    required this.previewUsefulnessData,
-    required this.fsrsUsefulnessData,
-    required this.ugcData,
-    required this.susData,
   });
+
+  /// Extracts response maps for a given survey type and optional time point.
+  /// For SUS responses, merges computedScore as 'sus_score' key.
+  List<Map<String, dynamic>> _responsesFor(
+    String surveyType, {
+    String? timePoint,
+  }) {
+    return surveyResponses
+        .where((r) =>
+            r.surveyType == surveyType &&
+            (timePoint == null || r.timePoint == timePoint))
+        .map((r) {
+      final map = Map<String, dynamic>.from(r.responses);
+      if (r.computedScore != null) map['sus_score'] = r.computedScore;
+      return map;
+    }).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
     final setA = testResults.where((r) => r.testSet == 'A').toList();
     final setB = testResults.where((r) => r.testSet == 'B').toList();
-    final expShort = experienceSurveyData
-        .where((e) => e['time_point'] == 'short_term')
-        .toList();
-    final expLong = experienceSurveyData
-        .where((e) => e['time_point'] == 'long_term')
-        .toList();
+
+    final proficiencyData = _responsesFor('proficiency_screener');
+    final languageInterestData = _responsesFor('language_interest');
+    final expShort = _responsesFor('experience_survey', timePoint: 'short_term');
+    final expLong = _responsesFor('experience_survey', timePoint: 'long_term');
+    final previewUsefulnessData = _responsesFor('preview_usefulness');
+    final fsrsUsefulnessData = _responsesFor('fsrs_usefulness');
+    final ugcData = _responsesFor('ugc_perception');
+    final susData = _responsesFor('sus');
 
     return ListView(
       padding: const EdgeInsets.all(AppSpacing.md),

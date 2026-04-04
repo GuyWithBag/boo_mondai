@@ -110,7 +110,7 @@ class MatchRow extends HookWidget {
                 controller: termController,
                 decoration: const InputDecoration(hintText: 'Term'),
                 onChanged: (value) =>
-                    onChanged((term: value, match: pair.match)),
+                    onChanged(MatchPairData(term: value, match: pair.match)),
               ),
             ),
           ),
@@ -140,7 +140,7 @@ class MatchRow extends HookWidget {
                 controller: matchController,
                 decoration: const InputDecoration(hintText: 'Match'),
                 onChanged: (value) =>
-                    onChanged((term: pair.term, match: value)),
+                    onChanged(MatchPairData(term: pair.term, match: value)),
               ),
             ),
           ),

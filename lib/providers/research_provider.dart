@@ -14,43 +14,30 @@ import 'package:boo_mondai/services/app_exception.dart';
 class ResearchProvider extends ChangeNotifier {
   final _supabaseService = Services.research;
 
-  ResearchUser? _researchUser;
+  ResearchProfile? _researchProfile;
   List<ResearchCode> _codes = [];
   final List<String> _unlockedFlows = [];
-  final List<SurveyResponse> _surveyResponses = [];
+  List<SurveyResponse> _surveyResponses = [];
   List<VocabularyTestResult> _testResults = [];
-  List<ResearchUser> _researchUsers = [];
-  List<Map<String, dynamic>> _proficiencyData = [];
-  List<Map<String, dynamic>> _languageInterestData = [];
-  List<Map<String, dynamic>> _experienceSurveyData = [];
-  List<Map<String, dynamic>> _previewUsefulnessData = [];
-  List<Map<String, dynamic>> _fsrsUsefulnessData = [];
-  List<Map<String, dynamic>> _ugcData = [];
-  List<Map<String, dynamic>> _susData = [];
+  List<ResearchProfile> _researchProfiles = [];
   bool _isLoading = false;
   String? _error;
 
-  ResearchUser? get researchUser => _researchUser;
+  ResearchProfile? get researchProfile => _researchProfile;
   List<ResearchCode> get codes => List.unmodifiable(_codes);
   List<String> get unlockedFlows => List.unmodifiable(_unlockedFlows);
   List<SurveyResponse> get surveyResponses =>
       List.unmodifiable(_surveyResponses);
   List<VocabularyTestResult> get testResults => List.unmodifiable(_testResults);
-  List<ResearchUser> get researchUsers => List.unmodifiable(_researchUsers);
-  List<Map<String, dynamic>> get proficiencyData =>
-      List.unmodifiable(_proficiencyData);
-  List<Map<String, dynamic>> get languageInterestData =>
-      List.unmodifiable(_languageInterestData);
-  List<Map<String, dynamic>> get experienceSurveyData =>
-      List.unmodifiable(_experienceSurveyData);
-  List<Map<String, dynamic>> get previewUsefulnessData =>
-      List.unmodifiable(_previewUsefulnessData);
-  List<Map<String, dynamic>> get fsrsUsefulnessData =>
-      List.unmodifiable(_fsrsUsefulnessData);
-  List<Map<String, dynamic>> get ugcData => List.unmodifiable(_ugcData);
-  List<Map<String, dynamic>> get susData => List.unmodifiable(_susData);
+  List<ResearchProfile> get researchProfiles =>
+      List.unmodifiable(_researchProfiles);
   bool get isLoading => _isLoading;
   String? get error => _error;
+
+  void clearError() {
+    _error = null;
+    notifyListeners();
+  }
 
   Future<String?> redeemCode(String userId, String code) async {
     _isLoading = true;
@@ -83,12 +70,12 @@ class ResearchProvider extends ChangeNotifier {
       final code = _generateCodeString();
       final data = {
         'code': code,
-        'target_role': targetRole,
+        'targetRole': targetRole,
         'unlocks': unlocks,
-        'created_by': createdBy,
+        'createdBy': createdBy,
       };
       final result = await _supabaseService.insertResearchCode(data);
-      final researchCode = ResearchCode.fromJson(result);
+      final researchCode = ResearchCodeMapper.fromJson(result);
       _codes = [researchCode, ..._codes];
       notifyListeners();
       return researchCode;
@@ -99,28 +86,27 @@ class ResearchProvider extends ChangeNotifier {
     }
   }
 
+  /// Submits a survey response to the single generic survey_responses table.
+  /// For SUS surveys, computes the score client-side before submitting.
   Future<void> submitSurvey(
     String userId,
     String surveyType,
     String? timePoint,
-    Map<String, int> responses,
-  ) async {
+    Map<String, int> responses, {
+    Map<String, dynamic>? extras,
+  }) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
-      final table = _surveyTypeToTable(surveyType);
-      final data = <String, dynamic>{
-        'user_id': userId,
-        ...responses.map((k, v) => MapEntry(k, v)),
+      // Merge responses with any extras (e.g. proficiency_level)
+      final fullResponses = <String, dynamic>{
+        ...responses,
+        if (extras != null) ...extras,
       };
 
-      if (timePoint != null) {
-        data['time_point'] = timePoint;
-      }
-
-      // Compute SUS score if applicable
+      double? computedScore;
       if (surveyType == 'sus') {
         final oddSum =
             (responses['item_1'] ?? 0) +
@@ -134,13 +120,19 @@ class ResearchProvider extends ChangeNotifier {
             (responses['item_6'] ?? 0) +
             (responses['item_8'] ?? 0) +
             (responses['item_10'] ?? 0);
-        data['sus_score'] = ((oddSum - 5) + (25 - evenSum)) * 2.5;
+        computedScore = ((oddSum - 5) + (25 - evenSum)) * 2.5;
       }
 
-      // Proficiency screener needs the proficiency_level field
-      // It should be included in the responses map already
+      final data = <String, dynamic>{
+        'userId': userId,
+        'surveyType': surveyType,
+        if (timePoint != null) 'timePoint': timePoint,
+        'responses': fullResponses,
+        if (computedScore != null) 'computedScore': computedScore,
+        'submittedAt': DateTime.now().toIso8601String(),
+      };
 
-      await _supabaseService.insertSurveyResponse(table, data);
+      await _supabaseService.insertSurveyResponse(data);
     } on AppException catch (e) {
       _error = e.message;
     } finally {
@@ -161,10 +153,11 @@ class ResearchProvider extends ChangeNotifier {
 
     try {
       await _supabaseService.insertVocabularyTest({
-        'user_id': userId,
-        'test_set': testSet,
+        'userId': userId,
+        'testSet': testSet,
         'score': score,
         'answers': answers,
+        'submittedAt': DateTime.now().toIso8601String(),
       });
     } on AppException catch (e) {
       _error = e.message;
@@ -181,34 +174,18 @@ class ResearchProvider extends ChangeNotifier {
 
     try {
       final allData = await _supabaseService.fetchAllResearchData();
-      _researchUsers = (allData['research_users'] ?? [])
-          .map((d) => ResearchUser.fromJson(d))
-          .toList();
       final codesData = await _supabaseService.fetchResearchCodes();
-      _codes = codesData.map(ResearchCode.fromJson).toList();
 
-      _testResults = (allData['vocabulary_test'] ?? [])
-          .map((d) => VocabularyTestResult.fromJson(d))
+      _researchProfiles = (allData['research_profiles'] ?? [])
+          .map((d) => ResearchProfileMapper.fromJson(d))
           .toList();
-      _proficiencyData = List<Map<String, dynamic>>.from(
-        allData['proficiency_screener'] ?? [],
-      );
-      _languageInterestData = List<Map<String, dynamic>>.from(
-        allData['language_interest'] ?? [],
-      );
-      _experienceSurveyData = List<Map<String, dynamic>>.from(
-        allData['experience_survey'] ?? [],
-      );
-      _previewUsefulnessData = List<Map<String, dynamic>>.from(
-        allData['preview_usefulness'] ?? [],
-      );
-      _fsrsUsefulnessData = List<Map<String, dynamic>>.from(
-        allData['fsrs_usefulness'] ?? [],
-      );
-      _ugcData = List<Map<String, dynamic>>.from(
-        allData['ugc_perception'] ?? [],
-      );
-      _susData = List<Map<String, dynamic>>.from(allData['sus'] ?? []);
+      _codes = codesData.map(ResearchCodeMapper.fromJson).toList();
+      _surveyResponses = (allData['survey_responses'] ?? [])
+          .map((d) => SurveyResponseMapper.fromJson(d))
+          .toList();
+      _testResults = (allData['vocabulary_test_results'] ?? [])
+          .map((d) => VocabularyTestResultMapper.fromJson(d))
+          .toList();
     } on AppException catch (e) {
       _error = e.message;
     } finally {
@@ -217,43 +194,30 @@ class ResearchProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> addResearchUser(
-    String userId,
-    String role,
-    String targetLanguage,
-  ) async {
+  Future<void> addResearchProfile({
+    required String userId,
+    required String role,
+    required String targetLanguage,
+    required String firstName,
+    required String lastName,
+    required int age,
+    String? userName,
+  }) async {
     _error = null;
 
     try {
-      await _supabaseService.insertResearchUser({
-        'user_id': userId,
+      await _supabaseService.insertResearchProfile({
+        'userId': userId,
+        if (userName != null) 'userName': userName,
+        'firstName': firstName,
+        'lastName': lastName,
+        'age': age,
         'role': role,
-        'target_language': targetLanguage,
+        'targetLanguage': targetLanguage,
       });
     } on AppException catch (e) {
       _error = e.message;
       notifyListeners();
-    }
-  }
-
-  String _surveyTypeToTable(String surveyType) {
-    switch (surveyType) {
-      case 'proficiency_screener':
-        return 'research_proficiency_screener';
-      case 'language_interest':
-        return 'research_language_interest';
-      case 'experience_survey':
-        return 'research_experience_survey';
-      case 'preview_usefulness':
-        return 'research_preview_usefulness';
-      case 'fsrs_usefulness':
-        return 'research_fsrs_usefulness';
-      case 'ugc_perception':
-        return 'research_ugc_perception';
-      case 'sus':
-        return 'research_sus';
-      default:
-        throw AppException('Unknown survey type: $surveyType');
     }
   }
 

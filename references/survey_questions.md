@@ -86,10 +86,10 @@
 
 | No. | Statement |
 |---|---|
-| 1 | Previewing the vocabulary before the quiz helped me feel prepared |
-| 2 | The preview feature reduced my anxiety during the quiz |
+| 1 | Previewing the vocabulary before the drill helped me feel prepared |
+| 2 | The preview feature reduced my anxiety during the drill |
 | 3 | I would choose to use the preview feature again in future sessions |
-| 4 | The preview made it easier to recall vocabulary during the quiz |
+| 4 | The preview made it easier to recall vocabulary during the drill |
 | 5 | I would recommend the preview feature to other learners |
 
 ---
@@ -114,10 +114,10 @@
 
 | No. | Statement |
 |---|---|
-| 1 | I would find it useful to create my own quiz decks for vocabulary I want to learn |
+| 1 | I would find it useful to create my own drill decks for vocabulary I want to learn |
 | 2 | Creating my own flashcard content would help me understand the material better |
 | 3 | I would use a feature that allows me to build my own study decks |
-| 4 | I would find it helpful to access quiz decks created by other learners |
+| 4 | I would find it helpful to access drill decks created by other learners |
 | 5 | Using community-made decks would save me time in preparing study materials |
 | 6 | A platform where I can create and use other learners' content would be more motivating than studying alone |
 

@@ -30,9 +30,9 @@ class ViewDeckPage extends HookWidget {
 
     // ── NEW: Calculate Eligibility ───────────────────────────
     final userId = Services.auth.currentUser!.id;
-    final eligibleCards = QuizService.getEligibleQuizCards(deckId!, userId);
+    final eligibleCards = DrillService.getEligibleDrillCards(deckId!, userId);
     final availableCount = eligibleCards.length;
-    final canQuiz = availableCount > 0;
+    final canDrill = availableCount > 0;
     // ─────────────────────────────────────────────────────────
 
     Future<void> deleteDeckDialog() async {
@@ -71,7 +71,7 @@ class ViewDeckPage extends HookWidget {
           children: [
             Expanded(
               child: OutlinedButton(
-                onPressed: () => context.push('/quiz/$deckId/preview'),
+                onPressed: () => context.push('/drill/$deckId/preview'),
                 child: const Text('Preview'),
               ),
             ),
@@ -79,11 +79,11 @@ class ViewDeckPage extends HookWidget {
             Expanded(
               child: FilledButton(
                 // Disable the button if there are no eligible cards
-                onPressed: canQuiz
-                    ? () => context.go('/quiz/$deckId/session')
+                onPressed: canDrill
+                    ? () => context.go('/drill/$deckId/session')
                     : null,
                 child: Text(
-                  canQuiz ? 'Start Quiz ($availableCount)' : 'Completed',
+                  canDrill ? 'Start Drill ($availableCount)' : 'Completed',
                 ),
               ),
             ),

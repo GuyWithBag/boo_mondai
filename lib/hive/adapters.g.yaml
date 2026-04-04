@@ -133,46 +133,26 @@ types:
         index: 7
       sourceTemplateId:
         index: 8
-  UserDeckProgress:
-    typeId: 8
-    nextIndex: 8
-    fields:
-      id:
-        index: 0
-      userId:
-        index: 1
-      deckId:
-        index: 2
-      newCardsCount:
-        index: 3
-      learningCardsCount:
-        index: 4
-      reviewCardsCount:
-        index: 5
-      totalQuizzed:
-        index: 6
-      lastStudiedAt:
-        index: 7
-  QuizSession:
+  DrillSession:
     typeId: 9
-    nextIndex: 8
+    nextIndex: 13
     fields:
-      id:
-        index: 0
-      userId:
-        index: 1
-      deckId:
-        index: 2
       previewed:
         index: 3
       totalQuestions:
         index: 4
       correctCount:
         index: 5
+      id:
+        index: 8
+      userId:
+        index: 9
+      deckId:
+        index: 10
       startedAt:
-        index: 6
+        index: 11
       completedAt:
-        index: 7
+        index: 12
   Card:
     typeId: 10
     nextIndex: 7
@@ -345,7 +325,7 @@ types:
         index: 7
       sourceTemplateId:
         index: 8
-  QuizAnswer:
+  DrillAnswer:
     typeId: 20
     nextIndex: 6
     fields:
@@ -361,7 +341,7 @@ types:
         index: 4
       createdAt:
         index: 5
-  QuizAnswerType:
+  StudyRating:
     typeId: 21
     nextIndex: 5
     fields:

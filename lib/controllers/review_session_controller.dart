@@ -6,8 +6,9 @@
 import 'package:boo_mondai/lib.barrel.dart';
 import 'package:fsrs/fsrs.dart' as fsrs;
 
-class ReviewSessionController extends SessionController {
+class ReviewSessionController extends StudySessionController {
   // ── Specific State ──
+  ReviewSession? _session;
   final List<FsrsCard> _queue = [];
   final Map<String, ReviewCard> _reviewCards = {};
   late DueFilterThreshold dueFilter;
@@ -15,6 +16,9 @@ class ReviewSessionController extends SessionController {
   // ── BATCH SAVING STATE ──
   final List<FsrsReviewLog> _pendingLogs = [];
   final Map<String, FsrsCard> _pendingCards = {};
+
+  // ── Specific Getters ──
+  ReviewSession? get session => _session;
 
   int get remainingCount =>
       (_queue.length - currentIndex).clamp(0, _queue.length);
@@ -43,7 +47,7 @@ class ReviewSessionController extends SessionController {
     required DueFilterThreshold filter,
   }) {
     // 1. Reset session state
-    sessionError = null; // 👈 Using the base class variable!
+    sessionError = null;
     dueFilter = filter;
     _queue.clear();
     _pendingCards.clear();
@@ -60,17 +64,15 @@ class ReviewSessionController extends SessionController {
       final allFsrsCards = Repositories.fsrsCard.getByUserId(userId);
       final allReviewCards = Repositories.reviewCard.getAll();
 
-      // ── THE FIX: Fetch and populate templates ──
-      // (Adjust 'cardTemplate' if your repository is named slightly differently)
+      // Fetch and populate templates
       final allTemplates = Repositories.cardTemplate.getAll();
       for (final t in allTemplates) {
-        templates[t.id] = t; // 'templates' is inherited from SessionController
+        templates[t.id] = t;
       }
-      // ──────────────────────────────────────────
 
       final rcToDeck = {for (final rc in allReviewCards) rc.id: rc.deckId};
 
-      // Ensure we populate the _reviewCards map so `currentReviewCard` works
+      // Populate review cards map
       for (final rc in allReviewCards) {
         _reviewCards[rc.id] = rc;
       }
@@ -88,9 +90,17 @@ class ReviewSessionController extends SessionController {
 
       dueCards.shuffle();
       _queue.addAll(dueCards);
+
+      // ── NEW: Initialize the ReviewSession ──
+      _session = ReviewSession(
+        id: UuidService.uuid.v4(),
+        userId: userId,
+        deckId: deckId,
+        totalCards: _queue.length,
+        startedAt: now,
+      );
     } catch (e) {
-      sessionError =
-          'Failed to load session data: $e'; // 👈 Using the base class variable!
+      sessionError = 'Failed to load session data: $e';
     } finally {
       notifyListeners();
     }
@@ -105,26 +115,20 @@ class ReviewSessionController extends SessionController {
     generateIntervalsForState(currentFsrs.state);
   }
 
-  // ── The Single Submit Logic (Triggered by RatingArea) ──
+  // ── The Single Submit Logic ──
   @override
-  Future<void> submitAnswer(String userAnswer, QuizAnswerType type) async {
+  Future<void> submitAnswer(String userAnswer, StudyRating rating) async {
     final fsrsCard = currentFsrsCard;
-    if (fsrsCard == null) return;
+    if (fsrsCard == null || _session == null) return;
 
-    final fsrsRating = mapToFsrsRating(type);
+    final fsrsRating = mapToFsrsRating(rating);
     final now = DateTime.now();
 
-    // ── THE TIME TRAVEL TRICK ──
-    // If the card is due in the future (Look-ahead), pretend we are answering
-    // it exactly when it is due so FSRS doesn't penalize the interval.
+    // The time travel trick for future look-ahead reviews
     DateTime? customReviewTime;
     if (fsrsCard.state.due.isAfter(now)) {
       customReviewTime = fsrsCard.state.due;
     }
-
-    // Process the card using your updated FsrsService
-    // (Assuming you instantiate FsrsService or have it as a singleton somewhere,
-    // e.g., `Services.fsrs.enrollCard` or similar based on your architecture)
 
     final scheduler = fsrs.Scheduler();
     final utcReviewTime = customReviewTime?.toUtc() ?? now.toUtc();
@@ -142,18 +146,26 @@ class ReviewSessionController extends SessionController {
       log: result.reviewLog,
     );
 
-    // ── THE TOGGLE (Unchanged) ──
+    // Append to queue if they forgot it (FSRS requires re-reviewing)
+    if (dueFilter.isCardDue(updatedCard.state.due, now)) {
+      _queue.add(updatedCard);
+    }
+
+    // ── NEW: Update session progress ──
+    // Note: If cards get added back to the queue, totalCards updates so progress bars stay accurate
+    _session = _session!.copyWith(
+      cardsReviewed: _session!.cardsReviewed + 1,
+      totalCards: _queue.length,
+    );
+
+    // ── THE TOGGLE ──
     if (realTimeSaving) {
       await Repositories.fsrsCard.save(updatedCard);
       await Repositories.reviewLog.save(log);
+      await Repositories.reviewSession.save(_session!); // Assumes repo exists
     } else {
       _pendingCards[updatedCard.id] = updatedCard;
       _pendingLogs.add(log);
-    }
-
-    // Append to queue if they forgot it
-    if (dueFilter.isCardDue(updatedCard.state.due, now)) {
-      _queue.add(updatedCard);
     }
 
     currentIndex++;
@@ -169,14 +181,24 @@ class ReviewSessionController extends SessionController {
   // ── Session Completion ──
   @override
   Future<void> completeSession() async {
+    if (_session == null) return;
+
     try {
-      if (!realTimeSaving) {
+      // ── NEW: Finalize session ──
+      _session = _session!.copyWith(completedAt: DateTime.now());
+
+      if (realTimeSaving) {
+        // Just save the final session state
+        await Repositories.reviewSession.save(_session!);
+      } else {
+        // Batch Save everything
         if (_pendingCards.isNotEmpty) {
           await Repositories.fsrsCard.saveAll(_pendingCards.values.toList());
         }
         if (_pendingLogs.isNotEmpty) {
           await Repositories.reviewLog.saveAll(_pendingLogs);
         }
+        await Repositories.reviewSession.save(_session!);
       }
     } catch (e) {
       sessionError = e.toString();
@@ -187,6 +209,7 @@ class ReviewSessionController extends SessionController {
 
   @override
   void reset() {
+    _session = null;
     _queue.clear();
     _pendingLogs.clear();
     _pendingCards.clear();

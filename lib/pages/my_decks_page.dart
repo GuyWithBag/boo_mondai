@@ -145,7 +145,7 @@ class _DeckListBody extends StatelessWidget {
           child: DeckCardTile(
             deck: deck,
             // onTap: () => context.push('/decks/${deck.id}'),
-            // onStartQuiz: () => context.push('/quiz/${deck.id}'),
+            // onStartDrill: () => context.push('/drill/${deck.id}'),
           ),
         );
       },

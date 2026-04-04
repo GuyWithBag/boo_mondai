@@ -64,7 +64,7 @@ class EditorMain extends HookWidget {
                   matchingPairs: matchPairs,
                   onPairAdd: () => formState.matchPairs.value = [
                     ...matchPairs,
-                    (term: '', match: ''),
+                    MatchPairData(term: '', match: ''),
                   ],
                   onPairRemove: (i) {
                     final l = [...matchPairs];
@@ -89,7 +89,7 @@ class EditorMain extends HookWidget {
                   onMultipleChoiceAdd: () =>
                       formState.multipleChoiceOptions.value = [
                         ...mcOpts,
-                        (text: '', isCorrect: false),
+                        MultipleChoiceOptionData(text: '', isCorrect: false),
                       ],
                   onMultipleChoiceRemove: (i) {
                     final l = [...mcOpts];

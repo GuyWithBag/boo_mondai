@@ -4,9 +4,9 @@
 export 'account_page_controller.dart';
 export 'dashboard_page_controller.dart';
 export 'deck_editor_page_controller.dart';
+export 'drill_session_controller.dart';
 export 'my_decks_page_controller.dart';
-export 'quiz_session_page_controller.dart';
 export 'review_dashboard_controller.dart';
 export 'review_session_controller.dart';
-export 'session_controller.dart';
 export 'session_interactions_controller.dart';
+export 'study_session_controller.dart';

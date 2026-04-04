@@ -207,7 +207,12 @@ class DeckEditorPageController extends ChangeNotifier {
         formState.frontController.text = m.questionPrompt;
         formState.multipleChoiceOptions.value = m.options.isNotEmpty
             ? m.options
-                  .map((o) => (text: o.optionText, isCorrect: o.isCorrect))
+                  .map(
+                    (o) => MultipleChoiceOptionData(
+                      text: o.optionText,
+                      isCorrect: o.isCorrect,
+                    ),
+                  )
                   .toList()
             : [...defaultMultipleChoiceOptions];
         break;
@@ -231,7 +236,9 @@ class DeckEditorPageController extends ChangeNotifier {
       case MatchMadnessTemplate mm:
         formState.questionType.value = QuestionType.matchMadness;
         formState.matchPairs.value = mm.pairs.isNotEmpty
-            ? mm.pairs.map((p) => (term: p.term, match: p.match)).toList()
+            ? mm.pairs
+                  .map((p) => MatchPairData(term: p.term, match: p.match))
+                  .toList()
             : [...defaultMatchPairs];
         break;
 

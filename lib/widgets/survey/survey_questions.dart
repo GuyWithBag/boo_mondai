@@ -98,11 +98,11 @@ List<SurveyQuestion> buildSurveyQuestions(String surveyType) {
       return const [
         SurveyQuestion(
           'item_1',
-          'Previewing the vocabulary before the quiz helped me feel prepared',
+          'Previewing the vocabulary before the drill helped me feel prepared',
         ),
         SurveyQuestion(
           'item_2',
-          'The preview feature reduced my anxiety during the quiz',
+          'The preview feature reduced my anxiety during the drill',
         ),
         SurveyQuestion(
           'item_3',
@@ -110,7 +110,7 @@ List<SurveyQuestion> buildSurveyQuestions(String surveyType) {
         ),
         SurveyQuestion(
           'item_4',
-          'The preview made it easier to recall vocabulary during the quiz',
+          'The preview made it easier to recall vocabulary during the drill',
         ),
         SurveyQuestion(
           'item_5',
@@ -144,7 +144,7 @@ List<SurveyQuestion> buildSurveyQuestions(String surveyType) {
       return const [
         SurveyQuestion(
           'item_1',
-          'I would find it useful to create my own quiz decks for vocabulary I want to learn',
+          'I would find it useful to create my own drill decks for vocabulary I want to learn',
         ),
         SurveyQuestion(
           'item_2',
@@ -156,7 +156,7 @@ List<SurveyQuestion> buildSurveyQuestions(String surveyType) {
         ),
         SurveyQuestion(
           'item_4',
-          'I would find it helpful to access quiz decks created by other learners',
+          'I would find it helpful to access drill decks created by other learners',
         ),
         SurveyQuestion(
           'item_5',

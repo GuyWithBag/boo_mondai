@@ -1,11 +1,15 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/models/question_type.dart
-// PURPOSE: Enum — determines the quiz interaction style for a card
+// PURPOSE: Enum — determines the drill interaction style for a card
 // PROVIDERS: none
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-/// The quiz interaction style presented to the learner.
+import 'package:dart_mappable/dart_mappable.dart';
+
+part 'question_type.mapper.dart';
+
+/// The drill interaction style presented to the learner.
 ///
 /// - [flashcard]      → show front, learner reveals back and self-grades (no typing)
 /// - [identification] → show front, learner must type an accepted answer; self-grade follows
@@ -21,6 +25,7 @@
 /// - [wordScramble] → Note.frontText stores the full sentence; words are split at runtime.
 /// - [identification] → Note.frontText is the prompt; acceptable answers are stored
 ///   in [DeckCard.identificationAnswer] (comma-separated), not in Note.backText.
+@MappableEnum()
 enum QuestionType {
   flashcard,
   identification,
@@ -28,27 +33,6 @@ enum QuestionType {
   fillInTheBlanks,
   wordScramble,
   matchMadness;
-
-  static const _fromDb = <String, QuestionType>{
-    'flashcard': flashcard,
-    'read_and_select': flashcard, // legacy alias — data migrated before rename
-    'identification': identification,
-    'multiple_choice': multipleChoice,
-    'fill_in_the_blanks': fillInTheBlanks,
-    'word_scramble': wordScramble,
-    'match_madness': matchMadness,
-  };
-
-  static QuestionType fromString(String? s) => _fromDb[s] ?? flashcard;
-
-  String toJson() => switch (this) {
-        flashcard => 'flashcard',
-        identification => 'identification',
-        multipleChoice => 'multiple_choice',
-        fillInTheBlanks => 'fill_in_the_blanks',
-        wordScramble => 'word_scramble',
-        matchMadness => 'match_madness',
-      };
 
   /// True when this type supports [CardType.reversed] / [CardType.both].
   /// Currently only [flashcard].
