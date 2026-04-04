@@ -489,7 +489,7 @@ classDiagram
         +createNewCard() Card
         +scheduleCard(card, rating) SchedulingInfo
         +reviewCard(state, ratingValue) FsrsCardState
-        +enrollCard(userId, cardId, ratingValue) FsrsCardState
+        +reviewCard(userId, cardId, ratingValue) FsrsCardState
         note: ratingValue is 1-indexed (1=Again, 2=Hard, 3=Good, 4=Easy)\nRating.values uses ratingValue - 1 internally
     }
 

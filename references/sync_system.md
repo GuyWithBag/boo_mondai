@@ -72,7 +72,7 @@ User                  QuizProvider              Hive          Supabase
  │                         │                     │               │
  │                         │── enrollCardsFromQuiz()              │
  │                         │   for each rated card:               │
- │                         │   FsrsService.enrollCard()           │
+ │                         │   FsrsService.reviewCard()           │
  │                         │   ─────────────────►│               │
  │                         │   saveFsrsCard()     │               │
  │                         │   saveReviewLog()    │               │

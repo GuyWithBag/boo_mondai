@@ -68,6 +68,7 @@ Future<void> main() async {
         // ),
         ChangeNotifierProvider(create: (_) => QuizSessionPageController()),
         ChangeNotifierProvider(create: (_) => ReviewDashboardController()),
+        ChangeNotifierProvider(create: (_) => ReviewSessionController()),
         ChangeNotifierProvider(create: (_) => MyDecksPageController()),
         // ChangeNotifierProvider(
         //   create: (_) => FsrsProvider(

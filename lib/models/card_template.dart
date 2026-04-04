@@ -38,5 +38,3 @@ abstract class CardTemplate with CardTemplateMappable {
   /// Every template MUST know how to grade a user's answer based on its own data.
   bool checkAnswer(String userAnswer, {bool isReversed = false});
 }
-
-// ── 2. THE SUBCLASSES ─────────────────────────────────────────────────

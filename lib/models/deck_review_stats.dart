@@ -1,36 +1,50 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/models/deck_review_stats.dart
-// PURPOSE: Aggregated FSRS stats for a single deck
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-class DeckReviewStats {
-  final String deckId;
-  final String deckTitle;
-
-  // Due counts (The Anki standard)
+class DeckDueStats {
   final int dueNew;
   final int dueLearning;
   final int dueReview;
 
-  // Historical FSRS ratings
-  final int historicalAgain;
-  final int historicalHard;
-  final int historicalGood;
-  final int historicalEasy;
+  const DeckDueStats({
+    this.dueNew = 0,
+    this.dueLearning = 0,
+    this.dueReview = 0,
+  });
+
+  int get totalDue => dueNew + dueLearning + dueReview;
+}
+
+class DeckHistoricalStats {
+  final int again;
+  final int hard;
+  final int good;
+  final int easy;
+
+  const DeckHistoricalStats({
+    this.again = 0,
+    this.hard = 0,
+    this.good = 0,
+    this.easy = 0,
+  });
+
+  int get totalReviews => again + hard + good + easy;
+}
+
+/// The composed model that the UI actually consumes
+class DeckReviewStats {
+  final String deckId;
+  final String deckTitle;
+  final DeckDueStats due;
+  final DeckHistoricalStats historical;
 
   const DeckReviewStats({
     required this.deckId,
     required this.deckTitle,
-    this.dueNew = 0,
-    this.dueLearning = 0,
-    this.dueReview = 0,
-    this.historicalAgain = 0,
-    this.historicalHard = 0,
-    this.historicalGood = 0,
-    this.historicalEasy = 0,
+    required this.due,
+    required this.historical,
   });
 
-  int get totalDue => dueNew + dueLearning + dueReview;
-  int get totalHistorical =>
-      historicalAgain + historicalHard + historicalGood + historicalEasy;
+  int get totalDue => due.totalDue;
 }

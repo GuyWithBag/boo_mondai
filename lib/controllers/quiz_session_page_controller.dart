@@ -118,7 +118,7 @@ class QuizSessionPageController extends SessionController {
 
     _currentAnswers.add(newAnswer);
 
-    // ── THE TOGGLE ──
+    // ── THE TOGGLE (REAL-TIME) ──
     if (realTimeSaving) {
       await Repositories.quizAnswer.save(newAnswer);
 
@@ -127,11 +127,20 @@ class QuizSessionPageController extends SessionController {
 
       // Real-time FSRS enrollment for correct answers
       if (type != QuizAnswerType.incorrect) {
-        final fsrsCard = await FsrsCard.create(
-          reviewCardId: reviewCard.id,
-          userId: _session!.userId,
-        );
-        Services.fsrs.enrollCard(card: fsrsCard, rating: mapToFsrsRating(type));
+        // SAFETY CHECK: Ensure it isn't already enrolled
+        final existing = Repositories.fsrsCard.getByReviewCardId(reviewCard.id);
+
+        if (existing == null) {
+          final fsrsCard = await FsrsCard.create(
+            reviewCardId: reviewCard.id,
+            userId: _session!.userId,
+          );
+          // Make sure to await this so the Hive box finishes writing!
+          await Services.fsrs.enrollCard(
+            card: fsrsCard,
+            rating: mapToFsrsRating(type),
+          );
+        }
       }
     }
 
@@ -169,24 +178,34 @@ class QuizSessionPageController extends SessionController {
       _isComplete = true;
 
       if (realTimeSaving) {
-        // If we saved in real-time, we just need to update the final completedAt timestamp
         await Repositories.quizSession.save(_session!);
       } else {
         // ── BATCH SAVE ──
         await Repositories.quizSession.save(_session!);
         await Repositories.quizAnswer.saveAll(_currentAnswers);
 
-        final fsrsEligibleAnswers = _currentAnswers.where(
-          (a) => a.type != QuizAnswerType.incorrect,
-        );
+        // 1. Deduplicate: Get only the final correct answer for each card
+        final eligibleAnswersMap = <String, QuizAnswer>{};
+        for (final a in _currentAnswers) {
+          if (a.type != QuizAnswerType.incorrect) {
+            eligibleAnswersMap[a.cardId] = a;
+          }
+        }
 
-        for (final answer in fsrsEligibleAnswers) {
+        // 2. Process enrollments safely
+        for (final answer in eligibleAnswersMap.values) {
+          // SAFETY CHECK: Ensure it isn't already enrolled
+          final existing = Repositories.fsrsCard.getByReviewCardId(
+            answer.cardId,
+          );
+          if (existing != null) continue;
+
           final fsrsCard = await FsrsCard.create(
             reviewCardId: answer.cardId,
             userId: _session!.userId,
           );
 
-          Services.fsrs.enrollCard(
+          await Services.fsrs.enrollCard(
             card: fsrsCard,
             rating: mapToFsrsRating(answer.type),
           );

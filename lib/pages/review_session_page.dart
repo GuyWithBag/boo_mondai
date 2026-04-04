@@ -21,13 +21,19 @@ class ReviewSessionPage extends HookWidget {
       return ErrorState(message: 'Deck Id Not Found');
     }
     final ctrl = context.watch<ReviewSessionController>();
+    final dashboardController = context.read<ReviewDashboardController>();
     final shakeController = useAnimationController(
       duration: const Duration(milliseconds: 400),
     );
 
     // Initialize session on mount
     useEffect(() {
-      Future.microtask(() => ctrl.startSession(deckId: deckId));
+      Future.microtask(
+        () => ctrl.startSession(
+          deckId: deckId,
+          filter: dashboardController.dueFilter,
+        ),
+      );
       return null;
     }, [deckId]);
 
@@ -67,19 +73,13 @@ class ReviewSessionPage extends HookWidget {
             children: [
               const Icon(Icons.auto_awesome, size: 80, color: Colors.orange),
               const SizedBox(height: AppSpacing.lg),
-              const Text(
-                'Deck Finished!',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              const Text(
-                'Your memory has been updated.',
-                style: TextStyle(color: AppColors.textSecondary),
-              ),
-              const SizedBox(height: AppSpacing.xl),
+              const Text('Deck Finished!'),
+              // ...
               FilledButton.icon(
                 onPressed: () {
                   ctrl.reset();
+                  // ✨ FIX 1: Refresh the dashboard before leaving!
+                  dashboardController.loadDashboard();
                   context.pop();
                 },
                 icon: const Icon(Icons.arrow_back),
@@ -105,7 +105,11 @@ class ReviewSessionPage extends HookWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.close),
-            onPressed: () => context.pop(),
+            onPressed: () {
+              // ✨ FIX 1 (Part B): Also refresh if they exit early!
+              dashboardController.loadDashboard();
+              context.pop();
+            },
           ),
         ],
       ),
@@ -120,13 +124,15 @@ class ReviewSessionPage extends HookWidget {
               backgroundColor: AppColors.textSecondary.withValues(alpha: 0.1),
             ),
 
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              child: QuizInteraction(
-                template: currentTemplate,
-                reviewCard: currentReviewCard,
-                controller: ctrl,
-                shakeController: shakeController,
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                child: QuizInteraction(
+                  template: currentTemplate,
+                  reviewCard: currentReviewCard,
+                  controller: ctrl,
+                  shakeController: shakeController,
+                ),
               ),
             ),
           ],

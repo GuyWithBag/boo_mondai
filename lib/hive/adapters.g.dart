@@ -1001,3 +1001,270 @@ class IdentificationTemplateAdapter
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
+
+class QuizAnswerAdapter extends TypeAdapter<QuizAnswer> {
+  @override
+  final typeId = 20;
+
+  @override
+  QuizAnswer read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return QuizAnswer(
+      id: fields[0] as String,
+      sessionId: fields[1] as String,
+      cardId: fields[2] as String,
+      userAnswer: fields[3] as String,
+      type: fields[4] as QuizAnswerType,
+      createdAt: fields[5] as DateTime,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, QuizAnswer obj) {
+    writer
+      ..writeByte(6)
+      ..writeByte(0)
+      ..write(obj.id)
+      ..writeByte(1)
+      ..write(obj.sessionId)
+      ..writeByte(2)
+      ..write(obj.cardId)
+      ..writeByte(3)
+      ..write(obj.userAnswer)
+      ..writeByte(4)
+      ..write(obj.type)
+      ..writeByte(5)
+      ..write(obj.createdAt);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is QuizAnswerAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class QuizAnswerTypeAdapter extends TypeAdapter<QuizAnswerType> {
+  @override
+  final typeId = 21;
+
+  @override
+  QuizAnswerType read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return QuizAnswerType.incorrect;
+      case 1:
+        return QuizAnswerType.again;
+      case 2:
+        return QuizAnswerType.easy;
+      case 3:
+        return QuizAnswerType.good;
+      case 4:
+        return QuizAnswerType.hard;
+      default:
+        return QuizAnswerType.incorrect;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, QuizAnswerType obj) {
+    switch (obj) {
+      case QuizAnswerType.incorrect:
+        writer.writeByte(0);
+      case QuizAnswerType.again:
+        writer.writeByte(1);
+      case QuizAnswerType.easy:
+        writer.writeByte(2);
+      case QuizAnswerType.good:
+        writer.writeByte(3);
+      case QuizAnswerType.hard:
+        writer.writeByte(4);
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is QuizAnswerTypeAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class FsrsCardAdapter extends TypeAdapter<FsrsCard> {
+  @override
+  final typeId = 22;
+
+  @override
+  FsrsCard read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return FsrsCard(
+      id: fields[0] as String,
+      userId: fields[1] as String,
+      reviewCardId: fields[2] as String,
+      state: fields[3] as Card,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, FsrsCard obj) {
+    writer
+      ..writeByte(4)
+      ..writeByte(0)
+      ..write(obj.id)
+      ..writeByte(1)
+      ..write(obj.userId)
+      ..writeByte(2)
+      ..write(obj.reviewCardId)
+      ..writeByte(3)
+      ..write(obj.state);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is FsrsCardAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class FsrsReviewLogAdapter extends TypeAdapter<FsrsReviewLog> {
+  @override
+  final typeId = 23;
+
+  @override
+  FsrsReviewLog read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return FsrsReviewLog(
+      id: fields[0] as String,
+      cardId: fields[1] as String,
+      log: fields[2] as ReviewLog,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, FsrsReviewLog obj) {
+    writer
+      ..writeByte(3)
+      ..writeByte(0)
+      ..write(obj.id)
+      ..writeByte(1)
+      ..write(obj.cardId)
+      ..writeByte(2)
+      ..write(obj.log);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is FsrsReviewLogAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class StateAdapter extends TypeAdapter<State> {
+  @override
+  final typeId = 24;
+
+  @override
+  State read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return State.learning;
+      case 1:
+        return State.review;
+      case 2:
+        return State.relearning;
+      default:
+        return State.learning;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, State obj) {
+    switch (obj) {
+      case State.learning:
+        writer.writeByte(0);
+      case State.review:
+        writer.writeByte(1);
+      case State.relearning:
+        writer.writeByte(2);
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is StateAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class RatingAdapter extends TypeAdapter<Rating> {
+  @override
+  final typeId = 25;
+
+  @override
+  Rating read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return Rating.again;
+      case 1:
+        return Rating.hard;
+      case 2:
+        return Rating.good;
+      case 3:
+        return Rating.easy;
+      default:
+        return Rating.again;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, Rating obj) {
+    switch (obj) {
+      case Rating.again:
+        writer.writeByte(0);
+      case Rating.hard:
+        writer.writeByte(1);
+      case Rating.good:
+        writer.writeByte(2);
+      case Rating.easy:
+        writer.writeByte(3);
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is RatingAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}

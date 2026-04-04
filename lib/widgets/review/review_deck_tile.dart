@@ -71,17 +71,17 @@ class ReviewDeckTile extends StatelessWidget {
                 children: [
                   _StatColumn(
                     label: 'New',
-                    count: stats.dueNew,
+                    count: stats.due.dueNew, // Updated accessor
                     color: Colors.blue,
                   ),
                   _StatColumn(
                     label: 'Learn',
-                    count: stats.dueLearning,
+                    count: stats.due.dueLearning, // Updated accessor
                     color: AppColors.incorrect,
                   ),
                   _StatColumn(
                     label: 'Review',
-                    count: stats.dueReview,
+                    count: stats.due.dueReview, // Updated accessor
                     color: AppColors.correct,
                   ),
                 ],
@@ -104,22 +104,22 @@ class ReviewDeckTile extends StatelessWidget {
                 children: [
                   _HistoryBadge(
                     label: 'Again',
-                    count: stats.historicalAgain,
+                    count: stats.historical.again, // Updated accessor
                     color: AppColors.incorrect,
                   ),
                   _HistoryBadge(
                     label: 'Hard',
-                    count: stats.historicalHard,
+                    count: stats.historical.hard, // Updated accessor
                     color: AppColors.hard,
                   ),
                   _HistoryBadge(
                     label: 'Good',
-                    count: stats.historicalGood,
+                    count: stats.historical.good, // Updated accessor
                     color: AppColors.correct,
                   ),
                   _HistoryBadge(
                     label: 'Easy',
-                    count: stats.historicalEasy,
+                    count: stats.historical.easy, // Updated accessor
                     color: Colors.blue,
                   ),
                 ],

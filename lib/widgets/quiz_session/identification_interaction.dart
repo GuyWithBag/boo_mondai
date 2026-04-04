@@ -48,7 +48,7 @@ class IdentificationInteraction extends HookWidget {
       } // Optional: prevent blank submissions
 
       // Pre-calculate the FSRS intervals for the RatingArea UI
-      await controller.calculateNextIntervals();
+      // await controller.calculateNextIntervals();
 
       // Update local state to show the Rating Area
       isRevealed.value = true;

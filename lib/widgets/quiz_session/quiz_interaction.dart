@@ -7,8 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/models/models.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 
-class QuizInteraction extends StatelessWidget {
+class QuizInteraction extends HookWidget {
   const QuizInteraction({
     super.key,
     required this.template,
@@ -24,6 +25,10 @@ class QuizInteraction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    useEffect(() {
+      controller.calculateNextIntervals();
+      return null;
+    });
     return switch (template) {
       FlashcardTemplate f => FlashcardInteraction(
         template: f,

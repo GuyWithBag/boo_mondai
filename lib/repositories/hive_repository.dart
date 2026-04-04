@@ -29,16 +29,16 @@ abstract class HiveRepository<T> {
 
   T? getById(String id) => box.get(id);
 
-  Future<void> save(T item) => box.put(getId(item), item);
+  Future<void> save(T item) async => await box.put(getId(item), item);
 
   Future<void> saveAll(List<T> items) async {
     final map = {for (final item in items) getId(item): item};
     await box.putAll(map);
   }
 
-  Future<void> delete(String id) => box.delete(id);
+  Future<void> delete(String id) async => await box.delete(id);
 
-  Future<void> deleteAll(List<String> ids) => box.deleteAll(ids);
+  Future<void> deleteAll(List<String> ids) async => await box.deleteAll(ids);
 
   Future<void> clear() => box.clear();
 }

@@ -7,9 +7,6 @@
 
 import 'package:boo_mondai/lib.barrel.dart';
 
-import '../models/deck.dart';
-import 'hive_repository.dart';
-
 class DeckRepository extends HiveRepository<Deck> {
   @override
   String get boxName => 'deck_box';

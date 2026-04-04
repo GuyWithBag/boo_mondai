@@ -31,13 +31,11 @@ class QuizSessionPage extends HookWidget {
     useEffect(() {
       // We use context.read here because we only want to call this once,
       // not every time the controller updates.
-      final controller = context.read<QuizSessionPageController>();
-
       // We wrap it in a post-frame callback to avoid "setState() or markNeedsBuild()
       // called during build" errors from Provider.
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (controller.session == null) {
-          controller.startSession(deckId!);
+        if (ctrl.session == null) {
+          ctrl.startSession(deckId!);
         }
       });
 

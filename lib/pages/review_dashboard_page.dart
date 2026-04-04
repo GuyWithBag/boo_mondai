@@ -19,9 +19,7 @@ class ReviewDashboardPage extends HookWidget {
 
     useEffect(() {
       // Load stats when page opens
-      Future.microtask(
-        () => context.read<ReviewDashboardController>().loadDashboard(),
-      );
+      Future.microtask(() => ctrl.loadDashboard());
       return null;
     }, const []);
 
@@ -52,7 +50,7 @@ class ReviewDashboardPage extends HookWidget {
           bottom: 100, // Padding for FAB
         ),
         itemCount: ctrl.deckStats.length,
-        separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
+        separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.sm),
         itemBuilder: (context, i) {
           final stat = ctrl.deckStats[i];
           return ReviewDeckTile(
