@@ -107,20 +107,20 @@ Always use LayoutBuilder — never raw MediaQuery.size comparisons inline.
 ### SECTION 1 — PROJECT OVERVIEW
 
 - App name: BooMondai (問題)
-- Purpose: Gamified language learning platform with FSRS spaced repetition, user-generated quizzes, and built-in research instrumentation for a quasi-experimental capstone study.
+- Purpose: Gamified language learning platform with FSRS spaced repetition, user-generated drillzes, and built-in research instrumentation for a quasi-experimental capstone study.
 - Target platforms: Mobile (iOS + Android), Web, Desktop (Windows/macOS/Linux)
 
 Core user stories:
-- As a Group A participant, I want to take a gamified quiz on a premade vocabulary deck so that I learn new words effectively.
-- As a Group A participant, I want to preview vocabulary before quizzing so that I can prime my memory.
-- As a learner, I want my quiz results to seed an FSRS review schedule so that I retain words long-term via spaced repetition.
+- As a Group A participant, I want to take a gamified drill on a premade vocabulary deck so that I learn new words effectively.
+- As a Group A participant, I want to preview vocabulary before drillzing so that I can prime my memory.
+- As a learner, I want my drill results to seed an FSRS review schedule so that I retain words long-term via spaced repetition.
 - As a learner, I want to create my own decks and share them so that I can study additional vocabulary.
 - As a participant (A or B), I want to enter a researcher code so that I can unlock and complete required surveys and vocabulary tests.
 - As a researcher, I want to generate codes, add users to the study, and view all collected data so that I can run the experiment.
 - As a learner, I want to see leaderboards and my streak so that I stay motivated.
 
 v1.0 scope — explicitly OUT:
-- Multiplayer / real-time WebSocket quiz sessions
+- Multiplayer / real-time WebSocket drill sessions
 - Audio/pronunciation features
 - Chat or social features
 - Push notifications to external devices (local notifications only)
@@ -136,13 +136,13 @@ lib/
 │   ├── auth_provider.dart
 │   ├── deck_provider.dart
 │   ├── card_provider.dart
-│   ├── quiz_provider.dart
+│   ├── drill_provider.dart
 │   ├── fsrs_provider.dart
 │   ├── leaderboard_provider.dart
 │   ├── streak_provider.dart
 │   └── research_provider.dart
 ├── controllers/
-│   └── quiz_queue_controller.dart
+│   └── drill_queue_controller.dart
 ├── services/
 │   ├── supabase_service.dart
 │   ├── hive_service.dart
@@ -152,8 +152,8 @@ lib/
 │   ├── user_profile.dart
 │   ├── deck.dart
 │   ├── deck_card.dart
-│   ├── quiz_session.dart
-│   ├── quiz_answer.dart
+│   ├── drill_session.dart
+│   ├── drill_answer.dart
 │   ├── fsrs_card_state.dart
 │   ├── review_log_entry.dart
 │   ├── leaderboard_entry.dart
@@ -168,7 +168,7 @@ lib/
 ├── widgets/
 │   ├── responsive_scaffold.dart
 │   ├── deck_card_widget.dart
-│   ├── quiz_question_card.dart
+│   ├── drill_question_card.dart
 │   ├── self_rating_bottom_sheet.dart
 │   ├── likert_scale_widget.dart
 │   ├── streak_badge.dart
@@ -182,9 +182,9 @@ lib/
 │   ├── deck_detail_page.dart
 │   ├── deck_creator_page.dart
 │   ├── card_editor_page.dart
-│   ├── quiz_preview_page.dart
-│   ├── quiz_session_page.dart
-│   ├── quiz_result_page.dart
+│   ├── drill_preview_page.dart
+│   ├── drill_session_page.dart
+│   ├── drill_result_page.dart
 │   ├── review_page.dart
 │   ├── leaderboard_page.dart
 │   ├── account_page.dart
@@ -208,13 +208,13 @@ test/
 │   ├── auth_provider_test.dart
 │   ├── deck_provider_test.dart
 │   ├── card_provider_test.dart
-│   ├── quiz_provider_test.dart
+│   ├── drill_provider_test.dart
 │   ├── fsrs_provider_test.dart
 │   ├── leaderboard_provider_test.dart
 │   ├── streak_provider_test.dart
 │   └── research_provider_test.dart
 ├── controllers/
-│   └── quiz_queue_controller_test.dart
+│   └── drill_queue_controller_test.dart
 ├── services/
 │   ├── supabase_service_test.dart
 │   ├── hive_service_test.dart
@@ -223,7 +223,7 @@ test/
 ├── widgets/
 │   ├── responsive_scaffold_test.dart
 │   ├── deck_card_widget_test.dart
-│   ├── quiz_question_card_test.dart
+│   ├── drill_question_card_test.dart
 │   ├── self_rating_bottom_sheet_test.dart
 │   ├── likert_scale_widget_test.dart
 │   ├── streak_badge_test.dart
@@ -233,7 +233,7 @@ test/
 │   ├── login_page_test.dart
 │   ├── home_page_test.dart
 │   ├── deck_list_page_test.dart
-│   ├── quiz_session_page_test.dart
+│   ├── drill_session_page_test.dart
 │   ├── review_page_test.dart
 │   ├── researcher_dashboard_page_test.dart
 │   ├── survey_page_test.dart
@@ -242,7 +242,7 @@ test/
     ├── fake_deck.dart
     ├── fake_deck_card.dart
     ├── fake_user_profile.dart
-    ├── fake_quiz_session.dart
+    ├── fake_drill_session.dart
     ├── fake_fsrs_card_state.dart
     ├── mock_supabase_service.dart
     ├── mock_hive_service.dart
@@ -264,7 +264,7 @@ Fields:
   - createdAt (DateTime, non-null)
 Source: Supabase profiles table + local Hive cache
 Serialization: fromJson/toJson + hive_ce @GenerateAdapters
-Relationships: has many Deck, has many QuizSession, has one Streak
+Relationships: has many Deck, has many DrillSession, has one Streak
 ```
 
 ```
@@ -303,7 +303,7 @@ Notes: Multiple accepted answers stored as comma-separated string. Matching logi
 ```
 
 ```
-Model: QuizSession
+Model: DrillSession
 Fields:
   - id (String, non-null) — UUID
   - userId (String, non-null)
@@ -313,13 +313,13 @@ Fields:
   - correctCount (int, non-null)
   - startedAt (DateTime, non-null)
   - completedAt (DateTime?, nullable)
-Source: Supabase quiz_sessions table + local Hive cache
+Source: Supabase drill_sessions table + local Hive cache
 Serialization: fromJson/toJson + hive_ce @GenerateAdapters
-Relationships: belongs to UserProfile, belongs to Deck, has many QuizAnswer
+Relationships: belongs to UserProfile, belongs to Deck, has many DrillAnswer
 ```
 
 ```
-Model: QuizAnswer
+Model: DrillAnswer
 Fields:
   - id (String, non-null) — UUID
   - sessionId (String, non-null)
@@ -328,9 +328,9 @@ Fields:
   - isCorrect (bool, non-null)
   - selfRating (int?, nullable) — 1=Again, 2=Hard, 3=Good, 4=Easy; null if incorrect final attempt
   - answeredAt (DateTime, non-null)
-Source: Supabase quiz_answers table + local Hive cache
+Source: Supabase drill_answers table + local Hive cache
 Serialization: fromJson/toJson + hive_ce @GenerateAdapters
-Relationships: belongs to QuizSession, belongs to DeckCard
+Relationships: belongs to DrillSession, belongs to DeckCard
 ```
 
 ```
@@ -376,7 +376,7 @@ Fields:
   - userId (String, non-null)
   - userName (String, non-null)
   - targetLanguage (String?, nullable)
-  - quizScore (int, non-null) — total correct across all sessions
+  - drillScore (int, non-null) — total correct across all sessions
   - reviewCount (int, non-null) — total FSRS reviews completed
   - currentStreak (int, non-null)
 Source: Supabase leaderboard view (computed)
@@ -610,29 +610,29 @@ Error state: String? _error with getter
 ```
 
 ```
-Provider: QuizProvider
-File: lib/providers/quiz_provider.dart
-Responsibility: Manages quiz session state — preview choice, question queue, answer tracking, session completion
+Provider: DrillProvider
+File: lib/providers/drill_provider.dart
+Responsibility: Manages drill session state — preview choice, question queue, answer tracking, session completion
 
 Dependencies (injected via constructor):
   - SupabaseService
   - HiveService
   - FsrsService
-  - QuizQueueController
+  - DrillQueueController
 
 Private state fields:
-  - _session (QuizSession?)
+  - _session (DrillSession?)
   - _currentCard (DeckCard?)
-  - _answers (List<QuizAnswer>)
+  - _answers (List<DrillAnswer>)
   - _queueLength (int)
   - _isLoading (bool)
   - _error (String?)
   - _isComplete (bool)
 
 Public getters:
-  - session → QuizSession?
+  - session → DrillSession?
   - currentCard → DeckCard?
-  - answers → List<QuizAnswer>
+  - answers → List<DrillAnswer>
   - queueLength → int
   - progress → double
   - isLoading → bool
@@ -641,7 +641,7 @@ Public getters:
 
 Public methods:
   - startSession(deckId, userId, cards, previewed) → Future<void>
-    Does: creates QuizSession, initializes QuizQueueController with cards, saves to Supabase
+    Does: creates DrillSession, initializes DrillQueueController with cards, saves to Supabase
     Notifies: yes
     Error handling: sets _error
 
@@ -650,7 +650,7 @@ Public methods:
     Notifies: yes
 
   - submitSelfRating(rating) → Future<void>
-    Does: if Again(1), requeues; if Hard(2)/Good(3)/Easy(4), saves QuizAnswer, advances queue. When queue empty, completes session and enrolls cards in FSRS.
+    Does: if Again(1), requeues; if Hard(2)/Good(3)/Easy(4), saves DrillAnswer, advances queue. When queue empty, completes session and enrolls cards in FSRS.
     Notifies: yes
     Error handling: sets _error
 
@@ -704,7 +704,7 @@ Public methods:
     Notifies: yes
     Error handling: sets _error
 
-  - enrollCardsFromQuiz(List<QuizAnswer> answers, List<DeckCard> cards) → Future<void>
+  - enrollCardsFromDrill(List<DrillAnswer> answers, List<DeckCard> cards) → Future<void>
     Does: for each card with a self-rating, calls FsrsService.createNewCard + scheduleCard, saves FsrsCardState to Hive and Supabase
     Notifies: yes
     Error handling: sets _error
@@ -735,7 +735,7 @@ Public getters:
 
 Public methods:
   - fetchLeaderboard({String? targetLanguage}) → Future<void>
-    Does: queries Supabase leaderboard view, optionally filtered by targetLanguage, sorts by quizScore descending
+    Does: queries Supabase leaderboard view, optionally filtered by targetLanguage, sorts by drillScore descending
     Notifies: yes
     Error handling: sets _error
 
@@ -881,18 +881,18 @@ Hooks:
   - useTextEditingController → question, answer fields
   - useFocusNode → question field (auto-focus)
 
-Screen: QuizPreviewPage
+Screen: DrillPreviewPage
 Hooks:
   - useScrollController → scrollable card list
 
-Screen: QuizSessionPage
+Screen: DrillSessionPage
 Hooks:
   - useTextEditingController → answer input field
   - useAnimationController → card transition animation (300ms, easeInOut)
   - useAnimationController → incorrect answer shake animation (400ms)
   - useEffect → auto-focus answer field when new card appears
 
-Screen: QuizResultPage
+Screen: DrillResultPage
 Hooks:
   - useAnimationController → score reveal spring animation (600ms)
 
@@ -949,9 +949,9 @@ Routes:
   /decks/:deckId/edit → DeckCreatorPage edit mode (auth: yes)
   /decks/:deckId/cards/add → CardEditorPage (auth: yes)
   /decks/:deckId/cards/:cardId/edit → CardEditorPage edit mode (auth: yes)
-  /quiz/:deckId/preview → QuizPreviewPage (auth: yes)
-  /quiz/:deckId/session → QuizSessionPage (auth: yes, URL not restorable mid-quiz)
-  /quiz/:sessionId/result → QuizResultPage (auth: yes)
+  /drill/:deckId/preview → DrillPreviewPage (auth: yes)
+  /drill/:deckId/session → DrillSessionPage (auth: yes, URL not restorable mid-drill)
+  /drill/:sessionId/result → DrillResultPage (auth: yes)
   /review → ReviewPage (auth: yes)
   /leaderboard → LeaderboardPage (auth: yes)
   /account → AccountPage (auth: yes)
@@ -990,7 +990,7 @@ Screen: DeckListPage
   Web: responsive grid (2–3 columns), search bar. MouseRegion hover elevation. Ctrl+N create shortcut.
   Desktop: same grid. Tooltips on deck cards.
 
-Screen: QuizSessionPage
+Screen: DrillSessionPage
   Mobile: full screen — question card centered, answer input bottom. SafeArea. No swipe gestures.
   Web: centered max-width (600px). Enter to submit, 1/2/3/4 for self-rating shortcuts.
   Desktop: same as web. Same keyboard shortcuts.
@@ -1020,12 +1020,12 @@ Responsive breakpoints (lib/shared/breakpoints.dart):
 
 ```
 API: AnimationController + CurvedAnimation (easeInOutCubic)
-Used in: ReviewPage (card flip 400ms), QuizSessionPage (card transitions 300ms), QuizResultPage (score reveal 600ms spring)
+Used in: ReviewPage (card flip 400ms), DrillSessionPage (card transitions 300ms), DrillResultPage (score reveal 600ms spring)
 Purpose: smooth card flip and transition animations
 Why native: simple tween animations don't need a package
 
 API: AnimatedSwitcher
-Used in: QuizSessionPage (switching between question cards)
+Used in: DrillSessionPage (switching between question cards)
 Purpose: cross-fade between cards
 Why native: built-in widget
 
@@ -1045,7 +1045,7 @@ Purpose: form validation
 Why native: built-in form validation
 
 API: GestureDetector
-Used in: ReviewPage (tap to reveal), QuizSessionPage (answer interactions)
+Used in: ReviewPage (tap to reveal), DrillSessionPage (answer interactions)
 Purpose: tap detection
 Why native: no gesture library needed
 
@@ -1060,7 +1060,7 @@ Purpose: responsive layout decisions
 Why native: preferred over raw MediaQuery
 
 API: Shortcuts + Actions + Intent
-Used in: QuizSessionPage (1/2/3/4 rating, Enter submit), ReviewPage (Space flip)
+Used in: DrillSessionPage (1/2/3/4 rating, Enter submit), ReviewPage (Space flip)
 Purpose: keyboard shortcut support for web and desktop
 Why native: native keyboard handling
 
@@ -1119,10 +1119,10 @@ Methods:
   - updateCard(id, data) → Future<void>
   - deleteCard(id) → Future<void>
 
-  Quiz:
-  - insertQuizSession(data) → Future<Map<String, dynamic>>
-  - updateQuizSession(id, data) → Future<void>
-  - insertQuizAnswer(data) → Future<void>
+  Drill:
+  - insertDrillSession(data) → Future<Map<String, dynamic>>
+  - updateDrillSession(id, data) → Future<void>
+  - insertDrillAnswer(data) → Future<void>
 
   FSRS:
   - upsertFsrsCard(data) → Future<void>
@@ -1291,8 +1291,8 @@ CREATE INDEX ON deck_cards (deck_id);
 ```
 
 ```sql
--- ── quiz_sessions ──────────────────────────────────────────
-CREATE TABLE quiz_sessions (
+-- ── drill_sessions ──────────────────────────────────────────
+CREATE TABLE drill_sessions (
   id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id         uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   deck_id         uuid NOT NULL REFERENCES decks(id) ON DELETE CASCADE,
@@ -1302,29 +1302,29 @@ CREATE TABLE quiz_sessions (
   started_at      timestamptz NOT NULL DEFAULT now(),
   completed_at    timestamptz
 );
-ALTER TABLE quiz_sessions ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "quiz_sessions: users manage own" ON quiz_sessions FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
-CREATE INDEX ON quiz_sessions (user_id);
-CREATE INDEX ON quiz_sessions (deck_id);
+ALTER TABLE drill_sessions ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "drill_sessions: users manage own" ON drill_sessions FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+CREATE INDEX ON drill_sessions (user_id);
+CREATE INDEX ON drill_sessions (deck_id);
 ```
 
 ```sql
--- ── quiz_answers ──────────────────────────────────────────
-CREATE TABLE quiz_answers (
+-- ── drill_answers ──────────────────────────────────────────
+CREATE TABLE drill_answers (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  session_id  uuid NOT NULL REFERENCES quiz_sessions(id) ON DELETE CASCADE,
+  session_id  uuid NOT NULL REFERENCES drill_sessions(id) ON DELETE CASCADE,
   card_id     uuid NOT NULL REFERENCES deck_cards(id) ON DELETE CASCADE,
   user_answer text NOT NULL,
   is_correct  bool NOT NULL,
   self_rating int CHECK (self_rating BETWEEN 1 AND 4),
   answered_at timestamptz NOT NULL DEFAULT now()
 );
-ALTER TABLE quiz_answers ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "quiz_answers: users manage own" ON quiz_answers FOR ALL
-  USING (EXISTS (SELECT 1 FROM quiz_sessions WHERE quiz_sessions.id = quiz_answers.session_id AND quiz_sessions.user_id = auth.uid()))
-  WITH CHECK (EXISTS (SELECT 1 FROM quiz_sessions WHERE quiz_sessions.id = quiz_answers.session_id AND quiz_sessions.user_id = auth.uid()));
-CREATE INDEX ON quiz_answers (session_id);
-CREATE INDEX ON quiz_answers (card_id);
+ALTER TABLE drill_answers ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "drill_answers: users manage own" ON drill_answers FOR ALL
+  USING (EXISTS (SELECT 1 FROM drill_sessions WHERE drill_sessions.id = drill_answers.session_id AND drill_sessions.user_id = auth.uid()))
+  WITH CHECK (EXISTS (SELECT 1 FROM drill_sessions WHERE drill_sessions.id = drill_answers.session_id AND drill_sessions.user_id = auth.uid()));
+CREATE INDEX ON drill_answers (session_id);
+CREATE INDEX ON drill_answers (card_id);
 ```
 
 ```sql
@@ -1393,16 +1393,16 @@ SELECT
   p.id AS user_id,
   p.display_name,
   p.target_language,
-  COALESCE(SUM(qs.correct_count), 0)::int AS quiz_score,
+  COALESCE(SUM(qs.correct_count), 0)::int AS drill_score,
   COALESCE(rc.review_count, 0)::int AS review_count,
   COALESCE(s.current_streak, 0) AS current_streak
 FROM profiles p
-LEFT JOIN quiz_sessions qs ON qs.user_id = p.id AND qs.completed_at IS NOT NULL
+LEFT JOIN drill_sessions qs ON qs.user_id = p.id AND qs.completed_at IS NOT NULL
 LEFT JOIN (SELECT user_id, COUNT(*)::int AS review_count FROM review_logs GROUP BY user_id) rc ON rc.user_id = p.id
 LEFT JOIN streaks s ON s.user_id = p.id
 WHERE p.role = 'group_a_participant'
 GROUP BY p.id, p.display_name, p.target_language, rc.review_count, s.current_streak
-ORDER BY quiz_score DESC;
+ORDER BY drill_score DESC;
 ```
 
 ```sql
@@ -1688,8 +1688,8 @@ DeckCard fakeDeckCard({String? id, String? question, String? answer}) => DeckCar
 List<DeckCard> fakeDeckCardList({int count = 3}) =>
   List.generate(count, (i) => fakeDeckCard(id: '00000000-0000-0000-0000-00000000002$i'));
 
-// test/helpers/fake_quiz_session.dart
-QuizSession fakeQuizSession({String? id, bool? completed}) => QuizSession(
+// test/helpers/fake_drill_session.dart
+DrillSession fakeDrillSession({String? id, bool? completed}) => DrillSession(
   id: id ?? '00000000-0000-0000-0000-000000000040',
   userId: '00000000-0000-0000-0000-000000000002',
   deckId: '00000000-0000-0000-0000-000000000010',
@@ -1768,7 +1768,7 @@ Crash reporting: none for v1
 │  DeckCreatorPage/CardEditorPage ──watch──> DeckProvider, CardProvider│
 │      └── hooks: useTextEditingController, useFocusNode               │
 │                                                                      │
-│  QuizSessionPage ──watch──> QuizProvider                             │
+│  DrillSessionPage ──watch──> DrillProvider                             │
 │      └── hooks: useTextEditingController, useAnimationController x2  │
 │                                                                      │
 │  ReviewPage ──watch──> FsrsProvider                                  │
@@ -1797,8 +1797,8 @@ Crash reporting: none for v1
 │  FsrsService              NotificationService                        │
 │                                                                      │
 │  ┌──────────────────────────────────────────────────────┐           │
-│  │ QuizQueueController (non-ChangeNotifier)             │           │
-│  │ Manages quiz question queue: enqueue, dequeue,       │           │
+│  │ DrillQueueController (non-ChangeNotifier)             │           │
+│  │ Manages drill question queue: enqueue, dequeue,       │           │
 │  │ reinsert, isEmpty, length                            │           │
 │  └──────────────────────────────────────────────────────┘           │
 └──────────────┬────────────────┬──────────────────────────────────────┘
@@ -1869,7 +1869,7 @@ dev_dependencies:
 ### SECTION 15 — OPEN QUESTIONS (RESOLVED)
 
 All 10 open questions have been resolved:
-1. Quiz accepts multiple comma-separated answers, case-insensitive match
+1. Drill accepts multiple comma-separated answers, case-insensitive match
 2. Vocabulary test is multiple choice A/B/C/D, 30 items per set
 3. All survey question text provided — see references/survey_questions.md
 4. Premade deck uploaded via UI; mock data seeded for dev

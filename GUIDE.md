@@ -10,8 +10,8 @@ BooMondai (問題) is a gamified Japanese vocabulary learning app. It also doubl
 
 This app is built for an academic study with a **quasi-experimental design**. That means:
 
-- **Group A** uses the full app — quizzes, FSRS spaced repetition, deck creation. They experience the "treatment."
-- **Group B** is the control group. They only take surveys and vocabulary tests. They never touch the quiz or deck features.
+- **Group A** uses the full app — drillzes, FSRS spaced repetition, deck creation. They experience the "treatment."
+- **Group B** is the control group. They only take surveys and vocabulary tests. They never touch the drill or deck features.
 
 The researcher needs to measure both groups at specific points in time (e.g., before, during, and after the study period). The measurement tools are surveys and vocabulary tests built into the app.
 
@@ -22,7 +22,7 @@ The researcher needs to measure both groups at specific points in time (e.g., be
 | Role | What they see |
 |---|---|
 | `group_a_participant` | Full app — Home, Decks, Review, Leaderboard, Account tabs. Can enter research codes to unlock surveys/tests when the researcher tells them to. |
-| `group_b_participant` | Only a code entry screen. No quiz, no decks. They only interact with the app when the researcher hands them a code. |
+| `group_b_participant` | Only a code entry screen. No drill, no decks. They only interact with the app when the researcher hands them a code. |
 | `researcher` | Everything Group A sees, plus a **Research Dashboard** button on the Home screen. |
 
 When a user signs up normally, they become `group_a_participant` by default. To make someone a researcher:
@@ -120,7 +120,7 @@ All sections render their structure even when there are no submissions yet, so y
 ### How to get to pages with a back button
 
 - Tapping a deck card → opens Deck Detail (back returns to Decks tab)
-- Deck Detail → Edit / Add Card / Preview / Quiz → back returns to Deck Detail
+- Deck Detail → Edit / Add Card / Preview / Drill → back returns to Deck Detail
 - Account → Sign In / Create Account → back returns to Account
 - Home → Research Dashboard → back returns to Home
 - Account → Enter Research Code → back returns to Account
@@ -142,9 +142,9 @@ A NavigationRail is shown on the left instead of the bottom bar.
 1. Open app → Account tab → **Create Account**
 2. Sign up with email and password
 3. Go to **Decks** tab → tap a deck
-4. Choose **Preview** (see cards first) or **Start Quiz** directly
-5. During the quiz, type your answer. After a correct answer, self-rate: Again / Hard / Good / Easy
-6. After the quiz, cards are scheduled with FSRS spaced repetition
+4. Choose **Preview** (see cards first) or **Start Drill** directly
+5. During the drill, type your answer. After a correct answer, self-rate: Again / Hard / Good / Easy
+6. After the drill, cards are scheduled with FSRS spaced repetition
 7. Come back daily to the **Review** tab to do your due reviews
 8. When the researcher gives you a code → Account tab → **Enter Research Code** → type it in
 
@@ -194,9 +194,9 @@ UPDATE research_codes SET used_by = NULL, used_at = NULL WHERE code = 'VOCAB-A-0
 -- See all vocabulary test results
 SELECT user_id, test_set, score, submitted_at FROM research_vocabulary_test;
 
--- See all quiz sessions
+-- See all drill sessions
 SELECT qs.id, p.email, d.title, qs.correct_count, qs.total_questions, qs.completed_at
-FROM quiz_sessions qs
+FROM drill_sessions qs
 JOIN profiles p ON p.id = qs.user_id
 JOIN decks d ON d.id = qs.deck_id;
 ```

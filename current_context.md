@@ -25,32 +25,32 @@ Reference docs updated: `references/deck_psuedo_class_diagram.md`, `references/d
 
 ---
 
-## 2. Pending: Quiz Session Overhaul
+## 2. Pending: Drill Session Overhaul
 
 ### 2a. Bug fix — answer recognition (とり not matched)
 - Root cause: `CardProvider.fetchCards` likely doesn't join the `notes` table, so `card.notes` is empty → `primaryNote` is null → `checkAnswer` always returns false.
 - Fix: ensure Supabase query for cards left-joins `notes`, `mc_options`, `fitb_segments`, `mm_pairs`.
-- Confirmed by user: front/back shows correctly in editor (so notes DO load in the editor's fetch path, but not in the quiz path).
+- Confirmed by user: front/back shows correctly in editor (so notes DO load in the editor's fetch path, but not in the drill path).
 
-### 2b. Local-first quiz (no Supabase blocking during quiz)
-- **All Supabase writes during a quiz session are deferred** until `_completeSession()`.
-- `startSession`: create `QuizSession` object in memory only (do NOT insert to Supabase yet).
-- `submitSelfRating`: save `QuizAnswer` in-memory `_answers` list only (no `insertQuizAnswer` call).
+### 2b. Local-first drill (no Supabase blocking during drill)
+- **All Supabase writes during a drill session are deferred** until `_completeSession()`.
+- `startSession`: create `DrillSession` object in memory only (do NOT insert to Supabase yet).
+- `submitSelfRating`: save `DrillAnswer` in-memory `_answers` list only (no `insertDrillAnswer` call).
 - `_completeSession`: batch-insert the session row + all answer rows + FSRS enrollment all at once at the end.
 - This eliminates the latency the user was experiencing after each self-rating.
 
 ### 2c. Three-strike rule (per session, per card)
-- Track `_wrongCounts: Map<String, int>` (cardId → wrong count) in `QuizQueueController` or `QuizProvider`.
+- Track `_wrongCounts: Map<String, int>` (cardId → wrong count) in `DrillQueueController` or `DrillProvider`.
 - On `submitAnswer` wrong: increment count for that card.
-- If count reaches 3: do NOT requeue. Instead, auto-enroll in FSRS with `Rating.again` (1) and record a `QuizAnswer(isCorrect: false, selfRating: 1)`.
+- If count reaches 3: do NOT requeue. Instead, auto-enroll in FSRS with `Rating.again` (1) and record a `DrillAnswer(isCorrect: false, selfRating: 1)`.
 - UI: show a counter chip below/on the card: `"Attempt 2 / 3"`. Chip turns red at 3.
 - Animation on 3rd strike: brief flash/shake, then card disappears from queue.
 
-### 2d. Question type UI — quiz_session_page.dart
+### 2d. Question type UI — drill_session_page.dart
 
-Each question type needs its own UI widget in `quiz_session_page.dart`:
+Each question type needs its own UI widget in `drill_session_page.dart`:
 
-| Type | Quiz UI |
+| Type | Drill UI |
 |---|---|
 | `flashcard` | Show front → tap "Show Answer" button → back revealed → self-rate. No text input. |
 | `identification` | Show front → text input → submit → show correct answer if wrong → self-rate. |
@@ -59,8 +59,8 @@ Each question type needs its own UI widget in `quiz_session_page.dart`:
 | `wordScramble` | Shuffled word chips at bottom, target reconstruction area at top. User presses "Submit" to check. Self-rate. |
 | `matchMadness` | One card = one full game. All mm_pairs shown (terms left, matches right). User taps to connect pairs. Manual self-rate after game ends. |
 
-### 2e. Anki-style FSRS counter in quiz_session_page
-- Show 3 numbers in the quiz app bar (or below progress bar), FSRS-state-based:
+### 2e. Anki-style FSRS counter in drill_session_page
+- Show 3 numbers in the drill app bar (or below progress bar), FSRS-state-based:
   - **Blue — New**: cards with FSRS `state = 0` (never reviewed)
   - **Red — Learning**: cards with FSRS `state = 1` or `state = 3` (learning / relearning)
   - **Green — Review**: cards with FSRS `state = 2` (in review phase)
@@ -71,8 +71,8 @@ Each question type needs its own UI widget in `quiz_session_page.dart`:
 
 ## 3. Pending: Review Page Overhaul
 
-### 3a. Post-quiz flow
-1. Quiz completes → navigate to **Results page** (existing).
+### 3a. Post-drill flow
+1. Drill completes → navigate to **Results page** (existing).
 2. Results page shows a prompt: **"You have cards to review"** — grouped by deck, each deck shows how many cards are due.
 3. Two buttons: **[Review Now]** and **[Maybe Later]**.
 4. [Review Now] navigates to the **Review page**.
@@ -81,7 +81,7 @@ Each question type needs its own UI widget in `quiz_session_page.dart`:
 - Cards answered correctly (rating 2/3/4) → enrolled in FSRS normally.
 - Cards that hit 3 strikes (auto-ejected) → enrolled with `Rating.again (1)`.
 - Label in UI for 3-strike cards: **"Review Later"** (with tooltip: "This card was moved to FSRS review").
-- All enrolled cards appear on the review page immediately after quiz.
+- All enrolled cards appear on the review page immediately after drill.
 
 ### 3c. Early review rule
 - Cards due **within the next hour**: shown as reviewable immediately.
@@ -169,7 +169,7 @@ ALTER TABLE decks ADD COLUMN IF NOT EXISTS is_published bool NOT NULL DEFAULT fa
 
 - Add detailed comments explaining the deck/card system and FSRS review system.
 - Explain the relationship between `DeckCard` → `FsrsCardState` → `ReviewLogEntry`.
-- Explain the quiz flow from model perspective.
+- Explain the drill flow from model perspective.
 - Already-done model changes (section 1 above) must be reflected.
 
 ---
@@ -177,11 +177,11 @@ ALTER TABLE decks ADD COLUMN IF NOT EXISTS is_published bool NOT NULL DEFAULT fa
 ## 8. Pending: sync_system.md
 
 - Write a detailed sequence diagram + explanation of the sync system (see section 4).
-- Cover: quiz session sync, deck/card sync, FSRS sync, `is_published` flow, conflict resolution.
+- Cover: drill session sync, deck/card sync, FSRS sync, `is_published` flow, conflict resolution.
 - Diagrams needed:
-  1. Full quiz session flow (start → answer → 3-strike → self-grade → complete → local save → sync)
+  1. Full drill session flow (start → answer → 3-strike → self-grade → complete → local save → sync)
   2. Deck/card edit flow (edit locally → save to Hive → push button → Supabase)
-  3. FSRS review flow (quiz complete → enroll → review page → review → sync)
+  3. FSRS review flow (drill complete → enroll → review page → review → sync)
   4. is_published flow
 
 ---
@@ -204,9 +204,9 @@ All items from this section have been completed across Phases 4–6.
 
 | Phase | Name | Status | Summary |
 |---|---|---|---|
-| Phase 1 | Quiz local-first + 3-strike | ✅ Done | No Supabase during quiz; auto-eject at 3 strikes; batch-insert on complete |
-| Phase 2 | Quiz session UI — 6 question types | ✅ Done | flashcard, identification, MC, FITB, wordScramble, matchMadness; Anki counter; strike chip |
-| Phase 3 | Post-quiz review flow + FSRS early-review | ✅ Done | "Review now?" prompt; 1-hour early-review window; upcoming-cards countdown |
+| Phase 1 | Drill local-first + 3-strike | ✅ Done | No Supabase during drill; auto-eject at 3 strikes; batch-insert on complete |
+| Phase 2 | Drill session UI — 6 question types | ✅ Done | flashcard, identification, MC, FITB, wordScramble, matchMadness; Anki counter; strike chip |
+| Phase 3 | Post-drill review flow + FSRS early-review | ✅ Done | "Review now?" prompt; 1-hour early-review window; upcoming-cards countdown |
 | Phase 4 | Local-first sync system | ✅ Done | CardProvider/DeckProvider Hive-first; dirty flag; pushDeck; deck delete local-first |
 | Phase 5 | Bug fix + schema | ✅ Done | fetchCards join already correct (prior session); added is_published to schema.sql |
 | Phase 6 | Documentation | ✅ Done | Wrote references/sync_system.md (4 sequence diagrams); updated references/class_diagram.md with full model + local-first architecture |
@@ -217,9 +217,9 @@ All items from this section have been completed across Phases 4–6.
 
 | Phase | Name | What was done |
 |---|---|---|
-| Phase 1 | **Quiz local-first + 3-strike** | `QuizQueueController`: per-card wrong-count tracking, auto-eject at 3 strikes with `Rating.again`. `QuizProvider`: no Supabase writes during quiz (fully in-memory), batch-inserts session + all answers + FSRS enrollment in one go at `_completeSession`. `SupabaseService`: `batchInsertQuizAnswers`. |
-| Phase 2 | **Quiz session UI — all 6 question types** | `quiz_session_page.dart`: full UI for flashcard (tap-to-reveal), identification (text input + self-rate), multipleChoice (4-button tap), fillInTheBlanks (multi-blank inline inputs), wordScramble (chip tap-to-reconstruct), matchMadness (pair-tap game). Anki-style New/Learning/Review counter in app bar. Strike chip showing attempt count. `QuizProvider`: added `revealAnswer`, `submitIdentificationAnswer`, `submitFitbAnswers`. |
-| Phase 3 | **Post-quiz review flow + FSRS early-review** | `QuizProvider`: `enrolledCards`, `reviewableNowCount`, `reviewLaterCount` getters. `FsrsProvider`: 1-hour early-review window, `upcomingCards` (sorted by due). `quiz_result_page.dart`: "Review now?" prompt with ready/later card counts, "Review Later" label for 3-strike ejected cards. `review_page.dart`: FSRS state badge (New/Learning/Review), upcoming-cards list with live `Due in Xd Xh Xm Xs` / `Overdue since …` countdown. |
+| Phase 1 | **Drill local-first + 3-strike** | `DrillQueueController`: per-card wrong-count tracking, auto-eject at 3 strikes with `Rating.again`. `DrillProvider`: no Supabase writes during drill (fully in-memory), batch-inserts session + all answers + FSRS enrollment in one go at `_completeSession`. `SupabaseService`: `batchInsertDrillAnswers`. |
+| Phase 2 | **Drill session UI — all 6 question types** | `drill_session_page.dart`: full UI for flashcard (tap-to-reveal), identification (text input + self-rate), multipleChoice (4-button tap), fillInTheBlanks (multi-blank inline inputs), wordScramble (chip tap-to-reconstruct), matchMadness (pair-tap game). Anki-style New/Learning/Review counter in app bar. Strike chip showing attempt count. `DrillProvider`: added `revealAnswer`, `submitIdentificationAnswer`, `submitFitbAnswers`. |
+| Phase 3 | **Post-drill review flow + FSRS early-review** | `DrillProvider`: `enrolledCards`, `reviewableNowCount`, `reviewLaterCount` getters. `FsrsProvider`: 1-hour early-review window, `upcomingCards` (sorted by due). `drill_result_page.dart`: "Review now?" prompt with ready/later card counts, "Review Later" label for 3-strike ejected cards. `review_page.dart`: FSRS state badge (New/Learning/Review), upcoming-cards list with live `Due in Xd Xh Xm Xs` / `Overdue since …` countdown. |
 | Phase 4 | **Local-first sync system** | `HiveService`: `saveDeck`, `deleteDeck`, `getUserDecks`. `SupabaseService`: `upsertCardRow`, `deleteChildrenByCardId`, `deleteOrphanCards`, `batchInsertNotes/MCOptions/FITBSegments/MMPairs`. `CardProvider`: full local-first rewrite — all mutations hit Hive only, per-deck dirty flag, `pushDeck` batch-syncs to Supabase. `DeckProvider`: `loadFromCache`, local-first `deleteDeck` (Hive immediate, Supabase best-effort). `deck_list_page.dart`: cache-first load, manual refresh button, delete with confirm dialog. `deck_editor_page.dart`: `_PushButton` shown when deck is dirty. `FsrsService`: fixed `Rating.values` off-by-one (1-indexed → subtract 1). All tests updated and passing (153 total). |
 | Phase 5 | **Bug fix + schema** | Confirmed `SupabaseService.fetchCards` already had correct join (`*, notes(*), mc_options(*), fitb_segments(*), mm_pairs!card_id(*)`). Added `is_published bool NOT NULL DEFAULT false` column to `decks` table in `supabase/schema.sql` with explanatory comment. |
-| Phase 6 | **Documentation** | `references/sync_system.md`: wrote full sync design document covering architecture overview, sync rules table, and 4 sequence diagrams (quiz session, deck/card edit, FSRS review, is_published flow) plus conflict resolution and error handling tables. `references/class_diagram.md`: full rewrite — Section 1a shows Deck/DeckCard/Note/Options/Segments/Pairs with the computed-getter note on `question`/`answer`; Section 1b shows Quiz/FSRS/Streak models; Section 2 shows all Providers and Services updated to reflect local-first CardProvider, new HiveService/SupabaseService methods, and FsrsService rating note. |
+| Phase 6 | **Documentation** | `references/sync_system.md`: wrote full sync design document covering architecture overview, sync rules table, and 4 sequence diagrams (drill session, deck/card edit, FSRS review, is_published flow) plus conflict resolution and error handling tables. `references/class_diagram.md`: full rewrite — Section 1a shows Deck/DeckCard/Note/Options/Segments/Pairs with the computed-getter note on `question`/`answer`; Section 1b shows Drill/FSRS/Streak models; Section 2 shows all Providers and Services updated to reflect local-first CardProvider, new HiveService/SupabaseService methods, and FsrsService rating note. |

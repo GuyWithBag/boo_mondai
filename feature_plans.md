@@ -182,3 +182,8 @@ CREATE POLICY "deck_comments: author or deck owner soft-delete" ON deck_comments
 CREATE INDEX ON deck_comments (deck_id);
 CREATE INDEX ON deck_comments (parent_id);
 ```
+
+
+## Manually written improvements
+- Make it so that you can create a local account if you want for absolute privacy and so that you do not need to be connected to the internet.
+- Currently, both (CardType) does not create 2 fsrs cards
