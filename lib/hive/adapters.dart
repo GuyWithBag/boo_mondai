@@ -23,6 +23,7 @@ import 'package:hive_ce/hive_ce.dart';
   AdapterSpec<IdentificationTemplate>(),
   AdapterSpec<ReviewCard>(),
   AdapterSpec<FillInTheBlankSegment>(),
+  AdapterSpec<WordScrambleTemplate>(),
   AdapterSpec<MatchMadnessPair>(),
   AdapterSpec<UserDeckProgress>(),
   AdapterSpec<QuizSession>(),

@@ -21,10 +21,18 @@ abstract class SessionController extends ChangeNotifier {
   // ── Abstract Contract (Subclasses MUST implement) ──
   bool get isComplete;
   ReviewCard? get currentReviewCard;
+  double get progress;
 
   void submitAnswer(String userAnswer, QuizAnswerType type);
   Future<void> completeSession(); // <-- Pulled up to the base class
   void reset();
+
+  // bool get isCardRevealed => isCardRevealed;
+  // bool isCardRevealed = false;
+  set isCardRevealed(bool value) {
+    isCardRevealed = value;
+    notifyListeners();
+  }
 
   // ── Shared Getters ──
   String? get error => sessionError;
@@ -112,16 +120,16 @@ abstract class SessionController extends ChangeNotifier {
       );
 
       // Print the raw FSRS due dates and the calculated durations
-      print('--- FSRS DEBUG ---');
-      print('Base Due: ${baseState.due}');
-      print('Review Time: $utcReviewTime');
-      print(
-        'Again Next Due: ${again.card.due} | Difference: ${again.card.due.difference(utcReviewTime)}',
-      );
-      print(
-        'Good Next Due:  ${good.card.due} | Difference: ${good.card.due.difference(utcReviewTime)}',
-      );
-      print('------------------');
+      // print('--- FSRS DEBUG ---');
+      // print('Base Due: ${baseState.due}');
+      // print('Review Time: $utcReviewTime');
+      // print(
+      //   'Again Next Due: ${again.card.due} | Difference: ${again.card.due.difference(utcReviewTime)}',
+      // );
+      // print(
+      //   'Good Next Due:  ${good.card.due} | Difference: ${good.card.due.difference(utcReviewTime)}',
+      // );
+      // print('------------------');
 
       nextIntervals = {
         QuizAnswerType.again: formatInterval(

@@ -19,7 +19,7 @@ class ReviewDashboardPage extends HookWidget {
 
     useEffect(() {
       // Load stats when page opens
-      Future.microtask(() => ctrl.loadDashboard());
+      Future.microtask(() => ctrl.load());
       return null;
     }, const []);
 

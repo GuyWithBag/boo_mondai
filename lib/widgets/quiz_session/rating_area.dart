@@ -11,6 +11,7 @@ import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/models/models.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 
 // Custom intents for the keyboard shortcuts
 class RateIntent extends Intent {
@@ -18,24 +19,65 @@ class RateIntent extends Intent {
   const RateIntent(this.type);
 }
 
-class RatingArea extends StatelessWidget {
+enum SubmissionStyle { showAnswer, submitAnswer, none }
+
+class RatingArea extends HookWidget {
   const RatingArea({
     super.key,
-    required this.template,
-    required this.isReversed,
     required this.controller,
     required this.answer,
+    required this.isRevealed,
+    required this.onSubmit,
+    required this.submissionStyle,
   });
 
-  final CardTemplate template;
-  final bool isReversed;
   final SessionController controller;
-  final String answer;
+  final String? answer;
+  final bool isRevealed;
+  final VoidCallback? onSubmit;
+  final SubmissionStyle submissionStyle;
 
   @override
   Widget build(BuildContext context) {
     void onTap(QuizAnswerType type) {
-      controller.submitAnswer(answer, type);
+      if (answer == null) {
+        print("ERROR");
+        return;
+      }
+      controller.submitAnswer(answer!, type);
+    }
+
+    if (!isRevealed || submissionStyle == SubmissionStyle.none) {
+      return Shortcuts(
+        shortcuts: const {
+          SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
+        },
+        child: Actions(
+          actions: {
+            ActivateIntent: CallbackAction<ActivateIntent>(
+              onInvoke: (_) {
+                if (onSubmit == null) return;
+                onSubmit!();
+                return null;
+              },
+            ),
+          },
+          child: SizedBox(
+            width: double.infinity,
+            child: submissionStyle == SubmissionStyle.showAnswer
+                ? FilledButton.icon(
+                    onPressed: onSubmit,
+                    icon: const Icon(Icons.visibility_outlined),
+                    label: const Text('Show Answer'),
+                  )
+                : FilledButton.icon(
+                    onPressed: onSubmit,
+                    icon: const Icon(Icons.check),
+                    label: const Text('Submit'),
+                  ),
+          ),
+        ),
+      );
     }
 
     return Shortcuts(

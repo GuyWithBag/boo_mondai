@@ -3,12 +3,11 @@
 // Other files
 export 'quiz_preview_page.dart';
 export 'quiz_result_page.dart';
-export 'quiz_session_page.dart';
 export 'register_page.dart';
 export 'researcher_dashboard_page.dart';
 export 'research_code_entry_page.dart';
 export 'review_dashboard_page.dart';
-export 'review_session_page.dart';
+export 'session_page.dart';
 export 'survey_page.dart';
 export 'view_deck_page.dart';
 export 'vocabulary_test_page.dart';

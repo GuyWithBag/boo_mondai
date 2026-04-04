@@ -57,10 +57,10 @@ class FitbInteraction extends HookWidget {
       if (!allOk) shakeController.forward(from: 0);
 
       // Map boolean to enum
-      context.read<QuizSessionPageController>().submitAnswer(
-        answers.join('|'),
-        allOk ? QuizAnswerType.good : QuizAnswerType.incorrect,
-      );
+      // controller.submitAnswer(
+      //   answers.join('|'),
+      //   allOk ? QuizAnswerType.good : QuizAnswerType.incorrect,
+      // );
 
       for (final c in controllers) {
         c.clear();
@@ -92,15 +92,6 @@ class FitbInteraction extends HookWidget {
             ),
           );
         }),
-        const SizedBox(height: AppSpacing.sm),
-        SizedBox(
-          width: double.infinity,
-          child: FilledButton.icon(
-            onPressed: submit,
-            icon: const Icon(Icons.check),
-            label: const Text('Submit'),
-          ),
-        ),
       ],
     );
   }

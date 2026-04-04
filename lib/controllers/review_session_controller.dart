@@ -10,21 +10,21 @@ class ReviewSessionController extends SessionController {
   // ── Specific State ──
   final List<FsrsCard> _queue = [];
   final Map<String, ReviewCard> _reviewCards = {};
-  bool _isLoading = false;
   late DueFilterThreshold dueFilter;
 
   // ── BATCH SAVING STATE ──
   final List<FsrsReviewLog> _pendingLogs = [];
   final Map<String, FsrsCard> _pendingCards = {};
 
-  // ── Specific Getters ──
-  bool get isLoading => _isLoading;
-
   int get remainingCount =>
       (_queue.length - currentIndex).clamp(0, _queue.length);
 
   @override
   bool get isComplete => _queue.isEmpty || currentIndex >= _queue.length;
+
+  @override
+  double get progress =>
+      _queue.isEmpty ? 0 : (currentIndex / _queue.length).clamp(0.0, 1.0);
 
   FsrsCard? get currentFsrsCard =>
       (_queue.isNotEmpty && currentIndex < _queue.length)
@@ -37,13 +37,12 @@ class ReviewSessionController extends SessionController {
       : null;
 
   // ── Initialization ──
-  Future<void> startSession({
+  void startSession({
     String? deckId,
     bool realTime = false,
     required DueFilterThreshold filter,
-  }) async {
+  }) {
     // 1. Reset session state
-    _isLoading = true;
     sessionError = null; // 👈 Using the base class variable!
     dueFilter = filter;
     _queue.clear();
@@ -93,7 +92,6 @@ class ReviewSessionController extends SessionController {
       sessionError =
           'Failed to load session data: $e'; // 👈 Using the base class variable!
     } finally {
-      _isLoading = false;
       notifyListeners();
     }
   }

@@ -9,42 +9,44 @@ import 'package:boo_mondai/models/models.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
-class QuizInteraction extends HookWidget {
-  const QuizInteraction({
+class SessionInteraction extends HookWidget {
+  const SessionInteraction({
     super.key,
     required this.template,
     required this.reviewCard,
     required this.controller,
     required this.shakeController,
+    required this.interactionsController,
   });
 
   final CardTemplate template;
   final ReviewCard reviewCard;
   final SessionController controller;
+  final SessionInteractionsController interactionsController;
   final AnimationController shakeController;
 
   @override
   Widget build(BuildContext context) {
     useEffect(() {
       controller.calculateNextIntervals();
+
       return null;
-    });
+    }, []);
+
     return switch (template) {
       FlashcardTemplate f => FlashcardInteraction(
         template: f,
         isReversed: reviewCard.isReversed,
-        controller: controller,
+        controller: interactionsController,
       ),
       IdentificationTemplate i => IdentificationInteraction(
         template: i,
-        isReversed: reviewCard.isReversed,
-        controller: controller,
+        controller: interactionsController,
         shakeController: shakeController,
       ),
       MultipleChoiceTemplate m => MultipleChoiceInteraction(
         template: m,
-        isReversed: reviewCard.isReversed,
-        controller: controller,
+        controller: interactionsController,
         shakeController: shakeController,
       ),
       FillInTheBlanksTemplate fb => FitbInteraction(
@@ -55,8 +57,7 @@ class QuizInteraction extends HookWidget {
       ),
       WordScrambleTemplate ws => WordScrambleInteraction(
         template: ws,
-        isReversed: reviewCard.isReversed,
-        controller: controller,
+        controller: interactionsController,
         shakeController: shakeController,
       ),
       MatchMadnessTemplate mm => MatchMadnessInteraction(

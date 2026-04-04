@@ -7,7 +7,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:provider/provider.dart';
 import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/models/models.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
@@ -16,14 +15,12 @@ class MultipleChoiceInteraction extends HookWidget {
   const MultipleChoiceInteraction({
     super.key,
     required this.template, // <-- NEW: Specific template
-    required this.isReversed, // <-- NEW: Passed from router
     required this.controller,
     required this.shakeController,
   });
 
   final MultipleChoiceTemplate template;
-  final bool isReversed;
-  final SessionController controller;
+  final SessionInteractionsController controller;
   final AnimationController shakeController;
 
   @override
@@ -42,13 +39,16 @@ class MultipleChoiceInteraction extends HookWidget {
 
       if (!option.isCorrect) shakeController.forward(from: 0);
 
-      await Future<void>.delayed(const Duration(milliseconds: 800));
+      await Future<void>.delayed(const Duration(milliseconds: 300));
 
       if (context.mounted) {
-        context.read<QuizSessionPageController>().submitAnswer(
-          option.optionText,
-          option.isCorrect ? QuizAnswerType.good : QuizAnswerType.incorrect,
-        );
+        return;
+      }
+
+      controller.answer = option.optionText;
+      controller.canReveal = option.isCorrect;
+      if (controller.canReveal) {
+        controller.isRevealed = true;
       }
     }
 

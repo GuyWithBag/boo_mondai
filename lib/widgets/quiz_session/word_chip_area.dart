@@ -16,12 +16,14 @@ class WordChipArea extends StatelessWidget {
     required this.onTap,
     this.chipColor,
     this.minHeight = 40,
+    this.textColor,
   });
 
   final String label;
   final List<String> chips;
   final void Function(int index) onTap;
   final Color? chipColor;
+  final Color? textColor;
   final double minHeight;
 
   @override
@@ -61,6 +63,8 @@ class WordChipArea extends StatelessWidget {
                     label: Text(chips[i]),
                     backgroundColor:
                         chipColor ?? AppColors.primary.withValues(alpha: 0.12),
+                    //TODO: Probably should refine
+                    color: WidgetStatePropertyAll(textColor),
                     side: BorderSide.none,
                     visualDensity: VisualDensity.compact,
                   ),

@@ -16,6 +16,7 @@ class QuizSessionPageController extends SessionController {
 
   int _batchSize = defaultBatchSize;
   bool _isComplete = false;
+
   final Map<String, int> _strikes = {};
 
   // ── Specific Getters ──
@@ -30,6 +31,7 @@ class QuizSessionPageController extends SessionController {
       ? _queue[currentIndex]
       : null;
 
+  @override
   double get progress =>
       _batchSize == 0 ? 0 : (currentIndex / _batchSize).clamp(0.0, 1.0);
 

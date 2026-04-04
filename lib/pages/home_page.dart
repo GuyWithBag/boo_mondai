@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:boo_mondai/models/models.barrel.dart';
 import 'package:boo_mondai/providers/providers.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
@@ -24,13 +23,12 @@ class HomePage extends HookWidget {
     // final streakProv = context.watch<StreakProvider>();
     final leaderboard = context.watch<LeaderboardProvider>();
     final userId = auth.userProfile?.id;
-
     useEffect(() {
       if (userId != null) {
         Future.microtask(() {
           // context.read<FsrsProvider>().fetchDueCards(userId);
           // context.read<StreakProvider>().fetchStreak(userId);
-          context.read<LeaderboardProvider>().fetchLeaderboard(
+          leaderboard.fetchLeaderboard(
             targetLanguage: auth.userProfile?.targetLanguage,
           );
         });
@@ -47,7 +45,7 @@ class HomePage extends HookWidget {
               await Future.wait([
                 // context.read<FsrsProvider>().fetchDueCards(userId),
                 // context.read<StreakProvider>().fetchStreak(userId),
-                context.read<LeaderboardProvider>().fetchLeaderboard(
+                leaderboard.fetchLeaderboard(
                   targetLanguage: auth.userProfile?.targetLanguage,
                 ),
               ]);

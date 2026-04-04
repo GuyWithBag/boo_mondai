@@ -31,7 +31,7 @@ class ReviewDashboardController extends ChangeNotifier {
     }
   }
 
-  Future<void> loadDashboard() async {
+  Future<void> load() async {
     // Initial load fetches everything
     await _loadData(fetchHistorical: true);
   }

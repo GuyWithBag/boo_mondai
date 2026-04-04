@@ -9,3 +9,4 @@ export 'quiz_session_page_controller.dart';
 export 'review_dashboard_controller.dart';
 export 'review_session_controller.dart';
 export 'session_controller.dart';
+export 'session_interactions_controller.dart';

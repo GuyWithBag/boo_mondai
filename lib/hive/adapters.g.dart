@@ -1268,3 +1268,58 @@ class RatingAdapter extends TypeAdapter<Rating> {
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
+
+class WordScrambleTemplateAdapter extends TypeAdapter<WordScrambleTemplate> {
+  @override
+  final typeId = 26;
+
+  @override
+  WordScrambleTemplate read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return WordScrambleTemplate(
+      id: fields[3] as String,
+      deckId: fields[4] as String,
+      sortOrder: (fields[5] as num).toInt(),
+      createdAt: fields[6] as DateTime,
+      sourceTemplateId: fields[7] as String?,
+      sentenceToScramble: fields[0] as String,
+      imageUrl: fields[1] as String?,
+      audioUrl: fields[2] as String?,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, WordScrambleTemplate obj) {
+    writer
+      ..writeByte(8)
+      ..writeByte(0)
+      ..write(obj.sentenceToScramble)
+      ..writeByte(1)
+      ..write(obj.imageUrl)
+      ..writeByte(2)
+      ..write(obj.audioUrl)
+      ..writeByte(3)
+      ..write(obj.id)
+      ..writeByte(4)
+      ..write(obj.deckId)
+      ..writeByte(5)
+      ..write(obj.sortOrder)
+      ..writeByte(6)
+      ..write(obj.createdAt)
+      ..writeByte(7)
+      ..write(obj.sourceTemplateId);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is WordScrambleTemplateAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}

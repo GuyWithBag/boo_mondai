@@ -110,8 +110,10 @@ GoRouter createRouter(AuthProvider authProvider) {
       // ),
       GoRoute(
         path: '/quiz/:deckId/session',
-        builder: (context, state) =>
-            QuizSessionPage(deckId: state.pathParameters['deckId']),
+        builder: (context, state) => SessionPage(
+          deckId: state.pathParameters['deckId'],
+          mode: SessionMode.quiz,
+        ),
       ),
       GoRoute(
         path: '/quiz/:sessionId/result',
@@ -122,15 +124,19 @@ GoRouter createRouter(AuthProvider authProvider) {
       // 1. Global Review (Study everything due)
       GoRoute(
         path: '/review/deckid/session',
-        builder: (context, state) =>
-            ReviewSessionPage(deckId: state.pathParameters['deckId']),
+        builder: (context, state) => SessionPage(
+          deckId: state.pathParameters['deckId'],
+          mode: SessionMode.review,
+        ),
       ),
 
       // 2. Deck-Specific Review (Matches your Quiz pattern)
       GoRoute(
         path: '/review/:deckId/session',
-        builder: (context, state) =>
-            ReviewSessionPage(deckId: state.pathParameters['deckId']),
+        builder: (context, state) => SessionPage(
+          deckId: state.pathParameters['deckId'],
+          mode: SessionMode.review,
+        ),
       ),
       GoRoute(
         path: '/research',
