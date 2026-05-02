@@ -1,117 +1,81 @@
-// // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// // PATH: lib/providers/streak_provider.dart
-// // PURPOSE: Tracks and updates user's daily FSRS review streak
-// // PROVIDERS: none
-// // HOOKS: none
-// // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// PATH: lib/providers/streak_provider.dart
+// PURPOSE: Tracks and updates user's daily FSRS review streak
+// PROVIDERS: none
+// HOOKS: none
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-// import 'package:flutter/foundation.dart';
-// import 'package:uuid/uuid.dart';
-// import 'package:boo_mondai/models/models.barrel.dart';
-// import 'package:boo_mondai/services/services.barrel.dart';
+import 'package:flutter/foundation.dart';
+import 'package:boo_mondai/models/models.barrel.dart';
+import 'package:boo_mondai/repositories/repositories.barrel.dart';
+import 'package:boo_mondai/services/app_exception.dart';
+import 'package:boo_mondai/services/services.dart';
 
-// /// Manages streak state. Activity = completing at least one FSRS review per day.
-// class StreakProvider extends ChangeNotifier {
-//   final SupabaseService _supabaseService;
-//   final HiveService _hiveService;
-//   static const _uuid = Uuid();
+/// Manages streak state. Activity = completing at least one FSRS review per day.
+///
+/// Call [fetchStreak] on app start / home page mount.
+/// Call [recordActivity] after every review session completes.
+class StreakProvider extends ChangeNotifier {
+  Streak? _streak;
+  bool _isLoading = false;
+  String? _error;
 
-//   StreakProvider({
-//     required SupabaseService supabaseService,
-//     required HiveService hiveService,
-//   }) : _supabaseService = supabaseService,
-//        _hiveService = hiveService;
+  Streak? get streak => _streak;
+  int get currentStreak => _streak?.currentStreak ?? 0;
+  int get longestStreak => _streak?.longestStreak ?? 0;
+  bool get isLoading => _isLoading;
+  String? get error => _error;
 
-//   Streak? _streak;
-//   bool _isLoading = false;
-//   String? _error;
+  /// Loads streak — Hive first (fast), then syncs from Supabase.
+  Future<void> fetchStreak(String userId) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
 
-//   Streak? get streak => _streak;
-//   int get currentStreak => _streak?.currentStreak ?? 0;
-//   int get longestStreak => _streak?.longestStreak ?? 0;
-//   bool get isLoading => _isLoading;
-//   String? get error => _error;
+    try {
+      _streak = Repositories.streak.getByUserId(userId);
+      if (_streak != null) notifyListeners();
 
-//   Future<void> fetchStreak(String userId) async {
-//     _isLoading = true;
-//     _error = null;
-//     notifyListeners();
+      final data = await Services.streakSync.fetchStreak(userId);
+      if (data != null) {
+        _streak = StreakMapper.fromMap(data);
+        await Repositories.streak.save(_streak!);
+      }
+    } on AppException catch (e) {
+      _error = e.message;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 
-//     try {
-//       // Fast local read first
-//       _streak = _hiveService.getStreak(userId);
-//       notifyListeners();
+  /// Records today as an active day and syncs to Supabase in the background.
+  Future<void> recordActivity(String userId) async {
+    try {
+      final updated = await Repositories.streak.recordActivity(
+        userId,
+        DateTime.now(),
+      );
+      _streak = updated;
+      notifyListeners();
 
-//       // Then sync from remote
-//       final data = await _supabaseService.fetchStreak(userId);
-//       if (data != null) {
-//         _streak = Streak.fromJson(data);
-//         await _hiveService.saveStreak(_streak!);
-//       }
-//     } on AppException catch (e) {
-//       _error = e.message;
-//     } finally {
-//       _isLoading = false;
-//       notifyListeners();
-//     }
-//   }
+      // Keys must match snake_case DB column names (Supabase ignores camelCase).
+      await Services.streakSync.upsertStreak({
+        'id': updated.id,
+        'user_id': updated.userId,
+        'current_streak': updated.currentStreak,
+        'longest_streak': updated.longestStreak,
+        if (updated.lastActivityDate != null)
+          'last_activity_date': updated.lastActivityDate!.toIso8601String(),
+      });
+    } on AppException catch (e) {
+      _error = e.message;
+      notifyListeners();
+    }
+  }
 
-//   Future<void> recordActivity(String userId) async {
-//     _error = null;
-
-//     final today = DateTime.now();
-//     final todayDate = DateTime(today.year, today.month, today.day);
-
-//     if (_streak == null) {
-//       _streak = Streak(
-//         id: _uuid.v4(),
-//         userId: userId,
-//         currentStreak: 1,
-//         longestStreak: 1,
-//         lastActivityDate: todayDate,
-//       );
-//     } else {
-//       final last = _streak!.lastActivityDate;
-//       if (last != null) {
-//         final lastDate = DateTime(last.year, last.month, last.day);
-//         final diff = todayDate.difference(lastDate).inDays;
-
-//         if (diff == 0) {
-//           return; // Already recorded today
-//         } else if (diff == 1) {
-//           // Consecutive day
-//           final newCurrent = _streak!.currentStreak + 1;
-//           _streak = _streak!.copyWith(
-//             currentStreak: newCurrent,
-//             longestStreak: newCurrent > _streak!.longestStreak
-//                 ? newCurrent
-//                 : null,
-//             lastActivityDate: todayDate,
-//           );
-//         } else {
-//           // Gap — reset
-//           _streak = _streak!.copyWith(
-//             currentStreak: 1,
-//             lastActivityDate: todayDate,
-//           );
-//         }
-//       } else {
-//         _streak = _streak!.copyWith(
-//           currentStreak: 1,
-//           longestStreak: _streak!.longestStreak < 1 ? 1 : null,
-//           lastActivityDate: todayDate,
-//         );
-//       }
-//     }
-
-//     await _hiveService.saveStreak(_streak!);
-//     notifyListeners();
-
-//     try {
-//       await _supabaseService.upsertStreak(_streak!.toJson());
-//     } on AppException catch (e) {
-//       _error = e.message;
-//       notifyListeners();
-//     }
-//   }
-// }
+  void clearError() {
+    _error = null;
+    notifyListeners();
+  }
+}
