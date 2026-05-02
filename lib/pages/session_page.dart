@@ -5,6 +5,7 @@
 
 import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart';
+import 'package:boo_mondai/providers/providers.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 import 'package:boo_mondai/pages/drill_result_page.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
@@ -23,7 +24,8 @@ class SessionPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (deckId == null) {
+    // Drill sessions always require a deckId; review sessions can be global (null = all due cards)
+    if (deckId == null && mode == SessionMode.drill) {
       return const ErrorState(message: 'Deck Id not found');
     }
 
@@ -60,6 +62,17 @@ class SessionPage extends HookWidget {
       });
       return null;
     }, [deckId, mode]);
+
+    // ── RECORD STREAK ON REVIEW COMPLETION ───────────────
+    useEffect(() {
+      if (ctrl.isComplete && mode == SessionMode.review) {
+        final userId = context.read<AuthProvider>().userProfile?.id;
+        if (userId != null) {
+          context.read<StreakProvider>().recordActivity(userId);
+        }
+      }
+      return null;
+    }, [ctrl.isComplete]);
 
     // 1. Handle Loading (Review only has isLoading, Drill uses null session or missing template)
 

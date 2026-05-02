@@ -1,7 +1,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/pages/home_page.dart
 // PURPOSE: Dashboard — streak, due reviews, leaderboard preview
-// PROVIDERS: AuthProvider, FsrsProvider, StreakProvider, LeaderboardProvider
+// PROVIDERS: AuthProvider, StreakProvider, ReviewDashboardController, LeaderboardProvider
 // HOOKS: useEffect
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/providers/providers.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
@@ -19,15 +20,16 @@ class HomePage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
-    // final fsrs = context.watch<FsrsProvider>();
-    // final streakProv = context.watch<StreakProvider>();
+    final streakProv = context.watch<StreakProvider>();
+    final dashboard = context.watch<ReviewDashboardController>();
     final leaderboard = context.watch<LeaderboardProvider>();
     final userId = auth.userProfile?.id;
+
     useEffect(() {
       if (userId != null) {
         Future.microtask(() {
-          // context.read<FsrsProvider>().fetchDueCards(userId);
-          // context.read<StreakProvider>().fetchStreak(userId);
+          context.read<StreakProvider>().fetchStreak(userId);
+          context.read<ReviewDashboardController>().load();
           leaderboard.fetchLeaderboard(
             targetLanguage: auth.userProfile?.targetLanguage,
           );
@@ -43,8 +45,8 @@ class HomePage extends HookWidget {
           onRefresh: () async {
             if (userId != null) {
               await Future.wait([
-                // context.read<FsrsProvider>().fetchDueCards(userId),
-                // context.read<StreakProvider>().fetchStreak(userId),
+                context.read<StreakProvider>().fetchStreak(userId),
+                context.read<ReviewDashboardController>().load(),
                 leaderboard.fetchLeaderboard(
                   targetLanguage: auth.userProfile?.targetLanguage,
                 ),
@@ -59,12 +61,12 @@ class HomePage extends HookWidget {
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
               const SizedBox(height: AppSpacing.lg),
-              // StreakBadge(currentStreak: streakProv.currentStreak),
+              StreakBadge(currentStreak: streakProv.currentStreak),
               const SizedBox(height: AppSpacing.md),
-              // DueReviewCard(
-              //   dueCount: fsrs.dueCount,
-              //   onTap: () => context.go('/review'),
-              // ),
+              DueReviewCard(
+                dueCount: dashboard.totalDue,
+                onTap: () => context.push('/review/session'),
+              ),
               const SizedBox(height: AppSpacing.lg),
               FilledButton.icon(
                 onPressed: () => context.go('/my-decks'),

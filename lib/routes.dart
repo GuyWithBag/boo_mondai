@@ -121,16 +121,16 @@ GoRouter createRouter(AuthProvider authProvider) {
             DrillResultPage(sessionId: state.pathParameters['sessionId']!),
       ),
 
-      // 1. Global Review (Study everything due)
+      // Global Review (all due cards across all decks)
       GoRoute(
-        path: '/review/deckid/session',
-        builder: (context, state) => SessionPage(
-          deckId: state.pathParameters['deckId'],
+        path: '/review/session',
+        builder: (context, state) => const SessionPage(
+          deckId: null,
           mode: SessionMode.review,
         ),
       ),
 
-      // 2. Deck-Specific Review (Matches your Drill pattern)
+      // Deck-Specific Review
       GoRoute(
         path: '/review/:deckId/session',
         builder: (context, state) => SessionPage(
