@@ -22,7 +22,7 @@ class ScoringInfoDialog extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const ScoreRow(
-            icon: Icons.drill_outlined,
+            icon: Icons.quiz_outlined,
             label: 'Drill score',
             detail: 'Total correct answers across all drill sessions.',
           ),
