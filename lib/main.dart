@@ -78,15 +78,8 @@ Future<void> main() async {
         //   ),
         // ),
         ChangeNotifierProvider(create: (_) => LeaderboardProvider()),
-        // ChangeNotifierProvider(
-        //   create: (_) => StreakProvider(
-        //     supabaseService: supabaseService,
-        //     // hiveService: hiveService,
-        //   ),
-        // ),
-        // ChangeNotifierProvider(
-        //   create: (_) => ResearchProvider(supabaseService: supabaseService),
-        // ),
+        ChangeNotifierProvider(create: (_) => StreakProvider()),
+        ChangeNotifierProvider(create: (_) => ResearchProvider()),
       ],
       child: const BooMondaiApp(),
     ),

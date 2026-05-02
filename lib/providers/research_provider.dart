@@ -75,7 +75,7 @@ class ResearchProvider extends ChangeNotifier {
         'createdBy': createdBy,
       };
       final result = await _supabaseService.insertResearchCode(data);
-      final researchCode = ResearchCodeMapper.fromJson(result);
+      final researchCode = ResearchCodeMapper.fromMap(result);
       _codes = [researchCode, ..._codes];
       notifyListeners();
       return researchCode;
@@ -177,14 +177,14 @@ class ResearchProvider extends ChangeNotifier {
       final codesData = await _supabaseService.fetchResearchCodes();
 
       _researchProfiles = (allData['research_profiles'] ?? [])
-          .map((d) => ResearchProfileMapper.fromJson(d))
+          .map((d) => ResearchProfileMapper.fromMap(d))
           .toList();
-      _codes = codesData.map(ResearchCodeMapper.fromJson).toList();
+      _codes = codesData.map(ResearchCodeMapper.fromMap).toList();
       _surveyResponses = (allData['survey_responses'] ?? [])
-          .map((d) => SurveyResponseMapper.fromJson(d))
+          .map((d) => SurveyResponseMapper.fromMap(d))
           .toList();
       _testResults = (allData['vocabulary_test_results'] ?? [])
-          .map((d) => VocabularyTestResultMapper.fromJson(d))
+          .map((d) => VocabularyTestResultMapper.fromMap(d))
           .toList();
     } on AppException catch (e) {
       _error = e.message;

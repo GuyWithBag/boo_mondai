@@ -32,7 +32,7 @@ class LeaderboardProvider extends ChangeNotifier {
       final data = await Services.leaderboard.fetchLeaderboard(
         targetLanguage: targetLanguage,
       );
-      _entries = data.map(LeaderboardEntryMapper.fromJson).toList();
+      _entries = data.map(LeaderboardEntryMapper.fromMap).toList();
     } on AppException catch (e) {
       _error = e.message;
     } finally {
