@@ -10,6 +10,7 @@ import 'package:boo_mondai/models/models.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
@@ -32,7 +33,9 @@ class MyDecksPage extends HookWidget {
     final searchQuery = useState('');
 
     useEffect(() {
-      controller.load();
+      // Defer past the current build frame to avoid
+      // "setState called during build" when mounted inside a LayoutBuilder.
+      SchedulerBinding.instance.addPostFrameCallback((_) => controller.load());
       return null;
     }, const []);
 
