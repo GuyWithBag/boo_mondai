@@ -93,7 +93,9 @@ CREATE TABLE card_templates (
                      )),
   "sortOrder"        int  NOT NULL DEFAULT 0,
   "sourceTemplateId" uuid REFERENCES card_templates(id) ON DELETE SET NULL,
-  "createdAt"        timestamptz NOT NULL DEFAULT now()
+  "createdAt"        timestamptz NOT NULL DEFAULT now(),
+  -- flashcard-only: controls ReviewCard generation direction
+  "cardType"         text CHECK ("cardType" IN ('normal', 'reversed', 'both'))
 );
 
 ALTER TABLE card_templates ENABLE ROW LEVEL SECURITY;
@@ -465,31 +467,6 @@ CREATE INDEX ON streaks ("userId");
 CREATE TRIGGER set_streak_updated_at
   BEFORE UPDATE ON streaks
   FOR EACH ROW EXECUTE FUNCTION moddatetime("updatedAt");
-
--- ══════════════════════════════════════════════════════
--- USER DECK PROGRESS
--- UserDeckProgress uses dart_mappable → camelCase columns
--- Cached stats for fast UI rendering of per-deck progress
--- ══════════════════════════════════════════════════════
-
-CREATE TABLE user_deck_progress (
-  id                   uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  "userId"             uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-  "deckId"             uuid NOT NULL REFERENCES decks(id)    ON DELETE CASCADE,
-  "newCardsCount"      int  NOT NULL DEFAULT 0,
-  "learningCardsCount" int  NOT NULL DEFAULT 0,
-  "reviewCardsCount"   int  NOT NULL DEFAULT 0,
-  "totalDrilled"       int  NOT NULL DEFAULT 0,
-  "lastStudiedAt"      timestamptz NOT NULL DEFAULT now(),
-  UNIQUE ("userId", "deckId")
-);
-
-ALTER TABLE user_deck_progress ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "user_deck_progress: users manage own" ON user_deck_progress FOR ALL
-  USING (auth.uid() = "userId") WITH CHECK (auth.uid() = "userId");
-
-CREATE INDEX ON user_deck_progress ("userId");
-CREATE INDEX ON user_deck_progress ("deckId");
 
 -- ══════════════════════════════════════════════════════
 -- LEADERBOARD VIEW

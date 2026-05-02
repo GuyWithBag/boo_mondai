@@ -14,6 +14,7 @@ class FlashcardTemplateMapper extends SubClassMapperBase<FlashcardTemplate> {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = FlashcardTemplateMapper._());
       CardTemplateMapper.ensureInitialized().addSubMapper(_instance!);
+      CardTypeMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -53,6 +54,9 @@ class FlashcardTemplateMapper extends SubClassMapperBase<FlashcardTemplate> {
   static String? _$backAudioUrl(FlashcardTemplate v) => v.backAudioUrl;
   static const Field<FlashcardTemplate, String> _f$backAudioUrl =
       Field('backAudioUrl', _$backAudioUrl, opt: true);
+  static CardType _$cardType(FlashcardTemplate v) => v.cardType;
+  static const Field<FlashcardTemplate, CardType> _f$cardType =
+      Field('cardType', _$cardType, opt: true, def: CardType.normal);
 
   @override
   final MappableFields<FlashcardTemplate> fields = const {
@@ -67,6 +71,7 @@ class FlashcardTemplateMapper extends SubClassMapperBase<FlashcardTemplate> {
     #backImageUrl: _f$backImageUrl,
     #frontAudioUrl: _f$frontAudioUrl,
     #backAudioUrl: _f$backAudioUrl,
+    #cardType: _f$cardType,
   };
 
   @override
@@ -89,7 +94,8 @@ class FlashcardTemplateMapper extends SubClassMapperBase<FlashcardTemplate> {
         frontImageUrl: data.dec(_f$frontImageUrl),
         backImageUrl: data.dec(_f$backImageUrl),
         frontAudioUrl: data.dec(_f$frontAudioUrl),
-        backAudioUrl: data.dec(_f$backAudioUrl));
+        backAudioUrl: data.dec(_f$backAudioUrl),
+        cardType: data.dec(_f$cardType));
   }
 
   @override
@@ -160,7 +166,8 @@ abstract class FlashcardTemplateCopyWith<$R, $In extends FlashcardTemplate,
       String? frontImageUrl,
       String? backImageUrl,
       String? frontAudioUrl,
-      String? backAudioUrl});
+      String? backAudioUrl,
+      CardType? cardType});
   FlashcardTemplateCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
       Then<$Out2, $R2> t);
 }
@@ -185,7 +192,8 @@ class _FlashcardTemplateCopyWithImpl<$R, $Out>
           Object? frontImageUrl = $none,
           Object? backImageUrl = $none,
           Object? frontAudioUrl = $none,
-          Object? backAudioUrl = $none}) =>
+          Object? backAudioUrl = $none,
+          CardType? cardType}) =>
       $apply(FieldCopyWithData({
         if (id != null) #id: id,
         if (deckId != null) #deckId: deckId,
@@ -197,7 +205,8 @@ class _FlashcardTemplateCopyWithImpl<$R, $Out>
         if (frontImageUrl != $none) #frontImageUrl: frontImageUrl,
         if (backImageUrl != $none) #backImageUrl: backImageUrl,
         if (frontAudioUrl != $none) #frontAudioUrl: frontAudioUrl,
-        if (backAudioUrl != $none) #backAudioUrl: backAudioUrl
+        if (backAudioUrl != $none) #backAudioUrl: backAudioUrl,
+        if (cardType != null) #cardType: cardType
       }));
   @override
   FlashcardTemplate $make(CopyWithData data) => FlashcardTemplate(
@@ -212,7 +221,8 @@ class _FlashcardTemplateCopyWithImpl<$R, $Out>
       frontImageUrl: data.get(#frontImageUrl, or: $value.frontImageUrl),
       backImageUrl: data.get(#backImageUrl, or: $value.backImageUrl),
       frontAudioUrl: data.get(#frontAudioUrl, or: $value.frontAudioUrl),
-      backAudioUrl: data.get(#backAudioUrl, or: $value.backAudioUrl));
+      backAudioUrl: data.get(#backAudioUrl, or: $value.backAudioUrl),
+      cardType: data.get(#cardType, or: $value.cardType));
 
   @override
   FlashcardTemplateCopyWith<$R2, FlashcardTemplate, $Out2> $chain<$R2, $Out2>(

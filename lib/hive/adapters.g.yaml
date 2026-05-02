@@ -263,7 +263,7 @@ types:
         index: 8
   FlashcardTemplate:
     typeId: 17
-    nextIndex: 11
+    nextIndex: 12
     fields:
       frontText:
         index: 0
@@ -287,6 +287,8 @@ types:
         index: 9
       sourceTemplateId:
         index: 10
+      cardType:
+        index: 11
   MatchMadnessTemplate:
     typeId: 18
     nextIndex: 6

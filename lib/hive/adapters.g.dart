@@ -797,13 +797,14 @@ class FlashcardTemplateAdapter extends TypeAdapter<FlashcardTemplate> {
       backImageUrl: fields[3] as String?,
       frontAudioUrl: fields[4] as String?,
       backAudioUrl: fields[5] as String?,
+      cardType: fields[11] == null ? CardType.normal : fields[11] as CardType,
     );
   }
 
   @override
   void write(BinaryWriter writer, FlashcardTemplate obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(12)
       ..writeByte(0)
       ..write(obj.frontText)
       ..writeByte(1)
@@ -825,7 +826,9 @@ class FlashcardTemplateAdapter extends TypeAdapter<FlashcardTemplate> {
       ..writeByte(9)
       ..write(obj.createdAt)
       ..writeByte(10)
-      ..write(obj.sourceTemplateId);
+      ..write(obj.sourceTemplateId)
+      ..writeByte(11)
+      ..write(obj.cardType);
   }
 
   @override

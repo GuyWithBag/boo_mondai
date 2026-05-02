@@ -135,30 +135,55 @@ class DeckEditorPageController extends ChangeNotifier {
       await _deckRepository.save(updatedDeck);
       await _templateRepository.saveAll(_templates);
 
-      // ── THE CLEAN WAY TO GENERATE REVIEW CARDS ──────────
+      // ── REVIEW CARD GENERATION ───────────────────────────
 
-      // 1. Fetch the review cards that already exist for this deck
+      // 1. Fetch review cards that already exist for this deck
       final existingReviewCards = Repositories.reviewCard.getByDeckId(
         _deck!.id,
       );
 
-      // 2. Create a fast-lookup set of template IDs that already have review cards
-      final existingTemplateIds = existingReviewCards
-          .map((rc) => rc.templateId)
-          .toSet();
+      // 2. Build a lookup: templateId → Set of isReversed values already stored
+      final existingDirections = <String, Set<bool>>{};
+      for (final rc in existingReviewCards) {
+        existingDirections.putIfAbsent(rc.templateId, () => {}).add(rc.isReversed);
+      }
 
-      // 3. Only generate a new ReviewCard if the template doesn't have one yet
+      // 3. Determine which ReviewCards are missing and create them
       final newReviewCards = <ReviewCard>[];
       for (final template in _templates) {
-        if (!existingTemplateIds.contains(template.id)) {
-          newReviewCards.add(
-            ReviewCard(
-              id: UuidService.uuid.v4(), // strictly opaque, clean UUID
+        final existing = existingDirections[template.id] ?? {};
+
+        if (template is FlashcardTemplate) {
+          // Flashcards support reversal — generate based on cardType
+          final needsNormal = template.cardType != CardType.reversed;
+          final needsReversed = template.cardType != CardType.normal;
+
+          if (needsNormal && !existing.contains(false)) {
+            newReviewCards.add(ReviewCard(
+              id: UuidService.uuid.v4(),
               deckId: template.deckId,
               templateId: template.id,
               isReversed: false,
-            ),
-          );
+            ));
+          }
+          if (needsReversed && !existing.contains(true)) {
+            newReviewCards.add(ReviewCard(
+              id: UuidService.uuid.v4(),
+              deckId: template.deckId,
+              templateId: template.id,
+              isReversed: true,
+            ));
+          }
+        } else {
+          // All other template types: exactly one non-reversed ReviewCard
+          if (!existing.contains(false)) {
+            newReviewCards.add(ReviewCard(
+              id: UuidService.uuid.v4(),
+              deckId: template.deckId,
+              templateId: template.id,
+              isReversed: false,
+            ));
+          }
         }
       }
 
@@ -182,6 +207,7 @@ class DeckEditorPageController extends ChangeNotifier {
 
   void _populateFormFromTemplate(CardTemplate template) {
     // Reset the form so old data doesn't bleed over
+    formState.cardType.value = CardType.normal;
     formState.frontController.clear();
     formState.backController.clear();
     formState.identificationAnswerController.clear();
@@ -192,6 +218,7 @@ class DeckEditorPageController extends ChangeNotifier {
     switch (template) {
       case FlashcardTemplate f:
         formState.questionType.value = QuestionType.flashcard;
+        formState.cardType.value = f.cardType;
         formState.frontController.text = f.frontText;
         formState.backController.text = f.backText;
         break;
@@ -270,6 +297,7 @@ class DeckEditorPageController extends ChangeNotifier {
           sourceTemplateId: sourceId,
           frontText: formState.frontController.text.trim(),
           backText: formState.backController.text.trim(),
+          cardType: formState.cardType.value,
         );
 
       case QuestionType.identification:

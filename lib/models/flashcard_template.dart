@@ -12,6 +12,12 @@ class FlashcardTemplate extends CardTemplate with FlashcardTemplateMappable {
   final String? frontAudioUrl;
   final String? backAudioUrl;
 
+  /// Controls how many ReviewCards are generated for this template.
+  /// - [CardType.normal]   → 1 ReviewCard (isReversed: false)
+  /// - [CardType.reversed] → 1 ReviewCard (isReversed: true)
+  /// - [CardType.both]     → 2 ReviewCards (one each)
+  final CardType cardType;
+
   const FlashcardTemplate({
     required super.id,
     required super.deckId,
@@ -24,6 +30,7 @@ class FlashcardTemplate extends CardTemplate with FlashcardTemplateMappable {
     this.backImageUrl,
     this.frontAudioUrl,
     this.backAudioUrl,
+    this.cardType = CardType.normal,
   });
 
   String getQuestion({bool isReversed = false}) =>
