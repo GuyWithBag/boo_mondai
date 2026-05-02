@@ -6,6 +6,7 @@ import 'package:boo_mondai/services/supabase/supabase_leaderboard_service.dart';
 import 'package:boo_mondai/services/supabase/supabase_drill_service.dart';
 import 'package:boo_mondai/services/supabase/supabase_research_service.dart';
 import 'package:boo_mondai/services/supabase/supabase_storage_service.dart';
+import 'package:boo_mondai/services/supabase/supabase_streak_service.dart';
 import 'package:boo_mondai/services/services.barrel.dart';
 
 class Services {
@@ -21,6 +22,7 @@ class Services {
   static late final SupabaseLeaderboardService leaderboard;
   static late final SupabaseResearchService research;
   static late final SupabaseStorageService storage;
+  static late final SupabaseStreakService streakSync;
 
   static void init() {
     hive = HiveService();
@@ -34,5 +36,6 @@ class Services {
     leaderboard = SupabaseLeaderboardService();
     research = SupabaseResearchService();
     storage = SupabaseStorageService();
+    streakSync = SupabaseStreakService();
   }
 }

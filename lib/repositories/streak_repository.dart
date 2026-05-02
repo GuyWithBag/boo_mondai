@@ -1,92 +1,74 @@
-// // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// // PATH: lib/repositories/streak_repository.dart
-// // PURPOSE: Hive CRUD for Streak — single-record store that tracks the user's daily activity streak
-// // PROVIDERS: none
-// // HOOKS: none
-// // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// PATH: lib/repositories/streak_repository.dart
+// PURPOSE: Hive CRUD for Streak — single record per user with activity tracking
+// PROVIDERS: none
+// HOOKS: none
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-// import 'package:flutter/material.dart';
-// import 'package:hive_ce/hive.dart';
-// import 'package:uuid/uuid.dart';
-// import '../models/streak.dart';
+import 'package:boo_mondai/lib.barrel.dart';
+import 'package:flutter/material.dart';
 
-// class StreakRepository {
-//   static const String boxName = 'streak_box';
-//   static const String _streakKey = 'streak';
-//   static const _uuid = Uuid();
+class StreakRepository extends HiveRepository<Streak> {
+  @override
+  String get boxName => 'streak_box';
 
-//   Box<Streak> get _box => Hive.box<Streak>(boxName);
+  @override
+  String getId(Streak item) => item.userId;
 
-//   Streak? get() => _box.get(_streakKey);
+  Streak? getByUserId(String userId) => box.get(userId);
 
-//   Future<void> save(Streak streak) => _box.put(_streakKey, streak);
+  /// Records an activity for [userId] on [activityDate] and returns the
+  /// updated [Streak]. Handles first-time, same-day, consecutive, and
+  /// broken-streak cases.
+  Future<Streak> recordActivity(String userId, DateTime activityDate) async {
+    final existing = getByUserId(userId);
 
-//   Future<void> clear() => _box.clear();
+    if (existing == null) {
+      final created = Streak(
+        id: UuidService.uuid.v4(),
+        userId: userId,
+        currentStreak: 1,
+        longestStreak: 1,
+        lastActivityDate: activityDate,
+      );
+      await save(created);
+      return created;
+    }
 
-//   Future<Streak> incrementStreak(String userId, DateTime activityDate) async {
-//     final existing = get();
+    // Already counted today — no-op
+    if (existing.lastActivityDate != null &&
+        DateUtils.isSameDay(existing.lastActivityDate, activityDate)) {
+      return existing;
+    }
 
-//     if (existing == null) {
-//       final newStreak = Streak(
-//         id: _uuid.v4(),
-//         userId: userId,
-//         currentStreak: 1,
-//         longestStreak: 1,
-//         lastActivityDate: activityDate,
-//       );
-//       await save(newStreak);
-//       return newStreak;
-//     }
+    final int newCurrent;
+    if (existing.lastActivityDate == null) {
+      newCurrent = 1;
+    } else {
+      final lastDay = DateTime(
+        existing.lastActivityDate!.year,
+        existing.lastActivityDate!.month,
+        existing.lastActivityDate!.day,
+      );
+      final today = DateTime(
+        activityDate.year,
+        activityDate.month,
+        activityDate.day,
+      );
+      newCurrent = today.difference(lastDay).inDays == 1
+          ? existing.currentStreak + 1
+          : 1;
+    }
 
-//     // Already counted today — return unchanged
-//     if (DateUtils.isSameDay(existing.lastActivityDate, activityDate)) {
-//       return existing;
-//     }
+    final newLongest =
+        newCurrent > existing.longestStreak ? newCurrent : existing.longestStreak;
 
-//     // If no prior activity date, treat as a fresh start
-//     if (existing.lastActivityDate == null) {
-//       final reset = existing.copyWith(
-//         currentStreak: 1,
-//         longestStreak: existing.longestStreak < 1 ? 1 : existing.longestStreak,
-//         lastActivityDate: activityDate,
-//       );
-//       await save(reset);
-//       return reset;
-//     }
-
-//     // Check if lastActivityDate was yesterday (date-only comparison)
-//     final lastDate = DateTime(
-//       existing.lastActivityDate!.year,
-//       existing.lastActivityDate!.month,
-//       existing.lastActivityDate!.day,
-//     );
-//     final currentDate = DateTime(
-//       activityDate.year,
-//       activityDate.month,
-//       activityDate.day,
-//     );
-//     final differenceInDays = currentDate.difference(lastDate).inDays;
-
-//     final int newCurrentStreak;
-//     if (differenceInDays == 1) {
-//       // Consecutive day — extend streak
-//       newCurrentStreak = existing.currentStreak + 1;
-//     } else {
-//       // Gap of more than one day — reset streak
-//       newCurrentStreak = 1;
-//     }
-
-//     final newLongestStreak = newCurrentStreak > existing.longestStreak
-//         ? newCurrentStreak
-//         : existing.longestStreak;
-
-//     final updated = existing.copyWith(
-//       currentStreak: newCurrentStreak,
-//       longestStreak: newLongestStreak,
-//       lastActivityDate: activityDate,
-//     );
-
-//     await save(updated);
-//     return updated;
-//   }
-// }
+    final updated = existing.copyWith(
+      currentStreak: newCurrent,
+      longestStreak: newLongest,
+      lastActivityDate: activityDate,
+    );
+    await save(updated);
+    return updated;
+  }
+}

@@ -10,6 +10,7 @@ class Repositories {
   static late final DrillAnswerRepository drillAnswer;
   static late final ReviewLogRepository reviewLog;
   // static late final StreakRepository streak;
+  static late final StreakRepository streak;
   static late final ProfileRepository userProfile;
   static late final CachedProfileRepository cachedProfile;
 
@@ -28,8 +29,7 @@ class Repositories {
         await ReviewSessionRepository().init() as ReviewSessionRepository;
     reviewLog = await ReviewLogRepository().init() as ReviewLogRepository;
     drillAnswer = await DrillAnswerRepository().init() as DrillAnswerRepository;
-    // streak = StreakRepository();
-    // Repositories.clearAll();
+    streak = await StreakRepository().init() as StreakRepository;
   }
 
   static void clearAll() {

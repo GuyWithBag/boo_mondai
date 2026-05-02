@@ -10,3 +10,4 @@ export 'supabase_leaderboard_service.dart';
 export 'supabase_research_service.dart';
 export 'supabase_service.dart';
 export 'supabase_storage_service.dart';
+export 'supabase_streak_service.dart';
