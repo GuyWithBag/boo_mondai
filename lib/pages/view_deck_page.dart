@@ -2,11 +2,13 @@
 // PATH: lib/pages/view_deck_page.dart
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/providers/providers.barrel.dart';
 import 'package:boo_mondai/repositories/repositories.barrel.dart';
-import 'package:boo_mondai/services/services.barrel.dart'; // <-- Ensure services are imported
+import 'package:boo_mondai/services/services.barrel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
 
@@ -22,15 +24,21 @@ class ViewDeckPage extends HookWidget {
 
     final deckRepo = Repositories.deck;
     final currentDeck = deckRepo.getById(deckId!);
+    if (currentDeck == null) {
+      return const Scaffold(
+        body: Center(child: Text('Deck not found.')),
+      );
+    }
     final cachedProfsRepo = Repositories.cachedProfile;
-    final author = cachedProfsRepo.getById(currentDeck!.authorId);
+    final author = cachedProfsRepo.getById(currentDeck.authorId);
     final sourceAuthor = cachedProfsRepo.getById(
       currentDeck.sourceAuthorId ?? '',
     );
 
-    // ── NEW: Calculate Eligibility ───────────────────────────
-    final userId = Services.auth.currentUser!.id;
+    // ── Calculate drill eligibility (works in guest mode too) ──────────────
+    final userId = context.read<AuthProvider>().localUserId;
     final eligibleCards = DrillService.getEligibleDrillCards(deckId!, userId);
+
     final availableCount = eligibleCards.length;
     final canDrill = availableCount > 0;
     // ─────────────────────────────────────────────────────────

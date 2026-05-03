@@ -61,7 +61,7 @@ class DrillSessionController extends StudySessionController {
     realTimeSaving = realTime; // Set the toggle
 
     try {
-      final userId = Services.auth.currentUser!.id;
+      final userId = LocalIdentityService.getOrCreate();
 
       final allTemplates = Repositories.cardTemplate.getByDeckId(deckId);
       templates = {for (final t in allTemplates) t.id: t};

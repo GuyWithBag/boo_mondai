@@ -29,24 +29,14 @@ class ResponsiveScaffold extends HookWidget {
     '/review',
     '/account',
   ];
-  // Indices 2 (My Decks), 3 (Review) require auth; Browse (1) is public
-  static const _authRequiredIndices = {2, 3};
 
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
-    final isAuth = auth.isAuthenticated;
     final isCreateDeck = useState(false);
+
     void onTap(BuildContext context, int index) {
       if (index == currentIndex) return;
-
-      final isAuth = context.read<AuthProvider>().isAuthenticated;
-      if (!isAuth && _authRequiredIndices.contains(index)) {
-        // Redirect to account page to prompt login
-        context.go('/account');
-        return;
-      }
-
       final goTo = _routes[index];
       context.go(goTo);
       isCreateDeck.value = goTo == '/my-decks';
@@ -67,7 +57,7 @@ class ResponsiveScaffold extends HookWidget {
                   extended: constraints.maxWidth > 1200,
                   selectedIndex: currentIndex,
                   onDestinationSelected: (i) => onTap(context, i),
-                  destinations: _buildRailDestinations(isAuth),
+                  destinations: _buildRailDestinations(),
                 ),
                 const VerticalDivider(width: 1),
                 Expanded(child: child),
@@ -81,43 +71,36 @@ class ResponsiveScaffold extends HookWidget {
           bottomNavigationBar: NavigationBar(
             selectedIndex: currentIndex,
             onDestinationSelected: (i) => onTap(context, i),
-            destinations: _buildNavDestinations(context, isAuth),
+            destinations: _buildNavDestinations(),
           ),
         );
       },
     );
   }
 
-  List<NavigationDestination> _buildNavDestinations(
-    BuildContext context,
-    bool isAuth,
-  ) {
-    final disabledColor = Theme.of(context).disabledColor;
-    return [
-      const NavigationDestination(
+  List<NavigationDestination> _buildNavDestinations() {
+    return const [
+      NavigationDestination(
         icon: Icon(Icons.home_outlined),
         selectedIcon: Icon(Icons.home),
         label: 'Home',
       ),
-      const NavigationDestination(
+      NavigationDestination(
         icon: Icon(Icons.explore_outlined),
         selectedIcon: Icon(Icons.explore),
         label: 'Browse',
       ),
       NavigationDestination(
-        icon: Icon(
-          Icons.library_books_outlined,
-          color: isAuth ? null : disabledColor,
-        ),
-        selectedIcon: const Icon(Icons.library_books),
+        icon: Icon(Icons.library_books_outlined),
+        selectedIcon: Icon(Icons.library_books),
         label: 'My Decks',
       ),
       NavigationDestination(
-        icon: Icon(Icons.replay_outlined, color: isAuth ? null : disabledColor),
-        selectedIcon: const Icon(Icons.replay),
+        icon: Icon(Icons.replay_outlined),
+        selectedIcon: Icon(Icons.replay),
         label: 'Review',
       ),
-      const NavigationDestination(
+      NavigationDestination(
         icon: Icon(Icons.person_outlined),
         selectedIcon: Icon(Icons.person),
         label: 'Account',
@@ -125,40 +108,29 @@ class ResponsiveScaffold extends HookWidget {
     ];
   }
 
-  List<NavigationRailDestination> _buildRailDestinations(bool isAuth) {
-    return [
-      const NavigationRailDestination(
+  List<NavigationRailDestination> _buildRailDestinations() {
+    return const [
+      NavigationRailDestination(
         icon: Icon(Icons.home_outlined),
         selectedIcon: Icon(Icons.home),
         label: Text('Home'),
       ),
-      const NavigationRailDestination(
+      NavigationRailDestination(
         icon: Icon(Icons.explore_outlined),
         selectedIcon: Icon(Icons.explore),
         label: Text('Browse'),
       ),
       NavigationRailDestination(
-        icon: Icon(
-          Icons.library_books_outlined,
-          color: isAuth ? null : Colors.grey,
-        ),
-        selectedIcon: const Icon(Icons.library_books),
-        label: Text(
-          'My Decks',
-          style: isAuth ? null : const TextStyle(color: Colors.grey),
-        ),
-        disabled: !isAuth,
+        icon: Icon(Icons.library_books_outlined),
+        selectedIcon: Icon(Icons.library_books),
+        label: Text('My Decks'),
       ),
       NavigationRailDestination(
-        icon: Icon(Icons.replay_outlined, color: isAuth ? null : Colors.grey),
-        selectedIcon: const Icon(Icons.replay),
-        label: Text(
-          'Review',
-          style: isAuth ? null : const TextStyle(color: Colors.grey),
-        ),
-        disabled: !isAuth,
+        icon: Icon(Icons.replay_outlined),
+        selectedIcon: Icon(Icons.replay),
+        label: Text('Review'),
       ),
-      const NavigationRailDestination(
+      NavigationRailDestination(
         icon: Icon(Icons.person_outlined),
         selectedIcon: Icon(Icons.person),
         label: Text('Account'),

@@ -58,7 +58,7 @@ class ReviewSessionController extends StudySessionController {
     notifyListeners();
 
     try {
-      final userId = Services.auth.currentUser!.id;
+      final userId = LocalIdentityService.getOrCreate();
       final now = DateTime.now();
 
       final allFsrsCards = Repositories.fsrsCard.getByUserId(userId);

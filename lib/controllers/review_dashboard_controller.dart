@@ -42,7 +42,7 @@ class ReviewDashboardController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final userId = Services.auth.currentUser!.id;
+      final userId = LocalIdentityService.getOrCreate();
       final allDecks = Repositories.deck.getAll();
       final deckMap = {for (final d in allDecks) d.id: d};
 
