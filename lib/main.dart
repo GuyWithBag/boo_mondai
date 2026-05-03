@@ -15,6 +15,7 @@ import 'package:boo_mondai/app.dart';
 import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/providers/providers.barrel.dart';
 import 'package:boo_mondai/services/services.barrel.dart';
+import 'package:boo_mondai/services/local_identity_service.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 
 import 'repositories/repositories.barrel.dart';
@@ -40,10 +41,12 @@ Future<void> main() async {
   final notificationService = NotificationService();
   await notificationService.init();
 
+  // ── Local identity (must run before restoreSession) ──
+  await LocalIdentityService.init();
+
   // ── Restore session ─────────────────────────────────
   final authProvider = AuthProvider();
-  // await authProvider.restoreSession();
-  authProvider.mockSignIn();
+  await authProvider.restoreSession();
 
   runApp(
     MultiProvider(

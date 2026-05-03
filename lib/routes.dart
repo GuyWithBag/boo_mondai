@@ -21,14 +21,10 @@ GoRouter createRouter(AuthProvider authProvider) {
       // Authenticated users landing on /login or /register → go home
       if (isAuth && (loc == '/login' || loc == '/register')) return '/';
 
-      // Auth-required routes: redirect to /account if not logged in
-      if (!isAuth) {
-        final requiresAuth =
-            loc.startsWith('/my-decks') ||
-            loc.startsWith('/drill') ||
-            loc.startsWith('/review') ||
-            loc.startsWith('/research');
-        if (requiresAuth) return '/account';
+      // Researcher dashboard requires a real account with the researcher role
+      if (loc == '/research' &&
+          (!isAuth || authProvider.role != 'researcher')) {
+        return '/';
       }
 
       // Group B guard — redirect to code entry for non-allowed routes
