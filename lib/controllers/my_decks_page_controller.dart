@@ -41,7 +41,8 @@ class MyDecksPageController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final all = _deckRepository.getAll();
+      final userId = LocalIdentityService.getOrCreate();
+      final all = _deckRepository.getByAuthorId(userId);
       all.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
       _decks = all;
     } on Exception catch (e) {
