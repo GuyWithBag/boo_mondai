@@ -7,6 +7,7 @@
 
 import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/models/models.barrel.dart';
+import 'package:boo_mondai/providers/providers.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +29,7 @@ class MyDecksPage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<MyDecksPageController>();
+    final auth = context.watch<AuthProvider>();
     // final scrollController = useScrollController();
     final searchController = useTextEditingController();
     final searchQuery = useState('');
@@ -38,6 +40,26 @@ class MyDecksPage extends HookWidget {
       SchedulerBinding.instance.addPostFrameCallback((_) => controller.load());
       return null;
     }, const []);
+
+    // Show a snackbar whenever a sync error arrives.
+    useEffect(() {
+      final err = controller.syncError;
+      if (err == null) return null;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Sync failed: $err'),
+            action: SnackBarAction(
+              label: 'Retry',
+              onPressed: () => controller.sync(auth.localUserId),
+            ),
+          ),
+        );
+        controller.clearSyncError();
+      });
+      return null;
+    }, [controller.syncError]);
 
     useEffect(() {
       void listener() => searchQuery.value = searchController.text;
@@ -52,7 +74,16 @@ class MyDecksPage extends HookWidget {
     }).toList();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('My Decks')),
+      appBar: AppBar(
+        title: const Text('My Decks'),
+        actions: [
+          _SyncButton(
+            isSyncing: controller.isSyncing,
+            isAuthenticated: auth.isAuthenticated,
+            onSync: () => controller.sync(auth.localUserId),
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => context.push('/my-decks/create'),
         tooltip: 'New Deck',
@@ -215,3 +246,46 @@ class _PlaceholderDeckTile extends StatelessWidget {
 //     );
 //   }
 // }
+
+// ── _SyncButton ─────────────────────────────────────────────────────────
+
+/// AppBar action that drives the deck sync operation.
+///
+/// Shows a spinner while syncing, a disabled cloud icon with a tooltip
+/// when the user is a guest, and a tappable cloud icon when authenticated.
+class _SyncButton extends StatelessWidget {
+  const _SyncButton({
+    required this.isSyncing,
+    required this.isAuthenticated,
+    required this.onSync,
+  });
+
+  final bool isSyncing;
+  final bool isAuthenticated;
+  final VoidCallback onSync;
+
+  @override
+  Widget build(BuildContext context) {
+    if (isSyncing) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 12),
+        child: SizedBox(
+          width: 20,
+          height: 20,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+      );
+    }
+
+    return Tooltip(
+      message: isAuthenticated ? 'Sync decks' : 'Sign in to sync',
+      child: IconButton(
+        icon: Icon(
+          Icons.sync_rounded,
+          color: isAuthenticated ? null : Theme.of(context).disabledColor,
+        ),
+        onPressed: isAuthenticated ? onSync : null,
+      ),
+    );
+  }
+}

@@ -26,11 +26,16 @@ class MyDecksPageController extends ChangeNotifier {
   bool _isLoading = false;
   String? _error;
 
+  bool _isSyncing = false;
+  String? _syncError;
+
   // ── public getters ───────────────────────────────────────
 
   List<Deck> get decks => List.unmodifiable(_decks);
   bool get isLoading => _isLoading;
   String? get error => _error;
+  bool get isSyncing => _isSyncing;
+  String? get syncError => _syncError;
 
   // ── methods ──────────────────────────────────────────────
 
@@ -71,5 +76,49 @@ class MyDecksPageController extends ChangeNotifier {
   void clearError() {
     _error = null;
     notifyListeners();
+  }
+
+  void clearSyncError() {
+    _syncError = null;
+    notifyListeners();
+  }
+
+  /// Pull remote decks (newer [updatedAt] wins), then push all local decks.
+  ///
+  /// Requires an authenticated Supabase session — call only when
+  /// [AuthProvider.isAuthenticated] is true.
+  Future<void> sync(String userId) async {
+    _isSyncing = true;
+    _syncError = null;
+    notifyListeners();
+
+    try {
+      // ── 1. Pull ──────────────────────────────────────────
+      // Fetch all remote decks for this user and save any that are newer
+      // than the local copy (or missing locally).
+      final remoteMaps = await Services.deck.fetchUserDecks(userId);
+      for (final map in remoteMaps) {
+        final remote = DeckMapper.fromMap(map);
+        final local = _deckRepository.getById(remote.id);
+        if (local == null || remote.updatedAt.isAfter(local.updatedAt)) {
+          await _deckRepository.save(remote);
+        }
+      }
+
+      // ── 2. Push ──────────────────────────────────────────
+      // Upsert every local deck that belongs to this user.
+      final localDecks = _deckRepository.getByAuthorId(userId);
+      for (final deck in localDecks) {
+        await Services.deck.upsertDeck(deck.toMap());
+      }
+
+      // ── 3. Reload ────────────────────────────────────────
+      load();
+    } on AppException catch (e) {
+      _syncError = e.message;
+    } finally {
+      _isSyncing = false;
+      notifyListeners();
+    }
   }
 }
