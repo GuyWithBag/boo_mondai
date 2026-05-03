@@ -30,14 +30,29 @@ class LoginPage extends HookWidget {
       return null;
     }, const []);
 
+    // Navigate home only when authenticated AND the merge dialog is not pending.
     useEffect(() {
-      if (auth.isAuthenticated) {
+      if (auth.isAuthenticated && !auth.hasPendingGuestMerge) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (context.mounted) context.go('/');
         });
       }
       return null;
-    }, [auth.isAuthenticated]);
+    }, [auth.isAuthenticated, auth.hasPendingGuestMerge]);
+
+    // Show the merge dialog when the provider signals a pending decision.
+    useEffect(() {
+      if (!auth.hasPendingGuestMerge) return null;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!context.mounted) return;
+        showDialog<void>(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => GuestMergeDialog(auth: auth),
+        );
+      });
+      return null;
+    }, [auth.hasPendingGuestMerge]);
 
     return Scaffold(
       appBar: AppBar(
@@ -124,6 +139,54 @@ class LoginPage extends HookWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+// ── Screen-local widget ──────────────────────────────────────────────────────
+
+/// Dialog shown when a guest who has local data signs into an existing account.
+/// Forces a choice — [barrierDismissible] must be false at the call site.
+class GuestMergeDialog extends StatelessWidget {
+  final AuthProvider auth;
+  const GuestMergeDialog({super.key, required this.auth});
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('You have local data'),
+      content: const Text(
+        'You created decks and study progress on this device before signing in. '
+        'Would you like to merge them into your account?\n\n'
+        'If you discard, your local data will be deleted and your '
+        'account data will be loaded instead.',
+      ),
+      actions: [
+        TextButton(
+          onPressed: auth.isLoading
+              ? null
+              : () {
+                  Navigator.of(context).pop();
+                  auth.confirmMerge(false);
+                },
+          child: const Text('Discard local data'),
+        ),
+        FilledButton(
+          onPressed: auth.isLoading
+              ? null
+              : () {
+                  Navigator.of(context).pop();
+                  auth.confirmMerge(true);
+                },
+          child: auth.isLoading
+              ? const SizedBox(
+                  height: 18,
+                  width: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Text('Merge into account'),
+        ),
+      ],
     );
   }
 }
