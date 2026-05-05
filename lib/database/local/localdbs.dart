@@ -11,11 +11,11 @@ class LocalDB {
   static late final ReviewLogLocalDB reviewLog;
   // static late final StreakLocalDB streak;
   static late final StreakLocalDB streak;
-  static late final ProfileLocalDB userProfile;
+  static late final ProfileLocalDB profile;
   static late final CachedProfileLocalDB cachedProfile;
 
   static Future<void> init() async {
-    userProfile = await ProfileLocalDB().init() as ProfileLocalDB;
+    profile = await ProfileLocalDB().init() as ProfileLocalDB;
     cachedProfile = await CachedProfileLocalDB().init() as CachedProfileLocalDB;
     deck = await DeckLocalDB().init() as DeckLocalDB;
     cardTemplate = await CardTemplateLocalDB().init() as CardTemplateLocalDB;
@@ -34,7 +34,7 @@ class LocalDB {
     fsrsCard.clear();
     drillSession.clear();
     reviewLog.clear();
-    userProfile.clear();
+    profile.clear();
     cachedProfile.clear();
   }
 }

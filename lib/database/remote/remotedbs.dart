@@ -2,7 +2,7 @@ import 'package:boo_mondai/database/database.barrel.dart';
 
 class RemoteDB {
   // ── Remote Data Sources ──────────────────────────
-  static late final AuthRemoteDB auth;
+  static late final ProfileRemoteDB profile;
   static late final DeckRemoteDB deck;
   static late final CardTemplateRemoteDB card;
   static late final DrillSessionRemoteDB drill;
@@ -13,7 +13,7 @@ class RemoteDB {
   static late final StreakRemoteDB streakSync;
 
   static Future<void> init() async {
-    auth = AuthRemoteDB();
+    profile = ProfileRemoteDB();
     deck = DeckRemoteDB();
     card = CardTemplateRemoteDB();
     drill = DrillSessionRemoteDB();
