@@ -22,9 +22,9 @@ class CachedProfileMapper extends ClassMapperBase<CachedProfile> {
 
   static String _$id(CachedProfile v) => v.id;
   static const Field<CachedProfile, String> _f$id = Field('id', _$id);
-  static String _$userName(CachedProfile v) => v.userName;
-  static const Field<CachedProfile, String> _f$userName =
-      Field('userName', _$userName, key: r'user_name');
+  static String _$username(CachedProfile v) => v.username;
+  static const Field<CachedProfile, String> _f$username =
+      Field('username', _$username);
   static String? _$avatarUrl(CachedProfile v) => v.avatarUrl;
   static const Field<CachedProfile, String> _f$avatarUrl =
       Field('avatarUrl', _$avatarUrl, key: r'avatar_url', opt: true);
@@ -35,7 +35,7 @@ class CachedProfileMapper extends ClassMapperBase<CachedProfile> {
   @override
   final MappableFields<CachedProfile> fields = const {
     #id: _f$id,
-    #userName: _f$userName,
+    #username: _f$username,
     #avatarUrl: _f$avatarUrl,
     #createdAt: _f$createdAt,
   };
@@ -43,7 +43,7 @@ class CachedProfileMapper extends ClassMapperBase<CachedProfile> {
   static CachedProfile _instantiate(DecodingData data) {
     return CachedProfile(
         id: data.dec(_f$id),
-        userName: data.dec(_f$userName),
+        username: data.dec(_f$username),
         avatarUrl: data.dec(_f$avatarUrl),
         createdAt: data.dec(_f$createdAt));
   }
@@ -102,7 +102,7 @@ extension CachedProfileValueCopy<$R, $Out>
 abstract class CachedProfileCopyWith<$R, $In extends CachedProfile, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   $R call(
-      {String? id, String? userName, String? avatarUrl, DateTime? createdAt});
+      {String? id, String? username, String? avatarUrl, DateTime? createdAt});
   CachedProfileCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -117,19 +117,19 @@ class _CachedProfileCopyWithImpl<$R, $Out>
   @override
   $R call(
           {String? id,
-          String? userName,
+          String? username,
           Object? avatarUrl = $none,
           DateTime? createdAt}) =>
       $apply(FieldCopyWithData({
         if (id != null) #id: id,
-        if (userName != null) #userName: userName,
+        if (username != null) #username: username,
         if (avatarUrl != $none) #avatarUrl: avatarUrl,
         if (createdAt != null) #createdAt: createdAt
       }));
   @override
   CachedProfile $make(CopyWithData data) => CachedProfile(
       id: data.get(#id, or: $value.id),
-      userName: data.get(#userName, or: $value.userName),
+      username: data.get(#username, or: $value.username),
       avatarUrl: data.get(#avatarUrl, or: $value.avatarUrl),
       createdAt: data.get(#createdAt, or: $value.createdAt));
 
