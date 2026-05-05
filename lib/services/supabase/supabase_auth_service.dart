@@ -11,15 +11,12 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'supabase_service.dart';
 
 class SupabaseAuthService extends SupabaseService {
-  Future<AuthResponse> signIn(String email, String password) => guard(() async {
-    final res = await client.auth.signInWithPassword(
-      email: email,
-      password: password,
-    );
-    return res;
-  });
+  // ── Auth ──────────────────────────────────────────────
 
-  // TODO: Create User Profile here to work with AuthProvider
+  Future<AuthResponse> signIn(String email, String password) => guard(
+    () => client.auth.signInWithPassword(email: email, password: password),
+  );
+
   Future<AuthResponse> signUp(
     String email,
     String password,
@@ -31,20 +28,16 @@ class SupabaseAuthService extends SupabaseService {
     return res;
   });
 
-  Future<void> signOut() => guard(() async {
-    await client.auth.signOut();
-    Repositories.userProfile.clear();
-  });
+  Future<void> signOut() => guard(() => client.auth.signOut());
 
   Session? get currentSession => client.auth.currentSession;
   User? get currentUser => client.auth.currentUser;
 
   // ── Profiles ──────────────────────────────────────────
 
-  Future<Map<String, dynamic>?> getProfile(String userId) => guard(
-    () => client.from('profiles').select().eq('id', userId).maybeSingle(),
-  );
+  Future<Map<String, dynamic>?> getProfile(String userId) =>
+      fetchById('profiles', userId);
 
   Future<void> upsertProfile(Map<String, dynamic> data) =>
-      guard(() => client.from('profiles').upsert(data));
+      upsertRow('profiles', data);
 }

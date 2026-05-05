@@ -8,25 +8,18 @@
 import 'supabase_service.dart';
 
 class SupabaseResearchService extends SupabaseService {
-  Future<List<Map<String, dynamic>>> fetchResearchCodes({
-    String? createdBy,
-  }) =>
-      guard(() async {
-        var query = client.from('research_codes').select();
-        if (createdBy != null) {
-          query = query.eq('createdBy', createdBy);
-        }
-        final response = await query.order('createdAt', ascending: false);
-        return List<Map<String, dynamic>>.from(response);
-      });
+  Future<List<Map<String, dynamic>>> fetchResearchCodes({String? createdBy}) =>
+      fetchAll(
+        'research_codes',
+        filters: createdBy != null ? {'createdBy': createdBy} : null,
+        orderBy: 'createdAt',
+      );
 
-  Future<Map<String, dynamic>> insertResearchCode(
-          Map<String, dynamic> data) =>
-      guard(
-          () => client.from('research_codes').insert(data).select().single());
+  Future<Map<String, dynamic>> insertResearchCode(Map<String, dynamic> data) =>
+      insertOne('research_codes', data);
 
-  Future<Map<String, dynamic>> redeemResearchCode(
-          String code, String userId) =>
+  /// Validates the code, marks it as used, and returns the original code row.
+  Future<Map<String, dynamic>> redeemResearchCode(String code, String userId) =>
       guard(() async {
         final codeRow = await client
             .from('research_codes')
@@ -35,20 +28,22 @@ class SupabaseResearchService extends SupabaseService {
             .isFilter('usedBy', null)
             .single();
 
-        await client.from('research_codes').update({
-          'usedBy': userId,
-          'usedAt': DateTime.now().toIso8601String(),
-        }).eq('id', codeRow['id'] as String);
+        await client
+            .from('research_codes')
+            .update({
+              'usedBy': userId,
+              'usedAt': DateTime.now().toIso8601String(),
+            })
+            .eq('id', codeRow['id'] as String);
 
         return Map<String, dynamic>.from(codeRow);
       });
 
-  /// Inserts a survey response into the single generic survey_responses table.
   Future<void> insertSurveyResponse(Map<String, dynamic> data) =>
-      guard(() => client.from('survey_responses').insert(data));
+      insertRow('survey_responses', data);
 
   Future<void> insertVocabularyTest(Map<String, dynamic> data) =>
-      guard(() => client.from('vocabulary_test_results').insert(data));
+      insertRow('vocabulary_test_results', data);
 
   Future<Map<String, List<Map<String, dynamic>>>> fetchAllResearchData() =>
       guard(() async {
@@ -69,10 +64,12 @@ class SupabaseResearchService extends SupabaseService {
           'research_profiles': List<Map<String, dynamic>>.from(results[0]),
           'research_codes': List<Map<String, dynamic>>.from(results[1]),
           'survey_responses': List<Map<String, dynamic>>.from(results[2]),
-          'vocabulary_test_results': List<Map<String, dynamic>>.from(results[3]),
+          'vocabulary_test_results': List<Map<String, dynamic>>.from(
+            results[3],
+          ),
         };
       });
 
   Future<void> insertResearchProfile(Map<String, dynamic> data) =>
-      guard(() => client.from('research_profiles').insert(data));
+      insertRow('research_profiles', data);
 }

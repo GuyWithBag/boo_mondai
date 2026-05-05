@@ -9,8 +9,8 @@ import 'supabase_service.dart';
 
 class SupabaseFsrsService extends SupabaseService {
   Future<void> upsertFsrsCard(Map<String, dynamic> data) =>
-      guard(() => client.from('fsrs_cards').upsert(data));
+      upsertRow('fsrs_cards', data);
 
   Future<void> insertReviewLog(Map<String, dynamic> data) =>
-      guard(() => client.from('review_logs').insert(data));
+      insertRow('review_logs', data);
 }

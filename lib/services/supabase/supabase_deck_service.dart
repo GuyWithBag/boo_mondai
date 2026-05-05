@@ -8,39 +8,29 @@
 import 'supabase_service.dart';
 
 class SupabaseDeckService extends SupabaseService {
-  Future<List<Map<String, dynamic>>> fetchDecks({
-    bool publicOnly = true,
-  }) =>
+  /// Fetches all public decks (or all decks when [publicOnly] is false),
+  /// with a joined source-deck authorId for attribution display.
+  Future<List<Map<String, dynamic>>> fetchDecks({bool publicOnly = true}) =>
       guard(() async {
-        var query = client.from('decks').select(
-              '*, source_deck:decks!sourceDeckId(authorId)',
-            );
-        if (publicOnly) {
-          query = query.eq('isPublic', true);
-        }
+        var query = client
+            .from('decks')
+            .select('*, source_deck:decks!sourceDeckId(authorId)');
+        if (publicOnly) query = query.eq('isPublic', true);
         final response = await query.order('createdAt', ascending: false);
         return List<Map<String, dynamic>>.from(response);
       });
 
   Future<List<Map<String, dynamic>>> fetchUserDecks(String userId) =>
-      guard(() async {
-        final response = await client
-            .from('decks')
-            .select()
-            .eq('authorId', userId)
-            .order('createdAt', ascending: false);
-        return List<Map<String, dynamic>>.from(response);
-      });
+      fetchAll('decks', filters: {'authorId': userId}, orderBy: 'createdAt');
 
   Future<Map<String, dynamic>> insertDeck(Map<String, dynamic> data) =>
-      guard(() => client.from('decks').insert(data).select().single());
+      insertOne('decks', data);
 
   Future<void> updateDeck(String id, Map<String, dynamic> data) =>
-      guard(() => client.from('decks').update(data).eq('id', id));
+      updateById('decks', id, data);
 
   Future<void> upsertDeck(Map<String, dynamic> data) =>
-      guard(() => client.from('decks').upsert(data));
+      upsertRow('decks', data);
 
-  Future<void> deleteDeck(String id) =>
-      guard(() => client.from('decks').delete().eq('id', id));
+  Future<void> deleteDeck(String id) => deleteById('decks', id);
 }

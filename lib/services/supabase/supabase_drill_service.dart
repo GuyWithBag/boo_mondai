@@ -9,16 +9,14 @@ import 'supabase_service.dart';
 
 class SupabaseDrillService extends SupabaseService {
   Future<Map<String, dynamic>> insertDrillSession(Map<String, dynamic> data) =>
-      guard(() => client.from('drill_sessions').insert(data).select().single());
+      insertOne('drill_sessions', data);
 
   Future<void> updateDrillSession(String id, Map<String, dynamic> data) =>
-      guard(() => client.from('drill_sessions').update(data).eq('id', id));
+      updateById('drill_sessions', id, data);
 
   Future<void> insertDrillAnswer(Map<String, dynamic> data) =>
-      guard(() => client.from('drill_answers').insert(data));
+      insertRow('drill_answers', data);
 
-  Future<void> batchInsertDrillAnswers(List<Map<String, dynamic>> answers) {
-    if (answers.isEmpty) return Future.value();
-    return guard(() => client.from('drill_answers').insert(answers));
-  }
+  Future<void> batchInsertDrillAnswers(List<Map<String, dynamic>> answers) =>
+      insertMany('drill_answers', answers);
 }
