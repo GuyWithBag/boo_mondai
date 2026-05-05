@@ -9,4 +9,5 @@ export 'hive_service.dart';
 export 'local_identity_service.dart';
 export 'notification_service.dart';
 export 'services.dart';
+export 'sync_service.dart';
 export 'uuid_service.dart';

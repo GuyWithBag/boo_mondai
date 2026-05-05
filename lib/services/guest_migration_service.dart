@@ -17,7 +17,7 @@ class GuestMigrationService {
 
   /// Returns true if [guestId] owns any local data worth asking the user about.
   static bool hasLocalData(String guestId) {
-    final hasDecks = LocalDB.deck.getByAuthorId(guestId).isNotEmpty;
+    final hasDecks = LocalDB.deck.getByUserId(guestId).isNotEmpty;
     final hasFsrs = LocalDB.fsrsCard.getByUserId(guestId).isNotEmpty;
     final hasSessions = LocalDB.drillSession.getAll().any(
       (s) => s.userId == guestId,
@@ -35,9 +35,9 @@ class GuestMigrationService {
   /// Card templates and review cards belong to decks, not users — no change.
   static Future<void> migrateLocalData(String guestId, String newUserId) async {
     // ── Decks ──────────────────────────────────────────────
-    final guestDecks = LocalDB.deck.getByAuthorId(guestId);
+    final guestDecks = LocalDB.deck.getByUserId(guestId);
     for (final deck in guestDecks) {
-      await LocalDB.deck.put(deck.copyWith(authorId: newUserId));
+      await LocalDB.deck.put(deck.copyWith(userId: newUserId));
     }
 
     // ── FSRS cards ─────────────────────────────────────────
@@ -72,7 +72,7 @@ class GuestMigrationService {
   ///
   /// Used when the user signs in and chooses NOT to keep their guest data.
   static Future<void> discardGuestData(String guestId) async {
-    final guestDecks = LocalDB.deck.getByAuthorId(guestId);
+    final guestDecks = LocalDB.deck.getByUserId(guestId);
     await LocalDB.deck.deleteAll(guestDecks.map((d) => d.id).toList());
 
     final guestFsrs = LocalDB.fsrsCard.getByUserId(guestId);

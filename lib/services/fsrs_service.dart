@@ -49,7 +49,7 @@ class FsrsService {
     // We only need logs to determine if a card is "New" or "Learning"
     final studiedCardIds = LocalDB.reviewLog
         .getAll()
-        .map((l) => l.cardId)
+        .map((l) => l.fsrsCardId)
         .toSet();
 
     final dueNewMap = <String, int>{};
@@ -106,7 +106,7 @@ class FsrsService {
     final easyMap = <String, int>{};
 
     for (final log in allLogs) {
-      final fsrsCard = LocalDB.fsrsCard.getById(log.cardId);
+      final fsrsCard = LocalDB.fsrsCard.getById(log.fsrsCardId);
       if (fsrsCard == null) continue;
 
       final deckId = rcToDeck[fsrsCard.reviewCardId];
