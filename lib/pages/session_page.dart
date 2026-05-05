@@ -5,7 +5,6 @@
 
 import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart';
-import 'package:boo_mondai/providers/providers.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 import 'package:boo_mondai/pages/drill_result_page.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
@@ -68,7 +67,7 @@ class SessionPage extends HookWidget {
       if (ctrl.isComplete && mode == SessionMode.review) {
         final userId = context.read<AuthProvider>().userProfile?.id;
         if (userId != null) {
-          context.read<StreakProvider>().recordActivity(userId);
+          context.read<StreakController>().recordActivity(userId);
         }
       }
       return null;

@@ -14,9 +14,7 @@ import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:boo_mondai/app.dart';
 import 'package:boo_mondai/controllers/controllers.barrel.dart';
-import 'package:boo_mondai/providers/providers.barrel.dart';
 import 'package:boo_mondai/services/services.barrel.dart';
-import 'package:boo_mondai/services/local_identity_service.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 
 @BarrelConfig(
@@ -44,19 +42,16 @@ Future<void> main() async {
   final notificationService = NotificationService();
   await notificationService.init();
 
-  // ── Local identity (must run before restoreSession) ──
-  await LocalIdentityService.init();
-
   // ── Restore session ─────────────────────────────────
-  final authProvider = AuthProvider();
-  await authProvider.restoreSession();
+  final authController = AuthController();
+  await authController.restoreSession();
 
   runApp(
     MultiProvider(
       providers: [
         // Provider<HiveService>.value(value: hiveService),
         // Provider<SupabaseRemoteDB>.value(value: supabaseService),
-        ChangeNotifierProvider.value(value: authProvider),
+        ChangeNotifierProvider.value(value: authController),
         // ChangeNotifierProvider(
         //   create: (_) => DeckProvider(
         //     supabaseService: supabaseService,
@@ -83,9 +78,9 @@ Future<void> main() async {
         //     supabaseService: supabaseService,
         //   ),
         // ),
-        ChangeNotifierProvider(create: (_) => LeaderboardProvider()),
-        ChangeNotifierProvider(create: (_) => StreakProvider()),
-        ChangeNotifierProvider(create: (_) => ResearchProvider()),
+        ChangeNotifierProvider(create: (_) => LeaderboardController()),
+        ChangeNotifierProvider(create: (_) => StreakController()),
+        ChangeNotifierProvider(create: (_) => ResearchController()),
       ],
       child: const BooMondaiApp(),
     ),

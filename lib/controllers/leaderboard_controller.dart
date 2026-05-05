@@ -1,17 +1,14 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// PATH: lib/providers/leaderboard_provider.dart
-// PURPOSE: Fetches and exposes leaderboard rankings with optional language filter
-// PROVIDERS: none
-// HOOKS: none
+// PATH: lib/controllers/leaderboard_controller.dart
+// PURPOSE: UI state for leaderboard rankings with optional language filter
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:flutter/foundation.dart';
 import 'package:boo_mondai/models/models.barrel.dart';
-import 'package:boo_mondai/services/services.dart';
+import 'package:boo_mondai/database/database.barrel.dart';
 import 'package:boo_mondai/services/app_exception.dart';
 
-/// Provides ranked leaderboard entries, globally or filtered by language.
-class LeaderboardProvider extends ChangeNotifier {
+class LeaderboardController extends ChangeNotifier {
   List<LeaderboardEntry> _entries = [];
   String? _filteredLanguage;
   bool _isLoading = false;
@@ -29,10 +26,9 @@ class LeaderboardProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final data = await Services.leaderboard.fetchLeaderboard(
+      _entries = await RemoteDB.leaderboard.fetchLeaderboard(
         targetLanguage: targetLanguage,
       );
-      _entries = data.map(LeaderboardEntryMapper.fromMap).toList();
     } on AppException catch (e) {
       _error = e.message;
     } finally {
@@ -44,5 +40,12 @@ class LeaderboardProvider extends ChangeNotifier {
   void setLanguageFilter(String? language) {
     _filteredLanguage = language;
     fetchLeaderboard(targetLanguage: language);
+  }
+
+  void clearError() {
+    if (_error != null) {
+      _error = null;
+      notifyListeners();
+    }
   }
 }

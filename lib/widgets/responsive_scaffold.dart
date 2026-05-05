@@ -5,12 +5,11 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/lib.barrel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:boo_mondai/providers/providers.barrel.dart';
-import 'package:boo_mondai/shared/shared.barrel.dart';
 
 class ResponsiveScaffold extends HookWidget {
   final int currentIndex;
@@ -32,7 +31,7 @@ class ResponsiveScaffold extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final auth = context.watch<AuthProvider>();
+    final auth = context.watch<AuthController>();
     final isCreateDeck = useState(false);
 
     void onTap(BuildContext context, int index) {

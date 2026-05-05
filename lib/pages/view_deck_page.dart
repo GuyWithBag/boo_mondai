@@ -2,7 +2,7 @@
 // PATH: lib/pages/view_deck_page.dart
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/providers/providers.barrel.dart';
+import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/database/database.barrel.dart';
 
 import 'package:boo_mondai/services/services.barrel.dart';

@@ -1,7 +1,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/pages/research_code_entry_page.dart
 // PURPOSE: Code entry screen for unlocking research study flows
-// PROVIDERS: ResearchProvider, AuthProvider
+// PROVIDERS: ResearchController, AuthProvider
 // HOOKS: useTextEditingController, useFocusNode, useState
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:boo_mondai/providers/providers.barrel.dart';
+import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
 
@@ -54,7 +54,7 @@ class _CodeStep extends HookWidget {
   Widget build(BuildContext context) {
     final codeController = useTextEditingController();
     final codeFocus = useFocusNode();
-    final research = context.watch<ResearchProvider>();
+    final research = context.watch<ResearchController>();
     final auth = context.watch<AuthProvider>();
     final message = useState<String?>(null);
 
@@ -112,7 +112,7 @@ class _CodeStep extends HookWidget {
                             if (userId == null) return;
 
                             final unlocked = await context
-                                .read<ResearchProvider>()
+                                .read<ResearchController>()
                                 .redeemCode(userId, code);
 
                             if (unlocked == null || !context.mounted) return;
@@ -171,7 +171,7 @@ class _DemographicsStep extends HookWidget {
     final lastNameController = useTextEditingController();
     final ageController = useTextEditingController();
     final formKey = useMemoized(GlobalKey<FormState>.new);
-    final research = context.watch<ResearchProvider>();
+    final research = context.watch<ResearchController>();
     final auth = context.watch<AuthProvider>();
 
     return Scaffold(
@@ -244,7 +244,7 @@ class _DemographicsStep extends HookWidget {
                               if (userId == null) return;
 
                               await context
-                                  .read<ResearchProvider>()
+                                  .read<ResearchController>()
                                   .addResearchProfile(
                                     userId: userId,
                                     role: role,
@@ -258,7 +258,7 @@ class _DemographicsStep extends HookWidget {
                                   );
 
                               if (!context.mounted) return;
-                              if (context.read<ResearchProvider>().error !=
+                              if (context.read<ResearchController>().error !=
                                   null)
                                 return;
 

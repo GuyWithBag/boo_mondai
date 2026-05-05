@@ -1,7 +1,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/pages/home_page.dart
 // PURPOSE: Dashboard — streak, due reviews, leaderboard preview
-// PROVIDERS: AuthProvider, StreakProvider, ReviewDashboardController, LeaderboardProvider
+// PROVIDERS: AuthProvider, StreakController, ReviewDashboardController, LeaderboardController
 // HOOKS: useEffect
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -10,7 +10,6 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:boo_mondai/controllers/controllers.barrel.dart';
-import 'package:boo_mondai/providers/providers.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
 
@@ -20,15 +19,15 @@ class HomePage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
-    final streakProv = context.watch<StreakProvider>();
+    final streakProv = context.watch<StreakController>();
     final dashboard = context.watch<ReviewDashboardController>();
-    final leaderboard = context.watch<LeaderboardProvider>();
+    final leaderboard = context.watch<LeaderboardController>();
     final userId = auth.userProfile?.id;
 
     useEffect(() {
       if (userId != null) {
         Future.microtask(() {
-          context.read<StreakProvider>().fetchStreak(userId);
+          context.read<StreakController>().fetchStreak(userId);
           context.read<ReviewDashboardController>().load();
           leaderboard.fetchLeaderboard(
             targetLanguage: auth.userProfile?.targetLanguage,
@@ -45,7 +44,7 @@ class HomePage extends HookWidget {
           onRefresh: () async {
             if (userId != null) {
               await Future.wait([
-                context.read<StreakProvider>().fetchStreak(userId),
+                context.read<StreakController>().fetchStreak(userId),
                 context.read<ReviewDashboardController>().load(),
                 leaderboard.fetchLeaderboard(
                   targetLanguage: auth.userProfile?.targetLanguage,

@@ -1,14 +1,14 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/pages/leaderboard_page.dart
 // PURPOSE: Display global leaderboard rankings with optional language filter
-// PROVIDERS: LeaderboardProvider
+// PROVIDERS: LeaderboardController
 // HOOKS: useEffect, useScrollController
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
-import 'package:boo_mondai/providers/providers.barrel.dart';
+import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
 
@@ -17,12 +17,12 @@ class LeaderboardPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final leaderboard = context.watch<LeaderboardProvider>();
+    final leaderboard = context.watch<LeaderboardController>();
     final scrollController = useScrollController();
 
     useEffect(() {
       Future.microtask(
-        () => context.read<LeaderboardProvider>().fetchLeaderboard(),
+        () => context.read<LeaderboardController>().fetchLeaderboard(),
       );
       return null;
     }, const []);
@@ -35,7 +35,7 @@ class LeaderboardPage extends HookWidget {
             icon: const Icon(Icons.filter_list),
             tooltip: 'Filter by language',
             onSelected: (lang) =>
-                context.read<LeaderboardProvider>().setLanguageFilter(lang),
+                context.read<LeaderboardController>().setLanguageFilter(lang),
             itemBuilder: (_) => [
               const PopupMenuItem(value: null, child: Text('All languages')),
               const PopupMenuItem(value: 'japanese', child: Text('Japanese')),
@@ -49,7 +49,7 @@ class LeaderboardPage extends HookWidget {
           ? const Center(child: Text('No entries yet'))
           : RefreshIndicator(
               onRefresh: () =>
-                  context.read<LeaderboardProvider>().fetchLeaderboard(
+                  context.read<LeaderboardController>().fetchLeaderboard(
                     targetLanguage: leaderboard.filteredLanguage,
                   ),
               child: ListView.builder(

@@ -1,7 +1,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/pages/researcher_dashboard_page.dart
 // PURPOSE: Researcher dashboard — manage codes, view participants and results
-// PROVIDERS: ResearchProvider, AuthProvider
+// PROVIDERS: ResearchController, AuthProvider
 // HOOKS: useEffect
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -9,20 +9,20 @@ import 'package:boo_mondai/widgets/widgets.barrel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
-import 'package:boo_mondai/providers/providers.barrel.dart';
+import 'package:boo_mondai/controllers/controllers.barrel.dart';
 
 class ResearcherDashboardPage extends HookWidget {
   const ResearcherDashboardPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final research = context.watch<ResearchProvider>();
+    final research = context.watch<ResearchController>();
     final auth = context.read<AuthProvider>();
     final tabIndex = useState(0);
 
     useEffect(() {
       Future.microtask(
-        () => context.read<ResearchProvider>().fetchAllResearchData(),
+        () => context.read<ResearchController>().fetchAllResearchData(),
       );
       return null;
     }, const []);

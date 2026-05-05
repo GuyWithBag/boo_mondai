@@ -1,7 +1,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/pages/survey_page.dart
 // PURPOSE: Dynamic survey page rendering Likert scale questions by survey type
-// PROVIDERS: ResearchProvider, AuthProvider
+// PROVIDERS: ResearchController, AuthProvider
 // HOOKS: useScrollController, useMemoized
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:boo_mondai/providers/providers.barrel.dart';
+import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
 
@@ -22,7 +22,7 @@ class SurveyPage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final scrollController = useScrollController();
-    final research = context.watch<ResearchProvider>();
+    final research = context.watch<ResearchController>();
     final auth = context.read<AuthProvider>();
     final questions = useMemoized(() => buildSurveyQuestions(surveyType), [
       surveyType,
@@ -48,7 +48,7 @@ class SurveyPage extends HookWidget {
 
       final data = Map<String, int>.from(responses.value);
 
-      await context.read<ResearchProvider>().submitSurvey(
+      await context.read<ResearchController>().submitSurvey(
         userId,
         surveyType,
         timePoint,
@@ -61,7 +61,7 @@ class SurveyPage extends HookWidget {
       if (!context.mounted) return;
 
       // Chain proficiency screener → language interest
-      if (isProficiency && context.read<ResearchProvider>().error == null) {
+      if (isProficiency && context.read<ResearchController>().error == null) {
         context.go('/research/survey/language_interest');
         return;
       }

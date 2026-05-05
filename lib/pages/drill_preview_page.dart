@@ -9,7 +9,7 @@
 // import 'package:flutter_hooks/flutter_hooks.dart';
 // import 'package:go_router/go_router.dart';
 // import 'package:provider/provider.dart';
-// import 'package:boo_mondai/providers/providers.barrel.dart';
+// import 'package:boo_mondai/controllers/controllers.barrel.dart';
 // import 'package:boo_mondai/shared/shared.barrel.dart';
 
 // class DrillPreviewPage extends HookWidget {

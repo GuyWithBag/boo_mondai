@@ -1,7 +1,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/pages/researcher_dashboard/codes_tab.dart
 // PURPOSE: Tab displaying research codes with generation form and list
-// PROVIDERS: ResearchProvider
+// PROVIDERS: ResearchController
 // HOOKS: useTextEditingController
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
 import 'package:boo_mondai/models/models.barrel.dart';
-import 'package:boo_mondai/providers/providers.barrel.dart';
+import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
 
@@ -57,7 +57,7 @@ class CodesTab extends HookWidget {
               FilledButton(
                 onPressed: () {
                   if (unlocksController.text.trim().isEmpty) return;
-                  context.read<ResearchProvider>().generateCode(
+                  context.read<ResearchController>().generateCode(
                     researcherId,
                     roleController.text.trim(),
                     unlocksController.text.trim(),

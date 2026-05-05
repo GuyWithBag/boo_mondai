@@ -1,25 +1,24 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/pages/account/authenticated_account_view.dart
 // PURPOSE: Profile display with streak stats and sign-out for authenticated users
-// PROVIDERS: AuthProvider, StreakProvider
+// PROVIDERS: AuthProvider, StreakController
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/controllers/auth_controller.dart';
+import 'package:boo_mondai/database/database.barrel.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:boo_mondai/providers/providers.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 
 class AuthenticatedAccountView extends StatelessWidget {
-  final AuthProvider auth;
-
-  const AuthenticatedAccountView({super.key, required this.auth});
+  const AuthenticatedAccountView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // final streakProv = context.watch<StreakProvider>();
-    final profile = auth.userProfile!;
+    // final streakProv = context.watch<StreakController>();
+    final profile = LocalDB.profile.getOrCreate();
 
     return SafeArea(
       child: ListView(
@@ -105,7 +104,7 @@ class AuthenticatedAccountView extends StatelessWidget {
           const SizedBox(height: AppSpacing.xl),
           OutlinedButton.icon(
             onPressed: () async {
-              await context.read<AuthProvider>().signOut();
+              await context.read<AuthController>().signOut();
             },
             icon: Icon(
               Icons.logout,
