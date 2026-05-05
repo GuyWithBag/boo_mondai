@@ -70,6 +70,15 @@ abstract class SupabaseRemoteDB<T> {
     return row == null ? null : fromMap(row);
   });
 
+  Future<T?> selectByUserId(String userId) => guard(() async {
+    final row = await client
+        .from(tableName)
+        .select()
+        .eq('user_id', userId)
+        .maybeSingle();
+    return row == null ? null : fromMap(row);
+  });
+
   Future<List<T>> selectManyByUserId(String userId) => guard(() async {
     final row = await client.from(tableName).select().eq('user_id', userId);
     return List<Map<String, dynamic>>.from(row).map(fromMap).toList();
