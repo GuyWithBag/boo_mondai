@@ -1,7 +1,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/app.dart
 // PURPOSE: MaterialApp with router, theme, and ScreenUtil setup
-// PROVIDERS: AuthProvider
+// PROVIDERS: AuthController
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:boo_mondai/routes.dart';
-import 'package:boo_mondai/providers/providers.barrel.dart';
+import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 
 class BooMondaiApp extends StatelessWidget {
@@ -17,8 +17,8 @@ class BooMondaiApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = context.read<AuthProvider>();
-    final router = createRouter(authProvider);
+    final authController = context.read<AuthController>();
+    final router = createRouter(authController);
 
     return ScreenUtilInit(
       designSize: const Size(375, 812),

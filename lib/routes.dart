@@ -1,16 +1,16 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/routes.dart
 // PURPOSE: go_router configuration with shell navigation (no login gate)
-// PROVIDERS: AuthProvider
+// PROVIDERS: AuthController
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:go_router/go_router.dart';
 import 'package:boo_mondai/pages/pages.barrel.dart';
-import 'package:boo_mondai/providers/providers.barrel.dart';
+import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
 
-GoRouter createRouter(AuthProvider authProvider) {
+GoRouter createRouter(AuthController authProvider) {
   return GoRouter(
     refreshListenable: authProvider,
     initialLocation: '/',
