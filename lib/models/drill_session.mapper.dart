@@ -25,25 +25,26 @@ class DrillSessionMapper extends SubClassMapperBase<DrillSession> {
   static const Field<DrillSession, String> _f$id = Field('id', _$id);
   static String _$userId(DrillSession v) => v.userId;
   static const Field<DrillSession, String> _f$userId =
-      Field('userId', _$userId);
+      Field('userId', _$userId, key: r'user_id');
   static String? _$deckId(DrillSession v) => v.deckId;
   static const Field<DrillSession, String> _f$deckId =
-      Field('deckId', _$deckId, opt: true);
+      Field('deckId', _$deckId, key: r'deck_id', opt: true);
   static DateTime _$startedAt(DrillSession v) => v.startedAt;
   static const Field<DrillSession, DateTime> _f$startedAt =
-      Field('startedAt', _$startedAt);
+      Field('startedAt', _$startedAt, key: r'started_at');
   static DateTime? _$completedAt(DrillSession v) => v.completedAt;
   static const Field<DrillSession, DateTime> _f$completedAt =
-      Field('completedAt', _$completedAt, opt: true);
+      Field('completedAt', _$completedAt, key: r'completed_at', opt: true);
   static bool _$previewed(DrillSession v) => v.previewed;
   static const Field<DrillSession, bool> _f$previewed =
       Field('previewed', _$previewed, opt: true, def: false);
   static int _$totalQuestions(DrillSession v) => v.totalQuestions;
   static const Field<DrillSession, int> _f$totalQuestions =
-      Field('totalQuestions', _$totalQuestions);
+      Field('totalQuestions', _$totalQuestions, key: r'total_questions');
   static int _$correctCount(DrillSession v) => v.correctCount;
-  static const Field<DrillSession, int> _f$correctCount =
-      Field('correctCount', _$correctCount, opt: true, def: 0);
+  static const Field<DrillSession, int> _f$correctCount = Field(
+      'correctCount', _$correctCount,
+      key: r'correct_count', opt: true, def: 0);
 
   @override
   final MappableFields<DrillSession> fields = const {

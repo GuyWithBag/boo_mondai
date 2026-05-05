@@ -27,17 +27,18 @@ class MatchMadnessTemplateMapper
   static const Field<MatchMadnessTemplate, String> _f$id = Field('id', _$id);
   static String _$deckId(MatchMadnessTemplate v) => v.deckId;
   static const Field<MatchMadnessTemplate, String> _f$deckId =
-      Field('deckId', _$deckId);
+      Field('deckId', _$deckId, key: r'deck_id');
   static int _$sortOrder(MatchMadnessTemplate v) => v.sortOrder;
   static const Field<MatchMadnessTemplate, int> _f$sortOrder =
-      Field('sortOrder', _$sortOrder);
+      Field('sortOrder', _$sortOrder, key: r'sort_order');
   static DateTime _$createdAt(MatchMadnessTemplate v) => v.createdAt;
   static const Field<MatchMadnessTemplate, DateTime> _f$createdAt =
-      Field('createdAt', _$createdAt);
+      Field('createdAt', _$createdAt, key: r'created_at');
   static String? _$sourceTemplateId(MatchMadnessTemplate v) =>
       v.sourceTemplateId;
-  static const Field<MatchMadnessTemplate, String> _f$sourceTemplateId =
-      Field('sourceTemplateId', _$sourceTemplateId, opt: true);
+  static const Field<MatchMadnessTemplate, String> _f$sourceTemplateId = Field(
+      'sourceTemplateId', _$sourceTemplateId,
+      key: r'source_template_id', opt: true);
   static List<MatchMadnessPair> _$pairs(MatchMadnessTemplate v) => v.pairs;
   static const Field<MatchMadnessTemplate, List<MatchMadnessPair>> _f$pairs =
       Field('pairs', _$pairs);

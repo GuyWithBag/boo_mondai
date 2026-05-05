@@ -24,16 +24,16 @@ class MultipleChoiceOptionMapper extends ClassMapperBase<MultipleChoiceOption> {
   static const Field<MultipleChoiceOption, String> _f$id = Field('id', _$id);
   static String _$templateId(MultipleChoiceOption v) => v.templateId;
   static const Field<MultipleChoiceOption, String> _f$templateId =
-      Field('templateId', _$templateId);
+      Field('templateId', _$templateId, key: r'template_id');
   static String _$optionText(MultipleChoiceOption v) => v.optionText;
   static const Field<MultipleChoiceOption, String> _f$optionText =
-      Field('optionText', _$optionText);
+      Field('optionText', _$optionText, key: r'option_text');
   static bool _$isCorrect(MultipleChoiceOption v) => v.isCorrect;
   static const Field<MultipleChoiceOption, bool> _f$isCorrect =
-      Field('isCorrect', _$isCorrect);
+      Field('isCorrect', _$isCorrect, key: r'is_correct');
   static int _$displayOrder(MultipleChoiceOption v) => v.displayOrder;
   static const Field<MultipleChoiceOption, int> _f$displayOrder =
-      Field('displayOrder', _$displayOrder);
+      Field('displayOrder', _$displayOrder, key: r'display_order');
 
   @override
   final MappableFields<MultipleChoiceOption> fields = const {

@@ -25,17 +25,18 @@ class DrillAnswerMapper extends ClassMapperBase<DrillAnswer> {
   static const Field<DrillAnswer, String> _f$id = Field('id', _$id);
   static String _$sessionId(DrillAnswer v) => v.sessionId;
   static const Field<DrillAnswer, String> _f$sessionId =
-      Field('sessionId', _$sessionId);
+      Field('sessionId', _$sessionId, key: r'session_id');
   static String _$cardId(DrillAnswer v) => v.cardId;
-  static const Field<DrillAnswer, String> _f$cardId = Field('cardId', _$cardId);
+  static const Field<DrillAnswer, String> _f$cardId =
+      Field('cardId', _$cardId, key: r'card_id');
   static String _$userAnswer(DrillAnswer v) => v.userAnswer;
   static const Field<DrillAnswer, String> _f$userAnswer =
-      Field('userAnswer', _$userAnswer);
+      Field('userAnswer', _$userAnswer, key: r'user_answer');
   static StudyRating _$type(DrillAnswer v) => v.type;
   static const Field<DrillAnswer, StudyRating> _f$type = Field('type', _$type);
   static DateTime _$createdAt(DrillAnswer v) => v.createdAt;
   static const Field<DrillAnswer, DateTime> _f$createdAt =
-      Field('createdAt', _$createdAt);
+      Field('createdAt', _$createdAt, key: r'created_at');
 
   @override
   final MappableFields<DrillAnswer> fields = const {

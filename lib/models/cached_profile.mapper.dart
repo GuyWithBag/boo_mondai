@@ -24,13 +24,13 @@ class CachedProfileMapper extends ClassMapperBase<CachedProfile> {
   static const Field<CachedProfile, String> _f$id = Field('id', _$id);
   static String _$userName(CachedProfile v) => v.userName;
   static const Field<CachedProfile, String> _f$userName =
-      Field('userName', _$userName);
+      Field('userName', _$userName, key: r'user_name');
   static String? _$avatarUrl(CachedProfile v) => v.avatarUrl;
   static const Field<CachedProfile, String> _f$avatarUrl =
-      Field('avatarUrl', _$avatarUrl, opt: true);
+      Field('avatarUrl', _$avatarUrl, key: r'avatar_url', opt: true);
   static DateTime _$createdAt(CachedProfile v) => v.createdAt;
   static const Field<CachedProfile, DateTime> _f$createdAt =
-      Field('createdAt', _$createdAt);
+      Field('createdAt', _$createdAt, key: r'created_at');
 
   @override
   final MappableFields<CachedProfile> fields = const {

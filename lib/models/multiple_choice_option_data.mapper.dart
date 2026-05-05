@@ -27,7 +27,7 @@ class MultipleChoiceOptionDataMapper
       Field('text', _$text);
   static bool _$isCorrect(MultipleChoiceOptionData v) => v.isCorrect;
   static const Field<MultipleChoiceOptionData, bool> _f$isCorrect =
-      Field('isCorrect', _$isCorrect);
+      Field('isCorrect', _$isCorrect, key: r'is_correct');
 
   @override
   final MappableFields<MultipleChoiceOptionData> fields = const {

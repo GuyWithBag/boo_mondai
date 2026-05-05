@@ -25,19 +25,19 @@ class FillInTheBlankSegmentMapper
   static const Field<FillInTheBlankSegment, String> _f$id = Field('id', _$id);
   static String _$cardId(FillInTheBlankSegment v) => v.cardId;
   static const Field<FillInTheBlankSegment, String> _f$cardId =
-      Field('cardId', _$cardId);
+      Field('cardId', _$cardId, key: r'card_id');
   static String _$fullText(FillInTheBlankSegment v) => v.fullText;
   static const Field<FillInTheBlankSegment, String> _f$fullText =
-      Field('fullText', _$fullText);
+      Field('fullText', _$fullText, key: r'full_text');
   static int _$blankStart(FillInTheBlankSegment v) => v.blankStart;
   static const Field<FillInTheBlankSegment, int> _f$blankStart =
-      Field('blankStart', _$blankStart);
+      Field('blankStart', _$blankStart, key: r'blank_start');
   static int _$blankEnd(FillInTheBlankSegment v) => v.blankEnd;
   static const Field<FillInTheBlankSegment, int> _f$blankEnd =
-      Field('blankEnd', _$blankEnd);
+      Field('blankEnd', _$blankEnd, key: r'blank_end');
   static String _$correctAnswer(FillInTheBlankSegment v) => v.correctAnswer;
   static const Field<FillInTheBlankSegment, String> _f$correctAnswer =
-      Field('correctAnswer', _$correctAnswer);
+      Field('correctAnswer', _$correctAnswer, key: r'correct_answer');
 
   @override
   final MappableFields<FillInTheBlankSegment> fields = const {

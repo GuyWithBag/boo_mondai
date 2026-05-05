@@ -23,10 +23,11 @@ class FsrsCardMapper extends ClassMapperBase<FsrsCard> {
   static String _$id(FsrsCard v) => v.id;
   static const Field<FsrsCard, String> _f$id = Field('id', _$id);
   static String _$userId(FsrsCard v) => v.userId;
-  static const Field<FsrsCard, String> _f$userId = Field('userId', _$userId);
+  static const Field<FsrsCard, String> _f$userId =
+      Field('userId', _$userId, key: r'user_id');
   static String _$reviewCardId(FsrsCard v) => v.reviewCardId;
   static const Field<FsrsCard, String> _f$reviewCardId =
-      Field('reviewCardId', _$reviewCardId);
+      Field('reviewCardId', _$reviewCardId, key: r'review_card_id');
   static Card _$state(FsrsCard v) => v.state;
   static const Field<FsrsCard, Card> _f$state = Field('state', _$state);
 

@@ -26,37 +26,41 @@ class FlashcardTemplateMapper extends SubClassMapperBase<FlashcardTemplate> {
   static const Field<FlashcardTemplate, String> _f$id = Field('id', _$id);
   static String _$deckId(FlashcardTemplate v) => v.deckId;
   static const Field<FlashcardTemplate, String> _f$deckId =
-      Field('deckId', _$deckId);
+      Field('deckId', _$deckId, key: r'deck_id');
   static int _$sortOrder(FlashcardTemplate v) => v.sortOrder;
   static const Field<FlashcardTemplate, int> _f$sortOrder =
-      Field('sortOrder', _$sortOrder);
+      Field('sortOrder', _$sortOrder, key: r'sort_order');
   static DateTime _$createdAt(FlashcardTemplate v) => v.createdAt;
   static const Field<FlashcardTemplate, DateTime> _f$createdAt =
-      Field('createdAt', _$createdAt);
+      Field('createdAt', _$createdAt, key: r'created_at');
   static String? _$sourceTemplateId(FlashcardTemplate v) => v.sourceTemplateId;
-  static const Field<FlashcardTemplate, String> _f$sourceTemplateId =
-      Field('sourceTemplateId', _$sourceTemplateId, opt: true);
+  static const Field<FlashcardTemplate, String> _f$sourceTemplateId = Field(
+      'sourceTemplateId', _$sourceTemplateId,
+      key: r'source_template_id', opt: true);
   static String _$frontText(FlashcardTemplate v) => v.frontText;
   static const Field<FlashcardTemplate, String> _f$frontText =
-      Field('frontText', _$frontText);
+      Field('frontText', _$frontText, key: r'front_text');
   static String _$backText(FlashcardTemplate v) => v.backText;
   static const Field<FlashcardTemplate, String> _f$backText =
-      Field('backText', _$backText);
+      Field('backText', _$backText, key: r'back_text');
   static String? _$frontImageUrl(FlashcardTemplate v) => v.frontImageUrl;
-  static const Field<FlashcardTemplate, String> _f$frontImageUrl =
-      Field('frontImageUrl', _$frontImageUrl, opt: true);
+  static const Field<FlashcardTemplate, String> _f$frontImageUrl = Field(
+      'frontImageUrl', _$frontImageUrl,
+      key: r'front_image_url', opt: true);
   static String? _$backImageUrl(FlashcardTemplate v) => v.backImageUrl;
   static const Field<FlashcardTemplate, String> _f$backImageUrl =
-      Field('backImageUrl', _$backImageUrl, opt: true);
+      Field('backImageUrl', _$backImageUrl, key: r'back_image_url', opt: true);
   static String? _$frontAudioUrl(FlashcardTemplate v) => v.frontAudioUrl;
-  static const Field<FlashcardTemplate, String> _f$frontAudioUrl =
-      Field('frontAudioUrl', _$frontAudioUrl, opt: true);
+  static const Field<FlashcardTemplate, String> _f$frontAudioUrl = Field(
+      'frontAudioUrl', _$frontAudioUrl,
+      key: r'front_audio_url', opt: true);
   static String? _$backAudioUrl(FlashcardTemplate v) => v.backAudioUrl;
   static const Field<FlashcardTemplate, String> _f$backAudioUrl =
-      Field('backAudioUrl', _$backAudioUrl, opt: true);
+      Field('backAudioUrl', _$backAudioUrl, key: r'back_audio_url', opt: true);
   static CardType _$cardType(FlashcardTemplate v) => v.cardType;
-  static const Field<FlashcardTemplate, CardType> _f$cardType =
-      Field('cardType', _$cardType, opt: true, def: CardType.normal);
+  static const Field<FlashcardTemplate, CardType> _f$cardType = Field(
+      'cardType', _$cardType,
+      key: r'card_type', opt: true, def: CardType.normal);
 
   @override
   final MappableFields<FlashcardTemplate> fields = const {

@@ -23,52 +23,60 @@ class DeckMapper extends ClassMapperBase<Deck> {
   static String _$id(Deck v) => v.id;
   static const Field<Deck, String> _f$id = Field('id', _$id);
   static String _$authorId(Deck v) => v.authorId;
-  static const Field<Deck, String> _f$authorId = Field('authorId', _$authorId);
+  static const Field<Deck, String> _f$authorId =
+      Field('authorId', _$authorId, key: r'author_id');
   static String _$title(Deck v) => v.title;
   static const Field<Deck, String> _f$title = Field('title', _$title);
   static String _$shortDescription(Deck v) => v.shortDescription;
-  static const Field<Deck, String> _f$shortDescription =
-      Field('shortDescription', _$shortDescription, opt: true, def: '');
+  static const Field<Deck, String> _f$shortDescription = Field(
+      'shortDescription', _$shortDescription,
+      key: r'short_description', opt: true, def: '');
   static String _$longDescription(Deck v) => v.longDescription;
-  static const Field<Deck, String> _f$longDescription =
-      Field('longDescription', _$longDescription, opt: true, def: '');
+  static const Field<Deck, String> _f$longDescription = Field(
+      'longDescription', _$longDescription,
+      key: r'long_description', opt: true, def: '');
   static String _$targetLanguage(Deck v) => v.targetLanguage;
   static const Field<Deck, String> _f$targetLanguage =
-      Field('targetLanguage', _$targetLanguage);
+      Field('targetLanguage', _$targetLanguage, key: r'target_language');
   static List<String> _$tags(Deck v) => v.tags;
   static const Field<Deck, List<String>> _f$tags =
       Field('tags', _$tags, opt: true, def: const []);
   static bool _$isPremade(Deck v) => v.isPremade;
-  static const Field<Deck, bool> _f$isPremade =
-      Field('isPremade', _$isPremade, opt: true, def: false);
+  static const Field<Deck, bool> _f$isPremade = Field('isPremade', _$isPremade,
+      key: r'is_premade', opt: true, def: false);
   static bool _$isPublic(Deck v) => v.isPublic;
-  static const Field<Deck, bool> _f$isPublic = Field('isPublic', _$isPublic);
+  static const Field<Deck, bool> _f$isPublic =
+      Field('isPublic', _$isPublic, key: r'is_public');
   static bool _$isEditable(Deck v) => v.isEditable;
-  static const Field<Deck, bool> _f$isEditable =
-      Field('isEditable', _$isEditable, opt: true, def: true);
+  static const Field<Deck, bool> _f$isEditable = Field(
+      'isEditable', _$isEditable,
+      key: r'is_editable', opt: true, def: true);
   static int _$cardCount(Deck v) => v.cardCount;
-  static const Field<Deck, int> _f$cardCount = Field('cardCount', _$cardCount);
+  static const Field<Deck, int> _f$cardCount =
+      Field('cardCount', _$cardCount, key: r'card_count');
   static String _$version(Deck v) => v.version;
   static const Field<Deck, String> _f$version =
       Field('version', _$version, opt: true, def: '1.0.0');
   static int _$buildNumber(Deck v) => v.buildNumber;
-  static const Field<Deck, int> _f$buildNumber =
-      Field('buildNumber', _$buildNumber, opt: true, def: 1);
+  static const Field<Deck, int> _f$buildNumber = Field(
+      'buildNumber', _$buildNumber,
+      key: r'build_number', opt: true, def: 1);
   static DateTime _$createdAt(Deck v) => v.createdAt;
   static const Field<Deck, DateTime> _f$createdAt =
-      Field('createdAt', _$createdAt);
+      Field('createdAt', _$createdAt, key: r'created_at');
   static DateTime _$updatedAt(Deck v) => v.updatedAt;
   static const Field<Deck, DateTime> _f$updatedAt =
-      Field('updatedAt', _$updatedAt);
+      Field('updatedAt', _$updatedAt, key: r'updated_at');
   static String? _$sourceDeckId(Deck v) => v.sourceDeckId;
   static const Field<Deck, String> _f$sourceDeckId =
-      Field('sourceDeckId', _$sourceDeckId, opt: true);
+      Field('sourceDeckId', _$sourceDeckId, key: r'source_deck_id', opt: true);
   static String? _$sourceAuthorId(Deck v) => v.sourceAuthorId;
-  static const Field<Deck, String> _f$sourceAuthorId =
-      Field('sourceAuthorId', _$sourceAuthorId, opt: true);
+  static const Field<Deck, String> _f$sourceAuthorId = Field(
+      'sourceAuthorId', _$sourceAuthorId,
+      key: r'source_author_id', opt: true);
   static bool _$isPublished(Deck v) => v.isPublished;
   static const Field<Deck, bool> _f$isPublished =
-      Field('isPublished', _$isPublished);
+      Field('isPublished', _$isPublished, key: r'is_published');
 
   @override
   final MappableFields<Deck> fields = const {

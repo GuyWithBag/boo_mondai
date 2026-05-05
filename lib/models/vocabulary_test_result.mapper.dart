@@ -24,10 +24,10 @@ class VocabularyTestResultMapper extends ClassMapperBase<VocabularyTestResult> {
   static const Field<VocabularyTestResult, String> _f$id = Field('id', _$id);
   static String _$userId(VocabularyTestResult v) => v.userId;
   static const Field<VocabularyTestResult, String> _f$userId =
-      Field('userId', _$userId);
+      Field('userId', _$userId, key: r'user_id');
   static String _$testSet(VocabularyTestResult v) => v.testSet;
   static const Field<VocabularyTestResult, String> _f$testSet =
-      Field('testSet', _$testSet);
+      Field('testSet', _$testSet, key: r'test_set');
   static int _$score(VocabularyTestResult v) => v.score;
   static const Field<VocabularyTestResult, int> _f$score =
       Field('score', _$score);
@@ -36,7 +36,7 @@ class VocabularyTestResultMapper extends ClassMapperBase<VocabularyTestResult> {
       Field('answers', _$answers);
   static DateTime _$submittedAt(VocabularyTestResult v) => v.submittedAt;
   static const Field<VocabularyTestResult, DateTime> _f$submittedAt =
-      Field('submittedAt', _$submittedAt);
+      Field('submittedAt', _$submittedAt, key: r'submitted_at');
 
   @override
   final MappableFields<VocabularyTestResult> fields = const {

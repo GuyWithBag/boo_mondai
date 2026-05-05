@@ -24,21 +24,24 @@ class MatchMadnessPairMapper extends ClassMapperBase<MatchMadnessPair> {
   static const Field<MatchMadnessPair, String> _f$id = Field('id', _$id);
   static String _$templateId(MatchMadnessPair v) => v.templateId;
   static const Field<MatchMadnessPair, String> _f$templateId =
-      Field('templateId', _$templateId);
+      Field('templateId', _$templateId, key: r'template_id');
   static String? _$sourceTemplateId(MatchMadnessPair v) => v.sourceTemplateId;
-  static const Field<MatchMadnessPair, String> _f$sourceTemplateId =
-      Field('sourceTemplateId', _$sourceTemplateId, opt: true);
+  static const Field<MatchMadnessPair, String> _f$sourceTemplateId = Field(
+      'sourceTemplateId', _$sourceTemplateId,
+      key: r'source_template_id', opt: true);
   static String _$term(MatchMadnessPair v) => v.term;
   static const Field<MatchMadnessPair, String> _f$term = Field('term', _$term);
   static String _$match(MatchMadnessPair v) => v.match;
   static const Field<MatchMadnessPair, String> _f$match =
       Field('match', _$match);
   static bool _$isAutoPicked(MatchMadnessPair v) => v.isAutoPicked;
-  static const Field<MatchMadnessPair, bool> _f$isAutoPicked =
-      Field('isAutoPicked', _$isAutoPicked, opt: true, def: false);
+  static const Field<MatchMadnessPair, bool> _f$isAutoPicked = Field(
+      'isAutoPicked', _$isAutoPicked,
+      key: r'is_auto_picked', opt: true, def: false);
   static int _$displayOrder(MatchMadnessPair v) => v.displayOrder;
-  static const Field<MatchMadnessPair, int> _f$displayOrder =
-      Field('displayOrder', _$displayOrder, opt: true, def: 0);
+  static const Field<MatchMadnessPair, int> _f$displayOrder = Field(
+      'displayOrder', _$displayOrder,
+      key: r'display_order', opt: true, def: 0);
 
   @override
   final MappableFields<MatchMadnessPair> fields = const {

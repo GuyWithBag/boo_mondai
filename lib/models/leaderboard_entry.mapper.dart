@@ -22,22 +22,23 @@ class LeaderboardEntryMapper extends ClassMapperBase<LeaderboardEntry> {
 
   static String _$userId(LeaderboardEntry v) => v.userId;
   static const Field<LeaderboardEntry, String> _f$userId =
-      Field('userId', _$userId);
+      Field('userId', _$userId, key: r'user_id');
   static String _$userName(LeaderboardEntry v) => v.userName;
   static const Field<LeaderboardEntry, String> _f$userName =
-      Field('userName', _$userName);
+      Field('userName', _$userName, key: r'user_name');
   static String? _$targetLanguage(LeaderboardEntry v) => v.targetLanguage;
-  static const Field<LeaderboardEntry, String> _f$targetLanguage =
-      Field('targetLanguage', _$targetLanguage, opt: true);
+  static const Field<LeaderboardEntry, String> _f$targetLanguage = Field(
+      'targetLanguage', _$targetLanguage,
+      key: r'target_language', opt: true);
   static int _$drillScore(LeaderboardEntry v) => v.drillScore;
   static const Field<LeaderboardEntry, int> _f$drillScore =
-      Field('drillScore', _$drillScore);
+      Field('drillScore', _$drillScore, key: r'drill_score');
   static int _$reviewCount(LeaderboardEntry v) => v.reviewCount;
   static const Field<LeaderboardEntry, int> _f$reviewCount =
-      Field('reviewCount', _$reviewCount);
+      Field('reviewCount', _$reviewCount, key: r'review_count');
   static int _$currentStreak(LeaderboardEntry v) => v.currentStreak;
   static const Field<LeaderboardEntry, int> _f$currentStreak =
-      Field('currentStreak', _$currentStreak);
+      Field('currentStreak', _$currentStreak, key: r'current_streak');
 
   @override
   final MappableFields<LeaderboardEntry> fields = const {

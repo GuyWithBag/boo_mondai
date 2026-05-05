@@ -25,22 +25,23 @@ class ReviewSessionMapper extends SubClassMapperBase<ReviewSession> {
   static const Field<ReviewSession, String> _f$id = Field('id', _$id);
   static String _$userId(ReviewSession v) => v.userId;
   static const Field<ReviewSession, String> _f$userId =
-      Field('userId', _$userId);
+      Field('userId', _$userId, key: r'user_id');
   static String? _$deckId(ReviewSession v) => v.deckId;
   static const Field<ReviewSession, String> _f$deckId =
-      Field('deckId', _$deckId, opt: true);
+      Field('deckId', _$deckId, key: r'deck_id', opt: true);
   static DateTime _$startedAt(ReviewSession v) => v.startedAt;
   static const Field<ReviewSession, DateTime> _f$startedAt =
-      Field('startedAt', _$startedAt);
+      Field('startedAt', _$startedAt, key: r'started_at');
   static DateTime? _$completedAt(ReviewSession v) => v.completedAt;
   static const Field<ReviewSession, DateTime> _f$completedAt =
-      Field('completedAt', _$completedAt, opt: true);
+      Field('completedAt', _$completedAt, key: r'completed_at', opt: true);
   static int _$totalCards(ReviewSession v) => v.totalCards;
   static const Field<ReviewSession, int> _f$totalCards =
-      Field('totalCards', _$totalCards);
+      Field('totalCards', _$totalCards, key: r'total_cards');
   static int _$cardsReviewed(ReviewSession v) => v.cardsReviewed;
-  static const Field<ReviewSession, int> _f$cardsReviewed =
-      Field('cardsReviewed', _$cardsReviewed, opt: true, def: 0);
+  static const Field<ReviewSession, int> _f$cardsReviewed = Field(
+      'cardsReviewed', _$cardsReviewed,
+      key: r'cards_reviewed', opt: true, def: 0);
 
   @override
   final MappableFields<ReviewSession> fields = const {

@@ -24,21 +24,22 @@ class UserProfileMapper extends ClassMapperBase<UserProfile> {
   static const Field<UserProfile, String> _f$id = Field('id', _$id);
   static String _$userName(UserProfile v) => v.userName;
   static const Field<UserProfile, String> _f$userName =
-      Field('userName', _$userName);
+      Field('userName', _$userName, key: r'user_name');
   static String _$role(UserProfile v) => v.role;
   static const Field<UserProfile, String> _f$role = Field('role', _$role);
   static String? _$avatarUrl(UserProfile v) => v.avatarUrl;
   static const Field<UserProfile, String> _f$avatarUrl =
-      Field('avatarUrl', _$avatarUrl, opt: true);
+      Field('avatarUrl', _$avatarUrl, key: r'avatar_url', opt: true);
   static String? _$targetLanguage(UserProfile v) => v.targetLanguage;
-  static const Field<UserProfile, String> _f$targetLanguage =
-      Field('targetLanguage', _$targetLanguage, opt: true);
+  static const Field<UserProfile, String> _f$targetLanguage = Field(
+      'targetLanguage', _$targetLanguage,
+      key: r'target_language', opt: true);
   static DateTime _$createdAt(UserProfile v) => v.createdAt;
   static const Field<UserProfile, DateTime> _f$createdAt =
-      Field('createdAt', _$createdAt);
+      Field('createdAt', _$createdAt, key: r'created_at');
   static String? _$userId(UserProfile v) => v.userId;
   static const Field<UserProfile, String> _f$userId =
-      Field('userId', _$userId, opt: true);
+      Field('userId', _$userId, key: r'user_id', opt: true);
 
   @override
   final MappableFields<UserProfile> fields = const {

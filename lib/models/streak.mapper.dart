@@ -23,16 +23,18 @@ class StreakMapper extends ClassMapperBase<Streak> {
   static String _$id(Streak v) => v.id;
   static const Field<Streak, String> _f$id = Field('id', _$id);
   static String _$userId(Streak v) => v.userId;
-  static const Field<Streak, String> _f$userId = Field('userId', _$userId);
+  static const Field<Streak, String> _f$userId =
+      Field('userId', _$userId, key: r'user_id');
   static int _$currentStreak(Streak v) => v.currentStreak;
   static const Field<Streak, int> _f$currentStreak =
-      Field('currentStreak', _$currentStreak);
+      Field('currentStreak', _$currentStreak, key: r'current_streak');
   static int _$longestStreak(Streak v) => v.longestStreak;
   static const Field<Streak, int> _f$longestStreak =
-      Field('longestStreak', _$longestStreak);
+      Field('longestStreak', _$longestStreak, key: r'longest_streak');
   static DateTime? _$lastActivityDate(Streak v) => v.lastActivityDate;
-  static const Field<Streak, DateTime> _f$lastActivityDate =
-      Field('lastActivityDate', _$lastActivityDate, opt: true);
+  static const Field<Streak, DateTime> _f$lastActivityDate = Field(
+      'lastActivityDate', _$lastActivityDate,
+      key: r'last_activity_date', opt: true);
 
   @override
   final MappableFields<Streak> fields = const {

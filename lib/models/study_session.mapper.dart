@@ -24,16 +24,16 @@ class StudySessionMapper extends ClassMapperBase<StudySession> {
   static const Field<StudySession, String> _f$id = Field('id', _$id);
   static String _$userId(StudySession v) => v.userId;
   static const Field<StudySession, String> _f$userId =
-      Field('userId', _$userId);
+      Field('userId', _$userId, key: r'user_id');
   static String? _$deckId(StudySession v) => v.deckId;
   static const Field<StudySession, String> _f$deckId =
-      Field('deckId', _$deckId, opt: true);
+      Field('deckId', _$deckId, key: r'deck_id', opt: true);
   static DateTime _$startedAt(StudySession v) => v.startedAt;
   static const Field<StudySession, DateTime> _f$startedAt =
-      Field('startedAt', _$startedAt);
+      Field('startedAt', _$startedAt, key: r'started_at');
   static DateTime? _$completedAt(StudySession v) => v.completedAt;
   static const Field<StudySession, DateTime> _f$completedAt =
-      Field('completedAt', _$completedAt, opt: true);
+      Field('completedAt', _$completedAt, key: r'completed_at', opt: true);
 
   @override
   final MappableFields<StudySession> fields = const {

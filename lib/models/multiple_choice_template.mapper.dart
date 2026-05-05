@@ -27,30 +27,31 @@ class MultipleChoiceTemplateMapper
   static const Field<MultipleChoiceTemplate, String> _f$id = Field('id', _$id);
   static String _$deckId(MultipleChoiceTemplate v) => v.deckId;
   static const Field<MultipleChoiceTemplate, String> _f$deckId =
-      Field('deckId', _$deckId);
+      Field('deckId', _$deckId, key: r'deck_id');
   static int _$sortOrder(MultipleChoiceTemplate v) => v.sortOrder;
   static const Field<MultipleChoiceTemplate, int> _f$sortOrder =
-      Field('sortOrder', _$sortOrder);
+      Field('sortOrder', _$sortOrder, key: r'sort_order');
   static DateTime _$createdAt(MultipleChoiceTemplate v) => v.createdAt;
   static const Field<MultipleChoiceTemplate, DateTime> _f$createdAt =
-      Field('createdAt', _$createdAt);
+      Field('createdAt', _$createdAt, key: r'created_at');
   static String? _$sourceTemplateId(MultipleChoiceTemplate v) =>
       v.sourceTemplateId;
   static const Field<MultipleChoiceTemplate, String> _f$sourceTemplateId =
-      Field('sourceTemplateId', _$sourceTemplateId, opt: true);
+      Field('sourceTemplateId', _$sourceTemplateId,
+          key: r'source_template_id', opt: true);
   static String _$questionPrompt(MultipleChoiceTemplate v) => v.questionPrompt;
   static const Field<MultipleChoiceTemplate, String> _f$questionPrompt =
-      Field('questionPrompt', _$questionPrompt);
+      Field('questionPrompt', _$questionPrompt, key: r'question_prompt');
   static List<MultipleChoiceOption> _$options(MultipleChoiceTemplate v) =>
       v.options;
   static const Field<MultipleChoiceTemplate, List<MultipleChoiceOption>>
       _f$options = Field('options', _$options);
   static String? _$imageUrl(MultipleChoiceTemplate v) => v.imageUrl;
   static const Field<MultipleChoiceTemplate, String> _f$imageUrl =
-      Field('imageUrl', _$imageUrl, opt: true);
+      Field('imageUrl', _$imageUrl, key: r'image_url', opt: true);
   static String? _$audioUrl(MultipleChoiceTemplate v) => v.audioUrl;
   static const Field<MultipleChoiceTemplate, String> _f$audioUrl =
-      Field('audioUrl', _$audioUrl, opt: true);
+      Field('audioUrl', _$audioUrl, key: r'audio_url', opt: true);
 
   @override
   final MappableFields<MultipleChoiceTemplate> fields = const {

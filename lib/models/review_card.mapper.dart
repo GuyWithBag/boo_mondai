@@ -24,12 +24,14 @@ class ReviewCardMapper extends ClassMapperBase<ReviewCard> {
   static const Field<ReviewCard, String> _f$id = Field('id', _$id);
   static String _$templateId(ReviewCard v) => v.templateId;
   static const Field<ReviewCard, String> _f$templateId =
-      Field('templateId', _$templateId);
+      Field('templateId', _$templateId, key: r'template_id');
   static bool _$isReversed(ReviewCard v) => v.isReversed;
-  static const Field<ReviewCard, bool> _f$isReversed =
-      Field('isReversed', _$isReversed, opt: true, def: false);
+  static const Field<ReviewCard, bool> _f$isReversed = Field(
+      'isReversed', _$isReversed,
+      key: r'is_reversed', opt: true, def: false);
   static String _$deckId(ReviewCard v) => v.deckId;
-  static const Field<ReviewCard, String> _f$deckId = Field('deckId', _$deckId);
+  static const Field<ReviewCard, String> _f$deckId =
+      Field('deckId', _$deckId, key: r'deck_id');
 
   @override
   final MappableFields<ReviewCard> fields = const {

@@ -26,30 +26,31 @@ class IdentificationTemplateMapper
   static const Field<IdentificationTemplate, String> _f$id = Field('id', _$id);
   static String _$deckId(IdentificationTemplate v) => v.deckId;
   static const Field<IdentificationTemplate, String> _f$deckId =
-      Field('deckId', _$deckId);
+      Field('deckId', _$deckId, key: r'deck_id');
   static int _$sortOrder(IdentificationTemplate v) => v.sortOrder;
   static const Field<IdentificationTemplate, int> _f$sortOrder =
-      Field('sortOrder', _$sortOrder);
+      Field('sortOrder', _$sortOrder, key: r'sort_order');
   static DateTime _$createdAt(IdentificationTemplate v) => v.createdAt;
   static const Field<IdentificationTemplate, DateTime> _f$createdAt =
-      Field('createdAt', _$createdAt);
+      Field('createdAt', _$createdAt, key: r'created_at');
   static String? _$sourceTemplateId(IdentificationTemplate v) =>
       v.sourceTemplateId;
   static const Field<IdentificationTemplate, String> _f$sourceTemplateId =
-      Field('sourceTemplateId', _$sourceTemplateId, opt: true);
+      Field('sourceTemplateId', _$sourceTemplateId,
+          key: r'source_template_id', opt: true);
   static String _$promptText(IdentificationTemplate v) => v.promptText;
   static const Field<IdentificationTemplate, String> _f$promptText =
-      Field('promptText', _$promptText);
+      Field('promptText', _$promptText, key: r'prompt_text');
   static String _$acceptedAnswers(IdentificationTemplate v) =>
       v.acceptedAnswers;
   static const Field<IdentificationTemplate, String> _f$acceptedAnswers =
-      Field('acceptedAnswers', _$acceptedAnswers);
+      Field('acceptedAnswers', _$acceptedAnswers, key: r'accepted_answers');
   static String? _$imageUrl(IdentificationTemplate v) => v.imageUrl;
   static const Field<IdentificationTemplate, String> _f$imageUrl =
-      Field('imageUrl', _$imageUrl, opt: true);
+      Field('imageUrl', _$imageUrl, key: r'image_url', opt: true);
   static String? _$audioUrl(IdentificationTemplate v) => v.audioUrl;
   static const Field<IdentificationTemplate, String> _f$audioUrl =
-      Field('audioUrl', _$audioUrl, opt: true);
+      Field('audioUrl', _$audioUrl, key: r'audio_url', opt: true);
 
   @override
   final MappableFields<IdentificationTemplate> fields = const {

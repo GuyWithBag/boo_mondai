@@ -29,13 +29,13 @@ class QuestionTypeMapper extends EnumMapper<QuestionType> {
         return QuestionType.flashcard;
       case r'identification':
         return QuestionType.identification;
-      case r'multipleChoice':
+      case r'multiple_choice':
         return QuestionType.multipleChoice;
-      case r'fillInTheBlanks':
+      case r'fill_in_the_blanks':
         return QuestionType.fillInTheBlanks;
-      case r'wordScramble':
+      case r'word_scramble':
         return QuestionType.wordScramble;
-      case r'matchMadness':
+      case r'match_madness':
         return QuestionType.matchMadness;
       default:
         throw MapperException.unknownEnumValue(value);
@@ -50,13 +50,13 @@ class QuestionTypeMapper extends EnumMapper<QuestionType> {
       case QuestionType.identification:
         return r'identification';
       case QuestionType.multipleChoice:
-        return r'multipleChoice';
+        return r'multiple_choice';
       case QuestionType.fillInTheBlanks:
-        return r'fillInTheBlanks';
+        return r'fill_in_the_blanks';
       case QuestionType.wordScramble:
-        return r'wordScramble';
+        return r'word_scramble';
       case QuestionType.matchMadness:
-        return r'matchMadness';
+        return r'match_madness';
     }
   }
 }

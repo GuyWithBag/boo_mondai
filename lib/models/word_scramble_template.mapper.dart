@@ -26,27 +26,29 @@ class WordScrambleTemplateMapper
   static const Field<WordScrambleTemplate, String> _f$id = Field('id', _$id);
   static String _$deckId(WordScrambleTemplate v) => v.deckId;
   static const Field<WordScrambleTemplate, String> _f$deckId =
-      Field('deckId', _$deckId);
+      Field('deckId', _$deckId, key: r'deck_id');
   static int _$sortOrder(WordScrambleTemplate v) => v.sortOrder;
   static const Field<WordScrambleTemplate, int> _f$sortOrder =
-      Field('sortOrder', _$sortOrder);
+      Field('sortOrder', _$sortOrder, key: r'sort_order');
   static DateTime _$createdAt(WordScrambleTemplate v) => v.createdAt;
   static const Field<WordScrambleTemplate, DateTime> _f$createdAt =
-      Field('createdAt', _$createdAt);
+      Field('createdAt', _$createdAt, key: r'created_at');
   static String? _$sourceTemplateId(WordScrambleTemplate v) =>
       v.sourceTemplateId;
-  static const Field<WordScrambleTemplate, String> _f$sourceTemplateId =
-      Field('sourceTemplateId', _$sourceTemplateId, opt: true);
+  static const Field<WordScrambleTemplate, String> _f$sourceTemplateId = Field(
+      'sourceTemplateId', _$sourceTemplateId,
+      key: r'source_template_id', opt: true);
   static String _$sentenceToScramble(WordScrambleTemplate v) =>
       v.sentenceToScramble;
   static const Field<WordScrambleTemplate, String> _f$sentenceToScramble =
-      Field('sentenceToScramble', _$sentenceToScramble);
+      Field('sentenceToScramble', _$sentenceToScramble,
+          key: r'sentence_to_scramble');
   static String? _$imageUrl(WordScrambleTemplate v) => v.imageUrl;
   static const Field<WordScrambleTemplate, String> _f$imageUrl =
-      Field('imageUrl', _$imageUrl, opt: true);
+      Field('imageUrl', _$imageUrl, key: r'image_url', opt: true);
   static String? _$audioUrl(WordScrambleTemplate v) => v.audioUrl;
   static const Field<WordScrambleTemplate, String> _f$audioUrl =
-      Field('audioUrl', _$audioUrl, opt: true);
+      Field('audioUrl', _$audioUrl, key: r'audio_url', opt: true);
 
   @override
   final MappableFields<WordScrambleTemplate> fields = const {

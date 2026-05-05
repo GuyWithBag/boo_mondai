@@ -24,7 +24,7 @@ class FsrsReviewLogMapper extends ClassMapperBase<FsrsReviewLog> {
   static const Field<FsrsReviewLog, String> _f$id = Field('id', _$id);
   static String _$cardId(FsrsReviewLog v) => v.cardId;
   static const Field<FsrsReviewLog, String> _f$cardId =
-      Field('cardId', _$cardId);
+      Field('cardId', _$cardId, key: r'card_id');
   static ReviewLog _$log(FsrsReviewLog v) => v.log;
   static const Field<FsrsReviewLog, ReviewLog> _f$log = Field('log', _$log);
 

@@ -28,17 +28,18 @@ class FillInTheBlanksTemplateMapper
   static const Field<FillInTheBlanksTemplate, String> _f$id = Field('id', _$id);
   static String _$deckId(FillInTheBlanksTemplate v) => v.deckId;
   static const Field<FillInTheBlanksTemplate, String> _f$deckId =
-      Field('deckId', _$deckId);
+      Field('deckId', _$deckId, key: r'deck_id');
   static int _$sortOrder(FillInTheBlanksTemplate v) => v.sortOrder;
   static const Field<FillInTheBlanksTemplate, int> _f$sortOrder =
-      Field('sortOrder', _$sortOrder);
+      Field('sortOrder', _$sortOrder, key: r'sort_order');
   static DateTime _$createdAt(FillInTheBlanksTemplate v) => v.createdAt;
   static const Field<FillInTheBlanksTemplate, DateTime> _f$createdAt =
-      Field('createdAt', _$createdAt);
+      Field('createdAt', _$createdAt, key: r'created_at');
   static String? _$sourceTemplateId(FillInTheBlanksTemplate v) =>
       v.sourceTemplateId;
   static const Field<FillInTheBlanksTemplate, String> _f$sourceTemplateId =
-      Field('sourceTemplateId', _$sourceTemplateId, opt: true);
+      Field('sourceTemplateId', _$sourceTemplateId,
+          key: r'source_template_id', opt: true);
   static List<FillInTheBlankSegment> _$segments(FillInTheBlanksTemplate v) =>
       v.segments;
   static const Field<FillInTheBlanksTemplate, List<FillInTheBlankSegment>>

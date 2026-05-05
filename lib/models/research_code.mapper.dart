@@ -26,22 +26,22 @@ class ResearchCodeMapper extends ClassMapperBase<ResearchCode> {
   static const Field<ResearchCode, String> _f$code = Field('code', _$code);
   static String _$targetRole(ResearchCode v) => v.targetRole;
   static const Field<ResearchCode, String> _f$targetRole =
-      Field('targetRole', _$targetRole);
+      Field('targetRole', _$targetRole, key: r'target_role');
   static String _$unlocks(ResearchCode v) => v.unlocks;
   static const Field<ResearchCode, String> _f$unlocks =
       Field('unlocks', _$unlocks);
   static String _$createdBy(ResearchCode v) => v.createdBy;
   static const Field<ResearchCode, String> _f$createdBy =
-      Field('createdBy', _$createdBy);
+      Field('createdBy', _$createdBy, key: r'created_by');
   static String? _$usedBy(ResearchCode v) => v.usedBy;
   static const Field<ResearchCode, String> _f$usedBy =
-      Field('usedBy', _$usedBy, opt: true);
+      Field('usedBy', _$usedBy, key: r'used_by', opt: true);
   static DateTime? _$usedAt(ResearchCode v) => v.usedAt;
   static const Field<ResearchCode, DateTime> _f$usedAt =
-      Field('usedAt', _$usedAt, opt: true);
+      Field('usedAt', _$usedAt, key: r'used_at', opt: true);
   static DateTime _$createdAt(ResearchCode v) => v.createdAt;
   static const Field<ResearchCode, DateTime> _f$createdAt =
-      Field('createdAt', _$createdAt);
+      Field('createdAt', _$createdAt, key: r'created_at');
 
   @override
   final MappableFields<ResearchCode> fields = const {

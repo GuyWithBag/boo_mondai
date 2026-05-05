@@ -24,24 +24,24 @@ class ResearchProfileMapper extends ClassMapperBase<ResearchProfile> {
   static const Field<ResearchProfile, String> _f$id = Field('id', _$id);
   static String _$userId(ResearchProfile v) => v.userId;
   static const Field<ResearchProfile, String> _f$userId =
-      Field('userId', _$userId);
+      Field('userId', _$userId, key: r'user_id');
   static String? _$userName(ResearchProfile v) => v.userName;
   static const Field<ResearchProfile, String> _f$userName =
-      Field('userName', _$userName, opt: true);
+      Field('userName', _$userName, key: r'user_name', opt: true);
   static String _$role(ResearchProfile v) => v.role;
   static const Field<ResearchProfile, String> _f$role = Field('role', _$role);
   static String _$targetLanguage(ResearchProfile v) => v.targetLanguage;
   static const Field<ResearchProfile, String> _f$targetLanguage =
-      Field('targetLanguage', _$targetLanguage);
+      Field('targetLanguage', _$targetLanguage, key: r'target_language');
   static DateTime _$createdAt(ResearchProfile v) => v.createdAt;
   static const Field<ResearchProfile, DateTime> _f$createdAt =
-      Field('createdAt', _$createdAt);
+      Field('createdAt', _$createdAt, key: r'created_at');
   static String _$firstName(ResearchProfile v) => v.firstName;
   static const Field<ResearchProfile, String> _f$firstName =
-      Field('firstName', _$firstName);
+      Field('firstName', _$firstName, key: r'first_name');
   static String _$lastName(ResearchProfile v) => v.lastName;
   static const Field<ResearchProfile, String> _f$lastName =
-      Field('lastName', _$lastName);
+      Field('lastName', _$lastName, key: r'last_name');
   static int _$age(ResearchProfile v) => v.age;
   static const Field<ResearchProfile, int> _f$age = Field('age', _$age);
 

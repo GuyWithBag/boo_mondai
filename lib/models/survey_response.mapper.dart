@@ -24,22 +24,23 @@ class SurveyResponseMapper extends ClassMapperBase<SurveyResponse> {
   static const Field<SurveyResponse, String> _f$id = Field('id', _$id);
   static String _$userId(SurveyResponse v) => v.userId;
   static const Field<SurveyResponse, String> _f$userId =
-      Field('userId', _$userId);
+      Field('userId', _$userId, key: r'user_id');
   static String _$surveyType(SurveyResponse v) => v.surveyType;
   static const Field<SurveyResponse, String> _f$surveyType =
-      Field('surveyType', _$surveyType);
+      Field('surveyType', _$surveyType, key: r'survey_type');
   static String? _$timePoint(SurveyResponse v) => v.timePoint;
   static const Field<SurveyResponse, String> _f$timePoint =
-      Field('timePoint', _$timePoint, opt: true);
+      Field('timePoint', _$timePoint, key: r'time_point', opt: true);
   static Map<String, dynamic> _$responses(SurveyResponse v) => v.responses;
   static const Field<SurveyResponse, Map<String, dynamic>> _f$responses =
       Field('responses', _$responses);
   static double? _$computedScore(SurveyResponse v) => v.computedScore;
-  static const Field<SurveyResponse, double> _f$computedScore =
-      Field('computedScore', _$computedScore, opt: true);
+  static const Field<SurveyResponse, double> _f$computedScore = Field(
+      'computedScore', _$computedScore,
+      key: r'computed_score', opt: true);
   static DateTime _$submittedAt(SurveyResponse v) => v.submittedAt;
   static const Field<SurveyResponse, DateTime> _f$submittedAt =
-      Field('submittedAt', _$submittedAt);
+      Field('submittedAt', _$submittedAt, key: r'submitted_at');
 
   @override
   final MappableFields<SurveyResponse> fields = const {

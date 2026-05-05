@@ -29,16 +29,17 @@ class CardTemplateMapper extends ClassMapperBase<CardTemplate> {
   static const Field<CardTemplate, String> _f$id = Field('id', _$id);
   static String _$deckId(CardTemplate v) => v.deckId;
   static const Field<CardTemplate, String> _f$deckId =
-      Field('deckId', _$deckId);
+      Field('deckId', _$deckId, key: r'deck_id');
   static int _$sortOrder(CardTemplate v) => v.sortOrder;
   static const Field<CardTemplate, int> _f$sortOrder =
-      Field('sortOrder', _$sortOrder);
+      Field('sortOrder', _$sortOrder, key: r'sort_order');
   static DateTime _$createdAt(CardTemplate v) => v.createdAt;
   static const Field<CardTemplate, DateTime> _f$createdAt =
-      Field('createdAt', _$createdAt);
+      Field('createdAt', _$createdAt, key: r'created_at');
   static String? _$sourceTemplateId(CardTemplate v) => v.sourceTemplateId;
-  static const Field<CardTemplate, String> _f$sourceTemplateId =
-      Field('sourceTemplateId', _$sourceTemplateId, opt: true);
+  static const Field<CardTemplate, String> _f$sourceTemplateId = Field(
+      'sourceTemplateId', _$sourceTemplateId,
+      key: r'source_template_id', opt: true);
 
   @override
   final MappableFields<CardTemplate> fields = const {
