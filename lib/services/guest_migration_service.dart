@@ -5,7 +5,7 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/repositories/repositories.barrel.dart';
+import 'package:boo_mondai/database/database.barrel.dart';
 
 /// Handles transferring (or discarding) local guest-owned Hive data when
 /// the user creates or signs into a Supabase account.
@@ -17,11 +17,12 @@ class GuestMigrationService {
 
   /// Returns true if [guestId] owns any local data worth asking the user about.
   static bool hasLocalData(String guestId) {
-    final hasDecks = Repositories.deck.getByAuthorId(guestId).isNotEmpty;
-    final hasFsrs = Repositories.fsrsCard.getByUserId(guestId).isNotEmpty;
-    final hasSessions =
-        Repositories.drillSession.getAll().any((s) => s.userId == guestId);
-    final hasStreak = Repositories.streak.getByUserId(guestId) != null;
+    final hasDecks = LocalDB.deck.getByAuthorId(guestId).isNotEmpty;
+    final hasFsrs = LocalDB.fsrsCard.getByUserId(guestId).isNotEmpty;
+    final hasSessions = LocalDB.drillSession.getAll().any(
+      (s) => s.userId == guestId,
+    );
+    final hasStreak = LocalDB.streak.getByUserId(guestId) != null;
     return hasDecks || hasFsrs || hasSessions || hasStreak;
   }
 
@@ -32,39 +33,36 @@ class GuestMigrationService {
   /// Covered: decks, FSRS cards, drill sessions, streak.
   /// Review logs are linked via cardId (not userId) and need no migration.
   /// Card templates and review cards belong to decks, not users — no change.
-  static Future<void> migrateLocalData(
-    String guestId,
-    String newUserId,
-  ) async {
+  static Future<void> migrateLocalData(String guestId, String newUserId) async {
     // ── Decks ──────────────────────────────────────────────
-    final guestDecks = Repositories.deck.getByAuthorId(guestId);
+    final guestDecks = LocalDB.deck.getByAuthorId(guestId);
     for (final deck in guestDecks) {
-      await Repositories.deck.save(deck.copyWith(authorId: newUserId));
+      await LocalDB.deck.put(deck.copyWith(authorId: newUserId));
     }
 
     // ── FSRS cards ─────────────────────────────────────────
-    final guestFsrs = Repositories.fsrsCard.getByUserId(guestId);
+    final guestFsrs = LocalDB.fsrsCard.getByUserId(guestId);
     for (final card in guestFsrs) {
-      await Repositories.fsrsCard.save(card.copyWith(userId: newUserId));
+      await LocalDB.fsrsCard.put(card.copyWith(userId: newUserId));
     }
 
     // ── Drill sessions ─────────────────────────────────────
     // userId lives on the StudySession base class; dart_mappable includes it
     // in the generated copyWith for all subclasses.
-    final guestSessions = Repositories.drillSession
+    final guestSessions = LocalDB.drillSession
         .getAll()
         .where((s) => s.userId == guestId)
         .toList();
     for (final session in guestSessions) {
-      await Repositories.drillSession.save(session.copyWith(userId: newUserId));
+      await LocalDB.drillSession.put(session.copyWith(userId: newUserId));
     }
 
     // ── Streak ─────────────────────────────────────────────
-    // StreakRepository keys by userId, so delete the old entry first.
-    final guestStreak = Repositories.streak.getByUserId(guestId);
+    // StreakLocalDB keys by userId, so delete the old entry first.
+    final guestStreak = LocalDB.streak.getByUserId(guestId);
     if (guestStreak != null) {
-      await Repositories.streak.delete(guestId);
-      await Repositories.streak.save(guestStreak.copyWith(userId: newUserId));
+      await LocalDB.streak.delete(guestId);
+      await LocalDB.streak.put(guestStreak.copyWith(userId: newUserId));
     }
   }
 
@@ -74,23 +72,23 @@ class GuestMigrationService {
   ///
   /// Used when the user signs in and chooses NOT to keep their guest data.
   static Future<void> discardGuestData(String guestId) async {
-    final guestDecks = Repositories.deck.getByAuthorId(guestId);
-    await Repositories.deck.deleteAll(guestDecks.map((d) => d.id).toList());
+    final guestDecks = LocalDB.deck.getByAuthorId(guestId);
+    await LocalDB.deck.deleteAll(guestDecks.map((d) => d.id).toList());
 
-    final guestFsrs = Repositories.fsrsCard.getByUserId(guestId);
-    await Repositories.fsrsCard
-        .deleteAll(guestFsrs.map((c) => c.id).toList());
+    final guestFsrs = LocalDB.fsrsCard.getByUserId(guestId);
+    await LocalDB.fsrsCard.deleteAll(guestFsrs.map((c) => c.id).toList());
 
-    final guestSessions = Repositories.drillSession
+    final guestSessions = LocalDB.drillSession
         .getAll()
         .where((s) => s.userId == guestId)
         .toList();
-    await Repositories.drillSession
-        .deleteAll(guestSessions.map((s) => s.id).toList());
+    await LocalDB.drillSession.deleteAll(
+      guestSessions.map((s) => s.id).toList(),
+    );
 
-    final guestStreak = Repositories.streak.getByUserId(guestId);
+    final guestStreak = LocalDB.streak.getByUserId(guestId);
     if (guestStreak != null) {
-      await Repositories.streak.delete(guestId);
+      await LocalDB.streak.delete(guestId);
     }
   }
 }

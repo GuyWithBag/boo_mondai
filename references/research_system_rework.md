@@ -3,7 +3,7 @@ Research System — Current State
 ### What's already built and functional
 
 **Backend/Data layer** — fully wired:
-- `SupabaseResearchService` — all Supabase operations (code redeem, code insert, survey insert, vocab test insert, full data fetch)
+- `ResearchRemoteDB` — all Supabase operations (code redeem, code insert, survey insert, vocab test insert, full data fetch)
 - `ResearchProvider` — all business logic (generate codes, redeem codes, submit surveys, submit vocab tests, fetch dashboard data)
 - Models: `ResearchCode`, `ResearchUser`, `SurveyResponse`, `VocabularyTestResult`
 

@@ -5,7 +5,7 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/repositories/repositories.dart';
+import 'package:boo_mondai/database/database.barrel.dart';
 import 'package:flutter/material.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
@@ -29,7 +29,7 @@ class ReviewPrompt extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (deckId == null) return ErrorState(message: 'Deck Id not found');
-    final deckProvider = Repositories.deck;
+    final deckProvider = LocalDB.deck;
 
     // Safely look up the deck across both public and user decks
     final deck = [

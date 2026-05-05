@@ -3,7 +3,8 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/models/models.barrel.dart';
-import 'package:boo_mondai/repositories/repositories.barrel.dart';
+import 'package:boo_mondai/database/database.barrel.dart';
+
 import 'package:boo_mondai/services/services.barrel.dart';
 import 'package:flutter/foundation.dart';
 
@@ -43,7 +44,7 @@ class ReviewDashboardController extends ChangeNotifier {
 
     try {
       final userId = LocalIdentityService.getOrCreate();
-      final allDecks = Repositories.deck.getAll();
+      final allDecks = LocalDB.deck.getAll();
       final deckMap = {for (final d in allDecks) d.id: d};
 
       // 1. Fetch Historical (Only if requested or not cached)

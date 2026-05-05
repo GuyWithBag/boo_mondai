@@ -35,7 +35,7 @@ Reference docs updated: `references/deck_psuedo_class_diagram.md`, `references/d
 ### 2b. Local-first drill (no Supabase blocking during drill)
 - **All Supabase writes during a drill session are deferred** until `_completeSession()`.
 - `startSession`: create `DrillSession` object in memory only (do NOT insert to Supabase yet).
-- `submitSelfRating`: save `DrillAnswer` in-memory `_answers` list only (no `insertDrillAnswer` call).
+- `submitSelfRating`: put `DrillAnswer` in-memory `_answers` list only (no `insertDrillAnswer` call).
 - `_completeSession`: batch-insert the session row + all answer rows + FSRS enrollment all at once at the end.
 - This eliminates the latency the user was experiencing after each self-rating.
 
@@ -159,7 +159,7 @@ ALTER TABLE decks ADD COLUMN IF NOT EXISTS is_published bool NOT NULL DEFAULT fa
 
 ## 6. Pending: deck_editor_page.dart — Local-first
 
-- All card edits go to **Hive only**. No Supabase call on save.
+- All card edits go to **Hive only**. No Supabase call on put.
 - A **"Push Changes"** button per deck (in the deck editor or deck detail page) triggers sync for that specific deck.
 - `CardProvider.addCard` / `updateCard` / `deleteCard`: write to Hive, mark deck as having local changes, do NOT call Supabase.
 
@@ -179,8 +179,8 @@ ALTER TABLE decks ADD COLUMN IF NOT EXISTS is_published bool NOT NULL DEFAULT fa
 - Write a detailed sequence diagram + explanation of the sync system (see section 4).
 - Cover: drill session sync, deck/card sync, FSRS sync, `is_published` flow, conflict resolution.
 - Diagrams needed:
-  1. Full drill session flow (start → answer → 3-strike → self-grade → complete → local save → sync)
-  2. Deck/card edit flow (edit locally → save to Hive → push button → Supabase)
+  1. Full drill session flow (start → answer → 3-strike → self-grade → complete → local put → sync)
+  2. Deck/card edit flow (edit locally → put to Hive → push button → Supabase)
   3. FSRS review flow (drill complete → enroll → review page → review → sync)
   4. is_published flow
 
@@ -217,9 +217,9 @@ All items from this section have been completed across Phases 4–6.
 
 | Phase | Name | What was done |
 |---|---|---|
-| Phase 1 | **Drill local-first + 3-strike** | `DrillQueueController`: per-card wrong-count tracking, auto-eject at 3 strikes with `Rating.again`. `DrillProvider`: no Supabase writes during drill (fully in-memory), batch-inserts session + all answers + FSRS enrollment in one go at `_completeSession`. `SupabaseService`: `batchInsertDrillAnswers`. |
+| Phase 1 | **Drill local-first + 3-strike** | `DrillQueueController`: per-card wrong-count tracking, auto-eject at 3 strikes with `Rating.again`. `DrillProvider`: no Supabase writes during drill (fully in-memory), batch-inserts session + all answers + FSRS enrollment in one go at `_completeSession`. `SupabaseRemoteDB`: `batchInsertDrillAnswers`. |
 | Phase 2 | **Drill session UI — all 6 question types** | `drill_session_page.dart`: full UI for flashcard (tap-to-reveal), identification (text input + self-rate), multipleChoice (4-button tap), fillInTheBlanks (multi-blank inline inputs), wordScramble (chip tap-to-reconstruct), matchMadness (pair-tap game). Anki-style New/Learning/Review counter in app bar. Strike chip showing attempt count. `DrillProvider`: added `revealAnswer`, `submitIdentificationAnswer`, `submitFitbAnswers`. |
 | Phase 3 | **Post-drill review flow + FSRS early-review** | `DrillProvider`: `enrolledCards`, `reviewableNowCount`, `reviewLaterCount` getters. `FsrsProvider`: 1-hour early-review window, `upcomingCards` (sorted by due). `drill_result_page.dart`: "Review now?" prompt with ready/later card counts, "Review Later" label for 3-strike ejected cards. `review_page.dart`: FSRS state badge (New/Learning/Review), upcoming-cards list with live `Due in Xd Xh Xm Xs` / `Overdue since …` countdown. |
-| Phase 4 | **Local-first sync system** | `HiveService`: `saveDeck`, `deleteDeck`, `getUserDecks`. `SupabaseService`: `upsertCardRow`, `deleteChildrenByCardId`, `deleteOrphanCards`, `batchInsertNotes/MCOptions/FITBSegments/MMPairs`. `CardProvider`: full local-first rewrite — all mutations hit Hive only, per-deck dirty flag, `pushDeck` batch-syncs to Supabase. `DeckProvider`: `loadFromCache`, local-first `deleteDeck` (Hive immediate, Supabase best-effort). `deck_list_page.dart`: cache-first load, manual refresh button, delete with confirm dialog. `deck_editor_page.dart`: `_PushButton` shown when deck is dirty. `FsrsService`: fixed `Rating.values` off-by-one (1-indexed → subtract 1). All tests updated and passing (153 total). |
-| Phase 5 | **Bug fix + schema** | Confirmed `SupabaseService.fetchCards` already had correct join (`*, notes(*), mc_options(*), fitb_segments(*), mm_pairs!card_id(*)`). Added `is_published bool NOT NULL DEFAULT false` column to `decks` table in `supabase/schema.sql` with explanatory comment. |
-| Phase 6 | **Documentation** | `references/sync_system.md`: wrote full sync design document covering architecture overview, sync rules table, and 4 sequence diagrams (drill session, deck/card edit, FSRS review, is_published flow) plus conflict resolution and error handling tables. `references/class_diagram.md`: full rewrite — Section 1a shows Deck/DeckCard/Note/Options/Segments/Pairs with the computed-getter note on `question`/`answer`; Section 1b shows Drill/FSRS/Streak models; Section 2 shows all Providers and Services updated to reflect local-first CardProvider, new HiveService/SupabaseService methods, and FsrsService rating note. |
+| Phase 4 | **Local-first sync system** | `HiveService`: `saveDeck`, `deleteDeck`, `getUserDecks`. `SupabaseRemoteDB`: `upsertCardRow`, `deleteChildrenByCardId`, `deleteOrphanCards`, `batchInsertNotes/MCOptions/FITBSegments/MMPairs`. `CardProvider`: full local-first rewrite — all mutations hit Hive only, per-deck dirty flag, `pushDeck` batch-syncs to Supabase. `DeckProvider`: `loadFromCache`, local-first `deleteDeck` (Hive immediate, Supabase best-effort). `deck_list_page.dart`: cache-first load, manual refresh button, delete with confirm dialog. `deck_editor_page.dart`: `_PushButton` shown when deck is dirty. `FsrsService`: fixed `Rating.values` off-by-one (1-indexed → subtract 1). All tests updated and passing (153 total). |
+| Phase 5 | **Bug fix + schema** | Confirmed `SupabaseRemoteDB.fetchCards` already had correct join (`*, notes(*), mc_options(*), fitb_segments(*), mm_pairs!card_id(*)`). Added `is_published bool NOT NULL DEFAULT false` column to `decks` table in `supabase/schema.sql` with explanatory comment. |
+| Phase 6 | **Documentation** | `references/sync_system.md`: wrote full sync design document covering architecture overview, sync rules table, and 4 sequence diagrams (drill session, deck/card edit, FSRS review, is_published flow) plus conflict resolution and error handling tables. `references/class_diagram.md`: full rewrite — Section 1a shows Deck/DeckCard/Note/Options/Segments/Pairs with the computed-getter note on `question`/`answer`; Section 1b shows Drill/FSRS/Streak models; Section 2 shows all Providers and Services updated to reflect local-first CardProvider, new HiveService/SupabaseRemoteDB methods, and FsrsService rating note. |

@@ -6,7 +6,8 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/models/models.barrel.dart';
-import 'package:boo_mondai/repositories/repositories.dart';
+import 'package:boo_mondai/database/database.barrel.dart';
+
 import 'package:fsrs/fsrs.dart';
 import 'package:fsrs/fsrs.dart' as fsrs;
 
@@ -31,8 +32,8 @@ class FsrsService {
     final newCard = card.copyWith(state: res.card);
     final newLog = FsrsReviewLog.create(log: res.reviewLog, cardId: newCard.id);
 
-    await Repositories.fsrsCard.save(newCard);
-    await Repositories.reviewLog.save(newLog);
+    await LocalDB.fsrsCard.put(newCard);
+    await LocalDB.reviewLog.put(newLog);
   }
 
   // ── Due Stats (Calculated dynamically based on time/filter) ──
@@ -41,12 +42,12 @@ class FsrsService {
     required DueFilterThreshold dueFilter,
   }) {
     final now = DateTime.now();
-    final allFsrsCards = Repositories.fsrsCard.getByUserId(userId);
-    final allReviewCards = Repositories.reviewCard.getAll();
+    final allFsrsCards = LocalDB.fsrsCard.getByUserId(userId);
+    final allReviewCards = LocalDB.reviewCard.getAll();
     final rcToDeck = {for (final rc in allReviewCards) rc.id: rc.deckId};
 
     // We only need logs to determine if a card is "New" or "Learning"
-    final studiedCardIds = Repositories.reviewLog
+    final studiedCardIds = LocalDB.reviewLog
         .getAll()
         .map((l) => l.cardId)
         .toSet();
@@ -94,9 +95,9 @@ class FsrsService {
   Map<String, DeckHistoricalStats> calculateHistoricalStats({
     required String userId,
   }) {
-    final allLogs = Repositories.reviewLog.getAll();
+    final allLogs = LocalDB.reviewLog.getAll();
     // In a real app, you'd want to query logs by userId, but relying on the card relation works for now
-    final allReviewCards = Repositories.reviewCard.getAll();
+    final allReviewCards = LocalDB.reviewCard.getAll();
     final rcToDeck = {for (final rc in allReviewCards) rc.id: rc.deckId};
 
     final againMap = <String, int>{};
@@ -105,7 +106,7 @@ class FsrsService {
     final easyMap = <String, int>{};
 
     for (final log in allLogs) {
-      final fsrsCard = Repositories.fsrsCard.getById(log.cardId);
+      final fsrsCard = LocalDB.fsrsCard.getById(log.cardId);
       if (fsrsCard == null) continue;
 
       final deckId = rcToDeck[fsrsCard.reviewCardId];

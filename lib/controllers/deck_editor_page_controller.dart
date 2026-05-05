@@ -4,15 +4,16 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/models/models.barrel.dart';
-import 'package:boo_mondai/repositories/repositories.barrel.dart';
+import 'package:boo_mondai/database/database.barrel.dart';
+
 import 'package:boo_mondai/services/uuid_service.dart';
 import 'package:flutter/foundation.dart';
 
 class DeckEditorPageController extends ChangeNotifier {
-  final DeckRepository _deckRepository = Repositories.deck;
+  final DeckLocalDB _deckRepository = LocalDB.deck;
 
   // Update to use the new template repository
-  final CardTemplateRepository _templateRepository = Repositories.cardTemplate;
+  final CardTemplateLocalDB _templateRepository = LocalDB.cardTemplate;
 
   // ── State ────────────────────────────────────────
 
@@ -132,20 +133,20 @@ class DeckEditorPageController extends ChangeNotifier {
         updatedAt: DateTime.now(),
       );
 
-      await _deckRepository.save(updatedDeck);
-      await _templateRepository.saveAll(_templates);
+      await _deckRepository.put(updatedDeck);
+      await _templateRepository.putAll(_templates);
 
       // ── REVIEW CARD GENERATION ───────────────────────────
 
       // 1. Fetch review cards that already exist for this deck
-      final existingReviewCards = Repositories.reviewCard.getByDeckId(
-        _deck!.id,
-      );
+      final existingReviewCards = LocalDB.reviewCard.getByDeckId(_deck!.id);
 
       // 2. Build a lookup: templateId → Set of isReversed values already stored
       final existingDirections = <String, Set<bool>>{};
       for (final rc in existingReviewCards) {
-        existingDirections.putIfAbsent(rc.templateId, () => {}).add(rc.isReversed);
+        existingDirections
+            .putIfAbsent(rc.templateId, () => {})
+            .add(rc.isReversed);
       }
 
       // 3. Determine which ReviewCards are missing and create them
@@ -159,37 +160,43 @@ class DeckEditorPageController extends ChangeNotifier {
           final needsReversed = template.cardType != CardType.normal;
 
           if (needsNormal && !existing.contains(false)) {
-            newReviewCards.add(ReviewCard(
-              id: UuidService.uuid.v4(),
-              deckId: template.deckId,
-              templateId: template.id,
-              isReversed: false,
-            ));
+            newReviewCards.add(
+              ReviewCard(
+                id: UuidService.uuid.v4(),
+                deckId: template.deckId,
+                templateId: template.id,
+                isReversed: false,
+              ),
+            );
           }
           if (needsReversed && !existing.contains(true)) {
-            newReviewCards.add(ReviewCard(
-              id: UuidService.uuid.v4(),
-              deckId: template.deckId,
-              templateId: template.id,
-              isReversed: true,
-            ));
+            newReviewCards.add(
+              ReviewCard(
+                id: UuidService.uuid.v4(),
+                deckId: template.deckId,
+                templateId: template.id,
+                isReversed: true,
+              ),
+            );
           }
         } else {
           // All other template types: exactly one non-reversed ReviewCard
           if (!existing.contains(false)) {
-            newReviewCards.add(ReviewCard(
-              id: UuidService.uuid.v4(),
-              deckId: template.deckId,
-              templateId: template.id,
-              isReversed: false,
-            ));
+            newReviewCards.add(
+              ReviewCard(
+                id: UuidService.uuid.v4(),
+                deckId: template.deckId,
+                templateId: template.id,
+                isReversed: false,
+              ),
+            );
           }
         }
       }
 
       // 4. Save only the newly generated ones
       if (newReviewCards.isNotEmpty) {
-        await Repositories.reviewCard.saveAll(newReviewCards);
+        await LocalDB.reviewCard.putAll(newReviewCards);
       }
       // ─────────────────────────────────────────────────────
 

@@ -63,10 +63,10 @@ class DrillSessionController extends StudySessionController {
     try {
       final userId = LocalIdentityService.getOrCreate();
 
-      final allTemplates = Repositories.cardTemplate.getByDeckId(deckId);
+      final allTemplates = LocalDB.cardTemplate.getByDeckId(deckId);
       templates = {for (final t in allTemplates) t.id: t};
 
-      final allReviewCards = Repositories.reviewCard.getByDeckId(deckId);
+      final allReviewCards = LocalDB.reviewCard.getByDeckId(deckId);
       final eligibleCards = DrillService.getEligibleDrillCards(deckId, userId);
 
       if (eligibleCards.isEmpty) {
@@ -120,15 +120,15 @@ class DrillSessionController extends StudySessionController {
 
     // ── THE TOGGLE (REAL-TIME) ──
     if (realTimeSaving) {
-      await Repositories.drillAnswer.save(newAnswer);
+      await LocalDB.drillAnswer.put(newAnswer);
 
       _session = _session!.copyWith(correctCount: correctCount);
-      await Repositories.drillSession.save(_session!);
+      await LocalDB.drillSession.put(_session!);
 
       // Real-time FSRS enrollment for correct answers
       if (type != StudyRating.incorrect) {
         // SAFETY CHECK: Ensure it isn't already enrolled
-        final existing = Repositories.fsrsCard.getByReviewCardId(reviewCard.id);
+        final existing = LocalDB.fsrsCard.getByReviewCardId(reviewCard.id);
 
         if (existing == null) {
           final fsrsCard = await FsrsCard.create(
@@ -178,11 +178,11 @@ class DrillSessionController extends StudySessionController {
       _isComplete = true;
 
       if (realTimeSaving) {
-        await Repositories.drillSession.save(_session!);
+        await LocalDB.drillSession.put(_session!);
       } else {
         // ── BATCH SAVE ──
-        await Repositories.drillSession.save(_session!);
-        await Repositories.drillAnswer.saveAll(_currentAnswers);
+        await LocalDB.drillSession.put(_session!);
+        await LocalDB.drillAnswer.putAll(_currentAnswers);
 
         // 1. Deduplicate: Get only the final correct answer for each card
         final eligibleAnswersMap = <String, DrillAnswer>{};
@@ -195,9 +195,7 @@ class DrillSessionController extends StudySessionController {
         // 2. Process enrollments safely
         for (final answer in eligibleAnswersMap.values) {
           // SAFETY CHECK: Ensure it isn't already enrolled
-          final existing = Repositories.fsrsCard.getByReviewCardId(
-            answer.cardId,
-          );
+          final existing = LocalDB.fsrsCard.getByReviewCardId(answer.cardId);
           if (existing != null) continue;
 
           final fsrsCard = await FsrsCard.create(

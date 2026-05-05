@@ -7,7 +7,8 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:boo_mondai/models/models.barrel.dart';
-import 'package:boo_mondai/repositories/repositories.barrel.dart';
+import 'package:boo_mondai/database/database.barrel.dart';
+
 import 'package:boo_mondai/services/app_exception.dart';
 import 'package:boo_mondai/services/services.dart';
 
@@ -33,13 +34,13 @@ class StreakProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _streak = Repositories.streak.getByUserId(userId);
+      _streak = LocalDB.streak.getByUserId(userId);
       if (_streak != null) notifyListeners();
 
       final data = await Services.streakSync.fetchStreak(userId);
       if (data != null) {
         _streak = StreakMapper.fromMap(data);
-        await Repositories.streak.save(_streak!);
+        await LocalDB.streak.put(_streak!);
       }
     } on AppException catch (e) {
       _error = e.message;
@@ -52,7 +53,7 @@ class StreakProvider extends ChangeNotifier {
   /// Records today as an active day and syncs to Supabase in the background.
   Future<void> recordActivity(String userId) async {
     try {
-      final updated = await Repositories.streak.recordActivity(
+      final updated = await LocalDB.streak.recordActivity(
         userId,
         DateTime.now(),
       );

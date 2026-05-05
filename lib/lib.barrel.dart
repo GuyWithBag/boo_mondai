@@ -2,11 +2,11 @@
 
 // Barrel files
 export 'controllers/controllers.barrel.dart';
+export 'database/database.barrel.dart';
 export 'models/models.barrel.dart';
 export 'pages/pages.barrel.dart';
 export 'painters/painters.barrel.dart';
 export 'providers/providers.barrel.dart';
-export 'repositories/repositories.barrel.dart';
 export 'services/services.barrel.dart';
 export 'shared/shared.barrel.dart';
 export 'widgets/widgets.barrel.dart';

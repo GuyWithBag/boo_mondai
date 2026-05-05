@@ -15,16 +15,16 @@
 // /// drill sessions to the UI via [ChangeNotifier].
 // class DashboardPageController extends ChangeNotifier {
 //   DashboardPageController({
-//     required StreakRepository streakRepository,
-//     required FsrsCardRepository fsrsRepository,
-//     required DrillSessionRepository drillSessionRepository,
+//     required StreakLocalDB streakRepository,
+//     required FsrsCardLocalDB fsrsRepository,
+//     required DrillSessionLocalDB drillSessionRepository,
 //   }) : _streakRepository = streakRepository,
 //        _fsrsRepository = fsrsRepository,
 //        _drillSessionRepository = drillSessionRepository;
 
-//   final StreakRepository _streakRepository;
-//   final FsrsCardRepository _fsrsRepository;
-//   final DrillSessionRepository _drillSessionRepository;
+//   final StreakLocalDB _streakRepository;
+//   final FsrsCardLocalDB _fsrsRepository;
+//   final DrillSessionLocalDB _drillSessionRepository;
 
 //   // ── private state ────────────────────────────────────────
 

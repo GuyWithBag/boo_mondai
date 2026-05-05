@@ -108,14 +108,14 @@ When copying a card with an existing `source_card_id`:
 ## Named Versions & Update Log
 
 **Context:** `Deck` now has a `version` string (e.g. `"1.0.0"`, user-editable) and a `build_number` int
-(server auto-incremented on every save). This mirrors the Google Play versioning model.
+(server auto-incremented on every put). This mirrors the Google Play versioning model.
 
 ### Planned improvements
 
 | # | Feature | Description |
 |---|---------|-------------|
 | 1 | **Version bump UI** | When saving a deck, show a dialog prompting the author to optionally bump `version` (patch / minor / major). `build_number` always increments automatically. |
-| 2 | **Update log (changelog)** | Add an `update_log` table keyed on `(deck_id, build_number)` with a `message text` column. Authors write a short release note per save (optional). |
+| 2 | **Update log (changelog)** | Add an `update_log` table keyed on `(deck_id, build_number)` with a `message text` column. Authors write a short release note per put (optional). |
 | 3 | **Version badge on deck tile** | Show `v{version}+{buildNumber}` on the deck detail page and in the online browser. |
 | 4 | **Consumer update notifications** | When a source deck's `build_number` exceeds the `build_number` recorded at copy time, surface a "New version available" badge on the consumer's copied deck. |
 | 5 | **Pinned version copies** | Let consumers optionally pin their copy to a specific `build_number` so they never receive auto-update prompts. |

@@ -69,7 +69,7 @@ class AuthProvider extends ChangeNotifier {
         final profileData = await Services.auth.getProfile(session.user.id);
         if (profileData != null) {
           _userProfile = UserProfileMapper.fromMap(profileData);
-          await Repositories.userProfile.save(_userProfile!);
+          await LocalDB.userProfile.put(_userProfile!);
         }
         // Keep local identity aligned with the Supabase UID.
         await LocalIdentityService.overwrite(session.user.id);
@@ -104,14 +104,13 @@ class AuthProvider extends ChangeNotifier {
       final profileData = await Services.auth.getProfile(user.id);
       if (profileData != null) {
         _userProfile = UserProfileMapper.fromMap(profileData);
-        await Repositories.userProfile.save(_userProfile!);
+        await LocalDB.userProfile.put(_userProfile!);
       }
 
       // 4. Check whether the guest had any local data worth asking about.
       //    We only prompt if the guest UUID differs from the Supabase UID
       //    (they always do unless the user somehow signed in as themselves).
-      if (guestId != user.id &&
-          GuestMigrationService.hasLocalData(guestId)) {
+      if (guestId != user.id && GuestMigrationService.hasLocalData(guestId)) {
         // Park the guest ID — the LoginPage will show the merge dialog.
         _pendingGuestId = guestId;
         _hasPendingGuestMerge = true;
@@ -177,8 +176,7 @@ class AuthProvider extends ChangeNotifier {
         role: 'group_a_participant',
         createdAt: DateTime.now(),
       );
-      final response =
-          await Services.auth.signUp(email, password, tempProfile);
+      final response = await Services.auth.signUp(email, password, tempProfile);
       final user = response.user;
 
       if (user != null) {
@@ -192,11 +190,10 @@ class AuthProvider extends ChangeNotifier {
         );
         await Services.auth.upsertProfile(profile.toMap());
         _userProfile = profile;
-        await Repositories.userProfile.save(profile);
+        await LocalDB.userProfile.put(profile);
 
         // 4. Silently migrate any existing guest data into the new account.
-        if (guestId != user.id &&
-            GuestMigrationService.hasLocalData(guestId)) {
+        if (guestId != user.id && GuestMigrationService.hasLocalData(guestId)) {
           await GuestMigrationService.migrateLocalData(guestId, user.id);
         }
 
@@ -220,7 +217,7 @@ class AuthProvider extends ChangeNotifier {
     try {
       await Services.auth.signOut();
       _userProfile = null;
-      await Repositories.userProfile.clear();
+      await LocalDB.userProfile.clear();
       // LocalIdentityService intentionally retains the last UID so that
       // local data remains accessible in guest mode after sign-out.
     } on AppException catch (e) {

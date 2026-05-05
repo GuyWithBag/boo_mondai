@@ -118,7 +118,7 @@
 | 2 | Creating my own flashcard content would help me understand the material better |
 | 3 | I would use a feature that allows me to build my own study decks |
 | 4 | I would find it helpful to access drill decks created by other learners |
-| 5 | Using community-made decks would save me time in preparing study materials |
+| 5 | Using community-made decks would put me time in preparing study materials |
 | 6 | A platform where I can create and use other learners' content would be more motivating than studying alone |
 
 ---

@@ -3,7 +3,8 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/providers/providers.barrel.dart';
-import 'package:boo_mondai/repositories/repositories.barrel.dart';
+import 'package:boo_mondai/database/database.barrel.dart';
+
 import 'package:boo_mondai/services/services.barrel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -22,14 +23,12 @@ class ViewDeckPage extends HookWidget {
       return Center(child: ErrorText('Error 404: deck Id not found'));
     }
 
-    final deckRepo = Repositories.deck;
+    final deckRepo = LocalDB.deck;
     final currentDeck = deckRepo.getById(deckId!);
     if (currentDeck == null) {
-      return const Scaffold(
-        body: Center(child: Text('Deck not found.')),
-      );
+      return const Scaffold(body: Center(child: Text('Deck not found.')));
     }
-    final cachedProfsRepo = Repositories.cachedProfile;
+    final cachedProfsRepo = LocalDB.cachedProfile;
     final author = cachedProfsRepo.getById(currentDeck.authorId);
     final sourceAuthor = cachedProfsRepo.getById(
       currentDeck.sourceAuthorId ?? '',

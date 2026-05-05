@@ -6,6 +6,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:barrel_annotation/barrel_annotation.dart';
+import 'package:boo_mondai/database/database.barrel.dart';
 import 'package:boo_mondai/hive/hive_registrar.g.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
@@ -17,8 +18,6 @@ import 'package:boo_mondai/providers/providers.barrel.dart';
 import 'package:boo_mondai/services/services.barrel.dart';
 import 'package:boo_mondai/services/local_identity_service.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
-
-import 'repositories/repositories.barrel.dart';
 
 @BarrelConfig(
   exclude: ['lib/hive/hive.barrel.dart', 'lib/models/*.mapper.dart'],
@@ -34,7 +33,7 @@ Future<void> main() async {
 
   // ── Supabase ────────────────────────────────────────
   await Supabase.initialize(url: Env.supabaseUrl, anonKey: Env.supabaseAnonKey);
-  await Repositories.init();
+  await LocalDB.init();
   Services.init();
 
   // ── Other services ──────────────────────────────────
@@ -52,7 +51,7 @@ Future<void> main() async {
     MultiProvider(
       providers: [
         // Provider<HiveService>.value(value: hiveService),
-        // Provider<SupabaseService>.value(value: supabaseService),
+        // Provider<SupabaseRemoteDB>.value(value: supabaseService),
         ChangeNotifierProvider.value(value: authProvider),
         // ChangeNotifierProvider(
         //   create: (_) => DeckProvider(

@@ -89,7 +89,7 @@ for the remote but FSRS state is already saved in Hive.
 
 ---
 
-## Flow 2 — Deck/card edit (edit locally → save to Hive → push button)
+## Flow 2 — Deck/card edit (edit locally → put to Hive → push button)
 
 ```
 User                  CardProvider              Hive          Supabase

@@ -61,11 +61,11 @@ class ReviewSessionController extends StudySessionController {
       final userId = LocalIdentityService.getOrCreate();
       final now = DateTime.now();
 
-      final allFsrsCards = Repositories.fsrsCard.getByUserId(userId);
-      final allReviewCards = Repositories.reviewCard.getAll();
+      final allFsrsCards = LocalDB.fsrsCard.getByUserId(userId);
+      final allReviewCards = LocalDB.reviewCard.getAll();
 
       // Fetch and populate templates
-      final allTemplates = Repositories.cardTemplate.getAll();
+      final allTemplates = LocalDB.cardTemplate.getAll();
       for (final t in allTemplates) {
         templates[t.id] = t;
       }
@@ -160,9 +160,9 @@ class ReviewSessionController extends StudySessionController {
 
     // ── THE TOGGLE ──
     if (realTimeSaving) {
-      await Repositories.fsrsCard.save(updatedCard);
-      await Repositories.reviewLog.save(log);
-      await Repositories.reviewSession.save(_session!); // Assumes repo exists
+      await LocalDB.fsrsCard.put(updatedCard);
+      await LocalDB.reviewLog.put(log);
+      await LocalDB.reviewSession.put(_session!); // Assumes repo exists
     } else {
       _pendingCards[updatedCard.id] = updatedCard;
       _pendingLogs.add(log);
@@ -188,17 +188,17 @@ class ReviewSessionController extends StudySessionController {
       _session = _session!.copyWith(completedAt: DateTime.now());
 
       if (realTimeSaving) {
-        // Just save the final session state
-        await Repositories.reviewSession.save(_session!);
+        // Just put the final session state
+        await LocalDB.reviewSession.put(_session!);
       } else {
         // Batch Save everything
         if (_pendingCards.isNotEmpty) {
-          await Repositories.fsrsCard.saveAll(_pendingCards.values.toList());
+          await LocalDB.fsrsCard.putAll(_pendingCards.values.toList());
         }
         if (_pendingLogs.isNotEmpty) {
-          await Repositories.reviewLog.saveAll(_pendingLogs);
+          await LocalDB.reviewLog.putAll(_pendingLogs);
         }
-        await Repositories.reviewSession.save(_session!);
+        await LocalDB.reviewSession.put(_session!);
       }
     } catch (e) {
       sessionError = e.toString();

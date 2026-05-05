@@ -12,11 +12,11 @@ import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 /// Drives the My Decks page — loads all decks sorted by [updatedAt] descending
 /// and exposes delete operations.
 class MyDecksPageController extends ChangeNotifier {
-  final DeckRepository _deckRepository = Repositories.deck;
+  final DeckLocalDB _deckRepository = LocalDB.deck;
   // Inside your Controller
   void init() {
     // Listen to Hive changes directly
-    Repositories.deck.box.listenable().addListener(() {
+    LocalDB.deck.box.listenable().addListener(() {
       load(); // Automatically refresh whenever the box changes
     });
   }
@@ -94,14 +94,14 @@ class MyDecksPageController extends ChangeNotifier {
 
     try {
       // ── 1. Pull ──────────────────────────────────────────
-      // Fetch all remote decks for this user and save any that are newer
+      // Fetch all remote decks for this user and put any that are newer
       // than the local copy (or missing locally).
-      final remoteMaps = await Services.deck.fetchUserDecks(userId);
-      for (final map in remoteMaps) {
-        final remote = DeckMapper.fromMap(map);
+      final remoteDecks = await RemoteDB.deck.fetchByUserId(userId);
+      for (final decks in remoteDecks) {
+        final remote = decks;
         final local = _deckRepository.getById(remote.id);
         if (local == null || remote.updatedAt.isAfter(local.updatedAt)) {
-          await _deckRepository.save(remote);
+          await _deckRepository.put(remote);
         }
       }
 
@@ -109,7 +109,7 @@ class MyDecksPageController extends ChangeNotifier {
       // Upsert every local deck that belongs to this user.
       final localDecks = _deckRepository.getByAuthorId(userId);
       for (final deck in localDecks) {
-        await Services.deck.upsertDeck(deck.toMap());
+        await RemoteDB.deck.upsertOne(deck);
       }
 
       // ── 3. Reload ────────────────────────────────────────

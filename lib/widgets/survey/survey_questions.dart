@@ -160,7 +160,7 @@ List<SurveyQuestion> buildSurveyQuestions(String surveyType) {
         ),
         SurveyQuestion(
           'item_5',
-          'Using community-made decks would save me time in preparing study materials',
+          'Using community-made decks would put me time in preparing study materials',
         ),
         SurveyQuestion(
           'item_6',

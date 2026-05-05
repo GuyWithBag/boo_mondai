@@ -12,9 +12,9 @@ UI (Pages + Widgets)
       │ watch / read
 Providers (ChangeNotifier)
       │ call
-Services (SupabaseService subclasses + HiveService + FsrsService)
+Services (SupabaseRemoteDB subclasses + HiveService + FsrsService)
       │
-Repositories (thin Hive wrappers for offline cache)
+LocalDB (thin Hive wrappers for offline cache)
       │
 [Supabase DB]   [Local Hive Boxes]
 ```

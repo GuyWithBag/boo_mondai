@@ -326,14 +326,14 @@ Document which pattern applies to each table and why.
 
 SUPABASE SERVICE CLASS:
 ```
-Service: SupabaseService
+Service: SupabaseRemoteDB
 File: lib/services/supabase_service.dart
 Responsibility: single access point for all Supabase operations
 
 Setup:
   - Initialized in main.dart via Supabase.initialize(url: Env.supabaseUrl, anonKey: Env.supabaseAnonKey)
   - Accessed via Supabase.instance.client — never expose the client directly from providers
-  - SupabaseService wraps the client and is injected into providers via constructor
+  - SupabaseRemoteDB wraps the client and is injected into providers via constructor
 
 Methods (one per table operation needed by the app):
   - methodName(params) → Future<ReturnType>
@@ -673,7 +673,7 @@ Default packages (always available — use these, do not reinvent them):
 - Notifications → flutter_local_notifications ^21.0.0
 - External links → url_launcher ^6.3.2
 - Responsive sizing → flutter_screenutil ^5.9.3 (use .sp, .w, .h, .r — never hardcode px)
-- Backend/auth/db → supabase_flutter ^2.12.2 (Supabase.instance.client — wrap in SupabaseService)
+- Backend/auth/db → supabase_flutter ^2.12.2 (Supabase.instance.client — wrap in SupabaseRemoteDB)
 - Barrel exports → barrel_annotation 1.0.0 + barrel_generator ^1.0.4
 - Testing mocks → mockito ^5.4.4 (use @GenerateMocks + build_runner)
 

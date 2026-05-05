@@ -65,13 +65,13 @@
 //     notifyListeners();
 //   }
 
-//   Future<void> save() async {
+//   Future<void> put() async {
 //     final profile = _profile;
 //     if (profile == null) return;
 //     _isLoading = true;
 //     notifyListeners();
 //     try {
-//       await _repository.save(profile);
+//       await _repository.put(profile);
 //       _isDirty = false;
 //     } catch (e) {
 //       _error = e.toString();

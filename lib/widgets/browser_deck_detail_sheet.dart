@@ -1,7 +1,7 @@
 // // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // // PATH: lib/widgets/browser_deck_detail_sheet.dart
 // // PURPOSE: Bottom sheet shown when tapping a deck in the online browser
-// // PROVIDERS: AuthProvider, DeckProvider, SupabaseService
+// // PROVIDERS: AuthProvider, DeckProvider, SupabaseRemoteDB
 // // HOOKS: useEffect, useState
 // // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -23,7 +23,7 @@
 //   Widget build(BuildContext context) {
 //     final theme = Theme.of(context);
 //     final scheme = theme.colorScheme;
-//     final supabase = context.read<SupabaseService>();
+//     final supabase = context.read<SupabaseRemoteDB>();
 
 //     // Fetch author profiles asynchronously
 //     final authorProfile = useState<ProfileInfo?>(null);

@@ -36,7 +36,7 @@ Default packages (always available — use these, do not reinvent them):
 - Notifications → flutter_local_notifications ^21.0.0
 - External links → url_launcher ^6.3.2
 - Responsive sizing → flutter_screenutil ^5.9.3 (use .sp, .w, .h, .r — never hardcode px)
-- Backend/auth/db → supabase_flutter ^2.12.2 (Supabase.instance.client — wrap in SupabaseService)
+- Backend/auth/db → supabase_flutter ^2.12.2 (Supabase.instance.client — wrap in SupabaseRemoteDB)
 - Barrel exports → barrel_annotation 1.0.0 + barrel_generator ^1.0.4
 - Testing mocks → mockito ^5.4.4 (use @GenerateMocks + build_runner)
 - FSRS → fsrs ^1.1.0 (spaced repetition algorithm — wrap in FsrsService)
@@ -462,7 +462,7 @@ File: lib/providers/auth_provider.dart
 Responsibility: Manages Supabase authentication state and current user profile
 
 Dependencies (injected via constructor):
-  - SupabaseService
+  - SupabaseRemoteDB
   - HiveService
 
 Private state fields:
@@ -479,17 +479,17 @@ Public getters:
 
 Public methods:
   - signIn(email, password) → Future<void>
-    Does: calls SupabaseService.signIn, fetches profile, caches in Hive
+    Does: calls SupabaseRemoteDB.signIn, fetches profile, caches in Hive
     Notifies: yes, after profile loaded
     Error handling: sets _error
 
   - signUp(email, password, userName) → Future<void>
-    Does: calls SupabaseService.signUp, creates profile row, caches in Hive
+    Does: calls SupabaseRemoteDB.signUp, creates profile row, caches in Hive
     Notifies: yes
     Error handling: sets _error
 
   - signOut() → Future<void>
-    Does: calls SupabaseService.signOut, clears Hive user cache
+    Does: calls SupabaseRemoteDB.signOut, clears Hive user cache
     Notifies: yes
     Error handling: sets _error
 
@@ -512,7 +512,7 @@ File: lib/providers/deck_provider.dart
 Responsibility: CRUD operations for decks, fetches all public decks and user's own decks
 
 Dependencies (injected via constructor):
-  - SupabaseService
+  - SupabaseRemoteDB
   - HiveService
 
 Private state fields:
@@ -564,7 +564,7 @@ File: lib/providers/card_provider.dart
 Responsibility: CRUD operations for cards within a specific deck
 
 Dependencies (injected via constructor):
-  - SupabaseService
+  - SupabaseRemoteDB
   - HiveService
 
 Private state fields:
@@ -615,7 +615,7 @@ File: lib/providers/drill_provider.dart
 Responsibility: Manages drill session state — preview choice, question queue, answer tracking, session completion
 
 Dependencies (injected via constructor):
-  - SupabaseService
+  - SupabaseRemoteDB
   - HiveService
   - FsrsService
   - DrillQueueController
@@ -671,7 +671,7 @@ Responsibility: Manages FSRS card states and review sessions — due cards, revi
 Dependencies (injected via constructor):
   - FsrsService
   - HiveService
-  - SupabaseService
+  - SupabaseRemoteDB
 
 Private state fields:
   - _dueCards (List<FsrsCardState>)
@@ -719,7 +719,7 @@ File: lib/providers/leaderboard_provider.dart
 Responsibility: Fetches and exposes leaderboard rankings with optional language filter
 
 Dependencies (injected via constructor):
-  - SupabaseService
+  - SupabaseRemoteDB
 
 Private state fields:
   - _entries (List<LeaderboardEntry>)
@@ -753,7 +753,7 @@ File: lib/providers/streak_provider.dart
 Responsibility: Tracks and updates user's daily FSRS review streak
 
 Dependencies (injected via constructor):
-  - SupabaseService
+  - SupabaseRemoteDB
   - HiveService
 
 Private state fields:
@@ -790,7 +790,7 @@ File: lib/providers/research_provider.dart
 Responsibility: Manages research codes, surveys, vocabulary tests, and researcher dashboard data
 
 Dependencies (injected via constructor):
-  - SupabaseService
+  - SupabaseRemoteDB
 
 Private state fields:
   - _researchUser (ResearchUser?)
@@ -1093,7 +1093,7 @@ Why native: Transform.rotateY with perspective matrix
 ### SECTION 9 — SERVICES LAYER
 
 ```
-Service: SupabaseService
+Service: SupabaseRemoteDB
 File: lib/services/supabase_service.dart
 Responsibility: Single access point for all Supabase operations (auth, database, storage)
 
@@ -1734,12 +1734,12 @@ Provider error pattern:
   Every async method wraps in try/catch, sets _error on failure, resets _isLoading
 
 UI error pattern:
-  SnackBar for transient errors (network, save failures)
+  SnackBar for transient errors (network, put failures)
   Inline form error for validation (TextFormField validator)
   Full-screen error widget with retry button for critical load failures
 
 Network error handling:
-  SupabaseService catches PostgrestException and AuthException, wraps in AppException
+  SupabaseRemoteDB catches PostgrestException and AuthException, wraps in AppException
   No automatic retry for v1 — user-initiated retry via pull-to-refresh or retry button
   Offline detection: check Supabase connectivity; fall back to Hive cache
   Automatic sync: when connectivity returns, sync queued Hive writes to Supabase
@@ -1793,7 +1793,7 @@ Crash reporting: none for v1
 ┌──────────────▼────────────────▼────────────────▼────────────────────┐
 │                          SERVICE LAYER                               │
 │                                                                      │
-│  SupabaseService          HiveService                                │
+│  SupabaseRemoteDB          HiveService                                │
 │  FsrsService              NotificationService                        │
 │                                                                      │
 │  ┌──────────────────────────────────────────────────────┐           │
