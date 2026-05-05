@@ -253,11 +253,11 @@ test/
 ### SECTION 3 — DATA LAYER MAP
 
 ```
-Model: UserProfile
+Model: Profile
 Fields:
   - id (String, non-null) — Supabase auth.users UUID
   - email (String, non-null)
-  - userName (String, non-null)
+  - username (String, non-null)
   - role (String, non-null) — 'group_a_participant' | 'group_b_participant' | 'researcher'
   - avatarUrl (String?, nullable)
   - targetLanguage (String?, nullable)
@@ -282,7 +282,7 @@ Fields:
   - updatedAt (DateTime, non-null)
 Source: Supabase decks table + local Hive cache
 Serialization: fromJson/toJson + hive_ce @GenerateAdapters
-Relationships: belongs to UserProfile, has many DeckCard
+Relationships: belongs to Profile, has many DeckCard
 ```
 
 ```
@@ -315,7 +315,7 @@ Fields:
   - completedAt (DateTime?, nullable)
 Source: Supabase drill_sessions table + local Hive cache
 Serialization: fromJson/toJson + hive_ce @GenerateAdapters
-Relationships: belongs to UserProfile, belongs to Deck, has many DrillAnswer
+Relationships: belongs to Profile, belongs to Deck, has many DrillAnswer
 ```
 
 ```
@@ -350,7 +350,7 @@ Fields:
   - lastReview (DateTime?, nullable)
 Source: Local Hive (primary) + Supabase fsrs_cards (sync)
 Serialization: hive_ce @GenerateAdapters + fromJson/toJson for sync
-Relationships: belongs to UserProfile, belongs to DeckCard
+Relationships: belongs to Profile, belongs to DeckCard
 Notes: FSRS computation is local via the fsrs dart package. State syncs to Supabase automatically when online for research data collection.
 ```
 
@@ -367,21 +367,21 @@ Fields:
   - state (int, non-null)
 Source: Local Hive + Supabase review_logs (sync)
 Serialization: hive_ce @GenerateAdapters + fromJson/toJson
-Relationships: belongs to UserProfile, belongs to DeckCard
+Relationships: belongs to Profile, belongs to DeckCard
 ```
 
 ```
 Model: LeaderboardEntry
 Fields:
   - userId (String, non-null)
-  - userName (String, non-null)
+  - username (String, non-null)
   - targetLanguage (String?, nullable)
   - drillScore (int, non-null) — total correct across all sessions
   - reviewCount (int, non-null) — total FSRS reviews completed
   - currentStreak (int, non-null)
 Source: Supabase leaderboard view (computed)
 Serialization: fromJson
-Relationships: belongs to UserProfile
+Relationships: belongs to Profile
 Notes: Global leaderboard with optional filter by targetLanguage
 ```
 
@@ -395,7 +395,7 @@ Fields:
   - lastActivityDate (DateTime?, nullable)
 Source: Supabase streaks table + local Hive cache
 Serialization: fromJson/toJson + hive_ce @GenerateAdapters
-Relationships: belongs to UserProfile
+Relationships: belongs to Profile
 Notes: Activity = completing at least one FSRS review per day
 ```
 
@@ -466,12 +466,12 @@ Dependencies (injected via constructor):
   - HiveService
 
 Private state fields:
-  - _userProfile (UserProfile?)
+  - _userProfile (Profile?)
   - _isLoading (bool)
   - _error (String?)
 
 Public getters:
-  - userProfile → UserProfile?
+  - userProfile → Profile?
   - isAuthenticated → bool
   - isLoading → bool
   - error → String?
@@ -483,7 +483,7 @@ Public methods:
     Notifies: yes, after profile loaded
     Error handling: sets _error
 
-  - signUp(email, password, userName) → Future<void>
+  - signUp(email, password, username) → Future<void>
     Does: calls SupabaseRemoteDB.signUp, creates profile row, caches in Hive
     Notifies: yes
     Error handling: sets _error
@@ -855,7 +855,7 @@ Hooks:
 
 Screen: RegisterPage
 Hooks:
-  - useTextEditingController → email, password, userName fields
+  - useTextEditingController → email, password, username fields
   - useFocusNode → email field
 
 Screen: HomePage
@@ -908,7 +908,7 @@ Hooks:
 
 Screen: AccountPage
 Hooks:
-  - useTextEditingController → userName edit field
+  - useTextEditingController → username edit field
 
 Screen: ResearcherDashboardPage
 Hooks:
@@ -1169,8 +1169,8 @@ Box constants:
 
 Methods:
   - init() → Future<void> — opens all boxes
-  - saveProfile(UserProfile) → Future<void>
-  - getProfile() → UserProfile?
+  - saveProfile(Profile) → Future<void>
+  - getProfile() → Profile?
   - saveDecks(List<Deck>) → Future<void>
   - getDecks() → List<Deck>
   - saveCards(deckId, List<DeckCard>) → Future<void>
@@ -1648,10 +1648,10 @@ INSERT INTO research_codes (id, code, target_role, unlocks, created_by) VALUES
 DART MOCK HELPERS:
 ```dart
 // test/helpers/fake_user_profile.dart
-UserProfile fakeUserProfile({String? id, String? role}) => UserProfile(
+Profile fakeUserProfile({String? id, String? role}) => Profile(
   id: id ?? '00000000-0000-0000-0000-000000000002',
   email: 'alice@test.com',
-  userName: 'Alice',
+  username: 'Alice',
   role: role ?? 'group_a_participant',
   avatarUrl: null,
   targetLanguage: 'japanese',

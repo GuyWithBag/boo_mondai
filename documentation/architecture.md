@@ -29,7 +29,7 @@ All models now use `dart_mappable`. This means **all DB tables use camelCase quo
 
 | Model | Table / View | Notes |
 |---|---|---|
-| `UserProfile` | `profiles` | `id` = local UUID; `"userId"` = FK to `auth.users` |
+| `Profile` | `profiles` | `id` = local UUID; `"userId"` = FK to `auth.users` |
 | `Deck` | `decks` | |
 | `CardTemplate` subclasses | `card_templates` | Discriminator key: `'type'` |
 | `ReviewCard` | `review_cards` | |
@@ -38,7 +38,6 @@ All models now use `dart_mappable`. This means **all DB tables use camelCase quo
 | `DrillAnswer` | `drill_answers` | `type` = `StudyRating` enum string |
 | `FsrsCard` | `fsrs_cards` | `state` field is a `Card` from the `fsrs` package (JSONB) |
 | `FsrsReviewLog` | `review_logs` | `log` = `ReviewLog` from `fsrs` package (JSONB) |
-| `UserDeckProgress` | `user_deck_progress` | |
 | `Streak` | `streaks` | |
 | `LeaderboardEntry` | `leaderboard` (view) | View outputs camelCase aliases |
 | `ResearchCode` | `research_codes` | |
@@ -46,7 +45,7 @@ All models now use `dart_mappable`. This means **all DB tables use camelCase quo
 | `SurveyResponse` | `survey_responses` | Single generic table with JSONB `responses` |
 | `VocabularyTestResult` | `vocabulary_test_results` | |
 
-> **Important:** `dart_mappable` generated mappers use the exact Dart field name as the JSON/DB key. All DB columns use double-quoted camelCase (`"userName"`, `"targetLanguage"`, etc.).
+> **Important:** `dart_mappable` generated mappers use the exact Dart field name as the JSON/DB key. All DB columns use double-quoted camelCase (`"username"`, `"targetLanguage"`, etc.).
 
 > **Internal content tables** (`notes`, `mc_options`, `fitb_segments`, `mm_pairs`) are not directly mapped to a Dart model — they use snake_case internally and are joined/assembled by services.
 
@@ -56,10 +55,10 @@ All models now use `dart_mappable`. This means **all DB tables use camelCase quo
 
 ```mermaid
 classDiagram
-    class UserProfile {
+    class Profile {
         +String id
         +String userId
-        +String userName
+        +String username
         +String role
         +String? avatarUrl
         +String? targetLanguage
@@ -177,7 +176,7 @@ classDiagram
 
     class LeaderboardEntry {
         +String userId
-        +String userName
+        +String username
         +String? targetLanguage
         +int drillScore
         +int reviewCount
@@ -199,7 +198,7 @@ classDiagram
     class ResearchProfile {
         +String id
         +String userId
-        +String? userName
+        +String? username
         +String firstName
         +String lastName
         +int age
@@ -228,16 +227,16 @@ classDiagram
         +double scorePercent
     }
 
-    UserProfile "1" --> "many" Deck : authorId
-    UserProfile "1" --> "1" Streak : userId
-    UserProfile "1" --> "many" UserDeckProgress : userId
-    UserProfile "1" --> "1" ResearchProfile : userId
-    UserProfile "1" --> "many" DrillSession : userId
-    UserProfile "1" --> "many" ReviewSession : userId
-    UserProfile "1" --> "many" FsrsCard : userId
-    UserProfile "1" --> "many" ResearchCode : createdBy
-    UserProfile "1" --> "many" SurveyResponse : userId
-    UserProfile "1" --> "many" VocabularyTestResult : userId
+    Profile "1" --> "many" Deck : authorId
+    Profile "1" --> "1" Streak : userId
+    Profile "1" --> "many" UserDeckProgress : userId
+    Profile "1" --> "1" ResearchProfile : userId
+    Profile "1" --> "many" DrillSession : userId
+    Profile "1" --> "many" ReviewSession : userId
+    Profile "1" --> "many" FsrsCard : userId
+    Profile "1" --> "many" ResearchCode : createdBy
+    Profile "1" --> "many" SurveyResponse : userId
+    Profile "1" --> "many" VocabularyTestResult : userId
 
     Deck "1" --> "many" CardTemplate : deckId
     Deck "1" --> "many" ReviewCard : deckId
@@ -271,7 +270,7 @@ classDiagram
 |---|---|---|
 | `id uuid REFERENCES auth.users` | `id uuid` (independent PK) | id is now a local UUID |
 | *(missing)* | `"userId" uuid REFERENCES auth.users` | Added; Supabase auth FK |
-| `display_name` | `"userName"` | Renamed |
+| `display_name` | `"username"` | Renamed |
 | `email` | *(removed)* | Not in model |
 | `avatar_url` | `"avatarUrl"` | Renamed |
 | `target_language` | `"targetLanguage"` | Renamed |
@@ -360,7 +359,7 @@ Maps to `ReviewSession`. Tracks FSRS review session state (`totalCards`, `cardsR
 | `user_id` | `"userId"` | Renamed |
 | `target_language` | `"targetLanguage"` | Renamed |
 | `created_at` | `"createdAt"` | Renamed |
-| *(missing)* | `"userName"` | Added |
+| *(missing)* | `"username"` | Added |
 | *(missing)* | `"firstName"`, `"lastName"`, `age` | Added (new model fields) |
 
 ### `research_codes`
