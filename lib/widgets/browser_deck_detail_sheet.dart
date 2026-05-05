@@ -34,7 +34,7 @@
 //         final raw = await supabase.getProfile(deck.creatorId);
 //         if (raw != null) {
 //           authorProfile.value = (
-//             userName: raw['display_name'] as String? ?? 'Unknown',
+//             username: raw['display_name'] as String? ?? 'Unknown',
 //             avatarUrl: raw['avatar_url'] as String?,
 //           );
 //         }
@@ -42,7 +42,7 @@
 //           final srcRaw = await supabase.getProfile(deck.sourceDeckCreatorId!);
 //           if (srcRaw != null) {
 //             originalAuthorProfile.value = (
-//               userName: srcRaw['display_name'] as String? ?? 'Unknown',
+//               username: srcRaw['display_name'] as String? ?? 'Unknown',
 //               avatarUrl: srcRaw['avatar_url'] as String?,
 //             );
 //           }

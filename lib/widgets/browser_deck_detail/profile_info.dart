@@ -5,4 +5,4 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-typedef ProfileInfo = ({String userName, String? avatarUrl});
+typedef ProfileInfo = ({String username, String? avatarUrl});

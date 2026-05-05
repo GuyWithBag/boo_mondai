@@ -24,7 +24,7 @@ class AvatarWithLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final name = profile?.userName ?? '…';
+    final name = profile?.username ?? '…';
     final initials = name.isNotEmpty ? name[0].toUpperCase() : '?';
 
     return Row(

@@ -24,18 +24,18 @@ class ResearchCodeEntryPage extends HookWidget {
 
     return switch (step.value) {
       _Step.code => _CodeStep(
-          onOnboarding: (unlock, role) {
-            pendingRole.value = role;
-            pendingUnlock.value = unlock;
-            step.value = _Step.demographics;
-          },
-          onNavigate: (route) => context.go(route),
-        ),
+        onOnboarding: (unlock, role) {
+          pendingRole.value = role;
+          pendingUnlock.value = unlock;
+          step.value = _Step.demographics;
+        },
+        onNavigate: (route) => context.go(route),
+      ),
       _Step.demographics => _DemographicsStep(
-          role: pendingRole.value!,
-          unlock: pendingUnlock.value!,
-          onComplete: (route) => context.go(route),
-        ),
+        role: pendingRole.value!,
+        unlock: pendingUnlock.value!,
+        onComplete: (route) => context.go(route),
+      ),
     };
   }
 }
@@ -202,7 +202,9 @@ class _DemographicsStep extends HookWidget {
                     const SizedBox(height: AppSpacing.lg),
                     TextFormField(
                       controller: firstNameController,
-                      decoration: const InputDecoration(labelText: 'First name'),
+                      decoration: const InputDecoration(
+                        labelText: 'First name',
+                      ),
                       textCapitalization: TextCapitalization.words,
                       validator: (v) =>
                           (v == null || v.trim().isEmpty) ? 'Required' : null,
@@ -248,16 +250,17 @@ class _DemographicsStep extends HookWidget {
                                     role: role,
                                     targetLanguage:
                                         auth.userProfile?.targetLanguage ??
-                                            'japanese',
+                                        'japanese',
                                     firstName: firstNameController.text.trim(),
                                     lastName: lastNameController.text.trim(),
                                     age: int.parse(ageController.text.trim()),
-                                    userName: auth.userProfile?.userName,
+                                    username: auth.userProfile?.username,
                                   );
 
                               if (!context.mounted) return;
                               if (context.read<ResearchProvider>().error !=
-                                  null) return;
+                                  null)
+                                return;
 
                               final route = _routeForUnlock(unlock);
                               if (route != null) onComplete(route);

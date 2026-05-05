@@ -92,7 +92,7 @@ class CreateDeckPage extends HookWidget {
       } else {
         // Use the factory for New Decks (Auto-UUID & Auto-Timestamps)
         final newDeck = Deck.createNow(
-          authorId: userId,
+          userId: userId,
           title: titleController.text.trim(),
           shortDescription: shortDescController.text.trim(),
           longDescription: longDescController.text.trim(),

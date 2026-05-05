@@ -29,7 +29,7 @@ class ViewDeckPage extends HookWidget {
       return const Scaffold(body: Center(child: Text('Deck not found.')));
     }
     final cachedProfsRepo = LocalDB.cachedProfile;
-    final author = cachedProfsRepo.getById(currentDeck.authorId);
+    final author = cachedProfsRepo.getById(currentDeck.userId);
     final sourceAuthor = cachedProfsRepo.getById(
       currentDeck.sourceAuthorId ?? '',
     );

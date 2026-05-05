@@ -29,8 +29,8 @@ class AuthenticatedAccountView extends StatelessWidget {
             child: CircleAvatar(
               radius: 48,
               child: Text(
-                profile.userName.isNotEmpty
-                    ? profile.userName[0].toUpperCase()
+                profile.username.isNotEmpty
+                    ? profile.username[0].toUpperCase()
                     : '?',
                 style: Theme.of(context).textTheme.displayLarge,
               ),
@@ -39,7 +39,7 @@ class AuthenticatedAccountView extends StatelessWidget {
           const SizedBox(height: AppSpacing.md),
           Center(
             child: Text(
-              profile.userName,
+              profile.username,
               style: Theme.of(context).textTheme.headlineMedium,
             ),
           ),

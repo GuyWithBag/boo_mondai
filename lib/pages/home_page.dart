@@ -57,7 +57,7 @@ class HomePage extends HookWidget {
             padding: const EdgeInsets.all(AppSpacing.md),
             children: [
               Text(
-                'Welcome, ${auth.userProfile?.userName ?? 'Learner'}!',
+                'Welcome, ${auth.userProfile?.username ?? 'Learner'}!',
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
               const SizedBox(height: AppSpacing.lg),

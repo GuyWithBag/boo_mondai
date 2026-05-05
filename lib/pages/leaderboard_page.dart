@@ -60,7 +60,7 @@ class LeaderboardPage extends HookWidget {
                   final entry = leaderboard.entries[i];
                   return LeaderboardTileWidget(
                     rank: i + 1,
-                    userName: entry.userName,
+                    username: entry.username,
                     drillScore: entry.drillScore,
                     reviewCount: entry.reviewCount,
                     currentStreak: entry.currentStreak,
