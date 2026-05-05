@@ -201,14 +201,14 @@ class ResearchProvider extends ChangeNotifier {
     required String firstName,
     required String lastName,
     required int age,
-    String? userName,
+    String? username,
   }) async {
     _error = null;
 
     try {
       await _supabaseService.insertResearchProfile({
         'userId': userId,
-        if (userName != null) 'userName': userName,
+        if (username != null) 'username': username,
         'firstName': firstName,
         'lastName': lastName,
         'age': age,

@@ -5,10 +5,10 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/database/database.barrel.dart';
 import 'package:boo_mondai/services/services.barrel.dart';
 import 'package:flutter/foundation.dart';
 import 'package:boo_mondai/models/models.barrel.dart';
-import 'package:boo_mondai/repositories/repositories.dart';
 
 /// Manages sign-in, sign-up, sign-out, session restoration, and the
 /// one-time guest-data merge prompt shown when a guest signs into an
@@ -19,7 +19,7 @@ import 'package:boo_mondai/repositories/repositories.dart';
 /// Authenticated:  [isAuthenticated] == true,  [localUserId] returns the
 ///                 Supabase UID (also persisted in [LocalIdentityService]).
 class AuthProvider extends ChangeNotifier {
-  UserProfile? _userProfile;
+  Profile? _userProfile;
   bool _isLoading = false;
   String? _error;
 
@@ -31,7 +31,7 @@ class AuthProvider extends ChangeNotifier {
 
   // ── Getters ─────────────────────────────────────────────
 
-  UserProfile? get userProfile => _userProfile;
+  Profile? get userProfile => _userProfile;
 
   /// True only when the user has an active Supabase session.
   bool get isAuthenticated => _userProfile != null;
@@ -68,7 +68,7 @@ class AuthProvider extends ChangeNotifier {
       if (session != null) {
         final profileData = await Services.auth.getProfile(session.user.id);
         if (profileData != null) {
-          _userProfile = UserProfileMapper.fromMap(profileData);
+          _userProfile = ProfileMapper.fromMap(profileData);
           await LocalDB.userProfile.put(_userProfile!);
         }
         // Keep local identity aligned with the Supabase UID.
@@ -160,7 +160,7 @@ class AuthProvider extends ChangeNotifier {
 
   /// Creates a new Supabase account and silently migrates any guest data
   /// into the new account (no dialog needed — there is no conflict).
-  Future<void> signUp(String email, String password, String userName) async {
+  Future<void> signUp(String email, String password, String username) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
@@ -170,9 +170,9 @@ class AuthProvider extends ChangeNotifier {
       final guestId = LocalIdentityService.getOrCreate();
 
       // 2. Register with Supabase.
-      final tempProfile = UserProfile(
+      final tempProfile = Profile(
         id: UuidService.uuid.v4(),
-        userName: userName,
+        username: username,
         role: 'group_a_participant',
         createdAt: DateTime.now(),
       );
@@ -181,10 +181,10 @@ class AuthProvider extends ChangeNotifier {
 
       if (user != null) {
         // 3. Build the canonical profile keyed by the Supabase UID.
-        final profile = UserProfile(
+        final profile = Profile(
           id: user.id,
           userId: user.id,
-          userName: userName,
+          username: username,
           role: 'group_a_participant',
           createdAt: DateTime.now(),
         );
