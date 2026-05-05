@@ -25,6 +25,8 @@ class StreakLocalDB extends HiveLocalDB<Streak> {
 
     if (existing == null) {
       final created = Streak(
+        updatedAt: DateTime.now(),
+        createdAt: DateTime.now(),
         id: UuidService.uuid.v4(),
         userId: userId,
         currentStreak: 1,

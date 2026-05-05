@@ -28,6 +28,8 @@ abstract class HiveLocalDB<T> {
   List<T> getAll() => box.values.toList();
 
   T? getById(String id) => box.get(id);
+  List<T> getAllById(String id) =>
+      getAll().where((T item) => getId(item) == id).toList();
 
   Future<void> put(T item) async => await box.put(getId(item), item);
 

@@ -42,31 +42,37 @@ abstract class SupabaseRemoteDB<T> {
 
   // ── Primary-table CRUD ───────────────────────────────────
 
-  Future<List<T>> fetchAll({
+  Future<List<T>> selectMany({
     Map<String, dynamic>? filters,
     String? orderBy,
     bool ascending = false,
   }) => guard(() async {
     var query = client.from(tableName).select();
+
     if (filters != null) {
       for (final entry in filters.entries) {
         query = query.eq(entry.key, entry.value);
       }
     }
-    if (orderBy != null) {
-      final response = await query.order(orderBy, ascending: ascending);
-      return List<Map<String, dynamic>>.from(response).map(fromMap).toList();
-    }
-    return List<Map<String, dynamic>>.from(await query).map(fromMap).toList();
+
+    final response = await (orderBy != null
+        ? query.order(orderBy, ascending: ascending)
+        : query);
+    return List<Map<String, dynamic>>.from(response).map(fromMap).toList();
   });
 
-  Future<T?> fetchById(String id) => guard(() async {
+  Future<T?> selectById(String id) => guard(() async {
     final row = await client
         .from(tableName)
         .select()
         .eq('id', id)
         .maybeSingle();
     return row == null ? null : fromMap(row);
+  });
+
+  Future<List<T>> selectManyByUserId(String userId) => guard(() async {
+    final row = await client.from(tableName).select().eq('user_id', userId);
+    return List<Map<String, dynamic>>.from(row).map(fromMap).toList();
   });
 
   Future<T> insertOne(T item) => guard(() async {

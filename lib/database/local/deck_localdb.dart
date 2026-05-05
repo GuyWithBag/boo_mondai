@@ -16,10 +16,10 @@ class DeckLocalDB extends HiveLocalDB<Deck> {
 
   List<Deck> getByCurrentUser() {
     return getAll()
-        .where((d) => d.authorId == LocalDB.userProfile.getAll().first.userId)
+        .where((d) => d.userId == LocalDB.userProfile.getAll().first.userId)
         .toList();
   }
 
-  List<Deck> getByAuthorId(String authorId) =>
-      box.values.where((d) => d.authorId == authorId).toList();
+  List<Deck> getByUserId(String userId) =>
+      box.values.where((d) => d.userId == userId).toList();
 }

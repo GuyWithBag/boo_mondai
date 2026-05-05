@@ -18,11 +18,11 @@ class DeckRemoteDB extends SupabaseRemoteDB<Deck> {
   @override
   Map<String, dynamic> toMap(Deck item) => item.toMap();
 
-  Future<List<Deck>> fetchDecks({bool publicOnly = true}) => fetchAll(
+  Future<List<Deck>> fetchDecks({bool publicOnly = true}) => selectMany(
     filters: publicOnly ? {'is_public': true} : null,
     orderBy: 'created_at',
   );
 
   Future<List<Deck>> fetchByUserId(String userId) =>
-      fetchAll(filters: {'author_id': userId}, orderBy: 'created_at');
+      selectMany(filters: {'author_id': userId}, orderBy: 'created_at');
 }

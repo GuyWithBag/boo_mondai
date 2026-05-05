@@ -12,7 +12,7 @@ import 'package:fsrs/fsrs.dart';
 import 'package:hive_ce/hive_ce.dart';
 
 @GenerateAdapters([
-  AdapterSpec<UserProfile>(),
+  AdapterSpec<Profile>(),
   AdapterSpec<CachedProfile>(),
   AdapterSpec<Deck>(),
   AdapterSpec<MultipleChoiceOption>(),

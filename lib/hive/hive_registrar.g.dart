@@ -23,6 +23,7 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(MatchMadnessTemplateAdapter());
     registerAdapter(MultipleChoiceOptionAdapter());
     registerAdapter(MultipleChoiceTemplateAdapter());
+    registerAdapter(ProfileAdapter());
     registerAdapter(QuestionTypeAdapter());
     registerAdapter(RatingAdapter());
     registerAdapter(ReviewCardAdapter());
@@ -30,7 +31,6 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(StateAdapter());
     registerAdapter(StreakAdapter());
     registerAdapter(StudyRatingAdapter());
-    registerAdapter(UserProfileAdapter());
     registerAdapter(WordScrambleTemplateAdapter());
   }
 }
@@ -53,6 +53,7 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(MatchMadnessTemplateAdapter());
     registerAdapter(MultipleChoiceOptionAdapter());
     registerAdapter(MultipleChoiceTemplateAdapter());
+    registerAdapter(ProfileAdapter());
     registerAdapter(QuestionTypeAdapter());
     registerAdapter(RatingAdapter());
     registerAdapter(ReviewCardAdapter());
@@ -60,7 +61,6 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(StateAdapter());
     registerAdapter(StreakAdapter());
     registerAdapter(StudyRatingAdapter());
-    registerAdapter(UserProfileAdapter());
     registerAdapter(WordScrambleTemplateAdapter());
   }
 }
