@@ -20,7 +20,11 @@ import 'package:boo_mondai/services/local_identity_service.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 
 @BarrelConfig(
-  exclude: ['lib/hive/hive.barrel.dart', 'lib/models/*.mapper.dart'],
+  exclude: [
+    'lib/hive/hive.barrel.dart',
+    'lib/models/*.mapper.dart',
+    'lib/models/dtos/*.mapper.dart',
+  ],
 )
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

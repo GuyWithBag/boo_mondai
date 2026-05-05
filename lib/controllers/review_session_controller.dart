@@ -142,7 +142,8 @@ class ReviewSessionController extends StudySessionController {
 
     final log = FsrsReviewLog(
       id: UuidService.uuid.v4(),
-      cardId: fsrsCard.id,
+      createdAt: DateTime.now(),
+      fsrsCardId: fsrsCard.id,
       log: result.reviewLog,
     );
 

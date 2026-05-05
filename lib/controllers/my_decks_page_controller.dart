@@ -46,8 +46,9 @@ class MyDecksPageController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final userId = LocalIdentityService.getOrCreate();
-      final all = _deckRepository.getByAuthorId(userId);
+      // final userId = LocalIdentityService.getOrCreate();
+      // ToDo: Unchecked change.
+      final all = _deckRepository.getAll();
       all.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
       _decks = all;
     } on Exception catch (e) {
@@ -96,21 +97,21 @@ class MyDecksPageController extends ChangeNotifier {
       // ── 1. Pull ──────────────────────────────────────────
       // Fetch all remote decks for this user and put any that are newer
       // than the local copy (or missing locally).
-      final remoteDecks = await RemoteDB.deck.fetchByUserId(userId);
-      for (final decks in remoteDecks) {
-        final remote = decks;
-        final local = _deckRepository.getById(remote.id);
-        if (local == null || remote.updatedAt.isAfter(local.updatedAt)) {
-          await _deckRepository.put(remote);
-        }
-      }
+      // final remoteDecks = await RemoteDB.deck.fetchByUserId(userId);
+      // for (final decks in remoteDecks) {
+      //   final remote = decks;
+      //   final local = _deckRepository.getById(remote.id);
+      //   if (local == null || remote.updatedAt.isAfter(local.updatedAt)) {
+      //     await _deckRepository.put(remote);
+      //   }
+      // }
 
-      // ── 2. Push ──────────────────────────────────────────
-      // Upsert every local deck that belongs to this user.
-      final localDecks = _deckRepository.getByAuthorId(userId);
-      for (final deck in localDecks) {
-        await RemoteDB.deck.upsertOne(deck);
-      }
+      // // ── 2. Push ──────────────────────────────────────────
+      // // Upsert every local deck that belongs to this user.
+      // final localDecks = _deckRepository.getByAuthorId(userId);
+      // for (final deck in localDecks) {
+      //   await RemoteDB.deck.upsertOne(deck);
+      // }
 
       // ── 3. Reload ────────────────────────────────────────
       load();

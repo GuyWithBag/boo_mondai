@@ -10,20 +10,20 @@
 // import '../models/user_profile.dart';
 // import '../repositories/user_profile_repository.dart';
 
-// /// Manages the local UserProfile with dirty-tracking and theme mode toggling.
+// /// Manages the local Profile with dirty-tracking and theme mode toggling.
 // class AccountPageController extends ChangeNotifier {
 //   AccountPageController({required UserProfileRepository repository})
 //       : _repository = repository;
 
 //   final UserProfileRepository _repository;
 
-//   UserProfile? _profile;
+//   Profile? _profile;
 //   bool _isDirty = false;
 //   bool _isLoading = false;
 //   String? _error;
 //   ThemeMode _themeMode = ThemeMode.system;
 
-//   UserProfile? get profile => _profile;
+//   Profile? get profile => _profile;
 //   bool get isDirty => _isDirty;
 //   bool get isLoading => _isLoading;
 //   String? get error => _error;
@@ -45,7 +45,7 @@
 //     }
 //   }
 
-//   void update(UserProfile updated) {
+//   void update(Profile updated) {
 //     _profile = updated;
 //     _isDirty = true;
 //     notifyListeners();
@@ -54,10 +54,10 @@
 //   void setThemeMode(ThemeMode mode) {
 //     _themeMode = mode;
 //     _profile = _profile?.copyWith(themeMode: _themeModeToString(mode)) ??
-//         UserProfile(
+//         Profile(
 //           id: 'local',
 //           email: '',
-//           userName: '',
+//           username: '',
 //           createdAt: DateTime.now(),
 //           themeMode: _themeModeToString(mode),
 //         );

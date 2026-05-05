@@ -102,6 +102,7 @@ class DeckEditorPageController extends ChangeNotifier {
     // Default to a basic FlashcardTemplate when adding new
     final newTemplate = FlashcardTemplate(
       id: UuidService.uuid.v4(),
+      updatedAt: DateTime.now(),
       deckId: _deck!.id,
       sortOrder: _templates.length,
       createdAt: DateTime.now(),
@@ -298,6 +299,8 @@ class DeckEditorPageController extends ChangeNotifier {
       case QuestionType.flashcard:
         return FlashcardTemplate(
           id: id,
+          updatedAt: DateTime.now(),
+
           deckId: deckId,
           sortOrder: sortOrder,
           createdAt: createdAt,
@@ -310,6 +313,8 @@ class DeckEditorPageController extends ChangeNotifier {
       case QuestionType.identification:
         return IdentificationTemplate(
           id: id,
+          updatedAt: DateTime.now(),
+
           deckId: deckId,
           sortOrder: sortOrder,
           createdAt: createdAt,
@@ -322,6 +327,8 @@ class DeckEditorPageController extends ChangeNotifier {
         return MultipleChoiceTemplate(
           id: id,
           deckId: deckId,
+          updatedAt: DateTime.now(),
+
           sortOrder: sortOrder,
           createdAt: createdAt,
           sourceTemplateId: sourceId,
@@ -333,6 +340,8 @@ class DeckEditorPageController extends ChangeNotifier {
         return FillInTheBlanksTemplate(
           id: id,
           deckId: deckId,
+          updatedAt: DateTime.now(),
+
           sortOrder: sortOrder,
           createdAt: createdAt,
           sourceTemplateId: sourceId,
@@ -342,6 +351,8 @@ class DeckEditorPageController extends ChangeNotifier {
       case QuestionType.wordScramble:
         return WordScrambleTemplate(
           id: id,
+          updatedAt: DateTime.now(),
+
           deckId: deckId,
           sortOrder: sortOrder,
           createdAt: createdAt,
@@ -353,6 +364,8 @@ class DeckEditorPageController extends ChangeNotifier {
         return MatchMadnessTemplate(
           id: id,
           deckId: deckId,
+          updatedAt: DateTime.now(),
+
           sortOrder: sortOrder,
           createdAt: createdAt,
           sourceTemplateId: sourceId,
