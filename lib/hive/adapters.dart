@@ -10,6 +10,7 @@ library;
 import 'package:boo_mondai/models/models.barrel.dart';
 import 'package:fsrs/fsrs.dart';
 import 'package:hive_ce/hive_ce.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 @GenerateAdapters([
   AdapterSpec<Profile>(),
@@ -37,6 +38,7 @@ import 'package:hive_ce/hive_ce.dart';
   AdapterSpec<Rating>(),
   AdapterSpec<CardType>(),
   AdapterSpec<QuestionType>(),
+  AdapterSpec<User>(),
 ])
 // ignore: unused_element
 part 'adapters.g.dart';

@@ -31,6 +31,7 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(StateAdapter());
     registerAdapter(StreakAdapter());
     registerAdapter(StudyRatingAdapter());
+    registerAdapter(UserAdapter());
     registerAdapter(WordScrambleTemplateAdapter());
   }
 }
@@ -61,6 +62,7 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(StateAdapter());
     registerAdapter(StreakAdapter());
     registerAdapter(StudyRatingAdapter());
+    registerAdapter(UserAdapter());
     registerAdapter(WordScrambleTemplateAdapter());
   }
 }
