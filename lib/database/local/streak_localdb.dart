@@ -8,32 +8,42 @@
 import 'package:boo_mondai/lib.barrel.dart';
 import 'package:flutter/material.dart';
 
-class StreakLocalDB extends HiveLocalDB<Streak> {
+class StreakLocalDB extends HiveSingleDataLocalDB<Streak> {
   @override
   String get boxName => 'streak_box';
 
   @override
   String getId(Streak item) => item.userId;
 
-  Streak? getByUserId(String userId) => box.get(userId);
+  // This is not used.
+  @override
+  Streak createValue() => Streak(
+    updatedAt: DateTime.now(),
+    createdAt: DateTime.now(),
+    id: UuidService.uuid.v4(),
+    userId: LocalDB.profile.getOrCreate().userId,
+    currentStreak: 1,
+    longestStreak: 1,
+    lastActivityDate: DateTime.now(),
+  );
 
   /// Records an activity for [userId] on [activityDate] and returns the
   /// updated [Streak]. Handles first-time, same-day, consecutive, and
   /// broken-streak cases.
-  Future<Streak> recordActivity(String userId, DateTime activityDate) async {
-    final existing = getByUserId(userId);
+  Future<Streak> recordActivity(DateTime activityDate) async {
+    final existing = retrieve();
 
     if (existing == null) {
       final created = Streak(
         updatedAt: DateTime.now(),
         createdAt: DateTime.now(),
         id: UuidService.uuid.v4(),
-        userId: userId,
+        userId: LocalDB.profile.getOrCreate().userId,
         currentStreak: 1,
         longestStreak: 1,
         lastActivityDate: activityDate,
       );
-      await put(created);
+      await upsert(created);
       return created;
     }
 
@@ -71,7 +81,7 @@ class StreakLocalDB extends HiveLocalDB<Streak> {
       longestStreak: newLongest,
       lastActivityDate: activityDate,
     );
-    await put(updated);
+    await upsert(updated);
     return updated;
   }
 }

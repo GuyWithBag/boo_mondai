@@ -21,17 +21,12 @@ class LeaderboardEntryRemoteDB extends SupabaseRemoteDB<LeaderboardEntry> {
 
   /// The view's display_name column is aliased to user_name to match the
   /// key expected by [LeaderboardEntryMapper].
-  Future<List<LeaderboardEntry>> fetchLeaderboard({
-    String? targetLanguage,
-  }) => guard(() async {
+  Future<List<LeaderboardEntry>> fetchLeaderboard() => guard(() async {
     var query = client
         .from(tableName)
         .select(
           'user_id, display_name as user_name, target_language, drill_score, review_count, current_streak',
         );
-    if (targetLanguage != null) {
-      query = query.eq('target_language', targetLanguage);
-    }
     final response = await query.order('drill_score', ascending: false);
     return List<Map<String, dynamic>>.from(response).map(fromMap).toList();
   });

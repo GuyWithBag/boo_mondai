@@ -10,7 +10,7 @@ class RemoteDB {
   static late final LeaderboardEntryRemoteDB leaderboard;
   static late final ResearchRemoteDB research;
   static late final StorageRemoteDB storage;
-  static late final StreakRemoteDB streakSync;
+  static late final StreakRemoteDB streak;
 
   static Future<void> init() async {
     profile = ProfileRemoteDB();
@@ -21,6 +21,6 @@ class RemoteDB {
     leaderboard = LeaderboardEntryRemoteDB();
     research = ResearchRemoteDB();
     storage = StorageRemoteDB();
-    streakSync = StreakRemoteDB();
+    streak = StreakRemoteDB();
   }
 }

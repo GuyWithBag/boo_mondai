@@ -16,7 +16,7 @@ class DeckLocalDB extends HiveLocalDB<Deck> {
 
   List<Deck> getByCurrentUser() {
     return getAll()
-        .where((d) => d.userId == LocalDB.profile.getAll().first.userId)
+        .where((d) => d.userId == LocalDB.profile.getOrCreate().userId)
         .toList();
   }
 

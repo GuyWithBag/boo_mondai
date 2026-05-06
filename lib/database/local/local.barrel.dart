@@ -8,6 +8,7 @@ export 'drill_answer_localdb.dart';
 export 'drill_session_localdb.dart';
 export 'fsrs_card_localdb.dart';
 export 'hive_localdb.dart';
+export 'hive_single_data_local_db.dart';
 export 'in_memory_localdb.dart';
 export 'localdbs.dart';
 export 'profile_localdb.dart';

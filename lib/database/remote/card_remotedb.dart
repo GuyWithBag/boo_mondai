@@ -11,7 +11,7 @@ import 'package:boo_mondai/database/database.barrel.dart';
 
 class CardTemplateRemoteDB extends SupabaseRemoteDB<CardTemplate> {
   @override
-  String get tableName => 'card_templates';
+  String get tableName => 'review_card';
 
   @override
   CardTemplate Function(Map<String, dynamic>) get fromMap =>

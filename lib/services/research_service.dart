@@ -16,12 +16,14 @@ class ResearchService {
   }
 
   double computeSusScore(Map<String, int> responses) {
-    final oddSum = (responses['item_1'] ?? 0) +
+    final oddSum =
+        (responses['item_1'] ?? 0) +
         (responses['item_3'] ?? 0) +
         (responses['item_5'] ?? 0) +
         (responses['item_7'] ?? 0) +
         (responses['item_9'] ?? 0);
-    final evenSum = (responses['item_2'] ?? 0) +
+    final evenSum =
+        (responses['item_2'] ?? 0) +
         (responses['item_4'] ?? 0) +
         (responses['item_6'] ?? 0) +
         (responses['item_8'] ?? 0) +
@@ -91,7 +93,7 @@ class ResearchService {
   ResearchProfile buildResearchProfile({
     required String userId,
     required String role,
-    required String targetLanguage,
+    required String goal,
     required String firstName,
     required String lastName,
     required int age,
@@ -100,7 +102,7 @@ class ResearchService {
       id: UuidService.uuid.v4(),
       userId: userId,
       role: role,
-      targetLanguage: targetLanguage,
+      goal: goal,
       firstName: firstName,
       lastName: lastName,
       age: age,
