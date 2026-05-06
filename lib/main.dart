@@ -8,7 +8,6 @@
 import 'package:barrel_annotation/barrel_annotation.dart';
 import 'package:boo_mondai/database/database.barrel.dart';
 import 'package:boo_mondai/hive/hive_registrar.g.dart';
-import 'package:boo_mondai/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:provider/provider.dart';
