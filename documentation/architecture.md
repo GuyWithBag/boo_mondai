@@ -440,6 +440,6 @@ UGC Perception (/research/survey/ugc_perception)
 
 - Vocabulary test items in `lib/widgets/vocabulary_test/test_items.dart` are placeholder mock data — need real Japanese vocabulary questions for the actual study
 - Researcher role is not enforced by a route guard on `/research` — any authenticated user can access the dashboard
-- `mockSignIn()` in `AuthProvider` still exists for development; should be removed before production
+- `mockSignIn()` in `AuthController` still exists for development; should be removed before production
 - Offline sync for research data (survey_responses, vocabulary_test_results) not yet implemented — submissions are stored locally and need a sync button to push to Supabase
 - `research_provider.dart` and `leaderboard_provider.dart` have errors due to model updates — need to be fixed

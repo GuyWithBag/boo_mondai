@@ -457,7 +457,7 @@ Notes: Multiple choice (A/B/C/D) format. 30 items per test set. Set A and Set B 
 ### SECTION 4 — PROVIDER ARCHITECTURE
 
 ```
-Provider: AuthProvider
+Provider: AuthController
 File: lib/providers/auth_provider.dart
 Responsibility: Manages Supabase authentication state and current user profile
 
@@ -1753,7 +1753,7 @@ Crash reporting: none for v1
 ┌─────────────────────────────────────────────────────────────────────┐
 │                            UI LAYER                                  │
 │                                                                      │
-│  LoginPage/RegisterPage ──watch──> AuthProvider                      │
+│  LoginPage/RegisterPage ──watch──> AuthController                      │
 │      └── hooks: useTextEditingController, useFocusNode               │
 │                                                                      │
 │  HomePage ──watch──> FsrsProvider, StreakProvider                     │
@@ -1786,7 +1786,7 @@ Crash reporting: none for v1
 │  SurveyPage/VocabularyTestPage ──watch──> ResearchProvider           │
 │      └── hooks: useScrollController, useMemoized                     │
 │                                                                      │
-│  AccountPage ──watch──> AuthProvider, StreakProvider                  │
+│  AccountPage ──watch──> AuthController, StreakProvider                  │
 │      └── hooks: useTextEditingController                             │
 └──────────────┬────────────────┬────────────────┬────────────────────┘
                │ calls          │ calls          │ calls
