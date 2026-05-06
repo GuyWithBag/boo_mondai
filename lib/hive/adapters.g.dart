@@ -21,10 +21,10 @@ class ProfileAdapter extends TypeAdapter<Profile> {
       username: fields[2] as String,
       role: fields[3] as String,
       avatarUrl: fields[4] as String?,
-      targetLanguage: fields[5] as String?,
       createdAt: fields[6] as DateTime,
-      userId: fields[1] as String?,
+      userId: fields[1] as String,
       updatedAt: fields[7] as DateTime,
+      isAnonymous: fields[8] == null ? true : fields[8] as bool,
     );
   }
 
@@ -42,12 +42,12 @@ class ProfileAdapter extends TypeAdapter<Profile> {
       ..write(obj.role)
       ..writeByte(4)
       ..write(obj.avatarUrl)
-      ..writeByte(5)
-      ..write(obj.targetLanguage)
       ..writeByte(6)
       ..write(obj.createdAt)
       ..writeByte(7)
-      ..write(obj.updatedAt);
+      ..write(obj.updatedAt)
+      ..writeByte(8)
+      ..write(obj.isAnonymous);
   }
 
   @override

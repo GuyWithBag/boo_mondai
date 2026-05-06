@@ -17,14 +17,14 @@ class ResearchProfile with ResearchProfileMappable {
   final String lastName;
   final int age;
   final String role;
-  final String targetLanguage;
+  final String goal;
   final DateTime createdAt;
 
   const ResearchProfile({
     required this.id,
     required this.userId,
     required this.role,
-    required this.targetLanguage,
+    required this.goal,
     required this.createdAt,
     required this.firstName,
     required this.lastName,

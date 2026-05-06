@@ -30,19 +30,19 @@ class ProfileMapper extends ClassMapperBase<Profile> {
   static String? _$avatarUrl(Profile v) => v.avatarUrl;
   static const Field<Profile, String> _f$avatarUrl =
       Field('avatarUrl', _$avatarUrl, key: r'avatar_url', opt: true);
-  static String? _$targetLanguage(Profile v) => v.targetLanguage;
-  static const Field<Profile, String> _f$targetLanguage = Field(
-      'targetLanguage', _$targetLanguage,
-      key: r'target_language', opt: true);
   static DateTime _$createdAt(Profile v) => v.createdAt;
   static const Field<Profile, DateTime> _f$createdAt =
       Field('createdAt', _$createdAt, key: r'created_at');
-  static String? _$userId(Profile v) => v.userId;
+  static String _$userId(Profile v) => v.userId;
   static const Field<Profile, String> _f$userId =
-      Field('userId', _$userId, key: r'user_id', opt: true);
+      Field('userId', _$userId, key: r'user_id');
   static DateTime _$updatedAt(Profile v) => v.updatedAt;
   static const Field<Profile, DateTime> _f$updatedAt =
       Field('updatedAt', _$updatedAt, key: r'updated_at');
+  static bool _$isAnonymous(Profile v) => v.isAnonymous;
+  static const Field<Profile, bool> _f$isAnonymous = Field(
+      'isAnonymous', _$isAnonymous,
+      key: r'is_anonymous', opt: true, def: true);
 
   @override
   final MappableFields<Profile> fields = const {
@@ -50,10 +50,10 @@ class ProfileMapper extends ClassMapperBase<Profile> {
     #username: _f$username,
     #role: _f$role,
     #avatarUrl: _f$avatarUrl,
-    #targetLanguage: _f$targetLanguage,
     #createdAt: _f$createdAt,
     #userId: _f$userId,
     #updatedAt: _f$updatedAt,
+    #isAnonymous: _f$isAnonymous,
   };
 
   static Profile _instantiate(DecodingData data) {
@@ -62,10 +62,10 @@ class ProfileMapper extends ClassMapperBase<Profile> {
         username: data.dec(_f$username),
         role: data.dec(_f$role),
         avatarUrl: data.dec(_f$avatarUrl),
-        targetLanguage: data.dec(_f$targetLanguage),
         createdAt: data.dec(_f$createdAt),
         userId: data.dec(_f$userId),
-        updatedAt: data.dec(_f$updatedAt));
+        updatedAt: data.dec(_f$updatedAt),
+        isAnonymous: data.dec(_f$isAnonymous));
   }
 
   @override
@@ -123,10 +123,10 @@ abstract class ProfileCopyWith<$R, $In extends Profile, $Out>
       String? username,
       String? role,
       String? avatarUrl,
-      String? targetLanguage,
       DateTime? createdAt,
       String? userId,
-      DateTime? updatedAt});
+      DateTime? updatedAt,
+      bool? isAnonymous});
   ProfileCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -144,19 +144,19 @@ class _ProfileCopyWithImpl<$R, $Out>
           String? username,
           String? role,
           Object? avatarUrl = $none,
-          Object? targetLanguage = $none,
           DateTime? createdAt,
-          Object? userId = $none,
-          DateTime? updatedAt}) =>
+          String? userId,
+          DateTime? updatedAt,
+          bool? isAnonymous}) =>
       $apply(FieldCopyWithData({
         if (id != null) #id: id,
         if (username != null) #username: username,
         if (role != null) #role: role,
         if (avatarUrl != $none) #avatarUrl: avatarUrl,
-        if (targetLanguage != $none) #targetLanguage: targetLanguage,
         if (createdAt != null) #createdAt: createdAt,
-        if (userId != $none) #userId: userId,
-        if (updatedAt != null) #updatedAt: updatedAt
+        if (userId != null) #userId: userId,
+        if (updatedAt != null) #updatedAt: updatedAt,
+        if (isAnonymous != null) #isAnonymous: isAnonymous
       }));
   @override
   Profile $make(CopyWithData data) => Profile(
@@ -164,10 +164,10 @@ class _ProfileCopyWithImpl<$R, $Out>
       username: data.get(#username, or: $value.username),
       role: data.get(#role, or: $value.role),
       avatarUrl: data.get(#avatarUrl, or: $value.avatarUrl),
-      targetLanguage: data.get(#targetLanguage, or: $value.targetLanguage),
       createdAt: data.get(#createdAt, or: $value.createdAt),
       userId: data.get(#userId, or: $value.userId),
-      updatedAt: data.get(#updatedAt, or: $value.updatedAt));
+      updatedAt: data.get(#updatedAt, or: $value.updatedAt),
+      isAnonymous: data.get(#isAnonymous, or: $value.isAnonymous));
 
   @override
   ProfileCopyWith<$R2, Profile, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>

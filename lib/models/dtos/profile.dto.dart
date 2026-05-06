@@ -14,24 +14,24 @@ part 'profile.dto.mapper.dart';
 class Profile with ProfileMappable implements DTO {
   @override
   final String id;
-  final String? userId;
+  final String userId;
   final String username;
   final String role;
   final String? avatarUrl;
-  final String? targetLanguage;
   @override
   final DateTime createdAt;
   @override
   final DateTime updatedAt;
+  final bool isAnonymous;
 
   const Profile({
     required this.id,
     required this.username,
     required this.role,
     this.avatarUrl,
-    this.targetLanguage,
     required this.createdAt,
-    this.userId,
+    required this.userId,
     required this.updatedAt,
+    this.isAnonymous = true,
   });
 }

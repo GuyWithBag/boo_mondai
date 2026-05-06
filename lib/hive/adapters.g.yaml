@@ -5,7 +5,7 @@ nextTypeId: 28
 types:
   Profile:
     typeId: 0
-    nextIndex: 8
+    nextIndex: 9
     fields:
       id:
         index: 0
@@ -17,12 +17,12 @@ types:
         index: 3
       avatarUrl:
         index: 4
-      targetLanguage:
-        index: 5
       createdAt:
         index: 6
       updatedAt:
         index: 7
+      isAnonymous:
+        index: 8
   CachedProfile:
     typeId: 1
     nextIndex: 4

@@ -12,16 +12,12 @@ part 'leaderboard_entry.dto.mapper.dart';
 @MappableClass()
 class LeaderboardEntry with LeaderboardEntryMappable {
   final String userId;
-  final String? targetLanguage;
   final int drillScore;
   final int reviewCount;
-  final int currentStreak;
 
   const LeaderboardEntry({
     required this.userId,
-    this.targetLanguage,
     required this.drillScore,
     required this.reviewCount,
-    required this.currentStreak,
   });
 }

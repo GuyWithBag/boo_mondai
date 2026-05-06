@@ -27,9 +27,8 @@ class ResearchProfileMapper extends ClassMapperBase<ResearchProfile> {
       Field('userId', _$userId, key: r'user_id');
   static String _$role(ResearchProfile v) => v.role;
   static const Field<ResearchProfile, String> _f$role = Field('role', _$role);
-  static String _$targetLanguage(ResearchProfile v) => v.targetLanguage;
-  static const Field<ResearchProfile, String> _f$targetLanguage =
-      Field('targetLanguage', _$targetLanguage, key: r'target_language');
+  static String _$goal(ResearchProfile v) => v.goal;
+  static const Field<ResearchProfile, String> _f$goal = Field('goal', _$goal);
   static DateTime _$createdAt(ResearchProfile v) => v.createdAt;
   static const Field<ResearchProfile, DateTime> _f$createdAt =
       Field('createdAt', _$createdAt, key: r'created_at');
@@ -47,7 +46,7 @@ class ResearchProfileMapper extends ClassMapperBase<ResearchProfile> {
     #id: _f$id,
     #userId: _f$userId,
     #role: _f$role,
-    #targetLanguage: _f$targetLanguage,
+    #goal: _f$goal,
     #createdAt: _f$createdAt,
     #firstName: _f$firstName,
     #lastName: _f$lastName,
@@ -59,7 +58,7 @@ class ResearchProfileMapper extends ClassMapperBase<ResearchProfile> {
         id: data.dec(_f$id),
         userId: data.dec(_f$userId),
         role: data.dec(_f$role),
-        targetLanguage: data.dec(_f$targetLanguage),
+        goal: data.dec(_f$goal),
         createdAt: data.dec(_f$createdAt),
         firstName: data.dec(_f$firstName),
         lastName: data.dec(_f$lastName),
@@ -124,7 +123,7 @@ abstract class ResearchProfileCopyWith<$R, $In extends ResearchProfile, $Out>
       {String? id,
       String? userId,
       String? role,
-      String? targetLanguage,
+      String? goal,
       DateTime? createdAt,
       String? firstName,
       String? lastName,
@@ -146,7 +145,7 @@ class _ResearchProfileCopyWithImpl<$R, $Out>
           {String? id,
           String? userId,
           String? role,
-          String? targetLanguage,
+          String? goal,
           DateTime? createdAt,
           String? firstName,
           String? lastName,
@@ -155,7 +154,7 @@ class _ResearchProfileCopyWithImpl<$R, $Out>
         if (id != null) #id: id,
         if (userId != null) #userId: userId,
         if (role != null) #role: role,
-        if (targetLanguage != null) #targetLanguage: targetLanguage,
+        if (goal != null) #goal: goal,
         if (createdAt != null) #createdAt: createdAt,
         if (firstName != null) #firstName: firstName,
         if (lastName != null) #lastName: lastName,
@@ -166,7 +165,7 @@ class _ResearchProfileCopyWithImpl<$R, $Out>
       id: data.get(#id, or: $value.id),
       userId: data.get(#userId, or: $value.userId),
       role: data.get(#role, or: $value.role),
-      targetLanguage: data.get(#targetLanguage, or: $value.targetLanguage),
+      goal: data.get(#goal, or: $value.goal),
       createdAt: data.get(#createdAt, or: $value.createdAt),
       firstName: data.get(#firstName, or: $value.firstName),
       lastName: data.get(#lastName, or: $value.lastName),
