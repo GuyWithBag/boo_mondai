@@ -1,7 +1,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/pages/login_page.dart
 // PURPOSE: Email/password login screen
-// PROVIDERS: AuthProvider
+// PROVIDERS: AuthController
 // HOOKS: useTextEditingController, useFocusNode, useEffect
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -23,7 +23,7 @@ class LoginPage extends HookWidget {
     final emailFocus = useFocusNode();
     final formKey = useMemoized(GlobalKey<FormState>.new);
 
-    final auth = context.watch<AuthProvider>();
+    final auth = context.watch<AuthController>();
 
     useEffect(() {
       emailFocus.requestFocus();
@@ -32,13 +32,13 @@ class LoginPage extends HookWidget {
 
     // Navigate home only when authenticated AND the merge dialog is not pending.
     useEffect(() {
-      if (auth.isAuthenticated && !auth.hasPendingGuestMerge) {
+      if (!auth.currentProfile.isAnonymous && !auth.hasPendingGuestMerge) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (context.mounted) context.go('/');
         });
       }
       return null;
-    }, [auth.isAuthenticated, auth.hasPendingGuestMerge]);
+    }, [!auth.currentProfile.isAnonymous, auth.hasPendingGuestMerge]);
 
     // Show the merge dialog when the provider signals a pending decision.
     useEffect(() {
@@ -113,7 +113,7 @@ class LoginPage extends HookWidget {
                           ? null
                           : () {
                               if (formKey.currentState!.validate()) {
-                                context.read<AuthProvider>().signIn(
+                                context.read<AuthController>().signIn(
                                   emailController.text.trim(),
                                   passwordController.text,
                                 );
@@ -148,7 +148,7 @@ class LoginPage extends HookWidget {
 /// Dialog shown when a guest who has local data signs into an existing account.
 /// Forces a choice — [barrierDismissible] must be false at the call site.
 class GuestMergeDialog extends StatelessWidget {
-  final AuthProvider auth;
+  final AuthController auth;
   const GuestMergeDialog({super.key, required this.auth});
 
   @override

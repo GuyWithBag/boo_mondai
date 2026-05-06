@@ -70,10 +70,11 @@ class LeaderboardSection extends StatelessWidget {
           ...entries.asMap().entries.map(
             (e) => LeaderboardTileWidget(
               rank: e.key + 1,
-              username: e.value.username,
-              drillScore: e.value.drillScore,
-              reviewCount: e.value.reviewCount,
-              currentStreak: e.value.currentStreak,
+              entry: e.value,
+              // username: e.value.username,
+              // drillScore: e.value.drillScore,
+              // reviewCount: e.value.reviewCount,
+              // currentStreak: e.value.currentStreak,
             ),
           ),
       ],

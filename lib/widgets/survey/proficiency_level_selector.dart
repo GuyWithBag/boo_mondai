@@ -7,7 +7,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
-import 'package:boo_mondai/widgets/widgets.barrel.dart';
 
 class ProficiencyLevelSelector extends StatelessWidget {
   final String? value;

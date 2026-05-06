@@ -5,25 +5,23 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/models/dtos/dtos.barrel.dart';
 import 'package:flutter/material.dart';
 import 'package:boo_mondai/painters/painters.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 
 class StreakBadge extends StatelessWidget {
-  final int currentStreak;
+  final Streak? streak;
   final bool compact;
 
-  const StreakBadge({
-    super.key,
-    required this.currentStreak,
-    this.compact = false,
-  });
+  const StreakBadge({super.key, required this.streak, this.compact = false});
 
   @override
   Widget build(BuildContext context) {
+    final currentStreak = streak?.currentStreak ?? -1;
     if (compact) {
       return Tooltip(
-        message: '$currentStreak day streak',
+        message: '$streak day streak',
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [

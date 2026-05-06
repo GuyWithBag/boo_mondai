@@ -1,7 +1,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/pages/vocabulary_test_page.dart
 // PURPOSE: Multiple-choice vocabulary test (30 items, A/B/C/D)
-// PROVIDERS: ResearchController, AuthProvider
+// PROVIDERS: ResearchController, AuthController
 // HOOKS: useScrollController, useMemoized
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -22,7 +22,7 @@ class VocabularyTestPage extends HookWidget {
   Widget build(BuildContext context) {
     final scrollController = useScrollController();
     final research = context.watch<ResearchController>();
-    final auth = context.read<AuthProvider>();
+    final auth = context.read<AuthController>();
     final items = useMemoized(() => buildTestItems(testSet), [testSet]);
     final answers = useState(<String, String>{});
     final submitted = useState(false);
@@ -31,8 +31,7 @@ class VocabularyTestPage extends HookWidget {
     bool isAllAnswered() => answers.value.length == items.length;
 
     Future<void> submit() async {
-      final userId = auth.userProfile?.id;
-      if (userId == null) return;
+      final userId = auth.currentProfile.id;
 
       // Calculate score
       int correct = 0;

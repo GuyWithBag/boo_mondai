@@ -1,7 +1,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/pages/account/authenticated_account_view.dart
 // PURPOSE: Profile display with streak stats and sign-out for authenticated users
-// PROVIDERS: AuthProvider, StreakController
+// PROVIDERS: AuthController, StreakController
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -52,11 +52,7 @@ class AuthenticatedAccountView extends StatelessWidget {
           Center(
             child: Wrap(
               spacing: AppSpacing.sm,
-              children: [
-                Chip(label: Text(profile.role.replaceAll('_', ' '))),
-                if (profile.targetLanguage != null)
-                  Chip(label: Text(profile.targetLanguage!)),
-              ],
+              children: [Chip(label: Text(profile.role.replaceAll('_', ' ')))],
             ),
           ),
           const SizedBox(height: AppSpacing.xl),

@@ -1,7 +1,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/pages/register_page.dart
 // PURPOSE: Registration screen for new users
-// PROVIDERS: AuthProvider
+// PROVIDERS: AuthController
 // HOOKS: useTextEditingController, useFocusNode
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -24,7 +24,7 @@ class RegisterPage extends HookWidget {
     final emailFocus = useFocusNode();
     final formKey = useMemoized(GlobalKey<FormState>.new);
 
-    final auth = context.watch<AuthProvider>();
+    final auth = context.watch<AuthController>();
 
     useEffect(() {
       emailFocus.requestFocus();
@@ -95,7 +95,7 @@ class RegisterPage extends HookWidget {
                           ? null
                           : () {
                               if (formKey.currentState!.validate()) {
-                                context.read<AuthProvider>().signUp(
+                                auth.signUp(
                                   emailController.text.trim(),
                                   passwordController.text,
                                   nameController.text.trim(),

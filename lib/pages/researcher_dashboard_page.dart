@@ -1,7 +1,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/pages/researcher_dashboard_page.dart
 // PURPOSE: Researcher dashboard — manage codes, view participants and results
-// PROVIDERS: ResearchController, AuthProvider
+// PROVIDERS: ResearchController, AuthController
 // HOOKS: useEffect
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -17,7 +17,7 @@ class ResearcherDashboardPage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final research = context.watch<ResearchController>();
-    final auth = context.read<AuthProvider>();
+    final auth = context.read<AuthController>();
     final tabIndex = useState(0);
 
     useEffect(() {
@@ -43,7 +43,7 @@ class ResearcherDashboardPage extends HookWidget {
                     children: [
                       CodesTab(
                         codes: research.codes,
-                        researcherId: auth.userProfile?.id ?? '',
+                        researcherId: auth.currentProfile.id,
                       ),
                       ParticipantsTab(participants: research.researchProfiles),
                       ResultsTab(

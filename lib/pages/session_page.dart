@@ -65,10 +65,7 @@ class SessionPage extends HookWidget {
     // ── RECORD STREAK ON REVIEW COMPLETION ───────────────
     useEffect(() {
       if (ctrl.isComplete && mode == SessionMode.review) {
-        final userId = context.read<AuthProvider>().userProfile?.id;
-        if (userId != null) {
-          context.read<StreakController>().recordActivity(userId);
-        }
+        context.read<StreakController>().recordActivity(DateTime.now());
       }
       return null;
     }, [ctrl.isComplete]);

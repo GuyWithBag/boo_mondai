@@ -10,25 +10,25 @@ import 'package:boo_mondai/pages/pages.barrel.dart';
 import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
 
-GoRouter createRouter(AuthController authProvider) {
+GoRouter createRouter(AuthController auth) {
   return GoRouter(
-    refreshListenable: authProvider,
+    refreshListenable: auth,
     initialLocation: '/',
     redirect: (context, state) {
-      final isAuth = authProvider.isAuthenticated;
+      final isNotAnonymous = !auth.currentProfile.isAnonymous;
       final loc = state.matchedLocation;
 
       // Authenticated users landing on /login or /register → go home
-      if (isAuth && (loc == '/login' || loc == '/register')) return '/';
+      if (isNotAnonymous && (loc == '/login' || loc == '/register')) return '/';
 
       // Researcher dashboard requires a real account with the researcher role
       if (loc == '/research' &&
-          (!isAuth || authProvider.role != 'researcher')) {
+          (!isNotAnonymous || auth.currentProfile.role != 'researcher')) {
         return '/';
       }
 
       // Group B guard — redirect to code entry for non-allowed routes
-      if (isAuth && authProvider.role == 'group_b_participant') {
+      if (isNotAnonymous && auth.currentProfile.role == 'group_b_participant') {
         final allowed = ['/', '/research/code', '/account'];
         if (!allowed.contains(loc) &&
             !loc.startsWith('/research/survey') &&
@@ -50,7 +50,7 @@ GoRouter createRouter(AuthController authProvider) {
           GoRoute(
             path: '/',
             builder: (context, state) {
-              if (authProvider.role == 'group_b_participant') {
+              if (auth.currentProfile.role == 'group_b_participant') {
                 return const ResearchCodeEntryPage();
               }
               return const HomePage();
@@ -120,10 +120,8 @@ GoRouter createRouter(AuthController authProvider) {
       // Global Review (all due cards across all decks)
       GoRoute(
         path: '/review/session',
-        builder: (context, state) => const SessionPage(
-          deckId: null,
-          mode: SessionMode.review,
-        ),
+        builder: (context, state) =>
+            const SessionPage(deckId: null, mode: SessionMode.review),
       ),
 
       // Deck-Specific Review

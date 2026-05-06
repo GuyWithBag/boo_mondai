@@ -1,10 +1,11 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/pages/home_page.dart
 // PURPOSE: Dashboard — streak, due reviews, leaderboard preview
-// PROVIDERS: AuthProvider, StreakController, ReviewDashboardController, LeaderboardController
+// PROVIDERS: AuthController, StreakController, ReviewDashboardController, LeaderboardController
 // HOOKS: useEffect
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/database/database.barrel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
@@ -18,22 +19,16 @@ class HomePage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final auth = context.watch<AuthProvider>();
-    final streakProv = context.watch<StreakController>();
+    final auth = context.watch<AuthController>();
     final dashboard = context.watch<ReviewDashboardController>();
     final leaderboard = context.watch<LeaderboardController>();
-    final userId = auth.userProfile?.id;
+    final userId = auth.currentProfile.id;
 
     useEffect(() {
-      if (userId != null) {
-        Future.microtask(() {
-          context.read<StreakController>().fetchStreak(userId);
-          context.read<ReviewDashboardController>().load();
-          leaderboard.fetchLeaderboard(
-            targetLanguage: auth.userProfile?.targetLanguage,
-          );
-        });
-      }
+      Future.microtask(() {
+        dashboard.load();
+        leaderboard.fetchLeaderboard();
+      });
       return null;
     }, [userId]);
 
@@ -42,25 +37,20 @@ class HomePage extends HookWidget {
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {
-            if (userId != null) {
-              await Future.wait([
-                context.read<StreakController>().fetchStreak(userId),
-                context.read<ReviewDashboardController>().load(),
-                leaderboard.fetchLeaderboard(
-                  targetLanguage: auth.userProfile?.targetLanguage,
-                ),
-              ]);
-            }
+            await Future.wait([
+              context.read<ReviewDashboardController>().load(),
+              leaderboard.fetchLeaderboard(),
+            ]);
           },
           child: ListView(
             padding: const EdgeInsets.all(AppSpacing.md),
             children: [
               Text(
-                'Welcome, ${auth.userProfile?.username ?? 'Learner'}!',
+                'Welcome, ${auth.currentProfile.username}!',
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
               const SizedBox(height: AppSpacing.lg),
-              StreakBadge(currentStreak: streakProv.currentStreak),
+              StreakBadge(streak: LocalDB.streak.retrieve()),
               const SizedBox(height: AppSpacing.md),
               DueReviewCard(
                 dueCount: dashboard.totalDue,
@@ -72,7 +62,7 @@ class HomePage extends HookWidget {
                 icon: const Icon(Icons.library_books),
                 label: const Text('Browse Decks'),
               ),
-              if (auth.role == 'researcher') ...[
+              if (auth.currentProfile.role == 'researcher') ...[
                 const SizedBox(height: AppSpacing.sm),
                 OutlinedButton.icon(
                   onPressed: () => context.push('/research'),

@@ -1,7 +1,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/widgets/responsive_scaffold.dart
 // PURPOSE: Responsive shell — mobile bottom nav, desktop navigation rail
-// PROVIDERS: AuthProvider
+// PROVIDERS: AuthController
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -42,7 +42,7 @@ class ResponsiveScaffold extends HookWidget {
     }
 
     // Group B only sees code entry — no shell nav
-    if (auth.role == 'group_b_participant') {
+    if (auth.currentProfile.role == 'group_b_participant') {
       return Scaffold(body: child);
     }
 

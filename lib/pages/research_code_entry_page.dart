@@ -1,7 +1,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/pages/research_code_entry_page.dart
 // PURPOSE: Code entry screen for unlocking research study flows
-// PROVIDERS: ResearchController, AuthProvider
+// PROVIDERS: ResearchController, AuthController
 // HOOKS: useTextEditingController, useFocusNode, useState
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -55,7 +55,7 @@ class _CodeStep extends HookWidget {
     final codeController = useTextEditingController();
     final codeFocus = useFocusNode();
     final research = context.watch<ResearchController>();
-    final auth = context.watch<AuthProvider>();
+    final auth = context.watch<AuthController>();
     final message = useState<String?>(null);
 
     useEffect(() {
@@ -108,8 +108,7 @@ class _CodeStep extends HookWidget {
                         : () async {
                             final code = codeController.text.trim();
                             if (code.isEmpty) return;
-                            final userId = auth.userProfile?.id;
-                            if (userId == null) return;
+                            final userId = auth.currentProfile.id;
 
                             final unlocked = await context
                                 .read<ResearchController>()
@@ -170,9 +169,10 @@ class _DemographicsStep extends HookWidget {
     final firstNameController = useTextEditingController();
     final lastNameController = useTextEditingController();
     final ageController = useTextEditingController();
+    final goalController = useTextEditingController();
     final formKey = useMemoized(GlobalKey<FormState>.new);
     final research = context.watch<ResearchController>();
-    final auth = context.watch<AuthProvider>();
+    final auth = context.watch<AuthController>();
 
     return Scaffold(
       appBar: AppBar(title: const Text('Participant Details')),
@@ -230,6 +230,17 @@ class _DemographicsStep extends HookWidget {
                         return null;
                       },
                     ),
+                    const SizedBox(height: AppSpacing.sm),
+                    TextFormField(
+                      controller: goalController,
+                      decoration: const InputDecoration(
+                        labelText: 'Learning goal',
+                        hintText: 'e.g. Japanese, Korean',
+                      ),
+                      textCapitalization: TextCapitalization.words,
+                      validator: (v) =>
+                          (v == null || v.trim().isEmpty) ? 'Required' : null,
+                    ),
                     if (research.error != null) ...[
                       const SizedBox(height: AppSpacing.sm),
                       ErrorText(research.error!),
@@ -240,27 +251,24 @@ class _DemographicsStep extends HookWidget {
                           ? null
                           : () async {
                               if (!formKey.currentState!.validate()) return;
-                              final userId = auth.userProfile?.id;
-                              if (userId == null) return;
+                              final userId = auth.currentProfile.id;
 
                               await context
                                   .read<ResearchController>()
                                   .addResearchProfile(
                                     userId: userId,
                                     role: role,
-                                    targetLanguage:
-                                        auth.userProfile?.targetLanguage ??
-                                        'japanese',
+                                    goal: goalController.text.trim(),
                                     firstName: firstNameController.text.trim(),
                                     lastName: lastNameController.text.trim(),
                                     age: int.parse(ageController.text.trim()),
-                                    username: auth.userProfile?.username,
                                   );
 
                               if (!context.mounted) return;
                               if (context.read<ResearchController>().error !=
-                                  null)
+                                  null) {
                                 return;
+                              }
 
                               final route = _routeForUnlock(unlock);
                               if (route != null) onComplete(route);

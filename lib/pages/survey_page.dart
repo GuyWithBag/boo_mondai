@@ -1,7 +1,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/pages/survey_page.dart
 // PURPOSE: Dynamic survey page rendering Likert scale questions by survey type
-// PROVIDERS: ResearchController, AuthProvider
+// PROVIDERS: ResearchController, AuthController
 // HOOKS: useScrollController, useMemoized
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -23,7 +23,7 @@ class SurveyPage extends HookWidget {
   Widget build(BuildContext context) {
     final scrollController = useScrollController();
     final research = context.watch<ResearchController>();
-    final auth = context.read<AuthProvider>();
+    final auth = context.read<AuthController>();
     final questions = useMemoized(() => buildSurveyQuestions(surveyType), [
       surveyType,
     ]);
@@ -43,8 +43,7 @@ class SurveyPage extends HookWidget {
     }
 
     Future<void> submit() async {
-      final userId = auth.userProfile?.id;
-      if (userId == null) return;
+      final userId = auth.currentProfile.id;
 
       final data = Map<String, int>.from(responses.value);
 

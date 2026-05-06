@@ -1,7 +1,7 @@
 // // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // // PATH: lib/widgets/browser_deck_detail_sheet.dart
 // // PURPOSE: Bottom sheet shown when tapping a deck in the online browser
-// // PROVIDERS: AuthProvider, DeckProvider, SupabaseRemoteDB
+// // PROVIDERS: AuthController, DeckProvider, SupabaseRemoteDB
 // // HOOKS: useEffect, useState
 // // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -90,8 +90,8 @@
 //                 FilledButton.icon(
 //                   onPressed: () {
 //                     Navigator.of(ctx).pop();
-//                     final auth = context.read<AuthProvider>();
-//                     if (!auth.isAuthenticated) return;
+//                     final auth = context.read<AuthController>();
+//                     if (!!auth.currentProfile.isAnonymous) return;
 //                     showModalBottomSheet<void>(
 //                       context: context,
 //                       builder: (_) => CopySheet(deck: deck),

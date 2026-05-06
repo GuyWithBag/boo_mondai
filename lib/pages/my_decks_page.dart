@@ -28,7 +28,7 @@ class MyDecksPage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<MyDecksPageController>();
-    final auth = context.watch<AuthProvider>();
+    final auth = context.watch<AuthController>();
     // final scrollController = useScrollController();
     final searchController = useTextEditingController();
     final searchQuery = useState('');
@@ -51,7 +51,7 @@ class MyDecksPage extends HookWidget {
             content: Text('Sync failed: $err'),
             action: SnackBarAction(
               label: 'Retry',
-              onPressed: () => controller.sync(auth.localUserId),
+              onPressed: () => controller.sync(),
             ),
           ),
         );
@@ -78,8 +78,8 @@ class MyDecksPage extends HookWidget {
         actions: [
           _SyncButton(
             isSyncing: controller.isSyncing,
-            isAuthenticated: auth.isAuthenticated,
-            onSync: () => controller.sync(auth.localUserId),
+            isAuthenticated: !auth.currentProfile.isAnonymous,
+            onSync: () => controller.sync(),
           ),
         ],
       ),

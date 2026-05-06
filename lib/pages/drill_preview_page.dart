@@ -1,7 +1,7 @@
 // // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // // PATH: lib/pages/drill_preview_page.dart
 // // PURPOSE: Preview vocabulary cards before starting a drill session
-// // PROVIDERS: CardProvider, AuthProvider, DrillProvider
+// // PROVIDERS: CardProvider, AuthController, DrillProvider
 // // HOOKS: useEffect, useScrollController
 // // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -59,8 +59,8 @@
 //                       width: double.infinity,
 //                       child: FilledButton(
 //                         onPressed: () async {
-//                           final auth = context.read<AuthProvider>();
-//                           final userId = auth.userProfile?.id;
+//                           final auth = context.read<AuthController>();
+//                           final userId = auth.currentProfile.id;
 //                           if (userId == null) return;
 
 //                           await context.read<DrillProvider>().startSession(

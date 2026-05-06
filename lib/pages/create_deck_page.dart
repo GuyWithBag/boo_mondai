@@ -1,11 +1,10 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/pages/deck_creator_page.dart
 // PURPOSE: Create or edit a deck with title, short/long description, target language, and publish toggle
-// PROVIDERS: DeckProvider, AuthProvider, CardProvider
+// PROVIDERS: DeckProvider, AuthController, CardProvider
 // HOOKS: useTextEditingController, useEffect, useState
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/controllers/my_decks_page_controller.dart';
 import 'package:boo_mondai/models/models.barrel.dart';
 import 'package:boo_mondai/database/database.barrel.dart';
 
@@ -16,9 +15,6 @@ import 'package:provider/provider.dart';
 import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
-
-// ... imports remains the same
-// ... imports ...
 
 class CreateDeckPage extends HookWidget {
   const CreateDeckPage({super.key, this.deckId});
@@ -37,14 +33,14 @@ class CreateDeckPage extends HookWidget {
     final wasPublicInitially = useState(true);
     final isPublic = useState(false);
 
-    final auth = context.read<AuthProvider>();
+    final auth = context.read<AuthController>();
     final isEdit = deckId != null;
-    final deckRepo = LocalDB.deck;
+    final deckDB = LocalDB.deck;
 
     // Load existing data if editing
     useEffect(() {
       if (isEdit) {
-        final existing = deckRepo
+        final existing = deckDB
             .getByCurrentUser()
             .where((d) => d.id == deckId)
             .firstOrNull;
@@ -65,13 +61,12 @@ class CreateDeckPage extends HookWidget {
     Future<void> handleSave() async {
       if (!formKey.currentState!.validate()) return;
 
-      final userId = auth.userProfile?.id;
-      if (userId == null) return;
+      final userId = auth.currentProfile.id;
 
       String? finalDeckId;
 
       if (isEdit) {
-        final existing = deckRepo
+        final existing = deckDB
             .getByCurrentUser()
             .where((d) => d.id == deckId)
             .firstOrNull;
@@ -86,7 +81,7 @@ class CreateDeckPage extends HookWidget {
             isPublished: isPublished.value,
             updatedAt: DateTime.now(), // Manual update for edit
           );
-          await deckRepo.put(updated);
+          await deckDB.put(updated);
           finalDeckId = existing.id;
         }
       } else {
@@ -103,7 +98,7 @@ class CreateDeckPage extends HookWidget {
           cardCount: 0,
         );
 
-        await deckRepo.put(newDeck);
+        await deckDB.put(newDeck);
         finalDeckId = newDeck.id;
       }
 

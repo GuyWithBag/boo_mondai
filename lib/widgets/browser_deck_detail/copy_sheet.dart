@@ -1,7 +1,7 @@
 // // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // // PATH: lib/widgets/browser_deck_detail/copy_sheet.dart
 // // PURPOSE: Bottom sheet confirmation dialog for copying a deck to My Decks
-// // PROVIDERS: AuthProvider, DeckProvider
+// // PROVIDERS: AuthController, DeckProvider
 // // HOOKS: useState
 // // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -27,7 +27,7 @@
 //       isCopying.value = true;
 //       error.value = null;
 //       try {
-//         final userId = context.read<AuthProvider>().userProfile!.id;
+//         final userId = context.read<AuthController>().userProfile!.id;
 //         final deckProvider = context.read<DeckProvider>();
 //         final result = await deckProvider.copyDeck(userId, deck);
 //         if (!context.mounted) return;

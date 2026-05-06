@@ -21,9 +21,7 @@ class LeaderboardPage extends HookWidget {
     final scrollController = useScrollController();
 
     useEffect(() {
-      Future.microtask(
-        () => context.read<LeaderboardController>().fetchLeaderboard(),
-      );
+      Future.microtask(() => leaderboard.fetchLeaderboard());
       return null;
     }, const []);
 
@@ -48,23 +46,14 @@ class LeaderboardPage extends HookWidget {
           : leaderboard.entries.isEmpty
           ? const Center(child: Text('No entries yet'))
           : RefreshIndicator(
-              onRefresh: () =>
-                  context.read<LeaderboardController>().fetchLeaderboard(
-                    targetLanguage: leaderboard.filteredLanguage,
-                  ),
+              onRefresh: () => leaderboard.fetchLeaderboard(),
               child: ListView.builder(
                 controller: scrollController,
                 padding: const EdgeInsets.all(AppSpacing.md),
                 itemCount: leaderboard.entries.length,
                 itemBuilder: (context, i) {
                   final entry = leaderboard.entries[i];
-                  return LeaderboardTileWidget(
-                    rank: i + 1,
-                    username: entry.username,
-                    drillScore: entry.drillScore,
-                    reviewCount: entry.reviewCount,
-                    currentStreak: entry.currentStreak,
-                  );
+                  return LeaderboardTileWidget(rank: i + 1, entry: entry);
                 },
               ),
             ),
