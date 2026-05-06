@@ -14,32 +14,28 @@ class AuthController extends ChangeNotifier {
   AuthController({AuthService? authService})
     : _authService = authService ?? AuthService();
 
-  Profile? _userProfile;
   bool _isLoading = false;
   String? _error;
 
-  bool _hasPendingGuestMerge = false;
-  String? _pendingGuestId;
+  /// Holds the result of the latest auth action to drive UI logic (like merges)
+  AuthServiceResponse? authServiceResponse;
 
   // ── Getters ─────────────────────────────────────────────
 
-  Profile? get userProfile => _userProfile;
-  bool get isAuthenticated => _userProfile != null;
-  bool get isGuest => !isAuthenticated;
+  Profile get currentProfile => LocalDB.profile.getOrCreate();
+
   bool get isLoading => _isLoading;
   String? get error => _error;
-  String? get role => _userProfile?.role;
-  bool get hasPendingGuestMerge => _hasPendingGuestMerge;
 
-  String get localUserId =>
-      _authService.currentUser?.id ?? LocalDB.profile.getOrCreate().userId;
+  /// Drives the UI prompt for merging guest data based on the latest auth response.
+  bool get hasPendingGuestMerge => authServiceResponse?.needsMerge ?? false;
 
   // ── Actions ─────────────────────────────────────────────
 
   Future<void> restoreSession() async {
     _setLoading(true);
     try {
-      _userProfile = await _authService.restoreSession();
+      await _authService.restoreSession();
     } catch (_) {
       // Network error on restore → stay in guest mode silently
     } finally {
@@ -50,14 +46,22 @@ class AuthController extends ChangeNotifier {
   Future<void> signIn(String email, String password) async {
     _setLoading(true);
     try {
-      final result = await _authService.signIn(email, password);
-      _userProfile = result.profile;
+      authServiceResponse = await _authService.signIn(email, password);
+    } on AppException catch (e) {
+      _error = e.message;
+    } finally {
+      _setLoading(false);
+    }
+  }
 
-      // If a merge is needed, surface it to the UI
-      if (result.needsMerge) {
-        _hasPendingGuestMerge = true;
-        _pendingGuestId = result.guestUserId;
-      }
+  Future<void> signUp(String email, String password, String username) async {
+    _setLoading(true);
+    try {
+      authServiceResponse = await _authService.signUp(
+        email,
+        password,
+        username,
+      );
     } on AppException catch (e) {
       _error = e.message;
     } finally {
@@ -66,26 +70,18 @@ class AuthController extends ChangeNotifier {
   }
 
   Future<void> confirmMerge(bool merge) async {
-    final guestId = _pendingGuestId;
-    if (guestId == null || _userProfile == null) return;
+    final guestId = authServiceResponse?.guestUserId;
+    final remoteProfile = authServiceResponse?.profile;
+
+    if (guestId == null || remoteProfile == null) return;
 
     _setLoading(true);
     try {
-      await _authService.executeMergeDecision(merge, guestId, _userProfile!);
-    } finally {
-      _pendingGuestId = null;
-      _hasPendingGuestMerge = false;
-      _setLoading(false);
-    }
-  }
-
-  Future<void> signUp(String email, String password, String username) async {
-    _setLoading(true);
-    try {
-      _userProfile = await _authService.signUp(email, password, username);
+      await _authService.executeMergeDecision(merge, guestId, remoteProfile);
     } on AppException catch (e) {
       _error = e.message;
     } finally {
+      authServiceResponse = null; // Clear merge state once decision is executed
       _setLoading(false);
     }
   }
@@ -94,7 +90,7 @@ class AuthController extends ChangeNotifier {
     _setLoading(true);
     try {
       await _authService.signOut();
-      _userProfile = null;
+      authServiceResponse = null; // Reset auth state on sign out
     } on AppException catch (e) {
       _error = e.message;
     } finally {

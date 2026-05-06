@@ -43,7 +43,7 @@ class ReviewDashboardController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final userId = LocalIdentityService.getOrCreate();
+      final userId = LocalDB.profile.getOrCreate().userId;
       final allDecks = LocalDB.deck.getAll();
       final deckMap = {for (final d in allDecks) d.id: d};
 

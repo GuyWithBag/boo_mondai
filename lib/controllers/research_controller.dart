@@ -166,7 +166,7 @@ class ResearchController extends ChangeNotifier {
   Future<void> addResearchProfile({
     required String userId,
     required String role,
-    required String targetLanguage,
+    required String goal,
     required String firstName,
     required String lastName,
     required int age,
@@ -177,7 +177,7 @@ class ResearchController extends ChangeNotifier {
       final profile = Services.research.buildResearchProfile(
         userId: userId,
         role: role,
-        targetLanguage: targetLanguage,
+        goal: goal,
         firstName: firstName,
         lastName: lastName,
         age: age,

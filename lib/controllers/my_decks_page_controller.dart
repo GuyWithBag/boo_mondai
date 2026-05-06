@@ -12,11 +12,11 @@ import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 /// Drives the My Decks page — loads all decks sorted by [updatedAt] descending
 /// and exposes delete operations.
 class MyDecksPageController extends ChangeNotifier {
-  final DeckLocalDB _deckRepository = LocalDB.deck;
+  final DeckLocalDB _deckDB = LocalDB.deck;
   // Inside your Controller
   void init() {
     // Listen to Hive changes directly
-    LocalDB.deck.box.listenable().addListener(() {
+    _deckDB.box.listenable().addListener(() {
       load(); // Automatically refresh whenever the box changes
     });
   }
@@ -46,9 +46,8 @@ class MyDecksPageController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // final userId = LocalIdentityService.getOrCreate();
       // ToDo: Unchecked change.
-      final all = _deckRepository.getAll();
+      final all = _deckDB.getAll();
       all.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
       _decks = all;
     } on Exception catch (e) {
@@ -64,8 +63,8 @@ class MyDecksPageController extends ChangeNotifier {
     _isLoading = true;
     _error = null;
     try {
-      await _deckRepository.delete(id);
-      load();
+      await _deckDB.delete(id);
+      // load();
     } on Exception catch (e) {
       _error = e.toString();
       _isLoading = false;
@@ -86,32 +85,17 @@ class MyDecksPageController extends ChangeNotifier {
 
   /// Pull remote decks (newer [updatedAt] wins), then push all local decks.
   ///
-  /// Requires an authenticated Supabase session — call only when
-  /// [AuthProvider.isAuthenticated] is true.
-  Future<void> sync(String userId) async {
+  Future<void> sync() async {
     _isSyncing = true;
     _syncError = null;
     notifyListeners();
 
     try {
-      // ── 1. Pull ──────────────────────────────────────────
-      // Fetch all remote decks for this user and put any that are newer
-      // than the local copy (or missing locally).
-      // final remoteDecks = await RemoteDB.deck.fetchByUserId(userId);
-      // for (final decks in remoteDecks) {
-      //   final remote = decks;
-      //   final local = _deckRepository.getById(remote.id);
-      //   if (local == null || remote.updatedAt.isAfter(local.updatedAt)) {
-      //     await _deckRepository.put(remote);
-      //   }
-      // }
-
-      // // ── 2. Push ──────────────────────────────────────────
-      // // Upsert every local deck that belongs to this user.
-      // final localDecks = _deckRepository.getByAuthorId(userId);
-      // for (final deck in localDecks) {
-      //   await RemoteDB.deck.upsertOne(deck);
-      // }
+      SyncService.sync(
+        localDb: LocalDB.deck,
+        remoteDb: RemoteDB.deck,
+        userId: LocalDB.profile.getOrCreate().userId,
+      );
 
       // ── 3. Reload ────────────────────────────────────────
       load();

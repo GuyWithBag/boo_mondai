@@ -19,16 +19,13 @@ class LeaderboardController extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get error => _error;
 
-  Future<void> fetchLeaderboard({String? targetLanguage}) async {
+  Future<void> fetchLeaderboard() async {
     _isLoading = true;
     _error = null;
-    _filteredLanguage = targetLanguage;
     notifyListeners();
 
     try {
-      _entries = await RemoteDB.leaderboard.fetchLeaderboard(
-        targetLanguage: targetLanguage,
-      );
+      _entries = await RemoteDB.leaderboard.fetchLeaderboard();
     } on AppException catch (e) {
       _error = e.message;
     } finally {
@@ -39,7 +36,7 @@ class LeaderboardController extends ChangeNotifier {
 
   void setLanguageFilter(String? language) {
     _filteredLanguage = language;
-    fetchLeaderboard(targetLanguage: language);
+    fetchLeaderboard();
   }
 
   void clearError() {

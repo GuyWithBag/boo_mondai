@@ -3,39 +3,35 @@
 // PURPOSE: UI state for user's daily FSRS review streak
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/database/database.barrel.dart';
 import 'package:flutter/foundation.dart';
 import 'package:boo_mondai/models/models.barrel.dart';
 import 'package:boo_mondai/services/services.barrel.dart';
 
 class StreakController extends ChangeNotifier {
-  Streak? _streak;
   bool _isLoading = false;
   String? _error;
 
-  Streak? get streak => _streak;
-  int get currentStreak => _streak?.currentStreak ?? 0;
-  int get longestStreak => _streak?.longestStreak ?? 0;
+  Streak? get streak => LocalDB.streak.retrieve();
   bool get isLoading => _isLoading;
   String? get error => _error;
 
-  Future<void> fetchStreak(String userId) async {
-    _isLoading = true;
-    _error = null;
-    notifyListeners();
+  // void fetchStreak(String userId) {
+  //   _isLoading = true;
+  //   _error = null;
+  //   notifyListeners();
 
-    try {
-      _streak = await Services.streak.fetchStreak(userId);
-    } on AppException catch (e) {
-      _error = e.message;
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
+  //   try {} on AppException catch (e) {
+  //     _error = e.message;
+  //   } finally {
+  //     _isLoading = false;
+  //     notifyListeners();
+  //   }
+  // }
 
-  Future<void> recordActivity(String userId) async {
+  Future<void> recordActivity(DateTime activityDate) async {
     try {
-      _streak = await Services.streak.recordAndSync(userId);
+      await LocalDB.streak.recordActivity(activityDate);
       notifyListeners();
     } on AppException catch (e) {
       _error = e.message;
