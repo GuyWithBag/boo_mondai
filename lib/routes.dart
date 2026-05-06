@@ -9,26 +9,32 @@ import 'package:go_router/go_router.dart';
 import 'package:boo_mondai/pages/pages.barrel.dart';
 import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
+import 'package:provider/provider.dart';
 
-GoRouter createRouter(AuthController auth) {
+GoRouter createRouter(AuthController authController) {
   return GoRouter(
-    refreshListenable: auth,
     initialLocation: '/',
+    refreshListenable: authController,
     redirect: (context, state) {
-      final isNotAnonymous = !auth.currentProfile.isAnonymous;
+      final auth = authController;
+      final isAnonymous = !auth.currentProfile.isAnonymous;
       final loc = state.matchedLocation;
 
       // Authenticated users landing on /login or /register → go home
-      if (isNotAnonymous && (loc == '/login' || loc == '/register')) return '/';
+      if (auth.service.isAuthenticated &&
+          !auth.hasPendingGuestMerge &&
+          (loc == '/login' || loc == '/register')) {
+        return '/';
+      }
 
       // Researcher dashboard requires a real account with the researcher role
       if (loc == '/research' &&
-          (!isNotAnonymous || auth.currentProfile.role != 'researcher')) {
+          (isAnonymous || auth.currentProfile.role != 'researcher')) {
         return '/';
       }
 
       // Group B guard — redirect to code entry for non-allowed routes
-      if (isNotAnonymous && auth.currentProfile.role == 'group_b_participant') {
+      if (!isAnonymous && auth.currentProfile.role == 'group_b_participant') {
         final allowed = ['/', '/research/code', '/account'];
         if (!allowed.contains(loc) &&
             !loc.startsWith('/research/survey') &&
@@ -50,6 +56,8 @@ GoRouter createRouter(AuthController auth) {
           GoRoute(
             path: '/',
             builder: (context, state) {
+              final auth = context.watch<AuthController>();
+
               if (auth.currentProfile.role == 'group_b_participant') {
                 return const ResearchCodeEntryPage();
               }

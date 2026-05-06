@@ -13,11 +13,13 @@ import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 
 class BooMondaiApp extends StatelessWidget {
-  const BooMondaiApp({super.key});
+  final AuthController authController;
+  const BooMondaiApp({super.key, required this.authController});
 
   @override
   Widget build(BuildContext context) {
-    final authController = context.read<AuthController>();
+    // ── Create Router ───────────────────────────────────
+    // Hand the controller to GoRouter before starting the app
     final router = createRouter(authController);
 
     return ScreenUtilInit(

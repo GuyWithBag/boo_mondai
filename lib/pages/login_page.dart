@@ -1,10 +1,3 @@
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// PATH: lib/pages/login_page.dart
-// PURPOSE: Email/password login screen
-// PROVIDERS: AuthController
-// HOOKS: useTextEditingController, useFocusNode, useEffect
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
@@ -16,51 +9,62 @@ import 'package:boo_mondai/widgets/widgets.barrel.dart';
 class LoginPage extends HookWidget {
   const LoginPage({super.key});
 
+  static String? _validateEmail(String? value) {
+    if (value != null && value.contains('@')) return null;
+    return 'Enter a valid email';
+  }
+
+  static String? _validatePassword(String? value) {
+    if (value != null && value.length >= 6) return null;
+    return 'Password must be at least 6 characters';
+  }
+
   @override
   Widget build(BuildContext context) {
     final emailController = useTextEditingController();
     final passwordController = useTextEditingController();
     final emailFocus = useFocusNode();
     final formKey = useMemoized(GlobalKey<FormState>.new);
-
     final auth = context.watch<AuthController>();
 
-    useEffect(() {
+    // 1. Initial Focus Effect
+    VoidCallback? handleInitFocus() {
       emailFocus.requestFocus();
       return null;
-    }, const []);
+    }
 
-    // Navigate home only when authenticated AND the merge dialog is not pending.
-    useEffect(() {
-      if (!auth.currentProfile.isAnonymous && !auth.hasPendingGuestMerge) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (context.mounted) context.go('/');
-        });
-      }
-      return null;
-    }, [!auth.currentProfile.isAnonymous, auth.hasPendingGuestMerge]);
+    useEffect(handleInitFocus, const []);
 
-    // Show the merge dialog when the provider signals a pending decision.
-    useEffect(() {
-      if (!auth.hasPendingGuestMerge) return null;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+    // 2. Dialog Builder
+    Widget buildMergeDialog(BuildContext dialogContext) {
+      return GuestMergeDialog(auth: auth);
+    }
+
+    // 3. Action-Driven Sign In (Navigation is handled entirely by routes.dart!)
+    Future<void> performSignIn() async {
+      if (formKey.currentState!.validate()) {
+        await auth.signIn(emailController.text.trim(), passwordController.text);
+
         if (!context.mounted) return;
-        showDialog<void>(
-          context: context,
-          barrierDismissible: false,
-          builder: (_) => GuestMergeDialog(auth: auth),
-        );
-      });
-      return null;
-    }, [auth.hasPendingGuestMerge]);
+
+        // If the sign-in resulted in a pending merge, show the dialog.
+        // Otherwise, GoRouter will automatically redirect them to '/'
+        if (auth.hasPendingGuestMerge) {
+          showDialog<void>(
+            context: context,
+            barrierDismissible: false,
+            builder: buildMergeDialog,
+          );
+        }
+      }
+    }
+
+    void navigateToRegister() {
+      context.push('/register');
+    }
 
     return Scaffold(
-      appBar: AppBar(
-        // leading: Navigator.canPop(context)
-        //     ? BackButton(onPressed: () => Navigator.pop(context))
-        //     : null,
-        // automaticallyImplyLeading: false,
-      ),
+      appBar: AppBar(),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -87,9 +91,7 @@ class LoginPage extends HookWidget {
                         prefixIcon: Icon(Icons.email_outlined),
                       ),
                       keyboardType: TextInputType.emailAddress,
-                      validator: (v) => v != null && v.contains('@')
-                          ? null
-                          : 'Enter a valid email',
+                      validator: _validateEmail,
                     ),
                     const SizedBox(height: AppSpacing.md),
                     TextFormField(
@@ -99,9 +101,7 @@ class LoginPage extends HookWidget {
                         prefixIcon: Icon(Icons.lock_outlined),
                       ),
                       obscureText: true,
-                      validator: (v) => v != null && v.length >= 6
-                          ? null
-                          : 'Password must be at least 6 characters',
+                      validator: _validatePassword,
                     ),
                     if (auth.error != null) ...[
                       const SizedBox(height: AppSpacing.sm),
@@ -109,27 +109,14 @@ class LoginPage extends HookWidget {
                     ],
                     const SizedBox(height: AppSpacing.lg),
                     FilledButton(
-                      onPressed: auth.isLoading
-                          ? null
-                          : () {
-                              if (formKey.currentState!.validate()) {
-                                context.read<AuthController>().signIn(
-                                  emailController.text.trim(),
-                                  passwordController.text,
-                                );
-                              }
-                            },
+                      onPressed: auth.isLoading ? null : performSignIn,
                       child: auth.isLoading
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
+                          ? const _LoadingIndicator()
                           : const Text('Sign In'),
                     ),
                     const SizedBox(height: AppSpacing.md),
                     TextButton(
-                      onPressed: () => context.push('/register'),
+                      onPressed: navigateToRegister,
                       child: const Text("Don't have an account? Sign Up"),
                     ),
                   ],
@@ -143,16 +130,39 @@ class LoginPage extends HookWidget {
   }
 }
 
-// ── Screen-local widget ──────────────────────────────────────────────────────
+// ── Screen-local widgets ─────────────────────────────────────────────────────
 
-/// Dialog shown when a guest who has local data signs into an existing account.
-/// Forces a choice — [barrierDismissible] must be false at the call site.
+class _LoadingIndicator extends StatelessWidget {
+  const _LoadingIndicator();
+
+  @override
+  Widget build(BuildContext context) {
+    return const SizedBox(
+      height: 20,
+      width: 20,
+      child: CircularProgressIndicator(strokeWidth: 2),
+    );
+  }
+}
+
 class GuestMergeDialog extends StatelessWidget {
   final AuthController auth;
   const GuestMergeDialog({super.key, required this.auth});
 
   @override
   Widget build(BuildContext context) {
+    // Once these complete, AuthController clears the merge state.
+    // GoRouter notices the state change and automatically routes to '/'!
+    void discardLocalData() {
+      Navigator.of(context).pop();
+      auth.confirmMerge(false);
+    }
+
+    void mergeLocalData() {
+      Navigator.of(context).pop();
+      auth.confirmMerge(true);
+    }
+
     return AlertDialog(
       title: const Text('You have local data'),
       content: const Text(
@@ -163,27 +173,13 @@ class GuestMergeDialog extends StatelessWidget {
       ),
       actions: [
         TextButton(
-          onPressed: auth.isLoading
-              ? null
-              : () {
-                  Navigator.of(context).pop();
-                  auth.confirmMerge(false);
-                },
+          onPressed: auth.isLoading ? null : discardLocalData,
           child: const Text('Discard local data'),
         ),
         FilledButton(
-          onPressed: auth.isLoading
-              ? null
-              : () {
-                  Navigator.of(context).pop();
-                  auth.confirmMerge(true);
-                },
+          onPressed: auth.isLoading ? null : mergeLocalData,
           child: auth.isLoading
-              ? const SizedBox(
-                  height: 18,
-                  width: 18,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
+              ? const _LoadingIndicator()
               : const Text('Merge into account'),
         ),
       ],

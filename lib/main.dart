@@ -8,6 +8,7 @@
 import 'package:barrel_annotation/barrel_annotation.dart';
 import 'package:boo_mondai/database/database.barrel.dart';
 import 'package:boo_mondai/hive/hive_registrar.g.dart';
+import 'package:boo_mondai/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:provider/provider.dart';
@@ -35,6 +36,7 @@ Future<void> main() async {
 
   // ── Supabase ────────────────────────────────────────
   await Supabase.initialize(url: Env.supabaseUrl, anonKey: Env.supabaseAnonKey);
+  await RemoteDB.init();
   await LocalDB.init();
   Services.init();
 
@@ -49,40 +51,16 @@ Future<void> main() async {
   runApp(
     MultiProvider(
       providers: [
-        // Provider<HiveService>.value(value: hiveService),
-        // Provider<SupabaseRemoteDB>.value(value: supabaseService),
         ChangeNotifierProvider.value(value: authController),
-        // ChangeNotifierProvider(
-        //   create: (_) => DeckProvider(
-        //     supabaseService: supabaseService,
-        //     hiveService: hiveService,
-        //   ),
-        // ),
-        // ChangeNotifierProvider(
-        //   create: (_) => CardProvider(
-        //     supabaseService: supabaseService,
-        //     hiveService: hiveService,
-        //   ),
-        // ),
-        // ChangeNotifierProvider(
-        //   create: (_) => ViewDeckController(hiveService: hiveService),
-        // ),
         ChangeNotifierProvider(create: (_) => DrillSessionController()),
         ChangeNotifierProvider(create: (_) => ReviewDashboardController()),
         ChangeNotifierProvider(create: (_) => ReviewSessionController()),
         ChangeNotifierProvider(create: (_) => MyDecksPageController()),
-        // ChangeNotifierProvider(
-        //   create: (_) => FsrsProvider(
-        //     fsrsService: fsrsService,
-        //     // hiveService: hiveService,
-        //     supabaseService: supabaseService,
-        //   ),
-        // ),
         ChangeNotifierProvider(create: (_) => LeaderboardController()),
         ChangeNotifierProvider(create: (_) => StreakController()),
         ChangeNotifierProvider(create: (_) => ResearchController()),
       ],
-      child: const BooMondaiApp(),
+      child: BooMondaiApp(authController: authController),
     ),
   );
 }

@@ -19,6 +19,7 @@ class AuthService {
 
   Session? get currentSession => _client.auth.currentSession;
   User? get currentUser => _client.auth.currentUser;
+  bool get isAuthenticated => _client.auth.currentUser != null;
 
   /// Restores a session and fetches the user profile if authenticated.
   /// If an OAuth session is restored but no profile exists, it automatically creates one.

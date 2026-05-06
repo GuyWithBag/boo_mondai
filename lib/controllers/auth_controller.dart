@@ -9,10 +9,7 @@ import 'package:boo_mondai/database/database.barrel.dart';
 import 'package:boo_mondai/services/services.barrel.dart';
 
 class AuthController extends ChangeNotifier {
-  final AuthService _authService;
-
-  AuthController({AuthService? authService})
-    : _authService = authService ?? AuthService();
+  AuthService get service => Services.auth;
 
   bool _isLoading = false;
   String? _error;
@@ -35,7 +32,7 @@ class AuthController extends ChangeNotifier {
   Future<void> restoreSession() async {
     _setLoading(true);
     try {
-      await _authService.restoreSession();
+      await service.restoreSession();
     } catch (_) {
       // Network error on restore → stay in guest mode silently
     } finally {
@@ -46,9 +43,9 @@ class AuthController extends ChangeNotifier {
   Future<void> signIn(String email, String password) async {
     _setLoading(true);
     try {
-      authServiceResponse = await _authService.signIn(email, password);
-    } on AppException catch (e) {
-      _error = e.message;
+      authServiceResponse = await service.signIn(email, password);
+    } catch (e) {
+      _error = e is AppException ? e.message : e.toString();
     } finally {
       _setLoading(false);
     }
@@ -57,11 +54,7 @@ class AuthController extends ChangeNotifier {
   Future<void> signUp(String email, String password, String username) async {
     _setLoading(true);
     try {
-      authServiceResponse = await _authService.signUp(
-        email,
-        password,
-        username,
-      );
+      authServiceResponse = await service.signUp(email, password, username);
     } on AppException catch (e) {
       _error = e.message;
     } finally {
@@ -77,7 +70,7 @@ class AuthController extends ChangeNotifier {
 
     _setLoading(true);
     try {
-      await _authService.executeMergeDecision(merge, guestId, remoteProfile);
+      await service.executeMergeDecision(merge, guestId, remoteProfile);
     } on AppException catch (e) {
       _error = e.message;
     } finally {
@@ -89,7 +82,7 @@ class AuthController extends ChangeNotifier {
   Future<void> signOut() async {
     _setLoading(true);
     try {
-      await _authService.signOut();
+      await service.signOut();
       authServiceResponse = null; // Reset auth state on sign out
     } on AppException catch (e) {
       _error = e.message;
