@@ -11,6 +11,7 @@ export 'create_deck_page.dart';
 export 'deck_editor_page.dart';
 export 'drill_preview_page.dart';
 export 'drill_result_page.dart';
+export 'error_page.dart';
 export 'home_page.dart';
 export 'leaderboard_page.dart';
 export 'login_page.dart';

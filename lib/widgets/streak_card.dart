@@ -10,11 +10,11 @@ import 'package:flutter/material.dart';
 import 'package:boo_mondai/painters/painters.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 
-class StreakBadge extends StatelessWidget {
+class StreakCard extends StatelessWidget {
   final Streak? streak;
   final bool compact;
 
-  const StreakBadge({super.key, required this.streak, this.compact = false});
+  const StreakCard({super.key, required this.streak, this.compact = false});
 
   @override
   Widget build(BuildContext context) {
