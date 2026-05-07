@@ -37,6 +37,13 @@ class ViewDeckPage extends HookWidget {
     final canDrill = availableCount > 0;
     // ─────────────────────────────────────────────────────────
 
+    String getStartDrillButtonText() {
+      if (currentDeck.cardCount == 0) {
+        return 'No cards yet';
+      }
+      return canDrill ? 'Start Drill ($availableCount)' : 'Completed';
+    }
+
     Future<void> deleteDeckDialog() async {
       final title = currentDeck.title;
       final confirmed = await showDialog<bool>(
@@ -84,9 +91,7 @@ class ViewDeckPage extends HookWidget {
                 onPressed: canDrill
                     ? () => context.go('/drill/$deckId/session')
                     : null,
-                child: Text(
-                  canDrill ? 'Start Drill ($availableCount)' : 'Completed',
-                ),
+                child: Text(getStartDrillButtonText()),
               ),
             ),
           ],
@@ -95,11 +100,6 @@ class ViewDeckPage extends HookWidget {
       appBar: AppBar(
         title: Text(currentDeck.title),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            tooltip: 'Edit deck',
-            onPressed: () => context.push('/my-decks/$deckId/edit'),
-          ),
           IconButton(
             onPressed: deleteDeckDialog,
             icon: const Icon(Icons.delete_outline, size: 18, color: Colors.red),
