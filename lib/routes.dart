@@ -5,6 +5,7 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/exceptions/route_exception.dart';
 import 'package:go_router/go_router.dart';
 import 'package:boo_mondai/pages/pages.barrel.dart';
 import 'package:boo_mondai/controllers/controllers.barrel.dart';
@@ -15,7 +16,30 @@ GoRouter createRouter(AuthController authController) {
   return GoRouter(
     initialLocation: '/',
     refreshListenable: authController,
+    errorBuilder: (context, state) {
+      // 1. Wrap the GoRouter error in your custom RouteException
+      final exception = RouteException(
+        'Error 404: The requested page could not be found.',
+        code: 'ROUTE_NOT_FOUND',
+        originalError:
+            state.error, // state.error contains the actual GoRouter exception
+      );
+
+      // 2. Return a Scaffold containing your ErrorText widget
+      return ErrorPage(exception: exception);
+    },
     redirect: (context, state) {
+      // This checks every dynamic segment (e.g., :deckId, :surveyType, :sessionId)
+      if (state.pathParameters.isNotEmpty) {
+        for (final entry in state.pathParameters.entries) {
+          final value = entry.value;
+          if (value.isEmpty || value == 'null') {
+            // Throwing here sends the user straight to errorBuilder
+            throw Exception("Missing required parameter: ${entry.key}");
+          }
+        }
+      }
+
       final auth = authController;
       final isAnonymous = !auth.currentProfile.isAnonymous;
       final loc = state.matchedLocation;
@@ -98,7 +122,7 @@ GoRouter createRouter(AuthController authController) {
       GoRoute(
         path: '/my-decks/:deckId',
         builder: (context, state) =>
-            ViewDeckPage(deckId: state.pathParameters['deckId']),
+            ViewDeckPage(deckId: state.pathParameters['deckId']!),
       ),
       GoRoute(
         path: '/my-decks/:deckId/edit',

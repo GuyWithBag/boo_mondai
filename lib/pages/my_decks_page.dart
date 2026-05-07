@@ -15,12 +15,6 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:skeletonizer/skeletonizer.dart';
-
-// typedef MyDecksWidgetController = ({
-//   ScrollController scrollController,
-//   TextEditingController searchController,
-// });
 
 class MyDecksPage extends HookWidget {
   const MyDecksPage({super.key});
@@ -118,55 +112,32 @@ class _DeckListBody extends StatelessWidget {
   });
 
   final bool isLoading;
-  final String? error;
+  final Exception? error;
   final List<Deck> decks;
   final VoidCallback onRetry;
   final void Function(String id) onDeleteDeck;
 
   @override
   Widget build(BuildContext context) {
-    if (error != null) {
-      return ErrorState(message: error!, onRetry: onRetry);
-    }
-
-    if (isLoading) {
-      return Skeletonizer(
-        enabled: true,
-        child: ListView.separated(
-          padding: EdgeInsets.symmetric(
-            horizontal: AppSpacing.md.w,
-            vertical: AppSpacing.sm.h,
-          ),
-          itemCount: 3,
-          separatorBuilder: (_, __) => SizedBox(height: AppSpacing.sm.h),
-          itemBuilder: (_, __) => _PlaceholderDeckTile(),
-        ),
-      );
-    }
-
-    if (decks.isEmpty) {
-      return EmptyState(
+    return ListingStatesWrapper<Deck>.list(
+      isLoading: isLoading,
+      items: decks,
+      onRetry: onRetry,
+      skeletonTile: DeckCardTile(deck: null),
+      emptyState: EmptyState(
         icon: Icons.layers,
         title: 'No decks yet',
         message: 'Create your first deck to get started',
-        action: Builder(
-          builder: (context) => ElevatedButton(
-            child: Text('Create Deck'),
-            onPressed: () => context.push('/my-decks/create'),
-          ),
+        action: ElevatedButton(
+          child: Text('Create Deck'),
+          onPressed: () => context.push('/my-decks/create'),
         ),
-      );
-    }
-
-    return ListView.separated(
+      ),
       padding: EdgeInsets.symmetric(
         horizontal: AppSpacing.md.w,
         vertical: AppSpacing.sm.h,
       ),
-      itemCount: decks.length,
-      separatorBuilder: (_, __) => SizedBox(height: AppSpacing.sm.h),
-      itemBuilder: (context, index) {
-        final deck = decks[index];
+      itemBuilder: (_, _, deck) {
         return Dismissible(
           key: ValueKey(deck.id),
           direction: DismissDirection.horizontal,
@@ -175,52 +146,9 @@ class _DeckListBody extends StatelessWidget {
           //   alignment: Alignment.centerRight,
           // ),
           onDismissed: (_) => onDeleteDeck(deck.id),
-          child: DeckCardTile(
-            deck: deck,
-            // onTap: () => context.push('/decks/${deck.id}'),
-            // onStartDrill: () => context.push('/drill/${deck.id}'),
-          ),
+          child: DeckCardTile(deck: deck),
         );
       },
-    );
-  }
-}
-
-// ── _PlaceholderDeckTile ──────────────────────────────────────────────────────
-
-class _PlaceholderDeckTile extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: EdgeInsets.all(AppSpacing.md.w),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    height: 16.h,
-                    width: 160.w,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(4.r),
-                    ),
-                  ),
-                  SizedBox(height: AppSpacing.xs.h),
-                  Container(
-                    height: 12.h,
-                    width: 100.w,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(4.r),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

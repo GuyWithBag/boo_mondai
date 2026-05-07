@@ -12,7 +12,7 @@ import 'package:boo_mondai/shared/shared.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
 
 class DeckCardTile extends StatelessWidget {
-  final Deck deck;
+  final Deck? deck;
 
   /// When non-null, a delete option appears in the card's popup menu.
   final VoidCallback? onDelete;
@@ -54,12 +54,20 @@ class DeckCardTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+
+    void onTap() {
+      if (deck == null) return;
+      if (isSelecting) {
+        onSelect!();
+      } else {
+        context.push('/my-decks/${deck!.id}');
+      }
+    }
+
     return Card(
       color: isSelected ? scheme.primaryContainer : null,
       child: InkWell(
-        onTap: isSelecting
-            ? onSelect
-            : () => context.push('/my-decks/${deck.id}'),
+        onTap: onTap,
         onLongPress: !isSelecting ? onLongPress : null,
         borderRadius: BorderRadius.circular(AppRadii.card),
         child: Padding(
@@ -72,18 +80,14 @@ class DeckCardTile extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      deck.title,
+                      deck?.title ?? 'null',
                       style: Theme.of(context).textTheme.titleMedium,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  Text(
-                    deck.id,
-                    style: Theme.of(context).textTheme.titleMedium,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+
                   if (!isSelecting) ...[
-                    if (deck.isPremade) const StatusBadge.premade(),
+                    if (deck?.isPremade ?? false) const StatusBadge.premade(),
                     if (isDirty) UnsyncedBadge(isPushing: isPushing),
                     if (onDelete != null || onPush != null)
                       DeckPopupMenu(
@@ -96,7 +100,7 @@ class DeckCardTile extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.xs),
               Text(
-                '${deck.cardCount} cards  ·  ${deck.targetLanguage}',
+                '${deck?.cardCount ?? 'null'} cards',
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
             ],

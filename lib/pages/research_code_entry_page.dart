@@ -92,7 +92,7 @@ class _CodeStep extends HookWidget {
                   ),
                   if (research.error != null) ...[
                     const SizedBox(height: AppSpacing.sm),
-                    ErrorText(research.error!),
+                    ErrorText(research.error),
                   ],
                   if (message.value != null) ...[
                     const SizedBox(height: AppSpacing.sm),
@@ -243,7 +243,6 @@ class _DemographicsStep extends HookWidget {
                     ),
                     if (research.error != null) ...[
                       const SizedBox(height: AppSpacing.sm),
-                      ErrorText(research.error!),
                     ],
                     const SizedBox(height: AppSpacing.lg),
                     FilledButton(

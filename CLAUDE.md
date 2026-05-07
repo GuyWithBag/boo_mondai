@@ -1730,7 +1730,7 @@ Global error model:
 
 Provider error pattern:
   String? _error with getter
-  clearError() sets _error = null and notifies
+  clearError() sets setError(null); and notifies
   Every async method wraps in try/catch, sets _error on failure, resets _isLoading
 
 UI error pattern:

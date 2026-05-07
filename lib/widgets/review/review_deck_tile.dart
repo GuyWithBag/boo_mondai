@@ -5,19 +5,27 @@
 import 'package:flutter/material.dart';
 import 'package:boo_mondai/models/deck_review_stats.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
+import 'package:go_router/go_router.dart';
 
 class ReviewDeckTile extends StatelessWidget {
-  const ReviewDeckTile({super.key, required this.stats, required this.onTap});
+  const ReviewDeckTile({super.key, this.stats, this.onPressed});
 
-  final DeckReviewStats stats;
-  final VoidCallback onTap;
+  final DeckReviewStats? stats;
+  final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {
+    void onTap() {
+      if (stats == null) return;
+      stats!.totalDue > 0
+          ? context.push('/review/${stats!.deckId}/session')
+          : null;
+    }
+
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: stats.totalDue > 0 ? onTap : null, // Disable if nothing is due
+        onTap: onTap, // Disable if nothing is due
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.md),
           child: Column(
@@ -28,13 +36,13 @@ class ReviewDeckTile extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      stats.deckTitle,
+                      stats?.deckTitle ?? 'null',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-                  if (stats.totalDue > 0)
+                  if ((stats?.totalDue ?? -1) > 0)
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 10,
@@ -45,7 +53,7 @@ class ReviewDeckTile extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        '${stats.totalDue} Due',
+                        '${stats?.totalDue} Due',
                         style: TextStyle(
                           color: Theme.of(
                             context,
@@ -71,17 +79,17 @@ class ReviewDeckTile extends StatelessWidget {
                 children: [
                   _StatColumn(
                     label: 'New',
-                    count: stats.due.dueNew, // Updated accessor
+                    count: stats?.due.dueNew ?? -1, // Updated accessor
                     color: Colors.blue,
                   ),
                   _StatColumn(
                     label: 'Learn',
-                    count: stats.due.dueLearning, // Updated accessor
+                    count: stats?.due.dueLearning ?? -1, // Updated accessor
                     color: AppColors.incorrect,
                   ),
                   _StatColumn(
                     label: 'Review',
-                    count: stats.due.dueReview, // Updated accessor
+                    count: stats?.due.dueReview ?? -1, // Updated accessor
                     color: AppColors.correct,
                   ),
                 ],
@@ -104,22 +112,22 @@ class ReviewDeckTile extends StatelessWidget {
                 children: [
                   _HistoryBadge(
                     label: 'Again',
-                    count: stats.historical.again, // Updated accessor
+                    count: stats?.historical.again ?? -1, // Updated accessor
                     color: AppColors.incorrect,
                   ),
                   _HistoryBadge(
                     label: 'Hard',
-                    count: stats.historical.hard, // Updated accessor
+                    count: stats?.historical.hard ?? -1, // Updated accessor
                     color: AppColors.hard,
                   ),
                   _HistoryBadge(
                     label: 'Good',
-                    count: stats.historical.good, // Updated accessor
+                    count: stats?.historical.good ?? -1, // Updated accessor
                     color: AppColors.correct,
                   ),
                   _HistoryBadge(
                     label: 'Easy',
-                    count: stats.historical.easy, // Updated accessor
+                    count: stats?.historical.easy ?? -1, // Updated accessor
                     color: Colors.blue,
                   ),
                 ],

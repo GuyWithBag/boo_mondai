@@ -23,43 +23,27 @@ class ReviewDashboardPage extends HookWidget {
       return null;
     }, const []);
 
-    if (ctrl.isLoading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
-
-    if (ctrl.error != null) {
-      return Scaffold(body: Center(child: Text(ctrl.error!)));
-    }
-
-    if (ctrl.deckStats.isEmpty) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('FSRS Reviews')),
-        body: const Center(
-          child: Text('No enrolled cards yet. Go take a drill!'),
-        ),
-      );
-    }
-
     return Scaffold(
       appBar: AppBar(title: const Text('FSRS Reviews')),
-      body: ListView.separated(
+      body: ListingStatesWrapper.list(
+        emptyState: EmptyState(
+          // Placeholder icon
+          icon: Icons.abc,
+          title: 'No Enrolled Cards Yet',
+          message: 'Go take a drill!',
+        ),
+        isLoading: ctrl.isLoading,
+        items: ctrl.deckStats,
+        onRetry: ctrl.load,
+        skeletonTile: ReviewDeckTile(),
         padding: const EdgeInsets.only(
           left: AppSpacing.md,
           right: AppSpacing.md,
           top: AppSpacing.md,
           bottom: 100, // Padding for FAB
         ),
-        itemCount: ctrl.deckStats.length,
-        separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.sm),
-        itemBuilder: (context, i) {
-          final stat = ctrl.deckStats[i];
-          return ReviewDeckTile(
-            stats: stat,
-            onTap: () {
-              // TODO (Phase 2): Route to the new interactive Review Session for this specific deck
-              context.push('/review/${stat.deckId}/session');
-            },
-          );
+        itemBuilder: (_, _, stat) {
+          return ReviewDeckTile(stats: stat);
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,

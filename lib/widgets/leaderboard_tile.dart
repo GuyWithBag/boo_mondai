@@ -7,8 +7,8 @@
 
 import 'package:boo_mondai/database/database.barrel.dart';
 import 'package:boo_mondai/models/models.barrel.dart';
+import 'package:boo_mondai/widgets/widgets.barrel.dart';
 import 'package:flutter/material.dart';
-import 'package:boo_mondai/widgets/streak_badge.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -69,7 +69,7 @@ class LeaderboardTileWidget extends HookWidget {
             style: Theme.of(context).textTheme.bodySmall,
           ),
           trailing: streak != null && streak.currentStreak > 0
-              ? StreakBadge(streak: streak, compact: true)
+              ? StreakCard(streak: streak, compact: true)
               : null,
         ),
       ),

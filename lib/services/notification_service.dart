@@ -6,7 +6,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:boo_mondai/services/app_exception.dart';
+import 'package:boo_mondai/exceptions/exceptions.barrel.dart';
 
 class NotificationService {
   final FlutterLocalNotificationsPlugin _plugin =
@@ -14,15 +14,17 @@ class NotificationService {
 
   Future<void> init() async {
     try {
-      const androidSettings =
-          AndroidInitializationSettings('@mipmap/ic_launcher');
+      const androidSettings = AndroidInitializationSettings(
+        '@mipmap/ic_launcher',
+      );
       const darwinSettings = DarwinInitializationSettings(
         requestAlertPermission: true,
         requestBadgePermission: true,
         requestSoundPermission: true,
       );
-      const linuxSettings =
-          LinuxInitializationSettings(defaultActionName: 'Open');
+      const linuxSettings = LinuxInitializationSettings(
+        defaultActionName: 'Open',
+      );
       const initSettings = InitializationSettings(
         android: androidSettings,
         iOS: darwinSettings,
@@ -36,7 +38,9 @@ class NotificationService {
   }
 
   Future<void> scheduleReviewReminder(
-      DateTime scheduledDate, int dueCount) async {
+    DateTime scheduledDate,
+    int dueCount,
+  ) async {
     try {
       await _plugin.show(
         id: 0,

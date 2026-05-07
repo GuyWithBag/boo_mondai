@@ -12,29 +12,22 @@ import 'package:boo_mondai/shared/shared.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
 
 class ViewDeckPage extends HookWidget {
-  final String? deckId;
+  final String deckId;
   const ViewDeckPage({super.key, required this.deckId});
 
   @override
   Widget build(BuildContext context) {
-    if (deckId == null) {
-      return Center(child: ErrorText('Error 404: deck Id not found'));
-    }
+    final currentDeck = LocalDB.deck.getById(deckId);
 
-    final deckRepo = LocalDB.deck;
-    final currentDeck = deckRepo.getById(deckId!);
-    if (currentDeck == null) {
-      return const Scaffold(body: Center(child: Text('Deck not found.')));
-    }
     final cachedProfsRepo = LocalDB.cachedProfile;
-    final author = cachedProfsRepo.getById(currentDeck.userId);
+    final author = cachedProfsRepo.getById(currentDeck!.userId);
     final sourceAuthor = cachedProfsRepo.getById(
       currentDeck.sourceAuthorId ?? '',
     );
 
     // ── Calculate drill eligibility (works in guest mode too) ──────────────
     final userId = LocalDB.profile.getOrCreate().userId;
-    final eligibleCards = DrillService.getEligibleDrillCards(deckId!, userId);
+    final eligibleCards = DrillService.getEligibleDrillCards(deckId, userId);
 
     final availableCount = eligibleCards.length;
     final canDrill = availableCount > 0;

@@ -32,6 +32,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
   AdapterSpec<Card>(),
   AdapterSpec<FsrsCard>(),
   AdapterSpec<ReviewLog>(),
+  AdapterSpec<ReviewSession>(),
   AdapterSpec<FsrsReviewLog>(),
   AdapterSpec<State>(),
   AdapterSpec<Streak>(),

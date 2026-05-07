@@ -1404,3 +1404,55 @@ class UserAdapter extends TypeAdapter<User> {
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
+
+class ReviewSessionAdapter extends TypeAdapter<ReviewSession> {
+  @override
+  final typeId = 28;
+
+  @override
+  ReviewSession read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return ReviewSession(
+      id: fields[2] as String,
+      userId: fields[3] as String,
+      deckId: fields[4] as String?,
+      startedAt: fields[5] as DateTime,
+      completedAt: fields[6] as DateTime?,
+      totalCards: (fields[0] as num).toInt(),
+      cardsReviewed: fields[1] == null ? 0 : (fields[1] as num).toInt(),
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, ReviewSession obj) {
+    writer
+      ..writeByte(7)
+      ..writeByte(0)
+      ..write(obj.totalCards)
+      ..writeByte(1)
+      ..write(obj.cardsReviewed)
+      ..writeByte(2)
+      ..write(obj.id)
+      ..writeByte(3)
+      ..write(obj.userId)
+      ..writeByte(4)
+      ..write(obj.deckId)
+      ..writeByte(5)
+      ..write(obj.startedAt)
+      ..writeByte(6)
+      ..write(obj.completedAt);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ReviewSessionAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}

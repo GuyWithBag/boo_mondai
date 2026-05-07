@@ -8,17 +8,20 @@
 import 'package:flutter/material.dart';
 
 class ErrorText extends StatelessWidget {
-  final String message;
+  final Exception? exception;
 
-  const ErrorText(this.message, {super.key});
+  const ErrorText(this.exception, {super.key});
 
   @override
   Widget build(BuildContext context) {
+    if (exception == null) {
+      return SizedBox.shrink();
+    }
     return SelectableText(
-      message,
+      exception.toString(),
       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: Theme.of(context).colorScheme.error,
-          ),
+        color: Theme.of(context).colorScheme.error,
+      ),
     );
   }
 }

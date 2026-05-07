@@ -87,7 +87,7 @@ class RegisterPage extends HookWidget {
                     ),
                     if (auth.error != null) ...[
                       const SizedBox(height: AppSpacing.sm),
-                      ErrorText(auth.error!),
+                      ErrorText(auth.error),
                     ],
                     const SizedBox(height: AppSpacing.lg),
                     FilledButton(

@@ -20,7 +20,7 @@ class ReviewPrompt extends StatelessWidget {
     required this.onMaybeLater,
   });
 
-  final String? deckId;
+  final String deckId;
   final int reviewableNow;
   final int reviewLater;
   final VoidCallback? onReviewNow;
@@ -28,7 +28,6 @@ class ReviewPrompt extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (deckId == null) return ErrorState(message: 'Deck Id not found');
     final deckProvider = LocalDB.deck;
 
     // Safely look up the deck across both public and user decks

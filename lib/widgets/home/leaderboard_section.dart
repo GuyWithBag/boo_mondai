@@ -16,12 +16,10 @@ class LeaderboardSection extends StatelessWidget {
     super.key,
     required this.entries,
     required this.isLoading,
-    required this.userId,
   });
 
   final List<LeaderboardEntry> entries;
   final bool isLoading;
-  final String? userId;
 
   @override
   Widget build(BuildContext context) {
@@ -68,14 +66,7 @@ class LeaderboardSection extends StatelessWidget {
           )
         else
           ...entries.asMap().entries.map(
-            (e) => LeaderboardTileWidget(
-              rank: e.key + 1,
-              entry: e.value,
-              // username: e.value.username,
-              // drillScore: e.value.drillScore,
-              // reviewCount: e.value.reviewCount,
-              // currentStreak: e.value.currentStreak,
-            ),
+            (e) => LeaderboardTileWidget(rank: e.key + 1, entry: e.value),
           ),
       ],
     );

@@ -12,35 +12,23 @@ class DeckEditorPage extends HookWidget {
   const DeckEditorPage({
     super.key,
     required this.deckId,
-    this.initialTemplateId,
+    required this.initialTemplateId,
   });
 
-  final String? deckId;
-  final String? initialTemplateId; // <-- Renamed from initialCardId
+  final String deckId;
+  final String? initialTemplateId;
 
   @override
   Widget build(BuildContext context) {
-    if (deckId == null) {
-      return ErrorState(message: 'Deck ID not found');
-    }
     return ChangeNotifierProvider(
-      create: (context) => DeckEditorPageController(),
+      create: (_) => DeckEditorPageController(
+        deckId: deckId,
+        initialTemplateId: initialTemplateId,
+      ),
       child: HookBuilder(
         builder: (context) {
           final controller = context.watch<DeckEditorPageController>();
           final formKey = useMemoized(GlobalKey<FormState>.new);
-
-          // Auto-select initial template on first render if provided
-          useEffect(() {
-            controller.loadDeck(deckId!);
-            if (initialTemplateId != null &&
-                controller.activeTemplateId == null) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                controller.selectTemplate(initialTemplateId); // <-- Updated
-              });
-            }
-            return null;
-          }, const []);
 
           Future<void> handleSaveDeck() async {
             if (formKey.currentState?.validate() ?? true) {

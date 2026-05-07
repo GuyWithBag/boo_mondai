@@ -20,17 +20,16 @@ class HomePage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthController>();
-    final dashboard = context.watch<ReviewDashboardController>();
+    final reviewDashboard = context.watch<ReviewDashboardController>();
     final leaderboard = context.watch<LeaderboardController>();
-    final userId = auth.currentProfile.id;
 
     useEffect(() {
       Future.microtask(() {
-        dashboard.load();
+        reviewDashboard.load();
         leaderboard.fetchLeaderboard();
       });
       return null;
-    }, [userId]);
+    }, []);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Home')),
@@ -38,7 +37,7 @@ class HomePage extends HookWidget {
         child: RefreshIndicator(
           onRefresh: () async {
             await Future.wait([
-              context.read<ReviewDashboardController>().load(),
+              reviewDashboard.load(),
               leaderboard.fetchLeaderboard(),
             ]);
           },
@@ -50,10 +49,10 @@ class HomePage extends HookWidget {
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
               const SizedBox(height: AppSpacing.lg),
-              StreakBadge(streak: LocalDB.streak.retrieve()),
+              StreakCard(streak: LocalDB.streak.retrieve()),
               const SizedBox(height: AppSpacing.md),
               DueReviewCard(
-                dueCount: dashboard.totalDue,
+                dueCount: reviewDashboard.totalDue,
                 onTap: () => context.push('/review/session'),
               ),
               const SizedBox(height: AppSpacing.lg),
@@ -74,7 +73,6 @@ class HomePage extends HookWidget {
               LeaderboardSection(
                 entries: leaderboard.entries.take(5).toList(),
                 isLoading: leaderboard.isLoading,
-                userId: userId,
               ),
             ],
           ),

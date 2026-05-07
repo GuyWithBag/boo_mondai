@@ -21,8 +21,8 @@ class DrillResultPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ctrl = context.watch<DrillSessionController>();
-    final session = ctrl.session;
+    final controller = context.watch<DrillSessionController>();
+    final session = controller.session!;
 
     final scoreAnim = useAnimationController(
       duration: const Duration(milliseconds: 600),
@@ -33,20 +33,13 @@ class DrillResultPage extends HookWidget {
       return null;
     }, const []);
 
-    if (session == null) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('Results')),
-        body: const Center(child: Text('No session data')),
-      );
-    }
-
     void goHome() {
-      ctrl.reset();
+      controller.reset();
       context.go('/');
     }
 
     // 1. Enrolled Count: FSRS now takes everything except auto-graded typos
-    final enrolledCount = ctrl.answers
+    final enrolledCount = controller.answers
         .where((a) => a.type != StudyRating.incorrect)
         .length;
 
@@ -54,7 +47,7 @@ class DrillResultPage extends HookWidget {
     final breakdown = <StudyRating, int>{
       for (final type in StudyRating.values) type: 0,
     };
-    for (final a in ctrl.answers) {
+    for (final a in controller.answers) {
       breakdown[a.type] = (breakdown[a.type] ?? 0) + 1;
     }
 
@@ -83,14 +76,14 @@ class DrillResultPage extends HookWidget {
                   const SizedBox(height: AppSpacing.lg),
 
                   // The list of individual answers
-                  if (ctrl.answers.isNotEmpty)
+                  if (controller.answers.isNotEmpty)
                     Expanded(
                       child: ListView.separated(
-                        itemCount: ctrl.answers.length,
+                        itemCount: controller.answers.length,
                         separatorBuilder: (context, i) =>
                             const SizedBox(height: AppSpacing.sm),
                         itemBuilder: (context, i) {
-                          final a = ctrl.answers[i];
+                          final a = controller.answers[i];
 
                           return AnswerResultTile(
                             userAnswer: a.userAnswer,
@@ -109,7 +102,7 @@ class DrillResultPage extends HookWidget {
                   // The action buttons at the bottom
                   if (enrolledCount > 0)
                     ReviewPrompt(
-                      deckId: session.deckId,
+                      deckId: session.deckId!,
                       reviewableNow: 0,
                       reviewLater: enrolledCount,
                       onReviewNow: null,
