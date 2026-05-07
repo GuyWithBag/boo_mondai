@@ -154,12 +154,12 @@ class GuestMergeDialog extends StatelessWidget {
     // Once these complete, AuthController clears the merge state.
     // GoRouter notices the state change and automatically routes to '/'!
     void discardLocalData() {
-      Navigator.of(context).pop();
+      context.go('/account');
       auth.confirmMerge(false);
     }
 
     void mergeLocalData() {
-      Navigator.of(context).pop();
+      context.go('/account');
       auth.confirmMerge(true);
     }
 
