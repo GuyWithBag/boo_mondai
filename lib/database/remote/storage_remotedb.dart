@@ -6,7 +6,8 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'dart:typed_data';
-import 'package:boo_mondai/services/app_exception.dart';
+import 'package:boo_mondai/exceptions/exceptions.barrel.dart';
+
 import 'package:boo_mondai/database/database.barrel.dart';
 
 class StorageRemoteDB extends SupabaseRemoteDB<Never> {

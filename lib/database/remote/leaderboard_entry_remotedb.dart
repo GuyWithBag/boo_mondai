@@ -10,7 +10,7 @@ import 'package:boo_mondai/database/database.barrel.dart';
 
 class LeaderboardEntryRemoteDB extends SupabaseRemoteDB<LeaderboardEntry> {
   @override
-  String get tableName => 'leaderboard';
+  String get tableName => 'leaderboard_entries';
 
   @override
   LeaderboardEntry Function(Map<String, dynamic>) get fromMap =>
@@ -24,10 +24,8 @@ class LeaderboardEntryRemoteDB extends SupabaseRemoteDB<LeaderboardEntry> {
   Future<List<LeaderboardEntry>> fetchLeaderboard() => guard(() async {
     var query = client
         .from(tableName)
-        .select(
-          'user_id, display_name as user_name, target_language, drill_score, review_count, current_streak',
-        );
+        .select('user_id,  drill_score, review_count');
     final response = await query.order('drill_score', ascending: false);
     return List<Map<String, dynamic>>.from(response).map(fromMap).toList();
-  });
+  }, action: 'fetchLeaderboard()');
 }

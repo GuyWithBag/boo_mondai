@@ -6,7 +6,8 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/models/models.barrel.dart';
-import 'package:boo_mondai/services/app_exception.dart';
+import 'package:boo_mondai/exceptions/exceptions.barrel.dart';
+
 import 'package:boo_mondai/database/database.barrel.dart';
 
 class CardTemplateRemoteDB extends SupabaseRemoteDB<CardTemplate> {
@@ -30,7 +31,7 @@ class CardTemplateRemoteDB extends SupabaseRemoteDB<CardTemplate> {
         .eq('deck_id', deckId)
         .order('sort_order');
     return List<Map<String, dynamic>>.from(response).map(fromMap).toList();
-  });
+  }, action: 'fetchCards($deckId)');
 
   Future<void> deleteCard(String id) => guard(() async {
     final deleted = await client
@@ -41,7 +42,7 @@ class CardTemplateRemoteDB extends SupabaseRemoteDB<CardTemplate> {
     if (deleted.isEmpty) {
       throw AppException('Card not found or permission denied');
     }
-  });
+  }, action: 'deleteCard($id)');
 
   /// Deletes remote card_templates for [deckId] whose IDs are NOT in [keepIds].
   Future<void> deleteOrphanCards(String deckId, List<String> keepIds) =>
@@ -56,7 +57,7 @@ class CardTemplateRemoteDB extends SupabaseRemoteDB<CardTemplate> {
             .toList();
         if (toDelete.isEmpty) return;
         await client.from('card_templates').delete().inFilter('id', toDelete);
-      });
+      }, action: 'deleteOrphanCards($deckId, $keepIds)');
 
   /// Deletes all content-node rows for [cardId] in parallel.
   Future<void> deleteChildrenByCardId(String cardId) => guard(() async {
@@ -66,19 +67,22 @@ class CardTemplateRemoteDB extends SupabaseRemoteDB<CardTemplate> {
       client.from('fitb_segments').delete().eq('card_id', cardId),
       client.from('mm_pairs').delete().eq('card_id', cardId),
     ]);
-  });
+  }, action: 'deleteChildrenByCardId($cardId)');
 
   // ── Batch content-node inserts ────────────────────────
   // Kept here to encapsulate the toMap conversion for each type.
 
-  Future<void> batchInsertNotes(List<Map<String, dynamic>> data) =>
-      guard(() => client.from('notes').insert(data));
+  Future<void> batchInsertNotes(List<Map<String, dynamic>> data) => guard(
+    () => client.from('notes').insert(data),
+    action: 'batchInsertNotes($data)',
+  );
 
   Future<void> batchInsertMCOptions(List<MultipleChoiceOption> options) =>
       guard(
         () => client
             .from('mc_options')
             .insert(options.map((o) => o.toMap()).toList()),
+        action: 'batchInsertMCOptions($options)',
       );
 
   Future<void> batchInsertFITBSegments(List<FillInTheBlankSegment> segments) =>
@@ -86,9 +90,11 @@ class CardTemplateRemoteDB extends SupabaseRemoteDB<CardTemplate> {
         () => client
             .from('fitb_segments')
             .insert(segments.map((s) => s.toMap()).toList()),
+        action: 'batchInsertFITBSegments($segments)',
       );
 
   Future<void> batchInsertMMPairs(List<MatchMadnessPair> pairs) => guard(
     () => client.from('mm_pairs').insert(pairs.map((p) => p.toMap()).toList()),
+    action: 'batchInsertMMPairs($pairs)',
   );
 }

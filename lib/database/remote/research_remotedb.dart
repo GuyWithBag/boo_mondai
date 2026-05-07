@@ -52,7 +52,7 @@ class ResearchRemoteDB extends SupabaseRemoteDB<ResearchCode> {
             .eq('id', codeRow['id'] as String);
 
         return fromMap(Map<String, dynamic>.from(codeRow));
-      });
+      }, action: 'redeemResearchCode($code, $userId)');
 
   Future<ResearchData> fetchAllResearchData() => guard(() async {
     final results = await Future.wait([
@@ -82,5 +82,5 @@ class ResearchRemoteDB extends SupabaseRemoteDB<ResearchCode> {
         results[3],
       ).map(VocabularyTestResultMapper.fromMap).toList(),
     );
-  });
+  }, action: 'fetchAllResearchData()');
 }
