@@ -3,6 +3,7 @@
 // Barrel files
 export 'controllers/controllers.barrel.dart';
 export 'database/database.barrel.dart';
+export 'exceptions/exceptions.barrel.dart';
 export 'models/models.barrel.dart';
 export 'pages/pages.barrel.dart';
 export 'painters/painters.barrel.dart';
