@@ -60,7 +60,7 @@ class MyDecksPageController extends Controller {
     ;
     try {
       await _deckDB.delete(id);
-      // load();
+      load();
     } on Exception catch (e) {
       setError(e);
       setLoading(false);

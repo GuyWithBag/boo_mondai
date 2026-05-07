@@ -2,6 +2,7 @@
 // PATH: lib/pages/view_deck_page.dart
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/controllers/my_decks_page_controller.dart';
 import 'package:boo_mondai/database/database.barrel.dart';
 
 import 'package:boo_mondai/services/services.barrel.dart';
@@ -10,6 +11,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
+import 'package:provider/provider.dart';
 
 class ViewDeckPage extends HookWidget {
   final String deckId;
@@ -24,6 +26,8 @@ class ViewDeckPage extends HookWidget {
     final sourceAuthor = cachedProfsRepo.getById(
       currentDeck.sourceAuthorId ?? '',
     );
+
+    final controller = context.read<MyDecksPageController>();
 
     // ── Calculate drill eligibility (works in guest mode too) ──────────────
     final userId = LocalDB.profile.getOrCreate().userId;
@@ -52,8 +56,8 @@ class ViewDeckPage extends HookWidget {
           ],
         ),
       );
-      if (confirmed == true && context.mounted) {
-        // await deckProv.deleteDeck(deckId);
+      if (confirmed == true) {
+        await controller.deleteDeck(deckId);
         if (context.mounted) context.pop();
       }
     }
