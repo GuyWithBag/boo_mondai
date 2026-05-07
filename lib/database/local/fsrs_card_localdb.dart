@@ -19,28 +19,32 @@ class FsrsCardLocalDB extends HiveLocalDB<FsrsCard> {
   // ── Domain Queries ──────────────────────────────────────
 
   /// Renamed to match the new ReviewCard nomenclature
-  FsrsCard? getByReviewCardId(String reviewCardId) {
-    return box.values.where((s) => s.reviewCardId == reviewCardId).firstOrNull;
-  }
+  FsrsCard? getByReviewCardId(String reviewCardId) => guardSync(
+    () => box.values.where((s) => s.reviewCardId == reviewCardId).firstOrNull,
+    action: 'getByReviewCardId($reviewCardId)',
+  );
 
   /// Gets all cards for a specific user
-  List<FsrsCard> getByUserId(String userId) {
-    return box.values.where((s) => s.userId == userId).toList();
-  }
+  List<FsrsCard> getByUserId(String userId) => guardSync(
+    () => box.values.where((s) => s.userId == userId).toList(),
+    action: 'getByUserId($userId)',
+  );
 
   /// Highly optimized: Returns just a Set of IDs.
   /// Perfect for checking if a card is already enrolled!
-  Set<String> getEnrolledReviewCardIds(String userId) {
-    return box.values
+  Set<String> getEnrolledReviewCardIds(String userId) => guardSync(
+    () => box.values
         .where((s) => s.userId == userId)
         .map((s) => s.reviewCardId)
-        .toSet();
-  }
+        .toSet(),
+    action: 'getEnrolledReviewCardIds($userId)',
+  );
 
   /// Gets cards that are ready to be reviewed right now
-  List<FsrsCard> getDueCards(DateTime now) {
-    return box.values.where((s) {
-      return s.state.due.isBefore(now) || s.state.due.isAtSameMomentAs(now);
-    }).toList();
-  }
+  List<FsrsCard> getDueCards(DateTime now) => guardSync(
+    () => box.values
+        .where((s) => s.state.due.isBefore(now) || s.state.due.isAtSameMomentAs(now))
+        .toList(),
+    action: 'getDueCards',
+  );
 }

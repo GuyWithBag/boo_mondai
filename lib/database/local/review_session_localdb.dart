@@ -14,9 +14,9 @@ class ReviewSessionLocalDB extends HiveLocalDB<ReviewSession> {
   @override
   String getId(ReviewSession item) => item.id;
 
-  List<ReviewSession> getRecent(int count) {
+  List<ReviewSession> getRecent(int count) => guardSync(() {
     final sorted = box.values.toList()
       ..sort((a, b) => b.startedAt.compareTo(a.startedAt));
     return sorted.take(count).toList();
-  }
+  }, action: 'getRecent($count)');
 }

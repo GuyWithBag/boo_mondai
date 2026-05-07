@@ -30,7 +30,7 @@ class StreakLocalDB extends HiveSingleDataLocalDB<Streak> {
   /// Records an activity for [userId] on [activityDate] and returns the
   /// updated [Streak]. Handles first-time, same-day, consecutive, and
   /// broken-streak cases.
-  Future<Streak> recordActivity(DateTime activityDate) async {
+  Future<Streak> recordActivity(DateTime activityDate) => guard(() async {
     final existing = retrieve();
 
     if (existing == null) {
@@ -83,5 +83,5 @@ class StreakLocalDB extends HiveSingleDataLocalDB<Streak> {
     );
     await upsert(updated);
     return updated;
-  }
+  }, action: 'recordActivity');
 }

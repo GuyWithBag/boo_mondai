@@ -14,6 +14,8 @@ class ReviewLogLocalDB extends HiveLocalDB<FsrsReviewLog> {
   @override
   String getId(FsrsReviewLog item) => item.log.cardId.toString();
 
-  List<FsrsReviewLog> getByCardId(String cardId) =>
-      box.values.where((e) => e.log.cardId.toString() == cardId).toList();
+  List<FsrsReviewLog> getByCardId(String cardId) => guardSync(
+    () => box.values.where((e) => e.log.cardId.toString() == cardId).toList(),
+    action: 'getByCardId($cardId)',
+  );
 }

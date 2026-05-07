@@ -42,7 +42,7 @@ abstract class HiveLocalDB<T> {
         name: 'HiveLocalDB[$boxName]',
         error: e,
       );
-      throw AppException(e.message, code: 'HIVE_ERROR');
+      throw HiveException(e.message, code: 'HIVE_ERROR', originalError: e);
     } catch (e, stack) {
       developer.log(
         '❌ Unknown Exception: $e',
@@ -67,7 +67,7 @@ abstract class HiveLocalDB<T> {
         name: 'HiveLocalDB[$boxName]',
         error: e,
       );
-      throw AppException(e.message, code: 'HIVE_ERROR');
+      throw HiveException(e.message, code: 'HIVE_ERROR', originalError: e);
     } catch (e, stack) {
       developer.log(
         '❌ Unknown Exception: $e',

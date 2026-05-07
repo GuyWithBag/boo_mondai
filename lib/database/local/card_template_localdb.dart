@@ -15,14 +15,16 @@ class CardTemplateLocalDB extends HiveLocalDB<CardTemplate> {
   @override
   String getId(CardTemplate item) => item.id;
 
-  List<CardTemplate> getByDeckId(String deckId) =>
-      box.values.where((c) => c.deckId == deckId).toList();
+  List<CardTemplate> getByDeckId(String deckId) => guardSync(
+    () => box.values.where((c) => c.deckId == deckId).toList(),
+    action: 'getByDeckId($deckId)',
+  );
 
-  Future<void> deleteByDeckId(String deckId) async {
+  Future<void> deleteByDeckId(String deckId) => guard(() async {
     final keys = box.values
         .where((c) => c.deckId == deckId)
         .map((c) => c.id)
         .toList();
     await box.deleteAll(keys);
-  }
+  }, action: 'deleteByDeckId($deckId)');
 }

@@ -16,12 +16,14 @@ class DrillAnswerLocalDB extends HiveLocalDB<DrillAnswer> {
   // ── Domain Specific Queries ────────────────────────────────
 
   /// Fetches all answers submitted during a specific session
-  List<DrillAnswer> getBySessionId(String sessionId) {
-    return box.values.where((a) => a.sessionId == sessionId).toList();
-  }
+  List<DrillAnswer> getBySessionId(String sessionId) => guardSync(
+    () => box.values.where((a) => a.sessionId == sessionId).toList(),
+    action: 'getBySessionId($sessionId)',
+  );
 
   /// Fetches the history of a specific card (useful for future stats screens!)
-  List<DrillAnswer> getByReviewCardId(String reviewCardId) {
-    return box.values.where((a) => a.cardId == reviewCardId).toList();
-  }
+  List<DrillAnswer> getByReviewCardId(String reviewCardId) => guardSync(
+    () => box.values.where((a) => a.cardId == reviewCardId).toList(),
+    action: 'getByReviewCardId($reviewCardId)',
+  );
 }

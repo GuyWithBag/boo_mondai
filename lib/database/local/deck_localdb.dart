@@ -14,12 +14,15 @@ class DeckLocalDB extends HiveLocalDB<Deck> {
   @override
   String getId(Deck item) => item.id;
 
-  List<Deck> getByCurrentUser() {
-    return getAll()
+  List<Deck> getByCurrentUser() => guardSync(
+    () => getAll()
         .where((d) => d.userId == LocalDB.profile.getOrCreate().userId)
-        .toList();
-  }
+        .toList(),
+    action: 'getByCurrentUser',
+  );
 
-  List<Deck> getByUserId(String userId) =>
-      box.values.where((d) => d.userId == userId).toList();
+  List<Deck> getByUserId(String userId) => guardSync(
+    () => box.values.where((d) => d.userId == userId).toList(),
+    action: 'getByUserId($userId)',
+  );
 }

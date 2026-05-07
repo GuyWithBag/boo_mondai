@@ -2,6 +2,7 @@
 
 // Other files
 export 'app_exception.dart';
+export 'hive_exception.dart';
 export 'route_exception.dart';
 export 'session_exception.dart';
 export 'sync_exception.dart';
