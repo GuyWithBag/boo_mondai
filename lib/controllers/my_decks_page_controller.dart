@@ -6,12 +6,11 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart';
-import 'package:flutter/foundation.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 
 /// Drives the My Decks page — loads all decks sorted by [updatedAt] descending
 /// and exposes delete operations.
-class MyDecksPageController extends ChangeNotifier {
+class MyDecksPageController extends Controller {
   final DeckLocalDB _deckDB = LocalDB.deck;
   // Inside your Controller
   void init() {
@@ -23,8 +22,6 @@ class MyDecksPageController extends ChangeNotifier {
   // ── private state ────────────────────────────────────────
 
   List<Deck> _decks = [];
-  bool _isLoading = false;
-  String? _error;
 
   bool _isSyncing = false;
   String? _syncError;
@@ -32,8 +29,6 @@ class MyDecksPageController extends ChangeNotifier {
   // ── public getters ───────────────────────────────────────
 
   List<Deck> get decks => List.unmodifiable(_decks);
-  bool get isLoading => _isLoading;
-  String? get error => _error;
   bool get isSyncing => _isSyncing;
   String? get syncError => _syncError;
 
@@ -41,8 +36,8 @@ class MyDecksPageController extends ChangeNotifier {
 
   /// Loads all decks from the repository, sorted by [updatedAt] descending.
   void load() {
-    _isLoading = true;
-    _error = null;
+    setLoading(true);
+    setError(null);
     notifyListeners();
 
     try {
@@ -51,30 +46,32 @@ class MyDecksPageController extends ChangeNotifier {
       all.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
       _decks = all;
     } on Exception catch (e) {
-      _error = e.toString();
+      setError(e);
     } finally {
-      _isLoading = false;
+      setLoading(false);
       notifyListeners();
     }
   }
 
   /// Deletes the deck with the given [id] from the repository, then reloads.
   Future<void> deleteDeck(String id) async {
-    _isLoading = true;
-    _error = null;
+    setLoading(true);
+    setError(null);
+    ;
     try {
       await _deckDB.delete(id);
       // load();
     } on Exception catch (e) {
-      _error = e.toString();
-      _isLoading = false;
+      setError(e);
+      setLoading(false);
       notifyListeners();
     }
   }
 
   /// Clears any active error message and notifies listeners.
   void clearError() {
-    _error = null;
+    setError(null);
+    ;
     notifyListeners();
   }
 

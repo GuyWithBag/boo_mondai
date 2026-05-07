@@ -3,19 +3,19 @@
 // PURPOSE: UI state for research codes, surveys, vocabulary tests, and researcher dashboard
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:flutter/foundation.dart';
+import 'package:boo_mondai/controllers/controllers.barrel.dart';
+import 'package:boo_mondai/exceptions/exceptions.barrel.dart';
 import 'package:boo_mondai/models/models.barrel.dart';
 import 'package:boo_mondai/database/database.barrel.dart';
 import 'package:boo_mondai/services/services.barrel.dart';
 
-class ResearchController extends ChangeNotifier {
+class ResearchController extends Controller {
   ResearchProfile? _researchProfile;
   List<ResearchCode> _codes = [];
   final List<String> _unlockedFlows = [];
   List<SurveyResponse> _surveyResponses = [];
   List<VocabularyTestResult> _testResults = [];
   List<ResearchProfile> _researchProfiles = [];
-  bool _isLoading = false;
   String? _error;
 
   ResearchProfile? get researchProfile => _researchProfile;
@@ -26,19 +26,19 @@ class ResearchController extends ChangeNotifier {
   List<VocabularyTestResult> get testResults => List.unmodifiable(_testResults);
   List<ResearchProfile> get researchProfiles =>
       List.unmodifiable(_researchProfiles);
-  bool get isLoading => _isLoading;
-  String? get error => _error;
 
   void clearError() {
     if (_error != null) {
-      _error = null;
+      setError(null);
+      ;
       notifyListeners();
     }
   }
 
   Future<String?> redeemCode(String userId, String code) async {
-    _isLoading = true;
-    _error = null;
+    setLoading(true);
+    setError(null);
+    ;
     notifyListeners();
 
     try {
@@ -47,12 +47,12 @@ class ResearchController extends ChangeNotifier {
         userId,
       );
       _unlockedFlows.add(researchCode.unlocks);
-      _isLoading = false;
+      setLoading(false);
       notifyListeners();
       return researchCode.unlocks;
     } on AppException catch (e) {
-      _error = e.message;
-      _isLoading = false;
+      setError(e);
+      setLoading(false);
       notifyListeners();
       return null;
     }
@@ -63,7 +63,8 @@ class ResearchController extends ChangeNotifier {
     String targetRole,
     String unlocks,
   ) async {
-    _error = null;
+    setError(null);
+    ;
 
     try {
       final researchCode = Services.research.buildResearchCode(
@@ -77,7 +78,7 @@ class ResearchController extends ChangeNotifier {
       notifyListeners();
       return result;
     } on AppException catch (e) {
-      _error = e.message;
+      setError(e);
       notifyListeners();
       return null;
     }
@@ -90,8 +91,9 @@ class ResearchController extends ChangeNotifier {
     Map<String, int> responses, {
     Map<String, dynamic>? extras,
   }) async {
-    _isLoading = true;
-    _error = null;
+    setLoading(true);
+    setError(null);
+    ;
     notifyListeners();
 
     try {
@@ -107,9 +109,9 @@ class ResearchController extends ChangeNotifier {
           .from('survey_responses')
           .insert(surveyResponse.toMap());
     } on AppException catch (e) {
-      _error = e.message;
+      setError(e);
     } finally {
-      _isLoading = false;
+      setLoading(false);
       notifyListeners();
     }
   }
@@ -120,8 +122,9 @@ class ResearchController extends ChangeNotifier {
     int score,
     Map<String, dynamic> answers,
   ) async {
-    _isLoading = true;
-    _error = null;
+    setLoading(true);
+    setError(null);
+    ;
     notifyListeners();
 
     try {
@@ -136,16 +139,17 @@ class ResearchController extends ChangeNotifier {
           .from('research_vocabulary_test')
           .insert(testResult.toMap());
     } on AppException catch (e) {
-      _error = e.message;
+      setError(e);
     } finally {
-      _isLoading = false;
+      setLoading(false);
       notifyListeners();
     }
   }
 
   Future<void> fetchAllResearchData() async {
-    _isLoading = true;
-    _error = null;
+    setLoading(true);
+    setError(null);
+    ;
     notifyListeners();
 
     try {
@@ -156,9 +160,9 @@ class ResearchController extends ChangeNotifier {
       _surveyResponses = allData.responses;
       _testResults = allData.testResults;
     } on AppException catch (e) {
-      _error = e.message;
+      setError(e);
     } finally {
-      _isLoading = false;
+      setLoading(false);
       notifyListeners();
     }
   }
@@ -171,7 +175,8 @@ class ResearchController extends ChangeNotifier {
     required String lastName,
     required int age,
   }) async {
-    _error = null;
+    setError(null);
+    ;
 
     try {
       final profile = Services.research.buildResearchProfile(
@@ -187,7 +192,7 @@ class ResearchController extends ChangeNotifier {
           .from('research_profiles')
           .insert(profile.toMap());
     } on AppException catch (e) {
-      _error = e.message;
+      setError(e);
       notifyListeners();
     }
   }

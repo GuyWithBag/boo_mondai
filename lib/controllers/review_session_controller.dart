@@ -47,7 +47,7 @@ class ReviewSessionController extends StudySessionController {
     required DueFilterThreshold filter,
   }) {
     // 1. Reset session state
-    sessionError = null;
+    setError(null);
     dueFilter = filter;
     _queue.clear();
     _pendingCards.clear();
@@ -100,9 +100,12 @@ class ReviewSessionController extends StudySessionController {
         startedAt: now,
       );
     } catch (e) {
-      sessionError = 'Failed to load session data: $e';
-    } finally {
-      notifyListeners();
+      setError(
+        SessionException(
+          'Failed to load session data: $e',
+          code: 'SESSION_INIT_FAILED',
+        ),
+      );
     }
   }
 
@@ -201,10 +204,13 @@ class ReviewSessionController extends StudySessionController {
         }
         await LocalDB.reviewSession.put(_session!);
       }
-    } catch (e) {
-      sessionError = e.toString();
-    } finally {
-      notifyListeners();
+    } on Exception catch (e) {
+      setError(
+        SessionException(
+          'Failed to save session data: $e',
+          code: 'SESSION_COMPLETE_FAILED',
+        ),
+      );
     }
   }
 

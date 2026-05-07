@@ -2,23 +2,19 @@
 // PATH: lib/controllers/review_dashboard_controller.dart
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/models/models.barrel.dart';
 import 'package:boo_mondai/database/database.barrel.dart';
 
 import 'package:boo_mondai/services/services.barrel.dart';
-import 'package:flutter/foundation.dart';
 
-class ReviewDashboardController extends ChangeNotifier {
-  bool _isLoading = true;
-  String? _error;
+class ReviewDashboardController extends Controller {
   List<DeckReviewStats> _deckStats = [];
   DueFilterThreshold _dueFilter = DueFilterThreshold.lookAheadOneDay;
 
   // Cache historical stats so we don't recalculate them on filter change
   Map<String, DeckHistoricalStats>? _cachedHistoricalStats;
 
-  bool get isLoading => _isLoading;
-  String? get error => _error;
   List<DeckReviewStats> get deckStats => _deckStats;
   DueFilterThreshold get dueFilter => _dueFilter;
 
@@ -38,8 +34,9 @@ class ReviewDashboardController extends ChangeNotifier {
   }
 
   Future<void> _loadData({required bool fetchHistorical}) async {
-    _isLoading = true;
-    _error = null;
+    setLoading(true);
+    setError(null);
+    ;
     notifyListeners();
 
     try {
@@ -84,10 +81,10 @@ class ReviewDashboardController extends ChangeNotifier {
       // Sort by most due cards first
       combinedStats.sort((a, b) => b.totalDue.compareTo(a.totalDue));
       _deckStats = combinedStats;
-    } catch (e) {
-      _error = e.toString();
+    } on Exception catch (e) {
+      setError(e);
     } finally {
-      _isLoading = false;
+      setLoading(false);
       notifyListeners();
     }
   }

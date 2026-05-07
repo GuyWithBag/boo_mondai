@@ -56,7 +56,7 @@ class DrillSessionController extends StudySessionController {
     int? batchSize,
     bool realTime = false,
   }) {
-    sessionError = null;
+    setError(null);
     _currentAnswers.clear();
     realTimeSaving = realTime; // Set the toggle
 
@@ -97,9 +97,13 @@ class DrillSessionController extends StudySessionController {
       nextIntervals.clear();
       _isComplete = false;
     } on Exception catch (e) {
-      sessionError = e.toString().replaceAll('Exception: ', '');
+      setError(
+        SessionException(
+          e.toString().replaceAll('Exception: ', ''),
+          code: 'DRILL_INIT_FAILED',
+        ),
+      );
     }
-    notifyListeners();
   }
 
   @override
@@ -210,9 +214,12 @@ class DrillSessionController extends StudySessionController {
         }
       }
     } on Exception catch (e) {
-      sessionError = e.toString();
-    } finally {
-      notifyListeners();
+      setError(
+        SessionException(
+          'Failed to complete drill session: $e',
+          code: 'DRILL_COMPLETE_FAILED',
+        ),
+      );
     }
   }
 
@@ -227,7 +234,7 @@ class DrillSessionController extends StudySessionController {
     nextIntervals.clear();
     _batchSize = defaultBatchSize;
     _isComplete = false;
-    sessionError = null;
+    setError(null);
     notifyListeners();
   }
 }

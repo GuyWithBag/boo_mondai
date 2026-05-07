@@ -3,16 +3,13 @@
 // PURPOSE: Manages UI state, loading indicators, and migration flows.
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:flutter/foundation.dart';
+import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/models/models.barrel.dart';
 import 'package:boo_mondai/database/database.barrel.dart';
 import 'package:boo_mondai/services/services.barrel.dart';
 
-class AuthController extends ChangeNotifier {
+class AuthController extends Controller {
   AuthService get service => Services.auth;
-
-  bool _isLoading = false;
-  String? _error;
 
   /// Holds the result of the latest auth action to drive UI logic (like merges)
   AuthServiceResponse? authServiceResponse;
@@ -21,44 +18,41 @@ class AuthController extends ChangeNotifier {
 
   Profile get currentProfile => LocalDB.profile.getOrCreate();
 
-  bool get isLoading => _isLoading;
-  String? get error => _error;
-
   /// Drives the UI prompt for merging guest data based on the latest auth response.
   bool get hasPendingGuestMerge => authServiceResponse?.needsMerge ?? false;
 
   // ── Actions ─────────────────────────────────────────────
 
   Future<void> restoreSession() async {
-    _setLoading(true);
+    setLoading(true);
     try {
       await service.restoreSession();
-    } catch (_) {
-      // Network error on restore → stay in guest mode silently
+    } on Exception catch (e) {
+      setError(e);
     } finally {
-      _setLoading(false);
+      setLoading(false);
     }
   }
 
   Future<void> signIn(String email, String password) async {
-    _setLoading(true);
+    setLoading(true);
     try {
       authServiceResponse = await service.signIn(email, password);
-    } catch (e) {
-      _error = e is AppException ? e.message : e.toString();
+    } on Exception catch (e) {
+      setError(e);
     } finally {
-      _setLoading(false);
+      setLoading(false);
     }
   }
 
   Future<void> signUp(String email, String password, String username) async {
-    _setLoading(true);
+    setLoading(true);
     try {
       authServiceResponse = await service.signUp(email, password, username);
-    } on AppException catch (e) {
-      _error = e.message;
+    } on Exception catch (e) {
+      setError(e); // Removed the debug junk!
     } finally {
-      _setLoading(false);
+      setLoading(false);
     }
   }
 
@@ -68,41 +62,26 @@ class AuthController extends ChangeNotifier {
 
     if (guestId == null || remoteProfile == null) return;
 
-    _setLoading(true);
+    setLoading(true);
     try {
       await service.executeMergeDecision(merge, guestId, remoteProfile);
-    } on AppException catch (e) {
-      _error = e.message;
+    } on Exception catch (e) {
+      setError(e);
     } finally {
       authServiceResponse = null; // Clear merge state once decision is executed
-      _setLoading(false);
+      setLoading(false);
     }
   }
 
   Future<void> signOut() async {
-    _setLoading(true);
+    setLoading(true);
     try {
       await service.signOut();
       authServiceResponse = null; // Reset auth state on sign out
-    } on AppException catch (e) {
-      _error = e.message;
+    } on Exception catch (e) {
+      setError(e);
     } finally {
-      _setLoading(false);
+      setLoading(false);
     }
-  }
-
-  // ── Helpers ─────────────────────────────────────────────
-
-  void clearError() {
-    if (_error != null) {
-      _error = null;
-      notifyListeners();
-    }
-  }
-
-  void _setLoading(bool value) {
-    _isLoading = value;
-    _error = null; // Clear previous errors when starting a new action
-    notifyListeners();
   }
 }

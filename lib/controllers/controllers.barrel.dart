@@ -3,6 +3,7 @@
 // Other files
 export 'account_page_controller.dart';
 export 'auth_controller.dart';
+export 'controller.dart';
 export 'dashboard_page_controller.dart';
 export 'deck_editor_page_controller.dart';
 export 'drill_session_controller.dart';

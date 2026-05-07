@@ -3,25 +3,23 @@
 // PURPOSE: Manages the working copy of a Deck, CardTemplates, and Editor Form State
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/models/models.barrel.dart';
 import 'package:boo_mondai/database/database.barrel.dart';
 
 import 'package:boo_mondai/services/uuid_service.dart';
-import 'package:flutter/foundation.dart';
 
-class DeckEditorPageController extends ChangeNotifier {
-  final DeckLocalDB _deckRepository = LocalDB.deck;
-
-  // Update to use the new template repository
-  final CardTemplateLocalDB _templateRepository = LocalDB.cardTemplate;
-
-  // ── State ────────────────────────────────────────
+class DeckEditorPageController extends Controller {
+  DeckEditorPageController({required String deckId, String? initialTemplateId}) {
+    loadDeck(deckId);
+    if (initialTemplateId != null) {
+      selectTemplate(initialTemplateId);
+    }
+  }
 
   Deck? _deck;
   List<CardTemplate> _templates = []; // Replaced _cards
   bool _isDirty = false;
-  bool _isLoading = false;
-  String? _error;
 
   // Editor State
   String? _activeTemplateId; // Replaced _activeCardId
@@ -32,8 +30,6 @@ class DeckEditorPageController extends ChangeNotifier {
   Deck? get deck => _deck;
   List<CardTemplate> get templates => List.unmodifiable(_templates);
   bool get isDirty => _isDirty;
-  bool get isLoading => _isLoading;
-  String? get error => _error;
   String? get activeTemplateId => _activeTemplateId;
 
   @override
@@ -43,17 +39,15 @@ class DeckEditorPageController extends ChangeNotifier {
   }
 
   Future<void> loadDeck(String deckId) async {
-    _isLoading = true;
-    notifyListeners();
+    setLoading(true);
 
     try {
-      _deck = _deckRepository.getById(deckId);
-      _templates = _templateRepository.getByDeckId(deckId);
+      _deck = LocalDB.deck.getById(deckId);
+      _templates = LocalDB.cardTemplate.getByDeckId(deckId);
     } on Exception catch (e) {
-      _error = e.toString();
+      setError(e);
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      setLoading(false);
     }
   }
 
@@ -125,8 +119,7 @@ class DeckEditorPageController extends ChangeNotifier {
 
     saveActiveTemplateToDraft();
 
-    _isLoading = true;
-    notifyListeners();
+    setLoading(true);
 
     try {
       final updatedDeck = _deck!.copyWith(
@@ -134,8 +127,8 @@ class DeckEditorPageController extends ChangeNotifier {
         updatedAt: DateTime.now(),
       );
 
-      await _deckRepository.put(updatedDeck);
-      await _templateRepository.putAll(_templates);
+      await LocalDB.deck.put(updatedDeck);
+      await LocalDB.cardTemplate.putAll(_templates);
 
       // ── REVIEW CARD GENERATION ───────────────────────────
 
@@ -204,10 +197,9 @@ class DeckEditorPageController extends ChangeNotifier {
       _deck = updatedDeck;
       _isDirty = false;
     } on Exception catch (e) {
-      _error = e.toString();
+      setError(e);
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      setLoading(false);
     }
   }
 

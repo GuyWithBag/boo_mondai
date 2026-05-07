@@ -3,15 +3,15 @@
 // PURPOSE: Abstract base class centralizing shared Drill and FSRS logic
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/services/services.barrel.dart';
 import 'package:flutter/foundation.dart';
 import 'package:boo_mondai/models/models.barrel.dart';
 import 'package:fsrs/fsrs.dart' as fsrs;
 
-abstract class StudySessionController extends ChangeNotifier {
+abstract class StudySessionController extends Controller {
   // ── Shared State (Protected for subclasses) ──
   int currentIndex = 0;
-  String? sessionError;
   Map<String, CardTemplate> templates = {};
   Map<StudyRating, String> nextIntervals = {};
 
@@ -33,9 +33,6 @@ abstract class StudySessionController extends ChangeNotifier {
     isCardRevealed = value;
     notifyListeners();
   }
-
-  // ── Shared Getters ──
-  String? get error => sessionError;
 
   CardTemplate? get currentTemplate => currentReviewCard != null
       ? templates[currentReviewCard!.templateId]
@@ -67,11 +64,6 @@ abstract class StudySessionController extends ChangeNotifier {
 
     final years = (days / 365).toStringAsFixed(1);
     return '${years.endsWith('.0') ? years.substring(0, years.length - 2) : years}y';
-  }
-
-  void clearError() {
-    sessionError = null;
-    notifyListeners();
   }
 
   Future<void> calculateNextIntervals();
@@ -118,18 +110,6 @@ abstract class StudySessionController extends ChangeNotifier {
         fsrs.Rating.easy,
         reviewDateTime: utcReviewTime,
       );
-
-      // Print the raw FSRS due dates and the calculated durations
-      // print('--- FSRS DEBUG ---');
-      // print('Base Due: ${baseState.due}');
-      // print('Review Time: $utcReviewTime');
-      // print(
-      //   'Again Next Due: ${again.card.due} | Difference: ${again.card.due.difference(utcReviewTime)}',
-      // );
-      // print(
-      //   'Good Next Due:  ${good.card.due} | Difference: ${good.card.due.difference(utcReviewTime)}',
-      // );
-      // print('------------------');
 
       nextIntervals = {
         StudyRating.again: formatInterval(displayNow, again.card.due.toLocal()),

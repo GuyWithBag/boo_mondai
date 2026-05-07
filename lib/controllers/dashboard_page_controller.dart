@@ -31,7 +31,7 @@
 //   Streak? _streak;
 //   int _dueCardCount = 0;
 //   List<DrillSession> _recentSessions = [];
-//   bool _isLoading = false;
+//   bool setLoading(false);
 //   String? _error;
 
 //   // ── public getters ───────────────────────────────────────
@@ -46,8 +46,8 @@
 
 //   /// Loads all dashboard data from the local repositories.
 //   Future<void> load() async {
-//     _isLoading = true;
-//     _error = null;
+//     setLoading(true);
+//     setError(null);;
 //     notifyListeners();
 
 //     try {
@@ -55,16 +55,16 @@
 //       _dueCardCount = _fsrsRepository.getDueCards(DateTime.now()).length;
 //       _recentSessions = _drillSessionRepository.getRecent(5);
 //     } on Exception catch (e) {
-//       _error = e.toString();
+//       setError(e);
 //     } finally {
-//       _isLoading = false;
+//       setLoading(false);
 //       notifyListeners();
 //     }
 //   }
 
 //   /// Clears any active error message and notifies listeners.
 //   void clearError() {
-//     _error = null;
+//     setError(null);;
 //     notifyListeners();
 //   }
 // }

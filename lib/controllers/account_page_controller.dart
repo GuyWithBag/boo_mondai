@@ -19,7 +19,7 @@
 
 //   Profile? _profile;
 //   bool _isDirty = false;
-//   bool _isLoading = false;
+//   bool setLoading(false);
 //   String? _error;
 //   ThemeMode _themeMode = ThemeMode.system;
 
@@ -30,17 +30,17 @@
 //   ThemeMode get themeMode => _themeMode;
 
 //   Future<void> load() async {
-//     _isLoading = true;
-//     _error = null;
+//     setLoading(true);
+//     setError(null);;
 //     notifyListeners();
 //     try {
 //       _profile = _repository.get();
 //       _themeMode = _themeModeFromString(_profile?.themeMode ?? 'system');
 //       _isDirty = false;
 //     } catch (e) {
-//       _error = e.toString();
+//       setError(e);
 //     } finally {
-//       _isLoading = false;
+//       setLoading(false);
 //       notifyListeners();
 //     }
 //   }
@@ -68,36 +68,36 @@
 //   Future<void> put() async {
 //     final profile = _profile;
 //     if (profile == null) return;
-//     _isLoading = true;
+//     setLoading(true);
 //     notifyListeners();
 //     try {
 //       await _repository.put(profile);
 //       _isDirty = false;
 //     } catch (e) {
-//       _error = e.toString();
+//       setError(e);
 //     } finally {
-//       _isLoading = false;
+//       setLoading(false);
 //       notifyListeners();
 //     }
 //   }
 
 //   Future<void> discard() async {
-//     _isLoading = true;
+//     setLoading(true);
 //     notifyListeners();
 //     try {
 //       _profile = _repository.get();
 //       _themeMode = _themeModeFromString(_profile?.themeMode ?? 'system');
 //       _isDirty = false;
 //     } catch (e) {
-//       _error = e.toString();
+//       setError(e);
 //     } finally {
-//       _isLoading = false;
+//       setLoading(false);
 //       notifyListeners();
 //     }
 //   }
 
 //   void clearError() {
-//     _error = null;
+//     setError(null);;
 //     notifyListeners();
 //   }
 
