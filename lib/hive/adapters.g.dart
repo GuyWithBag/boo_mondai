@@ -19,7 +19,7 @@ class ProfileAdapter extends TypeAdapter<Profile> {
     return Profile(
       id: fields[0] as String,
       username: fields[2] as String,
-      role: fields[3] as String,
+      role: fields[3] as String?,
       avatarUrl: fields[4] as String?,
       createdAt: fields[6] as DateTime,
       userId: fields[1] as String,

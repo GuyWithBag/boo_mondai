@@ -16,7 +16,7 @@ class Profile with ProfileMappable implements DTO {
   final String id;
   final String userId;
   final String username;
-  final String role;
+  final String? role;
   final String? avatarUrl;
   @override
   final DateTime createdAt;

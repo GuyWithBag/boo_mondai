@@ -25,7 +25,7 @@ class ProfileMapper extends ClassMapperBase<Profile> {
   static String _$username(Profile v) => v.username;
   static const Field<Profile, String> _f$username =
       Field('username', _$username);
-  static String _$role(Profile v) => v.role;
+  static String? _$role(Profile v) => v.role;
   static const Field<Profile, String> _f$role = Field('role', _$role);
   static String? _$avatarUrl(Profile v) => v.avatarUrl;
   static const Field<Profile, String> _f$avatarUrl =
@@ -142,7 +142,7 @@ class _ProfileCopyWithImpl<$R, $Out>
   $R call(
           {String? id,
           String? username,
-          String? role,
+          Object? role = $none,
           Object? avatarUrl = $none,
           DateTime? createdAt,
           String? userId,
@@ -151,7 +151,7 @@ class _ProfileCopyWithImpl<$R, $Out>
       $apply(FieldCopyWithData({
         if (id != null) #id: id,
         if (username != null) #username: username,
-        if (role != null) #role: role,
+        if (role != $none) #role: role,
         if (avatarUrl != $none) #avatarUrl: avatarUrl,
         if (createdAt != null) #createdAt: createdAt,
         if (userId != null) #userId: userId,
