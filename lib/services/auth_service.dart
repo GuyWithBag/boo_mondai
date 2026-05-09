@@ -3,12 +3,16 @@
 // PURPOSE: Pure business logic for Supabase auth and DB sync.
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'dart:async';
 import 'dart:developer' as developer;
+import 'dart:io';
 
 import 'package:boo_mondai/database/database.barrel.dart';
 import 'package:boo_mondai/exceptions/exceptions.barrel.dart';
 import 'package:boo_mondai/services/services.barrel.dart';
 import 'package:boo_mondai/models/models.barrel.dart';
+import 'package:flutter/foundation.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 typedef AuthServiceResponse = ({
@@ -22,7 +26,12 @@ class AuthService {
 
   Session? get currentSession => _client.auth.currentSession;
   User? get currentUser => _client.auth.currentUser;
-  bool get isAuthenticated => _client.auth.currentUser != null;
+  bool get isAuthenticatedRemote => _client.auth.currentUser != null;
+  bool get isAuthenticatedLocal =>
+      LocalDB.profile.getOrCreate().isAnonymous == false;
+  bool get isAuthenticatedEither =>
+      isAuthenticatedRemote || isAuthenticatedLocal;
+  bool get isAuthenticatedBoth => isAuthenticatedRemote && isAuthenticatedLocal;
 
   // ── Auth Guard ─────────────────────────────────────────────
 
@@ -57,7 +66,7 @@ class AuthService {
     Profile? profileData = await RemoteDB.profile.selectByUserId(user.id);
 
     if (profileData == null) {
-      final fallbackUsername = await _createFallbackUsername(user);
+      final fallbackUsername = _createFallbackUsername(user);
       profileData = await _upsertNewRemoteProfile(user.id, fallbackUsername);
     }
 
@@ -94,41 +103,69 @@ class AuthService {
     );
   }
 
-  Future<AuthServiceResponse> signInWithIdToken({
-    required OAuthProvider provider,
-    required String idToken,
-    required String accessToken,
-  }) async {
+  Future<AuthServiceResponse> signInWithGoogle() async {
     final guestUserId = LocalDB.profile.getOrCreate().userId;
 
-    await _guard(
-      () => _client.auth.signInWithIdToken(
-        provider: provider,
-        idToken: idToken,
-        accessToken: accessToken,
-      ),
-      action: 'signInWithIdToken(${provider.name})',
-    );
+    // Check if the app is running natively on mobile (iOS/Android)
+    final isMobile = !kIsWeb && (Platform.isIOS || Platform.isAndroid);
 
-    final user = _client.auth.currentUser!;
+    if (isMobile) {
+      // ━━━ NATIVE MOBILE FLOW ━━━
+      final response = await _guard(
+        () => _nativeMobileGoogleSignIn(),
+        action: 'signInWithGoogle(Native)',
+      );
 
-    Profile? profileData = await RemoteDB.profile.selectByUserId(user.id);
-    if (profileData == null) {
-      final fallbackUsername = await _createFallbackUsername(user);
-      profileData = await _upsertNewRemoteProfile(user.id, fallbackUsername);
+      final user = response.user!;
+      return await _processSuccessfulSignIn(user, guestUserId);
+    } else {
+      // ━━━ WEB / DESKTOP OAUTH FLOW ━━━
+      final completer = Completer<AuthServiceResponse>();
+      StreamSubscription<AuthState>? authSubscription;
+
+      // Set up the listener *before* launching the browser
+      authSubscription = _client.auth.onAuthStateChange.listen((data) async {
+        final AuthChangeEvent event = data.event;
+
+        if (event == AuthChangeEvent.signedIn) {
+          await authSubscription?.cancel();
+          try {
+            final user = _client.auth.currentUser!;
+            final response = await _processSuccessfulSignIn(user, guestUserId);
+            completer.complete(response);
+          } catch (e, stackTrace) {
+            completer.completeError(e, stackTrace);
+          }
+        }
+      });
+
+      // Launch the browser
+      try {
+        await _guard(
+          () => _client.auth.signInWithOAuth(
+            OAuthProvider.google,
+            redirectTo: kDebugMode
+                ? 'http://127.0.0.1:3000'
+                : 'boomondai://auth',
+          ),
+          action: 'signInWithOAuth(Google)',
+        );
+      } catch (e) {
+        await authSubscription.cancel();
+        rethrow;
+      }
+
+      return completer.future.timeout(
+        const Duration(minutes: 5),
+        onTimeout: () {
+          authSubscription?.cancel();
+          throw AppException(
+            'Google sign-in timed out. Please try again.',
+            code: 'TIMEOUT',
+          );
+        },
+      );
     }
-
-    await LocalDB.profile.upsert(profileData);
-
-    bool needsMerge =
-        guestUserId != user.id &&
-        GuestMigrationService.hasLocalData(guestUserId);
-
-    return (
-      profile: profileData,
-      needsMerge: needsMerge,
-      guestUserId: needsMerge ? guestUserId : null,
-    );
   }
 
   Future<AuthServiceResponse> signUp(
@@ -182,7 +219,84 @@ class AuthService {
     await LocalDB.profile.upsert(remoteProfile);
   }
 
-  Future<String> _createFallbackUsername(User user) {
+  // You can stick this in your AuthService or directly in your UI for testing
+  Future<void> manualDevLogin(String urlFromBrowser) async {
+    try {
+      final uri = Uri.parse(urlFromBrowser);
+      // This forces Supabase to process the URL as if it came from a deep link!
+      await Supabase.instance.client.auth.getSessionFromUrl(uri);
+      developer.log('✅ Dev Login Successful!');
+    } catch (e) {
+      developer.log('❌ Dev Login Failed: $e');
+    }
+  }
+
+  Future<AuthResponse> _nativeMobileGoogleSignIn() async {
+    /// TODO: update the Web client ID with your own.
+    ///
+    /// Web Client ID that you registered with Google Cloud.
+    const webClientId =
+        '256317141710-6qfk8m7379n1619rduj3dqdkr4a8qevn.apps.googleusercontent.com';
+
+    /// TODO: update the iOS client ID with your own.
+    ///
+    /// iOS Client ID that you registered with Google Cloud.
+    const iosClientId = 'my-ios.apps.googleusercontent.com';
+
+    final scopes = ['email', 'profile'];
+    final googleSignIn = GoogleSignIn.instance;
+    await googleSignIn.initialize(
+      serverClientId: webClientId,
+      clientId: iosClientId,
+    );
+    final googleUser = await googleSignIn.attemptLightweightAuthentication();
+    // or await googleSignIn.authenticate(); which will return a GoogleSignInAccount or throw an exception
+    if (googleUser == null) {
+      throw AuthException('Failed to sign in with Google.');
+    }
+
+    /// Authorization is required to obtain the access token with the appropriate scopes for Supabase authentication,
+    /// while also granting permission to access user information.
+    final authorization =
+        await googleUser.authorizationClient.authorizationForScopes(scopes) ??
+        await googleUser.authorizationClient.authorizeScopes(scopes);
+    final idToken = googleUser.authentication.idToken;
+    if (idToken == null) {
+      throw AuthException('No ID Token found.');
+    }
+    return await _client.auth.signInWithIdToken(
+      provider: OAuthProvider.google,
+      idToken: idToken,
+      accessToken: authorization.accessToken,
+    );
+  }
+
+  /// Extracted logic to keep DB sync and Guest Merging DRY
+  Future<AuthServiceResponse> _processSuccessfulSignIn(
+    User user,
+    String guestUserId,
+  ) async {
+    Profile? profileData = await RemoteDB.profile.selectByUserId(user.id);
+
+    if (profileData == null) {
+      final fallbackUsername = _createFallbackUsername(user);
+      profileData = await _upsertNewRemoteProfile(user.id, fallbackUsername);
+    }
+
+    await LocalDB.profile.upsert(profileData);
+
+    bool needsMerge =
+        guestUserId != user.id &&
+        GuestMigrationService.hasLocalData(guestUserId);
+
+    return (
+      profile: profileData,
+      needsMerge: needsMerge,
+      guestUserId: needsMerge ? guestUserId : null,
+    );
+  }
+
+  String _createFallbackUsername(User user) {
     final fallbackUsername =
         user.userMetadata?['full_name'] ??
         user.email?.split('@').first ??
@@ -200,7 +314,7 @@ class AuthService {
     final profile = Profile(
       id: localProfile.id,
       userId: newUserId,
-      role: 'user', // Assigned a default role instead of an empty string
+      role: null,
       username: newUsername,
       updatedAt: DateTime.now(),
       createdAt: DateTime.now(),

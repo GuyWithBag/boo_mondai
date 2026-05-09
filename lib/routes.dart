@@ -45,7 +45,7 @@ GoRouter createRouter(AuthController authController) {
       final loc = state.matchedLocation;
 
       // Authenticated users landing on /login or /register → go home
-      if (auth.service.isAuthenticated &&
+      if (auth.service.isAuthenticatedRemote &&
           !auth.hasPendingGuestMerge &&
           (loc == '/login' || loc == '/register')) {
         return '/';

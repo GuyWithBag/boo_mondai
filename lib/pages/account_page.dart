@@ -5,6 +5,8 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -18,7 +20,6 @@ class AccountPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthController>();
-    final isAuthenticated = auth.service.isAuthenticated;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Account')),
@@ -31,14 +32,16 @@ class AccountPage extends StatelessWidget {
             const SizedBox(height: AppSpacing.xl),
 
             // ── Auth-dependent actions ────────────────────────
-            if (!isAuthenticated)
-              const _SignInActions()
+            if (auth.service.isAuthenticatedEither)
+              const _AuthenticatedActions()
             else
-              const _AuthenticatedActions(),
+              const _SignInActions(),
             const SizedBox(height: AppSpacing.md),
+
+            // Kept the Force Sign Out for dev convenience
             TextButton(
               onPressed: () async {
-                await context.read<AuthController>().signOut();
+                await auth.signOut();
               },
               child: const Text('[DEV] Force Sign Out'),
             ),
@@ -56,6 +59,7 @@ class _ProfileHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<AuthController>();
     final profile = LocalDB.profile.getOrCreate();
 
     return Column(
@@ -82,7 +86,7 @@ class _ProfileHeader extends StatelessWidget {
         Center(
           child: Wrap(
             spacing: AppSpacing.sm,
-            children: [Chip(label: Text(profile.role.replaceAll('_', ' ')))],
+            children: [Chip(label: Text(profile.role ?? ''))],
           ),
         ),
       ],
@@ -197,8 +201,35 @@ class _GoogleSignInButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.read<AuthController>();
+
     return OutlinedButton.icon(
-      onPressed: null,
+      onPressed: () async {
+        // 1. Trigger the actual browser launch (don't await it yet so we can show the dialog)
+        final loginFuture = auth.signInWithGoogle();
+
+        // 2. Check if we are running in Debug Mode AND on a Desktop OS
+        final isDesktop =
+            !kIsWeb &&
+            (Platform.isLinux || Platform.isWindows || Platform.isMacOS);
+
+        if (kDebugMode && isDesktop) {
+          // 3. Immediately pop up the Dev input dialog
+          final url = await showDialog<String>(
+            context: context,
+            barrierDismissible: false, // Force them to interact with it
+            builder: (context) => const _DevManualLoginDialog(),
+          );
+
+          // 4. If they pasted a URL and hit Submit, process it
+          if (url != null && url.isNotEmpty) {
+            await auth.manualDevSignIn(url);
+          }
+        }
+
+        // 5. Catch any errors from the original future
+        await loginFuture;
+      },
       icon: const Icon(Icons.g_mobiledata, size: 24),
       label: const Text('Continue with Google'),
     );
@@ -214,6 +245,61 @@ class _AppleSignInButton extends StatelessWidget {
       onPressed: null,
       icon: const Icon(Icons.apple, size: 24),
       label: const Text('Continue with Apple'),
+    );
+  }
+}
+
+// ── Dev Manual Login Dialog ─────────────────────────────────────────────────
+
+class _DevManualLoginDialog extends StatefulWidget {
+  const _DevManualLoginDialog();
+
+  @override
+  State<_DevManualLoginDialog> createState() => _DevManualLoginDialogState();
+}
+
+class _DevManualLoginDialogState extends State<_DevManualLoginDialog> {
+  final _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Dev Auth Redirect'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Paste the local redirect URL from your browser to complete login.',
+            style: TextStyle(fontSize: 14),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _controller,
+            decoration: const InputDecoration(
+              hintText: 'http://127.0.0.1:3000/?code=...',
+              labelText: 'Redirect URL',
+              border: OutlineInputBorder(),
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(), // Returns null
+          child: const Text('Cancel / Let OS Handle It'),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.of(context).pop(_controller.text),
+          child: const Text('Submit Code'),
+        ),
+      ],
     );
   }
 }

@@ -45,6 +45,17 @@ class AuthController extends Controller {
     }
   }
 
+  Future<void> signInWithGoogle() async {
+    setLoading(true);
+    try {
+      authServiceResponse = await service.signInWithGoogle();
+    } on Exception catch (e) {
+      setError(e);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   Future<void> signUp(String email, String password, String username) async {
     setLoading(true);
     try {
@@ -80,6 +91,17 @@ class AuthController extends Controller {
       authServiceResponse = null; // Reset auth state on sign out
     } on Exception catch (e) {
       setError(e);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  Future<void> manualDevSignIn(String url) async {
+    setLoading(true);
+    try {
+      await service.manualDevLogin(url);
+    } catch (e) {
+      setError(e as Exception);
     } finally {
       setLoading(false);
     }

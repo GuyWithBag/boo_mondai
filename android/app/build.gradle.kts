@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.boo_mondai"
+    namespace = "com.macchyadev.boo_mondai"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 

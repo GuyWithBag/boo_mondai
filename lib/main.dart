@@ -5,6 +5,9 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'dart:developer' as developer;
+
+import 'package:app_links/app_links.dart';
 import 'package:barrel_annotation/barrel_annotation.dart';
 import 'package:boo_mondai/database/database.barrel.dart';
 import 'package:boo_mondai/hive/hive_registrar.g.dart';
@@ -46,6 +49,13 @@ Future<void> main() async {
   // ── Restore session ─────────────────────────────────
   final authController = AuthController();
   await authController.restoreSession();
+
+  // This is what catches the link on Linux when the OS tries
+  // to open the app via the .desktop file
+  final appLinks = AppLinks();
+  appLinks.uriLinkStream.listen((uri) {
+    developer.log('Received deep link: $uri');
+  });
 
   runApp(
     MultiProvider(
