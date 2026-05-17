@@ -9,8 +9,11 @@ extension HiveRegistrar on HiveInterface {
   void registerAdapters() {
     registerAdapter(CachedProfileAdapter());
     registerAdapter(CardAdapter());
+    registerAdapter(CardTemplateTagAdapter());
     registerAdapter(CardTypeAdapter());
     registerAdapter(DeckAdapter());
+    registerAdapter(DeckListingAdapter());
+    registerAdapter(DeckTagAdapter());
     registerAdapter(DrillAnswerAdapter());
     registerAdapter(DrillSessionAdapter());
     registerAdapter(FillInTheBlankSegmentAdapter());
@@ -32,7 +35,10 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(StateAdapter());
     registerAdapter(StreakAdapter());
     registerAdapter(StudyRatingAdapter());
+    registerAdapter(TagAdapter());
     registerAdapter(UserAdapter());
+    registerAdapter(UserReviewCardTagAdapter());
+    registerAdapter(VisibilityStateAdapter());
     registerAdapter(WordScrambleTemplateAdapter());
   }
 }
@@ -41,8 +47,11 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
   void registerAdapters() {
     registerAdapter(CachedProfileAdapter());
     registerAdapter(CardAdapter());
+    registerAdapter(CardTemplateTagAdapter());
     registerAdapter(CardTypeAdapter());
     registerAdapter(DeckAdapter());
+    registerAdapter(DeckListingAdapter());
+    registerAdapter(DeckTagAdapter());
     registerAdapter(DrillAnswerAdapter());
     registerAdapter(DrillSessionAdapter());
     registerAdapter(FillInTheBlankSegmentAdapter());
@@ -64,7 +73,10 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(StateAdapter());
     registerAdapter(StreakAdapter());
     registerAdapter(StudyRatingAdapter());
+    registerAdapter(TagAdapter());
     registerAdapter(UserAdapter());
+    registerAdapter(UserReviewCardTagAdapter());
+    registerAdapter(VisibilityStateAdapter());
     registerAdapter(WordScrambleTemplateAdapter());
   }
 }

@@ -40,6 +40,12 @@ import 'package:supabase_flutter/supabase_flutter.dart';
   AdapterSpec<CardType>(),
   AdapterSpec<QuestionType>(),
   AdapterSpec<User>(),
+  AdapterSpec<VisibilityState>(),
+  AdapterSpec<Tag>(),
+  AdapterSpec<DeckListing>(),
+  AdapterSpec<DeckTag>(),
+  AdapterSpec<CardTemplateTag>(),
+  AdapterSpec<UserReviewCardTag>(),
 ])
 // ignore: unused_element
 part 'adapters.g.dart';
