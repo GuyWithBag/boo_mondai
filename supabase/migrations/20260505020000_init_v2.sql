@@ -128,6 +128,7 @@ CREATE INDEX idx_listings_downloads ON deck_listings(downloads_count DESC);
 CREATE TABLE deck_tags (
   deck_id uuid NOT NULL REFERENCES decks(id) ON DELETE CASCADE,
   tag_id  uuid NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
+  created_at timestamptz NOT NULL DEFAULT now(),
   PRIMARY KEY (deck_id, tag_id)
 );
 ALTER TABLE deck_tags ENABLE ROW LEVEL SECURITY;
@@ -178,6 +179,7 @@ CREATE TRIGGER set_updated_at BEFORE UPDATE ON card_templates FOR EACH ROW EXECU
 CREATE TABLE card_template_tags (
   template_id uuid NOT NULL REFERENCES card_templates(id) ON DELETE CASCADE,
   tag_id      uuid NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
+  created_at  timestamptz NOT NULL DEFAULT now(),
   PRIMARY KEY (template_id, tag_id)
 );
 ALTER TABLE card_template_tags ENABLE ROW LEVEL SECURITY;
