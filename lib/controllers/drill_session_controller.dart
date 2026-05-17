@@ -82,7 +82,7 @@ class DrillSessionController extends StudySessionController {
       _batchSize = batch.length;
 
       _session = DrillSession(
-        id: UuidService.uuid.v4(),
+        id: uuid.v7(),
         userId: userId,
         deckId: deckId,
         previewed: previewed,
@@ -124,10 +124,10 @@ class DrillSessionController extends StudySessionController {
 
     // ── THE TOGGLE (REAL-TIME) ──
     if (realTimeSaving) {
-      await LocalDB.drillAnswer.put(newAnswer);
+      await LocalDB.drillAnswer.upsert(newAnswer);
 
       _session = _session!.copyWith(correctCount: correctCount);
-      await LocalDB.drillSession.put(_session!);
+      await LocalDB.drillSession.upsert(_session!);
 
       // Real-time FSRS enrollment for correct answers
       if (type != StudyRating.incorrect) {
@@ -182,11 +182,11 @@ class DrillSessionController extends StudySessionController {
       _isComplete = true;
 
       if (realTimeSaving) {
-        await LocalDB.drillSession.put(_session!);
+        await LocalDB.drillSession.upsert(_session!);
       } else {
         // ── BATCH SAVE ──
-        await LocalDB.drillSession.put(_session!);
-        await LocalDB.drillAnswer.putAll(_currentAnswers);
+        await LocalDB.drillSession.upsert(_session!);
+        await LocalDB.drillAnswer.upsertMany(_currentAnswers);
 
         // 1. Deduplicate: Get only the final correct answer for each card
         final eligibleAnswersMap = <String, DrillAnswer>{};

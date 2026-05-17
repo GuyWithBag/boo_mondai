@@ -30,7 +30,6 @@ class ResearchController extends Controller {
   void clearError() {
     if (_error != null) {
       setError(null);
-      ;
       notifyListeners();
     }
   }
@@ -38,7 +37,6 @@ class ResearchController extends Controller {
   Future<String?> redeemCode(String userId, String code) async {
     setLoading(true);
     setError(null);
-    ;
     notifyListeners();
 
     try {
@@ -64,7 +62,6 @@ class ResearchController extends Controller {
     String unlocks,
   ) async {
     setError(null);
-    ;
 
     try {
       final researchCode = Services.research.buildResearchCode(
@@ -73,7 +70,7 @@ class ResearchController extends Controller {
         unlocks: unlocks,
       );
 
-      final result = await RemoteDB.research.insertOne(researchCode);
+      final result = await RemoteDB.research.insert(researchCode);
       _codes = [result, ..._codes];
       notifyListeners();
       return result;
@@ -93,7 +90,6 @@ class ResearchController extends Controller {
   }) async {
     setLoading(true);
     setError(null);
-    ;
     notifyListeners();
 
     try {
@@ -124,7 +120,6 @@ class ResearchController extends Controller {
   ) async {
     setLoading(true);
     setError(null);
-    ;
     notifyListeners();
 
     try {
@@ -149,7 +144,6 @@ class ResearchController extends Controller {
   Future<void> fetchAllResearchData() async {
     setLoading(true);
     setError(null);
-    ;
     notifyListeners();
 
     try {
@@ -176,7 +170,6 @@ class ResearchController extends Controller {
     required int age,
   }) async {
     setError(null);
-    ;
 
     try {
       final profile = Services.research.buildResearchProfile(

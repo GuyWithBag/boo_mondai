@@ -42,7 +42,7 @@ class MyDecksPageController extends Controller {
 
     try {
       // ToDo: Unchecked change.
-      final all = _deckDB.getAll();
+      final all = _deckDB.selectMany();
       all.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
       _decks = all;
     } on Exception catch (e) {
@@ -57,9 +57,8 @@ class MyDecksPageController extends Controller {
   Future<void> deleteDeck(String id) async {
     setLoading(true);
     setError(null);
-    ;
     try {
-      await _deckDB.delete(id);
+      await _deckDB.deleteByPk({'id': id});
       load();
     } on Exception catch (e) {
       setError(e);
@@ -71,7 +70,6 @@ class MyDecksPageController extends Controller {
   /// Clears any active error message and notifies listeners.
   void clearError() {
     setError(null);
-    ;
     notifyListeners();
   }
 

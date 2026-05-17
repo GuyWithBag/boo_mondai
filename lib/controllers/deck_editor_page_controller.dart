@@ -7,10 +7,13 @@ import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/models/models.barrel.dart';
 import 'package:boo_mondai/database/database.barrel.dart';
 
-import 'package:boo_mondai/services/uuid_service.dart';
+import 'package:boo_mondai/shared/uuid.dart';
 
 class DeckEditorPageController extends Controller {
-  DeckEditorPageController({required String deckId, String? initialTemplateId}) {
+  DeckEditorPageController({
+    required String deckId,
+    String? initialTemplateId,
+  }) {
     loadDeck(deckId);
     if (initialTemplateId != null) {
       selectTemplate(initialTemplateId);
@@ -42,7 +45,7 @@ class DeckEditorPageController extends Controller {
     setLoading(true);
 
     try {
-      _deck = LocalDB.deck.getById(deckId);
+      _deck = LocalDB.deck.selectByPk({'id': deckId});
       _templates = LocalDB.cardTemplate.getByDeckId(deckId);
     } on Exception catch (e) {
       setError(e);
@@ -95,7 +98,7 @@ class DeckEditorPageController extends Controller {
 
     // Default to a basic FlashcardTemplate when adding new
     final newTemplate = FlashcardTemplate(
-      id: UuidService.uuid.v4(),
+      id: uuid.v7(),
       updatedAt: DateTime.now(),
       deckId: _deck!.id,
       sortOrder: _templates.length,
@@ -127,8 +130,8 @@ class DeckEditorPageController extends Controller {
         updatedAt: DateTime.now(),
       );
 
-      await LocalDB.deck.put(updatedDeck);
-      await LocalDB.cardTemplate.putAll(_templates);
+      await LocalDB.deck.upsert(updatedDeck);
+      await LocalDB.cardTemplate.upsertMany(_templates);
 
       // ── REVIEW CARD GENERATION ───────────────────────────
 
@@ -156,7 +159,7 @@ class DeckEditorPageController extends Controller {
           if (needsNormal && !existing.contains(false)) {
             newReviewCards.add(
               ReviewCard(
-                id: UuidService.uuid.v4(),
+                id: uuid.v7(),
                 deckId: template.deckId,
                 templateId: template.id,
                 isReversed: false,
@@ -166,7 +169,7 @@ class DeckEditorPageController extends Controller {
           if (needsReversed && !existing.contains(true)) {
             newReviewCards.add(
               ReviewCard(
-                id: UuidService.uuid.v4(),
+                id: uuid.v7(),
                 deckId: template.deckId,
                 templateId: template.id,
                 isReversed: true,
@@ -178,7 +181,7 @@ class DeckEditorPageController extends Controller {
           if (!existing.contains(false)) {
             newReviewCards.add(
               ReviewCard(
-                id: UuidService.uuid.v4(),
+                id: uuid.v7(),
                 deckId: template.deckId,
                 templateId: template.id,
                 isReversed: false,
@@ -190,7 +193,7 @@ class DeckEditorPageController extends Controller {
 
       // 4. Save only the newly generated ones
       if (newReviewCards.isNotEmpty) {
-        await LocalDB.reviewCard.putAll(newReviewCards);
+        await LocalDB.reviewCard.upsertMany(newReviewCards);
       }
       // ─────────────────────────────────────────────────────
 
@@ -373,7 +376,7 @@ class DeckEditorPageController extends Controller {
     return List.generate(
       tuples.length,
       (i) => MultipleChoiceOption(
-        id: UuidService.uuid.v4(),
+        id: uuid.v7(),
         templateId: templateId, // Use the new ID reference
         optionText: tuples[i].text,
         isCorrect: tuples[i].isCorrect,
@@ -393,7 +396,7 @@ class DeckEditorPageController extends Controller {
     return List.generate(
       tuples.length,
       (i) => MatchMadnessPair(
-        id: UuidService.uuid.v4(),
+        id: uuid.v7(),
         templateId: templateId, // Use the new ID reference
         term: tuples[i].term,
         match: tuples[i].match,

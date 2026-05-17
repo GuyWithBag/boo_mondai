@@ -62,10 +62,10 @@ class ReviewSessionController extends StudySessionController {
       final now = DateTime.now();
 
       final allFsrsCards = LocalDB.fsrsCard.getByUserId(userId);
-      final allReviewCards = LocalDB.reviewCard.getAll();
+      final allReviewCards = LocalDB.reviewCard.selectMany();
 
       // Fetch and populate templates
-      final allTemplates = LocalDB.cardTemplate.getAll();
+      final allTemplates = LocalDB.cardTemplate.selectMany();
       for (final t in allTemplates) {
         templates[t.id] = t;
       }
@@ -93,7 +93,7 @@ class ReviewSessionController extends StudySessionController {
 
       // ── NEW: Initialize the ReviewSession ──
       _session = ReviewSession(
-        id: UuidService.uuid.v4(),
+        id: uuid.v7(),
         userId: userId,
         deckId: deckId,
         totalCards: _queue.length,
@@ -144,7 +144,7 @@ class ReviewSessionController extends StudySessionController {
     final updatedCard = fsrsCard.copyWith(state: result.card);
 
     final log = FsrsReviewLog(
-      id: UuidService.uuid.v4(),
+      id: uuid.v7(),
       createdAt: DateTime.now(),
       fsrsCardId: fsrsCard.id,
       log: result.reviewLog,
@@ -164,9 +164,9 @@ class ReviewSessionController extends StudySessionController {
 
     // ── THE TOGGLE ──
     if (realTimeSaving) {
-      await LocalDB.fsrsCard.put(updatedCard);
-      await LocalDB.reviewLog.put(log);
-      await LocalDB.reviewSession.put(_session!); // Assumes repo exists
+      await LocalDB.fsrsCard.upsert(updatedCard);
+      await LocalDB.reviewLog.upsert(log);
+      await LocalDB.reviewSession.upsert(_session!); // Assumes repo exists
     } else {
       _pendingCards[updatedCard.id] = updatedCard;
       _pendingLogs.add(log);
@@ -193,16 +193,16 @@ class ReviewSessionController extends StudySessionController {
 
       if (realTimeSaving) {
         // Just put the final session state
-        await LocalDB.reviewSession.put(_session!);
+        await LocalDB.reviewSession.upsert(_session!);
       } else {
         // Batch Save everything
         if (_pendingCards.isNotEmpty) {
-          await LocalDB.fsrsCard.putAll(_pendingCards.values.toList());
+          await LocalDB.fsrsCard.upsertMany(_pendingCards.values.toList());
         }
         if (_pendingLogs.isNotEmpty) {
-          await LocalDB.reviewLog.putAll(_pendingLogs);
+          await LocalDB.reviewLog.upsertMany(_pendingLogs);
         }
-        await LocalDB.reviewSession.put(_session!);
+        await LocalDB.reviewSession.upsert(_session!);
       }
     } on Exception catch (e) {
       setError(

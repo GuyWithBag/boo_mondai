@@ -18,7 +18,6 @@ class LeaderboardController extends Controller {
   Future<void> fetchLeaderboard() async {
     setLoading(true);
     setError(null);
-    ;
     notifyListeners();
 
     try {

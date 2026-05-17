@@ -15,3 +15,4 @@ export 'review_session_controller.dart';
 export 'session_interactions_controller.dart';
 export 'streak_controller.dart';
 export 'study_session_controller.dart';
+export 'view_decks_online_page_controller.dart';

@@ -36,12 +36,11 @@ class ReviewDashboardController extends Controller {
   Future<void> _loadData({required bool fetchHistorical}) async {
     setLoading(true);
     setError(null);
-    ;
     notifyListeners();
 
     try {
       final userId = LocalDB.profile.getOrCreate().userId;
-      final allDecks = LocalDB.deck.getAll();
+      final allDecks = LocalDB.deck.selectMany();
       final deckMap = {for (final d in allDecks) d.id: d};
 
       // 1. Fetch Historical (Only if requested or not cached)
