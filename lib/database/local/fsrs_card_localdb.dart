@@ -11,10 +11,10 @@ import 'package:boo_mondai/models/models.barrel.dart';
 
 class FsrsCardLocalDB extends HiveLocalDB<FsrsCard> {
   @override
-  String get boxName => 'fsrs_card_box';
+  String get boxName => 'fsrs_cards';
 
   @override
-  String getId(FsrsCard item) => item.id.toString();
+  Map<String, Object?> primaryKeyFromItem(FsrsCard item) => {'id': item.id};
 
   // ── Domain Queries ──────────────────────────────────────
 
@@ -43,7 +43,9 @@ class FsrsCardLocalDB extends HiveLocalDB<FsrsCard> {
   /// Gets cards that are ready to be reviewed right now
   List<FsrsCard> getDueCards(DateTime now) => guardSync(
     () => box.values
-        .where((s) => s.state.due.isBefore(now) || s.state.due.isAtSameMomentAs(now))
+        .where(
+          (s) => s.state.due.isBefore(now) || s.state.due.isAtSameMomentAs(now),
+        )
         .toList(),
     action: 'getDueCards',
   );

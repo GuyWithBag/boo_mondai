@@ -5,8 +5,10 @@ import 'package:boo_mondai/database/database.barrel.dart';
 
 class CachedProfileLocalDB extends HiveLocalDB<CachedProfile> {
   @override
-  String get boxName => 'cached_profile_box';
+  String get boxName => 'cached_profiles';
 
   @override
-  String getId(CachedProfile item) => item.id;
+  Map<String, Object?> primaryKeyFromItem(CachedProfile item) => {
+    'id': item.id,
+  };
 }

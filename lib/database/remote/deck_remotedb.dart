@@ -1,12 +1,10 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// PATH: lib/services/supabase/supabase_deck_service.dart
+// PATH: lib/database/remote/deck_remote_db.dart
 // PURPOSE: Supabase CRUD for decks
-// PROVIDERS: none
-// HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/models/models.barrel.dart';
 import 'package:boo_mondai/database/database.barrel.dart';
+import 'package:boo_mondai/models/models.barrel.dart';
 
 class DeckRemoteDB extends SupabaseRemoteDB<Deck> {
   @override
@@ -18,11 +16,29 @@ class DeckRemoteDB extends SupabaseRemoteDB<Deck> {
   @override
   Map<String, dynamic> toMap(Deck item) => item.toMap();
 
-  Future<List<Deck>> fetchDecks({bool publicOnly = true}) => selectMany(
-    filters: publicOnly ? {'is_public': true} : null,
-    orderBy: 'created_at',
-  );
+  @override
+  Map<String, Object?> primaryKeyFromItem(Deck item) => {'id': item.id};
 
-  Future<List<Deck>> fetchByUserId(String userId) =>
-      selectMany(filters: {'author_id': userId}, orderBy: 'created_at');
+  @override
+  String get upsertConflictTarget => 'id';
+
+  /// Fetches decks where visibility_state is 'public'.
+  /// Also joins the tags using Supabase many-to-many syntax.
+  Future<List<Deck>> selectManyPublic({int? limit, int offset = 0}) =>
+      selectMany(
+        select: '*, tags(*)',
+        filters: {'visibility_state': 'public'},
+        orderBy: 'created_at',
+        ascending: false,
+        limit: limit,
+        offset: offset,
+      );
+
+  Future<Deck?> selectById(String deckId) => selectOne(filters: {'id': deckId});
+
+  Future<List<Deck>> selectManyByUserId(String profileId) => selectMany(
+    filters: {'user_id': profileId},
+    orderBy: 'updated_at',
+    ascending: false,
+  );
 }

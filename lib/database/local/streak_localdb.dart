@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 
 class StreakLocalDB extends HiveSingleDataLocalDB<Streak> {
   @override
-  String get boxName => 'streak_box';
+  String get boxName => 'streaks';
 
   @override
   String getId(Streak item) => item.userId;
@@ -20,7 +20,7 @@ class StreakLocalDB extends HiveSingleDataLocalDB<Streak> {
   Streak createValue() => Streak(
     updatedAt: DateTime.now(),
     createdAt: DateTime.now(),
-    id: UuidService.uuid.v4(),
+    id: uuid.v7(),
     userId: LocalDB.profile.getOrCreate().userId,
     currentStreak: 1,
     longestStreak: 1,
@@ -37,7 +37,7 @@ class StreakLocalDB extends HiveSingleDataLocalDB<Streak> {
       final created = Streak(
         updatedAt: DateTime.now(),
         createdAt: DateTime.now(),
-        id: UuidService.uuid.v4(),
+        id: uuid.v7(),
         userId: LocalDB.profile.getOrCreate().userId,
         currentStreak: 1,
         longestStreak: 1,

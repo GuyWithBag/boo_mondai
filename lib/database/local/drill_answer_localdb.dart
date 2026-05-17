@@ -8,10 +8,10 @@ import 'package:boo_mondai/database/database.barrel.dart';
 
 class DrillAnswerLocalDB extends HiveLocalDB<DrillAnswer> {
   @override
-  String get boxName => 'drill_answer_box';
+  String get boxName => 'drill_answers';
 
   @override
-  String getId(DrillAnswer item) => item.id;
+  Map<String, Object?> primaryKeyFromItem(DrillAnswer item) => {'id': item.id};
 
   // ── Domain Specific Queries ────────────────────────────────
 

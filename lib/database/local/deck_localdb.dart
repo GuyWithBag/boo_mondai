@@ -9,13 +9,13 @@ import 'package:boo_mondai/lib.barrel.dart';
 
 class DeckLocalDB extends HiveLocalDB<Deck> {
   @override
-  String get boxName => 'deck_box';
+  String get boxName => 'decks';
 
   @override
-  String getId(Deck item) => item.id;
+  Map<String, Object?> primaryKeyFromItem(Deck item) => {'id': item.id};
 
   List<Deck> getByCurrentUser() => guardSync(
-    () => getAll()
+    () => selectMany()
         .where((d) => d.userId == LocalDB.profile.getOrCreate().userId)
         .toList(),
     action: 'getByCurrentUser',

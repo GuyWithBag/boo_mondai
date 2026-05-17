@@ -2,11 +2,11 @@
 
 import 'package:boo_mondai/database/database.barrel.dart';
 import 'package:boo_mondai/models/models.barrel.dart';
-import 'package:boo_mondai/services/services.barrel.dart';
+import 'package:boo_mondai/shared/uuid.dart';
 
 class ProfileLocalDB extends HiveSingleDataLocalDB<Profile> {
   @override
-  String get boxName => 'profile_box';
+  String get boxName => 'profiles';
 
   @override
   String getId(Profile item) => item.id;
@@ -14,9 +14,9 @@ class ProfileLocalDB extends HiveSingleDataLocalDB<Profile> {
   @override
   Profile createValue() {
     final profile = Profile(
-      id: UuidService.uuid.v4(),
+      id: uuid.v7(),
       // This will be replaced by supabase's auth.user auto generated uuid.
-      userId: UuidService.uuid.v4(),
+      userId: uuid.v7(),
       role: '',
       updatedAt: DateTime.now(),
       createdAt: DateTime.now(),

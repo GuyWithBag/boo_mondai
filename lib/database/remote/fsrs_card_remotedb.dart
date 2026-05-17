@@ -17,4 +17,10 @@ class FsrsCardRemoteDB extends SupabaseRemoteDB<FsrsCard> {
 
   @override
   Map<String, dynamic> toMap(FsrsCard item) => item.toMap();
+
+  @override
+  Map<String, Object?> primaryKeyFromItem(FsrsCard item) => {'id': item.id};
+
+  @override
+  String get upsertConflictTarget => 'id';
 }

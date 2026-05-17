@@ -17,4 +17,13 @@ class ProfileRemoteDB extends SupabaseRemoteDB<Profile> {
 
   @override
   Map<String, dynamic> toMap(Profile item) => item.toMap();
+
+  @override
+  Map<String, Object?> primaryKeyFromItem(Profile item) => {'id': item.id};
+
+  @override
+  String get upsertConflictTarget => 'id';
+
+  Future<Profile?> selectByAuthUserId(String authUserId) =>
+      selectOne(filters: {'user_id': authUserId});
 }

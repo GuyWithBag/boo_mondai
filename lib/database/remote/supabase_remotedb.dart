@@ -1,70 +1,50 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// PATH: lib/services/supabase/supabase_service.dart
-// PURPOSE: Abstract base for all Supabase services — shared client, guard, and generic CRUD
+// PATH: lib/database/remote/supabase_remotedb.dart
+// PURPOSE: Abstract Supabase table repository — shared client, guard, and generic CRUD
 // PROVIDERS: none
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'dart:developer' as developer;
-import 'package:boo_mondai/database/database.barrel.dart';
 import 'package:boo_mondai/exceptions/exceptions.barrel.dart';
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-/// Base class for domain-specific Supabase services.
-///
-/// Mirrors [HiveLocalDB]: subclasses declare [tableName] and [fromMap] once,
-/// and all primary-table CRUD methods use them implicitly — no need to repeat
-/// the table name or deserialiser on every call.
+typedef DbPrimaryKey = Map<String, Object?>;
+
+/// Base class for Supabase table repositories.
+/// Subclasses own table identity, row mapping, and primary-key extraction.
 abstract class SupabaseRemoteDB<T> {
   SupabaseClient get client => Supabase.instance.client;
 
-  /// The Supabase table this service operates on.
+  /// Supabase table or view name.
   String get tableName;
 
-  /// Deserialises a raw DB row into [T].
+  /// Deserializes a raw DB row into [T].
   T Function(Map<String, dynamic>) get fromMap;
 
-  /// Serialises [item] into a DB row map.
+  /// Serializes [item] into a DB row map.
   Map<String, dynamic> toMap(T item);
+
+  /// Extracts the real primary key for [item].
+  DbPrimaryKey primaryKeyFromItem(T item);
+
+  /// Supabase/PostgREST upsert conflict target, e.g. `id` or `deck_id,tag_id`.
+  String? get upsertConflictTarget => null;
 
   // ── Error, Logging & Crashlytics Wrapper ───────────────────
 
   /// Wraps DB calls to handle exceptions, log results locally,
   /// and silently report crashes to Firebase.
   Future<U> guard<U>(Future<U> Function() fn, {required String action}) async {
-    developer.log('🚀 Starts: $action', name: 'SupabaseDB[$tableName]');
+    _debugLog('Starts: $action');
 
     try {
       final result = await fn();
-
-      // Local Logging: Check for empty lists or nulls
-      if (result == null) {
-        developer.log(
-          '⚠️ Result is NULL: $action',
-          name: 'SupabaseDB[$tableName]',
-        );
-      } else if (result is List && result.isEmpty) {
-        developer.log(
-          '⚠️ Result is an EMPTY LIST: $action',
-          name: 'SupabaseDB[$tableName]',
-        );
-      } else {
-        final countStr = result is List
-            ? ' (Returned ${result.length} items)'
-            : '';
-        developer.log(
-          '✅ Success: $action$countStr',
-          name: 'SupabaseDB[$tableName]',
-        );
-      }
-
+      _logResult(result, action);
       return result;
     } on AuthException catch (e) {
-      developer.log(
-        '❌ AuthException: ${e.message}',
-        name: 'SupabaseDB[$tableName]',
-        error: e,
-      );
+      _debugLog('AuthException: ${e.message}', error: e);
 
       // Send to Firebase Crashlytics silently
       // FirebaseCrashlytics.instance.recordError(
@@ -75,11 +55,7 @@ abstract class SupabaseRemoteDB<T> {
 
       throw AppException(e.message, code: e.statusCode);
     } on PostgrestException catch (e) {
-      developer.log(
-        '❌ PostgrestException: ${e.message}',
-        name: 'SupabaseDB[$tableName]',
-        error: e,
-      );
+      _debugLog('PostgrestException: ${e.message}', error: e);
 
       // Send to Firebase Crashlytics silently
       // FirebaseCrashlytics.instance.recordError(
@@ -90,12 +66,7 @@ abstract class SupabaseRemoteDB<T> {
 
       throw AppException(e.message, code: e.code);
     } catch (e, stack) {
-      developer.log(
-        '❌ Unknown Exception: $e',
-        name: 'SupabaseDB[$tableName]',
-        error: e,
-        stackTrace: stack,
-      );
+      _debugLog('Unknown Exception: $e', error: e, stackTrace: stack);
 
       // Catch unexpected app crashes (e.g., mapping errors, null pointers)
       // FirebaseCrashlytics.instance.recordError(
@@ -108,79 +79,126 @@ abstract class SupabaseRemoteDB<T> {
     }
   }
 
+  void _debugLog(String message, {Object? error, StackTrace? stackTrace}) {
+    if (!kDebugMode) return;
+    developer.log(
+      message,
+      name: 'SupabaseDB[$tableName]',
+      error: error,
+      stackTrace: stackTrace,
+    );
+  }
+
+  void _logResult<U>(U result, String action) {
+    if (result == null) {
+      _debugLog('Result is NULL: $action');
+    } else if (result is List && result.isEmpty) {
+      _debugLog('Result is an EMPTY LIST: $action');
+    } else {
+      final countStr = result is List
+          ? ' (Returned ${result.length} items)'
+          : '';
+      _debugLog('Success: $action$countStr');
+    }
+  }
+
+  dynamic _applyFilters(dynamic query, Map<String, Object?> filters) {
+    for (final entry in filters.entries) {
+      query = entry.value == null
+          ? query.isFilter(entry.key, null)
+          : query.eq(entry.key, entry.value);
+    }
+    return query;
+  }
+
+  Map<String, dynamic> _updatesWithoutPrimaryKey(T item) {
+    final updates = Map<String, dynamic>.from(toMap(item));
+    for (final key in primaryKeyFromItem(item).keys) {
+      updates.remove(key);
+    }
+    return updates;
+  }
+
   // ── Primary-table CRUD ───────────────────────────────────
 
   Future<List<T>> selectMany({
-    Map<String, dynamic>? filters,
+    String select = '*',
+    Map<String, Object?> filters = const {},
     String? orderBy,
-    bool ascending = false,
+    bool ascending = true,
+    int? limit,
+    int? offset,
   }) => guard(() async {
-    var query = client.from(tableName).select();
+    dynamic query = client.from(tableName).select(select);
 
-    if (filters != null) {
-      for (final entry in filters.entries) {
-        query = query.eq(entry.key, entry.value);
-      }
+    if (filters.isNotEmpty) {
+      query = _applyFilters(query, filters);
+    }
+    if (orderBy != null) {
+      query = query.order(orderBy, ascending: ascending);
+    }
+    if (limit != null && offset != null) {
+      query = query.range(offset, offset + limit - 1);
+    } else if (limit != null) {
+      query = query.limit(limit);
     }
 
-    final response = await (orderBy != null
-        ? query.order(orderBy, ascending: ascending)
-        : query);
+    final response = await query;
     return List<Map<String, dynamic>>.from(response).map(fromMap).toList();
   }, action: 'selectMany');
 
-  Future<T?> selectById(String id) => guard(() async {
-    final row = await client
-        .from(tableName)
-        .select()
-        .eq('id', id)
-        .maybeSingle();
+  Future<T?> selectOne({
+    String select = '*',
+    required Map<String, Object?> filters,
+  }) => guard(() async {
+    final row = await _applyFilters(
+      client.from(tableName).select(select),
+      filters,
+    ).maybeSingle();
     return row == null ? null : fromMap(row);
-  }, action: 'selectById($id)');
+  }, action: 'selectOne($filters)');
 
-  Future<T?> selectByUserId(String userId) => guard(() async {
-    final row = await client
-        .from(tableName)
-        .select()
-        .eq('user_id', userId)
-        .maybeSingle();
-    return row == null ? null : fromMap(row);
-  }, action: 'selectByUserId($userId)');
-
-  Future<List<T>> selectManyByUserId(String userId) => guard(() async {
-    final row = await client.from(tableName).select().eq('user_id', userId);
-    return List<Map<String, dynamic>>.from(row).map(fromMap).toList();
-  }, action: 'selectManyByUserId($userId)');
-
-  Future<List<T>> selectManyByCurrentUser() => guard(() async {
-    final row = await client
-        .from(tableName)
-        .select()
-        .eq('user_id', LocalDB.profile.getOrCreate().userId);
-    return List<Map<String, dynamic>>.from(row).map(fromMap).toList();
-  }, action: 'selectManyByUserCurrentUser()');
-
-  Future<T> insertOne(T item) => guard(() async {
+  Future<T> insert(T item, {String select = '*'}) => guard(() async {
     final response = await client
         .from(tableName)
         .insert(toMap(item))
-        .select()
+        .select(select)
         .single();
     return fromMap(response);
-  }, action: 'insertOne');
+  }, action: 'insert');
 
-  Future<void> updateById(String id, T item) => guard(
-    () => client.from(tableName).update(toMap(item)).eq('id', id),
-    action: 'updateById($id)',
+  Future<void> update(T item) => updateWhere(
+    filters: primaryKeyFromItem(item),
+    values: _updatesWithoutPrimaryKey(item),
   );
 
-  Future<void> upsertOne(T item, {String? onConflict}) => guard(
-    () => client.from(tableName).upsert(toMap(item), onConflict: onConflict),
-    action: 'upsertOne',
-  );
+  Future<void> updateWhere({
+    required Map<String, Object?> filters,
+    required Map<String, dynamic> values,
+  }) => guard(() async {
+    await _applyFilters(client.from(tableName).update(values), filters);
+  }, action: 'updateWhere($filters)');
 
-  Future<void> deleteById(String id) => guard(
-    () => client.from(tableName).delete().eq('id', id),
-    action: 'deleteById($id)',
-  );
+  Future<void> upsert(T item, {String? onConflict}) => guard(() async {
+    await client
+        .from(tableName)
+        .upsert(toMap(item), onConflict: onConflict ?? upsertConflictTarget);
+  }, action: 'upsert(${primaryKeyFromItem(item)})');
+
+  Future<void> upsertMany(List<T> items, {String? onConflict}) =>
+      guard(() async {
+        if (items.isEmpty) return;
+        await client
+            .from(tableName)
+            .upsert(
+              items.map(toMap).toList(),
+              onConflict: onConflict ?? upsertConflictTarget,
+            );
+      }, action: 'upsertMany(${items.length} items)');
+
+  Future<void> delete(T item) => deleteWhere(primaryKeyFromItem(item));
+
+  Future<void> deleteWhere(Map<String, Object?> filters) => guard(() async {
+    await _applyFilters(client.from(tableName).delete(), filters);
+  }, action: 'deleteWhere($filters)');
 }

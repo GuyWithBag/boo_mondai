@@ -9,10 +9,12 @@ import 'package:boo_mondai/models/models.barrel.dart';
 
 class ReviewSessionLocalDB extends HiveLocalDB<ReviewSession> {
   @override
-  String get boxName => 'review_session_box';
+  String get boxName => 'review_sessions';
 
   @override
-  String getId(ReviewSession item) => item.id;
+  Map<String, Object?> primaryKeyFromItem(ReviewSession item) => {
+    'id': item.id,
+  };
 
   List<ReviewSession> getRecent(int count) => guardSync(() {
     final sorted = box.values.toList()

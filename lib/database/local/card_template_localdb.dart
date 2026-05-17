@@ -10,10 +10,10 @@ import 'package:boo_mondai/database/database.barrel.dart';
 
 class CardTemplateLocalDB extends HiveLocalDB<CardTemplate> {
   @override
-  String get boxName => 'card_template_box';
+  String get boxName => 'card_templates';
 
   @override
-  String getId(CardTemplate item) => item.id;
+  Map<String, Object?> primaryKeyFromItem(CardTemplate item) => {'id': item.id};
 
   List<CardTemplate> getByDeckId(String deckId) => guardSync(
     () => box.values.where((c) => c.deckId == deckId).toList(),
@@ -23,8 +23,8 @@ class CardTemplateLocalDB extends HiveLocalDB<CardTemplate> {
   Future<void> deleteByDeckId(String deckId) => guard(() async {
     final keys = box.values
         .where((c) => c.deckId == deckId)
-        .map((c) => c.id)
+        .map((c) => primaryKeyFromItem(c))
         .toList();
-    await box.deleteAll(keys);
+    await box.deleteAll(keys.map(encodePrimaryKey));
   }, action: 'deleteByDeckId($deckId)');
 }

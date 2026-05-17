@@ -21,6 +21,10 @@ class StorageRemoteDB extends SupabaseRemoteDB<Never> {
   @override
   Map<String, dynamic> toMap(Never item) => {};
 
+  @override
+  Map<String, Object?> primaryKeyFromItem(Never item) =>
+      throw UnimplementedError();
+
   Future<String> uploadImage(
     String bucket,
     String path,

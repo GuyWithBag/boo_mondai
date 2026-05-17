@@ -8,10 +8,10 @@ import 'package:boo_mondai/database/database.barrel.dart';
 
 class DrillSessionLocalDB extends HiveLocalDB<DrillSession> {
   @override
-  String get boxName => 'drill_session_box';
+  String get boxName => 'drill_sessions';
 
   @override
-  String getId(DrillSession item) => item.id;
+  Map<String, Object?> primaryKeyFromItem(DrillSession item) => {'id': item.id};
 
   List<DrillSession> getRecent(int count) => guardSync(() {
     final sorted = box.values.toList()

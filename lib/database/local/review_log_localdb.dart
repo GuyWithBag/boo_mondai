@@ -9,10 +9,12 @@ import 'package:boo_mondai/lib.barrel.dart';
 
 class ReviewLogLocalDB extends HiveLocalDB<FsrsReviewLog> {
   @override
-  String get boxName => 'review_log_box';
+  String get boxName => 'review_logs';
 
   @override
-  String getId(FsrsReviewLog item) => item.log.cardId.toString();
+  Map<String, Object?> primaryKeyFromItem(FsrsReviewLog item) => {
+    'id': item.id,
+  };
 
   List<FsrsReviewLog> getByCardId(String cardId) => guardSync(
     () => box.values.where((e) => e.log.cardId.toString() == cardId).toList(),

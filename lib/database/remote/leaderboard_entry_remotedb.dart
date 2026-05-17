@@ -19,10 +19,15 @@ class LeaderboardEntryRemoteDB extends SupabaseRemoteDB<LeaderboardEntry> {
   @override
   Map<String, dynamic> toMap(LeaderboardEntry item) => item.toMap();
 
+  @override
+  Map<String, Object?> primaryKeyFromItem(LeaderboardEntry item) => {
+    'user_id': item.userId,
+  };
+
   /// The view's display_name column is aliased to user_name to match the
   /// key expected by [LeaderboardEntryMapper].
   Future<List<LeaderboardEntry>> fetchLeaderboard() => guard(() async {
-    var query = client
+    final query = client
         .from(tableName)
         .select('user_id,  drill_score, review_count');
     final response = await query.order('drill_score', ascending: false);

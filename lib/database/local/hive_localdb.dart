@@ -1,18 +1,20 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/database/local/hive_localdb.dart
-// PURPOSE: Abstract Hive CRUD base — shared getAll, getById, put, putAll, delete, deleteAll, clear
+// PURPOSE: Abstract Hive table repository — shared select, insert, upsert, delete, clear
 // PROVIDERS: none
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'dart:convert';
 import 'dart:developer' as developer;
 import 'package:boo_mondai/exceptions/exceptions.barrel.dart';
+import 'package:flutter/foundation.dart';
 import 'package:hive_ce/hive.dart';
 
-/// Base repository for Hive boxes keyed by a String id.
-///
-/// Subclasses provide [boxName] and [getId] to get shared CRUD for free.
-/// Domain-specific queries (e.g. getByDeckId) belong in the subclass.
+typedef HivePrimaryKey = Map<String, Object?>;
+
+/// Base repository for Hive boxes keyed by encoded primary-key maps.
+/// Subclasses should keep [boxName] identical to the backing Supabase table.
 abstract class HiveLocalDB<T> {
   String get boxName;
 
@@ -24,102 +26,136 @@ abstract class HiveLocalDB<T> {
     return this;
   }
 
-  /// Extracts the String key used for Hive put/get from an item.
-  String getId(T item);
+  /// Extracts the real primary key for [item].
+  HivePrimaryKey primaryKeyFromItem(T item);
+
+  String encodePrimaryKey(HivePrimaryKey primaryKey) {
+    final orderedKeys = primaryKey.keys.toList()..sort();
+    return jsonEncode({for (final key in orderedKeys) key: primaryKey[key]});
+  }
 
   // ── Error, Logging & Crashlytics Wrapper ───────────────────
 
   /// Wraps async Hive calls to handle exceptions and log results locally.
   Future<U> guard<U>(Future<U> Function() fn, {required String action}) async {
-    developer.log('🚀 Starts: $action', name: 'HiveLocalDB[$boxName]');
+    _debugLog('Starts: $action');
     try {
       final result = await fn();
       _logResult(result, action);
       return result;
     } on HiveError catch (e) {
-      developer.log(
-        '❌ HiveError: ${e.message}',
-        name: 'HiveLocalDB[$boxName]',
-        error: e,
-      );
+      _debugLog('HiveError: ${e.message}', error: e);
       throw HiveException(e.message, code: 'HIVE_ERROR', originalError: e);
     } catch (e, stack) {
-      developer.log(
-        '❌ Unknown Exception: $e',
-        name: 'HiveLocalDB[$boxName]',
-        error: e,
-        stackTrace: stack,
-      );
+      _debugLog('Unknown Exception: $e', error: e, stackTrace: stack);
       rethrow;
     }
   }
 
   /// Wraps synchronous Hive calls to handle exceptions and log results locally.
   U guardSync<U>(U Function() fn, {required String action}) {
-    developer.log('🚀 Starts: $action', name: 'HiveLocalDB[$boxName]');
+    _debugLog('Starts: $action');
     try {
       final result = fn();
       _logResult(result, action);
       return result;
     } on HiveError catch (e) {
-      developer.log(
-        '❌ HiveError: ${e.message}',
-        name: 'HiveLocalDB[$boxName]',
-        error: e,
-      );
+      _debugLog('HiveError: ${e.message}', error: e);
       throw HiveException(e.message, code: 'HIVE_ERROR', originalError: e);
     } catch (e, stack) {
-      developer.log(
-        '❌ Unknown Exception: $e',
-        name: 'HiveLocalDB[$boxName]',
-        error: e,
-        stackTrace: stack,
-      );
+      _debugLog('Unknown Exception: $e', error: e, stackTrace: stack);
       rethrow;
     }
   }
 
+  void _debugLog(String message, {Object? error, StackTrace? stackTrace}) {
+    if (!kDebugMode) return;
+    developer.log(
+      message,
+      name: 'HiveLocalDB[$boxName]',
+      error: error,
+      stackTrace: stackTrace,
+    );
+  }
+
   void _logResult<U>(U result, String action) {
     if (result == null) {
-      developer.log('⚠️ Result is NULL: $action', name: 'HiveLocalDB[$boxName]');
+      _debugLog('Result is NULL: $action');
     } else if (result is List && result.isEmpty) {
-      developer.log('⚠️ Result is an EMPTY LIST: $action', name: 'HiveLocalDB[$boxName]');
+      _debugLog('Result is an EMPTY LIST: $action');
     } else {
-      final countStr = result is List ? ' (Returned ${result.length} items)' : '';
-      developer.log('✅ Success: $action$countStr', name: 'HiveLocalDB[$boxName]');
+      final countStr = result is List
+          ? ' (Returned ${result.length} items)'
+          : '';
+      _debugLog('Success: $action$countStr');
     }
   }
 
   // ── CRUD ────────────────────────────────────────────────
 
-  List<T> getAll() => guardSync(() => box.values.toList(), action: 'getAll');
+  List<T> selectMany({
+    bool Function(T item)? where,
+    int? limit,
+    int offset = 0,
+  }) => guardSync(() {
+    Iterable<T> values = box.values;
+    if (where != null) {
+      values = values.where(where);
+    }
+    if (offset > 0) {
+      values = values.skip(offset);
+    }
+    if (limit != null) {
+      values = values.take(limit);
+    }
+    return values.toList();
+  }, action: 'selectMany');
 
-  T? getById(String id) => guardSync(() => box.get(id), action: 'getById($id)');
-
-  List<T> getAllById(String id) => guardSync(
-    () => box.values.where((T item) => getId(item) == id).toList(),
-    action: 'getAllById($id)',
+  T? selectByPk(HivePrimaryKey primaryKey) => guardSync(
+    () => box.get(encodePrimaryKey(primaryKey)),
+    action: 'selectByPk($primaryKey)',
   );
 
-  Future<void> put(T item) => guard(
-    () => box.put(getId(item), item),
-    action: 'put(${getId(item)})',
+  Future<void> insert(T item) => guard(() async {
+    final key = encodePrimaryKey(primaryKeyFromItem(item));
+    if (box.containsKey(key)) {
+      throw HiveException('Duplicate primary key: $key', code: 'DUPLICATE_KEY');
+    }
+    await box.put(key, item);
+  }, action: 'insert(${primaryKeyFromItem(item)})');
+
+  Future<void> upsert(T item) => guard(
+    () => box.put(encodePrimaryKey(primaryKeyFromItem(item)), item),
+    action: 'upsert(${primaryKeyFromItem(item)})',
   );
 
-  Future<void> putAll(List<T> items) => guard(() async {
-    final map = {for (final item in items) getId(item): item};
+  Future<void> upsertMany(List<T> items) => guard(() async {
+    final map = {
+      for (final item in items)
+        encodePrimaryKey(primaryKeyFromItem(item)): item,
+    };
     await box.putAll(map);
-  }, action: 'putAll(${items.length} items)');
+  }, action: 'upsertMany(${items.length} items)');
 
-  Future<void> delete(String id) => guard(
-    () => box.delete(id),
-    action: 'delete($id)',
+  Future<void> update(T item) => upsert(item);
+
+  Future<void> delete(T item) => deleteByPk(primaryKeyFromItem(item));
+
+  Future<void> deleteByPk(HivePrimaryKey primaryKey) => guard(
+    () => box.delete(encodePrimaryKey(primaryKey)),
+    action: 'deleteByPk($primaryKey)',
   );
 
-  Future<void> deleteAll(List<String> ids) => guard(
-    () => box.deleteAll(ids),
-    action: 'deleteAll(${ids.length} ids)',
+  Future<void> deleteManyByPk(List<HivePrimaryKey> primaryKeys) => guard(
+    () => box.deleteAll(primaryKeys.map(encodePrimaryKey)),
+    action: 'deleteManyByPk(${primaryKeys.length} keys)',
   );
 
   Future<void> clear() => guard(() => box.clear(), action: 'clear');
+
+  Stream<BoxEvent> watch({HivePrimaryKey? primaryKey}) {
+    return box.watch(
+      key: primaryKey == null ? null : encodePrimaryKey(primaryKey),
+    );
+  }
 }

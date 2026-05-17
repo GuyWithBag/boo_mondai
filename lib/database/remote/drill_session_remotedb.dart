@@ -20,4 +20,10 @@ class DrillSessionRemoteDB extends SupabaseRemoteDB<DrillSession> {
   @override
   Map<String, dynamic> toMap(DrillSession item) =>
       item.toMap()..remove('session_type');
+
+  @override
+  Map<String, Object?> primaryKeyFromItem(DrillSession item) => {'id': item.id};
+
+  @override
+  String get upsertConflictTarget => 'id';
 }

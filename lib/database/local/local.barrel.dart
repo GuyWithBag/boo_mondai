@@ -3,7 +3,10 @@
 // Other files
 export 'cached_profile_localdb.dart';
 export 'card_template_localdb.dart';
+export 'card_template_tag_localdb.dart';
+export 'deck_listing_locadb.dart';
 export 'deck_localdb.dart';
+export 'deck_tag_localdb.dart';
 export 'drill_answer_localdb.dart';
 export 'drill_session_localdb.dart';
 export 'fsrs_card_localdb.dart';
@@ -16,3 +19,5 @@ export 'review_card_localdb.dart';
 export 'review_log_localdb.dart';
 export 'review_session_localdb.dart';
 export 'streak_localdb.dart';
+export 'tags_localdb.dart';
+export 'user_review_card_tag_localdb.dart';

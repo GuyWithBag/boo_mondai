@@ -33,6 +33,12 @@ class ResearchRemoteDB extends SupabaseRemoteDB<ResearchCode> {
   @override
   Map<String, dynamic> toMap(ResearchCode item) => item.toMap();
 
+  @override
+  Map<String, Object?> primaryKeyFromItem(ResearchCode item) => {'id': item.id};
+
+  @override
+  String get upsertConflictTarget => 'id';
+
   /// Validates the code, marks it as used, and returns the updated code row.
   Future<ResearchCode> redeemResearchCode(String code, String userId) =>
       guard(() async {

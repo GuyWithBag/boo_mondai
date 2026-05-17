@@ -7,6 +7,7 @@
 
 import 'dart:developer' as developer;
 import 'package:boo_mondai/exceptions/exceptions.barrel.dart';
+import 'package:flutter/foundation.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 
 abstract class HiveSingleDataLocalDB<T> {
@@ -29,71 +30,60 @@ abstract class HiveSingleDataLocalDB<T> {
 
   /// Wraps async Hive calls to handle exceptions and log results locally.
   Future<U> guard<U>(Future<U> Function() fn, {required String action}) async {
-    developer.log('🚀 Starts: $action', name: 'HiveSingleDB[$boxName]');
+    _debugLog('Starts: $action');
     try {
       final result = await fn();
       _logResult(result, action);
       return result;
     } on HiveError catch (e) {
-      developer.log(
-        '❌ HiveError: ${e.message}',
-        name: 'HiveSingleDB[$boxName]',
-        error: e,
-      );
+      _debugLog('HiveError: ${e.message}', error: e);
       throw HiveException(e.message, code: 'HIVE_ERROR', originalError: e);
     } catch (e, stack) {
-      developer.log(
-        '❌ Unknown Exception: $e',
-        name: 'HiveSingleDB[$boxName]',
-        error: e,
-        stackTrace: stack,
-      );
+      _debugLog('Unknown Exception: $e', error: e, stackTrace: stack);
       rethrow;
     }
   }
 
   /// Wraps synchronous Hive calls to handle exceptions and log results locally.
   U guardSync<U>(U Function() fn, {required String action}) {
-    developer.log('🚀 Starts: $action', name: 'HiveSingleDB[$boxName]');
+    _debugLog('Starts: $action');
     try {
       final result = fn();
       _logResult(result, action);
       return result;
     } on HiveError catch (e) {
-      developer.log(
-        '❌ HiveError: ${e.message}',
-        name: 'HiveSingleDB[$boxName]',
-        error: e,
-      );
+      _debugLog('HiveError: ${e.message}', error: e);
       throw HiveException(e.message, code: 'HIVE_ERROR', originalError: e);
     } catch (e, stack) {
-      developer.log(
-        '❌ Unknown Exception: $e',
-        name: 'HiveSingleDB[$boxName]',
-        error: e,
-        stackTrace: stack,
-      );
+      _debugLog('Unknown Exception: $e', error: e, stackTrace: stack);
       rethrow;
     }
   }
 
+  void _debugLog(String message, {Object? error, StackTrace? stackTrace}) {
+    if (!kDebugMode) return;
+    developer.log(
+      message,
+      name: 'HiveSingleDB[$boxName]',
+      error: error,
+      stackTrace: stackTrace,
+    );
+  }
+
   void _logResult<U>(U result, String action) {
     if (result == null) {
-      developer.log('⚠️ Result is NULL: $action', name: 'HiveSingleDB[$boxName]');
+      _debugLog('Result is NULL: $action');
     } else {
-      developer.log('✅ Success: $action', name: 'HiveSingleDB[$boxName]');
+      _debugLog('Success: $action');
     }
   }
 
   // ── Operations ──────────────────────────────────────────
 
-  T? retrieve() => guardSync(
-    () {
-      final values = box.values.toList();
-      return values.isEmpty ? null : values[0];
-    },
-    action: 'retrieve',
-  );
+  T? retrieve() => guardSync(() {
+    final values = box.values.toList();
+    return values.isEmpty ? null : values[0];
+  }, action: 'retrieve');
 
   T getOrCreate() {
     final value = retrieve();
