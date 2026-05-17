@@ -113,6 +113,7 @@ CREATE TABLE deck_listings (
   reports_count    int NOT NULL DEFAULT 0,
   featured_cards   jsonb NOT NULL DEFAULT '[]',
   featured_images  text[] NOT NULL DEFAULT '{}',
+  created_at       timestamptz NOT NULL DEFAULT now(),
   updated_at       timestamptz NOT NULL DEFAULT now()
 );
 
@@ -289,14 +290,14 @@ CREATE POLICY "drill_answers: owner manages" ON drill_answers FOR ALL USING (EXI
 
 CREATE TABLE fsrs_cards (
   id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id        uuid NOT NULL REFERENCES auth.users(id)   ON DELETE CASCADE,
+  user_id        uuid NOT NULL REFERENCES profiles(id)     ON DELETE CASCADE,
   review_card_id uuid NOT NULL REFERENCES review_cards(id) ON DELETE CASCADE,
   state          jsonb NOT NULL DEFAULT '{}',
   created_at     timestamptz NOT NULL DEFAULT now(),
   updated_at     timestamptz NOT NULL DEFAULT now()
 );
 ALTER TABLE fsrs_cards ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "fsrs_cards: owner manages" ON fsrs_cards FOR ALL USING ((select auth.uid()) = user_id);
+CREATE POLICY "fsrs_cards: owner manages" ON fsrs_cards FOR ALL USING (user_id = current_profile_id());
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON fsrs_cards FOR EACH ROW EXECUTE FUNCTION moddatetime(updated_at);
 
 CREATE TABLE review_logs (
@@ -306,7 +307,7 @@ CREATE TABLE review_logs (
   created_at   timestamptz NOT NULL DEFAULT now()
 );
 ALTER TABLE review_logs ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "review_logs: owner manages" ON review_logs FOR ALL USING (EXISTS (SELECT 1 FROM fsrs_cards fc WHERE fc.id = review_logs.fsrs_card_id AND fc.user_id = (select auth.uid())));
+CREATE POLICY "review_logs: owner manages" ON review_logs FOR ALL USING (EXISTS (SELECT 1 FROM fsrs_cards fc WHERE fc.id = review_logs.fsrs_card_id AND fc.user_id = current_profile_id()));
 
 CREATE TABLE streaks (
   id                 uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -517,6 +518,20 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 CREATE TRIGGER trigger_deck_reports AFTER INSERT ON deck_reports FOR EACH ROW EXECUTE FUNCTION update_deck_reports_count();
+
+-- Update Comments (Targeting deck_listings)
+-- TODO: Wire this trigger once a deck_comments table is added.
+-- CREATE OR REPLACE FUNCTION update_deck_comments_count() RETURNS TRIGGER AS $$
+-- BEGIN
+--   IF (TG_OP = 'INSERT') THEN
+--     UPDATE deck_listings SET comments_count = comments_count + 1 WHERE deck_id = NEW.deck_id;
+--   ELSIF (TG_OP = 'DELETE') THEN
+--     UPDATE deck_listings SET comments_count = comments_count - 1 WHERE deck_id = OLD.deck_id;
+--   END IF;
+--   RETURN NULL;
+-- END;
+-- $$ LANGUAGE plpgsql;
+-- CREATE TRIGGER trigger_deck_comments AFTER INSERT OR DELETE ON deck_comments FOR EACH ROW EXECUTE FUNCTION update_deck_comments_count();
 
 -- Update Forks (Targeting deck_listings)
 CREATE OR REPLACE FUNCTION update_deck_forks_count() RETURNS TRIGGER AS $$
