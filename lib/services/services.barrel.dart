@@ -5,7 +5,6 @@ export 'auth_service.dart';
 export 'drill_service.dart';
 export 'fsrs_service.dart';
 export 'guest_migration_service.dart';
-export 'hive_service.dart';
 export 'notification_service.dart';
 export 'research_service.dart';
 export 'services.dart';

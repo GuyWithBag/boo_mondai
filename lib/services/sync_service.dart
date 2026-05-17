@@ -36,11 +36,13 @@ class SyncService {
     required String userId,
   }) async {
     try {
-      final remoteData = await remoteDb.selectManyByUserId(userId);
+      final remoteData = await remoteDb.selectMany(
+        filters: {'user_id': userId},
+      );
       for (final remote in remoteData) {
-        final local = localDb.getById(remote.id);
+        final local = localDb.selectByPk({'id': remote.id});
         if (local == null || remote.updatedAt.isAfter(local.updatedAt)) {
-          await localDb.put(remote);
+          await localDb.upsert(remote);
         }
       }
     } catch (e) {
@@ -58,14 +60,16 @@ class SyncService {
     required String userId,
   }) async {
     try {
-      final remoteData = await remoteDb.selectManyByUserId(userId);
+      final remoteData = await remoteDb.selectMany(
+        filters: {'user_id': userId},
+      );
       final remoteMap = {for (final r in remoteData) r.id: r};
 
-      final localData = localDb.getAll();
+      final localData = localDb.selectMany();
       for (final local in localData) {
         final remote = remoteMap[local.id];
         if (remote == null || local.updatedAt.isAfter(remote.updatedAt)) {
-          await remoteDb.upsertOne(local);
+          await remoteDb.upsert(local);
         }
       }
     } catch (e) {

@@ -19,13 +19,11 @@ class ViewDeckPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currentDeck = LocalDB.deck.getById(deckId);
+    final currentDeck = LocalDB.deck.selectByPk({'id': deckId});
 
     final cachedProfsRepo = LocalDB.cachedProfile;
-    final author = cachedProfsRepo.getById(currentDeck!.userId);
-    final sourceAuthor = cachedProfsRepo.getById(
-      currentDeck.sourceAuthorId ?? '',
-    );
+    final author = cachedProfsRepo.selectByPk({'id': currentDeck!.userId});
+    final sourceAuthor = null;
 
     final controller = context.read<MyDecksPageController>();
 

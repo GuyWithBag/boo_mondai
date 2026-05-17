@@ -33,7 +33,9 @@ class ParticipantsTab extends StatelessWidget {
           builder: (context) {
             final p = participants[i];
             final useProfile = useMemoized<Future<Profile?>>(() async {
-              return await RemoteDB.profile.selectByUserId(p.userId);
+              return await RemoteDB.profile.selectOne(
+                filters: {'id': p.userId},
+              );
             }, []);
 
             final profile = useFuture<Profile?>(useProfile);

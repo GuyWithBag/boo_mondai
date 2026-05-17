@@ -16,7 +16,10 @@ class BarHistogram extends StatelessWidget {
   Widget build(BuildContext context) {
     final maxCount = buckets.isEmpty
         ? 1
-        : buckets.map((b) => b.$2).reduce((a, b) => a > b ? a : b).clamp(1, 999);
+        : buckets
+              .map((b) => b.$2)
+              .reduce((a, b) => a > b ? a : b)
+              .clamp(1, 999);
 
     return SizedBox(
       height: 80,
@@ -41,7 +44,8 @@ class BarHistogram extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.primary,
                       borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(3)),
+                        top: Radius.circular(3),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 4),

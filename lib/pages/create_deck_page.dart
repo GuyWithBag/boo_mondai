@@ -1,6 +1,6 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/pages/deck_creator_page.dart
-// PURPOSE: Create or edit a deck with title, short/long description, target language, and publish toggle
+// PURPOSE: Create or edit a deck with title, descriptions, visibility, and publish toggle
 // PROVIDERS: DeckProvider, AuthController, CardProvider
 // HOOKS: useTextEditingController, useEffect, useState
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -26,12 +26,13 @@ class CreateDeckPage extends HookWidget {
     final titleController = useTextEditingController();
     final shortDescController = useTextEditingController();
     final longDescController = useTextEditingController();
-    final langController = useTextEditingController(text: 'japanese');
     final formKey = useMemoized(GlobalKey<FormState>.new);
 
     final isPublished = useState(true);
-    final wasPublicInitially = useState(true);
-    final isPublic = useState(false);
+    final wasPublishedInitially = useState(true);
+
+    // Use the new VisibilityState enum
+    final visibilityState = useState(VisibilityState.private);
 
     final auth = context.read<AuthController>();
     final isEdit = deckId != null;
@@ -49,10 +50,9 @@ class CreateDeckPage extends HookWidget {
           titleController.text = existing.title;
           shortDescController.text = existing.shortDescription;
           longDescController.text = existing.longDescription;
-          langController.text = existing.targetLanguage;
           isPublished.value = existing.isPublished;
-          isPublic.value = existing.isPublic;
-          wasPublicInitially.value = existing.isPublic;
+          wasPublishedInitially.value = existing.isPublished;
+          visibilityState.value = existing.visibilityState;
         }
       }
       return null;
@@ -62,7 +62,6 @@ class CreateDeckPage extends HookWidget {
       if (!formKey.currentState!.validate()) return;
 
       final userId = auth.currentProfile.id;
-
       String? finalDeckId;
 
       if (isEdit) {
@@ -76,12 +75,11 @@ class CreateDeckPage extends HookWidget {
             title: titleController.text.trim(),
             shortDescription: shortDescController.text.trim(),
             longDescription: longDescController.text.trim(),
-            targetLanguage: langController.text.trim(),
-            isPublic: isPublic.value,
+            visibilityState: visibilityState.value,
             isPublished: isPublished.value,
             updatedAt: DateTime.now(), // Manual update for edit
           );
-          await deckDB.put(updated);
+          await deckDB.upsert(updated);
           finalDeckId = existing.id;
         }
       } else {
@@ -91,14 +89,12 @@ class CreateDeckPage extends HookWidget {
           title: titleController.text.trim(),
           shortDescription: shortDescController.text.trim(),
           longDescription: longDescController.text.trim(),
-          targetLanguage: langController.text.trim(),
+          visibilityState: visibilityState.value,
           isPremade: false,
-          isPublic: isPublic.value,
           isPublished: isPublished.value,
-          cardCount: 0,
         );
 
-        await deckDB.put(newDeck);
+        await deckDB.upsert(newDeck);
         finalDeckId = newDeck.id;
       }
 
@@ -106,7 +102,7 @@ class CreateDeckPage extends HookWidget {
 
       // SnackBar logic for first-time publishing
       final beingPublished =
-          isPublished.value && (!isEdit || !wasPublicInitially.value);
+          isPublished.value && (!isEdit || !wasPublishedInitially.value);
       if (beingPublished && finalDeckId != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -154,15 +150,32 @@ class CreateDeckPage extends HookWidget {
                       maxLines: 4,
                     ),
                     const SizedBox(height: AppSpacing.md),
-                    TextFormField(
-                      controller: langController,
+
+                    // Replaced Language Field and isPublic toggle with Visibility Dropdown
+                    DropdownButtonFormField<VisibilityState>(
+                      value: visibilityState.value,
                       decoration: const InputDecoration(
-                        labelText: 'Target Language',
+                        labelText: 'Visibility',
                       ),
-                      validator: (v) => (v == null || v.trim().isEmpty)
-                          ? 'Language is required'
-                          : null,
+                      items: const [
+                        DropdownMenuItem(
+                          value: VisibilityState.private,
+                          child: Text('Private (Only you)'),
+                        ),
+                        DropdownMenuItem(
+                          value: VisibilityState.unlisted,
+                          child: Text('Unlisted (Anyone with link)'),
+                        ),
+                        DropdownMenuItem(
+                          value: VisibilityState.public,
+                          child: Text('Public (Discoverable)'),
+                        ),
+                      ],
+                      onChanged: (v) {
+                        if (v != null) visibilityState.value = v;
+                      },
                     ),
+
                     const SizedBox(height: AppSpacing.md),
                     PublishToggle(
                       value: isPublished.value,

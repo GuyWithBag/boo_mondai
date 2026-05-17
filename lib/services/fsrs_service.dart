@@ -32,8 +32,8 @@ class FsrsService {
     final newCard = card.copyWith(state: res.card);
     final newLog = FsrsReviewLog.create(log: res.reviewLog, cardId: newCard.id);
 
-    await LocalDB.fsrsCard.put(newCard);
-    await LocalDB.reviewLog.put(newLog);
+    await LocalDB.fsrsCard.upsert(newCard);
+    await LocalDB.reviewLog.upsert(newLog);
   }
 
   // ── Due Stats (Calculated dynamically based on time/filter) ──
@@ -43,12 +43,12 @@ class FsrsService {
   }) {
     final now = DateTime.now();
     final allFsrsCards = LocalDB.fsrsCard.getByUserId(userId);
-    final allReviewCards = LocalDB.reviewCard.getAll();
+    final allReviewCards = LocalDB.reviewCard.selectMany();
     final rcToDeck = {for (final rc in allReviewCards) rc.id: rc.deckId};
 
     // We only need logs to determine if a card is "New" or "Learning"
     final studiedCardIds = LocalDB.reviewLog
-        .getAll()
+        .selectMany()
         .map((l) => l.fsrsCardId)
         .toSet();
 
@@ -95,9 +95,9 @@ class FsrsService {
   Map<String, DeckHistoricalStats> calculateHistoricalStats({
     required String userId,
   }) {
-    final allLogs = LocalDB.reviewLog.getAll();
+    final allLogs = LocalDB.reviewLog.selectMany();
     // In a real app, you'd want to query logs by userId, but relying on the card relation works for now
-    final allReviewCards = LocalDB.reviewCard.getAll();
+    final allReviewCards = LocalDB.reviewCard.selectMany();
     final rcToDeck = {for (final rc in allReviewCards) rc.id: rc.deckId};
 
     final againMap = <String, int>{};
@@ -106,7 +106,7 @@ class FsrsService {
     final easyMap = <String, int>{};
 
     for (final log in allLogs) {
-      final fsrsCard = LocalDB.fsrsCard.getById(log.fsrsCardId);
+      final fsrsCard = LocalDB.fsrsCard.selectByPk({'id': log.fsrsCardId});
       if (fsrsCard == null) continue;
 
       final deckId = rcToDeck[fsrsCard.reviewCardId];

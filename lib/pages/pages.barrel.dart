@@ -4,6 +4,7 @@
 export 'review_dashboard_page.dart';
 export 'session_page.dart';
 export 'survey_page.dart';
+export 'view_decks_online_page.dart';
 export 'view_deck_page.dart';
 export 'vocabulary_test_page.dart';
 export 'account_page.dart';
@@ -16,7 +17,6 @@ export 'home_page.dart';
 export 'leaderboard_page.dart';
 export 'login_page.dart';
 export 'my_decks_page.dart';
-export 'online_deck_browser_page.dart';
 export 'register_page.dart';
 export 'researcher_dashboard_page.dart';
 export 'research_code_entry_page.dart';

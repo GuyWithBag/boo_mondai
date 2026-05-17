@@ -27,14 +27,17 @@ class ResultsTab extends StatelessWidget {
     String? timePoint,
   }) {
     return surveyResponses
-        .where((r) =>
-            r.surveyType == surveyType &&
-            (timePoint == null || r.timePoint == timePoint))
+        .where(
+          (r) =>
+              r.surveyType == surveyType &&
+              (timePoint == null || r.timePoint == timePoint),
+        )
         .map((r) {
-      final map = Map<String, dynamic>.from(r.responses);
-      if (r.computedScore != null) map['sus_score'] = r.computedScore;
-      return map;
-    }).toList();
+          final map = Map<String, dynamic>.from(r.responses);
+          if (r.computedScore != null) map['sus_score'] = r.computedScore;
+          return map;
+        })
+        .toList();
   }
 
   @override
@@ -44,7 +47,10 @@ class ResultsTab extends StatelessWidget {
 
     final proficiencyData = _responsesFor('proficiency_screener');
     final languageInterestData = _responsesFor('language_interest');
-    final expShort = _responsesFor('experience_survey', timePoint: 'short_term');
+    final expShort = _responsesFor(
+      'experience_survey',
+      timePoint: 'short_term',
+    );
     final expLong = _responsesFor('experience_survey', timePoint: 'long_term');
     final previewUsefulnessData = _responsesFor('preview_usefulness');
     final fsrsUsefulnessData = _responsesFor('fsrs_usefulness');

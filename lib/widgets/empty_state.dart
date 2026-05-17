@@ -47,10 +47,7 @@ class EmptyState extends StatelessWidget {
               style: theme.textTheme.bodyMedium,
               textAlign: TextAlign.center,
             ),
-            if (action != null) ...[
-              SizedBox(height: AppSpacing.lg.h),
-              action!,
-            ],
+            if (action != null) ...[SizedBox(height: AppSpacing.lg.h), action!],
           ],
         ),
       ),

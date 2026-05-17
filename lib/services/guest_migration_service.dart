@@ -19,7 +19,7 @@ class GuestMigrationService {
   static bool hasLocalData(String guestUserId) {
     final hasDecks = LocalDB.deck.getByUserId(guestUserId).isNotEmpty;
     final hasFsrs = LocalDB.fsrsCard.getByUserId(guestUserId).isNotEmpty;
-    final hasSessions = LocalDB.drillSession.getAll().any(
+    final hasSessions = LocalDB.drillSession.selectMany().any(
       (s) => s.userId == guestUserId,
     );
     final hasStreak = LocalDB.streak.retrieve() != null;
@@ -40,24 +40,24 @@ class GuestMigrationService {
     // ── Decks ──────────────────────────────────────────────
     final guestDecks = LocalDB.deck.getByUserId(guestUserId);
     for (final deck in guestDecks) {
-      await LocalDB.deck.put(deck.copyWith(userId: newUserId));
+      await LocalDB.deck.upsert(deck.copyWith(userId: newUserId));
     }
 
     // ── FSRS cards ─────────────────────────────────────────
     final guestFsrs = LocalDB.fsrsCard.getByUserId(guestUserId);
     for (final card in guestFsrs) {
-      await LocalDB.fsrsCard.put(card.copyWith(userId: newUserId));
+      await LocalDB.fsrsCard.upsert(card.copyWith(userId: newUserId));
     }
 
     // ── Drill sessions ─────────────────────────────────────
     // userId lives on the StudySession base class; dart_mappable includes it
     // in the generated copyWith for all subclasses.
     final guestSessions = LocalDB.drillSession
-        .getAll()
+        .selectMany()
         .where((s) => s.userId == guestUserId)
         .toList();
     for (final session in guestSessions) {
-      await LocalDB.drillSession.put(session.copyWith(userId: newUserId));
+      await LocalDB.drillSession.upsert(session.copyWith(userId: newUserId));
     }
 
     // ── Streak ─────────────────────────────────────────────
@@ -75,17 +75,21 @@ class GuestMigrationService {
   /// Used when the user signs in and chooses NOT to keep their guest data.
   static Future<void> discardGuestData(String guestUserId) async {
     final guestDecks = LocalDB.deck.getByUserId(guestUserId);
-    await LocalDB.deck.deleteAll(guestDecks.map((d) => d.id).toList());
+    await LocalDB.deck.deleteManyByPk(
+      guestDecks.map((d) => {'id': d.id}).toList(),
+    );
 
     final guestFsrs = LocalDB.fsrsCard.getByUserId(guestUserId);
-    await LocalDB.fsrsCard.deleteAll(guestFsrs.map((c) => c.id).toList());
+    await LocalDB.fsrsCard.deleteManyByPk(
+      guestFsrs.map((c) => {'id': c.id}).toList(),
+    );
 
     final guestSessions = LocalDB.drillSession
-        .getAll()
+        .selectMany()
         .where((s) => s.userId == guestUserId)
         .toList();
-    await LocalDB.drillSession.deleteAll(
-      guestSessions.map((s) => s.id).toList(),
+    await LocalDB.drillSession.deleteManyByPk(
+      guestSessions.map((s) => {'id': s.id}).toList(),
     );
 
     final guestStreak = LocalDB.streak.retrieve();

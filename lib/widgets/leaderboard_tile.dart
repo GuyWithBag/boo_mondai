@@ -29,14 +29,15 @@ class LeaderboardTileWidget extends HookWidget {
 
     final dataFuture =
         useMemoized<Future<({Profile? profile, Streak? streak})>>(() async {
-          final results = await Future.wait([
-            RemoteDB.profile.selectByUserId(entry.userId),
-            RemoteDB.streak.selectByUserId(entry.userId),
-          ]);
-          return (
-            profile: results[0] as Profile?,
-            streak: results[1] as Streak?,
+          final profile = await RemoteDB.profile.selectByAuthUserId(
+            entry.userId,
           );
+          final streak = profile == null
+              ? null
+              : await RemoteDB.streak.selectOne(
+                  filters: {'user_id': profile.id},
+                );
+          return (profile: profile, streak: streak);
         }, [entry.userId]);
 
     final snapshot = useFuture(dataFuture);

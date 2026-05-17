@@ -32,7 +32,7 @@ class ReviewPrompt extends StatelessWidget {
 
     // Safely look up the deck across both public and user decks
     final deck = [
-      ...deckProvider.getAll(),
+      ...deckProvider.selectMany(),
       ...deckProvider.getByCurrentUser(),
     ].where((d) => d.id == deckId).firstOrNull;
 

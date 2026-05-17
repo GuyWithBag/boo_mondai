@@ -5,6 +5,7 @@
 
 import 'package:boo_mondai/models/models.barrel.dart';
 import 'package:boo_mondai/services/uuid_service.dart';
+import 'package:boo_mondai/shared/uuid.dart';
 
 class ResearchService {
   String generateCode() {
@@ -49,7 +50,7 @@ class ResearchService {
     }
 
     return SurveyResponse(
-      id: UuidService.uuid.v4(),
+      id: uuid.v7(),
       userId: userId,
       surveyType: surveyType,
       timePoint: timePoint,
@@ -66,7 +67,7 @@ class ResearchService {
     required Map<String, dynamic> answers,
   }) {
     return VocabularyTestResult(
-      id: UuidService.uuid.v4(),
+      id: uuid.v7(),
       userId: userId,
       testSet: testSet,
       score: score,
@@ -81,7 +82,7 @@ class ResearchService {
     required String unlocks,
   }) {
     return ResearchCode(
-      id: UuidService.uuid.v4(),
+      id: uuid.v7(),
       code: generateCode(),
       targetRole: targetRole,
       unlocks: unlocks,
@@ -99,7 +100,7 @@ class ResearchService {
     required int age,
   }) {
     return ResearchProfile(
-      id: UuidService.uuid.v4(),
+      id: uuid.v7(),
       userId: userId,
       role: role,
       goal: goal,
