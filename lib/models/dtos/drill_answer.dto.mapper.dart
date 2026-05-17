@@ -24,31 +24,19 @@ class DrillAnswerMapper extends ClassMapperBase<DrillAnswer> {
   static String _$id(DrillAnswer v) => v.id;
   static const Field<DrillAnswer, String> _f$id = Field('id', _$id);
   static String _$sessionId(DrillAnswer v) => v.sessionId;
-  static const Field<DrillAnswer, String> _f$sessionId = Field(
-    'sessionId',
-    _$sessionId,
-    key: r'session_id',
-  );
+  static const Field<DrillAnswer, String> _f$sessionId =
+      Field('sessionId', _$sessionId, key: r'session_id');
   static String _$cardId(DrillAnswer v) => v.cardId;
-  static const Field<DrillAnswer, String> _f$cardId = Field(
-    'cardId',
-    _$cardId,
-    key: r'card_id',
-  );
+  static const Field<DrillAnswer, String> _f$cardId =
+      Field('cardId', _$cardId, key: r'card_id');
   static String _$userAnswer(DrillAnswer v) => v.userAnswer;
-  static const Field<DrillAnswer, String> _f$userAnswer = Field(
-    'userAnswer',
-    _$userAnswer,
-    key: r'user_answer',
-  );
+  static const Field<DrillAnswer, String> _f$userAnswer =
+      Field('userAnswer', _$userAnswer, key: r'user_answer');
   static StudyRating _$type(DrillAnswer v) => v.type;
   static const Field<DrillAnswer, StudyRating> _f$type = Field('type', _$type);
   static DateTime _$createdAt(DrillAnswer v) => v.createdAt;
-  static const Field<DrillAnswer, DateTime> _f$createdAt = Field(
-    'createdAt',
-    _$createdAt,
-    key: r'created_at',
-  );
+  static const Field<DrillAnswer, DateTime> _f$createdAt =
+      Field('createdAt', _$createdAt, key: r'created_at');
 
   @override
   final MappableFields<DrillAnswer> fields = const {
@@ -62,13 +50,12 @@ class DrillAnswerMapper extends ClassMapperBase<DrillAnswer> {
 
   static DrillAnswer _instantiate(DecodingData data) {
     return DrillAnswer(
-      id: data.dec(_f$id),
-      sessionId: data.dec(_f$sessionId),
-      cardId: data.dec(_f$cardId),
-      userAnswer: data.dec(_f$userAnswer),
-      type: data.dec(_f$type),
-      createdAt: data.dec(_f$createdAt),
-    );
+        id: data.dec(_f$id),
+        sessionId: data.dec(_f$sessionId),
+        cardId: data.dec(_f$cardId),
+        userAnswer: data.dec(_f$userAnswer),
+        type: data.dec(_f$type),
+        createdAt: data.dec(_f$createdAt));
   }
 
   @override
@@ -85,36 +72,28 @@ class DrillAnswerMapper extends ClassMapperBase<DrillAnswer> {
 
 mixin DrillAnswerMappable {
   String toJson() {
-    return DrillAnswerMapper.ensureInitialized().encodeJson<DrillAnswer>(
-      this as DrillAnswer,
-    );
+    return DrillAnswerMapper.ensureInitialized()
+        .encodeJson<DrillAnswer>(this as DrillAnswer);
   }
 
   Map<String, dynamic> toMap() {
-    return DrillAnswerMapper.ensureInitialized().encodeMap<DrillAnswer>(
-      this as DrillAnswer,
-    );
+    return DrillAnswerMapper.ensureInitialized()
+        .encodeMap<DrillAnswer>(this as DrillAnswer);
   }
 
   DrillAnswerCopyWith<DrillAnswer, DrillAnswer, DrillAnswer> get copyWith =>
       _DrillAnswerCopyWithImpl<DrillAnswer, DrillAnswer>(
-        this as DrillAnswer,
-        $identity,
-        $identity,
-      );
+          this as DrillAnswer, $identity, $identity);
   @override
   String toString() {
-    return DrillAnswerMapper.ensureInitialized().stringifyValue(
-      this as DrillAnswer,
-    );
+    return DrillAnswerMapper.ensureInitialized()
+        .stringifyValue(this as DrillAnswer);
   }
 
   @override
   bool operator ==(Object other) {
-    return DrillAnswerMapper.ensureInitialized().equalsValue(
-      this as DrillAnswer,
-      other,
-    );
+    return DrillAnswerMapper.ensureInitialized()
+        .equalsValue(this as DrillAnswer, other);
   }
 
   @override
@@ -131,14 +110,13 @@ extension DrillAnswerValueCopy<$R, $Out>
 
 abstract class DrillAnswerCopyWith<$R, $In extends DrillAnswer, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  $R call({
-    String? id,
-    String? sessionId,
-    String? cardId,
-    String? userAnswer,
-    StudyRating? type,
-    DateTime? createdAt,
-  });
+  $R call(
+      {String? id,
+      String? sessionId,
+      String? cardId,
+      String? userAnswer,
+      StudyRating? type,
+      DateTime? createdAt});
   DrillAnswerCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -151,35 +129,32 @@ class _DrillAnswerCopyWithImpl<$R, $Out>
   late final ClassMapperBase<DrillAnswer> $mapper =
       DrillAnswerMapper.ensureInitialized();
   @override
-  $R call({
-    String? id,
-    String? sessionId,
-    String? cardId,
-    String? userAnswer,
-    StudyRating? type,
-    DateTime? createdAt,
-  }) => $apply(
-    FieldCopyWithData({
-      if (id != null) #id: id,
-      if (sessionId != null) #sessionId: sessionId,
-      if (cardId != null) #cardId: cardId,
-      if (userAnswer != null) #userAnswer: userAnswer,
-      if (type != null) #type: type,
-      if (createdAt != null) #createdAt: createdAt,
-    }),
-  );
+  $R call(
+          {String? id,
+          String? sessionId,
+          String? cardId,
+          String? userAnswer,
+          StudyRating? type,
+          DateTime? createdAt}) =>
+      $apply(FieldCopyWithData({
+        if (id != null) #id: id,
+        if (sessionId != null) #sessionId: sessionId,
+        if (cardId != null) #cardId: cardId,
+        if (userAnswer != null) #userAnswer: userAnswer,
+        if (type != null) #type: type,
+        if (createdAt != null) #createdAt: createdAt
+      }));
   @override
   DrillAnswer $make(CopyWithData data) => DrillAnswer(
-    id: data.get(#id, or: $value.id),
-    sessionId: data.get(#sessionId, or: $value.sessionId),
-    cardId: data.get(#cardId, or: $value.cardId),
-    userAnswer: data.get(#userAnswer, or: $value.userAnswer),
-    type: data.get(#type, or: $value.type),
-    createdAt: data.get(#createdAt, or: $value.createdAt),
-  );
+      id: data.get(#id, or: $value.id),
+      sessionId: data.get(#sessionId, or: $value.sessionId),
+      cardId: data.get(#cardId, or: $value.cardId),
+      userAnswer: data.get(#userAnswer, or: $value.userAnswer),
+      type: data.get(#type, or: $value.type),
+      createdAt: data.get(#createdAt, or: $value.createdAt));
 
   @override
   DrillAnswerCopyWith<$R2, DrillAnswer, $Out2> $chain<$R2, $Out2>(
-    Then<$Out2, $R2> t,
-  ) => _DrillAnswerCopyWithImpl<$R2, $Out2>($value, $cast, t);
+          Then<$Out2, $R2> t) =>
+      _DrillAnswerCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }

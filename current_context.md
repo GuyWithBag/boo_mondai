@@ -1,7 +1,75 @@
 # BooMondai — Current Context
-> Last updated: 2026-03-28
+> Last updated: 2026-05-17
 > Use this file to resume any session. It is the single source of truth for
 > decisions made in conversations that are not yet reflected in code.
+
+---
+
+## 0. Active branch: `rework`
+
+Work resumed on the `rework` branch. All phases 1–6 in section 11 are done on `main`. The `rework` branch is a new effort layering a **public deck browser with tags, listings, and visibility states** on top of the existing app.
+
+### 0a. Model changes applied in `rework`
+
+The `Deck` DTO was heavily expanded and several new DTOs were added:
+
+| What changed | File | Detail |
+|---|---|---|
+| `Deck.userId` | `deck.dto.dart` | Renamed from `creatorId` |
+| `Deck.shortDescription` | `deck.dto.dart` | Replaces the old single `description` field |
+| `Deck.longDescription` | `deck.dto.dart` | New — rich text/markdown body |
+| `Deck.coverImageUrl` | `deck.dto.dart` | Optional cover art |
+| `Deck.sourceDeckId` | `deck.dto.dart` | FK to the deck this was forked from (attribution) |
+| `Deck.visibilityState` | `deck.dto.dart` | Enum: `public` / `private` / `unlisted` (replaces `isPublic bool`) |
+| `Deck.isPublished` | `deck.dto.dart` | Whether the deck has been synced to the public browser |
+| `Deck.isEditable` | `deck.dto.dart` | False for premade/locked decks |
+| `Deck.version` + `buildNumber` | `deck.dto.dart` | Semantic versioning for deck updates |
+| `Deck.tags: List<Tag>` | `deck.dto.dart` | Many-to-many via `deck_tags` join table |
+| `Deck.listing: DeckListing?` | `deck.dto.dart` | Nullable — populated only when fetching from the browser |
+| `Tag` | `tag.dto.dart` | New — global or user-created tags; `Tag.createNow()` uses UUID v7 |
+| `DeckListing` | `deck_listing.dto.dart` | New — storefront engagement stats (upvotes, downloads, forks, favorites, comments, reports, featured cards/images) stored in `deck_listings` table |
+| `DeckTag` | `deck_tag.dto.dart` | New — join table DTO |
+| `CardTemplateTag` | `card_template_tag.dto.dart` | New — tags on individual card templates |
+| `UserReviewCardTag` | `user_review_card_tag.dto.dart` | New — user's personal tags on review cards |
+| `VisibilityState` | `visibility_state.dto.dart` | New enum, `@MappableEnum(caseStyle: CaseStyle.snakeCase)` |
+
+New remote DB classes (all in `lib/database/remote/`):
+- `DeckListingRemoteDB` — CRUD for `deck_listings` table; custom `getByDeckId` and `updateListing`
+- `TagRemoteDB` — CRUD for `tags` table
+- `DeckTagRemoteDB` — manages `deck_tags` join rows
+- `CardTemplateRemoteDB` — CRUD for card templates
+- `CardTemplateTagsRemoteDB` — manages `card_template_tags` join rows
+- `ReviewCardRemoteDB` — CRUD for review cards
+- `DrillSessionRemoteDB` — CRUD for drill sessions
+- `UserReviewCardTagRemoteDB` — manages `user_review_card_tag` join rows
+
+New local DB classes (all in `lib/database/local/`): matching local Hive DB files for all of the above.
+
+`DeckRemoteDB.selectManyPublic()` — fetches public decks joining tags via Supabase many-to-many syntax: `.select('*, tags(*)')`.
+
+### 0b. Online deck browser — what's done
+
+- **`ViewDecksOnlinePage`** (`lib/pages/view_decks_online_page.dart`) — browse page with:
+  - Search bar in the app bar
+  - Horizontal `FilterChip` tag bar (auto-populated from fetched decks)
+  - `ListView` of `_BrowseDeckTile` cards showing title, description, card count, and tags
+  - `EmptyStateWidget` with "Clear filters" action
+  - `RefreshIndicator` for pull-to-refresh
+  - Tapping a tile calls `showModalBottomSheet` with `DeckDetailSheet(deck: deck)`
+- **`ViewDecksOnlinePageController`** (`lib/controllers/view_decks_online_page_controller.dart`) — loads public decks and extracts unique tags for the filter bar
+
+### 0c. What is NOT done yet (immediate next task)
+
+**`DeckDetailSheet`** — the bottom sheet shown when tapping a deck tile in the browser.
+
+- File: `lib/widgets/online_deck_detail_sheet.dart`
+- Current state: **entirely commented out** — it was mid-rewrite and never finished
+- The old version (from `browser_deck_detail_sheet.dart`, now deleted) had: author profile fetch, `DeckDetails` widget, "Copy to My Decks" button, comments placeholder
+- Needs to be rebuilt using the new `Deck` model (tags, listing stats, `visibilityState`, `sourceDeckId` for attribution)
+
+The old `online_deck_browser_page.dart` and `browser_deck_detail_sheet.dart` files were deleted and replaced by the new files — so the new detail sheet needs to be written from scratch.
+
+---
 
 ---
 
