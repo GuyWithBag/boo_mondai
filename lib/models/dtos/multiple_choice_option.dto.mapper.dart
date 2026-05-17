@@ -23,17 +23,29 @@ class MultipleChoiceOptionMapper extends ClassMapperBase<MultipleChoiceOption> {
   static String _$id(MultipleChoiceOption v) => v.id;
   static const Field<MultipleChoiceOption, String> _f$id = Field('id', _$id);
   static String _$templateId(MultipleChoiceOption v) => v.templateId;
-  static const Field<MultipleChoiceOption, String> _f$templateId =
-      Field('templateId', _$templateId, key: r'template_id');
+  static const Field<MultipleChoiceOption, String> _f$templateId = Field(
+    'templateId',
+    _$templateId,
+    key: r'template_id',
+  );
   static String _$optionText(MultipleChoiceOption v) => v.optionText;
-  static const Field<MultipleChoiceOption, String> _f$optionText =
-      Field('optionText', _$optionText, key: r'option_text');
+  static const Field<MultipleChoiceOption, String> _f$optionText = Field(
+    'optionText',
+    _$optionText,
+    key: r'option_text',
+  );
   static bool _$isCorrect(MultipleChoiceOption v) => v.isCorrect;
-  static const Field<MultipleChoiceOption, bool> _f$isCorrect =
-      Field('isCorrect', _$isCorrect, key: r'is_correct');
+  static const Field<MultipleChoiceOption, bool> _f$isCorrect = Field(
+    'isCorrect',
+    _$isCorrect,
+    key: r'is_correct',
+  );
   static int _$displayOrder(MultipleChoiceOption v) => v.displayOrder;
-  static const Field<MultipleChoiceOption, int> _f$displayOrder =
-      Field('displayOrder', _$displayOrder, key: r'display_order');
+  static const Field<MultipleChoiceOption, int> _f$displayOrder = Field(
+    'displayOrder',
+    _$displayOrder,
+    key: r'display_order',
+  );
 
   @override
   final MappableFields<MultipleChoiceOption> fields = const {
@@ -46,11 +58,12 @@ class MultipleChoiceOptionMapper extends ClassMapperBase<MultipleChoiceOption> {
 
   static MultipleChoiceOption _instantiate(DecodingData data) {
     return MultipleChoiceOption(
-        id: data.dec(_f$id),
-        templateId: data.dec(_f$templateId),
-        optionText: data.dec(_f$optionText),
-        isCorrect: data.dec(_f$isCorrect),
-        displayOrder: data.dec(_f$displayOrder));
+      id: data.dec(_f$id),
+      templateId: data.dec(_f$templateId),
+      optionText: data.dec(_f$optionText),
+      isCorrect: data.dec(_f$isCorrect),
+      displayOrder: data.dec(_f$displayOrder),
+    );
   }
 
   @override
@@ -76,48 +89,63 @@ mixin MultipleChoiceOptionMappable {
         .encodeMap<MultipleChoiceOption>(this as MultipleChoiceOption);
   }
 
-  MultipleChoiceOptionCopyWith<MultipleChoiceOption, MultipleChoiceOption,
-      MultipleChoiceOption> get copyWith => _MultipleChoiceOptionCopyWithImpl<
-          MultipleChoiceOption, MultipleChoiceOption>(
-      this as MultipleChoiceOption, $identity, $identity);
+  MultipleChoiceOptionCopyWith<
+    MultipleChoiceOption,
+    MultipleChoiceOption,
+    MultipleChoiceOption
+  >
+  get copyWith =>
+      _MultipleChoiceOptionCopyWithImpl<
+        MultipleChoiceOption,
+        MultipleChoiceOption
+      >(this as MultipleChoiceOption, $identity, $identity);
   @override
   String toString() {
-    return MultipleChoiceOptionMapper.ensureInitialized()
-        .stringifyValue(this as MultipleChoiceOption);
+    return MultipleChoiceOptionMapper.ensureInitialized().stringifyValue(
+      this as MultipleChoiceOption,
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return MultipleChoiceOptionMapper.ensureInitialized()
-        .equalsValue(this as MultipleChoiceOption, other);
+    return MultipleChoiceOptionMapper.ensureInitialized().equalsValue(
+      this as MultipleChoiceOption,
+      other,
+    );
   }
 
   @override
   int get hashCode {
-    return MultipleChoiceOptionMapper.ensureInitialized()
-        .hashValue(this as MultipleChoiceOption);
+    return MultipleChoiceOptionMapper.ensureInitialized().hashValue(
+      this as MultipleChoiceOption,
+    );
   }
 }
 
 extension MultipleChoiceOptionValueCopy<$R, $Out>
     on ObjectCopyWith<$R, MultipleChoiceOption, $Out> {
   MultipleChoiceOptionCopyWith<$R, MultipleChoiceOption, $Out>
-      get $asMultipleChoiceOption => $base.as(
-          (v, t, t2) => _MultipleChoiceOptionCopyWithImpl<$R, $Out>(v, t, t2));
+  get $asMultipleChoiceOption => $base.as(
+    (v, t, t2) => _MultipleChoiceOptionCopyWithImpl<$R, $Out>(v, t, t2),
+  );
 }
 
 abstract class MultipleChoiceOptionCopyWith<
-    $R,
-    $In extends MultipleChoiceOption,
-    $Out> implements ClassCopyWith<$R, $In, $Out> {
-  $R call(
-      {String? id,
-      String? templateId,
-      String? optionText,
-      bool? isCorrect,
-      int? displayOrder});
+  $R,
+  $In extends MultipleChoiceOption,
+  $Out
+>
+    implements ClassCopyWith<$R, $In, $Out> {
+  $R call({
+    String? id,
+    String? templateId,
+    String? optionText,
+    bool? isCorrect,
+    int? displayOrder,
+  });
   MultipleChoiceOptionCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-      Then<$Out2, $R2> t);
+    Then<$Out2, $R2> t,
+  );
 }
 
 class _MultipleChoiceOptionCopyWithImpl<$R, $Out>
@@ -129,29 +157,32 @@ class _MultipleChoiceOptionCopyWithImpl<$R, $Out>
   late final ClassMapperBase<MultipleChoiceOption> $mapper =
       MultipleChoiceOptionMapper.ensureInitialized();
   @override
-  $R call(
-          {String? id,
-          String? templateId,
-          String? optionText,
-          bool? isCorrect,
-          int? displayOrder}) =>
-      $apply(FieldCopyWithData({
-        if (id != null) #id: id,
-        if (templateId != null) #templateId: templateId,
-        if (optionText != null) #optionText: optionText,
-        if (isCorrect != null) #isCorrect: isCorrect,
-        if (displayOrder != null) #displayOrder: displayOrder
-      }));
+  $R call({
+    String? id,
+    String? templateId,
+    String? optionText,
+    bool? isCorrect,
+    int? displayOrder,
+  }) => $apply(
+    FieldCopyWithData({
+      if (id != null) #id: id,
+      if (templateId != null) #templateId: templateId,
+      if (optionText != null) #optionText: optionText,
+      if (isCorrect != null) #isCorrect: isCorrect,
+      if (displayOrder != null) #displayOrder: displayOrder,
+    }),
+  );
   @override
   MultipleChoiceOption $make(CopyWithData data) => MultipleChoiceOption(
-      id: data.get(#id, or: $value.id),
-      templateId: data.get(#templateId, or: $value.templateId),
-      optionText: data.get(#optionText, or: $value.optionText),
-      isCorrect: data.get(#isCorrect, or: $value.isCorrect),
-      displayOrder: data.get(#displayOrder, or: $value.displayOrder));
+    id: data.get(#id, or: $value.id),
+    templateId: data.get(#templateId, or: $value.templateId),
+    optionText: data.get(#optionText, or: $value.optionText),
+    isCorrect: data.get(#isCorrect, or: $value.isCorrect),
+    displayOrder: data.get(#displayOrder, or: $value.displayOrder),
+  );
 
   @override
   MultipleChoiceOptionCopyWith<$R2, MultipleChoiceOption, $Out2>
-      $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-          _MultipleChoiceOptionCopyWithImpl<$R2, $Out2>($value, $cast, t);
+  $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _MultipleChoiceOptionCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }

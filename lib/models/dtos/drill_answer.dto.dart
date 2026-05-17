@@ -6,7 +6,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/models/models.barrel.dart';
-import 'package:boo_mondai/services/services.barrel.dart';
+import 'package:boo_mondai/shared/uuid.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:fsrs/fsrs.dart';
 
@@ -39,7 +39,7 @@ class DrillAnswer with DrillAnswerMappable implements WriteOnceDTO {
     required StudyRating type,
   }) {
     final val = DrillAnswer(
-      id: UuidService.uuid.v4(),
+      id: uuid.v7(),
       createdAt: DateTime.now(),
       sessionId: sessionId,
       type: type,

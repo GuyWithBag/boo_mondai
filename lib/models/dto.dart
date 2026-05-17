@@ -23,8 +23,5 @@ abstract class WriteOnceDTO {
   final String id;
   final DateTime createdAt;
 
-  const WriteOnceDTO({
-    required this.id,
-    required this.createdAt,
-  });
+  const WriteOnceDTO({required this.id, required this.createdAt});
 }

@@ -1,11 +1,12 @@
-import 'package:boo_mondai/models/dto.dart';
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// PATH: lib/models/dtos/deck.dto.dart
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+import 'package:boo_mondai/models/models.barrel.dart';
+import 'package:boo_mondai/shared/shared.barrel.dart';
 import 'package:dart_mappable/dart_mappable.dart';
-import 'package:uuid/uuid.dart'; // 1. Import UUID
 
 part 'deck.dto.mapper.dart';
-
-// Initialize UUID instance outside the class for reuse
-const _uuid = Uuid();
 
 @MappableClass()
 class Deck with DeckMappable implements DTO {
@@ -20,77 +21,79 @@ class Deck with DeckMappable implements DTO {
   final String title;
   final String shortDescription;
   final String longDescription;
-  final String targetLanguage;
-  final List<String> tags;
+
+  // ── Visuals & Provenance ──
+  final String? coverImageUrl;
+  final String? sourceDeckId;
+
   final bool isPremade;
-  final bool isPublic;
+  final VisibilityState visibilityState;
   final bool isPublished;
   final bool isEditable;
   final int cardCount;
   final String version;
   final int buildNumber;
-  final String? sourceDeckId;
-  final String? sourceAuthorId;
 
-  // Standard constructor for mapping/deserialization
+  final List<Tag> tags;
+
+  // ── The Storefront Data (Populated when fetching from online browser) ──
+  final DeckListing? listing;
+
   const Deck({
     required this.id,
     required this.userId,
     required this.title,
     this.shortDescription = '',
     this.longDescription = '',
-    required this.targetLanguage,
-    this.tags = const [],
+    this.coverImageUrl,
+    this.sourceDeckId,
     this.isPremade = false,
-    required this.isPublic,
+    required this.visibilityState,
+    required this.isPublished,
     this.isEditable = true,
     required this.cardCount,
     this.version = '1.0.0',
     this.buildNumber = 1,
     required this.createdAt,
     required this.updatedAt,
-    this.sourceDeckId,
-    this.sourceAuthorId,
-    required this.isPublished,
+    this.tags = const [],
+    this.listing,
   });
 
-  /// Use this initializer for creating NEW decks in your UI/Logic.
-  /// It automatically generates the ID and Timestamps.
   factory Deck.createNow({
     required String userId,
     required String title,
-    required String targetLanguage,
-    bool? isPremade,
-    required bool isPublic,
-    required bool isPublished,
-    int cardCount = 0,
     String? shortDescription,
     String? longDescription,
-    List<String>? tags,
+    String? coverImageUrl,
+    String? sourceDeckId,
+    VisibilityState visibilityState = VisibilityState.private,
+    required bool isPublished,
+    bool? isPremade,
     bool? isEditable,
     String? version,
-    String? sourceDeckId,
-    String? sourceAuthorId,
+    List<Tag>? tags,
   }) {
     final now = DateTime.now();
     return Deck(
-      id: _uuid.v4(), // 2. Generate UUID
+      id: uuid.v7(),
       userId: userId,
       title: title,
-      targetLanguage: targetLanguage,
-      isPremade: isPremade ?? false,
-      isPublic: isPublic,
-      isPublished: isPublished,
-      cardCount: cardCount,
-      createdAt: now, // 3. Set current time
-      updatedAt: now, // 3. Set current time
       shortDescription: shortDescription ?? '',
       longDescription: longDescription ?? '',
-      tags: tags ?? const [],
-      isEditable: isEditable ?? true,
-      version: version ?? '1.0.0',
+      coverImageUrl: coverImageUrl,
       sourceDeckId: sourceDeckId,
-      sourceAuthorId: sourceAuthorId,
+      visibilityState: visibilityState,
+      isPublished: isPublished,
+      isPremade: isPremade ?? false,
+      isEditable: isEditable ?? true,
+      cardCount: 0,
+      version: version ?? '1.0.0',
+      buildNumber: 1,
+      createdAt: now,
+      updatedAt: now,
+      tags: tags ?? const [],
+      listing: null,
     );
   }
 }

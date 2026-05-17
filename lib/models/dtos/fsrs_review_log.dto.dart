@@ -3,7 +3,6 @@
 // PURPOSE: Wraps the FSRS ReviewLog with our database IDs for tracking history
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/models/dto.dart';
 import 'package:boo_mondai/lib.barrel.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:fsrs/fsrs.dart';
@@ -34,7 +33,7 @@ class FsrsReviewLog with FsrsReviewLogMappable implements WriteOnceDTO {
     required ReviewLog log,
   }) {
     return FsrsReviewLog(
-      id: UuidService.uuid.v4(),
+      id: uuid.v7(),
       createdAt: DateTime.now(),
       fsrsCardId: cardId,
       log: log,

@@ -13,8 +13,9 @@ class FillInTheBlanksTemplateMapper
   static FillInTheBlanksTemplateMapper? _instance;
   static FillInTheBlanksTemplateMapper ensureInitialized() {
     if (_instance == null) {
-      MapperContainer.globals
-          .use(_instance = FillInTheBlanksTemplateMapper._());
+      MapperContainer.globals.use(
+        _instance = FillInTheBlanksTemplateMapper._(),
+      );
       CardTemplateMapper.ensureInitialized().addSubMapper(_instance!);
       FillInTheBlankSegmentMapper.ensureInitialized();
     }
@@ -27,26 +28,48 @@ class FillInTheBlanksTemplateMapper
   static String _$id(FillInTheBlanksTemplate v) => v.id;
   static const Field<FillInTheBlanksTemplate, String> _f$id = Field('id', _$id);
   static String _$deckId(FillInTheBlanksTemplate v) => v.deckId;
-  static const Field<FillInTheBlanksTemplate, String> _f$deckId =
-      Field('deckId', _$deckId, key: r'deck_id');
+  static const Field<FillInTheBlanksTemplate, String> _f$deckId = Field(
+    'deckId',
+    _$deckId,
+    key: r'deck_id',
+  );
   static int _$sortOrder(FillInTheBlanksTemplate v) => v.sortOrder;
-  static const Field<FillInTheBlanksTemplate, int> _f$sortOrder =
-      Field('sortOrder', _$sortOrder, key: r'sort_order');
+  static const Field<FillInTheBlanksTemplate, int> _f$sortOrder = Field(
+    'sortOrder',
+    _$sortOrder,
+    key: r'sort_order',
+  );
   static DateTime _$createdAt(FillInTheBlanksTemplate v) => v.createdAt;
-  static const Field<FillInTheBlanksTemplate, DateTime> _f$createdAt =
-      Field('createdAt', _$createdAt, key: r'created_at');
+  static const Field<FillInTheBlanksTemplate, DateTime> _f$createdAt = Field(
+    'createdAt',
+    _$createdAt,
+    key: r'created_at',
+  );
   static DateTime _$updatedAt(FillInTheBlanksTemplate v) => v.updatedAt;
-  static const Field<FillInTheBlanksTemplate, DateTime> _f$updatedAt =
-      Field('updatedAt', _$updatedAt, key: r'updated_at');
+  static const Field<FillInTheBlanksTemplate, DateTime> _f$updatedAt = Field(
+    'updatedAt',
+    _$updatedAt,
+    key: r'updated_at',
+  );
   static String? _$sourceTemplateId(FillInTheBlanksTemplate v) =>
       v.sourceTemplateId;
   static const Field<FillInTheBlanksTemplate, String> _f$sourceTemplateId =
-      Field('sourceTemplateId', _$sourceTemplateId,
-          key: r'source_template_id', opt: true);
+      Field(
+        'sourceTemplateId',
+        _$sourceTemplateId,
+        key: r'source_template_id',
+        opt: true,
+      );
   static List<FillInTheBlankSegment> _$segments(FillInTheBlanksTemplate v) =>
       v.segments;
   static const Field<FillInTheBlanksTemplate, List<FillInTheBlankSegment>>
-      _f$segments = Field('segments', _$segments);
+  _f$segments = Field('segments', _$segments);
+  static List<Tag> _$tags(FillInTheBlanksTemplate v) => v.tags;
+  static const Field<FillInTheBlanksTemplate, List<Tag>> _f$tags = Field(
+    'tags',
+    _$tags,
+    mode: FieldMode.member,
+  );
 
   @override
   final MappableFields<FillInTheBlanksTemplate> fields = const {
@@ -57,6 +80,7 @@ class FillInTheBlanksTemplateMapper
     #updatedAt: _f$updatedAt,
     #sourceTemplateId: _f$sourceTemplateId,
     #segments: _f$segments,
+    #tags: _f$tags,
   };
 
   @override
@@ -69,13 +93,14 @@ class FillInTheBlanksTemplateMapper
 
   static FillInTheBlanksTemplate _instantiate(DecodingData data) {
     return FillInTheBlanksTemplate(
-        id: data.dec(_f$id),
-        deckId: data.dec(_f$deckId),
-        sortOrder: data.dec(_f$sortOrder),
-        createdAt: data.dec(_f$createdAt),
-        updatedAt: data.dec(_f$updatedAt),
-        sourceTemplateId: data.dec(_f$sourceTemplateId),
-        segments: data.dec(_f$segments));
+      id: data.dec(_f$id),
+      deckId: data.dec(_f$deckId),
+      sortOrder: data.dec(_f$sortOrder),
+      createdAt: data.dec(_f$createdAt),
+      updatedAt: data.dec(_f$updatedAt),
+      sourceTemplateId: data.dec(_f$sourceTemplateId),
+      segments: data.dec(_f$segments),
+    );
   }
 
   @override
@@ -101,57 +126,76 @@ mixin FillInTheBlanksTemplateMappable {
         .encodeMap<FillInTheBlanksTemplate>(this as FillInTheBlanksTemplate);
   }
 
-  FillInTheBlanksTemplateCopyWith<FillInTheBlanksTemplate,
-          FillInTheBlanksTemplate, FillInTheBlanksTemplate>
-      get copyWith => _FillInTheBlanksTemplateCopyWithImpl<
-              FillInTheBlanksTemplate, FillInTheBlanksTemplate>(
-          this as FillInTheBlanksTemplate, $identity, $identity);
+  FillInTheBlanksTemplateCopyWith<
+    FillInTheBlanksTemplate,
+    FillInTheBlanksTemplate,
+    FillInTheBlanksTemplate
+  >
+  get copyWith =>
+      _FillInTheBlanksTemplateCopyWithImpl<
+        FillInTheBlanksTemplate,
+        FillInTheBlanksTemplate
+      >(this as FillInTheBlanksTemplate, $identity, $identity);
   @override
   String toString() {
-    return FillInTheBlanksTemplateMapper.ensureInitialized()
-        .stringifyValue(this as FillInTheBlanksTemplate);
+    return FillInTheBlanksTemplateMapper.ensureInitialized().stringifyValue(
+      this as FillInTheBlanksTemplate,
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return FillInTheBlanksTemplateMapper.ensureInitialized()
-        .equalsValue(this as FillInTheBlanksTemplate, other);
+    return FillInTheBlanksTemplateMapper.ensureInitialized().equalsValue(
+      this as FillInTheBlanksTemplate,
+      other,
+    );
   }
 
   @override
   int get hashCode {
-    return FillInTheBlanksTemplateMapper.ensureInitialized()
-        .hashValue(this as FillInTheBlanksTemplate);
+    return FillInTheBlanksTemplateMapper.ensureInitialized().hashValue(
+      this as FillInTheBlanksTemplate,
+    );
   }
 }
 
 extension FillInTheBlanksTemplateValueCopy<$R, $Out>
     on ObjectCopyWith<$R, FillInTheBlanksTemplate, $Out> {
   FillInTheBlanksTemplateCopyWith<$R, FillInTheBlanksTemplate, $Out>
-      get $asFillInTheBlanksTemplate => $base.as((v, t, t2) =>
-          _FillInTheBlanksTemplateCopyWithImpl<$R, $Out>(v, t, t2));
+  get $asFillInTheBlanksTemplate => $base.as(
+    (v, t, t2) => _FillInTheBlanksTemplateCopyWithImpl<$R, $Out>(v, t, t2),
+  );
 }
 
 abstract class FillInTheBlanksTemplateCopyWith<
-    $R,
-    $In extends FillInTheBlanksTemplate,
-    $Out> implements CardTemplateCopyWith<$R, $In, $Out> {
+  $R,
+  $In extends FillInTheBlanksTemplate,
+  $Out
+>
+    implements CardTemplateCopyWith<$R, $In, $Out> {
   ListCopyWith<
+    $R,
+    FillInTheBlankSegment,
+    FillInTheBlankSegmentCopyWith<
       $R,
       FillInTheBlankSegment,
-      FillInTheBlankSegmentCopyWith<$R, FillInTheBlankSegment,
-          FillInTheBlankSegment>> get segments;
+      FillInTheBlankSegment
+    >
+  >
+  get segments;
   @override
-  $R call(
-      {String? id,
-      String? deckId,
-      int? sortOrder,
-      DateTime? createdAt,
-      DateTime? updatedAt,
-      String? sourceTemplateId,
-      List<FillInTheBlankSegment>? segments});
+  $R call({
+    String? id,
+    String? deckId,
+    int? sortOrder,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    String? sourceTemplateId,
+    List<FillInTheBlankSegment>? segments,
+  });
   FillInTheBlanksTemplateCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-      Then<$Out2, $R2> t);
+    Then<$Out2, $R2> t,
+  );
 }
 
 class _FillInTheBlanksTemplateCopyWithImpl<$R, $Out>
@@ -165,42 +209,52 @@ class _FillInTheBlanksTemplateCopyWithImpl<$R, $Out>
       FillInTheBlanksTemplateMapper.ensureInitialized();
   @override
   ListCopyWith<
+    $R,
+    FillInTheBlankSegment,
+    FillInTheBlankSegmentCopyWith<
       $R,
       FillInTheBlankSegment,
-      FillInTheBlankSegmentCopyWith<$R, FillInTheBlankSegment,
-          FillInTheBlankSegment>> get segments => ListCopyWith($value.segments,
-      (v, t) => v.copyWith.$chain(t), (v) => call(segments: v));
+      FillInTheBlankSegment
+    >
+  >
+  get segments => ListCopyWith(
+    $value.segments,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(segments: v),
+  );
   @override
-  $R call(
-          {String? id,
-          String? deckId,
-          int? sortOrder,
-          DateTime? createdAt,
-          DateTime? updatedAt,
-          Object? sourceTemplateId = $none,
-          List<FillInTheBlankSegment>? segments}) =>
-      $apply(FieldCopyWithData({
-        if (id != null) #id: id,
-        if (deckId != null) #deckId: deckId,
-        if (sortOrder != null) #sortOrder: sortOrder,
-        if (createdAt != null) #createdAt: createdAt,
-        if (updatedAt != null) #updatedAt: updatedAt,
-        if (sourceTemplateId != $none) #sourceTemplateId: sourceTemplateId,
-        if (segments != null) #segments: segments
-      }));
+  $R call({
+    String? id,
+    String? deckId,
+    int? sortOrder,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Object? sourceTemplateId = $none,
+    List<FillInTheBlankSegment>? segments,
+  }) => $apply(
+    FieldCopyWithData({
+      if (id != null) #id: id,
+      if (deckId != null) #deckId: deckId,
+      if (sortOrder != null) #sortOrder: sortOrder,
+      if (createdAt != null) #createdAt: createdAt,
+      if (updatedAt != null) #updatedAt: updatedAt,
+      if (sourceTemplateId != $none) #sourceTemplateId: sourceTemplateId,
+      if (segments != null) #segments: segments,
+    }),
+  );
   @override
   FillInTheBlanksTemplate $make(CopyWithData data) => FillInTheBlanksTemplate(
-      id: data.get(#id, or: $value.id),
-      deckId: data.get(#deckId, or: $value.deckId),
-      sortOrder: data.get(#sortOrder, or: $value.sortOrder),
-      createdAt: data.get(#createdAt, or: $value.createdAt),
-      updatedAt: data.get(#updatedAt, or: $value.updatedAt),
-      sourceTemplateId:
-          data.get(#sourceTemplateId, or: $value.sourceTemplateId),
-      segments: data.get(#segments, or: $value.segments));
+    id: data.get(#id, or: $value.id),
+    deckId: data.get(#deckId, or: $value.deckId),
+    sortOrder: data.get(#sortOrder, or: $value.sortOrder),
+    createdAt: data.get(#createdAt, or: $value.createdAt),
+    updatedAt: data.get(#updatedAt, or: $value.updatedAt),
+    sourceTemplateId: data.get(#sourceTemplateId, or: $value.sourceTemplateId),
+    segments: data.get(#segments, or: $value.segments),
+  );
 
   @override
   FillInTheBlanksTemplateCopyWith<$R2, FillInTheBlanksTemplate, $Out2>
-      $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-          _FillInTheBlanksTemplateCopyWithImpl<$R2, $Out2>($value, $cast, t);
+  $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _FillInTheBlanksTemplateCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }

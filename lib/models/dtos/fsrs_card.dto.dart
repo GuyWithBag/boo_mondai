@@ -3,7 +3,7 @@
 // PURPOSE: Tracks a specific user's spaced-repetition progress for a ReviewCard
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 import 'package:boo_mondai/models/dto.dart';
-import 'package:boo_mondai/services/services.barrel.dart';
+import 'package:boo_mondai/shared/uuid.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:fsrs/fsrs.dart';
 
@@ -40,7 +40,7 @@ class FsrsCard with FsrsCardMappable implements DTO {
   }) async {
     final now = DateTime.now();
     return FsrsCard(
-      id: UuidService.uuid.v4(),
+      id: uuid.v7(),
       createdAt: now,
       updatedAt: now,
       userId: userId,

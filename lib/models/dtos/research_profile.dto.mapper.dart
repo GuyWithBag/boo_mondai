@@ -23,21 +23,33 @@ class ResearchProfileMapper extends ClassMapperBase<ResearchProfile> {
   static String _$id(ResearchProfile v) => v.id;
   static const Field<ResearchProfile, String> _f$id = Field('id', _$id);
   static String _$userId(ResearchProfile v) => v.userId;
-  static const Field<ResearchProfile, String> _f$userId =
-      Field('userId', _$userId, key: r'user_id');
+  static const Field<ResearchProfile, String> _f$userId = Field(
+    'userId',
+    _$userId,
+    key: r'user_id',
+  );
   static String _$role(ResearchProfile v) => v.role;
   static const Field<ResearchProfile, String> _f$role = Field('role', _$role);
   static String _$goal(ResearchProfile v) => v.goal;
   static const Field<ResearchProfile, String> _f$goal = Field('goal', _$goal);
   static DateTime _$createdAt(ResearchProfile v) => v.createdAt;
-  static const Field<ResearchProfile, DateTime> _f$createdAt =
-      Field('createdAt', _$createdAt, key: r'created_at');
+  static const Field<ResearchProfile, DateTime> _f$createdAt = Field(
+    'createdAt',
+    _$createdAt,
+    key: r'created_at',
+  );
   static String _$firstName(ResearchProfile v) => v.firstName;
-  static const Field<ResearchProfile, String> _f$firstName =
-      Field('firstName', _$firstName, key: r'first_name');
+  static const Field<ResearchProfile, String> _f$firstName = Field(
+    'firstName',
+    _$firstName,
+    key: r'first_name',
+  );
   static String _$lastName(ResearchProfile v) => v.lastName;
-  static const Field<ResearchProfile, String> _f$lastName =
-      Field('lastName', _$lastName, key: r'last_name');
+  static const Field<ResearchProfile, String> _f$lastName = Field(
+    'lastName',
+    _$lastName,
+    key: r'last_name',
+  );
   static int _$age(ResearchProfile v) => v.age;
   static const Field<ResearchProfile, int> _f$age = Field('age', _$age);
 
@@ -55,14 +67,15 @@ class ResearchProfileMapper extends ClassMapperBase<ResearchProfile> {
 
   static ResearchProfile _instantiate(DecodingData data) {
     return ResearchProfile(
-        id: data.dec(_f$id),
-        userId: data.dec(_f$userId),
-        role: data.dec(_f$role),
-        goal: data.dec(_f$goal),
-        createdAt: data.dec(_f$createdAt),
-        firstName: data.dec(_f$firstName),
-        lastName: data.dec(_f$lastName),
-        age: data.dec(_f$age));
+      id: data.dec(_f$id),
+      userId: data.dec(_f$userId),
+      role: data.dec(_f$role),
+      goal: data.dec(_f$goal),
+      createdAt: data.dec(_f$createdAt),
+      firstName: data.dec(_f$firstName),
+      lastName: data.dec(_f$lastName),
+      age: data.dec(_f$age),
+    );
   }
 
   @override
@@ -84,30 +97,38 @@ mixin ResearchProfileMappable {
   }
 
   Map<String, dynamic> toMap() {
-    return ResearchProfileMapper.ensureInitialized()
-        .encodeMap<ResearchProfile>(this as ResearchProfile);
+    return ResearchProfileMapper.ensureInitialized().encodeMap<ResearchProfile>(
+      this as ResearchProfile,
+    );
   }
 
   ResearchProfileCopyWith<ResearchProfile, ResearchProfile, ResearchProfile>
-      get copyWith =>
-          _ResearchProfileCopyWithImpl<ResearchProfile, ResearchProfile>(
-              this as ResearchProfile, $identity, $identity);
+  get copyWith =>
+      _ResearchProfileCopyWithImpl<ResearchProfile, ResearchProfile>(
+        this as ResearchProfile,
+        $identity,
+        $identity,
+      );
   @override
   String toString() {
-    return ResearchProfileMapper.ensureInitialized()
-        .stringifyValue(this as ResearchProfile);
+    return ResearchProfileMapper.ensureInitialized().stringifyValue(
+      this as ResearchProfile,
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return ResearchProfileMapper.ensureInitialized()
-        .equalsValue(this as ResearchProfile, other);
+    return ResearchProfileMapper.ensureInitialized().equalsValue(
+      this as ResearchProfile,
+      other,
+    );
   }
 
   @override
   int get hashCode {
-    return ResearchProfileMapper.ensureInitialized()
-        .hashValue(this as ResearchProfile);
+    return ResearchProfileMapper.ensureInitialized().hashValue(
+      this as ResearchProfile,
+    );
   }
 }
 
@@ -119,17 +140,19 @@ extension ResearchProfileValueCopy<$R, $Out>
 
 abstract class ResearchProfileCopyWith<$R, $In extends ResearchProfile, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  $R call(
-      {String? id,
-      String? userId,
-      String? role,
-      String? goal,
-      DateTime? createdAt,
-      String? firstName,
-      String? lastName,
-      int? age});
+  $R call({
+    String? id,
+    String? userId,
+    String? role,
+    String? goal,
+    DateTime? createdAt,
+    String? firstName,
+    String? lastName,
+    int? age,
+  });
   ResearchProfileCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-      Then<$Out2, $R2> t);
+    Then<$Out2, $R2> t,
+  );
 }
 
 class _ResearchProfileCopyWithImpl<$R, $Out>
@@ -141,38 +164,41 @@ class _ResearchProfileCopyWithImpl<$R, $Out>
   late final ClassMapperBase<ResearchProfile> $mapper =
       ResearchProfileMapper.ensureInitialized();
   @override
-  $R call(
-          {String? id,
-          String? userId,
-          String? role,
-          String? goal,
-          DateTime? createdAt,
-          String? firstName,
-          String? lastName,
-          int? age}) =>
-      $apply(FieldCopyWithData({
-        if (id != null) #id: id,
-        if (userId != null) #userId: userId,
-        if (role != null) #role: role,
-        if (goal != null) #goal: goal,
-        if (createdAt != null) #createdAt: createdAt,
-        if (firstName != null) #firstName: firstName,
-        if (lastName != null) #lastName: lastName,
-        if (age != null) #age: age
-      }));
+  $R call({
+    String? id,
+    String? userId,
+    String? role,
+    String? goal,
+    DateTime? createdAt,
+    String? firstName,
+    String? lastName,
+    int? age,
+  }) => $apply(
+    FieldCopyWithData({
+      if (id != null) #id: id,
+      if (userId != null) #userId: userId,
+      if (role != null) #role: role,
+      if (goal != null) #goal: goal,
+      if (createdAt != null) #createdAt: createdAt,
+      if (firstName != null) #firstName: firstName,
+      if (lastName != null) #lastName: lastName,
+      if (age != null) #age: age,
+    }),
+  );
   @override
   ResearchProfile $make(CopyWithData data) => ResearchProfile(
-      id: data.get(#id, or: $value.id),
-      userId: data.get(#userId, or: $value.userId),
-      role: data.get(#role, or: $value.role),
-      goal: data.get(#goal, or: $value.goal),
-      createdAt: data.get(#createdAt, or: $value.createdAt),
-      firstName: data.get(#firstName, or: $value.firstName),
-      lastName: data.get(#lastName, or: $value.lastName),
-      age: data.get(#age, or: $value.age));
+    id: data.get(#id, or: $value.id),
+    userId: data.get(#userId, or: $value.userId),
+    role: data.get(#role, or: $value.role),
+    goal: data.get(#goal, or: $value.goal),
+    createdAt: data.get(#createdAt, or: $value.createdAt),
+    firstName: data.get(#firstName, or: $value.firstName),
+    lastName: data.get(#lastName, or: $value.lastName),
+    age: data.get(#age, or: $value.age),
+  );
 
   @override
   ResearchProfileCopyWith<$R2, ResearchProfile, $Out2> $chain<$R2, $Out2>(
-          Then<$Out2, $R2> t) =>
-      _ResearchProfileCopyWithImpl<$R2, $Out2>($value, $cast, t);
+    Then<$Out2, $R2> t,
+  ) => _ResearchProfileCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }

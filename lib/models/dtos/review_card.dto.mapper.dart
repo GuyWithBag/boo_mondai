@@ -13,6 +13,7 @@ class ReviewCardMapper extends ClassMapperBase<ReviewCard> {
   static ReviewCardMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = ReviewCardMapper._());
+      TagMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -23,15 +24,33 @@ class ReviewCardMapper extends ClassMapperBase<ReviewCard> {
   static String _$id(ReviewCard v) => v.id;
   static const Field<ReviewCard, String> _f$id = Field('id', _$id);
   static String _$templateId(ReviewCard v) => v.templateId;
-  static const Field<ReviewCard, String> _f$templateId =
-      Field('templateId', _$templateId, key: r'template_id');
+  static const Field<ReviewCard, String> _f$templateId = Field(
+    'templateId',
+    _$templateId,
+    key: r'template_id',
+  );
   static bool _$isReversed(ReviewCard v) => v.isReversed;
   static const Field<ReviewCard, bool> _f$isReversed = Field(
-      'isReversed', _$isReversed,
-      key: r'is_reversed', opt: true, def: false);
+    'isReversed',
+    _$isReversed,
+    key: r'is_reversed',
+    opt: true,
+    def: false,
+  );
   static String _$deckId(ReviewCard v) => v.deckId;
-  static const Field<ReviewCard, String> _f$deckId =
-      Field('deckId', _$deckId, key: r'deck_id');
+  static const Field<ReviewCard, String> _f$deckId = Field(
+    'deckId',
+    _$deckId,
+    key: r'deck_id',
+  );
+  static List<Tag> _$personalTags(ReviewCard v) => v.personalTags;
+  static const Field<ReviewCard, List<Tag>> _f$personalTags = Field(
+    'personalTags',
+    _$personalTags,
+    key: r'personal_tags',
+    opt: true,
+    def: const [],
+  );
 
   @override
   final MappableFields<ReviewCard> fields = const {
@@ -39,14 +58,17 @@ class ReviewCardMapper extends ClassMapperBase<ReviewCard> {
     #templateId: _f$templateId,
     #isReversed: _f$isReversed,
     #deckId: _f$deckId,
+    #personalTags: _f$personalTags,
   };
 
   static ReviewCard _instantiate(DecodingData data) {
     return ReviewCard(
-        id: data.dec(_f$id),
-        templateId: data.dec(_f$templateId),
-        isReversed: data.dec(_f$isReversed),
-        deckId: data.dec(_f$deckId));
+      id: data.dec(_f$id),
+      templateId: data.dec(_f$templateId),
+      isReversed: data.dec(_f$isReversed),
+      deckId: data.dec(_f$deckId),
+      personalTags: data.dec(_f$personalTags),
+    );
   }
 
   @override
@@ -63,28 +85,36 @@ class ReviewCardMapper extends ClassMapperBase<ReviewCard> {
 
 mixin ReviewCardMappable {
   String toJson() {
-    return ReviewCardMapper.ensureInitialized()
-        .encodeJson<ReviewCard>(this as ReviewCard);
+    return ReviewCardMapper.ensureInitialized().encodeJson<ReviewCard>(
+      this as ReviewCard,
+    );
   }
 
   Map<String, dynamic> toMap() {
-    return ReviewCardMapper.ensureInitialized()
-        .encodeMap<ReviewCard>(this as ReviewCard);
+    return ReviewCardMapper.ensureInitialized().encodeMap<ReviewCard>(
+      this as ReviewCard,
+    );
   }
 
   ReviewCardCopyWith<ReviewCard, ReviewCard, ReviewCard> get copyWith =>
       _ReviewCardCopyWithImpl<ReviewCard, ReviewCard>(
-          this as ReviewCard, $identity, $identity);
+        this as ReviewCard,
+        $identity,
+        $identity,
+      );
   @override
   String toString() {
-    return ReviewCardMapper.ensureInitialized()
-        .stringifyValue(this as ReviewCard);
+    return ReviewCardMapper.ensureInitialized().stringifyValue(
+      this as ReviewCard,
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return ReviewCardMapper.ensureInitialized()
-        .equalsValue(this as ReviewCard, other);
+    return ReviewCardMapper.ensureInitialized().equalsValue(
+      this as ReviewCard,
+      other,
+    );
   }
 
   @override
@@ -101,7 +131,14 @@ extension ReviewCardValueCopy<$R, $Out>
 
 abstract class ReviewCardCopyWith<$R, $In extends ReviewCard, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  $R call({String? id, String? templateId, bool? isReversed, String? deckId});
+  ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get personalTags;
+  $R call({
+    String? id,
+    String? templateId,
+    bool? isReversed,
+    String? deckId,
+    List<Tag>? personalTags,
+  });
   ReviewCardCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -114,22 +151,39 @@ class _ReviewCardCopyWithImpl<$R, $Out>
   late final ClassMapperBase<ReviewCard> $mapper =
       ReviewCardMapper.ensureInitialized();
   @override
-  $R call({String? id, String? templateId, bool? isReversed, String? deckId}) =>
-      $apply(FieldCopyWithData({
-        if (id != null) #id: id,
-        if (templateId != null) #templateId: templateId,
-        if (isReversed != null) #isReversed: isReversed,
-        if (deckId != null) #deckId: deckId
-      }));
+  ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get personalTags =>
+      ListCopyWith(
+        $value.personalTags,
+        (v, t) => v.copyWith.$chain(t),
+        (v) => call(personalTags: v),
+      );
+  @override
+  $R call({
+    String? id,
+    String? templateId,
+    bool? isReversed,
+    String? deckId,
+    List<Tag>? personalTags,
+  }) => $apply(
+    FieldCopyWithData({
+      if (id != null) #id: id,
+      if (templateId != null) #templateId: templateId,
+      if (isReversed != null) #isReversed: isReversed,
+      if (deckId != null) #deckId: deckId,
+      if (personalTags != null) #personalTags: personalTags,
+    }),
+  );
   @override
   ReviewCard $make(CopyWithData data) => ReviewCard(
-      id: data.get(#id, or: $value.id),
-      templateId: data.get(#templateId, or: $value.templateId),
-      isReversed: data.get(#isReversed, or: $value.isReversed),
-      deckId: data.get(#deckId, or: $value.deckId));
+    id: data.get(#id, or: $value.id),
+    templateId: data.get(#templateId, or: $value.templateId),
+    isReversed: data.get(#isReversed, or: $value.isReversed),
+    deckId: data.get(#deckId, or: $value.deckId),
+    personalTags: data.get(#personalTags, or: $value.personalTags),
+  );
 
   @override
   ReviewCardCopyWith<$R2, ReviewCard, $Out2> $chain<$R2, $Out2>(
-          Then<$Out2, $R2> t) =>
-      _ReviewCardCopyWithImpl<$R2, $Out2>($value, $cast, t);
+    Then<$Out2, $R2> t,
+  ) => _ReviewCardCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
