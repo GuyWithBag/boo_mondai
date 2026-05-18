@@ -88,10 +88,10 @@ GoRouter createRouter(AuthController authController) {
               return const HomePage();
             },
           ),
-          // GoRoute(
-          //   path: '/online-deck-browser',
-          //   builder: (context, state) => const OnlineDeckBrowserPage(),
-          // ),
+          GoRoute(
+            path: '/online-deck-browser',
+            builder: (context, state) => const ViewDecksOnlinePage(),
+          ),
           GoRoute(
             path: '/my-decks',
             builder: (context, state) => const MyDecksPage(),
