@@ -19,7 +19,7 @@ class ViewDecksOnlinePage extends StatelessWidget {
   Widget build(BuildContext context) {
     // Inject the controller at the page level
     return ChangeNotifierProvider(
-      create: (_) => ViewDecksOnlinePageController()..loadPublicDecks(),
+      create: (_) => ViewDecksOnlineController()..loadPublicDecks(),
       child: const _ViewDecksOnlineView(),
     );
   }
@@ -30,7 +30,7 @@ class _ViewDecksOnlineView extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = context.watch<ViewDecksOnlinePageController>();
+    final controller = context.watch<ViewDecksOnlineController>();
     final searchController = useTextEditingController();
 
     // Store the selected tag's ID

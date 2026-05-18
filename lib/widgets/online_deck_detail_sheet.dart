@@ -64,7 +64,7 @@ class DeckDetailSheet extends HookWidget {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Deck copied to My Decks.')));
-      context.read<MyDecksPageController>().load();
+      context.read<ViewDecksLocalController>().load();
     }
 
     return DraggableScrollableSheet(

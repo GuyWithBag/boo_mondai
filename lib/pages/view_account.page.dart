@@ -14,8 +14,8 @@ import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/database/database.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 
-class AccountPage extends StatelessWidget {
-  const AccountPage({super.key});
+class ViewAccountPage extends StatelessWidget {
+  const ViewAccountPage({super.key});
 
   @override
   Widget build(BuildContext context) {

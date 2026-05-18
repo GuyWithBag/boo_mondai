@@ -1,14 +1,14 @@
 import 'package:boo_mondai/database/database.barrel.dart';
 
 class LocalDB {
-  static late final DeckLocalDB deck;
-  static late final CardTemplateLocalDB cardTemplate;
-  static late final ReviewCardLocalDB reviewCard;
-  static late final FsrsCardLocalDB fsrsCard;
-  static late final DrillSessionLocalDB drillSession;
-  static late final ReviewSessionLocalDB reviewSession;
-  static late final DrillAnswerLocalDB drillAnswer;
-  static late final ReviewLogLocalDB reviewLog;
+  static late final DecksLocalDB deck;
+  static late final CardTemplatesLocalDB cardTemplate;
+  static late final ReviewCardsLocalDB reviewCard;
+  static late final FsrsCardsLocalDB fsrsCard;
+  static late final DrillSessionsLocalDB drillSession;
+  static late final ReviewSessionsLocalDB reviewSession;
+  static late final DrillAnswersLocalDB drillAnswer;
+  static late final ReviewLogsLocalDB reviewLog;
   // static late final StreakLocalDB streak;
   static late final StreakLocalDB streak;
   static late final ProfileLocalDB profile;
@@ -17,14 +17,14 @@ class LocalDB {
   static Future<void> init() async {
     profile = await ProfileLocalDB().init() as ProfileLocalDB;
     cachedProfile = await CachedProfileLocalDB().init() as CachedProfileLocalDB;
-    deck = await DeckLocalDB().init() as DeckLocalDB;
-    cardTemplate = await CardTemplateLocalDB().init() as CardTemplateLocalDB;
-    reviewCard = await ReviewCardLocalDB().init() as ReviewCardLocalDB;
-    fsrsCard = await FsrsCardLocalDB().init() as FsrsCardLocalDB;
-    drillSession = await DrillSessionLocalDB().init() as DrillSessionLocalDB;
-    reviewSession = await ReviewSessionLocalDB().init() as ReviewSessionLocalDB;
-    reviewLog = await ReviewLogLocalDB().init() as ReviewLogLocalDB;
-    drillAnswer = await DrillAnswerLocalDB().init() as DrillAnswerLocalDB;
+    deck = await DecksLocalDB().init() as DecksLocalDB;
+    cardTemplate = await CardTemplatesLocalDB().init() as CardTemplatesLocalDB;
+    reviewCard = await ReviewCardsLocalDB().init() as ReviewCardsLocalDB;
+    fsrsCard = await FsrsCardsLocalDB().init() as FsrsCardsLocalDB;
+    drillSession = await DrillSessionsLocalDB().init() as DrillSessionsLocalDB;
+    reviewSession = await ReviewSessionsLocalDB().init() as ReviewSessionsLocalDB;
+    reviewLog = await ReviewLogsLocalDB().init() as ReviewLogsLocalDB;
+    drillAnswer = await DrillAnswersLocalDB().init() as DrillAnswersLocalDB;
     streak = await StreakLocalDB().init() as StreakLocalDB;
   }
 

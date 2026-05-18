@@ -2,7 +2,7 @@
 // PATH: lib/pages/drill_session/flashcard_interaction.dart
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/controllers/session_interactions_controller.dart';
+import 'package:boo_mondai/controllers/study_session_controllers/session_interactions.controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:boo_mondai/models/models.barrel.dart';

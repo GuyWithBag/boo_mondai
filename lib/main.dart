@@ -62,10 +62,10 @@ Future<void> main() async {
       providers: [
         ChangeNotifierProvider.value(value: authController),
         ChangeNotifierProvider(create: (_) => DrillSessionController()),
-        ChangeNotifierProvider(create: (_) => ReviewDashboardController()),
+        ChangeNotifierProvider(create: (_) => ViewReviewsController()),
         ChangeNotifierProvider(create: (_) => ReviewSessionController()),
-        ChangeNotifierProvider(create: (_) => MyDecksPageController()),
-        ChangeNotifierProvider(create: (_) => LeaderboardController()),
+        ChangeNotifierProvider(create: (_) => ViewDecksLocalController()),
+        ChangeNotifierProvider(create: (_) => ViewLeaderboardController()),
         ChangeNotifierProvider(create: (_) => StreakController()),
         ChangeNotifierProvider(create: (_) => ResearchController()),
       ],

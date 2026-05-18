@@ -2,8 +2,8 @@
 // PATH: lib/services/sync_service.dart
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/database/local/hive_localdb.dart';
-import 'package:boo_mondai/database/remote/supabase_remotedb.dart';
+import 'package:boo_mondai/database/local/hive.local.db.dart';
+import 'package:boo_mondai/database/remote/supabase.remote.db.dart';
 import 'package:boo_mondai/exceptions/exceptions.barrel.dart';
 import 'package:boo_mondai/models/dto.dart';
 

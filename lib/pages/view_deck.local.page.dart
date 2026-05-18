@@ -2,7 +2,7 @@
 // PATH: lib/pages/view_deck_page.dart
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/controllers/my_decks_page_controller.dart';
+import 'package:boo_mondai/controllers/view_decks.local.controller.dart';
 import 'package:boo_mondai/database/database.barrel.dart';
 
 import 'package:boo_mondai/services/services.barrel.dart';
@@ -13,9 +13,9 @@ import 'package:boo_mondai/shared/shared.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
 import 'package:provider/provider.dart';
 
-class ViewDeckPage extends HookWidget {
+class ViewDeckLocalPage extends HookWidget {
   final String deckId;
-  const ViewDeckPage({super.key, required this.deckId});
+  const ViewDeckLocalPage({super.key, required this.deckId});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +25,7 @@ class ViewDeckPage extends HookWidget {
     final author = cachedProfsRepo.selectByPk({'id': currentDeck!.userId});
     final sourceAuthor = null;
 
-    final controller = context.read<MyDecksPageController>();
+    final controller = context.read<ViewDecksLocalController>();
 
     // ── Calculate drill eligibility (works in guest mode too) ──────────────
     final userId = LocalDB.profile.getOrCreate().userId;

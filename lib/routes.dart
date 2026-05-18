@@ -83,26 +83,26 @@ GoRouter createRouter(AuthController authController) {
               final auth = context.watch<AuthController>();
 
               if (auth.currentProfile.role == 'group_b_participant') {
-                return const ResearchCodeEntryPage();
+                return const EnterResearchCodePage();
               }
               return const HomePage();
             },
           ),
           GoRoute(
-            path: '/online-deck-browser',
+            path: '/decks-online',
             builder: (context, state) => const ViewDecksOnlinePage(),
           ),
           GoRoute(
-            path: '/my-decks',
-            builder: (context, state) => const MyDecksPage(),
+            path: '/decks-local',
+            builder: (context, state) => const ViewDecksLocalPage(),
           ),
           GoRoute(
-            path: '/review',
-            builder: (context, state) => const ReviewDashboardPage(),
+            path: '/reviews',
+            builder: (context, state) => const ViewReviewsPage(),
           ),
           GoRoute(
             path: '/account',
-            builder: (context, state) => const AccountPage(),
+            builder: (context, state) => const ViewAccountPage(),
           ),
         ],
       ),
@@ -116,23 +116,23 @@ GoRouter createRouter(AuthController authController) {
 
       // ── Non-shell routes ──────────────────────────────
       GoRoute(
-        path: '/my-decks/create',
+        path: '/decks-local/create',
         builder: (context, state) => const CreateDeckPage(),
       ),
       GoRoute(
-        path: '/my-decks/:deckId',
+        path: '/decks-local/:deckId',
         builder: (context, state) =>
-            ViewDeckPage(deckId: state.pathParameters['deckId']!),
+            ViewDeckLocalPage(deckId: state.pathParameters['deckId']!),
       ),
       GoRoute(
-        path: '/my-decks/:deckId/edit',
+        path: '/decks-local/:deckId/edit',
         builder: (context, state) => DeckEditorPage(
           deckId: state.pathParameters['deckId']!,
           initialTemplateId: state.uri.queryParameters['initialTemplateId'],
         ),
       ),
       // GoRoute(
-      //   path: '/my-decks/:deckId/preview',
+      //   path: '/decks-local/:deckId/preview',
       //   builder: (context, state) =>
       //       DrillPreviewPage(deckId: state.pathParameters['deckId']!),
       // ),
@@ -146,7 +146,7 @@ GoRouter createRouter(AuthController authController) {
       GoRoute(
         path: '/drill/:sessionId/result',
         builder: (context, state) =>
-            DrillResultPage(sessionId: state.pathParameters['sessionId']!),
+            ViewDrillResultPage(sessionId: state.pathParameters['sessionId']!),
       ),
 
       // Global Review (all due cards across all decks)
@@ -170,15 +170,15 @@ GoRouter createRouter(AuthController authController) {
       ),
       GoRoute(
         path: '/leaderboard',
-        builder: (context, state) => const LeaderboardPage(),
+        builder: (context, state) => const ViewLeaderboardPage(),
       ),
       GoRoute(
         path: '/research/code',
-        builder: (context, state) => const ResearchCodeEntryPage(),
+        builder: (context, state) => const EnterResearchCodePage(),
       ),
       GoRoute(
         path: '/research/survey/:surveyType',
-        builder: (context, state) => SurveyPage(
+        builder: (context, state) => AnswerSurveyPage(
           surveyType: state.pathParameters['surveyType']!,
           timePoint: state.uri.queryParameters['timePoint'],
         ),
@@ -193,8 +193,8 @@ GoRouter createRouter(AuthController authController) {
 }
 
 int _shellIndex(String location) {
-  if (location.startsWith('/online-deck-browser')) return 1;
-  if (location.startsWith('/my-decks')) return 2;
+  if (location.startsWith('/decks-online')) return 1;
+  if (location.startsWith('/decks-local')) return 2;
   if (location.startsWith('/review')) return 3;
   if (location.startsWith('/account')) return 4;
   return 0; // home

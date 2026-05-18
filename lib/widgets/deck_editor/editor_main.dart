@@ -15,7 +15,7 @@ class EditorMain extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = context.watch<DeckEditorPageController>();
+    final controller = context.watch<EditDeckController>();
     final formState = controller.formState;
 
     // Auto-listen to changes in the ValueNotifiers

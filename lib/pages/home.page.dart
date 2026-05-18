@@ -1,7 +1,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/pages/home_page.dart
 // PURPOSE: Dashboard — streak, due reviews, leaderboard preview
-// PROVIDERS: AuthController, StreakController, ReviewDashboardController, LeaderboardController
+// PROVIDERS: AuthController, StreakController, ViewReviewsController, ViewLeaderboardController
 // HOOKS: useEffect
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -20,8 +20,8 @@ class HomePage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthController>();
-    final reviewDashboard = context.watch<ReviewDashboardController>();
-    final leaderboard = context.watch<LeaderboardController>();
+    final reviewDashboard = context.watch<ViewReviewsController>();
+    final leaderboard = context.watch<ViewLeaderboardController>();
 
     useEffect(() {
       Future.microtask(() {
