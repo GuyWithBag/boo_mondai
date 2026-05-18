@@ -10,6 +10,11 @@ dependencies:
   flutter:
     sdk: flutter
 
+  theme_variants:
+    git:
+      url: https://github.com/GuyWithBag/theme_variants.git
+      ref: 87e5c15
+
   # ── State & UI ──────────────────────────────────────────
   provider: ^6.1.2
   flutter_hooks: ^0.20.5

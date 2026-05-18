@@ -1101,6 +1101,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.10"
+  theme_variants:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: "87e5c15"
+      resolved-ref: "87e5c156b2e2cd272f46e1959cdcd8ad06a6bb9f"
+      url: "https://github.com/GuyWithBag/theme_variants.git"
+    source: git
+    version: "0.0.1"
   timezone:
     dependency: transitive
     description:
@@ -1302,5 +1311,5 @@ packages:
     source: hosted
     version: "2.1.0"
 sdks:
-  dart: ">=3.10.8 <4.0.0"
+  dart: ">=3.11.4 <4.0.0"
   flutter: ">=3.38.4"
