@@ -11,8 +11,8 @@ Research System — Current State
 | Page | Route | Status |
 |---|---|---|
 | `ResearcherDashboardPage` | `/research` | ✅ Works |
-| `ResearchCodeEntryPage` | `/research/code` | ✅ Works |
-| `SurveyPage` | `/research/survey/:type?timePoint=` | ✅ Works (with 1 bug) |
+| `EnterResearchCodePage` | `/research/code` | ✅ Works |
+| `AnswerSurveyPage` | `/research/survey/:type?timePoint=` | ✅ Works (with 1 bug) |
 | `VocabularyTestPage` | `/research/test/:set` | ✅ Works (placeholder data) |
 
 **Group B guard** — implemented in `routes.dart`, redirects group_b_participant to `/research/code` for all non-allowed routes.
@@ -36,7 +36,7 @@ The `ProficiencyLevelSelector` shows in the UI and collects a value, but it's ne
 `test_items.dart` generates 30 fake questions with "What is the meaning of word A-1?" — no actual Japanese vocabulary content. These need to be the real test questions for your study.
 
 **3. No automatic navigation after code redemption**
-After a participant redeems a code in `ResearchCodeEntryPage`, it shows "Unlocked: vocabulary_test_a" as text — but doesn't navigate them to `/research/survey/proficiency_screener` or `/research/test/A`. The user is stuck.
+After a participant redeems a code in `EnterResearchCodePage`, it shows "Unlocked: vocabulary_test_a" as text — but doesn't navigate them to `/research/survey/proficiency_screener` or `/research/test/A`. The user is stuck.
 
 **4. Onboarding code flow not handled**
 The Day 1 study flow requires an "onboarding code" that:
@@ -47,7 +47,7 @@ The Day 1 study flow requires an "onboarding code" that:
 
 Currently `redeemCode()` just marks the code as used. There's no handling of enrollment into `research_users`. The `addResearchUser()` method exists but is never called from code redemption.
 
-**5. `ResearchCodeEntryPage` missing navigation after special unlock values**
+**5. `EnterResearchCodePage` missing navigation after special unlock values**
 After redeeming any code, nothing happens UI-side except showing the unlocked value as text.
 
 ---

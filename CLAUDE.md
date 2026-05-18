@@ -892,7 +892,7 @@ Hooks:
   - useAnimationController → incorrect answer shake animation (400ms)
   - useEffect → auto-focus answer field when new card appears
 
-Screen: DrillResultPage
+Screen: ViewDrillResultPage
 Hooks:
   - useAnimationController → score reveal spring animation (600ms)
 
@@ -901,7 +901,7 @@ Hooks:
   - useAnimationController → card flip Y-axis animation (400ms, easeInOutCubic)
   - useEffect → fetch due cards on mount, dependency: [userId]
 
-Screen: LeaderboardPage
+Screen: ViewLeaderboardPage
 Hooks:
   - useEffect → fetch leaderboard on mount
   - useScrollController → leaderboard list scroll
@@ -915,12 +915,12 @@ Hooks:
   - useEffect → fetch all research data on mount
   - useTextEditingController → code generation form fields
 
-Screen: ResearchCodeEntryPage
+Screen: EnterResearchCodePage
 Hooks:
   - useTextEditingController → code input field
   - useFocusNode → code input (auto-focus)
 
-Screen: SurveyPage
+Screen: AnswerSurveyPage
 Hooks:
   - useScrollController → survey question list
   - useMemoized → builds survey question list from surveyType (cached)
@@ -951,13 +951,13 @@ Routes:
   /decks/:deckId/cards/:cardId/edit → CardEditorPage edit mode (auth: yes)
   /drill/:deckId/preview → DrillPreviewPage (auth: yes)
   /drill/:deckId/session → DrillSessionPage (auth: yes, URL not restorable mid-drill)
-  /drill/:sessionId/result → DrillResultPage (auth: yes)
+  /drill/:sessionId/result → ViewDrillResultPage (auth: yes)
   /review → ReviewPage (auth: yes)
-  /leaderboard → LeaderboardPage (auth: yes)
+  /leaderboard → ViewLeaderboardPage (auth: yes)
   /account → AccountPage (auth: yes)
   /research → ResearcherDashboardPage (auth: yes, role: researcher)
-  /research/code → ResearchCodeEntryPage (auth: yes)
-  /research/survey/:surveyType → SurveyPage (auth: yes, params: ?timePoint)
+  /research/code → EnterResearchCodePage (auth: yes)
+  /research/survey/:surveyType → AnswerSurveyPage (auth: yes, params: ?timePoint)
   /research/test/:testSet → VocabularyTestPage (auth: yes)
 
 Guard logic:
@@ -1005,7 +1005,7 @@ Screen: ResearcherDashboardPage
   Web: sidebar nav + main content. SelectableText on data. Ctrl+G generate code.
   Desktop: multi-panel sidebar + data table. Right-click on data rows. Tooltips on headers.
 
-Screen: SurveyPage / VocabularyTestPage
+Screen: AnswerSurveyPage / VocabularyTestPage
   Mobile: single column scrollable, submit at bottom. SafeArea.
   Web: centered max-width (700px). SelectableText on questions.
   Desktop: same as web. Tab between questions.
@@ -1020,7 +1020,7 @@ Responsive breakpoints (lib/shared/breakpoints.dart):
 
 ```
 API: AnimationController + CurvedAnimation (easeInOutCubic)
-Used in: ReviewPage (card flip 400ms), DrillSessionPage (card transitions 300ms), DrillResultPage (score reveal 600ms spring)
+Used in: ReviewPage (card flip 400ms), DrillSessionPage (card transitions 300ms), ViewDrillResultPage (score reveal 600ms spring)
 Purpose: smooth card flip and transition animations
 Why native: simple tween animations don't need a package
 
@@ -1050,7 +1050,7 @@ Purpose: tap detection
 Why native: no gesture library needed
 
 API: RefreshIndicator
-Used in: HomePage, DeckListPage, LeaderboardPage
+Used in: HomePage, DeckListPage, ViewLeaderboardPage
 Purpose: pull-to-refresh on mobile
 Why native: Material pull-to-refresh
 
@@ -1065,7 +1065,7 @@ Purpose: keyboard shortcut support for web and desktop
 Why native: native keyboard handling
 
 API: FocusNode + FocusScope
-Used in: LoginPage, CardEditorPage, ResearchCodeEntryPage
+Used in: LoginPage, CardEditorPage, EnterResearchCodePage
 Purpose: auto-focus and tab-order management
 Why native: built-in focus system
 
@@ -1774,16 +1774,16 @@ Crash reporting: none for v1
 │  ReviewPage ──watch──> FsrsProvider                                  │
 │      └── hooks: useAnimationController (flip 400ms), useEffect       │
 │                                                                      │
-│  LeaderboardPage ──watch──> LeaderboardProvider                      │
+│  ViewLeaderboardPage ──watch──> LeaderboardProvider                      │
 │      └── hooks: useEffect, useScrollController                       │
 │                                                                      │
 │  ResearcherDashboardPage ──watch──> ResearchProvider                 │
 │      └── hooks: useEffect, useTextEditingController                  │
 │                                                                      │
-│  ResearchCodeEntryPage ──watch──> ResearchProvider                   │
+│  EnterResearchCodePage ──watch──> ResearchProvider                   │
 │      └── hooks: useTextEditingController, useFocusNode               │
 │                                                                      │
-│  SurveyPage/VocabularyTestPage ──watch──> ResearchProvider           │
+│  AnswerSurveyPage/VocabularyTestPage ──watch──> ResearchProvider           │
 │      └── hooks: useScrollController, useMemoized                     │
 │                                                                      │
 │  AccountPage ──watch──> AuthController, StreakProvider                  │
