@@ -1563,6 +1563,7 @@ class DeckListingAdapter extends TypeAdapter<DeckListing> {
       favoritesCount: fields[4] == null ? 0 : (fields[4] as num).toInt(),
       forksCount: fields[5] == null ? 0 : (fields[5] as num).toInt(),
       commentsCount: fields[6] == null ? 0 : (fields[6] as num).toInt(),
+      reviewsCount: fields[13] == null ? 0 : (fields[13] as num).toInt(),
       reportsCount: fields[7] == null ? 0 : (fields[7] as num).toInt(),
       featuredCards: fields[8] == null
           ? const []
@@ -1582,7 +1583,7 @@ class DeckListingAdapter extends TypeAdapter<DeckListing> {
   @override
   void write(BinaryWriter writer, DeckListing obj) {
     writer
-      ..writeByte(13)
+      ..writeByte(14)
       ..writeByte(0)
       ..write(obj.deckId)
       ..writeByte(1)
@@ -1608,7 +1609,9 @@ class DeckListingAdapter extends TypeAdapter<DeckListing> {
       ..writeByte(11)
       ..write(obj.updatedAt)
       ..writeByte(12)
-      ..write(obj.createdAt);
+      ..write(obj.createdAt)
+      ..writeByte(13)
+      ..write(obj.reviewsCount);
   }
 
   @override

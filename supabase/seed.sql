@@ -31,6 +31,11 @@ DECLARE
   deck_alice uuid := gen_random_uuid();  -- Alice's extra vocab
   deck_bob   uuid := gen_random_uuid();  -- Bob's copy of N5
 
+  -- ── Tags ───────────────────────────────────────────
+  tag_jlpt_n5 uuid := gen_random_uuid();
+  tag_animals uuid := gen_random_uuid();
+  tag_nature  uuid := gen_random_uuid();
+
   -- ── Card Templates ─────────────────────────────────
   -- N5 deck
   ct_inu    uuid := gen_random_uuid();  -- 犬  flashcard      (card_type=normal)
@@ -76,6 +81,11 @@ DECLARE
   -- ── Sessions ───────────────────────────────────────
   drill_session_alice  uuid := gen_random_uuid();
   review_session_alice uuid := gen_random_uuid();
+
+  -- ── Storefront Social ──────────────────────────────
+  review_alice_n5  uuid := gen_random_uuid();
+  comment_alice_n5 uuid := gen_random_uuid();
+  comment_bob_n5   uuid := gen_random_uuid();
 
 BEGIN
 
@@ -141,40 +151,52 @@ INSERT INTO profiles (id, user_id, username, role, is_anonymous, created_at, upd
   (p_carol,      auth_carol,      'Carol',    'group_b_participant',  false, now(), now())
 ON CONFLICT (id) DO NOTHING;
 
+-- ── Tags ──────────────────────────────────────────────
+INSERT INTO tags (id, user_id, name, created_at) VALUES
+  (tag_jlpt_n5, NULL, 'jlpt-n5', now()),
+  (tag_animals, NULL, 'animals', now()),
+  (tag_nature,  NULL, 'nature',  now())
+ON CONFLICT (id) DO NOTHING;
+
 -- ── Decks ─────────────────────────────────────────────
 INSERT INTO decks (
   id, user_id, title, short_description, long_description,
-  target_language, tags, is_premade, is_public, is_published, is_editable,
-  card_count, created_at, updated_at
+  is_premade, visibility_state, is_published, is_editable,
+  card_count, source_deck_id, design_config, created_at, updated_at
 ) VALUES
   (deck_n5, p_researcher,
    'JLPT N5 Vocabulary',
    'Basic Japanese vocabulary for beginners.',
    'A curated set of 5 essential JLPT N5 words covering animals and nature. '
    'Used as the premade deck for the BooMondai study.',
-   'japanese', ARRAY['jlpt-n5', 'animals', 'nature'],
-   true, true, true, false,  -- premade, public, published, NOT editable
-   5, now(), now()),
+   true, 'public', true, false,  -- premade, public, published, NOT editable
+   5, NULL, '{"language":"japanese"}'::jsonb, now(), now()),
 
   (deck_alice, p_alice,
    'My Extra Vocab',
    'Alice''s personal vocabulary deck.',
    'Extra words Alice has been studying alongside the N5 premade deck.',
-   'japanese', ARRAY['nature'],
-   false, true, false, true,
-   2, now(), now()),
+   false, 'public', false, true,
+   2, NULL, '{"language":"japanese"}'::jsonb, now(), now()),
 
   (deck_bob, p_bob,
    'N5 Copy',
    'My copy of the N5 premade deck.',
    'Bob''s personal copy of the N5 deck with source links preserved.',
-   'japanese', ARRAY['jlpt-n5', 'animals', 'nature'],
-   false, true, false, true,
-   2, now(), now())
+   false, 'public', false, true,
+   2, deck_n5, '{"language":"japanese"}'::jsonb, now(), now())
 ON CONFLICT (id) DO NOTHING;
 
--- Set source_deck_id for bob's copy
-UPDATE decks SET source_deck_id = deck_n5 WHERE id = deck_bob;
+-- ── Deck Tags ─────────────────────────────────────────
+INSERT INTO deck_tags (deck_id, tag_id, created_at) VALUES
+  (deck_n5, tag_jlpt_n5, now()),
+  (deck_n5, tag_animals, now()),
+  (deck_n5, tag_nature,  now()),
+  (deck_alice, tag_nature, now()),
+  (deck_bob, tag_jlpt_n5, now()),
+  (deck_bob, tag_animals, now()),
+  (deck_bob, tag_nature,  now())
+ON CONFLICT (deck_id, tag_id) DO NOTHING;
 
 -- ── Card Templates ────────────────────────────────────
 -- N5 deck — flashcard type (inu)
@@ -327,16 +349,16 @@ INSERT INTO drill_answers (session_id, card_id, user_answer, type, created_at) V
 -- ── FSRS Cards (Alice's review schedule after her drill) ─
 -- state is a JSONB snapshot of the fsrs package Card object
 INSERT INTO fsrs_cards (id, user_id, review_card_id, state, created_at, updated_at) VALUES
-  (fsrs_inu, auth_alice, rc_inu,
+  (fsrs_inu, p_alice, rc_inu,
    '{"due":"2026-03-26T10:00:00Z","stability":4.5,"difficulty":5.0,"elapsed_days":1,"scheduled_days":3,"reps":1,"lapses":0,"state":2,"last_review":"2026-03-25T10:02:00Z"}'::jsonb,
    now(), now()),
-  (fsrs_neko, auth_alice, rc_neko,
+  (fsrs_neko, p_alice, rc_neko,
    '{"due":"2026-03-28T10:00:00Z","stability":8.0,"difficulty":4.0,"elapsed_days":1,"scheduled_days":5,"reps":1,"lapses":0,"state":2,"last_review":"2026-03-25T10:04:00Z"}'::jsonb,
    now(), now()),
-  (fsrs_tori, auth_alice, rc_tori,
+  (fsrs_tori, p_alice, rc_tori,
    '{"due":"2026-03-26T10:00:00Z","stability":4.5,"difficulty":5.0,"elapsed_days":1,"scheduled_days":3,"reps":1,"lapses":0,"state":2,"last_review":"2026-03-25T10:06:00Z"}'::jsonb,
    now(), now()),
-  (fsrs_hana, auth_alice, rc_hana,
+  (fsrs_hana, p_alice, rc_hana,
    '{"due":"2026-03-26T10:00:00Z","stability":2.0,"difficulty":7.0,"elapsed_days":1,"scheduled_days":1,"reps":1,"lapses":0,"state":1,"last_review":"2026-03-25T10:10:00Z"}'::jsonb,
    now(), now())
 ON CONFLICT (id) DO NOTHING;
@@ -358,6 +380,45 @@ INSERT INTO review_sessions (
   4, 4,
   '2026-03-25 11:00:00+00', '2026-03-25 11:10:00+00'
 ) ON CONFLICT (id) DO NOTHING;
+
+-- ── Storefront Votes, Reviews, and Comments ───────────
+INSERT INTO deck_votes (deck_id, user_id, vote_value, created_at, updated_at) VALUES
+  (deck_n5, p_alice, 1,  '2026-03-25 12:00:00+00', '2026-03-25 12:00:00+00'),
+  (deck_n5, p_bob,   -1, '2026-03-25 12:05:00+00', '2026-03-25 12:05:00+00')
+ON CONFLICT (deck_id, user_id) DO NOTHING;
+
+-- Bob changes his mind, giving the vote history table an example timeline.
+UPDATE deck_votes
+SET vote_value = 1,
+    updated_at = '2026-03-25 12:20:00+00'
+WHERE deck_id = deck_n5 AND user_id = p_bob AND vote_value = -1;
+
+INSERT INTO deck_vote_reviews (id, deck_id, user_id, vote_value_at_creation, title, body, created_at, updated_at)
+VALUES (
+  review_alice_n5,
+  deck_n5,
+  p_alice,
+  1,
+  'Good beginner deck',
+  'The animal and nature cards are concise and easy to drill.',
+  '2026-03-25 12:10:00+00',
+  '2026-03-25 12:10:00+00'
+) ON CONFLICT (deck_id, user_id) DO NOTHING;
+
+UPDATE deck_vote_reviews
+SET body = 'The animal and nature cards are concise, easy to drill, and useful for day-one practice.',
+    updated_at = '2026-03-25 12:30:00+00'
+WHERE id = review_alice_n5;
+
+INSERT INTO deck_comments (id, deck_id, user_id, parent_comment_id, body, created_at, updated_at) VALUES
+  (comment_alice_n5, deck_n5, p_alice, NULL, 'Could use more kana-only examples.', '2026-03-25 12:15:00+00', '2026-03-25 12:15:00+00'),
+  (comment_bob_n5,   deck_n5, p_bob,   comment_alice_n5, 'Agreed. A kana hint mode would help.', '2026-03-25 12:25:00+00', '2026-03-25 12:25:00+00')
+ON CONFLICT (id) DO NOTHING;
+
+UPDATE deck_comments
+SET body = 'Could use more kana-only examples for first-time learners.',
+    updated_at = '2026-03-25 12:35:00+00'
+WHERE id = comment_alice_n5;
 
 -- ── Survey Responses (Alice completed Day 1 surveys) ──
 INSERT INTO survey_responses (user_id, survey_type, time_point, responses, submitted_at)

@@ -43,6 +43,10 @@ class DeckListingMapper extends ClassMapperBase<DeckListing> {
   static const Field<DeckListing, int> _f$commentsCount = Field(
       'commentsCount', _$commentsCount,
       key: r'comments_count', opt: true, def: 0);
+  static int _$reviewsCount(DeckListing v) => v.reviewsCount;
+  static const Field<DeckListing, int> _f$reviewsCount = Field(
+      'reviewsCount', _$reviewsCount,
+      key: r'reviews_count', opt: true, def: 0);
   static int _$reportsCount(DeckListing v) => v.reportsCount;
   static const Field<DeckListing, int> _f$reportsCount = Field(
       'reportsCount', _$reportsCount,
@@ -76,6 +80,7 @@ class DeckListingMapper extends ClassMapperBase<DeckListing> {
     #favoritesCount: _f$favoritesCount,
     #forksCount: _f$forksCount,
     #commentsCount: _f$commentsCount,
+    #reviewsCount: _f$reviewsCount,
     #reportsCount: _f$reportsCount,
     #featuredCards: _f$featuredCards,
     #featuredImages: _f$featuredImages,
@@ -93,6 +98,7 @@ class DeckListingMapper extends ClassMapperBase<DeckListing> {
         favoritesCount: data.dec(_f$favoritesCount),
         forksCount: data.dec(_f$forksCount),
         commentsCount: data.dec(_f$commentsCount),
+        reviewsCount: data.dec(_f$reviewsCount),
         reportsCount: data.dec(_f$reportsCount),
         featuredCards: data.dec(_f$featuredCards),
         featuredImages: data.dec(_f$featuredImages),
@@ -166,6 +172,7 @@ abstract class DeckListingCopyWith<$R, $In extends DeckListing, $Out>
       int? favoritesCount,
       int? forksCount,
       int? commentsCount,
+      int? reviewsCount,
       int? reportsCount,
       List<Map<String, dynamic>>? featuredCards,
       List<String>? featuredImages,
@@ -205,6 +212,7 @@ class _DeckListingCopyWithImpl<$R, $Out>
           int? favoritesCount,
           int? forksCount,
           int? commentsCount,
+          int? reviewsCount,
           int? reportsCount,
           List<Map<String, dynamic>>? featuredCards,
           List<String>? featuredImages,
@@ -219,6 +227,7 @@ class _DeckListingCopyWithImpl<$R, $Out>
         if (favoritesCount != null) #favoritesCount: favoritesCount,
         if (forksCount != null) #forksCount: forksCount,
         if (commentsCount != null) #commentsCount: commentsCount,
+        if (reviewsCount != null) #reviewsCount: reviewsCount,
         if (reportsCount != null) #reportsCount: reportsCount,
         if (featuredCards != null) #featuredCards: featuredCards,
         if (featuredImages != null) #featuredImages: featuredImages,
@@ -235,6 +244,7 @@ class _DeckListingCopyWithImpl<$R, $Out>
       favoritesCount: data.get(#favoritesCount, or: $value.favoritesCount),
       forksCount: data.get(#forksCount, or: $value.forksCount),
       commentsCount: data.get(#commentsCount, or: $value.commentsCount),
+      reviewsCount: data.get(#reviewsCount, or: $value.reviewsCount),
       reportsCount: data.get(#reportsCount, or: $value.reportsCount),
       featuredCards: data.get(#featuredCards, or: $value.featuredCards),
       featuredImages: data.get(#featuredImages, or: $value.featuredImages),

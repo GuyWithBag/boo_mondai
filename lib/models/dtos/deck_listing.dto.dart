@@ -18,6 +18,7 @@ class DeckListing with DeckListingMappable implements DTO {
   final int favoritesCount;
   final int forksCount;
   final int commentsCount;
+  final int reviewsCount;
   final int reportsCount;
 
   // Store the snippets as simple maps to match Supabase JSONB
@@ -38,6 +39,7 @@ class DeckListing with DeckListingMappable implements DTO {
     this.favoritesCount = 0,
     this.forksCount = 0,
     this.commentsCount = 0,
+    this.reviewsCount = 0,
     this.reportsCount = 0,
     this.featuredCards = const [],
     this.featuredImages = const [],

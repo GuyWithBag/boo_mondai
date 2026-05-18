@@ -56,6 +56,8 @@ erDiagram
         uuid deck_id PK, FK
         int upvotes_count
         int downloads_count
+        int reviews_count
+        int comments_count
         jsonb featured_cards
         text[] featured_images
     }
@@ -221,6 +223,47 @@ erDiagram
         int vote_value
     }
 
+    deck_vote_events {
+        uuid id PK
+        uuid deck_id FK
+        uuid user_id FK
+        int old_vote_value
+        int new_vote_value
+    }
+
+    deck_vote_reviews {
+        uuid id PK
+        uuid deck_id FK
+        uuid user_id FK
+        int vote_value_at_creation
+        text title
+        text body
+    }
+
+    deck_vote_review_edit_logs {
+        uuid id PK
+        uuid review_id FK
+        uuid edited_by FK
+        text old_body
+        text new_body
+    }
+
+    deck_comments {
+        uuid id PK
+        uuid deck_id FK
+        uuid user_id FK
+        uuid parent_comment_id FK
+        text body
+    }
+
+    deck_comment_edit_logs {
+        uuid id PK
+        uuid comment_id FK
+        uuid edited_by FK
+        text old_body
+        text new_body
+    }
+
     deck_downloads {
         uuid deck_id PK, FK
         uuid user_id PK, FK
@@ -241,6 +284,17 @@ erDiagram
 
     profiles ||--o{ deck_votes : "casts"
     decks ||--o{ deck_votes : "receives"
+    profiles ||--o{ deck_vote_events : "has vote history"
+    decks ||--o{ deck_vote_events : "records vote history"
+
+    profiles ||--o{ deck_vote_reviews : "writes"
+    decks ||--o{ deck_vote_reviews : "receives"
+    deck_vote_reviews ||--o{ deck_vote_review_edit_logs : "keeps edit history"
+
+    profiles ||--o{ deck_comments : "comments"
+    decks ||--o{ deck_comments : "receives"
+    deck_comments ||--o{ deck_comments : "threads replies"
+    deck_comments ||--o{ deck_comment_edit_logs : "keeps edit history"
 
     profiles ||--o{ deck_downloads : "downloads"
     decks ||--o{ deck_downloads : "receives"

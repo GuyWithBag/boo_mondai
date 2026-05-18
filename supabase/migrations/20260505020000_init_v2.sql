@@ -110,6 +110,7 @@ CREATE TABLE deck_listings (
   favorites_count  int NOT NULL DEFAULT 0,
   forks_count      int NOT NULL DEFAULT 0,
   comments_count   int NOT NULL DEFAULT 0,
+  reviews_count    int NOT NULL DEFAULT 0,
   reports_count    int NOT NULL DEFAULT 0,
   featured_cards   jsonb NOT NULL DEFAULT '[]',
   featured_images  text[] NOT NULL DEFAULT '{}',
@@ -405,11 +406,119 @@ CREATE TABLE deck_votes (
   user_id    uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   vote_value int  NOT NULL CHECK (vote_value IN (1, -1)),
   created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
   PRIMARY KEY (deck_id, user_id)
 );
 ALTER TABLE deck_votes ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "deck_votes: read all" ON deck_votes FOR SELECT USING (true);
 CREATE POLICY "deck_votes: manage own" ON deck_votes FOR ALL USING (user_id = current_profile_id()) WITH CHECK (user_id = current_profile_id());
+CREATE INDEX ON deck_votes (user_id);
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON deck_votes FOR EACH ROW EXECUTE FUNCTION moddatetime(updated_at);
+
+CREATE TABLE deck_vote_events (
+  id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  deck_id        uuid NOT NULL REFERENCES decks(id) ON DELETE CASCADE,
+  user_id        uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  old_vote_value int CHECK (old_vote_value IN (1, -1)),
+  new_vote_value int CHECK (new_vote_value IN (1, -1)),
+  changed_at     timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT deck_vote_events_changed CHECK (old_vote_value IS DISTINCT FROM new_vote_value)
+);
+ALTER TABLE deck_vote_events ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "deck_vote_events: read own or researcher" ON deck_vote_events FOR SELECT
+  USING (user_id = current_profile_id() OR EXISTS (SELECT 1 FROM profiles WHERE id = current_profile_id() AND role = 'researcher'));
+CREATE INDEX ON deck_vote_events (user_id, changed_at DESC);
+CREATE INDEX ON deck_vote_events (deck_id, changed_at DESC);
+
+CREATE TABLE deck_vote_reviews (
+  id                     uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  deck_id                uuid NOT NULL REFERENCES decks(id) ON DELETE CASCADE,
+  user_id                uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  vote_value_at_creation int NOT NULL CHECK (vote_value_at_creation IN (1, -1)),
+  title                  text NOT NULL DEFAULT '',
+  body                   text NOT NULL,
+  is_deleted             bool NOT NULL DEFAULT false,
+  created_at             timestamptz NOT NULL DEFAULT now(),
+  updated_at             timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (deck_id, user_id)
+);
+ALTER TABLE deck_vote_reviews ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "deck_vote_reviews: read visible" ON deck_vote_reviews FOR SELECT
+  USING (EXISTS (SELECT 1 FROM decks d WHERE d.id = deck_vote_reviews.deck_id AND (d.visibility_state IN ('public', 'unlisted') OR d.user_id = current_profile_id())));
+CREATE POLICY "deck_vote_reviews: insert own vote review" ON deck_vote_reviews FOR INSERT
+  WITH CHECK (user_id = current_profile_id() AND EXISTS (SELECT 1 FROM deck_votes dv WHERE dv.deck_id = deck_vote_reviews.deck_id AND dv.user_id = current_profile_id()));
+CREATE POLICY "deck_vote_reviews: update own" ON deck_vote_reviews FOR UPDATE
+  USING (user_id = current_profile_id())
+  WITH CHECK (user_id = current_profile_id());
+CREATE INDEX ON deck_vote_reviews (deck_id, created_at DESC) WHERE is_deleted = false;
+CREATE INDEX ON deck_vote_reviews (user_id, created_at DESC);
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON deck_vote_reviews FOR EACH ROW EXECUTE FUNCTION moddatetime(updated_at);
+
+CREATE TABLE deck_vote_review_edit_logs (
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  review_id   uuid NOT NULL REFERENCES deck_vote_reviews(id) ON DELETE CASCADE,
+  edited_by   uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  old_title   text NOT NULL,
+  new_title   text NOT NULL,
+  old_body    text NOT NULL,
+  new_body    text NOT NULL,
+  edited_at   timestamptz NOT NULL DEFAULT now()
+);
+ALTER TABLE deck_vote_review_edit_logs ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "deck_vote_review_edit_logs: read visible" ON deck_vote_review_edit_logs FOR SELECT
+  USING (EXISTS (
+    SELECT 1 FROM deck_vote_reviews r
+    JOIN decks d ON d.id = r.deck_id
+    WHERE r.id = deck_vote_review_edit_logs.review_id
+      AND (d.visibility_state IN ('public', 'unlisted') OR d.user_id = current_profile_id())
+  ));
+CREATE INDEX ON deck_vote_review_edit_logs (review_id, edited_at DESC);
+
+CREATE TABLE deck_comments (
+  id                uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  deck_id           uuid NOT NULL REFERENCES decks(id) ON DELETE CASCADE,
+  user_id           uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  parent_comment_id uuid,
+  body              text NOT NULL,
+  is_deleted        bool NOT NULL DEFAULT false,
+  created_at        timestamptz NOT NULL DEFAULT now(),
+  updated_at        timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (id, deck_id),
+  CONSTRAINT deck_comments_parent_fk
+    FOREIGN KEY (parent_comment_id, deck_id)
+    REFERENCES deck_comments(id, deck_id)
+    ON DELETE CASCADE
+);
+ALTER TABLE deck_comments ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "deck_comments: read visible" ON deck_comments FOR SELECT
+  USING (EXISTS (SELECT 1 FROM decks d WHERE d.id = deck_comments.deck_id AND (d.visibility_state IN ('public', 'unlisted') OR d.user_id = current_profile_id())));
+CREATE POLICY "deck_comments: insert own" ON deck_comments FOR INSERT
+  WITH CHECK (user_id = current_profile_id() AND EXISTS (SELECT 1 FROM decks d WHERE d.id = deck_comments.deck_id AND (d.visibility_state IN ('public', 'unlisted') OR d.user_id = current_profile_id())));
+CREATE POLICY "deck_comments: update own" ON deck_comments FOR UPDATE
+  USING (user_id = current_profile_id())
+  WITH CHECK (user_id = current_profile_id());
+CREATE INDEX ON deck_comments (deck_id, created_at DESC) WHERE parent_comment_id IS NULL;
+CREATE INDEX ON deck_comments (parent_comment_id, created_at);
+CREATE INDEX ON deck_comments (user_id, created_at DESC);
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON deck_comments FOR EACH ROW EXECUTE FUNCTION moddatetime(updated_at);
+
+CREATE TABLE deck_comment_edit_logs (
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  comment_id  uuid NOT NULL REFERENCES deck_comments(id) ON DELETE CASCADE,
+  edited_by   uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  old_body    text NOT NULL,
+  new_body    text NOT NULL,
+  edited_at   timestamptz NOT NULL DEFAULT now()
+);
+ALTER TABLE deck_comment_edit_logs ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "deck_comment_edit_logs: read visible" ON deck_comment_edit_logs FOR SELECT
+  USING (EXISTS (
+    SELECT 1 FROM deck_comments c
+    JOIN decks d ON d.id = c.deck_id
+    WHERE c.id = deck_comment_edit_logs.comment_id
+      AND (d.visibility_state IN ('public', 'unlisted') OR d.user_id = current_profile_id())
+  ));
+CREATE INDEX ON deck_comment_edit_logs (comment_id, edited_at DESC);
 
 CREATE TABLE deck_downloads (
   deck_id    uuid NOT NULL REFERENCES decks(id) ON DELETE CASCADE,
@@ -484,6 +593,77 @@ END;
 $$ LANGUAGE plpgsql;
 CREATE TRIGGER trigger_deck_votes AFTER INSERT OR UPDATE OR DELETE ON deck_votes FOR EACH ROW EXECUTE FUNCTION update_deck_vote_counts();
 
+CREATE OR REPLACE FUNCTION record_deck_vote_event() RETURNS TRIGGER AS $$
+BEGIN
+  IF (TG_OP = 'INSERT') THEN
+    INSERT INTO deck_vote_events (deck_id, user_id, old_vote_value, new_vote_value)
+    VALUES (NEW.deck_id, NEW.user_id, NULL, NEW.vote_value);
+  ELSIF (TG_OP = 'UPDATE' AND OLD.vote_value IS DISTINCT FROM NEW.vote_value) THEN
+    INSERT INTO deck_vote_events (deck_id, user_id, old_vote_value, new_vote_value)
+    VALUES (NEW.deck_id, NEW.user_id, OLD.vote_value, NEW.vote_value);
+  ELSIF (TG_OP = 'DELETE') THEN
+    INSERT INTO deck_vote_events (deck_id, user_id, old_vote_value, new_vote_value)
+    VALUES (OLD.deck_id, OLD.user_id, OLD.vote_value, NULL);
+  END IF;
+  RETURN NULL;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+CREATE TRIGGER trigger_deck_vote_events AFTER INSERT OR UPDATE OR DELETE ON deck_votes FOR EACH ROW EXECUTE FUNCTION record_deck_vote_event();
+
+CREATE OR REPLACE FUNCTION sync_deck_review_vote_snapshot() RETURNS TRIGGER AS $$
+DECLARE
+  current_vote int;
+BEGIN
+  SELECT vote_value INTO current_vote
+  FROM deck_votes
+  WHERE deck_id = NEW.deck_id AND user_id = NEW.user_id;
+
+  IF current_vote IS NULL THEN
+    RAISE EXCEPTION 'A deck vote is required before adding a review';
+  END IF;
+
+  NEW.vote_value_at_creation := current_vote;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+CREATE TRIGGER trigger_sync_deck_review_vote_snapshot BEFORE INSERT ON deck_vote_reviews FOR EACH ROW EXECUTE FUNCTION sync_deck_review_vote_snapshot();
+
+CREATE OR REPLACE FUNCTION log_deck_vote_review_edit() RETURNS TRIGGER AS $$
+BEGIN
+  IF (OLD.title IS DISTINCT FROM NEW.title OR OLD.body IS DISTINCT FROM NEW.body) THEN
+    INSERT INTO deck_vote_review_edit_logs (
+      review_id, edited_by, old_title, new_title, old_body, new_body
+    ) VALUES (
+      OLD.id, NEW.user_id, OLD.title, NEW.title, OLD.body, NEW.body
+    );
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+CREATE TRIGGER trigger_log_deck_vote_review_edit BEFORE UPDATE ON deck_vote_reviews FOR EACH ROW EXECUTE FUNCTION log_deck_vote_review_edit();
+
+CREATE OR REPLACE FUNCTION update_deck_review_counts() RETURNS TRIGGER AS $$
+BEGIN
+  IF (TG_OP = 'INSERT') THEN
+    IF NEW.is_deleted = false THEN
+      UPDATE deck_listings SET reviews_count = reviews_count + 1 WHERE deck_id = NEW.deck_id;
+    END IF;
+  ELSIF (TG_OP = 'UPDATE') THEN
+    IF OLD.is_deleted = true AND NEW.is_deleted = false THEN
+      UPDATE deck_listings SET reviews_count = reviews_count + 1 WHERE deck_id = NEW.deck_id;
+    ELSIF OLD.is_deleted = false AND NEW.is_deleted = true THEN
+      UPDATE deck_listings SET reviews_count = reviews_count - 1 WHERE deck_id = NEW.deck_id;
+    END IF;
+  ELSIF (TG_OP = 'DELETE') THEN
+    IF OLD.is_deleted = false THEN
+      UPDATE deck_listings SET reviews_count = reviews_count - 1 WHERE deck_id = OLD.deck_id;
+    END IF;
+  END IF;
+  RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+CREATE TRIGGER trigger_deck_reviews_count AFTER INSERT OR UPDATE OR DELETE ON deck_vote_reviews FOR EACH ROW EXECUTE FUNCTION update_deck_review_counts();
+
 -- Update Downloads (Targeting deck_listings)
 CREATE OR REPLACE FUNCTION update_deck_downloads_count() RETURNS TRIGGER AS $$
 BEGIN
@@ -520,18 +700,38 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER trigger_deck_reports AFTER INSERT ON deck_reports FOR EACH ROW EXECUTE FUNCTION update_deck_reports_count();
 
 -- Update Comments (Targeting deck_listings)
--- TODO: Wire this trigger once a deck_comments table is added.
--- CREATE OR REPLACE FUNCTION update_deck_comments_count() RETURNS TRIGGER AS $$
--- BEGIN
---   IF (TG_OP = 'INSERT') THEN
---     UPDATE deck_listings SET comments_count = comments_count + 1 WHERE deck_id = NEW.deck_id;
---   ELSIF (TG_OP = 'DELETE') THEN
---     UPDATE deck_listings SET comments_count = comments_count - 1 WHERE deck_id = OLD.deck_id;
---   END IF;
---   RETURN NULL;
--- END;
--- $$ LANGUAGE plpgsql;
--- CREATE TRIGGER trigger_deck_comments AFTER INSERT OR DELETE ON deck_comments FOR EACH ROW EXECUTE FUNCTION update_deck_comments_count();
+CREATE OR REPLACE FUNCTION log_deck_comment_edit() RETURNS TRIGGER AS $$
+BEGIN
+  IF (OLD.body IS DISTINCT FROM NEW.body) THEN
+    INSERT INTO deck_comment_edit_logs (comment_id, edited_by, old_body, new_body)
+    VALUES (OLD.id, NEW.user_id, OLD.body, NEW.body);
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+CREATE TRIGGER trigger_log_deck_comment_edit BEFORE UPDATE ON deck_comments FOR EACH ROW EXECUTE FUNCTION log_deck_comment_edit();
+
+CREATE OR REPLACE FUNCTION update_deck_comments_count() RETURNS TRIGGER AS $$
+BEGIN
+  IF (TG_OP = 'INSERT') THEN
+    IF NEW.is_deleted = false THEN
+      UPDATE deck_listings SET comments_count = comments_count + 1 WHERE deck_id = NEW.deck_id;
+    END IF;
+  ELSIF (TG_OP = 'UPDATE') THEN
+    IF OLD.is_deleted = true AND NEW.is_deleted = false THEN
+      UPDATE deck_listings SET comments_count = comments_count + 1 WHERE deck_id = NEW.deck_id;
+    ELSIF OLD.is_deleted = false AND NEW.is_deleted = true THEN
+      UPDATE deck_listings SET comments_count = comments_count - 1 WHERE deck_id = NEW.deck_id;
+    END IF;
+  ELSIF (TG_OP = 'DELETE') THEN
+    IF OLD.is_deleted = false THEN
+      UPDATE deck_listings SET comments_count = comments_count - 1 WHERE deck_id = OLD.deck_id;
+    END IF;
+  END IF;
+  RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+CREATE TRIGGER trigger_deck_comments AFTER INSERT OR UPDATE OR DELETE ON deck_comments FOR EACH ROW EXECUTE FUNCTION update_deck_comments_count();
 
 -- Update Forks (Targeting deck_listings)
 CREATE OR REPLACE FUNCTION update_deck_forks_count() RETURNS TRIGGER AS $$
