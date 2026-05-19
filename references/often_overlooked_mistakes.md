@@ -23,7 +23,7 @@ This applies to every model that stores nested lists in Hive (notes, mc_options,
 
 ## 2. `fetchCards` on page mount overwrites unsaved local (Hive-only) changes
 
-**What went wrong:** `DeckDetailPage` always called `fetchCards(deckId)` in its `useEffect`, which fetched from Supabase and replaced in-memory cards. Any edits made in `DeckEditorPage` (which writes only to Hive) were silently lost on navigation back.
+**What went wrong:** `DeckDetailPage` always called `fetchCards(deckId)` in its `useEffect`, which fetched from Supabase and replaced in-memory cards. Any edits made in `EditDeckPage` (which writes only to Hive) were silently lost on navigation back.
 
 **Rule:** Before fetching from the network, check whether cards are already loaded for the same deck:
 ```dart

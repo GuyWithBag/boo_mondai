@@ -126,7 +126,7 @@ GoRouter createRouter(AuthController authController) {
       ),
       GoRoute(
         path: '/decks-local/:deckId/edit',
-        builder: (context, state) => DeckEditorPage(
+        builder: (context, state) => EditDeckPage(
           deckId: state.pathParameters['deckId']!,
           initialTemplateId: state.uri.queryParameters['initialTemplateId'],
         ),

@@ -8,8 +8,8 @@ import 'package:provider/provider.dart';
 import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
 
-class DeckEditorPage extends HookWidget {
-  const DeckEditorPage({
+class EditDeckPage extends HookWidget {
+  const EditDeckPage({
     super.key,
     required this.deckId,
     required this.initialTemplateId,
