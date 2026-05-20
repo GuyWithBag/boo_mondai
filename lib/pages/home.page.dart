@@ -57,7 +57,7 @@ class HomePage extends HookWidget {
               ),
               const SizedBox(height: AppSpacing.lg),
               FilledButton.icon(
-                onPressed: () => context.go('/my-decks'),
+                onPressed: () => context.go('/decks-local'),
                 icon: const Icon(Icons.library_books),
                 label: const Text('Browse Decks'),
               ),

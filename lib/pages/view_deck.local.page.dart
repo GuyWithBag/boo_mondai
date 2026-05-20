@@ -69,7 +69,7 @@ class ViewDeckLocalPage extends HookWidget {
 
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push('/my-decks/$deckId/edit'),
+        onPressed: () => context.push('/decks-local/$deckId/edit'),
         child: const Icon(Icons.edit_rounded),
       ),
       bottomNavigationBar: Padding(

@@ -40,7 +40,7 @@
 //         ScaffoldMessenger.of(context).showSnackBar(
 //           SnackBar(content: Text('"${deck.title}" copied to My Decks')),
 //         );
-//         context.go('/my-decks');
+//         context.go('/decks-local');
 //       } catch (e) {
 //         error.value = e.toString();
 //         isCopying.value = false;

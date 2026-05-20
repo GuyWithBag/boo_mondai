@@ -60,7 +60,7 @@ class DeckCardTile extends StatelessWidget {
       if (isSelecting) {
         onSelect!();
       } else {
-        context.push('/my-decks/${deck!.id}');
+        context.push('/decks-local/${deck!.id}');
       }
     }
 

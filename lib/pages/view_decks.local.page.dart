@@ -78,7 +78,7 @@ class ViewDecksLocalPage extends HookWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push('/my-decks/create'),
+        onPressed: () => context.push('/decks-local/create'),
         tooltip: 'New Deck',
         child: const Icon(Icons.add),
       ),
@@ -130,7 +130,7 @@ class _DeckListBody extends StatelessWidget {
         message: 'Create your first deck to get started',
         action: ElevatedButton(
           child: Text('Create Deck'),
-          onPressed: () => context.push('/my-decks/create'),
+          onPressed: () => context.push('/decks-local/create'),
         ),
       ),
       padding: EdgeInsets.symmetric(

@@ -23,9 +23,9 @@ class ResponsiveScaffold extends HookWidget {
 
   static const _routes = [
     '/',
-    '/online-deck-browser',
-    '/my-decks',
-    '/review',
+    '/decks-online',
+    '/decks-local',
+    '/reviews',
     '/account',
   ];
 
@@ -38,7 +38,7 @@ class ResponsiveScaffold extends HookWidget {
       if (index == currentIndex) return;
       final goTo = _routes[index];
       context.go(goTo);
-      isCreateDeck.value = goTo == '/my-decks';
+      isCreateDeck.value = goTo == '/decks-local';
     }
 
     // Group B only sees code entry — no shell nav
