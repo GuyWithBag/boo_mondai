@@ -19,4 +19,4 @@ export 'login.online.page.dart';
 export 'preview_drill.local.page.dart';
 export 'register.online.page.dart';
 export 'researcher_dashboard.online.page.dart';
-export 'session.local.page.dart';
+export 'study_session.local.page.dart';

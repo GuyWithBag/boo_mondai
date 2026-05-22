@@ -9,10 +9,8 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 
-enum SessionMode { drill, review }
-
-class SessionPage extends HookWidget {
-  const SessionPage({super.key, required this.deckId, required this.mode});
+class StudySessionPage extends HookWidget {
+  const StudySessionPage({super.key, required this.deckId, required this.mode});
 
   // Drill sessions always require a deckId
   // Nullable becauase: Review sessions can be global (null = all due cards)
@@ -35,10 +33,6 @@ class SessionPage extends HookWidget {
       controller = context.watch<ReviewSessionController>();
       dashboardController = context.read<ViewReviewsController>();
     }
-
-    final shakeController = useAnimationController(
-      duration: const Duration(milliseconds: 400),
-    );
 
     // ── KICK OFF THE SESSION ──────────────────────────────
     useEffect(() {
@@ -78,7 +72,11 @@ class SessionPage extends HookWidget {
     if (controller.isComplete) {
       if (mode == SessionMode.drill) {
         final drillCtrl = controller as DrillSessionController;
-        context.go('/drill/${drillCtrl.session?.id}/result');
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!context.mounted) return;
+          context.go('/drill/${drillCtrl.session?.id}/result');
+        });
+        return const Scaffold(body: SizedBox.shrink());
       } else {
         return Scaffold(
           body: Center(
@@ -89,14 +87,14 @@ class SessionPage extends HookWidget {
                 const SizedBox(height: AppSpacing.lg),
                 const Text('Deck Review Finished!'),
                 const SizedBox(height: AppSpacing.lg),
-                FilledButton.icon(
+                TactileButton(
                   onPressed: () {
                     controller.reset();
                     dashboardController?.load();
                     context.pop();
                   },
-                  icon: const Icon(Icons.arrow_back),
-                  label: const Text('Back to Dashboard'),
+                  leading: const Icon(Icons.arrow_back),
+                  child: const Text('Back to Dashboard'),
                 ),
               ],
             ),
@@ -113,86 +111,43 @@ class SessionPage extends HookWidget {
       return ErrorText(controller.error);
     }
 
-    // 5. The Main UI
-    final String appBarTitle = mode == SessionMode.drill
-        ? 'Drill Session'
-        : '${(controller as ReviewSessionController).remainingCount} remaining';
-
-    SubmissionStyle getSubmissionStyle() {
-      if (template is FlashcardTemplate) {
-        return SubmissionStyle.showAnswer;
-      } else if (template is MultipleChoiceTemplate) {
-        return SubmissionStyle.none;
+    void closeSession() {
+      controller.reset();
+      if (mode == SessionMode.review) {
+        dashboardController?.load();
       }
-
-      return SubmissionStyle.submitAnswer;
+      context.pop();
     }
 
-    return ChangeNotifierProvider(
-      key: ValueKey(reviewCard.id),
-      create: (_) => SessionInteractionsController(),
-      child: HookBuilder(
-        builder: (context) {
-          final interactionsController = context
-              .watch<SessionInteractionsController>();
-          return Scaffold(
-            appBar: AppBar(
-              automaticallyImplyLeading: false,
-              title: mode == SessionMode.drill
-                  ? LinearProgressIndicator(value: controller.progress)
-                  : Text(appBarTitle),
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () {
-                    controller.reset();
-                    if (mode == SessionMode.review) {
-                      dashboardController?.load();
-                    }
-                    context.pop();
-                  },
-                ),
-              ],
-            ),
-            bottomNavigationBar: RatingArea(
-              answer: interactionsController.answer,
-              controller: controller,
-              isRevealed: interactionsController.isRevealed,
-              submissionStyle: getSubmissionStyle(),
-              onSubmit: () => interactionsController.tryAnswer(),
-            ),
-            body: SafeArea(
-              child: Column(
-                children: [
-                  if (mode == SessionMode.review)
-                    LinearProgressIndicator(
-                      value: controller.progress,
-                      backgroundColor: AppColors.textSecondary.withValues(
-                        alpha: 0.1,
-                      ),
-                    ),
-                  Expanded(
-                    child: Center(
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 600),
-                        child: Padding(
-                          padding: const EdgeInsets.all(AppSpacing.md),
-                          child: SessionInteraction(
-                            template: template,
-                            reviewCard: reviewCard,
-                            controller: controller,
-                            interactionsController: interactionsController,
-                            shakeController: shakeController,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
+    final interactionsController = useStudySessionCardStageController(
+      cardId: reviewCard.id,
+      cardIndex: controller.currentIndex,
+      canReveal: template is FlashcardTemplate,
+      initialAnswer: template is FlashcardTemplate
+          ? template.getAnswer(isReversed: reviewCard.isReversed)
+          : null,
+    );
+
+    return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(76),
+        child: SafeArea(
+          bottom: false,
+          child: StudySessionAppbar(
+            controller: controller,
+            onClose: closeSession,
+          ),
+        ),
+      ),
+      bottomNavigationBar: StudySessionBottomNavBar(
+        studySessionController: controller,
+        interactionsController: interactionsController,
+      ),
+      body: SafeArea(
+        child: StudySessionCardStage(
+          studySessionController: controller,
+          interactionsController: interactionsController,
+        ),
       ),
     );
   }

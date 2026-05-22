@@ -1,25 +1,21 @@
+import 'package:boo_mondai/controllers/study_session_controllers/study_session.controller.dart';
+import 'package:boo_mondai/variant_styles/variant_styles.barrel.dart';
+import 'package:boo_mondai/widgets/widgets.barrel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 import 'package:boo_mondai/shared/theme/theme.barrel.dart';
-import '../../variant_styles/variant_styles.barrel.dart';
-import 'progress_bar.dart';
-import '../tactile_button.dart';
 
 class StudySessionAppbar extends StatelessWidget {
   const StudySessionAppbar({
-    required this.current,
-    required this.total,
-    required this.progress,
-    required this.onClose,
     super.key,
+    required this.onClose,
+    required this.controller,
   });
 
-  final int current;
-  final int total;
-  final double progress;
   final VoidCallback onClose;
+  final StudySessionController controller;
 
   @override
   Widget build(BuildContext context) {
@@ -39,10 +35,12 @@ class StudySessionAppbar extends StatelessWidget {
         children: [
           TactileButton.icon(icon: Icons.close, onPressed: onClose),
           SizedBox(width: 18.w),
-          Expanded(child: ProgressBar(value: progress)),
+          Expanded(
+            child: ProgressBar(value: controller.getProgressPercentage()),
+          ),
           SizedBox(width: 18.w),
           Text(
-            '$current / $total',
+            '${controller.currentIndex} / ${controller.queue.length}',
             style: appTextStyle.resolve(tokens, [
               TextSize.labelSmall,
               TextWeight.heavy,

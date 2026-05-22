@@ -6,8 +6,8 @@ import 'package:theme_variants/theme_variants.dart';
 import '../../variant_styles/variant_styles.barrel.dart';
 import '../variant_text_field.dart';
 
-class BlankAnswerInput extends StatelessWidget {
-  const BlankAnswerInput({
+class FillInTheBlankAnswerInput extends StatelessWidget {
+  const FillInTheBlankAnswerInput({
     required this.revealed,
     required this.correct,
     required this.correctAnswer,

@@ -8,7 +8,6 @@
 import 'package:flutter/material.dart';
 import 'package:boo_mondai/models/models.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
-import 'package:boo_mondai/widgets/widgets.barrel.dart';
 
 class CardTile extends StatelessWidget {
   const CardTile({

@@ -3,5 +3,5 @@
 // Other files
 export 'drill.study_session.controller.dart';
 export 'review.study_session.controller.dart';
-export 'session_interactions.controller.dart';
+export 'study_session.card_stage.controller.dart';
 export 'study_session.controller.dart';

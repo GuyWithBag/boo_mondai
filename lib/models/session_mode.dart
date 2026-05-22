@@ -1,0 +1,1 @@
+enum SessionMode { drill, review }

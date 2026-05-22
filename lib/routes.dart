@@ -6,6 +6,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/exceptions/route_exception.dart';
+import 'package:boo_mondai/models/models.barrel.dart';
 import 'package:go_router/go_router.dart';
 import 'package:boo_mondai/pages/pages.barrel.dart';
 import 'package:boo_mondai/controllers/controllers.barrel.dart';
@@ -138,7 +139,7 @@ GoRouter createRouter(AuthController authController) {
       // ),
       GoRoute(
         path: '/drill/:deckId/session',
-        builder: (context, state) => SessionPage(
+        builder: (context, state) => StudySessionPage(
           deckId: state.pathParameters['deckId'],
           mode: SessionMode.drill,
         ),
@@ -153,13 +154,13 @@ GoRouter createRouter(AuthController authController) {
       GoRoute(
         path: '/review/session',
         builder: (context, state) =>
-            const SessionPage(deckId: null, mode: SessionMode.review),
+            const StudySessionPage(deckId: null, mode: SessionMode.review),
       ),
 
       // Deck-Specific Review
       GoRoute(
         path: '/review/:deckId/session',
-        builder: (context, state) => SessionPage(
+        builder: (context, state) => StudySessionPage(
           deckId: state.pathParameters['deckId'],
           mode: SessionMode.review,
         ),

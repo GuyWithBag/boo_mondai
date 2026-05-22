@@ -8,10 +8,10 @@
 import 'package:boo_mondai/models/models.barrel.dart';
 import 'package:boo_mondai/shared/uuid.dart';
 import 'package:dart_mappable/dart_mappable.dart';
-import 'package:fsrs/fsrs.dart';
 
 part 'drill_answer.dto.mapper.dart';
 
+/// For showing to logs and showing the end results after a drill
 @MappableClass()
 class DrillAnswer with DrillAnswerMappable implements WriteOnceDTO {
   @override
@@ -52,19 +52,5 @@ class DrillAnswer with DrillAnswerMappable implements WriteOnceDTO {
   bool isCorrect() {
     // FIX: Must include the enum name
     return type != StudyRating.incorrect;
-  }
-
-  static StudyRating fromRatingToType(Rating rating) {
-    // FIX: Must include the 'Rating' enum name on every case
-    switch (rating) {
-      case Rating.again:
-        return StudyRating.again;
-      case Rating.hard:
-        return StudyRating.hard;
-      case Rating.good:
-        return StudyRating.good;
-      case Rating.easy:
-        return StudyRating.easy;
-    }
   }
 }

@@ -4,12 +4,12 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:fsrs/fsrs.dart' as fsrs;
 
-class ReviewSessionController extends StudySessionController {
+class ReviewSessionController
+    extends StudySessionController<FsrsCard, ReviewSession> {
   // ── Specific State ──
-  ReviewSession? _session;
-  final List<FsrsCard> _queue = [];
   final Map<String, ReviewCard> _reviewCards = {};
   late DueFilterThreshold dueFilter;
 
@@ -17,22 +17,15 @@ class ReviewSessionController extends StudySessionController {
   final List<FsrsReviewLog> _pendingLogs = [];
   final Map<String, FsrsCard> _pendingCards = {};
 
-  // ── Specific Getters ──
-  ReviewSession? get session => _session;
-
   int get remainingCount =>
-      (_queue.length - currentIndex).clamp(0, _queue.length);
+      (queue.length - currentIndex).clamp(0, queue.length);
 
   @override
-  bool get isComplete => _queue.isEmpty || currentIndex >= _queue.length;
-
-  @override
-  double get progress =>
-      _queue.isEmpty ? 0 : (currentIndex / _queue.length).clamp(0.0, 1.0);
+  bool get isComplete => queue.isEmpty || currentIndex >= queue.length;
 
   FsrsCard? get currentFsrsCard =>
-      (_queue.isNotEmpty && currentIndex < _queue.length)
-      ? _queue[currentIndex]
+      (queue.isNotEmpty && currentIndex < queue.length)
+      ? queue[currentIndex]
       : null;
 
   @override
@@ -49,9 +42,13 @@ class ReviewSessionController extends StudySessionController {
     // 1. Reset session state
     setError(null);
     dueFilter = filter;
-    _queue.clear();
+    session = null;
+    queue.clear();
+    templates.clear();
+    _reviewCards.clear();
     _pendingCards.clear();
     _pendingLogs.clear();
+    nextIntervals.clear();
     currentIndex = 0;
     realTimeSaving = realTime;
 
@@ -89,21 +86,25 @@ class ReviewSessionController extends StudySessionController {
       }).toList();
 
       dueCards.shuffle();
-      _queue.addAll(dueCards);
+      queue.addAll(dueCards);
 
       // ── NEW: Initialize the ReviewSession ──
-      _session = ReviewSession(
+      session = ReviewSession(
         id: uuid.v7(),
         userId: userId,
         deckId: deckId,
-        totalCards: _queue.length,
+        totalCards: queue.length,
         startedAt: now,
       );
-    } catch (e) {
+    } on SessionException catch (e) {
+      setError(e);
+    } catch (e, stackTrace) {
       setError(
         SessionException(
           'Failed to load session data: $e',
           code: 'SESSION_INIT_FAILED',
+          originalError: e,
+          stackTrace: stackTrace,
         ),
       );
     }
@@ -112,19 +113,39 @@ class ReviewSessionController extends StudySessionController {
   @override
   Future<void> calculateNextIntervals() async {
     final currentFsrs = currentFsrsCard;
-    if (currentFsrs == null) return;
+    if (currentFsrs == null) {
+      failSession(
+        'Cannot calculate review intervals without a current FSRS card.',
+        code: 'REVIEW_CARD_MISSING',
+      );
+    }
 
     // Pass the existing card's memory state
-    generateIntervalsForState(currentFsrs.state);
+    nextIntervals.clear();
+    nextIntervals = StudySessionService.generateIntervalsForState(
+      currentFsrs.state,
+    );
+    notifyListeners();
   }
 
   // ── The Single Submit Logic ──
   @override
   Future<void> submitAnswer(String userAnswer, StudyRating rating) async {
     final fsrsCard = currentFsrsCard;
-    if (fsrsCard == null || _session == null) return;
+    if (fsrsCard == null) {
+      failSession(
+        'Cannot submit a review answer without a current FSRS card.',
+        code: 'REVIEW_CARD_MISSING',
+      );
+    }
+    if (session == null) {
+      failSession(
+        'Cannot submit a review answer before the session has started.',
+        code: 'REVIEW_SESSION_MISSING',
+      );
+    }
 
-    final fsrsRating = mapToFsrsRating(rating);
+    final fsrsRating = StudySessionService.studyRatingToFSRSRating(rating);
     final now = DateTime.now();
 
     // The time travel trick for future look-ahead reviews
@@ -150,23 +171,23 @@ class ReviewSessionController extends StudySessionController {
       log: result.reviewLog,
     );
 
-    // Append to queue if they forgot it (FSRS requires re-reviewing)
-    if (dueFilter.isCardDue(updatedCard.state.due, now)) {
-      _queue.add(updatedCard);
+    // Requeue failed answers for another pass in the same session.
+    if (rating == StudyRating.incorrect || rating == StudyRating.again) {
+      queue.add(updatedCard);
     }
 
     // ── NEW: Update session progress ──
     // Note: If cards get added back to the queue, totalCards updates so progress bars stay accurate
-    _session = _session!.copyWith(
-      cardsReviewed: _session!.cardsReviewed + 1,
-      totalCards: _queue.length,
+    session = session!.copyWith(
+      cardsReviewed: session!.cardsReviewed + 1,
+      totalCards: queue.length,
     );
 
     // ── THE TOGGLE ──
     if (realTimeSaving) {
       await LocalDB.fsrsCard.upsert(updatedCard);
       await LocalDB.reviewLog.upsert(log);
-      await LocalDB.reviewSession.upsert(_session!); // Assumes repo exists
+      await LocalDB.reviewSession.upsert(session!); // Assumes repo exists
     } else {
       _pendingCards[updatedCard.id] = updatedCard;
       _pendingLogs.add(log);
@@ -184,16 +205,22 @@ class ReviewSessionController extends StudySessionController {
 
   // ── Session Completion ──
   @override
+  @protected
   Future<void> completeSession() async {
-    if (_session == null) return;
+    if (session == null) {
+      failSession(
+        'Cannot complete a review session before it has started.',
+        code: 'REVIEW_SESSION_MISSING',
+      );
+    }
 
     try {
       // ── NEW: Finalize session ──
-      _session = _session!.copyWith(completedAt: DateTime.now());
+      session = session!.copyWith(completedAt: DateTime.now());
 
       if (realTimeSaving) {
         // Just put the final session state
-        await LocalDB.reviewSession.upsert(_session!);
+        await LocalDB.reviewSession.upsert(session!);
       } else {
         // Batch Save everything
         if (_pendingCards.isNotEmpty) {
@@ -202,13 +229,18 @@ class ReviewSessionController extends StudySessionController {
         if (_pendingLogs.isNotEmpty) {
           await LocalDB.reviewLog.upsertMany(_pendingLogs);
         }
-        await LocalDB.reviewSession.upsert(_session!);
+        await LocalDB.reviewSession.upsert(session!);
       }
-    } on Exception catch (e) {
+      notifyListeners();
+    } on SessionException catch (e) {
+      setError(e);
+    } on Exception catch (e, stackTrace) {
       setError(
         SessionException(
           'Failed to save session data: $e',
           code: 'SESSION_COMPLETE_FAILED',
+          originalError: e,
+          stackTrace: stackTrace,
         ),
       );
     }
@@ -216,11 +248,15 @@ class ReviewSessionController extends StudySessionController {
 
   @override
   void reset() {
-    _session = null;
-    _queue.clear();
+    session = null;
+    queue.clear();
     _pendingLogs.clear();
     _pendingCards.clear();
+    _reviewCards.clear();
+    templates.clear();
+    nextIntervals.clear();
     currentIndex = 0;
+    setError(null);
     notifyListeners();
   }
 }

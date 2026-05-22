@@ -5,8 +5,10 @@
 
 import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/models/models.barrel.dart'; // Needed for StudyRating
-import 'package:boo_mondai/shared/theme_constants.dart';
+import 'package:boo_mondai/variant_styles/tactile_button.variant.dart';
+import 'package:boo_mondai/widgets/widgets.barrel.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class RatingButton extends StatelessWidget {
   final StudyRating type;
@@ -25,51 +27,44 @@ class RatingButton extends StatelessWidget {
     final reviewTime = ctrl.nextIntervals[type] ?? '-';
 
     late final String shortcut;
-    late final Color color;
     late final String label;
+    late final TactileTone tone;
 
     switch (type) {
       case StudyRating.again:
       case StudyRating.incorrect: // Fallback just in case
         label = 'Again';
         shortcut = '1';
-        color = AppColors.incorrect;
+        tone = TactileTone.again;
       case StudyRating.hard:
         label = 'Hard';
         shortcut = '2';
-        color = AppColors.hard;
+        tone = TactileTone.hard;
       case StudyRating.good:
         label = 'Good';
         shortcut = '3';
-        color = AppColors.correct;
+        tone = TactileTone.good;
       case StudyRating.easy:
         label = 'Easy';
         shortcut = '4';
-        color = AppColors.easy;
+        tone = TactileTone.easy;
     }
 
     return Expanded(
       child: Tooltip(
         message: 'Press $shortcut',
-        child: FilledButton(
+        child: TactileButton(
           onPressed: onTap,
-          style: FilledButton.styleFrom(
-            backgroundColor: color.withValues(alpha: 0.15),
-            foregroundColor: color,
-            padding: const EdgeInsets.symmetric(vertical: 8),
-          ),
+          tone: tone,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                reviewTime,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                ),
+              Text(label.toUpperCase(), textAlign: TextAlign.center),
+              SizedBox(height: 4.h),
+              Opacity(
+                opacity: 0.7,
+                child: Text(reviewTime, textAlign: TextAlign.center),
               ),
-              const SizedBox(height: 2),
-              Text(label),
             ],
           ),
         ),

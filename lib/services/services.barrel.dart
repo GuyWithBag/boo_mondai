@@ -8,5 +8,6 @@ export 'guest_migration_service.dart';
 export 'notification_service.dart';
 export 'research_service.dart';
 export 'services.dart';
+export 'study_session.service.dart';
 export 'sync_service.dart';
 export 'uuid_service.dart';

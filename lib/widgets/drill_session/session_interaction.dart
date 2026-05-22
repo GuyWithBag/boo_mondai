@@ -22,7 +22,7 @@ class SessionInteraction extends HookWidget {
   final CardTemplate template;
   final ReviewCard reviewCard;
   final StudySessionController controller;
-  final SessionInteractionsController interactionsController;
+  final StudySessionCardStageController interactionsController;
   final AnimationController shakeController;
 
   @override
@@ -39,16 +39,16 @@ class SessionInteraction extends HookWidget {
         isReversed: reviewCard.isReversed,
         controller: interactionsController,
       ),
-      IdentificationTemplate i => IdentificationInteraction(
-        template: i,
-        controller: interactionsController,
-        shakeController: shakeController,
-      ),
-      MultipleChoiceTemplate m => MultipleChoiceInteraction(
-        template: m,
-        controller: interactionsController,
-        shakeController: shakeController,
-      ),
+      // IdentificationTemplate i => IdentificationInteraction(
+      //   template: i,
+      //   controller: interactionsController,
+      //   shakeController: shakeController,
+      // ),
+      // MultipleChoiceTemplate m => MultipleChoiceInteraction(
+      //   template: m,
+      //   controller: interactionsController,
+      //   shakeController: shakeController,
+      // ),
       FillInTheBlanksTemplate fb => FitbInteraction(
         template: fb,
         isReversed: reviewCard.isReversed,

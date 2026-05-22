@@ -3,8 +3,10 @@
 // Barrel files
 export 'researcher_dashboard/researcher_dashboard.barrel.dart';
 export 'review/review.barrel.dart';
+export 'study_session/study_session.barrel.dart';
 export 'survey/survey.barrel.dart';
 export 'vocabulary_test/vocabulary_test.barrel.dart';
+export 'animated_widgets/animated_widgets.barrel.dart';
 export 'browser_deck_detail/browser_deck_detail.barrel.dart';
 export 'deck_card/deck_card.barrel.dart';
 export 'deck_creator/deck_creator.barrel.dart';

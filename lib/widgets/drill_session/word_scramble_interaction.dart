@@ -22,7 +22,7 @@ class WordScrambleInteraction extends HookWidget {
   });
 
   final WordScrambleTemplate template;
-  final SessionInteractionsController controller;
+  final StudySessionCardStageController controller;
   final AnimationController shakeController;
 
   @override
@@ -52,7 +52,7 @@ class WordScrambleInteraction extends HookWidget {
         return;
       }
       controller.answer = answer;
-      controller.canReveal = true;
+      controller.setCanReveal(true);
     }
 
     // Initiates once rendered
