@@ -9,6 +9,7 @@ export 'pages/pages.barrel.dart';
 export 'painters/painters.barrel.dart';
 export 'services/services.barrel.dart';
 export 'shared/shared.barrel.dart';
+export 'variant_styles/variant_styles.barrel.dart';
 export 'widgets/widgets.barrel.dart';
 // Other files
 export 'app.dart';

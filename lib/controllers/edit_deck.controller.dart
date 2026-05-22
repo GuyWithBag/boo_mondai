@@ -32,6 +32,15 @@ class EditDeckController extends Controller {
   bool get isDirty => _isDirty;
   String? get activeTemplateId => _activeTemplateId;
 
+  void updateDeckTitle(String title) {
+    final deck = _deck;
+    if (deck == null || deck.title == title.trim()) return;
+
+    _deck = deck.copyWith(title: title.trim());
+    _isDirty = true;
+    notifyListeners();
+  }
+
   @override
   void dispose() {
     formState.dispose();
@@ -383,9 +392,39 @@ class EditDeckController extends Controller {
   }
 
   List<FillInTheBlankSegment> _buildSegments(String templateId) {
-    // Note: Re-implement your segment parsing logic here based on your UI's controllers
-    // Example placeholder:
-    return [];
+    final sentence = formState.fillInTheBlankSentenceController.text.trim();
+    final answers = splitFillInTheBlankAnswers(
+      formState.fillInTheBlankAnswersController.text,
+    );
+    if (sentence.isEmpty || answers.isEmpty) return [];
+
+    final lowerSentence = sentence.toLowerCase();
+    var searchStart = 0;
+    final segments = <FillInTheBlankSegment>[];
+
+    for (final answer in answers) {
+      final lowerAnswer = answer.toLowerCase();
+      var blankStart = lowerSentence.indexOf(lowerAnswer, searchStart);
+      if (blankStart == -1) {
+        blankStart = lowerSentence.indexOf(lowerAnswer);
+      }
+      if (blankStart == -1) continue;
+
+      final blankEnd = blankStart + answer.length;
+      searchStart = blankEnd;
+      segments.add(
+        FillInTheBlankSegment(
+          id: uuid.v7(),
+          cardId: templateId,
+          fullText: sentence,
+          blankStart: blankStart,
+          blankEnd: blankEnd,
+          correctAnswer: answer,
+        ),
+      );
+    }
+
+    return segments;
   }
 
   List<MatchMadnessPair> _buildPairs(String templateId) {

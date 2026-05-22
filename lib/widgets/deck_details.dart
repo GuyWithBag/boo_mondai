@@ -51,9 +51,9 @@ class DeckDetails extends StatelessWidget {
           spacing: AppSpacing.xs,
           runSpacing: AppSpacing.xs,
           children: [
-            MetaChip('${deck.cardCount} cards'),
-            if (deck.isPremade) const MetaChip('Premade'),
-            for (final tag in deck.tags) MetaChip('#${tag.name}'),
+            // MetaChip('${deck.cardCount} cards'),
+            // if (deck.isPremade) const MetaChip('Premade'),
+            // for (final tag in deck.tags) MetaChip('#${tag.name}'),
           ],
         ),
         const SizedBox(height: AppSpacing.lg),

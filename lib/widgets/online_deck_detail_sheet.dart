@@ -133,10 +133,10 @@ class _ListingStats extends StatelessWidget {
       spacing: AppSpacing.xs,
       runSpacing: AppSpacing.xs,
       children: [
-        MetaChip('${listing!.upvotesCount} upvotes'),
-        MetaChip('${listing!.downloadsCount} downloads'),
-        MetaChip('${listing!.forksCount} forks'),
-        MetaChip('${listing!.favoritesCount} favorites'),
+        // MetaChip('${listing!.upvotesCount} upvotes'),
+        // MetaChip('${listing!.downloadsCount} downloads'),
+        // MetaChip('${listing!.forksCount} forks'),
+        // MetaChip('${listing!.favoritesCount} favorites'),
       ],
     );
   }

@@ -13,7 +13,6 @@ dependencies:
   theme_variants:
     git:
       url: https://github.com/GuyWithBag/theme_variants.git
-      ref: 87e5c15
 
   # ── State & UI ──────────────────────────────────────────
   provider: ^6.1.2
@@ -71,3 +70,10 @@ flutter:
 analyzer:
   enable-experiment:
     - dot-shorthands
+
+fonts:
+  - family: Noto Sans
+    fonts:
+      - asset: fonts/noto_sans/NotoSans-VariableFont_wdth,wght.ttf
+      - asset: fonts/noto_sans/NotoSans-Italic-VariableFont_wdth,wght.ttf
+        style: italic

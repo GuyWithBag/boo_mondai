@@ -331,7 +331,7 @@ Design decision remains:
 
 Still to verify/complete:
 
-- Sync button on `/my-decks`.
+- Sync button on `/decks-local`.
 - Sync button on review page.
 - Cancel sync behavior.
 - Last-synced timestamp display.
@@ -341,7 +341,7 @@ Still to verify/complete:
   - Copied deck routine sync: local wins for the user's copy.
   - Explicit "Update from original author": diff UI.
 
-### 8d. `/my-decks`
+### 8d. `/decks-local`
 
 Still relevant unless verified against current code:
 
@@ -420,4 +420,3 @@ The old phase plan in this file was stale. The accurate status is:
 | Generated mappers/barrels sync | Done locally in `30cd266`; push still needed |
 | Product behavior verification | Still needed |
 | Sync UX completion/verification | Still needed |
-

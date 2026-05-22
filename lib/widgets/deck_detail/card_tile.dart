@@ -96,7 +96,7 @@ class CardTile extends StatelessWidget {
             ),
             if (isUneditable) ...[
               const SizedBox(width: AppSpacing.xs),
-              StatusBadge.uneditable(),
+              // StatusBadge.uneditable(),
             ],
           ],
         ),

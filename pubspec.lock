@@ -1105,11 +1105,11 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "87e5c15"
-      resolved-ref: "87e5c156b2e2cd272f46e1959cdcd8ad06a6bb9f"
+      ref: HEAD
+      resolved-ref: "0adcd0877a32414db3e9c120e19ca2cd19cc479c"
       url: "https://github.com/GuyWithBag/theme_variants.git"
     source: git
-    version: "0.0.1"
+    version: "0.1.2"
   timezone:
     dependency: transitive
     description:

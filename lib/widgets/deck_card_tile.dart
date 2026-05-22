@@ -87,7 +87,7 @@ class DeckCardTile extends StatelessWidget {
                   ),
 
                   if (!isSelecting) ...[
-                    if (deck?.isPremade ?? false) const StatusBadge.premade(),
+                    // if (deck?.isPremade ?? false) const StatusBadge.premade(),
                     if (isDirty) UnsyncedBadge(isPushing: isPushing),
                     if (onDelete != null || onPush != null)
                       DeckPopupMenu(

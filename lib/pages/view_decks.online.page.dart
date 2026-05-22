@@ -215,8 +215,8 @@ class _BrowseDeckTile extends StatelessWidget {
             Wrap(
               spacing: AppSpacing.xs,
               children: [
-                MetaChip('${deck.cardCount} cards'),
-                for (final tag in deck.tags) MetaChip('#${tag.name}'),
+                // MetaChip('${deck.cardCount} cards'),
+                // for (final tag in deck.tags) MetaChip('#${tag.name}'),
               ],
             ),
           ],
