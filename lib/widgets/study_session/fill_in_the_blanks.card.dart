@@ -49,7 +49,7 @@ class FillInTheBlanksCard extends HookWidget {
       );
     }
 
-    return StudyCardFrame(
+    return PhysicalCardSide(
       child: SingleChildScrollView(
         child: ConstrainedBox(
           constraints: BoxConstraints(minHeight: 480.h),

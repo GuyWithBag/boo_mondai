@@ -66,8 +66,6 @@ class DeckListingMapper extends ClassMapperBase<DeckListing> {
   static DateTime _$createdAt(DeckListing v) => v.createdAt;
   static const Field<DeckListing, DateTime> _f$createdAt =
       Field('createdAt', _$createdAt, key: r'created_at');
-  static String _$id(DeckListing v) => v.id;
-  static const Field<DeckListing, String> _f$id = Field('id', _$id);
   static String _$deckId(DeckListing v) => v.deckId;
   static const Field<DeckListing, String> _f$deckId =
       Field('deckId', _$deckId, key: r'deck_id');
@@ -86,7 +84,6 @@ class DeckListingMapper extends ClassMapperBase<DeckListing> {
     #featuredImages: _f$featuredImages,
     #updatedAt: _f$updatedAt,
     #createdAt: _f$createdAt,
-    #id: _f$id,
     #deckId: _f$deckId,
   };
 
@@ -104,7 +101,6 @@ class DeckListingMapper extends ClassMapperBase<DeckListing> {
         featuredImages: data.dec(_f$featuredImages),
         updatedAt: data.dec(_f$updatedAt),
         createdAt: data.dec(_f$createdAt),
-        id: data.dec(_f$id),
         deckId: data.dec(_f$deckId));
   }
 
@@ -178,7 +174,6 @@ abstract class DeckListingCopyWith<$R, $In extends DeckListing, $Out>
       List<String>? featuredImages,
       DateTime? updatedAt,
       DateTime? createdAt,
-      String? id,
       String? deckId});
   DeckListingCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -218,7 +213,6 @@ class _DeckListingCopyWithImpl<$R, $Out>
           List<String>? featuredImages,
           DateTime? updatedAt,
           DateTime? createdAt,
-          String? id,
           String? deckId}) =>
       $apply(FieldCopyWithData({
         if (upvotesCount != null) #upvotesCount: upvotesCount,
@@ -233,7 +227,6 @@ class _DeckListingCopyWithImpl<$R, $Out>
         if (featuredImages != null) #featuredImages: featuredImages,
         if (updatedAt != null) #updatedAt: updatedAt,
         if (createdAt != null) #createdAt: createdAt,
-        if (id != null) #id: id,
         if (deckId != null) #deckId: deckId
       }));
   @override
@@ -250,7 +243,6 @@ class _DeckListingCopyWithImpl<$R, $Out>
       featuredImages: data.get(#featuredImages, or: $value.featuredImages),
       updatedAt: data.get(#updatedAt, or: $value.updatedAt),
       createdAt: data.get(#createdAt, or: $value.createdAt),
-      id: data.get(#id, or: $value.id),
       deckId: data.get(#deckId, or: $value.deckId));
 
   @override

@@ -49,43 +49,34 @@ class MatchPairDataMapper extends ClassMapperBase<MatchPairData> {
 
 mixin MatchPairDataMappable {
   String toJson() {
-    return MatchPairDataMapper.ensureInitialized().encodeJson<MatchPairData>(
-      this as MatchPairData,
-    );
+    return MatchPairDataMapper.ensureInitialized()
+        .encodeJson<MatchPairData>(this as MatchPairData);
   }
 
   Map<String, dynamic> toMap() {
-    return MatchPairDataMapper.ensureInitialized().encodeMap<MatchPairData>(
-      this as MatchPairData,
-    );
+    return MatchPairDataMapper.ensureInitialized()
+        .encodeMap<MatchPairData>(this as MatchPairData);
   }
 
   MatchPairDataCopyWith<MatchPairData, MatchPairData, MatchPairData>
-  get copyWith => _MatchPairDataCopyWithImpl<MatchPairData, MatchPairData>(
-    this as MatchPairData,
-    $identity,
-    $identity,
-  );
+      get copyWith => _MatchPairDataCopyWithImpl<MatchPairData, MatchPairData>(
+          this as MatchPairData, $identity, $identity);
   @override
   String toString() {
-    return MatchPairDataMapper.ensureInitialized().stringifyValue(
-      this as MatchPairData,
-    );
+    return MatchPairDataMapper.ensureInitialized()
+        .stringifyValue(this as MatchPairData);
   }
 
   @override
   bool operator ==(Object other) {
-    return MatchPairDataMapper.ensureInitialized().equalsValue(
-      this as MatchPairData,
-      other,
-    );
+    return MatchPairDataMapper.ensureInitialized()
+        .equalsValue(this as MatchPairData, other);
   }
 
   @override
   int get hashCode {
-    return MatchPairDataMapper.ensureInitialized().hashValue(
-      this as MatchPairData,
-    );
+    return MatchPairDataMapper.ensureInitialized()
+        .hashValue(this as MatchPairData);
   }
 }
 
@@ -110,20 +101,15 @@ class _MatchPairDataCopyWithImpl<$R, $Out>
   late final ClassMapperBase<MatchPairData> $mapper =
       MatchPairDataMapper.ensureInitialized();
   @override
-  $R call({String? term, String? match}) => $apply(
-    FieldCopyWithData({
-      if (term != null) #term: term,
-      if (match != null) #match: match,
-    }),
-  );
+  $R call({String? term, String? match}) => $apply(FieldCopyWithData(
+      {if (term != null) #term: term, if (match != null) #match: match}));
   @override
   MatchPairData $make(CopyWithData data) => MatchPairData(
-    term: data.get(#term, or: $value.term),
-    match: data.get(#match, or: $value.match),
-  );
+      term: data.get(#term, or: $value.term),
+      match: data.get(#match, or: $value.match));
 
   @override
   MatchPairDataCopyWith<$R2, MatchPairData, $Out2> $chain<$R2, $Out2>(
-    Then<$Out2, $R2> t,
-  ) => _MatchPairDataCopyWithImpl<$R2, $Out2>($value, $cast, t);
+          Then<$Out2, $R2> t) =>
+      _MatchPairDataCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }

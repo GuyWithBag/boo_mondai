@@ -14,6 +14,7 @@ class ListingStatesWrapper<T> extends StatelessWidget {
     required this.skeletonTile,
     required this.itemBuilder,
     required this.layoutBuilder,
+    this.leadingItem,
   });
 
   /// 1. Constructor for ListView.separated
@@ -28,6 +29,7 @@ class ListingStatesWrapper<T> extends StatelessWidget {
     required this.itemBuilder,
     EdgeInsetsGeometry? padding,
     double separatorHeight = 12.0,
+    this.leadingItem,
   }) : layoutBuilder = ((context, itemCount, builder) {
          return ListView.separated(
            padding: padding,
@@ -42,6 +44,7 @@ class ListingStatesWrapper<T> extends StatelessWidget {
     super.key,
     required this.isLoading,
     this.exception,
+    this.leadingItem,
     required this.items,
     required this.emptyState,
     required this.onRetry,
@@ -68,6 +71,7 @@ class ListingStatesWrapper<T> extends StatelessWidget {
     required this.onRetry,
     required this.skeletonTile,
     required this.itemBuilder,
+    this.leadingItem,
     double spacing = 8.0,
     double runSpacing = 8.0,
     WrapAlignment alignment = WrapAlignment.start,
@@ -76,10 +80,10 @@ class ListingStatesWrapper<T> extends StatelessWidget {
            spacing: spacing,
            runSpacing: runSpacing,
            alignment: alignment,
-           children: List.generate(
-             itemCount,
-             (index) => builder(context, index),
-           ),
+           children: [
+             leadingItem ?? SizedBox.shrink(),
+             ...List.generate(itemCount, (index) => builder(context, index)),
+           ],
          );
        });
 
@@ -96,6 +100,9 @@ class ListingStatesWrapper<T> extends StatelessWidget {
     Widget Function(BuildContext context, int index) layoutItemBuilder,
   )
   layoutBuilder;
+
+  /// An item to add at the start of the list
+  final Widget? leadingItem;
 
   @override
   Widget build(BuildContext context) {

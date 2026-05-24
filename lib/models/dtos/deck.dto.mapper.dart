@@ -15,6 +15,7 @@ class DeckMapper extends ClassMapperBase<Deck> {
       MapperContainer.globals.use(_instance = DeckMapper._());
       VisibilityStateMapper.ensureInitialized();
       TagMapper.ensureInitialized();
+      ProfileMapper.ensureInitialized();
       DeckListingMapper.ensureInitialized();
     }
     return _instance!;
@@ -77,6 +78,9 @@ class DeckMapper extends ClassMapperBase<Deck> {
   static List<Tag> _$tags(Deck v) => v.tags;
   static const Field<Deck, List<Tag>> _f$tags =
       Field('tags', _$tags, opt: true, def: const []);
+  static Profile? _$userProfile(Deck v) => v.userProfile;
+  static const Field<Deck, Profile> _f$userProfile =
+      Field('userProfile', _$userProfile, key: r'user_profile', opt: true);
   static DeckListing? _$listing(Deck v) => v.listing;
   static const Field<Deck, DeckListing> _f$listing =
       Field('listing', _$listing, opt: true);
@@ -100,6 +104,7 @@ class DeckMapper extends ClassMapperBase<Deck> {
     #createdAt: _f$createdAt,
     #updatedAt: _f$updatedAt,
     #tags: _f$tags,
+    #userProfile: _f$userProfile,
     #listing: _f$listing,
   };
 
@@ -122,6 +127,7 @@ class DeckMapper extends ClassMapperBase<Deck> {
         createdAt: data.dec(_f$createdAt),
         updatedAt: data.dec(_f$updatedAt),
         tags: data.dec(_f$tags),
+        userProfile: data.dec(_f$userProfile),
         listing: data.dec(_f$listing));
   }
 
@@ -172,6 +178,7 @@ extension DeckValueCopy<$R, $Out> on ObjectCopyWith<$R, Deck, $Out> {
 abstract class DeckCopyWith<$R, $In extends Deck, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags;
+  ProfileCopyWith<$R, Profile, Profile>? get userProfile;
   DeckListingCopyWith<$R, DeckListing, DeckListing>? get listing;
   $R call(
       {String? id,
@@ -191,6 +198,7 @@ abstract class DeckCopyWith<$R, $In extends Deck, $Out>
       DateTime? createdAt,
       DateTime? updatedAt,
       List<Tag>? tags,
+      Profile? userProfile,
       DeckListing? listing});
   DeckCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -204,6 +212,9 @@ class _DeckCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Deck, $Out>
   @override
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags => ListCopyWith(
       $value.tags, (v, t) => v.copyWith.$chain(t), (v) => call(tags: v));
+  @override
+  ProfileCopyWith<$R, Profile, Profile>? get userProfile =>
+      $value.userProfile?.copyWith.$chain((v) => call(userProfile: v));
   @override
   DeckListingCopyWith<$R, DeckListing, DeckListing>? get listing =>
       $value.listing?.copyWith.$chain((v) => call(listing: v));
@@ -226,6 +237,7 @@ class _DeckCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Deck, $Out>
           DateTime? createdAt,
           DateTime? updatedAt,
           List<Tag>? tags,
+          Object? userProfile = $none,
           Object? listing = $none}) =>
       $apply(FieldCopyWithData({
         if (id != null) #id: id,
@@ -245,6 +257,7 @@ class _DeckCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Deck, $Out>
         if (createdAt != null) #createdAt: createdAt,
         if (updatedAt != null) #updatedAt: updatedAt,
         if (tags != null) #tags: tags,
+        if (userProfile != $none) #userProfile: userProfile,
         if (listing != $none) #listing: listing
       }));
   @override
@@ -267,6 +280,7 @@ class _DeckCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Deck, $Out>
       createdAt: data.get(#createdAt, or: $value.createdAt),
       updatedAt: data.get(#updatedAt, or: $value.updatedAt),
       tags: data.get(#tags, or: $value.tags),
+      userProfile: data.get(#userProfile, or: $value.userProfile),
       listing: data.get(#listing, or: $value.listing));
 
   @override

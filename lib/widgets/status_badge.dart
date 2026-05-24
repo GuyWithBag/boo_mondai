@@ -17,10 +17,15 @@ class StatusBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
+    final style = statusBadgeStyle.resolve(tokens, [tone]);
 
-    return Surface(
-      style: statusBadgeStyle.resolve(tokens, [tone]),
-      child: Text(label.toUpperCase()),
+    return ChipTheme(
+      data: style,
+      child: Chip(
+        label: Text(label.toUpperCase()),
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        visualDensity: VisualDensity.compact,
+      ),
     );
   }
 }

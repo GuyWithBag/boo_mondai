@@ -4,6 +4,7 @@
 export 'card_templates.remote.db.dart';
 export 'card_template_tags.remote.db.dart';
 export 'decks.remote.db.dart';
+export 'deck_interactions.remote.db.dart';
 export 'deck_listings.remote.db.dart';
 export 'deck_tags.remote.db.dart';
 export 'drill_sessions.remote.db.dart';

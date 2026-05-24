@@ -20,7 +20,7 @@ class FlashcardBackSide extends StatelessWidget {
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
 
-    return StudyCardFrame(
+    return PhysicalCardSide(
       maxWidth: 460,
       tone: SurfaceTone.primaryOutline,
       child: Center(

@@ -27,6 +27,7 @@ class ResponsiveScaffold extends HookWidget {
     '/decks-local',
     '/reviews',
     '/account',
+    '/variants',
   ];
 
   @override
@@ -104,6 +105,11 @@ class ResponsiveScaffold extends HookWidget {
         selectedIcon: Icon(Icons.person),
         label: 'Account',
       ),
+      NavigationDestination(
+        icon: Icon(Icons.palette_outlined),
+        selectedIcon: Icon(Icons.palette),
+        label: 'Variants',
+      ),
     ];
   }
 
@@ -133,6 +139,11 @@ class ResponsiveScaffold extends HookWidget {
         icon: Icon(Icons.person_outlined),
         selectedIcon: Icon(Icons.person),
         label: Text('Account'),
+      ),
+      NavigationRailDestination(
+        icon: Icon(Icons.palette_outlined),
+        selectedIcon: Icon(Icons.palette),
+        label: Text('Variants'),
       ),
     ];
   }

@@ -36,6 +36,9 @@ class Deck with DeckMappable implements DTO {
 
   final List<Tag> tags;
 
+  // ── Joined Data (Populated by remote deck fetches) ──
+  final Profile? userProfile;
+
   // ── The Storefront Data (Populated when fetching from online browser) ──
   final DeckListing? listing;
 
@@ -57,6 +60,7 @@ class Deck with DeckMappable implements DTO {
     required this.createdAt,
     required this.updatedAt,
     this.tags = const [],
+    this.userProfile,
     this.listing,
   });
 
@@ -93,6 +97,7 @@ class Deck with DeckMappable implements DTO {
       createdAt: now,
       updatedAt: now,
       tags: tags ?? const [],
+      userProfile: null,
       listing: null,
     );
   }

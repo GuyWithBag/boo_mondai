@@ -4,6 +4,7 @@ class RemoteDB {
   // ── Remote Data Sources ──────────────────────────
   static late final ProfilesRemoteDB profile;
   static late final DecksRemoteDB deck;
+  static late final DeckInteractionsRemoteDB deckInteractions;
   static late final CardTemplatesRemoteDB card;
   static late final DrillSessionsRemoteDB drill;
   static late final FsrsCardsRemoteDB fsrsSync;
@@ -15,6 +16,7 @@ class RemoteDB {
   static Future<void> init() async {
     profile = ProfilesRemoteDB();
     deck = DecksRemoteDB();
+    deckInteractions = DeckInteractionsRemoteDB();
     card = CardTemplatesRemoteDB();
     drill = DrillSessionsRemoteDB();
     fsrsSync = FsrsCardsRemoteDB();

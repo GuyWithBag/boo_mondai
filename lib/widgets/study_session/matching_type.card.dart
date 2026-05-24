@@ -56,7 +56,7 @@ class MatchingTypeCard extends HookWidget {
       selectedMatch.value = null;
     }
 
-    return StudyCardFrame(
+    return PhysicalCardSide(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

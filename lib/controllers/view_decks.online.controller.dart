@@ -6,6 +6,7 @@
 import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/database/database.barrel.dart';
 import 'package:boo_mondai/models/models.barrel.dart';
+import 'package:boo_mondai/services/services.barrel.dart';
 
 class ViewDecksOnlineController extends Controller {
   final DecksRemoteDB _deckRemoteDB = DecksRemoteDB();
@@ -16,18 +17,9 @@ class ViewDecksOnlineController extends Controller {
   Future<void> loadPublicDecks() async {
     setLoading(true);
     try {
-      decks = await _deckRemoteDB.selectManyPublic();
-
-      // Extract unique tags from all fetched decks for the filter bar
-      final tagMap = <String, Tag>{};
-      for (final deck in decks) {
-        for (final tag in deck.tags) {
-          tagMap[tag.id] = tag;
-        }
-      }
-
-      availableTags = tagMap.values.toList()
-        ..sort((a, b) => a.name.compareTo(b.name));
+      final publicDecks = await _deckRemoteDB.selectManyPublic();
+      decks = ViewDecksService.sortDecks(publicDecks);
+      availableTags = ViewDecksService.availableTags(decks);
     } catch (e) {
       setError(e is Exception ? e : Exception(e.toString()));
     } finally {

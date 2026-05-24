@@ -20,19 +20,7 @@ class DeckDetailSheet extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final authorFuture = useMemoized(() async {
-      final profile = await RemoteDB.profile.selectOne(
-        filters: {'id': deck.userId},
-      );
-      if (profile == null) return null;
-      return CachedProfile(
-        id: profile.id,
-        username: profile.username,
-        avatarUrl: profile.avatarUrl,
-        createdAt: profile.createdAt,
-      );
-    }, [deck.userId]);
-    final authorSnapshot = useFuture(authorFuture);
+    final author = _cachedProfileFromAuthor(deck.author);
 
     Future<void> copyDeck() async {
       final auth = context.read<AuthController>();
@@ -98,7 +86,7 @@ class DeckDetailSheet extends HookWidget {
                 children: [
                   DeckDetails(
                     deck: deck,
-                    author: authorSnapshot.data,
+                    author: author,
                     sourceAuthor: null,
                   ),
                   _ListingStats(listing: deck.listing),
@@ -118,6 +106,17 @@ class DeckDetailSheet extends HookWidget {
       },
     );
   }
+
+  CachedProfile? _cachedProfileFromAuthor(Profile? author) {
+    if (author == null) return null;
+
+    return CachedProfile(
+      id: author.id,
+      username: author.username,
+      avatarUrl: author.avatarUrl,
+      createdAt: author.createdAt,
+    );
+  }
 }
 
 class _ListingStats extends StatelessWidget {
@@ -133,11 +132,52 @@ class _ListingStats extends StatelessWidget {
       spacing: AppSpacing.xs,
       runSpacing: AppSpacing.xs,
       children: [
-        // MetaChip('${listing!.upvotesCount} upvotes'),
-        // MetaChip('${listing!.downloadsCount} downloads'),
-        // MetaChip('${listing!.forksCount} forks'),
-        // MetaChip('${listing!.favoritesCount} favorites'),
+        _ListingStatChip(
+          icon: Icons.thumb_up_alt_outlined,
+          label: '${listing!.upvotesCount} upvotes',
+        ),
+        _ListingStatChip(
+          icon: Icons.thumb_down_alt_outlined,
+          label: '${listing!.downvotesCount} downvotes',
+        ),
+        _ListingStatChip(
+          icon: Icons.download_outlined,
+          label: '${listing!.downloadsCount} downloads',
+        ),
+        _ListingStatChip(
+          icon: Icons.favorite_border,
+          label: '${listing!.favoritesCount} favorites',
+        ),
+        _ListingStatChip(
+          icon: Icons.call_split_outlined,
+          label: '${listing!.forksCount} forks',
+        ),
+        _ListingStatChip(
+          icon: Icons.rate_review_outlined,
+          label: '${listing!.reviewsCount} reviews',
+        ),
+        _ListingStatChip(
+          icon: Icons.chat_bubble_outline,
+          label: '${listing!.commentsCount} comments',
+        ),
       ],
+    );
+  }
+}
+
+class _ListingStatChip extends StatelessWidget {
+  const _ListingStatChip({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Chip(
+      avatar: Icon(icon, size: 16),
+      label: Text(label),
+      visualDensity: VisualDensity.compact,
+      padding: EdgeInsets.zero,
     );
   }
 }

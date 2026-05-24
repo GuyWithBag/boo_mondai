@@ -11,3 +11,4 @@ export 'services.dart';
 export 'study_session.service.dart';
 export 'sync_service.dart';
 export 'uuid_service.dart';
+export 'view_decks.service.dart';

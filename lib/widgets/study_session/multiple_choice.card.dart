@@ -28,7 +28,7 @@ class MultipleChoiceCard extends HookWidget {
       return null;
     }, [template.id, interactionsController]);
 
-    return StudyCardFrame(
+    return PhysicalCardSide(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

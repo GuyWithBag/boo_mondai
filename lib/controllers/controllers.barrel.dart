@@ -5,6 +5,8 @@ export 'study_session_controllers/study_session_controllers.barrel.dart';
 // Other files
 export 'auth.controller.dart';
 export 'controller.dart';
+export 'cube.controller.dart';
+export 'deck_listing_interactions.controller.dart';
 export 'edit_deck.controller.dart';
 export 'home.controller.dart';
 export 'research.controller.dart';

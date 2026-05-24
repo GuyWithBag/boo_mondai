@@ -105,6 +105,10 @@ GoRouter createRouter(AuthController authController) {
             path: '/account',
             builder: (context, state) => const ViewAccountPage(),
           ),
+          GoRoute(
+            path: '/variants',
+            builder: (context, state) => const VariantShowcasePage(),
+          ),
         ],
       ),
 
@@ -198,5 +202,6 @@ int _shellIndex(String location) {
   if (location.startsWith('/decks-local')) return 2;
   if (location.startsWith('/review')) return 3;
   if (location.startsWith('/account')) return 4;
+  if (location.startsWith('/variants')) return 5;
   return 0; // home
 }

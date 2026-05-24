@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-enum AppTextFieldSize { labelLarge, bodyLarge }
+enum AppTextFieldSize { labelLarge, bodyLarge, normal }
 
 enum AppTextFieldFrame { none, outline, underline }
 
@@ -28,7 +28,7 @@ final appTextFieldStyle = VariantStyle.textFieldParts<AppTokens>(
     }),
   },
   defaultVariants: const [
-    AppTextFieldSize.labelLarge,
+    AppTextFieldSize.normal,
     AppTextFieldFrame.none,
     AppTextFieldTone.neutral,
     AppTextFieldState.idle,
@@ -46,6 +46,11 @@ final appTextFieldStyle = VariantStyle.textFieldParts<AppTokens>(
         TextStylePart.fontSize(tokens.textSizeBodyLarge.sp),
         TextStylePart.fontWeight(tokens.fontWeightTextStrong),
         TextStylePart.height(tokens.lineHeightFieldDisplay),
+      }),
+    },
+    AppTextFieldSize.normal: (tokens) => {
+      TextFieldStylePart.text({
+        TextStylePart.fontSize(tokens.textSizeLabel.sp),
       }),
     },
     AppTextFieldFrame.none: (_) => {

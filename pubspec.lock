@@ -456,6 +456,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.5.0"
+  fuzzywuzzy:
+    dependency: "direct main"
+    description:
+      name: fuzzywuzzy
+      sha256: "3004379ffd6e7f476a0c2091f38f16588dc45f67de7adf7c41aa85dec06b432c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.0"
   glob:
     dependency: transitive
     description:
@@ -1106,10 +1114,10 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "0adcd0877a32414db3e9c120e19ca2cd19cc479c"
+      resolved-ref: a6449a17706280dd140c7b06c938917e767d8a12
       url: "https://github.com/GuyWithBag/theme_variants.git"
     source: git
-    version: "0.1.2"
+    version: "0.2.0"
   timezone:
     dependency: transitive
     description:
@@ -1215,7 +1223,7 @@ packages:
     source: hosted
     version: "4.5.3"
   vector_math:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: vector_math
       sha256: d530bd74fea330e6e364cda7a85019c434070188383e1cd8d9777ee586914c5b

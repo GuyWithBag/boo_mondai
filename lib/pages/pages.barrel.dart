@@ -20,3 +20,4 @@ export 'preview_drill.local.page.dart';
 export 'register.online.page.dart';
 export 'researcher_dashboard.online.page.dart';
 export 'study_session.local.page.dart';
+export 'variant_showcase.page.dart';

@@ -24,35 +24,20 @@ class FillInTheBlankSegmentMapper
   static String _$id(FillInTheBlankSegment v) => v.id;
   static const Field<FillInTheBlankSegment, String> _f$id = Field('id', _$id);
   static String _$cardId(FillInTheBlankSegment v) => v.cardId;
-  static const Field<FillInTheBlankSegment, String> _f$cardId = Field(
-    'cardId',
-    _$cardId,
-    key: r'card_id',
-  );
+  static const Field<FillInTheBlankSegment, String> _f$cardId =
+      Field('cardId', _$cardId, key: r'card_id');
   static String _$fullText(FillInTheBlankSegment v) => v.fullText;
-  static const Field<FillInTheBlankSegment, String> _f$fullText = Field(
-    'fullText',
-    _$fullText,
-    key: r'full_text',
-  );
+  static const Field<FillInTheBlankSegment, String> _f$fullText =
+      Field('fullText', _$fullText, key: r'full_text');
   static int _$blankStart(FillInTheBlankSegment v) => v.blankStart;
-  static const Field<FillInTheBlankSegment, int> _f$blankStart = Field(
-    'blankStart',
-    _$blankStart,
-    key: r'blank_start',
-  );
+  static const Field<FillInTheBlankSegment, int> _f$blankStart =
+      Field('blankStart', _$blankStart, key: r'blank_start');
   static int _$blankEnd(FillInTheBlankSegment v) => v.blankEnd;
-  static const Field<FillInTheBlankSegment, int> _f$blankEnd = Field(
-    'blankEnd',
-    _$blankEnd,
-    key: r'blank_end',
-  );
+  static const Field<FillInTheBlankSegment, int> _f$blankEnd =
+      Field('blankEnd', _$blankEnd, key: r'blank_end');
   static String _$correctAnswer(FillInTheBlankSegment v) => v.correctAnswer;
-  static const Field<FillInTheBlankSegment, String> _f$correctAnswer = Field(
-    'correctAnswer',
-    _$correctAnswer,
-    key: r'correct_answer',
-  );
+  static const Field<FillInTheBlankSegment, String> _f$correctAnswer =
+      Field('correctAnswer', _$correctAnswer, key: r'correct_answer');
 
   @override
   final MappableFields<FillInTheBlankSegment> fields = const {
@@ -66,13 +51,12 @@ class FillInTheBlankSegmentMapper
 
   static FillInTheBlankSegment _instantiate(DecodingData data) {
     return FillInTheBlankSegment(
-      id: data.dec(_f$id),
-      cardId: data.dec(_f$cardId),
-      fullText: data.dec(_f$fullText),
-      blankStart: data.dec(_f$blankStart),
-      blankEnd: data.dec(_f$blankEnd),
-      correctAnswer: data.dec(_f$correctAnswer),
-    );
+        id: data.dec(_f$id),
+        cardId: data.dec(_f$cardId),
+        fullText: data.dec(_f$fullText),
+        blankStart: data.dec(_f$blankStart),
+        blankEnd: data.dec(_f$blankEnd),
+        correctAnswer: data.dec(_f$correctAnswer));
   }
 
   @override
@@ -98,64 +82,49 @@ mixin FillInTheBlankSegmentMappable {
         .encodeMap<FillInTheBlankSegment>(this as FillInTheBlankSegment);
   }
 
-  FillInTheBlankSegmentCopyWith<
-    FillInTheBlankSegment,
-    FillInTheBlankSegment,
-    FillInTheBlankSegment
-  >
-  get copyWith =>
-      _FillInTheBlankSegmentCopyWithImpl<
-        FillInTheBlankSegment,
-        FillInTheBlankSegment
-      >(this as FillInTheBlankSegment, $identity, $identity);
+  FillInTheBlankSegmentCopyWith<FillInTheBlankSegment, FillInTheBlankSegment,
+      FillInTheBlankSegment> get copyWith => _FillInTheBlankSegmentCopyWithImpl<
+          FillInTheBlankSegment, FillInTheBlankSegment>(
+      this as FillInTheBlankSegment, $identity, $identity);
   @override
   String toString() {
-    return FillInTheBlankSegmentMapper.ensureInitialized().stringifyValue(
-      this as FillInTheBlankSegment,
-    );
+    return FillInTheBlankSegmentMapper.ensureInitialized()
+        .stringifyValue(this as FillInTheBlankSegment);
   }
 
   @override
   bool operator ==(Object other) {
-    return FillInTheBlankSegmentMapper.ensureInitialized().equalsValue(
-      this as FillInTheBlankSegment,
-      other,
-    );
+    return FillInTheBlankSegmentMapper.ensureInitialized()
+        .equalsValue(this as FillInTheBlankSegment, other);
   }
 
   @override
   int get hashCode {
-    return FillInTheBlankSegmentMapper.ensureInitialized().hashValue(
-      this as FillInTheBlankSegment,
-    );
+    return FillInTheBlankSegmentMapper.ensureInitialized()
+        .hashValue(this as FillInTheBlankSegment);
   }
 }
 
 extension FillInTheBlankSegmentValueCopy<$R, $Out>
     on ObjectCopyWith<$R, FillInTheBlankSegment, $Out> {
   FillInTheBlankSegmentCopyWith<$R, FillInTheBlankSegment, $Out>
-  get $asFillInTheBlankSegment => $base.as(
-    (v, t, t2) => _FillInTheBlankSegmentCopyWithImpl<$R, $Out>(v, t, t2),
-  );
+      get $asFillInTheBlankSegment => $base.as(
+          (v, t, t2) => _FillInTheBlankSegmentCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
 abstract class FillInTheBlankSegmentCopyWith<
-  $R,
-  $In extends FillInTheBlankSegment,
-  $Out
->
-    implements ClassCopyWith<$R, $In, $Out> {
-  $R call({
-    String? id,
-    String? cardId,
-    String? fullText,
-    int? blankStart,
-    int? blankEnd,
-    String? correctAnswer,
-  });
+    $R,
+    $In extends FillInTheBlankSegment,
+    $Out> implements ClassCopyWith<$R, $In, $Out> {
+  $R call(
+      {String? id,
+      String? cardId,
+      String? fullText,
+      int? blankStart,
+      int? blankEnd,
+      String? correctAnswer});
   FillInTheBlankSegmentCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-    Then<$Out2, $R2> t,
-  );
+      Then<$Out2, $R2> t);
 }
 
 class _FillInTheBlankSegmentCopyWithImpl<$R, $Out>
@@ -167,35 +136,32 @@ class _FillInTheBlankSegmentCopyWithImpl<$R, $Out>
   late final ClassMapperBase<FillInTheBlankSegment> $mapper =
       FillInTheBlankSegmentMapper.ensureInitialized();
   @override
-  $R call({
-    String? id,
-    String? cardId,
-    String? fullText,
-    int? blankStart,
-    int? blankEnd,
-    String? correctAnswer,
-  }) => $apply(
-    FieldCopyWithData({
-      if (id != null) #id: id,
-      if (cardId != null) #cardId: cardId,
-      if (fullText != null) #fullText: fullText,
-      if (blankStart != null) #blankStart: blankStart,
-      if (blankEnd != null) #blankEnd: blankEnd,
-      if (correctAnswer != null) #correctAnswer: correctAnswer,
-    }),
-  );
+  $R call(
+          {String? id,
+          String? cardId,
+          String? fullText,
+          int? blankStart,
+          int? blankEnd,
+          String? correctAnswer}) =>
+      $apply(FieldCopyWithData({
+        if (id != null) #id: id,
+        if (cardId != null) #cardId: cardId,
+        if (fullText != null) #fullText: fullText,
+        if (blankStart != null) #blankStart: blankStart,
+        if (blankEnd != null) #blankEnd: blankEnd,
+        if (correctAnswer != null) #correctAnswer: correctAnswer
+      }));
   @override
   FillInTheBlankSegment $make(CopyWithData data) => FillInTheBlankSegment(
-    id: data.get(#id, or: $value.id),
-    cardId: data.get(#cardId, or: $value.cardId),
-    fullText: data.get(#fullText, or: $value.fullText),
-    blankStart: data.get(#blankStart, or: $value.blankStart),
-    blankEnd: data.get(#blankEnd, or: $value.blankEnd),
-    correctAnswer: data.get(#correctAnswer, or: $value.correctAnswer),
-  );
+      id: data.get(#id, or: $value.id),
+      cardId: data.get(#cardId, or: $value.cardId),
+      fullText: data.get(#fullText, or: $value.fullText),
+      blankStart: data.get(#blankStart, or: $value.blankStart),
+      blankEnd: data.get(#blankEnd, or: $value.blankEnd),
+      correctAnswer: data.get(#correctAnswer, or: $value.correctAnswer));
 
   @override
   FillInTheBlankSegmentCopyWith<$R2, FillInTheBlankSegment, $Out2>
-  $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-      _FillInTheBlankSegmentCopyWithImpl<$R2, $Out2>($value, $cast, t);
+      $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+          _FillInTheBlankSegmentCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }

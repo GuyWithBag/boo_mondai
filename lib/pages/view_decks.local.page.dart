@@ -7,14 +7,12 @@
 
 import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/models/models.barrel.dart';
-import 'package:boo_mondai/shared/shared.barrel.dart';
+import 'package:boo_mondai/pages/create_deck.local.page.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
-import 'package:go_router/go_router.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ViewDecksLocalPage extends HookWidget {
   const ViewDecksLocalPage({super.key});
@@ -24,8 +22,6 @@ class ViewDecksLocalPage extends HookWidget {
     final controller = context.watch<ViewDecksLocalController>();
     final auth = context.watch<AuthController>();
     // final scrollController = useScrollController();
-    final searchController = useTextEditingController();
-    final searchQuery = useState('');
 
     useEffect(() {
       // Defer past the current build frame to avoid
@@ -54,18 +50,6 @@ class ViewDecksLocalPage extends HookWidget {
       return null;
     }, [controller.syncError]);
 
-    useEffect(() {
-      void listener() => searchQuery.value = searchController.text;
-      searchController.addListener(listener);
-      return () => searchController.removeListener(listener);
-    }, [searchController]);
-
-    final filteredDecks = controller.decks.where((deck) {
-      final q = searchQuery.value.trim().toLowerCase();
-      if (q.isEmpty) return true;
-      return deck.title.toLowerCase().contains(q);
-    }).toList();
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Decks'),
@@ -77,24 +61,16 @@ class ViewDecksLocalPage extends HookWidget {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push('/decks-local/create'),
-        tooltip: 'New Deck',
-        child: const Icon(Icons.add),
-      ),
-      body: Column(
-        children: [
-          SearchBar(controller: searchController),
-          Expanded(
-            child: _DeckListBody(
-              isLoading: controller.isLoading,
-              error: controller.error,
-              decks: filteredDecks,
-              onRetry: controller.load,
-              onDeleteDeck: controller.deleteDeck,
-            ),
-          ),
-        ],
+      body: Padding(
+        padding: const EdgeInsets.all(100.0),
+        child: _DeckListBody(
+          error: controller.error,
+          isLoading: controller.isLoading,
+          onRetry: () {},
+          onDeleteDeck: (id) {},
+          onPressed: controller.goToDeck,
+          decks: controller.decks,
+        ),
       ),
     );
   }
@@ -109,70 +85,47 @@ class _DeckListBody extends StatelessWidget {
     required this.decks,
     required this.onRetry,
     required this.onDeleteDeck,
+    required this.onPressed,
   });
 
   final bool isLoading;
   final Exception? error;
   final List<Deck> decks;
   final VoidCallback onRetry;
+  final Function(BuildContext context, Deck deck) onPressed;
   final void Function(String id) onDeleteDeck;
 
   @override
   Widget build(BuildContext context) {
-    return ListingStatesWrapper<Deck>.list(
+    return ListingStatesWrapper<Deck>.wrap(
       isLoading: isLoading,
       items: decks,
       onRetry: onRetry,
-      skeletonTile: DeckCardTile(deck: null),
+      skeletonTile: DeckTile(deck: null),
       emptyState: EmptyState(
         icon: Icons.layers,
         title: 'No decks yet',
         message: 'Create your first deck to get started',
         action: ElevatedButton(
           child: Text('Create Deck'),
-          onPressed: () => context.push('/decks-local/create'),
+          onPressed: () => showCreateDeckLocalSheet(context),
         ),
       ),
-      padding: EdgeInsets.symmetric(
-        horizontal: AppSpacing.md.w,
-        vertical: AppSpacing.sm.h,
+      spacing: 100,
+      leadingItem: CreateDeckTile(
+        onPressed: () => showCreateDeckLocalSheet(context),
       ),
       itemBuilder: (_, _, deck) {
-        return Dismissible(
-          key: ValueKey(deck.id),
-          direction: DismissDirection.horizontal,
-          // background: _DismissBackground(alignment: Alignment.centerLeft),
-          // secondaryBackground: _DismissBackground(
-          //   alignment: Alignment.centerRight,
-          // ),
-          onDismissed: (_) => onDeleteDeck(deck.id),
-          child: DeckCardTile(deck: deck),
+        return DeckTile(
+          deck: deck,
+          onPressed: () {
+            onPressed(context, deck);
+          },
         );
       },
     );
   }
 }
-
-// // ── _DismissBackground ────────────────────────────────────────────────────────
-
-// class _DismissBackground extends StatelessWidget {
-//   const _DismissBackground({required this.alignment});
-
-//   final Alignment alignment;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       decoration: BoxDecoration(
-//         color: AppColors.incorrect,
-//         borderRadius: BorderRadius.circular(16.r),
-//       ),
-//       alignment: alignment,
-//       padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg.w),
-//       child: const Icon(Icons.delete_outline, color: Colors.white),
-//     );
-//   }
-// }
 
 // ── _SyncButton ─────────────────────────────────────────────────────────
 

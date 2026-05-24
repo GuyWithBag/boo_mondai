@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 import 'package:boo_mondai/shared/shared.barrel.dart';
@@ -15,9 +14,11 @@ class PanelHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
 
-    return Container(
-      padding: EdgeInsets.all(20.w),
-      color: tokens.softGray,
+    return Surface(
+      style: surfaceStyle.resolve(tokens, const [
+        SurfaceTone.header,
+        SurfaceShape.sharp,
+      ]),
       child: Row(
         children: [
           Expanded(

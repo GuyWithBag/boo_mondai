@@ -6,6 +6,7 @@ export 'theme/theme.barrel.dart';
 export 'app_spacing.dart';
 export 'app_typography.dart';
 export 'breakpoints.dart';
+export 'browse_sort.dart';
 export 'env.dart';
 export 'main_theme.dart';
 export 'theme_constants.dart';

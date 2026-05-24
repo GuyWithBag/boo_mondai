@@ -51,9 +51,17 @@ class DeckDetails extends StatelessWidget {
           spacing: AppSpacing.xs,
           runSpacing: AppSpacing.xs,
           children: [
-            // MetaChip('${deck.cardCount} cards'),
-            // if (deck.isPremade) const MetaChip('Premade'),
-            // for (final tag in deck.tags) MetaChip('#${tag.name}'),
+            _MetadataChip(
+              icon: Icons.style_outlined,
+              label: '${deck.cardCount} cards',
+            ),
+            if (deck.isPremade)
+              const _MetadataChip(
+                icon: Icons.verified_outlined,
+                label: 'Premade',
+              ),
+            for (final tag in deck.tags)
+              _MetadataChip(icon: Icons.tag, label: tag.name),
           ],
         ),
         const SizedBox(height: AppSpacing.lg),
@@ -73,6 +81,26 @@ class DeckDetails extends StatelessWidget {
           const SizedBox(height: AppSpacing.lg),
         ],
       ],
+    );
+  }
+}
+
+class _MetadataChip extends StatelessWidget {
+  const _MetadataChip({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Chip(
+      avatar: Icon(icon, size: 16),
+      label: Text(label),
+      labelStyle: theme.textTheme.labelSmall,
+      visualDensity: VisualDensity.compact,
+      padding: EdgeInsets.zero,
     );
   }
 }

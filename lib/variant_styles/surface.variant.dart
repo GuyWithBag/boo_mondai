@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-enum SurfaceTone { surface, muted, dark, primaryOutline }
+enum SurfaceTone { surface, muted, dark, primaryOutline, header }
+
+enum SurfaceShape { rounded, cardShape, sharp }
+
+enum SurfacePadding { normal, text, none }
 
 final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
   base: (tokens) => {
@@ -29,8 +34,27 @@ final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
   },
   defaultVariants: const [SurfaceTone.surface],
   variants: {
+    SurfaceShape.rounded: (_) => const {},
+    SurfaceShape.cardShape: (tokens) => {
+      SurfaceStylePart.decoration({
+        DecorationPart.borderRadius(
+          BorderRadiusGeometry.circular(tokens.radius2xl),
+        ),
+      }),
+    },
+    SurfaceShape.sharp: (_) => {
+      SurfaceStylePart.decoration({
+        DecorationPart.borderRadius(BorderRadius.zero),
+      }),
+    },
+    SurfacePadding.normal: (_) => const {},
+    SurfacePadding.none: (_) => {SurfaceStylePart.padding(EdgeInsets.all(0))},
+    SurfacePadding.text: (_) => {
+      SurfaceStylePart.padding(
+        EdgeInsets.symmetric(horizontal: 20.sp, vertical: 10.sp),
+      ),
+    },
     SurfaceTone.surface: (_) => const {},
-
     SurfaceTone.primaryOutline: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.backgroundSurface),
@@ -46,7 +70,24 @@ final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
         ]),
       }),
     },
-
+    SurfaceTone.header: (tokens) => {
+      SurfaceStylePart.decoration({
+        DecorationPart.color(tokens.softGray),
+        DecorationPart.border(
+          // Border.all(
+          //   color: tokens.borderNeutralSubtle,
+          //   width: tokens.borderWidthDefault,
+          // ),
+          BoxBorder.fromLTRB(
+            bottom: BorderSide(
+              color: tokens.borderNeutralSubtle,
+              width: tokens.borderWidthDefault,
+            ),
+          ),
+        ),
+        DecorationPart.boxShadow([BoxShadow(color: tokens.colorTransparent)]),
+      }),
+    },
     SurfaceTone.muted: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.softGray),

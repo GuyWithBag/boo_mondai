@@ -2,15 +2,12 @@
 // PATH: lib/models/dtos/deck_listing.dto.dart
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/models/models.barrel.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 
 part 'deck_listing.dto.mapper.dart';
 
 @MappableClass()
-class DeckListing with DeckListingMappable implements DTO {
-  // We do not need a primary key 'id' field here because
-  // the ID is always identical to the parent Deck's ID.
+class DeckListing with DeckListingMappable {
   final String deckId;
   final int upvotesCount;
   final int downvotesCount;
@@ -25,11 +22,7 @@ class DeckListing with DeckListingMappable implements DTO {
   final List<Map<String, dynamic>> featuredCards;
   final List<String> featuredImages;
 
-  @override
-  final String id;
-  @override
   final DateTime updatedAt;
-  @override
   final DateTime createdAt;
 
   const DeckListing({
@@ -45,7 +38,6 @@ class DeckListing with DeckListingMappable implements DTO {
     this.featuredImages = const [],
     required this.updatedAt,
     required this.createdAt,
-    required this.id,
     required this.deckId,
   });
 }

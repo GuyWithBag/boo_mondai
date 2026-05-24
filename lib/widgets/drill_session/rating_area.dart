@@ -121,6 +121,7 @@ class RatingArea extends HookWidget {
                           ? onSubmit
                           : null,
                       leading: const Icon(Icons.check),
+                      tone: TactileTone.filled,
                       child: const Text('Submit'),
                     ),
             ),
@@ -148,6 +149,7 @@ class RatingArea extends HookWidget {
               child: TactileButton(
                 onPressed: onContinue,
                 leading: const Icon(Icons.arrow_forward),
+                tone: TactileTone.filled,
                 child: const Text('Continue'),
               ),
             ),

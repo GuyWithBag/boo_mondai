@@ -6,6 +6,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart';
+import 'package:flutter/material.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 
 /// Drives the My Decks page — loads all decks sorted by [updatedAt] descending
@@ -41,16 +42,17 @@ class ViewDecksLocalController extends Controller {
     notifyListeners();
 
     try {
-      // ToDo: Unchecked change.
-      final all = _deckDB.selectMany();
-      all.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
-      _decks = all;
+      _decks = _deckDB.filterDecks();
     } on Exception catch (e) {
       setError(e);
     } finally {
       setLoading(false);
       notifyListeners();
     }
+  }
+
+  void goToDeck(BuildContext context, Deck deck) {
+    showViewDeckLocalSheet(context, deck.id);
   }
 
   /// Deletes the deck with the given [id] from the repository, then reloads.

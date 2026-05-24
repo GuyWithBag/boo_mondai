@@ -92,19 +92,30 @@ class TactileButton extends HookWidget {
         vertical: 18,
       ),
       TactileSize.icon => EdgeInsets.zero,
+      TactileSize.fab => EdgeInsets.zero,
+      TactileSize.extendedFab => const EdgeInsets.symmetric(horizontal: 24),
     };
 
-    final minSize = size == TactileSize.icon
-        ? const Size.square(48)
-        : Size.zero;
+    final minSize = switch (size) {
+      TactileSize.icon => const Size.square(48),
+      TactileSize.fab => const Size.square(64),
+      TactileSize.extendedFab => const Size(0, 64),
+      _ => Size.zero,
+    };
+
+    final pressedOffset = switch (depth) {
+      TactileDepth.mechanical => 8.0,
+      TactileDepth.elevated => 4.0,
+      TactileDepth.flat => 0.0,
+    };
 
     final contentStyle = resolvedStyle.copyWith(
       transform: Matrix4.translationValues(
         0,
-        depth == TactileDepth.elevated &&
+        depth != TactileDepth.flat &&
                 state.value == TactileState.pressed &&
                 !(state.value == TactileState.disabled)
-            ? 4
+            ? pressedOffset
             : 0,
         0,
       ),

@@ -23,31 +23,20 @@ class VocabularyTestResultMapper extends ClassMapperBase<VocabularyTestResult> {
   static String _$id(VocabularyTestResult v) => v.id;
   static const Field<VocabularyTestResult, String> _f$id = Field('id', _$id);
   static String _$userId(VocabularyTestResult v) => v.userId;
-  static const Field<VocabularyTestResult, String> _f$userId = Field(
-    'userId',
-    _$userId,
-    key: r'user_id',
-  );
+  static const Field<VocabularyTestResult, String> _f$userId =
+      Field('userId', _$userId, key: r'user_id');
   static String _$testSet(VocabularyTestResult v) => v.testSet;
-  static const Field<VocabularyTestResult, String> _f$testSet = Field(
-    'testSet',
-    _$testSet,
-    key: r'test_set',
-  );
+  static const Field<VocabularyTestResult, String> _f$testSet =
+      Field('testSet', _$testSet, key: r'test_set');
   static int _$score(VocabularyTestResult v) => v.score;
-  static const Field<VocabularyTestResult, int> _f$score = Field(
-    'score',
-    _$score,
-  );
+  static const Field<VocabularyTestResult, int> _f$score =
+      Field('score', _$score);
   static Map<String, dynamic> _$answers(VocabularyTestResult v) => v.answers;
   static const Field<VocabularyTestResult, Map<String, dynamic>> _f$answers =
       Field('answers', _$answers);
   static DateTime _$submittedAt(VocabularyTestResult v) => v.submittedAt;
-  static const Field<VocabularyTestResult, DateTime> _f$submittedAt = Field(
-    'submittedAt',
-    _$submittedAt,
-    key: r'submitted_at',
-  );
+  static const Field<VocabularyTestResult, DateTime> _f$submittedAt =
+      Field('submittedAt', _$submittedAt, key: r'submitted_at');
 
   @override
   final MappableFields<VocabularyTestResult> fields = const {
@@ -61,13 +50,12 @@ class VocabularyTestResultMapper extends ClassMapperBase<VocabularyTestResult> {
 
   static VocabularyTestResult _instantiate(DecodingData data) {
     return VocabularyTestResult(
-      id: data.dec(_f$id),
-      userId: data.dec(_f$userId),
-      testSet: data.dec(_f$testSet),
-      score: data.dec(_f$score),
-      answers: data.dec(_f$answers),
-      submittedAt: data.dec(_f$submittedAt),
-    );
+        id: data.dec(_f$id),
+        userId: data.dec(_f$userId),
+        testSet: data.dec(_f$testSet),
+        score: data.dec(_f$score),
+        answers: data.dec(_f$answers),
+        submittedAt: data.dec(_f$submittedAt));
   }
 
   @override
@@ -93,66 +81,51 @@ mixin VocabularyTestResultMappable {
         .encodeMap<VocabularyTestResult>(this as VocabularyTestResult);
   }
 
-  VocabularyTestResultCopyWith<
-    VocabularyTestResult,
-    VocabularyTestResult,
-    VocabularyTestResult
-  >
-  get copyWith =>
-      _VocabularyTestResultCopyWithImpl<
-        VocabularyTestResult,
-        VocabularyTestResult
-      >(this as VocabularyTestResult, $identity, $identity);
+  VocabularyTestResultCopyWith<VocabularyTestResult, VocabularyTestResult,
+      VocabularyTestResult> get copyWith => _VocabularyTestResultCopyWithImpl<
+          VocabularyTestResult, VocabularyTestResult>(
+      this as VocabularyTestResult, $identity, $identity);
   @override
   String toString() {
-    return VocabularyTestResultMapper.ensureInitialized().stringifyValue(
-      this as VocabularyTestResult,
-    );
+    return VocabularyTestResultMapper.ensureInitialized()
+        .stringifyValue(this as VocabularyTestResult);
   }
 
   @override
   bool operator ==(Object other) {
-    return VocabularyTestResultMapper.ensureInitialized().equalsValue(
-      this as VocabularyTestResult,
-      other,
-    );
+    return VocabularyTestResultMapper.ensureInitialized()
+        .equalsValue(this as VocabularyTestResult, other);
   }
 
   @override
   int get hashCode {
-    return VocabularyTestResultMapper.ensureInitialized().hashValue(
-      this as VocabularyTestResult,
-    );
+    return VocabularyTestResultMapper.ensureInitialized()
+        .hashValue(this as VocabularyTestResult);
   }
 }
 
 extension VocabularyTestResultValueCopy<$R, $Out>
     on ObjectCopyWith<$R, VocabularyTestResult, $Out> {
   VocabularyTestResultCopyWith<$R, VocabularyTestResult, $Out>
-  get $asVocabularyTestResult => $base.as(
-    (v, t, t2) => _VocabularyTestResultCopyWithImpl<$R, $Out>(v, t, t2),
-  );
+      get $asVocabularyTestResult => $base.as(
+          (v, t, t2) => _VocabularyTestResultCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
 abstract class VocabularyTestResultCopyWith<
-  $R,
-  $In extends VocabularyTestResult,
-  $Out
->
-    implements ClassCopyWith<$R, $In, $Out> {
+    $R,
+    $In extends VocabularyTestResult,
+    $Out> implements ClassCopyWith<$R, $In, $Out> {
   MapCopyWith<$R, String, dynamic, ObjectCopyWith<$R, dynamic, dynamic>>
-  get answers;
-  $R call({
-    String? id,
-    String? userId,
-    String? testSet,
-    int? score,
-    Map<String, dynamic>? answers,
-    DateTime? submittedAt,
-  });
+      get answers;
+  $R call(
+      {String? id,
+      String? userId,
+      String? testSet,
+      int? score,
+      Map<String, dynamic>? answers,
+      DateTime? submittedAt});
   VocabularyTestResultCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-    Then<$Out2, $R2> t,
-  );
+      Then<$Out2, $R2> t);
 }
 
 class _VocabularyTestResultCopyWithImpl<$R, $Out>
@@ -165,41 +138,35 @@ class _VocabularyTestResultCopyWithImpl<$R, $Out>
       VocabularyTestResultMapper.ensureInitialized();
   @override
   MapCopyWith<$R, String, dynamic, ObjectCopyWith<$R, dynamic, dynamic>>
-  get answers => MapCopyWith(
-    $value.answers,
-    (v, t) => ObjectCopyWith(v, $identity, t),
-    (v) => call(answers: v),
-  );
+      get answers => MapCopyWith($value.answers,
+          (v, t) => ObjectCopyWith(v, $identity, t), (v) => call(answers: v));
   @override
-  $R call({
-    String? id,
-    String? userId,
-    String? testSet,
-    int? score,
-    Map<String, dynamic>? answers,
-    DateTime? submittedAt,
-  }) => $apply(
-    FieldCopyWithData({
-      if (id != null) #id: id,
-      if (userId != null) #userId: userId,
-      if (testSet != null) #testSet: testSet,
-      if (score != null) #score: score,
-      if (answers != null) #answers: answers,
-      if (submittedAt != null) #submittedAt: submittedAt,
-    }),
-  );
+  $R call(
+          {String? id,
+          String? userId,
+          String? testSet,
+          int? score,
+          Map<String, dynamic>? answers,
+          DateTime? submittedAt}) =>
+      $apply(FieldCopyWithData({
+        if (id != null) #id: id,
+        if (userId != null) #userId: userId,
+        if (testSet != null) #testSet: testSet,
+        if (score != null) #score: score,
+        if (answers != null) #answers: answers,
+        if (submittedAt != null) #submittedAt: submittedAt
+      }));
   @override
   VocabularyTestResult $make(CopyWithData data) => VocabularyTestResult(
-    id: data.get(#id, or: $value.id),
-    userId: data.get(#userId, or: $value.userId),
-    testSet: data.get(#testSet, or: $value.testSet),
-    score: data.get(#score, or: $value.score),
-    answers: data.get(#answers, or: $value.answers),
-    submittedAt: data.get(#submittedAt, or: $value.submittedAt),
-  );
+      id: data.get(#id, or: $value.id),
+      userId: data.get(#userId, or: $value.userId),
+      testSet: data.get(#testSet, or: $value.testSet),
+      score: data.get(#score, or: $value.score),
+      answers: data.get(#answers, or: $value.answers),
+      submittedAt: data.get(#submittedAt, or: $value.submittedAt));
 
   @override
   VocabularyTestResultCopyWith<$R2, VocabularyTestResult, $Out2>
-  $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-      _VocabularyTestResultCopyWithImpl<$R2, $Out2>($value, $cast, t);
+      $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+          _VocabularyTestResultCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }

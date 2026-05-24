@@ -21,23 +21,14 @@ class UserReviewCardTagMapper extends ClassMapperBase<UserReviewCardTag> {
   final String id = 'UserReviewCardTag';
 
   static String _$userId(UserReviewCardTag v) => v.userId;
-  static const Field<UserReviewCardTag, String> _f$userId = Field(
-    'userId',
-    _$userId,
-    key: r'user_id',
-  );
+  static const Field<UserReviewCardTag, String> _f$userId =
+      Field('userId', _$userId, key: r'user_id');
   static String _$reviewCardId(UserReviewCardTag v) => v.reviewCardId;
-  static const Field<UserReviewCardTag, String> _f$reviewCardId = Field(
-    'reviewCardId',
-    _$reviewCardId,
-    key: r'review_card_id',
-  );
+  static const Field<UserReviewCardTag, String> _f$reviewCardId =
+      Field('reviewCardId', _$reviewCardId, key: r'review_card_id');
   static String _$tagId(UserReviewCardTag v) => v.tagId;
-  static const Field<UserReviewCardTag, String> _f$tagId = Field(
-    'tagId',
-    _$tagId,
-    key: r'tag_id',
-  );
+  static const Field<UserReviewCardTag, String> _f$tagId =
+      Field('tagId', _$tagId, key: r'tag_id');
 
   @override
   final MappableFields<UserReviewCardTag> fields = const {
@@ -48,10 +39,9 @@ class UserReviewCardTagMapper extends ClassMapperBase<UserReviewCardTag> {
 
   static UserReviewCardTag _instantiate(DecodingData data) {
     return UserReviewCardTag(
-      userId: data.dec(_f$userId),
-      reviewCardId: data.dec(_f$reviewCardId),
-      tagId: data.dec(_f$tagId),
-    );
+        userId: data.dec(_f$userId),
+        reviewCardId: data.dec(_f$reviewCardId),
+        tagId: data.dec(_f$tagId));
   }
 
   @override
@@ -77,58 +67,42 @@ mixin UserReviewCardTagMappable {
         .encodeMap<UserReviewCardTag>(this as UserReviewCardTag);
   }
 
-  UserReviewCardTagCopyWith<
-    UserReviewCardTag,
-    UserReviewCardTag,
-    UserReviewCardTag
-  >
-  get copyWith =>
-      _UserReviewCardTagCopyWithImpl<UserReviewCardTag, UserReviewCardTag>(
-        this as UserReviewCardTag,
-        $identity,
-        $identity,
-      );
+  UserReviewCardTagCopyWith<UserReviewCardTag, UserReviewCardTag,
+          UserReviewCardTag>
+      get copyWith =>
+          _UserReviewCardTagCopyWithImpl<UserReviewCardTag, UserReviewCardTag>(
+              this as UserReviewCardTag, $identity, $identity);
   @override
   String toString() {
-    return UserReviewCardTagMapper.ensureInitialized().stringifyValue(
-      this as UserReviewCardTag,
-    );
+    return UserReviewCardTagMapper.ensureInitialized()
+        .stringifyValue(this as UserReviewCardTag);
   }
 
   @override
   bool operator ==(Object other) {
-    return UserReviewCardTagMapper.ensureInitialized().equalsValue(
-      this as UserReviewCardTag,
-      other,
-    );
+    return UserReviewCardTagMapper.ensureInitialized()
+        .equalsValue(this as UserReviewCardTag, other);
   }
 
   @override
   int get hashCode {
-    return UserReviewCardTagMapper.ensureInitialized().hashValue(
-      this as UserReviewCardTag,
-    );
+    return UserReviewCardTagMapper.ensureInitialized()
+        .hashValue(this as UserReviewCardTag);
   }
 }
 
 extension UserReviewCardTagValueCopy<$R, $Out>
     on ObjectCopyWith<$R, UserReviewCardTag, $Out> {
   UserReviewCardTagCopyWith<$R, UserReviewCardTag, $Out>
-  get $asUserReviewCardTag => $base.as(
-    (v, t, t2) => _UserReviewCardTagCopyWithImpl<$R, $Out>(v, t, t2),
-  );
+      get $asUserReviewCardTag => $base
+          .as((v, t, t2) => _UserReviewCardTagCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
-abstract class UserReviewCardTagCopyWith<
-  $R,
-  $In extends UserReviewCardTag,
-  $Out
->
-    implements ClassCopyWith<$R, $In, $Out> {
+abstract class UserReviewCardTagCopyWith<$R, $In extends UserReviewCardTag,
+    $Out> implements ClassCopyWith<$R, $In, $Out> {
   $R call({String? userId, String? reviewCardId, String? tagId});
   UserReviewCardTagCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-    Then<$Out2, $R2> t,
-  );
+      Then<$Out2, $R2> t);
 }
 
 class _UserReviewCardTagCopyWithImpl<$R, $Out>
@@ -140,22 +114,20 @@ class _UserReviewCardTagCopyWithImpl<$R, $Out>
   late final ClassMapperBase<UserReviewCardTag> $mapper =
       UserReviewCardTagMapper.ensureInitialized();
   @override
-  $R call({String? userId, String? reviewCardId, String? tagId}) => $apply(
-    FieldCopyWithData({
-      if (userId != null) #userId: userId,
-      if (reviewCardId != null) #reviewCardId: reviewCardId,
-      if (tagId != null) #tagId: tagId,
-    }),
-  );
+  $R call({String? userId, String? reviewCardId, String? tagId}) =>
+      $apply(FieldCopyWithData({
+        if (userId != null) #userId: userId,
+        if (reviewCardId != null) #reviewCardId: reviewCardId,
+        if (tagId != null) #tagId: tagId
+      }));
   @override
   UserReviewCardTag $make(CopyWithData data) => UserReviewCardTag(
-    userId: data.get(#userId, or: $value.userId),
-    reviewCardId: data.get(#reviewCardId, or: $value.reviewCardId),
-    tagId: data.get(#tagId, or: $value.tagId),
-  );
+      userId: data.get(#userId, or: $value.userId),
+      reviewCardId: data.get(#reviewCardId, or: $value.reviewCardId),
+      tagId: data.get(#tagId, or: $value.tagId));
 
   @override
   UserReviewCardTagCopyWith<$R2, UserReviewCardTag, $Out2> $chain<$R2, $Out2>(
-    Then<$Out2, $R2> t,
-  ) => _UserReviewCardTagCopyWithImpl<$R2, $Out2>($value, $cast, t);
+          Then<$Out2, $R2> t) =>
+      _UserReviewCardTagCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }

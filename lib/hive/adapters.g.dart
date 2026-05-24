@@ -132,6 +132,7 @@ class DeckAdapter extends TypeAdapter<Deck> {
       createdAt: fields[21] as DateTime,
       updatedAt: fields[20] as DateTime,
       tags: fields[6] == null ? const [] : (fields[6] as List).cast<Tag>(),
+      userProfile: fields[32] as Profile?,
       listing: fields[30] as DeckListing?,
     );
   }
@@ -139,7 +140,7 @@ class DeckAdapter extends TypeAdapter<Deck> {
   @override
   void write(BinaryWriter writer, Deck obj) {
     writer
-      ..writeByte(18)
+      ..writeByte(19)
       ..writeByte(2)
       ..write(obj.title)
       ..writeByte(3)
@@ -175,7 +176,9 @@ class DeckAdapter extends TypeAdapter<Deck> {
       ..writeByte(28)
       ..write(obj.coverImageUrl)
       ..writeByte(30)
-      ..write(obj.listing);
+      ..write(obj.listing)
+      ..writeByte(32)
+      ..write(obj.userProfile);
   }
 
   @override
@@ -1575,7 +1578,6 @@ class DeckListingAdapter extends TypeAdapter<DeckListing> {
           : (fields[9] as List).cast<String>(),
       updatedAt: fields[11] as DateTime,
       createdAt: fields[12] as DateTime,
-      id: fields[10] as String,
       deckId: fields[0] as String,
     );
   }
@@ -1583,7 +1585,7 @@ class DeckListingAdapter extends TypeAdapter<DeckListing> {
   @override
   void write(BinaryWriter writer, DeckListing obj) {
     writer
-      ..writeByte(14)
+      ..writeByte(13)
       ..writeByte(0)
       ..write(obj.deckId)
       ..writeByte(1)
@@ -1604,8 +1606,6 @@ class DeckListingAdapter extends TypeAdapter<DeckListing> {
       ..write(obj.featuredCards)
       ..writeByte(9)
       ..write(obj.featuredImages)
-      ..writeByte(10)
-      ..write(obj.id)
       ..writeByte(11)
       ..write(obj.updatedAt)
       ..writeByte(12)

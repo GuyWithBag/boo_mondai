@@ -37,7 +37,7 @@ types:
         index: 3
   Deck:
     typeId: 2
-    nextIndex: 31
+    nextIndex: 33
     fields:
       title:
         index: 2
@@ -75,6 +75,8 @@ types:
         index: 28
       listing:
         index: 30
+      userProfile:
+        index: 32
   MultipleChoiceOption:
     typeId: 3
     nextIndex: 6
@@ -559,8 +561,6 @@ types:
         index: 8
       featuredImages:
         index: 9
-      id:
-        index: 10
       updatedAt:
         index: 11
       createdAt:
