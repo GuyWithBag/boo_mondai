@@ -5,6 +5,7 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/models/models.barrel.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 
 part 'vocabulary_test_result.dto.mapper.dart';
@@ -17,6 +18,8 @@ class VocabularyTestResult with VocabularyTestResultMappable {
   final int score; // out of 30
   final Map<String, dynamic> answers; // {question_id: selected_option}
   final DateTime submittedAt;
+  final CachedProfile? userProfile;
+  final ResearchProfile? researchProfile;
 
   const VocabularyTestResult({
     required this.id,
@@ -25,6 +28,8 @@ class VocabularyTestResult with VocabularyTestResultMappable {
     required this.score,
     required this.answers,
     required this.submittedAt,
+    this.userProfile,
+    this.researchProfile,
   });
 
   double get scorePercent => score / 30;

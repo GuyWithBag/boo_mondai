@@ -13,6 +13,7 @@ class FsrsCardMapper extends ClassMapperBase<FsrsCard> {
   static FsrsCardMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = FsrsCardMapper._());
+      ReviewCardMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -36,6 +37,9 @@ class FsrsCardMapper extends ClassMapperBase<FsrsCard> {
       Field('reviewCardId', _$reviewCardId, key: r'review_card_id');
   static Card _$state(FsrsCard v) => v.state;
   static const Field<FsrsCard, Card> _f$state = Field('state', _$state);
+  static ReviewCard? _$reviewCard(FsrsCard v) => v.reviewCard;
+  static const Field<FsrsCard, ReviewCard> _f$reviewCard =
+      Field('reviewCard', _$reviewCard, key: r'review_card', opt: true);
 
   @override
   final MappableFields<FsrsCard> fields = const {
@@ -45,6 +49,7 @@ class FsrsCardMapper extends ClassMapperBase<FsrsCard> {
     #userId: _f$userId,
     #reviewCardId: _f$reviewCardId,
     #state: _f$state,
+    #reviewCard: _f$reviewCard,
   };
 
   static FsrsCard _instantiate(DecodingData data) {
@@ -54,7 +59,8 @@ class FsrsCardMapper extends ClassMapperBase<FsrsCard> {
         updatedAt: data.dec(_f$updatedAt),
         userId: data.dec(_f$userId),
         reviewCardId: data.dec(_f$reviewCardId),
-        state: data.dec(_f$state));
+        state: data.dec(_f$state),
+        reviewCard: data.dec(_f$reviewCard));
   }
 
   @override
@@ -107,13 +113,15 @@ extension FsrsCardValueCopy<$R, $Out> on ObjectCopyWith<$R, FsrsCard, $Out> {
 
 abstract class FsrsCardCopyWith<$R, $In extends FsrsCard, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
+  ReviewCardCopyWith<$R, ReviewCard, ReviewCard>? get reviewCard;
   $R call(
       {String? id,
       DateTime? createdAt,
       DateTime? updatedAt,
       String? userId,
       String? reviewCardId,
-      Card? state});
+      Card? state,
+      ReviewCard? reviewCard});
   FsrsCardCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -126,20 +134,25 @@ class _FsrsCardCopyWithImpl<$R, $Out>
   late final ClassMapperBase<FsrsCard> $mapper =
       FsrsCardMapper.ensureInitialized();
   @override
+  ReviewCardCopyWith<$R, ReviewCard, ReviewCard>? get reviewCard =>
+      $value.reviewCard?.copyWith.$chain((v) => call(reviewCard: v));
+  @override
   $R call(
           {String? id,
           DateTime? createdAt,
           DateTime? updatedAt,
           String? userId,
           String? reviewCardId,
-          Card? state}) =>
+          Card? state,
+          Object? reviewCard = $none}) =>
       $apply(FieldCopyWithData({
         if (id != null) #id: id,
         if (createdAt != null) #createdAt: createdAt,
         if (updatedAt != null) #updatedAt: updatedAt,
         if (userId != null) #userId: userId,
         if (reviewCardId != null) #reviewCardId: reviewCardId,
-        if (state != null) #state: state
+        if (state != null) #state: state,
+        if (reviewCard != $none) #reviewCard: reviewCard
       }));
   @override
   FsrsCard $make(CopyWithData data) => FsrsCard(
@@ -148,7 +161,8 @@ class _FsrsCardCopyWithImpl<$R, $Out>
       updatedAt: data.get(#updatedAt, or: $value.updatedAt),
       userId: data.get(#userId, or: $value.userId),
       reviewCardId: data.get(#reviewCardId, or: $value.reviewCardId),
-      state: data.get(#state, or: $value.state));
+      state: data.get(#state, or: $value.state),
+      reviewCard: data.get(#reviewCard, or: $value.reviewCard));
 
   @override
   FsrsCardCopyWith<$R2, FsrsCard, $Out2> $chain<$R2, $Out2>(

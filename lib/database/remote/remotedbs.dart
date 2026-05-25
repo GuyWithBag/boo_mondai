@@ -7,6 +7,8 @@ class RemoteDB {
   static late final DeckInteractionsRemoteDB deckInteractions;
   static late final CardTemplatesRemoteDB card;
   static late final DrillSessionsRemoteDB drill;
+  static late final ReviewSessionsRemoteDB reviewSession;
+  static late final DrillAnswersRemoteDB drillAnswer;
   static late final FsrsCardsRemoteDB fsrsSync;
   static late final LeaderboardEntriesRemoteDB leaderboard;
   static late final ResearchRemoteDB research;
@@ -19,6 +21,8 @@ class RemoteDB {
     deckInteractions = DeckInteractionsRemoteDB();
     card = CardTemplatesRemoteDB();
     drill = DrillSessionsRemoteDB();
+    reviewSession = ReviewSessionsRemoteDB();
+    drillAnswer = DrillAnswersRemoteDB();
     fsrsSync = FsrsCardsRemoteDB();
     leaderboard = LeaderboardEntriesRemoteDB();
     research = ResearchRemoteDB();

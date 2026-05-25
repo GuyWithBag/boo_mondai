@@ -13,6 +13,8 @@ class VocabularyTestResultMapper extends ClassMapperBase<VocabularyTestResult> {
   static VocabularyTestResultMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = VocabularyTestResultMapper._());
+      CachedProfileMapper.ensureInitialized();
+      ResearchProfileMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -37,6 +39,14 @@ class VocabularyTestResultMapper extends ClassMapperBase<VocabularyTestResult> {
   static DateTime _$submittedAt(VocabularyTestResult v) => v.submittedAt;
   static const Field<VocabularyTestResult, DateTime> _f$submittedAt =
       Field('submittedAt', _$submittedAt, key: r'submitted_at');
+  static CachedProfile? _$userProfile(VocabularyTestResult v) => v.userProfile;
+  static const Field<VocabularyTestResult, CachedProfile> _f$userProfile =
+      Field('userProfile', _$userProfile, key: r'user_profile', opt: true);
+  static ResearchProfile? _$researchProfile(VocabularyTestResult v) =>
+      v.researchProfile;
+  static const Field<VocabularyTestResult, ResearchProfile> _f$researchProfile =
+      Field('researchProfile', _$researchProfile,
+          key: r'research_profile', opt: true);
 
   @override
   final MappableFields<VocabularyTestResult> fields = const {
@@ -46,6 +56,8 @@ class VocabularyTestResultMapper extends ClassMapperBase<VocabularyTestResult> {
     #score: _f$score,
     #answers: _f$answers,
     #submittedAt: _f$submittedAt,
+    #userProfile: _f$userProfile,
+    #researchProfile: _f$researchProfile,
   };
 
   static VocabularyTestResult _instantiate(DecodingData data) {
@@ -55,7 +67,9 @@ class VocabularyTestResultMapper extends ClassMapperBase<VocabularyTestResult> {
         testSet: data.dec(_f$testSet),
         score: data.dec(_f$score),
         answers: data.dec(_f$answers),
-        submittedAt: data.dec(_f$submittedAt));
+        submittedAt: data.dec(_f$submittedAt),
+        userProfile: data.dec(_f$userProfile),
+        researchProfile: data.dec(_f$researchProfile));
   }
 
   @override
@@ -117,13 +131,18 @@ abstract class VocabularyTestResultCopyWith<
     $Out> implements ClassCopyWith<$R, $In, $Out> {
   MapCopyWith<$R, String, dynamic, ObjectCopyWith<$R, dynamic, dynamic>>
       get answers;
+  CachedProfileCopyWith<$R, CachedProfile, CachedProfile>? get userProfile;
+  ResearchProfileCopyWith<$R, ResearchProfile, ResearchProfile>?
+      get researchProfile;
   $R call(
       {String? id,
       String? userId,
       String? testSet,
       int? score,
       Map<String, dynamic>? answers,
-      DateTime? submittedAt});
+      DateTime? submittedAt,
+      CachedProfile? userProfile,
+      ResearchProfile? researchProfile});
   VocabularyTestResultCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
       Then<$Out2, $R2> t);
 }
@@ -141,20 +160,31 @@ class _VocabularyTestResultCopyWithImpl<$R, $Out>
       get answers => MapCopyWith($value.answers,
           (v, t) => ObjectCopyWith(v, $identity, t), (v) => call(answers: v));
   @override
+  CachedProfileCopyWith<$R, CachedProfile, CachedProfile>? get userProfile =>
+      $value.userProfile?.copyWith.$chain((v) => call(userProfile: v));
+  @override
+  ResearchProfileCopyWith<$R, ResearchProfile, ResearchProfile>?
+      get researchProfile => $value.researchProfile?.copyWith
+          .$chain((v) => call(researchProfile: v));
+  @override
   $R call(
           {String? id,
           String? userId,
           String? testSet,
           int? score,
           Map<String, dynamic>? answers,
-          DateTime? submittedAt}) =>
+          DateTime? submittedAt,
+          Object? userProfile = $none,
+          Object? researchProfile = $none}) =>
       $apply(FieldCopyWithData({
         if (id != null) #id: id,
         if (userId != null) #userId: userId,
         if (testSet != null) #testSet: testSet,
         if (score != null) #score: score,
         if (answers != null) #answers: answers,
-        if (submittedAt != null) #submittedAt: submittedAt
+        if (submittedAt != null) #submittedAt: submittedAt,
+        if (userProfile != $none) #userProfile: userProfile,
+        if (researchProfile != $none) #researchProfile: researchProfile
       }));
   @override
   VocabularyTestResult $make(CopyWithData data) => VocabularyTestResult(
@@ -163,7 +193,9 @@ class _VocabularyTestResultCopyWithImpl<$R, $Out>
       testSet: data.get(#testSet, or: $value.testSet),
       score: data.get(#score, or: $value.score),
       answers: data.get(#answers, or: $value.answers),
-      submittedAt: data.get(#submittedAt, or: $value.submittedAt));
+      submittedAt: data.get(#submittedAt, or: $value.submittedAt),
+      userProfile: data.get(#userProfile, or: $value.userProfile),
+      researchProfile: data.get(#researchProfile, or: $value.researchProfile));
 
   @override
   VocabularyTestResultCopyWith<$R2, VocabularyTestResult, $Out2>

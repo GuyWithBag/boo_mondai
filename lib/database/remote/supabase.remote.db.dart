@@ -32,6 +32,29 @@ abstract class SupabaseRemoteDB<T> {
   /// Supabase/PostgREST upsert conflict target, e.g. `id` or `deck_id,tag_id`.
   String? get upsertConflictTarget => null;
 
+  /// Default select used by read methods. Override this to include joins.
+  String get defaultSelect => '*';
+
+  /// Map keys that are populated by joined selects and must not be written.
+  Set<String> get joinedFields => const {};
+
+  /// Deserializes a DB map that may include joined relation data.
+  T fromJoinedMap(Map<String, dynamic> map) => fromMap(map);
+
+  /// Serializes [item] for insert/update/upsert, excluding joined data.
+  Map<String, dynamic> toWriteMap(T item) {
+    final map = Map<String, dynamic>.from(toMap(item));
+    return withoutJoinedFields(map);
+  }
+
+  Map<String, dynamic> withoutJoinedFields(Map<String, dynamic> map) {
+    final values = Map<String, dynamic>.from(map);
+    for (final field in joinedFields) {
+      values.remove(field);
+    }
+    return values;
+  }
+
   // ── Error, Logging & Crashlytics Wrapper ───────────────────
 
   /// Wraps DB calls to handle exceptions, log results locally,
@@ -102,7 +125,7 @@ abstract class SupabaseRemoteDB<T> {
     }
   }
 
-  dynamic _applyFilters(dynamic query, Map<String, Object?> filters) {
+  dynamic applyFilters(dynamic query, Map<String, Object?> filters) {
     for (final entry in filters.entries) {
       query = entry.value == null
           ? query.isFilter(entry.key, null)
@@ -112,7 +135,7 @@ abstract class SupabaseRemoteDB<T> {
   }
 
   Map<String, dynamic> _updatesWithoutPrimaryKey(T item) {
-    final updates = Map<String, dynamic>.from(toMap(item));
+    final updates = toWriteMap(item);
     for (final key in primaryKeyFromItem(item).keys) {
       updates.remove(key);
     }
@@ -122,17 +145,17 @@ abstract class SupabaseRemoteDB<T> {
   // ── Primary-table CRUD ───────────────────────────────────
 
   Future<List<T>> selectMany({
-    String select = '*',
+    String? select,
     Map<String, Object?> filters = const {},
     String? orderBy,
     bool ascending = true,
     int? limit,
     int? offset,
   }) => guard(() async {
-    dynamic query = client.from(tableName).select(select);
+    dynamic query = client.from(tableName).select(select ?? defaultSelect);
 
     if (filters.isNotEmpty) {
-      query = _applyFilters(query, filters);
+      query = applyFilters(query, filters);
     }
     if (orderBy != null) {
       query = query.order(orderBy, ascending: ascending);
@@ -144,27 +167,29 @@ abstract class SupabaseRemoteDB<T> {
     }
 
     final response = await query;
-    return List<Map<String, dynamic>>.from(response).map(fromMap).toList();
+    return List<Map<String, dynamic>>.from(
+      response,
+    ).map(fromJoinedMap).toList();
   }, action: 'selectMany');
 
   Future<T?> selectOne({
-    String select = '*',
+    String? select,
     required Map<String, Object?> filters,
   }) => guard(() async {
-    final row = await _applyFilters(
-      client.from(tableName).select(select),
+    final row = await applyFilters(
+      client.from(tableName).select(select ?? defaultSelect),
       filters,
     ).maybeSingle();
-    return row == null ? null : fromMap(row);
+    return row == null ? null : fromJoinedMap(row);
   }, action: 'selectOne($filters)');
 
   Future<T> insert(T item, {String select = '*'}) => guard(() async {
     final response = await client
         .from(tableName)
-        .insert(toMap(item))
+        .insert(toWriteMap(item))
         .select(select)
         .single();
-    return fromMap(response);
+    return fromJoinedMap(response);
   }, action: 'insert');
 
   Future<void> update(T item) => updateWhere(
@@ -176,13 +201,19 @@ abstract class SupabaseRemoteDB<T> {
     required Map<String, Object?> filters,
     required Map<String, dynamic> values,
   }) => guard(() async {
-    await _applyFilters(client.from(tableName).update(values), filters);
+    await applyFilters(
+      client.from(tableName).update(withoutJoinedFields(values)),
+      filters,
+    );
   }, action: 'updateWhere($filters)');
 
   Future<void> upsert(T item, {String? onConflict}) => guard(() async {
     await client
         .from(tableName)
-        .upsert(toMap(item), onConflict: onConflict ?? upsertConflictTarget);
+        .upsert(
+          toWriteMap(item),
+          onConflict: onConflict ?? upsertConflictTarget,
+        );
   }, action: 'upsert(${primaryKeyFromItem(item)})');
 
   Future<void> upsertMany(List<T> items, {String? onConflict}) =>
@@ -191,7 +222,7 @@ abstract class SupabaseRemoteDB<T> {
         await client
             .from(tableName)
             .upsert(
-              items.map(toMap).toList(),
+              items.map(toWriteMap).toList(),
               onConflict: onConflict ?? upsertConflictTarget,
             );
       }, action: 'upsertMany(${items.length} items)');
@@ -199,6 +230,6 @@ abstract class SupabaseRemoteDB<T> {
   Future<void> delete(T item) => deleteWhere(primaryKeyFromItem(item));
 
   Future<void> deleteWhere(Map<String, Object?> filters) => guard(() async {
-    await _applyFilters(client.from(tableName).delete(), filters);
+    await applyFilters(client.from(tableName).delete(), filters);
   }, action: 'deleteWhere($filters)');
 }

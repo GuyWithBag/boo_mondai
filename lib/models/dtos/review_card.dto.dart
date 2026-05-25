@@ -17,6 +17,8 @@ class ReviewCard with ReviewCardMappable {
   // Added to support Supabase joins with user_review_card_tags
   // Note: Only the logged-in user will ever get data populated here due to RLS!
   final List<Tag> personalTags;
+  final CardTemplate? template;
+  final Deck? deck;
 
   const ReviewCard({
     required this.id,
@@ -24,5 +26,7 @@ class ReviewCard with ReviewCardMappable {
     this.isReversed = false,
     required this.deckId,
     this.personalTags = const [],
+    this.template,
+    this.deck,
   });
 }

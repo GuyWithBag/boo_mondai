@@ -325,7 +325,13 @@ CREATE TRIGGER set_updated_at BEFORE UPDATE ON streaks FOR EACH ROW EXECUTE FUNC
 
 CREATE VIEW leaderboard_entries WITH (security_invoker = true) AS
 SELECT
-  p.user_id,
+  p.id AS user_id,
+  jsonb_build_object(
+    'id', p.id,
+    'username', p.username,
+    'avatar_url', p.avatar_url,
+    'created_at', p.created_at
+  ) AS user_profile,
   COALESCE(SUM(ds.correct_count), 0)::int AS drill_score,
   COALESCE(rc.review_count, 0)::int       AS review_count
 FROM profiles p
@@ -333,9 +339,9 @@ LEFT JOIN drill_sessions ds ON ds.user_id = p.id AND ds.completed_at IS NOT NULL
 LEFT JOIN (
   SELECT fc.user_id, COUNT(*)::int AS review_count
   FROM review_logs rl JOIN fsrs_cards fc ON fc.id = rl.fsrs_card_id GROUP BY fc.user_id
-) rc ON rc.user_id = p.user_id
+) rc ON rc.user_id = p.id
 WHERE p.role = 'group_a_participant'
-GROUP BY p.user_id, rc.review_count
+GROUP BY p.id, p.username, p.avatar_url, p.created_at, rc.review_count
 ORDER BY drill_score DESC;
 
 -- ══════════════════════════════════════════════════════
@@ -361,8 +367,8 @@ CREATE TABLE research_codes (
   code        text NOT NULL UNIQUE,
   target_role text NOT NULL,
   unlocks     text NOT NULL,
-  created_by  uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-  used_by     uuid REFERENCES profiles(id),
+  created_by  uuid NOT NULL CONSTRAINT research_codes_created_by_fkey REFERENCES profiles(id) ON DELETE CASCADE,
+  used_by     uuid CONSTRAINT research_codes_used_by_fkey REFERENCES profiles(id),
   used_at     timestamptz,
   created_at  timestamptz NOT NULL DEFAULT now()
 );
@@ -372,12 +378,14 @@ CREATE POLICY "research_codes: researcher manage" ON research_codes FOR ALL TO a
 
 CREATE TABLE survey_responses (
   id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id        uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  user_id        uuid NOT NULL CONSTRAINT survey_responses_user_id_fkey REFERENCES profiles(id) ON DELETE CASCADE,
   survey_type    text NOT NULL,
   time_point     text,
   responses      jsonb NOT NULL DEFAULT '{}',
   computed_score double precision,
   submitted_at   timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT survey_responses_research_profile_user_id_fkey
+    FOREIGN KEY (user_id) REFERENCES research_profiles(user_id) ON DELETE CASCADE,
   UNIQUE (user_id, survey_type, time_point)
 );
 ALTER TABLE survey_responses ENABLE ROW LEVEL SECURITY;
@@ -386,11 +394,13 @@ CREATE POLICY "survey_responses: read own or researcher" ON survey_responses FOR
 
 CREATE TABLE vocabulary_test_results (
   id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id      uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  user_id      uuid NOT NULL CONSTRAINT vocabulary_test_results_user_id_fkey REFERENCES profiles(id) ON DELETE CASCADE,
   test_set     text NOT NULL CHECK (test_set IN ('A', 'B')),
   score        int  NOT NULL CHECK (score BETWEEN 0 AND 30),
   answers      jsonb NOT NULL,
   submitted_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT vocabulary_test_results_research_profile_user_id_fkey
+    FOREIGN KEY (user_id) REFERENCES research_profiles(user_id) ON DELETE CASCADE,
   UNIQUE (user_id, test_set)
 );
 ALTER TABLE vocabulary_test_results ENABLE ROW LEVEL SECURITY;
@@ -531,8 +541,8 @@ CREATE POLICY "deck_downloads: insert own" ON deck_downloads FOR INSERT WITH CHE
 CREATE POLICY "deck_downloads: read own" ON deck_downloads FOR SELECT USING (user_id = current_profile_id());
 
 CREATE TABLE deck_favorites (
-  deck_id    uuid NOT NULL REFERENCES decks(id) ON DELETE CASCADE,
-  user_id    uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  deck_id    uuid NOT NULL CONSTRAINT deck_favorites_deck_id_fkey REFERENCES decks(id) ON DELETE CASCADE,
+  user_id    uuid NOT NULL CONSTRAINT deck_favorites_user_id_fkey REFERENCES profiles(id) ON DELETE CASCADE,
   created_at timestamptz NOT NULL DEFAULT now(),
   PRIMARY KEY (deck_id, user_id)
 );

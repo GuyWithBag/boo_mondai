@@ -15,6 +15,7 @@ class IdentificationTemplateMapper
     if (_instance == null) {
       MapperContainer.globals.use(_instance = IdentificationTemplateMapper._());
       CardTemplateMapper.ensureInitialized().addSubMapper(_instance!);
+      TagMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -41,6 +42,9 @@ class IdentificationTemplateMapper
   static const Field<IdentificationTemplate, String> _f$sourceTemplateId =
       Field('sourceTemplateId', _$sourceTemplateId,
           key: r'source_template_id', opt: true);
+  static List<Tag> _$tags(IdentificationTemplate v) => v.tags;
+  static const Field<IdentificationTemplate, List<Tag>> _f$tags =
+      Field('tags', _$tags, opt: true, def: const []);
   static String _$promptText(IdentificationTemplate v) => v.promptText;
   static const Field<IdentificationTemplate, String> _f$promptText =
       Field('promptText', _$promptText, key: r'prompt_text');
@@ -54,9 +58,6 @@ class IdentificationTemplateMapper
   static String? _$audioUrl(IdentificationTemplate v) => v.audioUrl;
   static const Field<IdentificationTemplate, String> _f$audioUrl =
       Field('audioUrl', _$audioUrl, key: r'audio_url', opt: true);
-  static List<Tag> _$tags(IdentificationTemplate v) => v.tags;
-  static const Field<IdentificationTemplate, List<Tag>> _f$tags =
-      Field('tags', _$tags, mode: FieldMode.member);
 
   @override
   final MappableFields<IdentificationTemplate> fields = const {
@@ -66,11 +67,11 @@ class IdentificationTemplateMapper
     #createdAt: _f$createdAt,
     #updatedAt: _f$updatedAt,
     #sourceTemplateId: _f$sourceTemplateId,
+    #tags: _f$tags,
     #promptText: _f$promptText,
     #acceptedAnswers: _f$acceptedAnswers,
     #imageUrl: _f$imageUrl,
     #audioUrl: _f$audioUrl,
-    #tags: _f$tags,
   };
 
   @override
@@ -89,6 +90,7 @@ class IdentificationTemplateMapper
         createdAt: data.dec(_f$createdAt),
         updatedAt: data.dec(_f$updatedAt),
         sourceTemplateId: data.dec(_f$sourceTemplateId),
+        tags: data.dec(_f$tags),
         promptText: data.dec(_f$promptText),
         acceptedAnswers: data.dec(_f$acceptedAnswers),
         imageUrl: data.dec(_f$imageUrl),
@@ -154,6 +156,8 @@ abstract class IdentificationTemplateCopyWith<
     $In extends IdentificationTemplate,
     $Out> implements CardTemplateCopyWith<$R, $In, $Out> {
   @override
+  ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags;
+  @override
   $R call(
       {String? id,
       String? deckId,
@@ -161,6 +165,7 @@ abstract class IdentificationTemplateCopyWith<
       DateTime? createdAt,
       DateTime? updatedAt,
       String? sourceTemplateId,
+      List<Tag>? tags,
       String? promptText,
       String? acceptedAnswers,
       String? imageUrl,
@@ -179,6 +184,9 @@ class _IdentificationTemplateCopyWithImpl<$R, $Out>
   late final ClassMapperBase<IdentificationTemplate> $mapper =
       IdentificationTemplateMapper.ensureInitialized();
   @override
+  ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags => ListCopyWith(
+      $value.tags, (v, t) => v.copyWith.$chain(t), (v) => call(tags: v));
+  @override
   $R call(
           {String? id,
           String? deckId,
@@ -186,6 +194,7 @@ class _IdentificationTemplateCopyWithImpl<$R, $Out>
           DateTime? createdAt,
           DateTime? updatedAt,
           Object? sourceTemplateId = $none,
+          List<Tag>? tags,
           String? promptText,
           String? acceptedAnswers,
           Object? imageUrl = $none,
@@ -197,6 +206,7 @@ class _IdentificationTemplateCopyWithImpl<$R, $Out>
         if (createdAt != null) #createdAt: createdAt,
         if (updatedAt != null) #updatedAt: updatedAt,
         if (sourceTemplateId != $none) #sourceTemplateId: sourceTemplateId,
+        if (tags != null) #tags: tags,
         if (promptText != null) #promptText: promptText,
         if (acceptedAnswers != null) #acceptedAnswers: acceptedAnswers,
         if (imageUrl != $none) #imageUrl: imageUrl,
@@ -211,6 +221,7 @@ class _IdentificationTemplateCopyWithImpl<$R, $Out>
       updatedAt: data.get(#updatedAt, or: $value.updatedAt),
       sourceTemplateId:
           data.get(#sourceTemplateId, or: $value.sourceTemplateId),
+      tags: data.get(#tags, or: $value.tags),
       promptText: data.get(#promptText, or: $value.promptText),
       acceptedAnswers: data.get(#acceptedAnswers, or: $value.acceptedAnswers),
       imageUrl: data.get(#imageUrl, or: $value.imageUrl),

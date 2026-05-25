@@ -15,6 +15,7 @@ class FillInTheBlanksTemplate extends CardTemplate
     required super.createdAt,
     required super.updatedAt,
     super.sourceTemplateId,
+    super.tags,
     required this.segments,
   });
 

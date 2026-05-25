@@ -5,6 +5,7 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/models/models.barrel.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 
 part 'research_code.dto.mapper.dart';
@@ -19,6 +20,8 @@ class ResearchCode with ResearchCodeMappable {
   final String? usedBy;
   final DateTime? usedAt;
   final DateTime createdAt;
+  final CachedProfile? createdByProfile;
+  final CachedProfile? usedByProfile;
 
   const ResearchCode({
     required this.id,
@@ -29,6 +32,8 @@ class ResearchCode with ResearchCodeMappable {
     this.usedBy,
     this.usedAt,
     required this.createdAt,
+    this.createdByProfile,
+    this.usedByProfile,
   });
 
   bool get isUsed => usedBy != null;

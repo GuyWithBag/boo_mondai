@@ -16,6 +16,8 @@ class ReviewSession extends StudySession with ReviewSessionMappable {
     super.deckId,
     required super.startedAt,
     super.completedAt,
+    super.userProfile,
+    super.deck,
 
     // Subclass specific properties
     required this.totalCards,

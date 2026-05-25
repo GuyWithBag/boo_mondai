@@ -2,7 +2,7 @@
 // PATH: lib/models/fsrs_card.dart
 // PURPOSE: Tracks a specific user's spaced-repetition progress for a ReviewCard
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-import 'package:boo_mondai/models/dto.dart';
+import 'package:boo_mondai/models/models.barrel.dart';
 import 'package:boo_mondai/shared/uuid.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:fsrs/fsrs.dart';
@@ -24,6 +24,7 @@ class FsrsCard with FsrsCardMappable implements DTO {
   final String reviewCardId;
 
   final Card state;
+  final ReviewCard? reviewCard;
 
   FsrsCard({
     required this.id,
@@ -32,6 +33,7 @@ class FsrsCard with FsrsCardMappable implements DTO {
     required this.userId,
     required this.reviewCardId,
     required this.state,
+    this.reviewCard,
   });
 
   static Future<FsrsCard> create({

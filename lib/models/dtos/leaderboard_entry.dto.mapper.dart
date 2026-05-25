@@ -13,6 +13,7 @@ class LeaderboardEntryMapper extends ClassMapperBase<LeaderboardEntry> {
   static LeaderboardEntryMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = LeaderboardEntryMapper._());
+      CachedProfileMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -29,19 +30,24 @@ class LeaderboardEntryMapper extends ClassMapperBase<LeaderboardEntry> {
   static int _$reviewCount(LeaderboardEntry v) => v.reviewCount;
   static const Field<LeaderboardEntry, int> _f$reviewCount =
       Field('reviewCount', _$reviewCount, key: r'review_count');
+  static CachedProfile? _$userProfile(LeaderboardEntry v) => v.userProfile;
+  static const Field<LeaderboardEntry, CachedProfile> _f$userProfile =
+      Field('userProfile', _$userProfile, key: r'user_profile', opt: true);
 
   @override
   final MappableFields<LeaderboardEntry> fields = const {
     #userId: _f$userId,
     #drillScore: _f$drillScore,
     #reviewCount: _f$reviewCount,
+    #userProfile: _f$userProfile,
   };
 
   static LeaderboardEntry _instantiate(DecodingData data) {
     return LeaderboardEntry(
         userId: data.dec(_f$userId),
         drillScore: data.dec(_f$drillScore),
-        reviewCount: data.dec(_f$reviewCount));
+        reviewCount: data.dec(_f$reviewCount),
+        userProfile: data.dec(_f$userProfile));
   }
 
   @override
@@ -99,7 +105,12 @@ extension LeaderboardEntryValueCopy<$R, $Out>
 
 abstract class LeaderboardEntryCopyWith<$R, $In extends LeaderboardEntry, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  $R call({String? userId, int? drillScore, int? reviewCount});
+  CachedProfileCopyWith<$R, CachedProfile, CachedProfile>? get userProfile;
+  $R call(
+      {String? userId,
+      int? drillScore,
+      int? reviewCount,
+      CachedProfile? userProfile});
   LeaderboardEntryCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
       Then<$Out2, $R2> t);
 }
@@ -113,17 +124,26 @@ class _LeaderboardEntryCopyWithImpl<$R, $Out>
   late final ClassMapperBase<LeaderboardEntry> $mapper =
       LeaderboardEntryMapper.ensureInitialized();
   @override
-  $R call({String? userId, int? drillScore, int? reviewCount}) =>
+  CachedProfileCopyWith<$R, CachedProfile, CachedProfile>? get userProfile =>
+      $value.userProfile?.copyWith.$chain((v) => call(userProfile: v));
+  @override
+  $R call(
+          {String? userId,
+          int? drillScore,
+          int? reviewCount,
+          Object? userProfile = $none}) =>
       $apply(FieldCopyWithData({
         if (userId != null) #userId: userId,
         if (drillScore != null) #drillScore: drillScore,
-        if (reviewCount != null) #reviewCount: reviewCount
+        if (reviewCount != null) #reviewCount: reviewCount,
+        if (userProfile != $none) #userProfile: userProfile
       }));
   @override
   LeaderboardEntry $make(CopyWithData data) => LeaderboardEntry(
       userId: data.get(#userId, or: $value.userId),
       drillScore: data.get(#drillScore, or: $value.drillScore),
-      reviewCount: data.get(#reviewCount, or: $value.reviewCount));
+      reviewCount: data.get(#reviewCount, or: $value.reviewCount),
+      userProfile: data.get(#userProfile, or: $value.userProfile));
 
   @override
   LeaderboardEntryCopyWith<$R2, LeaderboardEntry, $Out2> $chain<$R2, $Out2>(

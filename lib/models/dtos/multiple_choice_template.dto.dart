@@ -18,6 +18,7 @@ class MultipleChoiceTemplate extends CardTemplate
     required super.createdAt,
     required super.updatedAt,
     super.sourceTemplateId,
+    super.tags,
     required this.questionPrompt,
     required this.options,
     this.imageUrl,

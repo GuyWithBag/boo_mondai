@@ -15,7 +15,7 @@ class DeckMapper extends ClassMapperBase<Deck> {
       MapperContainer.globals.use(_instance = DeckMapper._());
       VisibilityStateMapper.ensureInitialized();
       TagMapper.ensureInitialized();
-      ProfileMapper.ensureInitialized();
+      CachedProfileMapper.ensureInitialized();
       DeckListingMapper.ensureInitialized();
     }
     return _instance!;
@@ -78,8 +78,8 @@ class DeckMapper extends ClassMapperBase<Deck> {
   static List<Tag> _$tags(Deck v) => v.tags;
   static const Field<Deck, List<Tag>> _f$tags =
       Field('tags', _$tags, opt: true, def: const []);
-  static Profile? _$userProfile(Deck v) => v.userProfile;
-  static const Field<Deck, Profile> _f$userProfile =
+  static CachedProfile? _$userProfile(Deck v) => v.userProfile;
+  static const Field<Deck, CachedProfile> _f$userProfile =
       Field('userProfile', _$userProfile, key: r'user_profile', opt: true);
   static DeckListing? _$listing(Deck v) => v.listing;
   static const Field<Deck, DeckListing> _f$listing =
@@ -178,7 +178,7 @@ extension DeckValueCopy<$R, $Out> on ObjectCopyWith<$R, Deck, $Out> {
 abstract class DeckCopyWith<$R, $In extends Deck, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags;
-  ProfileCopyWith<$R, Profile, Profile>? get userProfile;
+  CachedProfileCopyWith<$R, CachedProfile, CachedProfile>? get userProfile;
   DeckListingCopyWith<$R, DeckListing, DeckListing>? get listing;
   $R call(
       {String? id,
@@ -198,7 +198,7 @@ abstract class DeckCopyWith<$R, $In extends Deck, $Out>
       DateTime? createdAt,
       DateTime? updatedAt,
       List<Tag>? tags,
-      Profile? userProfile,
+      CachedProfile? userProfile,
       DeckListing? listing});
   DeckCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -213,7 +213,7 @@ class _DeckCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Deck, $Out>
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags => ListCopyWith(
       $value.tags, (v, t) => v.copyWith.$chain(t), (v) => call(tags: v));
   @override
-  ProfileCopyWith<$R, Profile, Profile>? get userProfile =>
+  CachedProfileCopyWith<$R, CachedProfile, CachedProfile>? get userProfile =>
       $value.userProfile?.copyWith.$chain((v) => call(userProfile: v));
   @override
   DeckListingCopyWith<$R, DeckListing, DeckListing>? get listing =>

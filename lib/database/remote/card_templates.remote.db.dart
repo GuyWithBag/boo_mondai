@@ -20,4 +20,18 @@ class CardTemplatesRemoteDB extends SupabaseRemoteDB<CardTemplate> {
 
   @override
   String get upsertConflictTarget => 'id';
+
+  @override
+  String get defaultSelect => _cardTemplateWithRelationsSelect;
+
+  @override
+  Set<String> get joinedFields => const {
+    'tags',
+    'options',
+    'segments',
+    'pairs',
+  };
 }
+
+const _cardTemplateWithRelationsSelect =
+    '*, tags(*), options:multiple_choice_options(*), segments:fill_in_the_blank_segments(*), pairs:match_madness_pairs(*)';

@@ -25,6 +25,7 @@ class FlashcardTemplate extends CardTemplate with FlashcardTemplateMappable {
     required super.createdAt,
     required super.updatedAt,
     super.sourceTemplateId,
+    super.tags,
     required this.frontText,
     required this.backText,
     this.frontImageUrl,

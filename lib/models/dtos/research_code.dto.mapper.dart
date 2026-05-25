@@ -13,6 +13,7 @@ class ResearchCodeMapper extends ClassMapperBase<ResearchCode> {
   static ResearchCodeMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = ResearchCodeMapper._());
+      CachedProfileMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -42,6 +43,15 @@ class ResearchCodeMapper extends ClassMapperBase<ResearchCode> {
   static DateTime _$createdAt(ResearchCode v) => v.createdAt;
   static const Field<ResearchCode, DateTime> _f$createdAt =
       Field('createdAt', _$createdAt, key: r'created_at');
+  static CachedProfile? _$createdByProfile(ResearchCode v) =>
+      v.createdByProfile;
+  static const Field<ResearchCode, CachedProfile> _f$createdByProfile = Field(
+      'createdByProfile', _$createdByProfile,
+      key: r'created_by_profile', opt: true);
+  static CachedProfile? _$usedByProfile(ResearchCode v) => v.usedByProfile;
+  static const Field<ResearchCode, CachedProfile> _f$usedByProfile = Field(
+      'usedByProfile', _$usedByProfile,
+      key: r'used_by_profile', opt: true);
 
   @override
   final MappableFields<ResearchCode> fields = const {
@@ -53,6 +63,8 @@ class ResearchCodeMapper extends ClassMapperBase<ResearchCode> {
     #usedBy: _f$usedBy,
     #usedAt: _f$usedAt,
     #createdAt: _f$createdAt,
+    #createdByProfile: _f$createdByProfile,
+    #usedByProfile: _f$usedByProfile,
   };
 
   static ResearchCode _instantiate(DecodingData data) {
@@ -64,7 +76,9 @@ class ResearchCodeMapper extends ClassMapperBase<ResearchCode> {
         createdBy: data.dec(_f$createdBy),
         usedBy: data.dec(_f$usedBy),
         usedAt: data.dec(_f$usedAt),
-        createdAt: data.dec(_f$createdAt));
+        createdAt: data.dec(_f$createdAt),
+        createdByProfile: data.dec(_f$createdByProfile),
+        usedByProfile: data.dec(_f$usedByProfile));
   }
 
   @override
@@ -120,6 +134,8 @@ extension ResearchCodeValueCopy<$R, $Out>
 
 abstract class ResearchCodeCopyWith<$R, $In extends ResearchCode, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
+  CachedProfileCopyWith<$R, CachedProfile, CachedProfile>? get createdByProfile;
+  CachedProfileCopyWith<$R, CachedProfile, CachedProfile>? get usedByProfile;
   $R call(
       {String? id,
       String? code,
@@ -128,7 +144,9 @@ abstract class ResearchCodeCopyWith<$R, $In extends ResearchCode, $Out>
       String? createdBy,
       String? usedBy,
       DateTime? usedAt,
-      DateTime? createdAt});
+      DateTime? createdAt,
+      CachedProfile? createdByProfile,
+      CachedProfile? usedByProfile});
   ResearchCodeCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -141,6 +159,13 @@ class _ResearchCodeCopyWithImpl<$R, $Out>
   late final ClassMapperBase<ResearchCode> $mapper =
       ResearchCodeMapper.ensureInitialized();
   @override
+  CachedProfileCopyWith<$R, CachedProfile, CachedProfile>?
+      get createdByProfile => $value.createdByProfile?.copyWith
+          .$chain((v) => call(createdByProfile: v));
+  @override
+  CachedProfileCopyWith<$R, CachedProfile, CachedProfile>? get usedByProfile =>
+      $value.usedByProfile?.copyWith.$chain((v) => call(usedByProfile: v));
+  @override
   $R call(
           {String? id,
           String? code,
@@ -149,7 +174,9 @@ class _ResearchCodeCopyWithImpl<$R, $Out>
           String? createdBy,
           Object? usedBy = $none,
           Object? usedAt = $none,
-          DateTime? createdAt}) =>
+          DateTime? createdAt,
+          Object? createdByProfile = $none,
+          Object? usedByProfile = $none}) =>
       $apply(FieldCopyWithData({
         if (id != null) #id: id,
         if (code != null) #code: code,
@@ -158,7 +185,9 @@ class _ResearchCodeCopyWithImpl<$R, $Out>
         if (createdBy != null) #createdBy: createdBy,
         if (usedBy != $none) #usedBy: usedBy,
         if (usedAt != $none) #usedAt: usedAt,
-        if (createdAt != null) #createdAt: createdAt
+        if (createdAt != null) #createdAt: createdAt,
+        if (createdByProfile != $none) #createdByProfile: createdByProfile,
+        if (usedByProfile != $none) #usedByProfile: usedByProfile
       }));
   @override
   ResearchCode $make(CopyWithData data) => ResearchCode(
@@ -169,7 +198,10 @@ class _ResearchCodeCopyWithImpl<$R, $Out>
       createdBy: data.get(#createdBy, or: $value.createdBy),
       usedBy: data.get(#usedBy, or: $value.usedBy),
       usedAt: data.get(#usedAt, or: $value.usedAt),
-      createdAt: data.get(#createdAt, or: $value.createdAt));
+      createdAt: data.get(#createdAt, or: $value.createdAt),
+      createdByProfile:
+          data.get(#createdByProfile, or: $value.createdByProfile),
+      usedByProfile: data.get(#usedByProfile, or: $value.usedByProfile));
 
   @override
   ResearchCodeCopyWith<$R2, ResearchCode, $Out2> $chain<$R2, $Out2>(

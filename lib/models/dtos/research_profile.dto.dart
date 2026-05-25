@@ -5,6 +5,7 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/models/models.barrel.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 
 part 'research_profile.dto.mapper.dart';
@@ -19,6 +20,7 @@ class ResearchProfile with ResearchProfileMappable {
   final String role;
   final String goal;
   final DateTime createdAt;
+  final CachedProfile? userProfile;
 
   const ResearchProfile({
     required this.id,
@@ -29,5 +31,6 @@ class ResearchProfile with ResearchProfileMappable {
     required this.firstName,
     required this.lastName,
     required this.age,
+    this.userProfile,
   });
 }

@@ -93,7 +93,7 @@ types:
         index: 5
   ReviewCard:
     typeId: 5
-    nextIndex: 5
+    nextIndex: 7
     fields:
       id:
         index: 0
@@ -105,6 +105,10 @@ types:
         index: 3
       personalTags:
         index: 4
+      template:
+        index: 5
+      deck:
+        index: 6
   FillInTheBlankSegment:
     typeId: 6
     nextIndex: 6
@@ -141,7 +145,7 @@ types:
         index: 8
   DrillSession:
     typeId: 9
-    nextIndex: 13
+    nextIndex: 15
     fields:
       previewed:
         index: 3
@@ -159,6 +163,10 @@ types:
         index: 11
       completedAt:
         index: 12
+      userProfile:
+        index: 13
+      deck:
+        index: 14
   Card:
     typeId: 10
     nextIndex: 7
@@ -235,7 +243,7 @@ types:
         index: 5
   FillInTheBlanksTemplate:
     typeId: 15
-    nextIndex: 7
+    nextIndex: 8
     fields:
       segments:
         index: 0
@@ -251,9 +259,11 @@ types:
         index: 5
       updatedAt:
         index: 6
+      tags:
+        index: 7
   MultipleChoiceTemplate:
     typeId: 16
-    nextIndex: 10
+    nextIndex: 11
     fields:
       questionPrompt:
         index: 0
@@ -275,9 +285,11 @@ types:
         index: 8
       updatedAt:
         index: 9
+      tags:
+        index: 10
   FlashcardTemplate:
     typeId: 17
-    nextIndex: 13
+    nextIndex: 14
     fields:
       frontText:
         index: 0
@@ -305,9 +317,11 @@ types:
         index: 11
       updatedAt:
         index: 12
+      tags:
+        index: 13
   MatchMadnessTemplate:
     typeId: 18
-    nextIndex: 7
+    nextIndex: 8
     fields:
       pairs:
         index: 0
@@ -323,9 +337,11 @@ types:
         index: 5
       updatedAt:
         index: 6
+      tags:
+        index: 7
   IdentificationTemplate:
     typeId: 19
-    nextIndex: 10
+    nextIndex: 11
     fields:
       promptText:
         index: 0
@@ -347,9 +363,11 @@ types:
         index: 8
       updatedAt:
         index: 9
+      tags:
+        index: 10
   DrillAnswer:
     typeId: 20
-    nextIndex: 6
+    nextIndex: 8
     fields:
       id:
         index: 0
@@ -363,6 +381,10 @@ types:
         index: 4
       createdAt:
         index: 5
+      session:
+        index: 6
+      cardTemplate:
+        index: 7
   StudyRating:
     typeId: 21
     nextIndex: 5
@@ -379,7 +401,7 @@ types:
         index: 4
   FsrsCard:
     typeId: 22
-    nextIndex: 6
+    nextIndex: 7
     fields:
       id:
         index: 0
@@ -393,6 +415,8 @@ types:
         index: 4
       updatedAt:
         index: 5
+      reviewCard:
+        index: 6
   FsrsReviewLog:
     typeId: 23
     nextIndex: 5
@@ -429,7 +453,7 @@ types:
         index: 3
   WordScrambleTemplate:
     typeId: 26
-    nextIndex: 9
+    nextIndex: 10
     fields:
       sentenceToScramble:
         index: 0
@@ -449,6 +473,8 @@ types:
         index: 7
       updatedAt:
         index: 8
+      tags:
+        index: 9
   User:
     typeId: 27
     nextIndex: 22
@@ -499,7 +525,7 @@ types:
         index: 21
   ReviewSession:
     typeId: 28
-    nextIndex: 7
+    nextIndex: 9
     fields:
       totalCards:
         index: 0
@@ -515,6 +541,10 @@ types:
         index: 5
       completedAt:
         index: 6
+      userProfile:
+        index: 7
+      deck:
+        index: 8
   VisibilityState:
     typeId: 29
     nextIndex: 3

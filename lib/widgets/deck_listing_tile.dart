@@ -29,7 +29,7 @@ class DeckListingTile extends HookWidget {
         : deck.shortDescription;
     final version = deck.version.isEmpty ? '1.0.0' : deck.version;
     final backgroundImageUrl = _listingImageUrl(deck);
-    final creatorName = deck.author?.username ?? 'Unknown creator';
+    final creatorName = deck.userProfile?.username ?? 'Unknown creator';
 
     useEffect(() {
       final error = interactionsController.error;

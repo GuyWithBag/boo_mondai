@@ -14,6 +14,8 @@ class DrillSessionMapper extends SubClassMapperBase<DrillSession> {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = DrillSessionMapper._());
       StudySessionMapper.ensureInitialized().addSubMapper(_instance!);
+      CachedProfileMapper.ensureInitialized();
+      DeckMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -35,6 +37,12 @@ class DrillSessionMapper extends SubClassMapperBase<DrillSession> {
   static DateTime? _$completedAt(DrillSession v) => v.completedAt;
   static const Field<DrillSession, DateTime> _f$completedAt =
       Field('completedAt', _$completedAt, key: r'completed_at', opt: true);
+  static CachedProfile? _$userProfile(DrillSession v) => v.userProfile;
+  static const Field<DrillSession, CachedProfile> _f$userProfile =
+      Field('userProfile', _$userProfile, key: r'user_profile', opt: true);
+  static Deck? _$deck(DrillSession v) => v.deck;
+  static const Field<DrillSession, Deck> _f$deck =
+      Field('deck', _$deck, opt: true);
   static bool _$previewed(DrillSession v) => v.previewed;
   static const Field<DrillSession, bool> _f$previewed =
       Field('previewed', _$previewed, opt: true, def: false);
@@ -53,6 +61,8 @@ class DrillSessionMapper extends SubClassMapperBase<DrillSession> {
     #deckId: _f$deckId,
     #startedAt: _f$startedAt,
     #completedAt: _f$completedAt,
+    #userProfile: _f$userProfile,
+    #deck: _f$deck,
     #previewed: _f$previewed,
     #totalQuestions: _f$totalQuestions,
     #correctCount: _f$correctCount,
@@ -73,6 +83,8 @@ class DrillSessionMapper extends SubClassMapperBase<DrillSession> {
         deckId: data.dec(_f$deckId),
         startedAt: data.dec(_f$startedAt),
         completedAt: data.dec(_f$completedAt),
+        userProfile: data.dec(_f$userProfile),
+        deck: data.dec(_f$deck),
         previewed: data.dec(_f$previewed),
         totalQuestions: data.dec(_f$totalQuestions),
         correctCount: data.dec(_f$correctCount));
@@ -132,12 +144,18 @@ extension DrillSessionValueCopy<$R, $Out>
 abstract class DrillSessionCopyWith<$R, $In extends DrillSession, $Out>
     implements StudySessionCopyWith<$R, $In, $Out> {
   @override
+  CachedProfileCopyWith<$R, CachedProfile, CachedProfile>? get userProfile;
+  @override
+  DeckCopyWith<$R, Deck, Deck>? get deck;
+  @override
   $R call(
       {String? id,
       String? userId,
       String? deckId,
       DateTime? startedAt,
       DateTime? completedAt,
+      CachedProfile? userProfile,
+      Deck? deck,
       bool? previewed,
       int? totalQuestions,
       int? correctCount});
@@ -153,12 +171,20 @@ class _DrillSessionCopyWithImpl<$R, $Out>
   late final ClassMapperBase<DrillSession> $mapper =
       DrillSessionMapper.ensureInitialized();
   @override
+  CachedProfileCopyWith<$R, CachedProfile, CachedProfile>? get userProfile =>
+      $value.userProfile?.copyWith.$chain((v) => call(userProfile: v));
+  @override
+  DeckCopyWith<$R, Deck, Deck>? get deck =>
+      $value.deck?.copyWith.$chain((v) => call(deck: v));
+  @override
   $R call(
           {String? id,
           String? userId,
           Object? deckId = $none,
           DateTime? startedAt,
           Object? completedAt = $none,
+          Object? userProfile = $none,
+          Object? deck = $none,
           bool? previewed,
           int? totalQuestions,
           int? correctCount}) =>
@@ -168,6 +194,8 @@ class _DrillSessionCopyWithImpl<$R, $Out>
         if (deckId != $none) #deckId: deckId,
         if (startedAt != null) #startedAt: startedAt,
         if (completedAt != $none) #completedAt: completedAt,
+        if (userProfile != $none) #userProfile: userProfile,
+        if (deck != $none) #deck: deck,
         if (previewed != null) #previewed: previewed,
         if (totalQuestions != null) #totalQuestions: totalQuestions,
         if (correctCount != null) #correctCount: correctCount
@@ -179,6 +207,8 @@ class _DrillSessionCopyWithImpl<$R, $Out>
       deckId: data.get(#deckId, or: $value.deckId),
       startedAt: data.get(#startedAt, or: $value.startedAt),
       completedAt: data.get(#completedAt, or: $value.completedAt),
+      userProfile: data.get(#userProfile, or: $value.userProfile),
+      deck: data.get(#deck, or: $value.deck),
       previewed: data.get(#previewed, or: $value.previewed),
       totalQuestions: data.get(#totalQuestions, or: $value.totalQuestions),
       correctCount: data.get(#correctCount, or: $value.correctCount));

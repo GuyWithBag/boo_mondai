@@ -88,6 +88,25 @@ class DeckFavoritesRemoteDB extends SupabaseRemoteDB<DeckFavorite> {
   @override
   String get upsertConflictTarget => 'deck_id,user_id';
 
+  @override
+  String get defaultSelect => _deckFavoriteWithRelationsSelect;
+
+  @override
+  Set<String> get joinedFields => const {'deck', 'userProfile', 'user_profile'};
+
+  @override
+  DeckFavorite fromJoinedMap(Map<String, dynamic> map) {
+    final deck = map['deck'];
+    if (deck is Map<String, dynamic>) {
+      final listing = deck['listing'];
+      if (listing is List) {
+        deck['listing'] = listing.isEmpty ? null : listing.first;
+      }
+    }
+
+    return fromMap(map);
+  }
+
   Future<DeckFavorite?> getByDeckAndUser({
     required String deckId,
     required String userId,
@@ -110,7 +129,16 @@ class DeckFavoritesRemoteDB extends SupabaseRemoteDB<DeckFavorite> {
 
     await insert(DeckFavorite.createNow(deckId: deckId, userId: userId));
   }
+
+  Future<List<DeckFavorite>> getByUser(String userId) => selectMany(
+    filters: {'user_id': userId},
+    orderBy: 'created_at',
+    ascending: false,
+  );
 }
+
+const _deckFavoriteWithRelationsSelect =
+    '*, deck:decks(*, user_profile:profiles(id, username, avatar_url, created_at), listing:deck_listings(*), tags(*)), user_profile:profiles(id, username, avatar_url, created_at)';
 
 class DeckInteractionsRemoteDB {
   DeckInteractionsRemoteDB({

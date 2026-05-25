@@ -13,6 +13,7 @@ class ResearchProfileMapper extends ClassMapperBase<ResearchProfile> {
   static ResearchProfileMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = ResearchProfileMapper._());
+      CachedProfileMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -40,6 +41,9 @@ class ResearchProfileMapper extends ClassMapperBase<ResearchProfile> {
       Field('lastName', _$lastName, key: r'last_name');
   static int _$age(ResearchProfile v) => v.age;
   static const Field<ResearchProfile, int> _f$age = Field('age', _$age);
+  static CachedProfile? _$userProfile(ResearchProfile v) => v.userProfile;
+  static const Field<ResearchProfile, CachedProfile> _f$userProfile =
+      Field('userProfile', _$userProfile, key: r'user_profile', opt: true);
 
   @override
   final MappableFields<ResearchProfile> fields = const {
@@ -51,6 +55,7 @@ class ResearchProfileMapper extends ClassMapperBase<ResearchProfile> {
     #firstName: _f$firstName,
     #lastName: _f$lastName,
     #age: _f$age,
+    #userProfile: _f$userProfile,
   };
 
   static ResearchProfile _instantiate(DecodingData data) {
@@ -62,7 +67,8 @@ class ResearchProfileMapper extends ClassMapperBase<ResearchProfile> {
         createdAt: data.dec(_f$createdAt),
         firstName: data.dec(_f$firstName),
         lastName: data.dec(_f$lastName),
-        age: data.dec(_f$age));
+        age: data.dec(_f$age),
+        userProfile: data.dec(_f$userProfile));
   }
 
   @override
@@ -119,6 +125,7 @@ extension ResearchProfileValueCopy<$R, $Out>
 
 abstract class ResearchProfileCopyWith<$R, $In extends ResearchProfile, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
+  CachedProfileCopyWith<$R, CachedProfile, CachedProfile>? get userProfile;
   $R call(
       {String? id,
       String? userId,
@@ -127,7 +134,8 @@ abstract class ResearchProfileCopyWith<$R, $In extends ResearchProfile, $Out>
       DateTime? createdAt,
       String? firstName,
       String? lastName,
-      int? age});
+      int? age,
+      CachedProfile? userProfile});
   ResearchProfileCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
       Then<$Out2, $R2> t);
 }
@@ -141,6 +149,9 @@ class _ResearchProfileCopyWithImpl<$R, $Out>
   late final ClassMapperBase<ResearchProfile> $mapper =
       ResearchProfileMapper.ensureInitialized();
   @override
+  CachedProfileCopyWith<$R, CachedProfile, CachedProfile>? get userProfile =>
+      $value.userProfile?.copyWith.$chain((v) => call(userProfile: v));
+  @override
   $R call(
           {String? id,
           String? userId,
@@ -149,7 +160,8 @@ class _ResearchProfileCopyWithImpl<$R, $Out>
           DateTime? createdAt,
           String? firstName,
           String? lastName,
-          int? age}) =>
+          int? age,
+          Object? userProfile = $none}) =>
       $apply(FieldCopyWithData({
         if (id != null) #id: id,
         if (userId != null) #userId: userId,
@@ -158,7 +170,8 @@ class _ResearchProfileCopyWithImpl<$R, $Out>
         if (createdAt != null) #createdAt: createdAt,
         if (firstName != null) #firstName: firstName,
         if (lastName != null) #lastName: lastName,
-        if (age != null) #age: age
+        if (age != null) #age: age,
+        if (userProfile != $none) #userProfile: userProfile
       }));
   @override
   ResearchProfile $make(CopyWithData data) => ResearchProfile(
@@ -169,7 +182,8 @@ class _ResearchProfileCopyWithImpl<$R, $Out>
       createdAt: data.get(#createdAt, or: $value.createdAt),
       firstName: data.get(#firstName, or: $value.firstName),
       lastName: data.get(#lastName, or: $value.lastName),
-      age: data.get(#age, or: $value.age));
+      age: data.get(#age, or: $value.age),
+      userProfile: data.get(#userProfile, or: $value.userProfile));
 
   @override
   ResearchProfileCopyWith<$R2, ResearchProfile, $Out2> $chain<$R2, $Out2>(

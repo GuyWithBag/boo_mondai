@@ -26,4 +26,13 @@ class DrillSessionsRemoteDB extends SupabaseRemoteDB<DrillSession> {
 
   @override
   String get upsertConflictTarget => 'id';
+
+  @override
+  String get defaultSelect => _drillSessionWithRelationsSelect;
+
+  @override
+  Set<String> get joinedFields => const {'deck', 'userProfile', 'user_profile'};
 }
+
+const _drillSessionWithRelationsSelect =
+    '*, deck:decks(*), user_profile:profiles(id, username, avatar_url, created_at)';

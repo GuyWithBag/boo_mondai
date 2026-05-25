@@ -132,7 +132,7 @@ class DeckAdapter extends TypeAdapter<Deck> {
       createdAt: fields[21] as DateTime,
       updatedAt: fields[20] as DateTime,
       tags: fields[6] == null ? const [] : (fields[6] as List).cast<Tag>(),
-      userProfile: fields[32] as Profile?,
+      userProfile: fields[32] as CachedProfile?,
       listing: fields[30] as DeckListing?,
     );
   }
@@ -256,13 +256,15 @@ class ReviewCardAdapter extends TypeAdapter<ReviewCard> {
       personalTags: fields[4] == null
           ? const []
           : (fields[4] as List).cast<Tag>(),
+      template: fields[5] as CardTemplate?,
+      deck: fields[6] as Deck?,
     );
   }
 
   @override
   void write(BinaryWriter writer, ReviewCard obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -272,7 +274,11 @@ class ReviewCardAdapter extends TypeAdapter<ReviewCard> {
       ..writeByte(3)
       ..write(obj.deckId)
       ..writeByte(4)
-      ..write(obj.personalTags);
+      ..write(obj.personalTags)
+      ..writeByte(5)
+      ..write(obj.template)
+      ..writeByte(6)
+      ..write(obj.deck);
   }
 
   @override
@@ -403,6 +409,8 @@ class DrillSessionAdapter extends TypeAdapter<DrillSession> {
       deckId: fields[10] as String?,
       startedAt: fields[11] as DateTime,
       completedAt: fields[12] as DateTime?,
+      userProfile: fields[13] as CachedProfile?,
+      deck: fields[14] as Deck?,
       previewed: fields[3] == null ? false : fields[3] as bool,
       totalQuestions: (fields[4] as num).toInt(),
       correctCount: fields[5] == null ? 0 : (fields[5] as num).toInt(),
@@ -412,7 +420,7 @@ class DrillSessionAdapter extends TypeAdapter<DrillSession> {
   @override
   void write(BinaryWriter writer, DrillSession obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(10)
       ..writeByte(3)
       ..write(obj.previewed)
       ..writeByte(4)
@@ -428,7 +436,11 @@ class DrillSessionAdapter extends TypeAdapter<DrillSession> {
       ..writeByte(11)
       ..write(obj.startedAt)
       ..writeByte(12)
-      ..write(obj.completedAt);
+      ..write(obj.completedAt)
+      ..writeByte(13)
+      ..write(obj.userProfile)
+      ..writeByte(14)
+      ..write(obj.deck);
   }
 
   @override
@@ -701,6 +713,7 @@ class FillInTheBlanksTemplateAdapter
       createdAt: fields[4] as DateTime,
       updatedAt: fields[6] as DateTime,
       sourceTemplateId: fields[5] as String?,
+      tags: fields[7] == null ? const [] : (fields[7] as List).cast<Tag>(),
       segments: (fields[0] as List).cast<FillInTheBlankSegment>(),
     );
   }
@@ -708,7 +721,7 @@ class FillInTheBlanksTemplateAdapter
   @override
   void write(BinaryWriter writer, FillInTheBlanksTemplate obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.segments)
       ..writeByte(1)
@@ -722,7 +735,9 @@ class FillInTheBlanksTemplateAdapter
       ..writeByte(5)
       ..write(obj.sourceTemplateId)
       ..writeByte(6)
-      ..write(obj.updatedAt);
+      ..write(obj.updatedAt)
+      ..writeByte(7)
+      ..write(obj.tags);
   }
 
   @override
@@ -754,6 +769,7 @@ class MultipleChoiceTemplateAdapter
       createdAt: fields[7] as DateTime,
       updatedAt: fields[9] as DateTime,
       sourceTemplateId: fields[8] as String?,
+      tags: fields[10] == null ? const [] : (fields[10] as List).cast<Tag>(),
       questionPrompt: fields[0] as String,
       options: (fields[1] as List).cast<MultipleChoiceOption>(),
       imageUrl: fields[2] as String?,
@@ -764,7 +780,7 @@ class MultipleChoiceTemplateAdapter
   @override
   void write(BinaryWriter writer, MultipleChoiceTemplate obj) {
     writer
-      ..writeByte(10)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.questionPrompt)
       ..writeByte(1)
@@ -784,7 +800,9 @@ class MultipleChoiceTemplateAdapter
       ..writeByte(8)
       ..write(obj.sourceTemplateId)
       ..writeByte(9)
-      ..write(obj.updatedAt);
+      ..write(obj.updatedAt)
+      ..writeByte(10)
+      ..write(obj.tags);
   }
 
   @override
@@ -815,6 +833,7 @@ class FlashcardTemplateAdapter extends TypeAdapter<FlashcardTemplate> {
       createdAt: fields[9] as DateTime,
       updatedAt: fields[12] as DateTime,
       sourceTemplateId: fields[10] as String?,
+      tags: fields[13] == null ? const [] : (fields[13] as List).cast<Tag>(),
       frontText: fields[0] as String,
       backText: fields[1] as String,
       frontImageUrl: fields[2] as String?,
@@ -828,7 +847,7 @@ class FlashcardTemplateAdapter extends TypeAdapter<FlashcardTemplate> {
   @override
   void write(BinaryWriter writer, FlashcardTemplate obj) {
     writer
-      ..writeByte(13)
+      ..writeByte(14)
       ..writeByte(0)
       ..write(obj.frontText)
       ..writeByte(1)
@@ -854,7 +873,9 @@ class FlashcardTemplateAdapter extends TypeAdapter<FlashcardTemplate> {
       ..writeByte(11)
       ..write(obj.cardType)
       ..writeByte(12)
-      ..write(obj.updatedAt);
+      ..write(obj.updatedAt)
+      ..writeByte(13)
+      ..write(obj.tags);
   }
 
   @override
@@ -885,6 +906,7 @@ class MatchMadnessTemplateAdapter extends TypeAdapter<MatchMadnessTemplate> {
       createdAt: fields[4] as DateTime,
       updatedAt: fields[6] as DateTime,
       sourceTemplateId: fields[5] as String?,
+      tags: fields[7] == null ? const [] : (fields[7] as List).cast<Tag>(),
       pairs: (fields[0] as List).cast<MatchMadnessPair>(),
     );
   }
@@ -892,7 +914,7 @@ class MatchMadnessTemplateAdapter extends TypeAdapter<MatchMadnessTemplate> {
   @override
   void write(BinaryWriter writer, MatchMadnessTemplate obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.pairs)
       ..writeByte(1)
@@ -906,7 +928,9 @@ class MatchMadnessTemplateAdapter extends TypeAdapter<MatchMadnessTemplate> {
       ..writeByte(5)
       ..write(obj.sourceTemplateId)
       ..writeByte(6)
-      ..write(obj.updatedAt);
+      ..write(obj.updatedAt)
+      ..writeByte(7)
+      ..write(obj.tags);
   }
 
   @override
@@ -938,6 +962,7 @@ class IdentificationTemplateAdapter
       createdAt: fields[7] as DateTime,
       updatedAt: fields[9] as DateTime,
       sourceTemplateId: fields[8] as String?,
+      tags: fields[10] == null ? const [] : (fields[10] as List).cast<Tag>(),
       promptText: fields[0] as String,
       acceptedAnswers: fields[1] as String,
       imageUrl: fields[2] as String?,
@@ -948,7 +973,7 @@ class IdentificationTemplateAdapter
   @override
   void write(BinaryWriter writer, IdentificationTemplate obj) {
     writer
-      ..writeByte(10)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.promptText)
       ..writeByte(1)
@@ -968,7 +993,9 @@ class IdentificationTemplateAdapter
       ..writeByte(8)
       ..write(obj.sourceTemplateId)
       ..writeByte(9)
-      ..write(obj.updatedAt);
+      ..write(obj.updatedAt)
+      ..writeByte(10)
+      ..write(obj.tags);
   }
 
   @override
@@ -999,13 +1026,15 @@ class DrillAnswerAdapter extends TypeAdapter<DrillAnswer> {
       userAnswer: fields[3] as String,
       type: fields[4] as StudyRating,
       createdAt: fields[5] as DateTime,
+      session: fields[6] as DrillSession?,
+      cardTemplate: fields[7] as CardTemplate?,
     );
   }
 
   @override
   void write(BinaryWriter writer, DrillAnswer obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -1017,7 +1046,11 @@ class DrillAnswerAdapter extends TypeAdapter<DrillAnswer> {
       ..writeByte(4)
       ..write(obj.type)
       ..writeByte(5)
-      ..write(obj.createdAt);
+      ..write(obj.createdAt)
+      ..writeByte(6)
+      ..write(obj.session)
+      ..writeByte(7)
+      ..write(obj.cardTemplate);
   }
 
   @override
@@ -1097,13 +1130,14 @@ class FsrsCardAdapter extends TypeAdapter<FsrsCard> {
       userId: fields[1] as String,
       reviewCardId: fields[2] as String,
       state: fields[3] as Card,
+      reviewCard: fields[6] as ReviewCard?,
     );
   }
 
   @override
   void write(BinaryWriter writer, FsrsCard obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -1115,7 +1149,9 @@ class FsrsCardAdapter extends TypeAdapter<FsrsCard> {
       ..writeByte(4)
       ..write(obj.createdAt)
       ..writeByte(5)
-      ..write(obj.updatedAt);
+      ..write(obj.updatedAt)
+      ..writeByte(6)
+      ..write(obj.reviewCard);
   }
 
   @override
@@ -1275,6 +1311,7 @@ class WordScrambleTemplateAdapter extends TypeAdapter<WordScrambleTemplate> {
       createdAt: fields[6] as DateTime,
       updatedAt: fields[8] as DateTime,
       sourceTemplateId: fields[7] as String?,
+      tags: fields[9] == null ? const [] : (fields[9] as List).cast<Tag>(),
       sentenceToScramble: fields[0] as String,
       imageUrl: fields[1] as String?,
       audioUrl: fields[2] as String?,
@@ -1284,7 +1321,7 @@ class WordScrambleTemplateAdapter extends TypeAdapter<WordScrambleTemplate> {
   @override
   void write(BinaryWriter writer, WordScrambleTemplate obj) {
     writer
-      ..writeByte(9)
+      ..writeByte(10)
       ..writeByte(0)
       ..write(obj.sentenceToScramble)
       ..writeByte(1)
@@ -1302,7 +1339,9 @@ class WordScrambleTemplateAdapter extends TypeAdapter<WordScrambleTemplate> {
       ..writeByte(7)
       ..write(obj.sourceTemplateId)
       ..writeByte(8)
-      ..write(obj.updatedAt);
+      ..write(obj.updatedAt)
+      ..writeByte(9)
+      ..write(obj.tags);
   }
 
   @override
@@ -1429,6 +1468,8 @@ class ReviewSessionAdapter extends TypeAdapter<ReviewSession> {
       deckId: fields[4] as String?,
       startedAt: fields[5] as DateTime,
       completedAt: fields[6] as DateTime?,
+      userProfile: fields[7] as CachedProfile?,
+      deck: fields[8] as Deck?,
       totalCards: (fields[0] as num).toInt(),
       cardsReviewed: fields[1] == null ? 0 : (fields[1] as num).toInt(),
     );
@@ -1437,7 +1478,7 @@ class ReviewSessionAdapter extends TypeAdapter<ReviewSession> {
   @override
   void write(BinaryWriter writer, ReviewSession obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.totalCards)
       ..writeByte(1)
@@ -1451,7 +1492,11 @@ class ReviewSessionAdapter extends TypeAdapter<ReviewSession> {
       ..writeByte(5)
       ..write(obj.startedAt)
       ..writeByte(6)
-      ..write(obj.completedAt);
+      ..write(obj.completedAt)
+      ..writeByte(7)
+      ..write(obj.userProfile)
+      ..writeByte(8)
+      ..write(obj.deck);
   }
 
   @override

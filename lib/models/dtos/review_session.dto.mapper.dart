@@ -14,6 +14,8 @@ class ReviewSessionMapper extends SubClassMapperBase<ReviewSession> {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = ReviewSessionMapper._());
       StudySessionMapper.ensureInitialized().addSubMapper(_instance!);
+      CachedProfileMapper.ensureInitialized();
+      DeckMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -35,6 +37,12 @@ class ReviewSessionMapper extends SubClassMapperBase<ReviewSession> {
   static DateTime? _$completedAt(ReviewSession v) => v.completedAt;
   static const Field<ReviewSession, DateTime> _f$completedAt =
       Field('completedAt', _$completedAt, key: r'completed_at', opt: true);
+  static CachedProfile? _$userProfile(ReviewSession v) => v.userProfile;
+  static const Field<ReviewSession, CachedProfile> _f$userProfile =
+      Field('userProfile', _$userProfile, key: r'user_profile', opt: true);
+  static Deck? _$deck(ReviewSession v) => v.deck;
+  static const Field<ReviewSession, Deck> _f$deck =
+      Field('deck', _$deck, opt: true);
   static int _$totalCards(ReviewSession v) => v.totalCards;
   static const Field<ReviewSession, int> _f$totalCards =
       Field('totalCards', _$totalCards, key: r'total_cards');
@@ -50,6 +58,8 @@ class ReviewSessionMapper extends SubClassMapperBase<ReviewSession> {
     #deckId: _f$deckId,
     #startedAt: _f$startedAt,
     #completedAt: _f$completedAt,
+    #userProfile: _f$userProfile,
+    #deck: _f$deck,
     #totalCards: _f$totalCards,
     #cardsReviewed: _f$cardsReviewed,
   };
@@ -69,6 +79,8 @@ class ReviewSessionMapper extends SubClassMapperBase<ReviewSession> {
         deckId: data.dec(_f$deckId),
         startedAt: data.dec(_f$startedAt),
         completedAt: data.dec(_f$completedAt),
+        userProfile: data.dec(_f$userProfile),
+        deck: data.dec(_f$deck),
         totalCards: data.dec(_f$totalCards),
         cardsReviewed: data.dec(_f$cardsReviewed));
   }
@@ -127,12 +139,18 @@ extension ReviewSessionValueCopy<$R, $Out>
 abstract class ReviewSessionCopyWith<$R, $In extends ReviewSession, $Out>
     implements StudySessionCopyWith<$R, $In, $Out> {
   @override
+  CachedProfileCopyWith<$R, CachedProfile, CachedProfile>? get userProfile;
+  @override
+  DeckCopyWith<$R, Deck, Deck>? get deck;
+  @override
   $R call(
       {String? id,
       String? userId,
       String? deckId,
       DateTime? startedAt,
       DateTime? completedAt,
+      CachedProfile? userProfile,
+      Deck? deck,
       int? totalCards,
       int? cardsReviewed});
   ReviewSessionCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
@@ -147,12 +165,20 @@ class _ReviewSessionCopyWithImpl<$R, $Out>
   late final ClassMapperBase<ReviewSession> $mapper =
       ReviewSessionMapper.ensureInitialized();
   @override
+  CachedProfileCopyWith<$R, CachedProfile, CachedProfile>? get userProfile =>
+      $value.userProfile?.copyWith.$chain((v) => call(userProfile: v));
+  @override
+  DeckCopyWith<$R, Deck, Deck>? get deck =>
+      $value.deck?.copyWith.$chain((v) => call(deck: v));
+  @override
   $R call(
           {String? id,
           String? userId,
           Object? deckId = $none,
           DateTime? startedAt,
           Object? completedAt = $none,
+          Object? userProfile = $none,
+          Object? deck = $none,
           int? totalCards,
           int? cardsReviewed}) =>
       $apply(FieldCopyWithData({
@@ -161,6 +187,8 @@ class _ReviewSessionCopyWithImpl<$R, $Out>
         if (deckId != $none) #deckId: deckId,
         if (startedAt != null) #startedAt: startedAt,
         if (completedAt != $none) #completedAt: completedAt,
+        if (userProfile != $none) #userProfile: userProfile,
+        if (deck != $none) #deck: deck,
         if (totalCards != null) #totalCards: totalCards,
         if (cardsReviewed != null) #cardsReviewed: cardsReviewed
       }));
@@ -171,6 +199,8 @@ class _ReviewSessionCopyWithImpl<$R, $Out>
       deckId: data.get(#deckId, or: $value.deckId),
       startedAt: data.get(#startedAt, or: $value.startedAt),
       completedAt: data.get(#completedAt, or: $value.completedAt),
+      userProfile: data.get(#userProfile, or: $value.userProfile),
+      deck: data.get(#deck, or: $value.deck),
       totalCards: data.get(#totalCards, or: $value.totalCards),
       cardsReviewed: data.get(#cardsReviewed, or: $value.cardsReviewed));
 

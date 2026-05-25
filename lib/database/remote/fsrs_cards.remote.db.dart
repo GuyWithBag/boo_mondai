@@ -23,4 +23,13 @@ class FsrsCardsRemoteDB extends SupabaseRemoteDB<FsrsCard> {
 
   @override
   String get upsertConflictTarget => 'id';
+
+  @override
+  String get defaultSelect => _fsrsCardWithRelationsSelect;
+
+  @override
+  Set<String> get joinedFields => const {'reviewCard', 'review_card'};
 }
+
+const _fsrsCardWithRelationsSelect =
+    '*, review_card:review_cards(*, deck:decks(*), template:card_templates(*, tags(*), options:multiple_choice_options(*), segments:fill_in_the_blank_segments(*), pairs:match_madness_pairs(*)), personal_tags:tags(*))';

@@ -14,6 +14,7 @@ class FlashcardTemplateMapper extends SubClassMapperBase<FlashcardTemplate> {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = FlashcardTemplateMapper._());
       CardTemplateMapper.ensureInitialized().addSubMapper(_instance!);
+      TagMapper.ensureInitialized();
       CardTypeMapper.ensureInitialized();
     }
     return _instance!;
@@ -40,6 +41,9 @@ class FlashcardTemplateMapper extends SubClassMapperBase<FlashcardTemplate> {
   static const Field<FlashcardTemplate, String> _f$sourceTemplateId = Field(
       'sourceTemplateId', _$sourceTemplateId,
       key: r'source_template_id', opt: true);
+  static List<Tag> _$tags(FlashcardTemplate v) => v.tags;
+  static const Field<FlashcardTemplate, List<Tag>> _f$tags =
+      Field('tags', _$tags, opt: true, def: const []);
   static String _$frontText(FlashcardTemplate v) => v.frontText;
   static const Field<FlashcardTemplate, String> _f$frontText =
       Field('frontText', _$frontText, key: r'front_text');
@@ -64,9 +68,6 @@ class FlashcardTemplateMapper extends SubClassMapperBase<FlashcardTemplate> {
   static const Field<FlashcardTemplate, CardType> _f$cardType = Field(
       'cardType', _$cardType,
       key: r'card_type', opt: true, def: CardType.normal);
-  static List<Tag> _$tags(FlashcardTemplate v) => v.tags;
-  static const Field<FlashcardTemplate, List<Tag>> _f$tags =
-      Field('tags', _$tags, mode: FieldMode.member);
 
   @override
   final MappableFields<FlashcardTemplate> fields = const {
@@ -76,6 +77,7 @@ class FlashcardTemplateMapper extends SubClassMapperBase<FlashcardTemplate> {
     #createdAt: _f$createdAt,
     #updatedAt: _f$updatedAt,
     #sourceTemplateId: _f$sourceTemplateId,
+    #tags: _f$tags,
     #frontText: _f$frontText,
     #backText: _f$backText,
     #frontImageUrl: _f$frontImageUrl,
@@ -83,7 +85,6 @@ class FlashcardTemplateMapper extends SubClassMapperBase<FlashcardTemplate> {
     #frontAudioUrl: _f$frontAudioUrl,
     #backAudioUrl: _f$backAudioUrl,
     #cardType: _f$cardType,
-    #tags: _f$tags,
   };
 
   @override
@@ -102,6 +103,7 @@ class FlashcardTemplateMapper extends SubClassMapperBase<FlashcardTemplate> {
         createdAt: data.dec(_f$createdAt),
         updatedAt: data.dec(_f$updatedAt),
         sourceTemplateId: data.dec(_f$sourceTemplateId),
+        tags: data.dec(_f$tags),
         frontText: data.dec(_f$frontText),
         backText: data.dec(_f$backText),
         frontImageUrl: data.dec(_f$frontImageUrl),
@@ -168,6 +170,8 @@ extension FlashcardTemplateValueCopy<$R, $Out>
 abstract class FlashcardTemplateCopyWith<$R, $In extends FlashcardTemplate,
     $Out> implements CardTemplateCopyWith<$R, $In, $Out> {
   @override
+  ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags;
+  @override
   $R call(
       {String? id,
       String? deckId,
@@ -175,6 +179,7 @@ abstract class FlashcardTemplateCopyWith<$R, $In extends FlashcardTemplate,
       DateTime? createdAt,
       DateTime? updatedAt,
       String? sourceTemplateId,
+      List<Tag>? tags,
       String? frontText,
       String? backText,
       String? frontImageUrl,
@@ -195,6 +200,9 @@ class _FlashcardTemplateCopyWithImpl<$R, $Out>
   late final ClassMapperBase<FlashcardTemplate> $mapper =
       FlashcardTemplateMapper.ensureInitialized();
   @override
+  ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags => ListCopyWith(
+      $value.tags, (v, t) => v.copyWith.$chain(t), (v) => call(tags: v));
+  @override
   $R call(
           {String? id,
           String? deckId,
@@ -202,6 +210,7 @@ class _FlashcardTemplateCopyWithImpl<$R, $Out>
           DateTime? createdAt,
           DateTime? updatedAt,
           Object? sourceTemplateId = $none,
+          List<Tag>? tags,
           String? frontText,
           String? backText,
           Object? frontImageUrl = $none,
@@ -216,6 +225,7 @@ class _FlashcardTemplateCopyWithImpl<$R, $Out>
         if (createdAt != null) #createdAt: createdAt,
         if (updatedAt != null) #updatedAt: updatedAt,
         if (sourceTemplateId != $none) #sourceTemplateId: sourceTemplateId,
+        if (tags != null) #tags: tags,
         if (frontText != null) #frontText: frontText,
         if (backText != null) #backText: backText,
         if (frontImageUrl != $none) #frontImageUrl: frontImageUrl,
@@ -233,6 +243,7 @@ class _FlashcardTemplateCopyWithImpl<$R, $Out>
       updatedAt: data.get(#updatedAt, or: $value.updatedAt),
       sourceTemplateId:
           data.get(#sourceTemplateId, or: $value.sourceTemplateId),
+      tags: data.get(#tags, or: $value.tags),
       frontText: data.get(#frontText, or: $value.frontText),
       backText: data.get(#backText, or: $value.backText),
       frontImageUrl: data.get(#frontImageUrl, or: $value.frontImageUrl),

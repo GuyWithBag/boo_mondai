@@ -18,6 +18,7 @@ class IdentificationTemplate extends CardTemplate
     required super.createdAt,
     required super.updatedAt,
     super.sourceTemplateId,
+    super.tags,
     required this.promptText,
     required this.acceptedAnswers,
     this.imageUrl,

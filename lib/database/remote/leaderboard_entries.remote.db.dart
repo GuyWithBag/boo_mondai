@@ -24,13 +24,24 @@ class LeaderboardEntriesRemoteDB extends SupabaseRemoteDB<LeaderboardEntry> {
     'user_id': item.userId,
   };
 
+  @override
+  String get defaultSelect => _leaderboardEntryWithRelationsSelect;
+
+  @override
+  Set<String> get joinedFields => const {'userProfile', 'user_profile'};
+
   /// The view's display_name column is aliased to user_name to match the
   /// key expected by [LeaderboardEntryMapper].
   Future<List<LeaderboardEntry>> fetchLeaderboard() => guard(() async {
     final query = client
         .from(tableName)
-        .select('user_id,  drill_score, review_count');
+        .select(_leaderboardEntryWithRelationsSelect);
     final response = await query.order('drill_score', ascending: false);
-    return List<Map<String, dynamic>>.from(response).map(fromMap).toList();
+    return List<Map<String, dynamic>>.from(
+      response,
+    ).map(fromJoinedMap).toList();
   }, action: 'fetchLeaderboard()');
 }
+
+const _leaderboardEntryWithRelationsSelect =
+    'user_id, drill_score, review_count, user_profile';

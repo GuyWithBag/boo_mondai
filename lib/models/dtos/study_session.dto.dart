@@ -2,6 +2,7 @@
 // PATH: lib/models/study_session.dart
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/models/models.barrel.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 
 part 'study_session.dto.mapper.dart';
@@ -14,6 +15,8 @@ abstract class StudySession with StudySessionMappable {
   final String? deckId;
   final DateTime startedAt;
   final DateTime? completedAt;
+  final CachedProfile? userProfile;
+  final Deck? deck;
 
   const StudySession({
     required this.id,
@@ -21,6 +24,8 @@ abstract class StudySession with StudySessionMappable {
     this.deckId,
     required this.startedAt,
     this.completedAt,
+    this.userProfile,
+    this.deck,
   });
 
   bool get isComplete => completedAt != null;

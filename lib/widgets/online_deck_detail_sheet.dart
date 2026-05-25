@@ -20,7 +20,6 @@ class DeckDetailSheet extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final author = _cachedProfileFromAuthor(deck.author);
 
     Future<void> copyDeck() async {
       final auth = context.read<AuthController>();
@@ -86,7 +85,7 @@ class DeckDetailSheet extends HookWidget {
                 children: [
                   DeckDetails(
                     deck: deck,
-                    author: author,
+                    author: deck.userProfile,
                     sourceAuthor: null,
                   ),
                   _ListingStats(listing: deck.listing),
@@ -104,17 +103,6 @@ class DeckDetailSheet extends HookWidget {
           ],
         );
       },
-    );
-  }
-
-  CachedProfile? _cachedProfileFromAuthor(Profile? author) {
-    if (author == null) return null;
-
-    return CachedProfile(
-      id: author.id,
-      username: author.username,
-      avatarUrl: author.avatarUrl,
-      createdAt: author.createdAt,
     );
   }
 }

@@ -15,6 +15,7 @@ class MultipleChoiceTemplateMapper
     if (_instance == null) {
       MapperContainer.globals.use(_instance = MultipleChoiceTemplateMapper._());
       CardTemplateMapper.ensureInitialized().addSubMapper(_instance!);
+      TagMapper.ensureInitialized();
       MultipleChoiceOptionMapper.ensureInitialized();
     }
     return _instance!;
@@ -42,6 +43,9 @@ class MultipleChoiceTemplateMapper
   static const Field<MultipleChoiceTemplate, String> _f$sourceTemplateId =
       Field('sourceTemplateId', _$sourceTemplateId,
           key: r'source_template_id', opt: true);
+  static List<Tag> _$tags(MultipleChoiceTemplate v) => v.tags;
+  static const Field<MultipleChoiceTemplate, List<Tag>> _f$tags =
+      Field('tags', _$tags, opt: true, def: const []);
   static String _$questionPrompt(MultipleChoiceTemplate v) => v.questionPrompt;
   static const Field<MultipleChoiceTemplate, String> _f$questionPrompt =
       Field('questionPrompt', _$questionPrompt, key: r'question_prompt');
@@ -55,9 +59,6 @@ class MultipleChoiceTemplateMapper
   static String? _$audioUrl(MultipleChoiceTemplate v) => v.audioUrl;
   static const Field<MultipleChoiceTemplate, String> _f$audioUrl =
       Field('audioUrl', _$audioUrl, key: r'audio_url', opt: true);
-  static List<Tag> _$tags(MultipleChoiceTemplate v) => v.tags;
-  static const Field<MultipleChoiceTemplate, List<Tag>> _f$tags =
-      Field('tags', _$tags, mode: FieldMode.member);
 
   @override
   final MappableFields<MultipleChoiceTemplate> fields = const {
@@ -67,11 +68,11 @@ class MultipleChoiceTemplateMapper
     #createdAt: _f$createdAt,
     #updatedAt: _f$updatedAt,
     #sourceTemplateId: _f$sourceTemplateId,
+    #tags: _f$tags,
     #questionPrompt: _f$questionPrompt,
     #options: _f$options,
     #imageUrl: _f$imageUrl,
     #audioUrl: _f$audioUrl,
-    #tags: _f$tags,
   };
 
   @override
@@ -90,6 +91,7 @@ class MultipleChoiceTemplateMapper
         createdAt: data.dec(_f$createdAt),
         updatedAt: data.dec(_f$updatedAt),
         sourceTemplateId: data.dec(_f$sourceTemplateId),
+        tags: data.dec(_f$tags),
         questionPrompt: data.dec(_f$questionPrompt),
         options: data.dec(_f$options),
         imageUrl: data.dec(_f$imageUrl),
@@ -154,6 +156,8 @@ abstract class MultipleChoiceTemplateCopyWith<
     $R,
     $In extends MultipleChoiceTemplate,
     $Out> implements CardTemplateCopyWith<$R, $In, $Out> {
+  @override
+  ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags;
   ListCopyWith<
       $R,
       MultipleChoiceOption,
@@ -167,6 +171,7 @@ abstract class MultipleChoiceTemplateCopyWith<
       DateTime? createdAt,
       DateTime? updatedAt,
       String? sourceTemplateId,
+      List<Tag>? tags,
       String? questionPrompt,
       List<MultipleChoiceOption>? options,
       String? imageUrl,
@@ -185,6 +190,9 @@ class _MultipleChoiceTemplateCopyWithImpl<$R, $Out>
   late final ClassMapperBase<MultipleChoiceTemplate> $mapper =
       MultipleChoiceTemplateMapper.ensureInitialized();
   @override
+  ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags => ListCopyWith(
+      $value.tags, (v, t) => v.copyWith.$chain(t), (v) => call(tags: v));
+  @override
   ListCopyWith<
       $R,
       MultipleChoiceOption,
@@ -199,6 +207,7 @@ class _MultipleChoiceTemplateCopyWithImpl<$R, $Out>
           DateTime? createdAt,
           DateTime? updatedAt,
           Object? sourceTemplateId = $none,
+          List<Tag>? tags,
           String? questionPrompt,
           List<MultipleChoiceOption>? options,
           Object? imageUrl = $none,
@@ -210,6 +219,7 @@ class _MultipleChoiceTemplateCopyWithImpl<$R, $Out>
         if (createdAt != null) #createdAt: createdAt,
         if (updatedAt != null) #updatedAt: updatedAt,
         if (sourceTemplateId != $none) #sourceTemplateId: sourceTemplateId,
+        if (tags != null) #tags: tags,
         if (questionPrompt != null) #questionPrompt: questionPrompt,
         if (options != null) #options: options,
         if (imageUrl != $none) #imageUrl: imageUrl,
@@ -224,6 +234,7 @@ class _MultipleChoiceTemplateCopyWithImpl<$R, $Out>
       updatedAt: data.get(#updatedAt, or: $value.updatedAt),
       sourceTemplateId:
           data.get(#sourceTemplateId, or: $value.sourceTemplateId),
+      tags: data.get(#tags, or: $value.tags),
       questionPrompt: data.get(#questionPrompt, or: $value.questionPrompt),
       options: data.get(#options, or: $value.options),
       imageUrl: data.get(#imageUrl, or: $value.imageUrl),

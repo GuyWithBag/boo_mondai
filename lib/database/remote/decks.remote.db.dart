@@ -5,6 +5,7 @@
 
 import 'package:boo_mondai/database/database.barrel.dart';
 import 'package:boo_mondai/models/models.barrel.dart';
+import 'package:boo_mondai/shared/shared.barrel.dart';
 
 class DecksRemoteDB extends SupabaseRemoteDB<Deck> {
   @override
@@ -22,17 +23,41 @@ class DecksRemoteDB extends SupabaseRemoteDB<Deck> {
   @override
   String get upsertConflictTarget => 'id';
 
+  @override
+  String get defaultSelect => _deckWithRelationsSelect;
+
+  @override
+  Set<String> get joinedFields => const {
+    'userProfile',
+    'user_profile',
+    'listing',
+    'tags',
+  };
+
+  @override
+  Deck fromJoinedMap(Map<String, dynamic> map) {
+    final listing = map['listing'];
+    if (listing is List) {
+      map['listing'] = listing.isEmpty ? null : listing.first;
+    }
+
+    return fromMap(map);
+  }
+
   /// Fetches decks where visibility_state is 'public'.
-  /// Also joins the tags using Supabase many-to-many syntax.
-  Future<List<Deck>> selectManyPublic({int? limit, int offset = 0}) =>
-      selectMany(
-        select: '*, tags(*)',
-        filters: {'visibility_state': 'public'},
-        orderBy: 'created_at',
-        ascending: false,
-        limit: limit,
-        offset: offset,
-      );
+  /// Also joins author, storefront listing data, and tags for the online browser.
+  Future<List<Deck>> selectManyPublic({
+    int? limit,
+    int offset = 0,
+    BrowseSortField sortField = BrowseSortField.createdAt,
+    BrowseSortDirection sortDirection = BrowseSortDirection.descending,
+  }) => selectMany(
+    filters: const {'visibility_state': 'public', 'is_published': true},
+    orderBy: _columnForSortField(sortField),
+    ascending: sortDirection == BrowseSortDirection.ascending,
+    limit: limit,
+    offset: offset,
+  );
 
   Future<Deck?> selectById(String deckId) => selectOne(filters: {'id': deckId});
 
@@ -41,4 +66,15 @@ class DecksRemoteDB extends SupabaseRemoteDB<Deck> {
     orderBy: 'updated_at',
     ascending: false,
   );
+
+  String _columnForSortField(BrowseSortField field) {
+    return switch (field) {
+      BrowseSortField.letters => 'title',
+      BrowseSortField.createdAt => 'created_at',
+      BrowseSortField.updatedAt => 'updated_at',
+    };
+  }
 }
+
+const _deckWithRelationsSelect =
+    '*, user_profile:profiles(id, username, avatar_url, created_at), listing:deck_listings(*), tags(*)';

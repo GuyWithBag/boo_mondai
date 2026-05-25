@@ -37,7 +37,7 @@ class Deck with DeckMappable implements DTO {
   final List<Tag> tags;
 
   // ── Joined Data (Populated by remote deck fetches) ──
-  final Profile? userProfile;
+  final CachedProfile? userProfile;
 
   // ── The Storefront Data (Populated when fetching from online browser) ──
   final DeckListing? listing;

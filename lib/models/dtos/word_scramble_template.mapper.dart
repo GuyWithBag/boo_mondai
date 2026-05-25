@@ -15,6 +15,7 @@ class WordScrambleTemplateMapper
     if (_instance == null) {
       MapperContainer.globals.use(_instance = WordScrambleTemplateMapper._());
       CardTemplateMapper.ensureInitialized().addSubMapper(_instance!);
+      TagMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -41,6 +42,9 @@ class WordScrambleTemplateMapper
   static const Field<WordScrambleTemplate, String> _f$sourceTemplateId = Field(
       'sourceTemplateId', _$sourceTemplateId,
       key: r'source_template_id', opt: true);
+  static List<Tag> _$tags(WordScrambleTemplate v) => v.tags;
+  static const Field<WordScrambleTemplate, List<Tag>> _f$tags =
+      Field('tags', _$tags, opt: true, def: const []);
   static String _$sentenceToScramble(WordScrambleTemplate v) =>
       v.sentenceToScramble;
   static const Field<WordScrambleTemplate, String> _f$sentenceToScramble =
@@ -52,9 +56,6 @@ class WordScrambleTemplateMapper
   static String? _$audioUrl(WordScrambleTemplate v) => v.audioUrl;
   static const Field<WordScrambleTemplate, String> _f$audioUrl =
       Field('audioUrl', _$audioUrl, key: r'audio_url', opt: true);
-  static List<Tag> _$tags(WordScrambleTemplate v) => v.tags;
-  static const Field<WordScrambleTemplate, List<Tag>> _f$tags =
-      Field('tags', _$tags, mode: FieldMode.member);
 
   @override
   final MappableFields<WordScrambleTemplate> fields = const {
@@ -64,10 +65,10 @@ class WordScrambleTemplateMapper
     #createdAt: _f$createdAt,
     #updatedAt: _f$updatedAt,
     #sourceTemplateId: _f$sourceTemplateId,
+    #tags: _f$tags,
     #sentenceToScramble: _f$sentenceToScramble,
     #imageUrl: _f$imageUrl,
     #audioUrl: _f$audioUrl,
-    #tags: _f$tags,
   };
 
   @override
@@ -86,6 +87,7 @@ class WordScrambleTemplateMapper
         createdAt: data.dec(_f$createdAt),
         updatedAt: data.dec(_f$updatedAt),
         sourceTemplateId: data.dec(_f$sourceTemplateId),
+        tags: data.dec(_f$tags),
         sentenceToScramble: data.dec(_f$sentenceToScramble),
         imageUrl: data.dec(_f$imageUrl),
         audioUrl: data.dec(_f$audioUrl));
@@ -149,6 +151,8 @@ abstract class WordScrambleTemplateCopyWith<
     $In extends WordScrambleTemplate,
     $Out> implements CardTemplateCopyWith<$R, $In, $Out> {
   @override
+  ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags;
+  @override
   $R call(
       {String? id,
       String? deckId,
@@ -156,6 +160,7 @@ abstract class WordScrambleTemplateCopyWith<
       DateTime? createdAt,
       DateTime? updatedAt,
       String? sourceTemplateId,
+      List<Tag>? tags,
       String? sentenceToScramble,
       String? imageUrl,
       String? audioUrl});
@@ -172,6 +177,9 @@ class _WordScrambleTemplateCopyWithImpl<$R, $Out>
   late final ClassMapperBase<WordScrambleTemplate> $mapper =
       WordScrambleTemplateMapper.ensureInitialized();
   @override
+  ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags => ListCopyWith(
+      $value.tags, (v, t) => v.copyWith.$chain(t), (v) => call(tags: v));
+  @override
   $R call(
           {String? id,
           String? deckId,
@@ -179,6 +187,7 @@ class _WordScrambleTemplateCopyWithImpl<$R, $Out>
           DateTime? createdAt,
           DateTime? updatedAt,
           Object? sourceTemplateId = $none,
+          List<Tag>? tags,
           String? sentenceToScramble,
           Object? imageUrl = $none,
           Object? audioUrl = $none}) =>
@@ -189,6 +198,7 @@ class _WordScrambleTemplateCopyWithImpl<$R, $Out>
         if (createdAt != null) #createdAt: createdAt,
         if (updatedAt != null) #updatedAt: updatedAt,
         if (sourceTemplateId != $none) #sourceTemplateId: sourceTemplateId,
+        if (tags != null) #tags: tags,
         if (sentenceToScramble != null) #sentenceToScramble: sentenceToScramble,
         if (imageUrl != $none) #imageUrl: imageUrl,
         if (audioUrl != $none) #audioUrl: audioUrl
@@ -202,6 +212,7 @@ class _WordScrambleTemplateCopyWithImpl<$R, $Out>
       updatedAt: data.get(#updatedAt, or: $value.updatedAt),
       sourceTemplateId:
           data.get(#sourceTemplateId, or: $value.sourceTemplateId),
+      tags: data.get(#tags, or: $value.tags),
       sentenceToScramble:
           data.get(#sentenceToScramble, or: $value.sentenceToScramble),
       imageUrl: data.get(#imageUrl, or: $value.imageUrl),

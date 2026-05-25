@@ -22,6 +22,8 @@ class DrillAnswer with DrillAnswerMappable implements WriteOnceDTO {
   final StudyRating type;
   @override
   final DateTime createdAt;
+  final DrillSession? session;
+  final CardTemplate? cardTemplate;
 
   const DrillAnswer({
     required this.id,
@@ -30,6 +32,8 @@ class DrillAnswer with DrillAnswerMappable implements WriteOnceDTO {
     required this.userAnswer,
     required this.type,
     required this.createdAt,
+    this.session,
+    this.cardTemplate,
   });
 
   factory DrillAnswer.create({

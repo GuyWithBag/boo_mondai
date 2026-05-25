@@ -14,6 +14,8 @@ class ReviewCardMapper extends ClassMapperBase<ReviewCard> {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = ReviewCardMapper._());
       TagMapper.ensureInitialized();
+      CardTemplateMapper.ensureInitialized();
+      DeckMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -37,6 +39,12 @@ class ReviewCardMapper extends ClassMapperBase<ReviewCard> {
   static const Field<ReviewCard, List<Tag>> _f$personalTags = Field(
       'personalTags', _$personalTags,
       key: r'personal_tags', opt: true, def: const []);
+  static CardTemplate? _$template(ReviewCard v) => v.template;
+  static const Field<ReviewCard, CardTemplate> _f$template =
+      Field('template', _$template, opt: true);
+  static Deck? _$deck(ReviewCard v) => v.deck;
+  static const Field<ReviewCard, Deck> _f$deck =
+      Field('deck', _$deck, opt: true);
 
   @override
   final MappableFields<ReviewCard> fields = const {
@@ -45,6 +53,8 @@ class ReviewCardMapper extends ClassMapperBase<ReviewCard> {
     #isReversed: _f$isReversed,
     #deckId: _f$deckId,
     #personalTags: _f$personalTags,
+    #template: _f$template,
+    #deck: _f$deck,
   };
 
   static ReviewCard _instantiate(DecodingData data) {
@@ -53,7 +63,9 @@ class ReviewCardMapper extends ClassMapperBase<ReviewCard> {
         templateId: data.dec(_f$templateId),
         isReversed: data.dec(_f$isReversed),
         deckId: data.dec(_f$deckId),
-        personalTags: data.dec(_f$personalTags));
+        personalTags: data.dec(_f$personalTags),
+        template: data.dec(_f$template),
+        deck: data.dec(_f$deck));
   }
 
   @override
@@ -109,12 +121,16 @@ extension ReviewCardValueCopy<$R, $Out>
 abstract class ReviewCardCopyWith<$R, $In extends ReviewCard, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get personalTags;
+  CardTemplateCopyWith<$R, CardTemplate, CardTemplate>? get template;
+  DeckCopyWith<$R, Deck, Deck>? get deck;
   $R call(
       {String? id,
       String? templateId,
       bool? isReversed,
       String? deckId,
-      List<Tag>? personalTags});
+      List<Tag>? personalTags,
+      CardTemplate? template,
+      Deck? deck});
   ReviewCardCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -131,18 +147,28 @@ class _ReviewCardCopyWithImpl<$R, $Out>
       ListCopyWith($value.personalTags, (v, t) => v.copyWith.$chain(t),
           (v) => call(personalTags: v));
   @override
+  CardTemplateCopyWith<$R, CardTemplate, CardTemplate>? get template =>
+      $value.template?.copyWith.$chain((v) => call(template: v));
+  @override
+  DeckCopyWith<$R, Deck, Deck>? get deck =>
+      $value.deck?.copyWith.$chain((v) => call(deck: v));
+  @override
   $R call(
           {String? id,
           String? templateId,
           bool? isReversed,
           String? deckId,
-          List<Tag>? personalTags}) =>
+          List<Tag>? personalTags,
+          Object? template = $none,
+          Object? deck = $none}) =>
       $apply(FieldCopyWithData({
         if (id != null) #id: id,
         if (templateId != null) #templateId: templateId,
         if (isReversed != null) #isReversed: isReversed,
         if (deckId != null) #deckId: deckId,
-        if (personalTags != null) #personalTags: personalTags
+        if (personalTags != null) #personalTags: personalTags,
+        if (template != $none) #template: template,
+        if (deck != $none) #deck: deck
       }));
   @override
   ReviewCard $make(CopyWithData data) => ReviewCard(
@@ -150,7 +176,9 @@ class _ReviewCardCopyWithImpl<$R, $Out>
       templateId: data.get(#templateId, or: $value.templateId),
       isReversed: data.get(#isReversed, or: $value.isReversed),
       deckId: data.get(#deckId, or: $value.deckId),
-      personalTags: data.get(#personalTags, or: $value.personalTags));
+      personalTags: data.get(#personalTags, or: $value.personalTags),
+      template: data.get(#template, or: $value.template),
+      deck: data.get(#deck, or: $value.deck));
 
   @override
   ReviewCardCopyWith<$R2, ReviewCard, $Out2> $chain<$R2, $Out2>(

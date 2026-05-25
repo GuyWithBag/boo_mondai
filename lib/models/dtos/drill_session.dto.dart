@@ -17,6 +17,8 @@ class DrillSession extends StudySession with DrillSessionMappable {
     super.deckId,
     required super.startedAt,
     super.completedAt,
+    super.userProfile,
+    super.deck,
 
     // Subclass specific properties
     this.previewed = false,

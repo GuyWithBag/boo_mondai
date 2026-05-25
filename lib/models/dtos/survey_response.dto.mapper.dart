@@ -13,6 +13,8 @@ class SurveyResponseMapper extends ClassMapperBase<SurveyResponse> {
   static SurveyResponseMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = SurveyResponseMapper._());
+      CachedProfileMapper.ensureInitialized();
+      ResearchProfileMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -41,6 +43,14 @@ class SurveyResponseMapper extends ClassMapperBase<SurveyResponse> {
   static DateTime _$submittedAt(SurveyResponse v) => v.submittedAt;
   static const Field<SurveyResponse, DateTime> _f$submittedAt =
       Field('submittedAt', _$submittedAt, key: r'submitted_at');
+  static CachedProfile? _$userProfile(SurveyResponse v) => v.userProfile;
+  static const Field<SurveyResponse, CachedProfile> _f$userProfile =
+      Field('userProfile', _$userProfile, key: r'user_profile', opt: true);
+  static ResearchProfile? _$researchProfile(SurveyResponse v) =>
+      v.researchProfile;
+  static const Field<SurveyResponse, ResearchProfile> _f$researchProfile =
+      Field('researchProfile', _$researchProfile,
+          key: r'research_profile', opt: true);
 
   @override
   final MappableFields<SurveyResponse> fields = const {
@@ -51,6 +61,8 @@ class SurveyResponseMapper extends ClassMapperBase<SurveyResponse> {
     #responses: _f$responses,
     #computedScore: _f$computedScore,
     #submittedAt: _f$submittedAt,
+    #userProfile: _f$userProfile,
+    #researchProfile: _f$researchProfile,
   };
 
   static SurveyResponse _instantiate(DecodingData data) {
@@ -61,7 +73,9 @@ class SurveyResponseMapper extends ClassMapperBase<SurveyResponse> {
         timePoint: data.dec(_f$timePoint),
         responses: data.dec(_f$responses),
         computedScore: data.dec(_f$computedScore),
-        submittedAt: data.dec(_f$submittedAt));
+        submittedAt: data.dec(_f$submittedAt),
+        userProfile: data.dec(_f$userProfile),
+        researchProfile: data.dec(_f$researchProfile));
   }
 
   @override
@@ -120,6 +134,9 @@ abstract class SurveyResponseCopyWith<$R, $In extends SurveyResponse, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   MapCopyWith<$R, String, dynamic, ObjectCopyWith<$R, dynamic, dynamic>>
       get responses;
+  CachedProfileCopyWith<$R, CachedProfile, CachedProfile>? get userProfile;
+  ResearchProfileCopyWith<$R, ResearchProfile, ResearchProfile>?
+      get researchProfile;
   $R call(
       {String? id,
       String? userId,
@@ -127,7 +144,9 @@ abstract class SurveyResponseCopyWith<$R, $In extends SurveyResponse, $Out>
       String? timePoint,
       Map<String, dynamic>? responses,
       double? computedScore,
-      DateTime? submittedAt});
+      DateTime? submittedAt,
+      CachedProfile? userProfile,
+      ResearchProfile? researchProfile});
   SurveyResponseCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
       Then<$Out2, $R2> t);
 }
@@ -145,6 +164,13 @@ class _SurveyResponseCopyWithImpl<$R, $Out>
       get responses => MapCopyWith($value.responses,
           (v, t) => ObjectCopyWith(v, $identity, t), (v) => call(responses: v));
   @override
+  CachedProfileCopyWith<$R, CachedProfile, CachedProfile>? get userProfile =>
+      $value.userProfile?.copyWith.$chain((v) => call(userProfile: v));
+  @override
+  ResearchProfileCopyWith<$R, ResearchProfile, ResearchProfile>?
+      get researchProfile => $value.researchProfile?.copyWith
+          .$chain((v) => call(researchProfile: v));
+  @override
   $R call(
           {String? id,
           String? userId,
@@ -152,7 +178,9 @@ class _SurveyResponseCopyWithImpl<$R, $Out>
           Object? timePoint = $none,
           Map<String, dynamic>? responses,
           Object? computedScore = $none,
-          DateTime? submittedAt}) =>
+          DateTime? submittedAt,
+          Object? userProfile = $none,
+          Object? researchProfile = $none}) =>
       $apply(FieldCopyWithData({
         if (id != null) #id: id,
         if (userId != null) #userId: userId,
@@ -160,7 +188,9 @@ class _SurveyResponseCopyWithImpl<$R, $Out>
         if (timePoint != $none) #timePoint: timePoint,
         if (responses != null) #responses: responses,
         if (computedScore != $none) #computedScore: computedScore,
-        if (submittedAt != null) #submittedAt: submittedAt
+        if (submittedAt != null) #submittedAt: submittedAt,
+        if (userProfile != $none) #userProfile: userProfile,
+        if (researchProfile != $none) #researchProfile: researchProfile
       }));
   @override
   SurveyResponse $make(CopyWithData data) => SurveyResponse(
@@ -170,7 +200,9 @@ class _SurveyResponseCopyWithImpl<$R, $Out>
       timePoint: data.get(#timePoint, or: $value.timePoint),
       responses: data.get(#responses, or: $value.responses),
       computedScore: data.get(#computedScore, or: $value.computedScore),
-      submittedAt: data.get(#submittedAt, or: $value.submittedAt));
+      submittedAt: data.get(#submittedAt, or: $value.submittedAt),
+      userProfile: data.get(#userProfile, or: $value.userProfile),
+      researchProfile: data.get(#researchProfile, or: $value.researchProfile));
 
   @override
   SurveyResponseCopyWith<$R2, SurveyResponse, $Out2> $chain<$R2, $Out2>(

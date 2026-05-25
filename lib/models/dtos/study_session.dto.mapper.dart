@@ -13,6 +13,8 @@ class StudySessionMapper extends ClassMapperBase<StudySession> {
   static StudySessionMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = StudySessionMapper._());
+      CachedProfileMapper.ensureInitialized();
+      DeckMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -34,6 +36,12 @@ class StudySessionMapper extends ClassMapperBase<StudySession> {
   static DateTime? _$completedAt(StudySession v) => v.completedAt;
   static const Field<StudySession, DateTime> _f$completedAt =
       Field('completedAt', _$completedAt, key: r'completed_at', opt: true);
+  static CachedProfile? _$userProfile(StudySession v) => v.userProfile;
+  static const Field<StudySession, CachedProfile> _f$userProfile =
+      Field('userProfile', _$userProfile, key: r'user_profile', opt: true);
+  static Deck? _$deck(StudySession v) => v.deck;
+  static const Field<StudySession, Deck> _f$deck =
+      Field('deck', _$deck, opt: true);
 
   @override
   final MappableFields<StudySession> fields = const {
@@ -42,6 +50,8 @@ class StudySessionMapper extends ClassMapperBase<StudySession> {
     #deckId: _f$deckId,
     #startedAt: _f$startedAt,
     #completedAt: _f$completedAt,
+    #userProfile: _f$userProfile,
+    #deck: _f$deck,
   };
 
   static StudySession _instantiate(DecodingData data) {
@@ -68,11 +78,15 @@ mixin StudySessionMappable {
 
 abstract class StudySessionCopyWith<$R, $In extends StudySession, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
+  CachedProfileCopyWith<$R, CachedProfile, CachedProfile>? get userProfile;
+  DeckCopyWith<$R, Deck, Deck>? get deck;
   $R call(
       {String? id,
       String? userId,
       String? deckId,
       DateTime? startedAt,
-      DateTime? completedAt});
+      DateTime? completedAt,
+      CachedProfile? userProfile,
+      Deck? deck});
   StudySessionCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }

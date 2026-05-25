@@ -14,6 +14,8 @@ class DrillAnswerMapper extends ClassMapperBase<DrillAnswer> {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = DrillAnswerMapper._());
       StudyRatingMapper.ensureInitialized();
+      DrillSessionMapper.ensureInitialized();
+      CardTemplateMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -37,6 +39,12 @@ class DrillAnswerMapper extends ClassMapperBase<DrillAnswer> {
   static DateTime _$createdAt(DrillAnswer v) => v.createdAt;
   static const Field<DrillAnswer, DateTime> _f$createdAt =
       Field('createdAt', _$createdAt, key: r'created_at');
+  static DrillSession? _$session(DrillAnswer v) => v.session;
+  static const Field<DrillAnswer, DrillSession> _f$session =
+      Field('session', _$session, opt: true);
+  static CardTemplate? _$cardTemplate(DrillAnswer v) => v.cardTemplate;
+  static const Field<DrillAnswer, CardTemplate> _f$cardTemplate =
+      Field('cardTemplate', _$cardTemplate, key: r'card_template', opt: true);
 
   @override
   final MappableFields<DrillAnswer> fields = const {
@@ -46,6 +54,8 @@ class DrillAnswerMapper extends ClassMapperBase<DrillAnswer> {
     #userAnswer: _f$userAnswer,
     #type: _f$type,
     #createdAt: _f$createdAt,
+    #session: _f$session,
+    #cardTemplate: _f$cardTemplate,
   };
 
   static DrillAnswer _instantiate(DecodingData data) {
@@ -55,7 +65,9 @@ class DrillAnswerMapper extends ClassMapperBase<DrillAnswer> {
         cardId: data.dec(_f$cardId),
         userAnswer: data.dec(_f$userAnswer),
         type: data.dec(_f$type),
-        createdAt: data.dec(_f$createdAt));
+        createdAt: data.dec(_f$createdAt),
+        session: data.dec(_f$session),
+        cardTemplate: data.dec(_f$cardTemplate));
   }
 
   @override
@@ -110,13 +122,17 @@ extension DrillAnswerValueCopy<$R, $Out>
 
 abstract class DrillAnswerCopyWith<$R, $In extends DrillAnswer, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
+  DrillSessionCopyWith<$R, DrillSession, DrillSession>? get session;
+  CardTemplateCopyWith<$R, CardTemplate, CardTemplate>? get cardTemplate;
   $R call(
       {String? id,
       String? sessionId,
       String? cardId,
       String? userAnswer,
       StudyRating? type,
-      DateTime? createdAt});
+      DateTime? createdAt,
+      DrillSession? session,
+      CardTemplate? cardTemplate});
   DrillAnswerCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -129,20 +145,30 @@ class _DrillAnswerCopyWithImpl<$R, $Out>
   late final ClassMapperBase<DrillAnswer> $mapper =
       DrillAnswerMapper.ensureInitialized();
   @override
+  DrillSessionCopyWith<$R, DrillSession, DrillSession>? get session =>
+      $value.session?.copyWith.$chain((v) => call(session: v));
+  @override
+  CardTemplateCopyWith<$R, CardTemplate, CardTemplate>? get cardTemplate =>
+      $value.cardTemplate?.copyWith.$chain((v) => call(cardTemplate: v));
+  @override
   $R call(
           {String? id,
           String? sessionId,
           String? cardId,
           String? userAnswer,
           StudyRating? type,
-          DateTime? createdAt}) =>
+          DateTime? createdAt,
+          Object? session = $none,
+          Object? cardTemplate = $none}) =>
       $apply(FieldCopyWithData({
         if (id != null) #id: id,
         if (sessionId != null) #sessionId: sessionId,
         if (cardId != null) #cardId: cardId,
         if (userAnswer != null) #userAnswer: userAnswer,
         if (type != null) #type: type,
-        if (createdAt != null) #createdAt: createdAt
+        if (createdAt != null) #createdAt: createdAt,
+        if (session != $none) #session: session,
+        if (cardTemplate != $none) #cardTemplate: cardTemplate
       }));
   @override
   DrillAnswer $make(CopyWithData data) => DrillAnswer(
@@ -151,7 +177,9 @@ class _DrillAnswerCopyWithImpl<$R, $Out>
       cardId: data.get(#cardId, or: $value.cardId),
       userAnswer: data.get(#userAnswer, or: $value.userAnswer),
       type: data.get(#type, or: $value.type),
-      createdAt: data.get(#createdAt, or: $value.createdAt));
+      createdAt: data.get(#createdAt, or: $value.createdAt),
+      session: data.get(#session, or: $value.session),
+      cardTemplate: data.get(#cardTemplate, or: $value.cardTemplate));
 
   @override
   DrillAnswerCopyWith<$R2, DrillAnswer, $Out2> $chain<$R2, $Out2>(

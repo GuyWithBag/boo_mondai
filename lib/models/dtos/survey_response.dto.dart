@@ -5,6 +5,7 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/models/models.barrel.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 
 part 'survey_response.dto.mapper.dart';
@@ -18,6 +19,8 @@ class SurveyResponse with SurveyResponseMappable {
   final Map<String, dynamic> responses;
   final double? computedScore;
   final DateTime submittedAt;
+  final CachedProfile? userProfile;
+  final ResearchProfile? researchProfile;
 
   const SurveyResponse({
     required this.id,
@@ -27,5 +30,7 @@ class SurveyResponse with SurveyResponseMappable {
     required this.responses,
     this.computedScore,
     required this.submittedAt,
+    this.userProfile,
+    this.researchProfile,
   });
 }

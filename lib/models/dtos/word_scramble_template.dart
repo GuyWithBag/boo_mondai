@@ -17,6 +17,7 @@ class WordScrambleTemplate extends CardTemplate
     required super.createdAt,
     required super.updatedAt,
     super.sourceTemplateId,
+    super.tags,
     required this.sentenceToScramble,
     this.imageUrl,
     this.audioUrl,

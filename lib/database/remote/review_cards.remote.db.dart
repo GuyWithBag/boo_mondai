@@ -25,4 +25,18 @@ class ReviewCardsRemoteDB extends SupabaseRemoteDB<ReviewCard> {
 
   @override
   String get upsertConflictTarget => 'id';
+
+  @override
+  String get defaultSelect => _reviewCardWithRelationsSelect;
+
+  @override
+  Set<String> get joinedFields => const {
+    'template',
+    'deck',
+    'personalTags',
+    'personal_tags',
+  };
 }
+
+const _reviewCardWithRelationsSelect =
+    '*, deck:decks(*), template:card_templates(*, tags(*), options:multiple_choice_options(*), segments:fill_in_the_blank_segments(*), pairs:match_madness_pairs(*)), personal_tags:tags(*)';

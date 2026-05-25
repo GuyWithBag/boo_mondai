@@ -85,12 +85,14 @@ mixin CardTemplateMappable {
 
 abstract class CardTemplateCopyWith<$R, $In extends CardTemplate, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
+  ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags;
   $R call(
       {String? id,
       String? deckId,
       int? sortOrder,
       DateTime? createdAt,
       DateTime? updatedAt,
-      String? sourceTemplateId});
+      String? sourceTemplateId,
+      List<Tag>? tags});
   CardTemplateCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }

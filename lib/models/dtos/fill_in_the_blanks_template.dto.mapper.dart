@@ -16,6 +16,7 @@ class FillInTheBlanksTemplateMapper
       MapperContainer.globals
           .use(_instance = FillInTheBlanksTemplateMapper._());
       CardTemplateMapper.ensureInitialized().addSubMapper(_instance!);
+      TagMapper.ensureInitialized();
       FillInTheBlankSegmentMapper.ensureInitialized();
     }
     return _instance!;
@@ -43,13 +44,13 @@ class FillInTheBlanksTemplateMapper
   static const Field<FillInTheBlanksTemplate, String> _f$sourceTemplateId =
       Field('sourceTemplateId', _$sourceTemplateId,
           key: r'source_template_id', opt: true);
+  static List<Tag> _$tags(FillInTheBlanksTemplate v) => v.tags;
+  static const Field<FillInTheBlanksTemplate, List<Tag>> _f$tags =
+      Field('tags', _$tags, opt: true, def: const []);
   static List<FillInTheBlankSegment> _$segments(FillInTheBlanksTemplate v) =>
       v.segments;
   static const Field<FillInTheBlanksTemplate, List<FillInTheBlankSegment>>
       _f$segments = Field('segments', _$segments);
-  static List<Tag> _$tags(FillInTheBlanksTemplate v) => v.tags;
-  static const Field<FillInTheBlanksTemplate, List<Tag>> _f$tags =
-      Field('tags', _$tags, mode: FieldMode.member);
 
   @override
   final MappableFields<FillInTheBlanksTemplate> fields = const {
@@ -59,8 +60,8 @@ class FillInTheBlanksTemplateMapper
     #createdAt: _f$createdAt,
     #updatedAt: _f$updatedAt,
     #sourceTemplateId: _f$sourceTemplateId,
-    #segments: _f$segments,
     #tags: _f$tags,
+    #segments: _f$segments,
   };
 
   @override
@@ -79,6 +80,7 @@ class FillInTheBlanksTemplateMapper
         createdAt: data.dec(_f$createdAt),
         updatedAt: data.dec(_f$updatedAt),
         sourceTemplateId: data.dec(_f$sourceTemplateId),
+        tags: data.dec(_f$tags),
         segments: data.dec(_f$segments));
   }
 
@@ -140,6 +142,8 @@ abstract class FillInTheBlanksTemplateCopyWith<
     $R,
     $In extends FillInTheBlanksTemplate,
     $Out> implements CardTemplateCopyWith<$R, $In, $Out> {
+  @override
+  ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags;
   ListCopyWith<
       $R,
       FillInTheBlankSegment,
@@ -153,6 +157,7 @@ abstract class FillInTheBlanksTemplateCopyWith<
       DateTime? createdAt,
       DateTime? updatedAt,
       String? sourceTemplateId,
+      List<Tag>? tags,
       List<FillInTheBlankSegment>? segments});
   FillInTheBlanksTemplateCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
       Then<$Out2, $R2> t);
@@ -168,6 +173,9 @@ class _FillInTheBlanksTemplateCopyWithImpl<$R, $Out>
   late final ClassMapperBase<FillInTheBlanksTemplate> $mapper =
       FillInTheBlanksTemplateMapper.ensureInitialized();
   @override
+  ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags => ListCopyWith(
+      $value.tags, (v, t) => v.copyWith.$chain(t), (v) => call(tags: v));
+  @override
   ListCopyWith<
       $R,
       FillInTheBlankSegment,
@@ -182,6 +190,7 @@ class _FillInTheBlanksTemplateCopyWithImpl<$R, $Out>
           DateTime? createdAt,
           DateTime? updatedAt,
           Object? sourceTemplateId = $none,
+          List<Tag>? tags,
           List<FillInTheBlankSegment>? segments}) =>
       $apply(FieldCopyWithData({
         if (id != null) #id: id,
@@ -190,6 +199,7 @@ class _FillInTheBlanksTemplateCopyWithImpl<$R, $Out>
         if (createdAt != null) #createdAt: createdAt,
         if (updatedAt != null) #updatedAt: updatedAt,
         if (sourceTemplateId != $none) #sourceTemplateId: sourceTemplateId,
+        if (tags != null) #tags: tags,
         if (segments != null) #segments: segments
       }));
   @override
@@ -201,6 +211,7 @@ class _FillInTheBlanksTemplateCopyWithImpl<$R, $Out>
       updatedAt: data.get(#updatedAt, or: $value.updatedAt),
       sourceTemplateId:
           data.get(#sourceTemplateId, or: $value.sourceTemplateId),
+      tags: data.get(#tags, or: $value.tags),
       segments: data.get(#segments, or: $value.segments));
 
   @override
