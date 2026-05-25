@@ -32,7 +32,7 @@ class DecksLocalDB extends HiveLocalDB<Deck> {
 
   List<Deck> getByCurrentUser() => guardSync(
     () => selectMany()
-        .where((d) => d.userId == LocalDB.profile.getOrCreate().userId)
+        .where((d) => d.userId == LocalDB.profile.getOrCreate().id)
         .toList(),
     action: 'getByCurrentUser',
   );
@@ -48,7 +48,9 @@ class DecksLocalDB extends HiveLocalDB<Deck> {
     BrowseSortDirection sortDirection = BrowseSortDirection.descending,
   }) => guardSync(() {
     final normalizedQuery = query.trim().toLowerCase();
+    final currentProfileId = LocalDB.profile.getOrCreate().id;
     final filtered = selectMany().where((deck) {
+      if (deck.userId != currentProfileId) return false;
       if (normalizedQuery.isEmpty) return true;
       return deck.title.toLowerCase().contains(normalizedQuery) ||
           deck.shortDescription.toLowerCase().contains(normalizedQuery) ||
@@ -57,6 +59,22 @@ class DecksLocalDB extends HiveLocalDB<Deck> {
 
     return _sortDecks(filtered, field: sortField, direction: sortDirection);
   }, action: 'filterDecks($query, $sortField, $sortDirection)');
+
+  Future<void> adoptLegacyOwnerId({
+    required String legacyUserId,
+    required String currentProfileId,
+  }) => guard(() async {
+    if (legacyUserId == currentProfileId) return;
+
+    final legacyDecks = box.values
+        .where((deck) => deck.userId == legacyUserId)
+        .toList();
+    for (final deck in legacyDecks) {
+      await upsert(
+        deck.copyWith(userId: currentProfileId, updatedAt: DateTime.now()),
+      );
+    }
+  }, action: 'adoptLegacyOwnerId($legacyUserId, $currentProfileId)');
 
   List<Deck> _sortDecks(
     Iterable<Deck> decks, {

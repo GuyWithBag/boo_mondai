@@ -47,14 +47,14 @@ class DeckListingTile extends HookWidget {
       return null;
     }, [interactionsController.error]);
 
-    return SizedBox(
+    final tile = SizedBox(
       height: 300,
       child: AspectRatio(
         aspectRatio: 16 / 9,
         child: Surface(
           style: surfaceStyle.resolve(tokens, const [
-            SurfaceShape.sharp,
             SurfacePadding.none,
+            SurfaceShape.sharp,
           ]),
           child: Stack(
             fit: StackFit.expand,
@@ -149,7 +149,7 @@ class DeckListingTile extends HookWidget {
                           runSpacing: tokens.spacePanelGapSm,
                           children: [
                             for (final tag in tags)
-                              StatusBadge(label: tag.name),
+                              HeaderBadge(label: tag.name),
                           ],
                         ),
                       ],
@@ -214,6 +214,17 @@ class DeckListingTile extends HookWidget {
             ],
           ),
         ),
+      ),
+    );
+
+    return MouseRegion(
+      cursor: onPressed == null
+          ? SystemMouseCursors.basic
+          : SystemMouseCursors.click,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onPressed,
+        child: tile,
       ),
     );
   }

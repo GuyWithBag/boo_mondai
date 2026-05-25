@@ -8,11 +8,15 @@
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/database/database.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
+import 'package:boo_mondai/variant_styles/variant_styles.barrel.dart';
+import 'package:boo_mondai/widgets/widgets.barrel.dart';
+import 'package:theme_variants/theme_variants.dart';
 
 class ViewAccountPage extends StatelessWidget {
   const ViewAccountPage({super.key});
@@ -39,7 +43,9 @@ class ViewAccountPage extends StatelessWidget {
             const SizedBox(height: AppSpacing.md),
 
             // Kept the Force Sign Out for dev convenience
-            TextButton(
+            TactileButton(
+              tone: TactileTone.text,
+              depth: TactileDepth.flat,
               onPressed: () async {
                 await auth.signOut();
               },
@@ -102,23 +108,23 @@ class _AuthenticatedActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final profile = LocalDB.profile.getOrCreate();
-    final colorScheme = Theme.of(context).colorScheme;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (profile.role != 'researcher') ...[
-          OutlinedButton.icon(
+          TactileButton(
             onPressed: () => context.push('/research/code'),
-            icon: const Icon(Icons.vpn_key),
-            label: const Text('Enter Research Code'),
+            leading: const Icon(Icons.vpn_key),
+            child: const Text('Enter Research Code'),
           ),
           const SizedBox(height: AppSpacing.xl),
         ],
-        OutlinedButton.icon(
+        TactileButton(
+          tone: TactileTone.error,
           onPressed: () => _showSignOutDialog(context),
-          icon: Icon(Icons.logout, color: colorScheme.error),
-          label: Text('Sign Out', style: TextStyle(color: colorScheme.error)),
+          leading: const Icon(Icons.logout),
+          child: const Text('Sign Out'),
         ),
       ],
     );
@@ -154,12 +160,13 @@ class _SignInActions extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: AppSpacing.lg),
-          FilledButton(
+          TactileButton(
+            tone: TactileTone.filled,
             onPressed: () => context.push('/login'),
             child: const Text('Sign In'),
           ),
           const SizedBox(height: AppSpacing.sm),
-          OutlinedButton(
+          TactileButton(
             onPressed: () => context.push('/register'),
             child: const Text('Create Account'),
           ),
@@ -203,7 +210,7 @@ class _GoogleSignInButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final auth = context.read<AuthController>();
 
-    return OutlinedButton.icon(
+    return TactileButton(
       onPressed: () async {
         // 1. Trigger the actual browser launch (don't await it yet so we can show the dialog)
         final loginFuture = auth.signInWithGoogle();
@@ -230,8 +237,8 @@ class _GoogleSignInButton extends StatelessWidget {
         // 5. Catch any errors from the original future
         await loginFuture;
       },
-      icon: const Icon(Icons.g_mobiledata, size: 24),
-      label: const Text('Continue with Google'),
+      leading: const Icon(Icons.g_mobiledata, size: 24),
+      child: const Text('Continue with Google'),
     );
   }
 }
@@ -241,65 +248,70 @@ class _AppleSignInButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return OutlinedButton.icon(
+    return TactileButton(
       onPressed: null,
-      icon: const Icon(Icons.apple, size: 24),
-      label: const Text('Continue with Apple'),
+      leading: const Icon(Icons.apple, size: 24),
+      child: const Text('Continue with Apple'),
     );
   }
 }
 
 // ── Dev Manual Login Dialog ─────────────────────────────────────────────────
 
-class _DevManualLoginDialog extends StatefulWidget {
+class _DevManualLoginDialog extends HookWidget {
   const _DevManualLoginDialog();
 
   @override
-  State<_DevManualLoginDialog> createState() => _DevManualLoginDialogState();
-}
-
-class _DevManualLoginDialogState extends State<_DevManualLoginDialog> {
-  final _controller = TextEditingController();
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Dev Auth Redirect'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Paste the local redirect URL from your browser to complete login.',
-            style: TextStyle(fontSize: 14),
+    final controller = useTextEditingController();
+    final tokens = context.themeTokens<AppTokens>();
+
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: EdgeInsets.all(tokens.spacePanelGapLg),
+      child: AppModal(
+        tone: AppModalTone.surface,
+        leading: const Icon(Icons.link),
+        actions: [
+          TactileButton(
+            tone: TactileTone.ghost,
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
           ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _controller,
-            decoration: const InputDecoration(
-              hintText: 'http://127.0.0.1:3000/?code=...',
-              labelText: 'Redirect URL',
-              border: OutlineInputBorder(),
-            ),
+          TactileButton(
+            tone: TactileTone.filled,
+            onPressed: () => Navigator.of(context).pop(controller.text),
+            child: const Text('Submit Code'),
           ),
         ],
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              'Dev Auth Redirect',
+              textAlign: TextAlign.center,
+              style: appTextStyle.resolve(tokens, const [
+                TextSize.header,
+                TextWeight.heavy,
+              ]),
+            ),
+            SizedBox(height: tokens.spacePanelGapMd),
+            VariantTextField(
+              controller: controller,
+              placeholder: 'http://127.0.0.1:3000/?code=...',
+              keyboardType: TextInputType.url,
+              textInputAction: TextInputAction.done,
+              onSubmitted: (_) => Navigator.of(context).pop(controller.text),
+              variants: const [
+                AppTextFieldSize.normal,
+                AppTextFieldFrame.outline,
+                AppTextFieldTone.neutral,
+              ],
+            ),
+          ],
+        ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(), // Returns null
-          child: const Text('Cancel / Let OS Handle It'),
-        ),
-        FilledButton(
-          onPressed: () => Navigator.of(context).pop(_controller.text),
-          child: const Text('Submit Code'),
-        ),
-      ],
     );
   }
 }
@@ -312,34 +324,62 @@ class _SignOutDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final auth = context.read<AuthController>();
+    final tokens = context.themeTokens<AppTokens>();
 
-    return AlertDialog(
-      title: const Text('Sign Out'),
-      content: const Text(
-        'Would you like to keep your local data after signing out, '
-        'or remove it from this device?',
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: EdgeInsets.all(tokens.spacePanelGapLg),
+      child: AppModal(
+        tone: AppModalTone.error,
+        leading: const Icon(Icons.logout),
+        actions: [
+          TactileButton(
+            tone: TactileTone.ghost,
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          TactileButton(
+            tone: TactileTone.ghost,
+            onPressed: () {
+              Navigator.of(context).pop();
+              auth.signOut();
+            },
+            child: const Text('Keep data'),
+          ),
+          TactileButton(
+            tone: TactileTone.error,
+            onPressed: () async {
+              Navigator.of(context).pop();
+              await auth.signOut();
+              await LocalDB.clearAll();
+            },
+            child: const Text('Remove data'),
+          ),
+        ],
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Sign Out',
+              textAlign: TextAlign.center,
+              style: appTextStyle.resolve(tokens, const [
+                TextSize.header,
+                TextWeight.heavy,
+              ]),
+            ),
+            SizedBox(height: tokens.spacePanelGapSm),
+            Text(
+              'Keep your local data on this device, or remove it after signing out.',
+              textAlign: TextAlign.center,
+              style: appTextStyle.resolve(tokens, const [
+                TextSize.label,
+                TextWeight.body,
+                TextTone.secondary,
+              ]),
+            ),
+          ],
+        ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
-        ),
-        OutlinedButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-            auth.signOut();
-          },
-          child: const Text('Sign out & keep data'),
-        ),
-        FilledButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-            auth.signOut();
-            LocalDB.clearAll();
-          },
-          child: const Text('Sign out & remove data'),
-        ),
-      ],
     );
   }
 }

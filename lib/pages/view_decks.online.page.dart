@@ -12,6 +12,8 @@ import 'package:boo_mondai/widgets/widgets.barrel.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
 
+import 'view_deck.online.page.dart';
+
 class ViewDecksOnlinePage extends StatelessWidget {
   const ViewDecksOnlinePage({super.key});
 
@@ -52,12 +54,7 @@ class _ViewDecksOnlineView extends HookWidget {
           itemBuilder: (context, _, deck) {
             return DeckListingTile(
               deck: deck,
-              onPressed: () => showModalBottomSheet<void>(
-                context: context,
-                isScrollControlled: true,
-                useSafeArea: true,
-                builder: (_) => DeckDetailSheet(deck: deck),
-              ),
+              onPressed: () => showViewDeckOnlineSheet(context, deck),
             );
           },
         ),

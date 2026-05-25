@@ -65,6 +65,7 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => ViewReviewsController()),
         ChangeNotifierProvider(create: (_) => ReviewSessionController()),
         ChangeNotifierProvider(create: (_) => ViewDecksLocalController()),
+        ChangeNotifierProvider(create: (_) => ViewDecksOnlineController()),
         ChangeNotifierProvider(create: (_) => ViewLeaderboardController()),
         ChangeNotifierProvider(create: (_) => StreakController()),
         ChangeNotifierProvider(create: (_) => ResearchController()),

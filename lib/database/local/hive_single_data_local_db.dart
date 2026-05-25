@@ -89,9 +89,10 @@ abstract class HiveSingleDataLocalDB<T> {
     final value = retrieve();
     if (value == null) {
       final newValue = createValue();
-      upsert(newValue);
+      box.put(getId(newValue), newValue);
+      return newValue;
     }
-    return retrieve()!;
+    return value;
   }
 
   Future<void> upsert(T item) => guard(() async {

@@ -34,7 +34,7 @@ class DeckReviewRow extends StatelessWidget {
         ),
         const SizedBox(width: AppSpacing.sm),
         if (reviewableNow > 0)
-          StatusBadge(
+          HeaderBadge(
             label: '$reviewableNow ready',
             // color: AppColors.correct
           ),
@@ -42,7 +42,7 @@ class DeckReviewRow extends StatelessWidget {
         if (reviewLater > 0)
           Tooltip(
             message: 'These cards were moved to FSRS review',
-            child: StatusBadge(
+            child: HeaderBadge(
               label: '$reviewLater later',
               // color: AppColors.textSecondary,
             ),

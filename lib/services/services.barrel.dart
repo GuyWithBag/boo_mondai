@@ -2,6 +2,7 @@
 
 // Other files
 export 'auth_service.dart';
+export 'deck_downloads.online.service.dart';
 export 'drill_service.dart';
 export 'fsrs_service.dart';
 export 'guest_migration_service.dart';

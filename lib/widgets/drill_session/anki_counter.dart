@@ -26,19 +26,19 @@ class AnkiCounter extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        StatusBadge(
+        HeaderBadge(
           label: '$newCount',
           // color: AppColors.easy,
           // backgroundOpacity: 0.15,
         ),
         const SizedBox(width: AppSpacing.sm),
-        StatusBadge(
+        HeaderBadge(
           label: '$learningCount',
           // color: AppColors.incorrect,
           // backgroundOpacity: 0.15,
         ),
         const SizedBox(width: AppSpacing.sm),
-        StatusBadge(
+        HeaderBadge(
           label: '$reviewCount',
           // color: AppColors.correct,
           // backgroundOpacity: 0.15,

@@ -1114,10 +1114,10 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: a6449a17706280dd140c7b06c938917e767d8a12
+      resolved-ref: "5c25f49345f1dda49be6dd41f7128613c5c99f2e"
       url: "https://github.com/GuyWithBag/theme_variants.git"
     source: git
-    version: "0.2.0"
+    version: "0.2.3"
   timezone:
     dependency: transitive
     description:

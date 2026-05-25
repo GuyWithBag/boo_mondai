@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
+import 'package:boo_mondai/variant_styles/variant_styles.barrel.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
 
 class LoginPage extends HookWidget {
@@ -24,7 +25,9 @@ class LoginPage extends HookWidget {
     final emailController = useTextEditingController();
     final passwordController = useTextEditingController();
     final emailFocus = useFocusNode();
-    final formKey = useMemoized(GlobalKey<FormState>.new);
+    final passwordFocus = useFocusNode();
+    final emailError = useState<String?>(null);
+    final passwordError = useState<String?>(null);
     final auth = context.watch<AuthController>();
 
     // 1. Initial Focus Effect
@@ -35,27 +38,20 @@ class LoginPage extends HookWidget {
 
     useEffect(handleInitFocus, const []);
 
-    // 2. Dialog Builder
-    Widget buildMergeDialog(BuildContext dialogContext) {
-      return GuestMergeDialog(auth: auth);
-    }
-
-    // 3. Action-Driven Sign In (Navigation is handled entirely by routes.dart!)
+    // 2. Action-Driven Sign In (Navigation is handled entirely by routes.dart!)
     Future<void> performSignIn() async {
-      if (formKey.currentState!.validate()) {
-        await auth.signIn(emailController.text.trim(), passwordController.text);
+      emailError.value = _validateEmail(emailController.text);
+      passwordError.value = _validatePassword(passwordController.text);
+      if (emailError.value != null || passwordError.value != null) return;
 
-        if (!context.mounted) return;
+      await auth.signIn(emailController.text.trim(), passwordController.text);
 
-        // If the sign-in resulted in a pending merge, show the dialog.
-        // Otherwise, GoRouter will automatically redirect them to '/'
-        if (auth.hasPendingGuestMerge) {
-          showDialog<void>(
-            context: context,
-            barrierDismissible: false,
-            builder: buildMergeDialog,
-          );
-        }
+      if (!context.mounted) return;
+
+      // If the sign-in resulted in a pending merge, show the dialog.
+      // Otherwise, GoRouter will automatically redirect them to '/'
+      if (auth.hasPendingGuestMerge) {
+        await showGuestMergeDialog(context: context, auth: auth);
       }
     }
 
@@ -64,63 +60,64 @@ class LoginPage extends HookWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(leading: const TactileBackButton(), leadingWidth: 100),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(AppSpacing.lg),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 400),
-              child: Form(
-                key: formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      'BooMondai',
-                      style: Theme.of(context).textTheme.displayLarge,
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: AppSpacing.xxl),
-                    TextFormField(
-                      controller: emailController,
-                      focusNode: emailFocus,
-                      decoration: const InputDecoration(
-                        labelText: 'Email',
-                        prefixIcon: Icon(Icons.email_outlined),
-                      ),
-                      keyboardType: TextInputType.emailAddress,
-                      validator: _validateEmail,
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    TextFormField(
-                      controller: passwordController,
-                      decoration: const InputDecoration(
-                        labelText: 'Password',
-                        prefixIcon: Icon(Icons.lock_outlined),
-                      ),
-                      obscureText: true,
-                      validator: _validatePassword,
-                    ),
-                    if (auth.error != null) ...[
-                      const SizedBox(height: AppSpacing.sm),
-                      ErrorText(auth.error),
-                    ],
-                    const SizedBox(height: AppSpacing.lg),
-                    FilledButton(
-                      onPressed: auth.isLoading ? null : performSignIn,
-                      child: auth.isLoading
-                          ? const _LoadingIndicator()
-                          : const Text('Sign In'),
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    TextButton(
-                      onPressed: navigateToRegister,
-                      child: const Text("Don't have an account? Sign Up"),
-                    ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    'BooMondai',
+                    style: Theme.of(context).textTheme.displayLarge,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: AppSpacing.xxl),
+                  _AuthField(
+                    label: 'Email',
+                    controller: emailController,
+                    focusNode: emailFocus,
+                    placeholder: 'you@example.com',
+                    keyboardType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.next,
+                    error: emailError.value,
+                    onSubmitted: (_) => passwordFocus.requestFocus(),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  _AuthField(
+                    label: 'Password',
+                    controller: passwordController,
+                    focusNode: passwordFocus,
+                    placeholder: 'Password',
+                    obscureText: true,
+                    textInputAction: TextInputAction.done,
+                    error: passwordError.value,
+                    onSubmitted: (_) => performSignIn(),
+                  ),
+                  if (auth.error != null) ...[
+                    const SizedBox(height: AppSpacing.sm),
+                    ErrorText(auth.error),
                   ],
-                ),
+                  const SizedBox(height: AppSpacing.lg),
+                  TactileButton(
+                    tone: TactileTone.filled,
+                    onPressed: auth.isLoading ? null : performSignIn,
+                    child: auth.isLoading
+                        ? const LoadingIndicator()
+                        : const Text('Sign In'),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  TactileButton(
+                    tone: TactileTone.text,
+                    depth: TactileDepth.flat,
+                    onPressed: navigateToRegister,
+                    child: const Text("Don't have an account? Sign Up"),
+                  ),
+                ],
               ),
             ),
           ),
@@ -132,56 +129,54 @@ class LoginPage extends HookWidget {
 
 // ── Screen-local widgets ─────────────────────────────────────────────────────
 
-class _LoadingIndicator extends StatelessWidget {
-  const _LoadingIndicator();
+class _AuthField extends StatelessWidget {
+  const _AuthField({
+    required this.label,
+    required this.controller,
+    this.focusNode,
+    this.placeholder,
+    this.keyboardType,
+    this.textInputAction,
+    this.obscureText = false,
+    this.error,
+    this.onSubmitted,
+  });
+
+  final String label;
+  final TextEditingController controller;
+  final FocusNode? focusNode;
+  final String? placeholder;
+  final TextInputType? keyboardType;
+  final TextInputAction? textInputAction;
+  final bool obscureText;
+  final String? error;
+  final ValueChanged<String>? onSubmitted;
 
   @override
   Widget build(BuildContext context) {
-    return const SizedBox(
-      height: 20,
-      width: 20,
-      child: CircularProgressIndicator(strokeWidth: 2),
-    );
-  }
-}
-
-class GuestMergeDialog extends StatelessWidget {
-  final AuthController auth;
-  const GuestMergeDialog({super.key, required this.auth});
-
-  @override
-  Widget build(BuildContext context) {
-    // Once these complete, AuthController clears the merge state.
-    // GoRouter notices the state change and automatically routes to '/'!
-    void discardLocalData() {
-      context.go('/account');
-      auth.confirmMerge(false);
-    }
-
-    void mergeLocalData() {
-      context.go('/account');
-      auth.confirmMerge(true);
-    }
-
-    return AlertDialog(
-      title: const Text('You have local data'),
-      content: const Text(
-        'You created decks and study progress on this device before signing in. '
-        'Would you like to merge them into your account?\n\n'
-        'If you discard, your local data will be deleted and your '
-        'account data will be loaded instead.',
-      ),
-      actions: [
-        TextButton(
-          onPressed: auth.isLoading ? null : discardLocalData,
-          child: const Text('Discard local data'),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(label),
+        const SizedBox(height: AppSpacing.xs),
+        VariantTextField(
+          controller: controller,
+          focusNode: focusNode,
+          placeholder: placeholder,
+          keyboardType: keyboardType,
+          textInputAction: textInputAction,
+          obscureText: obscureText,
+          onSubmitted: onSubmitted,
+          variants: const [
+            AppTextFieldSize.normal,
+            AppTextFieldFrame.outline,
+            AppTextFieldTone.neutral,
+          ],
         ),
-        FilledButton(
-          onPressed: auth.isLoading ? null : mergeLocalData,
-          child: auth.isLoading
-              ? const _LoadingIndicator()
-              : const Text('Merge into account'),
-        ),
+        if (error != null) ...[
+          const SizedBox(height: AppSpacing.xs),
+          Text(error!, style: const TextStyle(color: Colors.red)),
+        ],
       ],
     );
   }

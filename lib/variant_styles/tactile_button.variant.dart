@@ -29,17 +29,17 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
   base: (tokens) => {
     SurfaceStylePart.decoration({
       DecorationPart.color(tokens.backgroundSurface),
-      DecorationPart.borderRadius(BorderRadius.circular(tokens.radius2xl)),
+      DecorationPart.borderRadius(BorderRadius.circular(tokens.radius2xl.r)),
       DecorationPart.border(
         Border.all(
           color: tokens.borderNeutralSubtle,
-          width: tokens.borderWidthDefault,
+          width: tokens.borderWidthDefault.w,
         ),
       ),
       DecorationPart.boxShadow([
         BoxShadow(
           color: tokens.borderNeutralSubtle,
-          offset: Offset(0, tokens.shadowSecondaryOffset),
+          offset: Offset(0, tokens.surfaceShadowOffset.h),
         ),
       ]),
     }),
@@ -51,7 +51,7 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
     }),
     SurfaceStylePart.icon({
       IconThemePart.color(tokens.textSecondary),
-      IconThemePart.size(tokens.sizeIconMd),
+      IconThemePart.size(tokens.sizeIconMd.sp),
     }),
   },
   defaultVariants: const [
@@ -65,12 +65,12 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.primary),
         DecorationPart.border(
-          Border.all(color: tokens.primary, width: tokens.borderWidthDefault),
+          Border.all(color: tokens.primary, width: tokens.borderWidthDefault.w),
         ),
         DecorationPart.boxShadow([
           BoxShadow(
             color: tokens.primaryDim,
-            offset: Offset(0, tokens.shadowPrimaryLgOffset),
+            offset: Offset(0, tokens.surfaceShadowOffset.h),
           ),
         ]),
       }),
@@ -83,13 +83,13 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
         DecorationPart.border(
           Border.all(
             color: tokens.borderNeutralSubtle,
-            width: tokens.borderWidthDefault,
+            width: tokens.borderWidthDefault.w,
           ),
         ),
         DecorationPart.boxShadow([
           BoxShadow(
             color: tokens.borderNeutralSubtle,
-            offset: Offset(0, tokens.shadowSecondaryOffset),
+            offset: Offset(0, tokens.surfaceShadowOffset.h),
           ),
         ]),
       }),
@@ -98,17 +98,17 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
     },
     TactileTone.success: (tokens) => {
       SurfaceStylePart.decoration({
-        DecorationPart.color(tokens.actionSuccess.withValues(alpha: 0.12)),
+        DecorationPart.color(tokens.actionSuccessBackground),
         DecorationPart.border(
           Border.all(
-            color: tokens.actionSuccess,
-            width: tokens.borderWidthDefault,
+            color: tokens.actionSuccessBorder,
+            width: tokens.borderWidthDefault.w,
           ),
         ),
         DecorationPart.boxShadow([
           BoxShadow(
-            color: tokens.actionSuccess.withValues(alpha: 0.32),
-            offset: Offset(0, tokens.shadowFeedbackOffset),
+            color: tokens.actionSuccessBorder,
+            offset: Offset(0, tokens.surfaceShadowOffset.h),
           ),
         ]),
       }),
@@ -117,17 +117,17 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
     },
     TactileTone.error: (tokens) => {
       SurfaceStylePart.decoration({
-        DecorationPart.color(tokens.actionError.withValues(alpha: 0.12)),
+        DecorationPart.color(tokens.actionErrorBackground),
         DecorationPart.border(
           Border.all(
-            color: tokens.actionError,
-            width: tokens.borderWidthDefault,
+            color: tokens.actionErrorBorder,
+            width: tokens.borderWidthDefault.w,
           ),
         ),
         DecorationPart.boxShadow([
           BoxShadow(
-            color: tokens.actionError.withValues(alpha: 0.32),
-            offset: Offset(0, tokens.shadowFeedbackOffset),
+            color: tokens.actionErrorBorder,
+            offset: Offset(0, tokens.surfaceShadowOffset.h),
           ),
         ]),
       }),
@@ -138,12 +138,12 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.streak),
         DecorationPart.border(
-          Border.all(color: tokens.streak, width: tokens.borderWidthDefault),
+          Border.all(color: tokens.streak, width: tokens.borderWidthDefault.w),
         ),
         DecorationPart.boxShadow([
           BoxShadow(
             color: tokens.streakDim,
-            offset: Offset(0, tokens.shadowStreakOffset),
+            offset: Offset(0, tokens.surfaceShadowOffset.h),
           ),
         ]),
       }),
@@ -156,7 +156,7 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
         DecorationPart.border(
           Border.all(
             color: tokens.colorTransparent,
-            width: tokens.borderWidthDefault,
+            width: tokens.borderWidthDefault.w,
           ),
         ),
         DecorationPart.boxShadow(const []),
@@ -181,13 +181,13 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
         DecorationPart.border(
           Border.all(
             color: tokens.ratingAgainBorder,
-            width: tokens.borderWidthDefault,
+            width: tokens.borderWidthDefault.w,
           ),
         ),
         DecorationPart.boxShadow([
           BoxShadow(
             color: tokens.ratingAgainBorder,
-            offset: Offset(0, tokens.shadowFeedbackOffset),
+            offset: Offset(0, tokens.surfaceShadowOffset.h),
           ),
         ]),
       }),
@@ -200,13 +200,13 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
         DecorationPart.border(
           Border.all(
             color: tokens.ratingHardBorder,
-            width: tokens.borderWidthDefault,
+            width: tokens.borderWidthDefault.w,
           ),
         ),
         DecorationPart.boxShadow([
           BoxShadow(
             color: tokens.ratingHardBorder,
-            offset: Offset(0, tokens.shadowFeedbackOffset),
+            offset: Offset(0, tokens.surfaceShadowOffset.h),
           ),
         ]),
       }),
@@ -219,13 +219,13 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
         DecorationPart.border(
           Border.all(
             color: tokens.ratingGoodBorder,
-            width: tokens.borderWidthDefault,
+            width: tokens.borderWidthDefault.w,
           ),
         ),
         DecorationPart.boxShadow([
           BoxShadow(
             color: tokens.ratingGoodBorder,
-            offset: Offset(0, tokens.shadowFeedbackOffset),
+            offset: Offset(0, tokens.surfaceShadowOffset.h),
           ),
         ]),
       }),
@@ -238,13 +238,13 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
         DecorationPart.border(
           Border.all(
             color: tokens.ratingEasyBorder,
-            width: tokens.borderWidthDefault,
+            width: tokens.borderWidthDefault.w,
           ),
         ),
         DecorationPart.boxShadow([
           BoxShadow(
             color: tokens.ratingEasyBorder,
-            offset: Offset(0, tokens.shadowFeedbackOffset),
+            offset: Offset(0, tokens.surfaceShadowOffset.h),
           ),
         ]),
       }),
@@ -257,11 +257,11 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
         DecorationPart.border(
           Border.all(
             color: tokens.primaryDim,
-            width: tokens.borderWidthDefault,
+            width: tokens.borderWidthDefault.w,
           ),
         ),
         DecorationPart.boxShadow([
-          BoxShadow(color: tokens.primaryDim, offset: const Offset(0, 8)),
+          BoxShadow(color: tokens.primaryDim, offset: Offset(0, 8.h)),
         ]),
       }),
       SurfaceStylePart.text({TextStylePart.color(tokens.colorTextOnBrand)}),
@@ -273,13 +273,13 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
         DecorationPart.border(
           Border.all(
             color: tokens.textMuted.withValues(alpha: 0.45),
-            width: tokens.borderWidthDefault,
+            width: tokens.borderWidthDefault.w,
           ),
         ),
         DecorationPart.boxShadow([
           BoxShadow(
             color: tokens.textMuted.withValues(alpha: 0.45),
-            offset: const Offset(0, 8),
+            offset: Offset(0, 8.h),
           ),
         ]),
       }),
@@ -287,34 +287,34 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
       SurfaceStylePart.icon({IconThemePart.color(tokens.textSecondary)}),
     },
     TactileSize.sm: (tokens) => {
-      SurfaceStylePart.text({TextStylePart.fontSize(tokens.textSizeLabel)}),
-      SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconMd)}),
+      SurfaceStylePart.text({TextStylePart.fontSize(tokens.textSizeLabel.sp)}),
+      SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconMd.sp)}),
     },
     TactileSize.md: (tokens) => {
-      SurfaceStylePart.text({TextStylePart.fontSize(tokens.textSizeLabel)}),
-      SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconMd)}),
+      SurfaceStylePart.text({TextStylePart.fontSize(tokens.textSizeLabel.sp)}),
+      SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconMd.sp)}),
     },
     TactileSize.lg: (tokens) => {
-      SurfaceStylePart.text({TextStylePart.fontSize(tokens.textSizeLabel)}),
-      SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconLg)}),
+      SurfaceStylePart.text({TextStylePart.fontSize(tokens.textSizeLabel.sp)}),
+      SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconLg.sp)}),
     },
     TactileSize.icon: (tokens) => {
-      SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconLg)}),
-      SurfaceStylePart.height(48),
-      SurfaceStylePart.width(48),
+      SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconLg.sp)}),
+      SurfaceStylePart.height(48.h),
+      SurfaceStylePart.width(48.w),
     },
     TactileSize.fab: (tokens) => {
-      SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconLg)}),
-      SurfaceStylePart.height(64),
-      SurfaceStylePart.width(64),
+      SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconLg.sp)}),
+      SurfaceStylePart.height(64.h),
+      SurfaceStylePart.width(64.w),
     },
     TactileSize.extendedFab: (tokens) => {
       SurfaceStylePart.text({
-        TextStylePart.fontSize(tokens.textSizeLabel),
+        TextStylePart.fontSize(tokens.textSizeLabel.sp),
         TextStylePart.fontWeight(tokens.fontWeightTextHeavy),
       }),
-      SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconMd)}),
-      SurfaceStylePart.height(64),
+      SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconMd.sp)}),
+      SurfaceStylePart.height(64.h),
     },
     TactileState.idle: (_) => const <StylePart<SurfaceStyle>>{},
     TactileState.hovered: (_) => const <StylePart<SurfaceStyle>>{},
@@ -327,13 +327,13 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
         DecorationPart.border(
           Border.all(
             color: tokens.primaryBright,
-            width: tokens.borderWidthDefault,
+            width: tokens.borderWidthDefault.w,
           ),
         ),
         DecorationPart.boxShadow([
           BoxShadow(
             color: tokens.primaryBright,
-            offset: Offset(0, tokens.shadowGhostOffset),
+            offset: Offset(0, tokens.surfaceShadowOffset.h),
           ),
         ]),
       }),
@@ -393,13 +393,13 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
           DecorationPart.border(
             Border.all(
               color: tokens.primaryBright,
-              width: tokens.borderWidthDefault,
+              width: tokens.borderWidthDefault.w,
             ),
           ),
           DecorationPart.boxShadow([
             BoxShadow(
               color: tokens.primaryBright,
-              offset: Offset(0, tokens.shadowGhostOffset),
+              offset: Offset(0, tokens.surfaceShadowOffset.h),
             ),
           ]),
         }),
@@ -447,17 +447,17 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
       when: const {TactileTone.success, TactileState.disabled},
       build: (tokens) => {
         SurfaceStylePart.decoration({
-          DecorationPart.color(tokens.actionSuccess.withValues(alpha: 0.08)),
+          DecorationPart.color(tokens.actionSuccessBackground),
           DecorationPart.border(
             Border.all(
-              color: tokens.actionSuccess,
-              width: tokens.borderWidthDefault,
+              color: tokens.actionSuccessBorder,
+              width: tokens.borderWidthDefault.w,
             ),
           ),
           DecorationPart.boxShadow([
             BoxShadow(
-              color: tokens.actionSuccess.withValues(alpha: 0.32),
-              offset: Offset(0, tokens.shadowFeedbackOffset),
+              color: tokens.actionSuccessBorder,
+              offset: Offset(0, tokens.surfaceShadowOffset.h),
             ),
           ]),
         }),
@@ -469,21 +469,17 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
       when: const {TactileTone.error, TactileState.disabled},
       build: (tokens) => {
         SurfaceStylePart.decoration({
-          DecorationPart.color(tokens.actionError.withValues(alpha: 0.08)),
+          DecorationPart.color(tokens.actionErrorBackground),
           DecorationPart.border(
             Border.all(
-              color: tokens.actionError.withValues(alpha: 0.35),
-              width: tokens.borderWidthDefault,
+              color: tokens.actionErrorBorder,
+              width: tokens.borderWidthDefault.w,
             ),
           ),
           DecorationPart.boxShadow(const []),
         }),
-        SurfaceStylePart.text({
-          TextStylePart.color(tokens.actionError.withValues(alpha: 0.7)),
-        }),
-        SurfaceStylePart.icon({
-          IconThemePart.color(tokens.actionError.withValues(alpha: 0.7)),
-        }),
+        SurfaceStylePart.text({TextStylePart.color(tokens.actionError)}),
+        SurfaceStylePart.icon({IconThemePart.color(tokens.actionError)}),
       },
     ),
   ],
@@ -493,21 +489,21 @@ final mechanicalFabIconBadgeStyle = VariantStyle.surfaceParts<AppTokens>(
   base: (tokens) => {
     SurfaceStylePart.decoration({
       DecorationPart.color(tokens.softGray),
-      DecorationPart.borderRadius(BorderRadius.circular(12)),
+      DecorationPart.borderRadius(BorderRadius.circular(12.r)),
       DecorationPart.border(
         Border.all(
           color: tokens.borderNeutralSubtle,
-          width: tokens.borderWidthDefault / 2,
+          width: tokens.borderWidthDefault.w / 2,
         ),
       ),
       DecorationPart.boxShadow(const []),
     }),
     SurfaceStylePart.icon({
       IconThemePart.color(tokens.textSecondary),
-      IconThemePart.size(tokens.sizeIconMd),
+      IconThemePart.size(tokens.sizeIconMd.sp),
     }),
-    SurfaceStylePart.height(32),
-    SurfaceStylePart.width(32),
+    SurfaceStylePart.height(32.h),
+    SurfaceStylePart.width(32.w),
     SurfaceStylePart.padding(EdgeInsets.zero),
   },
 );

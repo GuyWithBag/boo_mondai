@@ -120,6 +120,8 @@ CREATE TABLE deck_listings (
 
 ALTER TABLE deck_listings ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "deck_listings: read all" ON deck_listings FOR SELECT USING (true);
+CREATE POLICY "deck_listings: owner insert" ON deck_listings FOR INSERT
+  WITH CHECK (EXISTS (SELECT 1 FROM decks WHERE id = deck_listings.deck_id AND user_id = current_profile_id()));
 CREATE POLICY "deck_listings: owner update" ON deck_listings FOR UPDATE
   USING (EXISTS (SELECT 1 FROM decks WHERE id = deck_listings.deck_id AND user_id = current_profile_id()));
 

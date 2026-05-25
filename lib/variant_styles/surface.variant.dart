@@ -11,23 +11,23 @@ enum SurfacePadding { normal, text, none }
 
 final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
   base: (tokens) => {
-    SurfaceStylePart.padding(EdgeInsets.all(tokens.spacePanelPadding)),
+    SurfaceStylePart.padding(EdgeInsets.all(tokens.spacePanelPadding.r)),
     SurfaceStylePart.decoration({
       DecorationPart.color(tokens.backgroundSurface),
       DecorationPart.borderRadius(
-        BorderRadius.circular(tokens.radiusContainerLarge),
+        BorderRadius.circular(tokens.radiusContainerLarge.r),
       ),
       DecorationPart.border(
         Border.all(
           color: tokens.borderNeutralSubtle,
-          width: tokens.borderWidthDefault,
+          width: tokens.borderWidthDefault.w,
         ),
       ),
       DecorationPart.boxShadow([
         BoxShadow(
           color: tokens.borderNeutralSubtle.withValues(alpha: 0.55),
-          offset: const Offset(0, 4),
-          blurRadius: 12,
+          offset: Offset(0, 4.h),
+          blurRadius: 12.r,
         ),
       ]),
     }),
@@ -38,7 +38,7 @@ final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
     SurfaceShape.cardShape: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.borderRadius(
-          BorderRadiusGeometry.circular(tokens.radius2xl),
+          BorderRadiusGeometry.circular(tokens.radius2xl.r),
         ),
       }),
     },
@@ -51,7 +51,7 @@ final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
     SurfacePadding.none: (_) => {SurfaceStylePart.padding(EdgeInsets.all(0))},
     SurfacePadding.text: (_) => {
       SurfaceStylePart.padding(
-        EdgeInsets.symmetric(horizontal: 20.sp, vertical: 10.sp),
+        EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
       ),
     },
     SurfaceTone.surface: (_) => const {},
@@ -59,13 +59,13 @@ final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.backgroundSurface),
         DecorationPart.border(
-          Border.all(color: tokens.primary, width: tokens.borderWidthDefault),
+          Border.all(color: tokens.primary, width: tokens.borderWidthDefault.w),
         ),
         DecorationPart.boxShadow([
           BoxShadow(
             color: tokens.primary.withValues(alpha: 0.16),
-            offset: const Offset(0, 8),
-            blurRadius: 30,
+            offset: Offset(0, 8.h),
+            blurRadius: 30.r,
           ),
         ]),
       }),
@@ -81,7 +81,7 @@ final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
           BoxBorder.fromLTRB(
             bottom: BorderSide(
               color: tokens.borderNeutralSubtle,
-              width: tokens.borderWidthDefault,
+              width: tokens.borderWidthDefault.w,
             ),
           ),
         ),
@@ -94,7 +94,7 @@ final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
         DecorationPart.border(
           Border.all(
             color: tokens.borderNeutralSubtle,
-            width: tokens.borderWidthDefault,
+            width: tokens.borderWidthDefault.w,
           ),
         ),
       }),
@@ -102,18 +102,18 @@ final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
     SurfaceTone.dark: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.primaryDim),
-        DecorationPart.radius(tokens.radiusContainerLarge),
+        DecorationPart.radius(tokens.radiusContainerLarge.r),
         DecorationPart.border(
           Border.all(
             color: tokens.primaryDim,
-            width: tokens.borderWidthDefault,
+            width: tokens.borderWidthDefault.w,
           ),
         ),
         DecorationPart.boxShadow([
           BoxShadow(
             color: tokens.primaryDim.withValues(alpha: 0.35),
-            offset: const Offset(0, 8),
-            blurRadius: 20,
+            offset: Offset(0, 8.h),
+            blurRadius: 20.r,
           ),
         ]),
       }),

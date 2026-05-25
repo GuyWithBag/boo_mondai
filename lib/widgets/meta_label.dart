@@ -9,12 +9,14 @@ class MetaLabel extends StatelessWidget {
   const MetaLabel({
     required this.label,
     this.icon,
+    this.tooltip,
     this.tone = MetaLabelTone.muted,
     super.key,
   });
 
   final String label;
   final IconData? icon;
+  final String? tooltip;
   final MetaLabelTone tone;
 
   @override
@@ -22,7 +24,7 @@ class MetaLabel extends StatelessWidget {
     final tokens = context.themeTokens<AppTokens>();
     final style = metaLabelStyle.resolve(tokens, [tone]);
 
-    return Row(
+    final content = Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         if (icon != null) ...[
@@ -32,5 +34,9 @@ class MetaLabel extends StatelessWidget {
         Text(label, style: style.textStyle),
       ],
     );
+
+    if (tooltip == null) return content;
+
+    return Tooltip(message: tooltip!, child: content);
   }
 }

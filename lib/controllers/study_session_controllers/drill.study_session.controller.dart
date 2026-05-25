@@ -52,7 +52,7 @@ class DrillSessionController
     realTimeSaving = realTime; // Set the toggle
 
     try {
-      final userId = LocalDB.profile.getOrCreate().userId;
+      final userId = LocalDB.profile.getOrCreate().id;
 
       final allTemplates = LocalDB.cardTemplate.getByDeckId(deckId);
       templates = {for (final t in allTemplates) t.id: t};

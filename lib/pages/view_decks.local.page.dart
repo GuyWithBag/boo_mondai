@@ -8,6 +8,7 @@
 import 'package:boo_mondai/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/models/models.barrel.dart';
 import 'package:boo_mondai/pages/create_deck.local.page.dart';
+import 'package:boo_mondai/variant_styles/app_snackbar.variant.dart';
 import 'package:boo_mondai/widgets/widgets.barrel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -36,14 +37,12 @@ class ViewDecksLocalPage extends HookWidget {
       if (err == null) return null;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!context.mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Sync failed: $err'),
-            action: SnackBarAction(
-              label: 'Retry',
-              onPressed: () => controller.sync(),
-            ),
-          ),
+        showAppSnackbar(
+          context: context,
+          message: 'Sync failed: $err',
+          leading: const Icon(Icons.sync_problem_outlined),
+          duration: const Duration(seconds: 3),
+          tone: AppSnackbarTone.error,
         );
         controller.clearSyncError();
       });
@@ -54,9 +53,9 @@ class ViewDecksLocalPage extends HookWidget {
       appBar: AppBar(
         title: const Text('My Decks'),
         actions: [
-          _SyncButton(
+          SyncButton(
             isSyncing: controller.isSyncing,
-            isAuthenticated: !auth.currentProfile.isAnonymous,
+            isAuthenticated: auth.service.isAuthenticatedRemote,
             onSync: () => controller.sync(),
           ),
         ],
@@ -123,49 +122,6 @@ class _DeckListBody extends StatelessWidget {
           },
         );
       },
-    );
-  }
-}
-
-// ── _SyncButton ─────────────────────────────────────────────────────────
-
-/// AppBar action that drives the deck sync operation.
-///
-/// Shows a spinner while syncing, a disabled cloud icon with a tooltip
-/// when the user is a guest, and a tappable cloud icon when authenticated.
-class _SyncButton extends StatelessWidget {
-  const _SyncButton({
-    required this.isSyncing,
-    required this.isAuthenticated,
-    required this.onSync,
-  });
-
-  final bool isSyncing;
-  final bool isAuthenticated;
-  final VoidCallback onSync;
-
-  @override
-  Widget build(BuildContext context) {
-    if (isSyncing) {
-      return const Padding(
-        padding: EdgeInsets.symmetric(horizontal: 12),
-        child: SizedBox(
-          width: 20,
-          height: 20,
-          child: CircularProgressIndicator(strokeWidth: 2),
-        ),
-      );
-    }
-
-    return Tooltip(
-      message: isAuthenticated ? 'Sync decks' : 'Sign in to sync',
-      child: IconButton(
-        icon: Icon(
-          Icons.sync_rounded,
-          color: isAuthenticated ? null : Theme.of(context).disabledColor,
-        ),
-        onPressed: isAuthenticated ? onSync : null,
-      ),
     );
   }
 }

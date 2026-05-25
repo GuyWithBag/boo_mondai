@@ -8,9 +8,14 @@ class VariantTextField extends StatelessWidget {
   const VariantTextField({
     required this.variants,
     this.controller,
+    this.focusNode,
     this.enabled,
     this.onChanged,
+    this.onSubmitted,
     this.placeholder,
+    this.keyboardType,
+    this.textInputAction,
+    this.obscureText = false,
     this.maxLines = 1,
     this.expands = false,
     this.textAlignVertical,
@@ -19,9 +24,14 @@ class VariantTextField extends StatelessWidget {
 
   final Iterable<Object> variants;
   final TextEditingController? controller;
+  final FocusNode? focusNode;
   final bool? enabled;
   final ValueChanged<String>? onChanged;
+  final ValueChanged<String>? onSubmitted;
   final String? placeholder;
+  final TextInputType? keyboardType;
+  final TextInputAction? textInputAction;
+  final bool obscureText;
   final int? maxLines;
   final bool expands;
   final TextAlignVertical? textAlignVertical;
@@ -33,8 +43,13 @@ class VariantTextField extends StatelessWidget {
 
     return TextField(
       controller: controller,
+      focusNode: focusNode,
       enabled: enabled,
       onChanged: onChanged,
+      onSubmitted: onSubmitted,
+      keyboardType: keyboardType,
+      textInputAction: textInputAction,
+      obscureText: obscureText,
       textAlign: style.textAlign ?? TextAlign.start,
       cursorColor: style.cursorColor,
       maxLines: maxLines,

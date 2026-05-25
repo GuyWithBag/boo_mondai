@@ -3,16 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-enum StatusBadgeTone { brand, neutral, success, error }
+enum HeaderBadgeTone { brand, neutral, success, error }
 
-final statusBadgeStyle = VariantStyle.chipParts<AppTokens>(
+final headerBadgeStyle = VariantStyle.chipParts<AppTokens>(
   base: (tokens) => {
-    ChipPart.padding(EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h)),
+    ChipPart.padding(EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h)),
     ChipPart.shape(
       RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.r)),
     ),
     ChipPart.side(
-      BorderSide(color: tokens.primaryBright, width: tokens.borderWidthDefault),
+      BorderSide(
+        color: tokens.primaryBright,
+        width: tokens.borderWidthDefault.w,
+      ),
     ),
     ChipPart.backgroundColor(tokens.primarySoft),
     ChipPart.labelStyle(
@@ -25,14 +28,14 @@ final statusBadgeStyle = VariantStyle.chipParts<AppTokens>(
     ),
     ChipPart.elevation(0),
   },
-  defaultVariants: const [StatusBadgeTone.brand],
+  defaultVariants: const [HeaderBadgeTone.brand],
   variants: {
-    StatusBadgeTone.brand: (tokens) => {
+    HeaderBadgeTone.brand: (tokens) => {
       ChipPart.backgroundColor(tokens.primarySoft),
       ChipPart.side(
         BorderSide(
           color: tokens.primaryBright,
-          width: tokens.borderWidthDefault,
+          width: tokens.borderWidthDefault.w,
         ),
       ),
       ChipPart.labelStyle(
@@ -44,12 +47,12 @@ final statusBadgeStyle = VariantStyle.chipParts<AppTokens>(
         ),
       ),
     },
-    StatusBadgeTone.neutral: (tokens) => {
+    HeaderBadgeTone.neutral: (tokens) => {
       ChipPart.backgroundColor(tokens.softGray),
       ChipPart.side(
         BorderSide(
           color: tokens.borderNeutralSubtle,
-          width: tokens.borderWidthDefault,
+          width: tokens.borderWidthDefault.w,
         ),
       ),
       ChipPart.labelStyle(
@@ -61,12 +64,12 @@ final statusBadgeStyle = VariantStyle.chipParts<AppTokens>(
         ),
       ),
     },
-    StatusBadgeTone.success: (tokens) => {
+    HeaderBadgeTone.success: (tokens) => {
       ChipPart.backgroundColor(tokens.actionSuccess.withValues(alpha: 0.12)),
       ChipPart.side(
         BorderSide(
           color: tokens.actionSuccess,
-          width: tokens.borderWidthDefault,
+          width: tokens.borderWidthDefault.w,
         ),
       ),
       ChipPart.labelStyle(
@@ -78,10 +81,13 @@ final statusBadgeStyle = VariantStyle.chipParts<AppTokens>(
         ),
       ),
     },
-    StatusBadgeTone.error: (tokens) => {
+    HeaderBadgeTone.error: (tokens) => {
       ChipPart.backgroundColor(tokens.actionError.withValues(alpha: 0.12)),
       ChipPart.side(
-        BorderSide(color: tokens.actionError, width: tokens.borderWidthDefault),
+        BorderSide(
+          color: tokens.actionError,
+          width: tokens.borderWidthDefault.w,
+        ),
       ),
       ChipPart.labelStyle(
         TextStyle(

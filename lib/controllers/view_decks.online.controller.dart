@@ -10,9 +10,14 @@ import 'package:boo_mondai/services/services.barrel.dart';
 
 class ViewDecksOnlineController extends Controller {
   final DecksRemoteDB _deckRemoteDB = DecksRemoteDB();
+  final DeckDownloadsOnlineService _deckDownloadsService =
+      DeckDownloadsOnlineService();
 
   List<Deck> decks = [];
   List<Tag> availableTags = [];
+  String? downloadingDeckId;
+
+  bool isDownloadingDeck(String deckId) => downloadingDeckId == deckId;
 
   Future<void> loadPublicDecks() async {
     setLoading(true);
@@ -24,6 +29,22 @@ class ViewDecksOnlineController extends Controller {
       setError(e is Exception ? e : Exception(e.toString()));
     } finally {
       setLoading(false);
+    }
+  }
+
+  Future<Deck?> downloadDeck(Deck deck) async {
+    downloadingDeckId = deck.id;
+    error = null;
+    notifyListeners();
+
+    try {
+      return await _deckDownloadsService.downloadDeck(deck);
+    } catch (e) {
+      setError(e is Exception ? e : Exception(e.toString()));
+      return null;
+    } finally {
+      downloadingDeckId = null;
+      notifyListeners();
     }
   }
 }

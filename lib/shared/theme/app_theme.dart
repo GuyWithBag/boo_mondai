@@ -3,6 +3,102 @@ import 'package:theme_variants/theme_variants.dart';
 
 import 'app_tokens.dart';
 
+TextStyle _textStyle(
+  AppTokens tokens, {
+  required Color color,
+  required double size,
+  required FontWeight weight,
+  required double height,
+  double? letterSpacing,
+}) {
+  return TextStyle(
+    color: color,
+    fontFamily: tokens.fontFamily,
+    fontSize: size,
+    fontWeight: weight,
+    height: height,
+    letterSpacing: letterSpacing,
+  );
+}
+
+TextTheme _textTheme(AppTokens tokens) {
+  final displayStyle = _textStyle(
+    tokens,
+    color: tokens.textPrimary,
+    size: tokens.textSizeCardFront,
+    weight: tokens.fontWeightTextHeavy,
+    height: tokens.lineHeightTextDisplay,
+  );
+  final headlineStyle = _textStyle(
+    tokens,
+    color: tokens.textPrimary,
+    size: tokens.textSizeBodyLarge,
+    weight: tokens.fontWeightTextHeavy,
+    height: tokens.lineHeightFieldDisplay,
+  );
+  final titleStyle = _textStyle(
+    tokens,
+    color: tokens.textPrimary,
+    size: tokens.textSizeHeader,
+    weight: tokens.fontWeightTextHeavy,
+    height: tokens.lineHeightTextDisplay,
+  );
+  final bodyLargeStyle = _textStyle(
+    tokens,
+    color: tokens.textPrimary,
+    size: tokens.textSizeLabelLarge,
+    weight: tokens.fontWeightTextBody,
+    height: tokens.lineHeightTextBody,
+  );
+  final bodyStyle = _textStyle(
+    tokens,
+    color: tokens.textPrimary,
+    size: tokens.textSizeLabel,
+    weight: tokens.fontWeightTextBody,
+    height: tokens.lineHeightTextBody,
+  );
+  final labelStyle = _textStyle(
+    tokens,
+    color: tokens.textPrimary,
+    size: tokens.textSizeLabel,
+    weight: tokens.fontWeightTextStrong,
+    height: tokens.lineHeightTactile,
+  );
+  final labelSmallStyle = _textStyle(
+    tokens,
+    color: tokens.textSecondary,
+    size: tokens.textSizeLabelSmall,
+    weight: tokens.fontWeightTextStrong,
+    height: tokens.lineHeightTactile,
+    letterSpacing: tokens.letterSpacingTextEyebrow,
+  );
+
+  return TextTheme(
+    displayLarge: displayStyle,
+    displayMedium: displayStyle.copyWith(
+      fontSize: tokens.textSizeCardBackFront,
+    ),
+    displaySmall: displayStyle.copyWith(
+      fontSize: tokens.textSizeCardBackContent,
+    ),
+    headlineLarge: headlineStyle,
+    headlineMedium: headlineStyle.copyWith(fontSize: tokens.textSizeHeader),
+    headlineSmall: headlineStyle.copyWith(fontSize: tokens.textSizeLabelLarge),
+    titleLarge: titleStyle,
+    titleMedium: titleStyle.copyWith(fontSize: tokens.textSizeLabelLarge),
+    titleSmall: titleStyle.copyWith(fontSize: tokens.textSizeLabel),
+    bodyLarge: bodyLargeStyle,
+    bodyMedium: bodyStyle,
+    bodySmall: bodyStyle.copyWith(
+      color: tokens.textSecondary,
+      fontSize: tokens.textSizeLabelSmall,
+    ),
+    labelLarge: labelStyle,
+    labelMedium: labelStyle.copyWith(fontSize: tokens.textSizeLabelSmall),
+    labelSmall: labelSmallStyle,
+  );
+}
+
 ThemeData _themeData(AppTokens tokens, Brightness brightness) {
   final scheme = ColorScheme.fromSeed(
     seedColor: tokens.primary,
@@ -56,7 +152,7 @@ ThemeData _themeData(AppTokens tokens, Brightness brightness) {
       secondaryLabelStyle: TextStyle(
         color: tokens.primary,
         fontSize: tokens.textSizeLabelSmall,
-        fontWeight: tokens.fontWeightTextHeavy,
+        fontWeight: tokens.fontWeightTextBody,
         letterSpacing: tokens.letterSpacingTextEyebrow,
       ),
       iconTheme: IconThemeData(
@@ -65,8 +161,9 @@ ThemeData _themeData(AppTokens tokens, Brightness brightness) {
       ),
       checkmarkColor: tokens.primary,
       deleteIconColor: tokens.textSecondary,
+      showCheckmark: false,
     ),
-    textTheme: TextTheme(),
+    textTheme: _textTheme(tokens),
     dividerTheme: DividerThemeData(
       color: tokens.borderNeutralSubtle,
       thickness: tokens.borderWidthDefault,
@@ -115,6 +212,6 @@ ThemeVariantsController<AppTokens> createAppThemeController() {
     registry: appThemeRegistry,
     lightThemeId: 'boomondai',
     darkThemeId: 'boomondai',
-    themeMode: ThemeMode.system,
+    themeMode: ThemeMode.dark,
   );
 }

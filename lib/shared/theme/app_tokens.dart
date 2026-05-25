@@ -1,3 +1,4 @@
+import 'package:boo_mondai/shared/shared.barrel.dart';
 import 'package:flutter/material.dart';
 
 /*
@@ -26,7 +27,7 @@ textSizeBodyLarge
 fontWeightTextStrong
 lineHeightTextBody
 spacePanelGapLg
-shadowPrimaryLgOffset
+surfaceShadowOffset
 radiusContainerLarge
 borderWidthDefault
 
@@ -86,7 +87,11 @@ typedef AppTokens = ({
   Color backgroundSurface,
   Color borderNeutralSubtle,
   Color actionSuccess,
+  Color actionSuccessBackground,
+  Color actionSuccessBorder,
   Color actionError,
+  Color actionErrorBackground,
+  Color actionErrorBorder,
   Color textPrimary,
   Color textSecondary,
   Color textMuted,
@@ -112,13 +117,9 @@ typedef AppTokens = ({
   Color colorTransparent,
   Color colorTextOnBrand,
 
-  double shadowPrimaryLgOffset,
-  double shadowSecondaryOffset,
-  double shadowGhostOffset,
-  double shadowFeedbackOffset,
-  double shadowStreakOffset,
+  double surfaceShadowOffset,
+  double modalShadowOffset,
 
-  FontWeight fontWeightTextBase,
   FontWeight fontWeightTextBody,
   FontWeight fontWeightTextStrong,
   FontWeight fontWeightTextHeavy,
@@ -136,6 +137,7 @@ typedef AppTokens = ({
 
   double borderWidthDefault,
   double spacePanelPadding,
+  double spacePanelPaddingSm,
   double spacePanelGapLg,
   double spacePanelGapMd,
   double spacePanelGapSm,
@@ -153,52 +155,6 @@ typedef AppTokens = ({
   double cardAspectRatio,
 });
 
-final Color colorTransparent = Colors.transparent;
-final Color colorTextOnBrand = Colors.white;
-
-final String fontFamily = 'Noto Sans';
-
-final double shadowPrimaryLgOffset = 6;
-final double shadowSecondaryOffset = 6;
-final double shadowGhostOffset = 4;
-final double shadowFeedbackOffset = 4;
-final double shadowStreakOffset = 6;
-
-final FontWeight fontWeightTextBase = FontWeight.w700;
-final FontWeight fontWeightTextBody = FontWeight.w600;
-final FontWeight fontWeightTextStrong = FontWeight.w800;
-final FontWeight fontWeightTextHeavy = FontWeight.w900;
-
-final double lineHeightTextBody = 1.45;
-final double lineHeightTextTitle = 1.1;
-final double lineHeightTextDisplay = 1.05;
-final double lineHeightFieldDisplay = 1.15;
-final double lineHeightTactile = 1.1;
-final double letterSpacingTextEyebrow = 1.6;
-
-final double borderWidthDefault = 2;
-final double spacePanelPadding = 28;
-final double spacePanelGapLg = 24;
-final double spacePanelGapMd = 18;
-final double spacePanelGapSm = 12;
-
-final double radiusContainerLarge = 40;
-final double radius2xl = 16;
-final double radius3xl = 24;
-
-final double textSizeHeader = 24;
-final double textSizeLabelLarge = 16;
-final double textSizeLabel = 14;
-final double textSizeLabelSmall = 10;
-final double textSizeBodyLarge = 30;
-final double textSizeCardFront = 68;
-final double textSizeCardBackFront = 42;
-final double textSizeCardBackContent = 34;
-final double sizeIconMd = 18;
-final double sizeIconLg = 24;
-
-final double cardAspectRatio = 5 / 7;
-
 final AppTokens defaultLight = (
   name: 'BooMondai Light',
   fontFamily: fontFamily,
@@ -212,7 +168,11 @@ final AppTokens defaultLight = (
   backgroundSurface: Color(0xffffffff),
   borderNeutralSubtle: Color(0xffe5e7eb),
   actionSuccess: Color(0xff22c55e),
+  actionSuccessBackground: Color(0xfff0fdf4),
+  actionSuccessBorder: Color(0xffbbf7d0),
   actionError: Color(0xffef4444),
+  actionErrorBackground: Color(0xfffef2f2),
+  actionErrorBorder: Color(0xfffecaca),
   textPrimary: Color(0xff111827),
   textSecondary: Color(0xff6b7280),
   textMuted: Color(0xff9ca3af),
@@ -237,13 +197,11 @@ final AppTokens defaultLight = (
   radiusContainerLarge: radiusContainerLarge,
   radius2xl: radius2xl,
   radius3xl: radius3xl,
-  shadowPrimaryLgOffset: shadowPrimaryLgOffset,
-  shadowSecondaryOffset: shadowSecondaryOffset,
-  shadowGhostOffset: shadowGhostOffset,
-  shadowFeedbackOffset: shadowFeedbackOffset,
-  shadowStreakOffset: shadowStreakOffset,
+  surfaceShadowOffset: surfaceShadowOffset,
+  modalShadowOffset: modalShadowOffset,
   borderWidthDefault: borderWidthDefault,
   spacePanelPadding: spacePanelPadding,
+  spacePanelPaddingSm: spacePanelGapSm,
   spacePanelGapLg: spacePanelGapLg,
   spacePanelGapMd: spacePanelGapMd,
   spacePanelGapSm: spacePanelGapSm,
@@ -255,7 +213,6 @@ final AppTokens defaultLight = (
   textSizeCardFront: textSizeCardFront,
   textSizeCardBackFront: textSizeCardBackFront,
   textSizeCardBackContent: textSizeCardBackContent,
-  fontWeightTextBase: fontWeightTextBase,
   fontWeightTextBody: fontWeightTextBody,
   fontWeightTextStrong: fontWeightTextStrong,
   fontWeightTextHeavy: fontWeightTextHeavy,
@@ -285,7 +242,11 @@ final AppTokens defaultDark = (
   backgroundSurface: Color(0xff111827),
   borderNeutralSubtle: Color(0xff374151),
   actionSuccess: Color(0xff4ade80),
+  actionSuccessBackground: Color(0xff052e16),
+  actionSuccessBorder: Color(0xff14532d),
   actionError: Color(0xfff87171),
+  actionErrorBackground: Color(0xff450a0a),
+  actionErrorBorder: Color(0xff7f1d1d),
   textPrimary: Color(0xfff3f4f6),
   textSecondary: Color(0xffd1d5db),
   textMuted: Color(0xff9ca3af),
@@ -310,13 +271,11 @@ final AppTokens defaultDark = (
   radiusContainerLarge: radiusContainerLarge,
   radius2xl: radius2xl,
   radius3xl: radius3xl,
-  shadowPrimaryLgOffset: shadowPrimaryLgOffset,
-  shadowSecondaryOffset: shadowSecondaryOffset,
-  shadowGhostOffset: shadowGhostOffset,
-  shadowFeedbackOffset: shadowFeedbackOffset,
-  shadowStreakOffset: shadowStreakOffset,
+  surfaceShadowOffset: surfaceShadowOffset,
+  modalShadowOffset: modalShadowOffset,
   borderWidthDefault: borderWidthDefault,
   spacePanelPadding: spacePanelPadding,
+  spacePanelPaddingSm: spacePanelGapSm,
   spacePanelGapLg: spacePanelGapLg,
   spacePanelGapMd: spacePanelGapMd,
   spacePanelGapSm: spacePanelGapSm,
@@ -328,7 +287,6 @@ final AppTokens defaultDark = (
   textSizeCardFront: textSizeCardFront,
   textSizeCardBackFront: textSizeCardBackFront,
   textSizeCardBackContent: textSizeCardBackContent,
-  fontWeightTextBase: fontWeightTextBase,
   fontWeightTextBody: fontWeightTextBody,
   fontWeightTextStrong: fontWeightTextStrong,
   fontWeightTextHeavy: fontWeightTextHeavy,

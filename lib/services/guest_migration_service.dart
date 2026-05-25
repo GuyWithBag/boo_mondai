@@ -22,7 +22,8 @@ class GuestMigrationService {
     final hasSessions = LocalDB.drillSession.selectMany().any(
       (s) => s.userId == guestUserId,
     );
-    final hasStreak = LocalDB.streak.retrieve() != null;
+    final streak = LocalDB.streak.retrieve();
+    final hasStreak = streak?.userId == guestUserId;
     return hasDecks || hasFsrs || hasSessions || hasStreak;
   }
 
@@ -63,7 +64,7 @@ class GuestMigrationService {
     // ── Streak ─────────────────────────────────────────────
     // StreakLocalDB keys by userId, so delete the old entry first.
     final guestStreak = LocalDB.streak.retrieve();
-    if (guestStreak != null) {
+    if (guestStreak != null && guestStreak.userId == guestUserId) {
       await LocalDB.streak.upsert(guestStreak.copyWith(userId: newUserId));
     }
   }
@@ -93,7 +94,7 @@ class GuestMigrationService {
     );
 
     final guestStreak = LocalDB.streak.retrieve();
-    if (guestStreak != null) {
+    if (guestStreak?.userId == guestUserId) {
       await LocalDB.streak.clear();
     }
   }

@@ -5,7 +5,6 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/models/cached_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:boo_mondai/shared/shared.barrel.dart';
 import 'package:boo_mondai/widgets/browser_deck_detail/avatar_with_label.dart';
@@ -13,26 +12,33 @@ import 'package:boo_mondai/widgets/browser_deck_detail/avatar_with_label.dart';
 class AuthorAvatarRow extends StatelessWidget {
   const AuthorAvatarRow({
     super.key,
-    required this.author,
-    required this.sourceAuthor,
+    required this.authorName,
+    this.authorAvatarUrl,
+    this.sourceAuthorName,
+    this.sourceAuthorAvatarUrl,
   });
 
-  final CachedProfile? author;
-  final CachedProfile? sourceAuthor;
+  final String authorName;
+  final String? authorAvatarUrl;
+  final String? sourceAuthorName;
+  final String? sourceAuthorAvatarUrl;
 
   @override
   Widget build(BuildContext context) {
-    final hasSourceAuthor = sourceAuthor != null;
+    final hasSourceAuthor =
+        sourceAuthorName != null && sourceAuthorName!.trim().isNotEmpty;
     return Row(
       children: [
         AvatarWithLabel(
-          profile: author,
+          displayName: authorName,
+          avatarUrl: authorAvatarUrl,
           label: hasSourceAuthor ? 'Published by' : 'By',
         ),
         if (hasSourceAuthor) ...[
           const SizedBox(width: AppSpacing.lg),
           AvatarWithLabel(
-            profile: sourceAuthor,
+            displayName: sourceAuthorName!,
+            avatarUrl: sourceAuthorAvatarUrl,
             label: 'Original by',
             isSourceAuthor: true,
           ),

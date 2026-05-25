@@ -39,7 +39,7 @@ class ViewReviewsController extends Controller {
     notifyListeners();
 
     try {
-      final userId = LocalDB.profile.getOrCreate().userId;
+      final userId = LocalDB.profile.getOrCreate().id;
       final allDecks = LocalDB.deck.selectMany();
       final deckMap = {for (final d in allDecks) d.id: d};
 

@@ -13,14 +13,14 @@ enum TextSize {
   cardBackContent,
 }
 
-enum TextWeight { base, body, strong, heavy }
+enum TextWeight { body, strong, heavy }
 
 enum TextTone { primary, secondary, muted, brand }
 
 final appTextStyle = VariantStyle.textParts<AppTokens>(
   base: (tokens) => {
     TextStylePart.color(tokens.textPrimary),
-    TextStylePart.fontWeight(tokens.fontWeightTextBase),
+    TextStylePart.fontWeight(tokens.fontWeightTextBody),
   },
   defaultVariants: const [
     TextSize.labelSmall,
@@ -59,9 +59,6 @@ final appTextStyle = VariantStyle.textParts<AppTokens>(
     TextSize.cardBackContent: (tokens) => {
       TextStylePart.fontSize(tokens.textSizeCardBackContent.sp),
       TextStylePart.height(tokens.lineHeightFieldDisplay),
-    },
-    TextWeight.base: (tokens) => {
-      TextStylePart.fontWeight(tokens.fontWeightTextBase),
     },
     TextWeight.body: (tokens) => {
       TextStylePart.fontWeight(tokens.fontWeightTextBody),

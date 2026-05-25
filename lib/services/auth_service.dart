@@ -75,7 +75,7 @@ class AuthService {
   }
 
   Future<AuthServiceResponse> signIn(String email, String password) async {
-    final guestUserId = LocalDB.profile.getOrCreate().userId;
+    final guestProfileId = LocalDB.profile.getOrCreate().id;
 
     // Wrap the actual auth call in the guard
     await _guard(
@@ -87,26 +87,32 @@ class AuthService {
         .auth
         .currentUser!; // Safe to bang-operator because guard would have caught failure
 
-    final remoteProfileData = await RemoteDB.profile.selectByAuthUserId(
-      user.id,
-    );
-    if (remoteProfileData != null) {
-      await LocalDB.profile.upsert(remoteProfileData);
+    var remoteProfileData = await RemoteDB.profile.selectByAuthUserId(user.id);
+    final createdProfile = remoteProfileData == null;
+    if (remoteProfileData == null) {
+      final fallbackUsername = _createFallbackUsername(user);
+      remoteProfileData = await _upsertNewRemoteProfile(
+        user.id,
+        fallbackUsername,
+      );
     }
 
-    bool needsMerge =
-        guestUserId != user.id &&
-        GuestMigrationService.hasLocalData(guestUserId);
+    await LocalDB.profile.upsert(remoteProfileData);
+
+    final hasLocalData = GuestMigrationService.hasLocalData(guestProfileId);
+    final needsMerge =
+        hasLocalData &&
+        (createdProfile || guestProfileId != remoteProfileData.id);
 
     return (
       profile: remoteProfileData,
       needsMerge: needsMerge,
-      guestUserId: needsMerge ? guestUserId : null,
+      guestUserId: needsMerge ? guestProfileId : null,
     );
   }
 
   Future<AuthServiceResponse> signInWithGoogle() async {
-    final guestUserId = LocalDB.profile.getOrCreate().userId;
+    final guestProfileId = LocalDB.profile.getOrCreate().id;
 
     // Check if the app is running natively on mobile (iOS/Android)
     final isMobile = !kIsWeb && (Platform.isIOS || Platform.isAndroid);
@@ -119,7 +125,7 @@ class AuthService {
       );
 
       final user = response.user!;
-      return await _processSuccessfulSignIn(user, guestUserId);
+      return await _processSuccessfulSignIn(user, guestProfileId);
     } else {
       // ━━━ WEB / DESKTOP OAUTH FLOW ━━━
       final completer = Completer<AuthServiceResponse>();
@@ -133,7 +139,10 @@ class AuthService {
           await authSubscription?.cancel();
           try {
             final user = _client.auth.currentUser!;
-            final response = await _processSuccessfulSignIn(user, guestUserId);
+            final response = await _processSuccessfulSignIn(
+              user,
+              guestProfileId,
+            );
             completer.complete(response);
           } catch (e, stackTrace) {
             completer.completeError(e, stackTrace);
@@ -175,7 +184,7 @@ class AuthService {
     String password,
     String username,
   ) async {
-    final guestUserId = LocalDB.profile.getOrCreate().userId;
+    final guestProfileId = LocalDB.profile.getOrCreate().id;
 
     final response = await _guard(
       () => _client.auth.signUp(email: email, password: password),
@@ -187,14 +196,12 @@ class AuthService {
     final profile = await _upsertNewRemoteProfile(user.id, username);
     await LocalDB.profile.upsert(profile);
 
-    bool needsMerge =
-        guestUserId != user.id &&
-        GuestMigrationService.hasLocalData(guestUserId);
+    final needsMerge = GuestMigrationService.hasLocalData(guestProfileId);
 
     return (
       profile: profile,
       needsMerge: needsMerge,
-      guestUserId: needsMerge ? guestUserId : null,
+      guestUserId: needsMerge ? guestProfileId : null,
     );
   }
 
@@ -202,6 +209,7 @@ class AuthService {
   Future<void> signOut() async {
     await _client.auth.signOut();
     await LocalDB.profile.clear();
+    LocalDB.profile.getOrCreate();
   }
 
   /// Executes the migration or deletion of guest data based on user choice.
@@ -213,7 +221,7 @@ class AuthService {
     if (merge) {
       await GuestMigrationService.migrateLocalData(
         guestUserId,
-        remoteProfile.userId,
+        remoteProfile.id,
       );
     } else {
       await GuestMigrationService.discardGuestData(guestUserId);
@@ -276,9 +284,10 @@ class AuthService {
   /// Extracted logic to keep DB sync and Guest Merging DRY
   Future<AuthServiceResponse> _processSuccessfulSignIn(
     User user,
-    String guestUserId,
+    String guestProfileId,
   ) async {
     Profile? profileData = await RemoteDB.profile.selectByAuthUserId(user.id);
+    final createdProfile = profileData == null;
 
     if (profileData == null) {
       final fallbackUsername = _createFallbackUsername(user);
@@ -287,14 +296,14 @@ class AuthService {
 
     await LocalDB.profile.upsert(profileData);
 
-    bool needsMerge =
-        guestUserId != user.id &&
-        GuestMigrationService.hasLocalData(guestUserId);
+    final hasLocalData = GuestMigrationService.hasLocalData(guestProfileId);
+    final needsMerge =
+        hasLocalData && (createdProfile || guestProfileId != profileData.id);
 
     return (
       profile: profileData,
       needsMerge: needsMerge,
-      guestUserId: needsMerge ? guestUserId : null,
+      guestUserId: needsMerge ? guestProfileId : null,
     );
   }
 

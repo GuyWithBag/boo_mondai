@@ -14,7 +14,7 @@ enum AppTextFieldState { idle, incorrect }
 final appTextFieldStyle = VariantStyle.textFieldParts<AppTokens>(
   base: (tokens) => {
     TextFieldStylePart.textAlign(TextAlign.start),
-    (style) => style.copyWith(cursorColor: tokens.primary),
+    TextFieldStylePart.cursorColor(tokens.primary),
     TextFieldStylePart.text({
       TextStylePart.color(tokens.textPrimary),
       TextStylePart.fontWeight(tokens.fontWeightTextStrong),
@@ -65,22 +65,22 @@ final appTextFieldStyle = VariantStyle.textFieldParts<AppTokens>(
       TextFieldStylePart.decoration({
         InputDecorationPart.filled(true),
         InputDecorationPart.fillColor(tokens.backgroundPage),
-        InputDecorationPart.contentPadding(const EdgeInsets.all(16)),
+        InputDecorationPart.contentPadding(EdgeInsets.all(16.r)),
         InputDecorationPart.enabledBorder(
           OutlineInputBorder(
-            borderRadius: BorderRadius.circular(tokens.radius2xl),
+            borderRadius: BorderRadius.circular(tokens.radius2xl.r),
             borderSide: BorderSide(
               color: tokens.borderNeutralSubtle,
-              width: tokens.borderWidthDefault,
+              width: tokens.borderWidthDefault.w,
             ),
           ),
         ),
         InputDecorationPart.focusedBorder(
           OutlineInputBorder(
-            borderRadius: BorderRadius.circular(tokens.radius2xl),
+            borderRadius: BorderRadius.circular(tokens.radius2xl.r),
             borderSide: BorderSide(
               color: tokens.primary,
-              width: tokens.borderWidthDefault,
+              width: tokens.borderWidthDefault.w,
             ),
           ),
         ),
@@ -96,13 +96,13 @@ final appTextFieldStyle = VariantStyle.textFieldParts<AppTokens>(
         ),
         InputDecorationPart.enabledBorder(
           UnderlineInputBorder(
-            borderSide: BorderSide(color: tokens.primary, width: 4),
+            borderSide: BorderSide(color: tokens.primary, width: 4.w),
             borderRadius: BorderRadius.circular(12.r),
           ),
         ),
         InputDecorationPart.focusedBorder(
           UnderlineInputBorder(
-            borderSide: BorderSide(color: tokens.primary, width: 4),
+            borderSide: BorderSide(color: tokens.primary, width: 4.w),
             borderRadius: BorderRadius.circular(12.r),
           ),
         ),
@@ -112,7 +112,7 @@ final appTextFieldStyle = VariantStyle.textFieldParts<AppTokens>(
       TextFieldStylePart.text({TextStylePart.color(tokens.textPrimary)}),
     },
     AppTextFieldTone.brand: (tokens) => {
-      (style) => style.copyWith(cursorColor: tokens.primary),
+      TextFieldStylePart.cursorColor(tokens.primary),
       TextFieldStylePart.text({TextStylePart.color(tokens.primary)}),
     },
     AppTextFieldTone.success: (tokens) => {
@@ -123,19 +123,19 @@ final appTextFieldStyle = VariantStyle.textFieldParts<AppTokens>(
         ),
         InputDecorationPart.enabledBorder(
           UnderlineInputBorder(
-            borderSide: BorderSide(color: tokens.actionSuccess, width: 4),
+            borderSide: BorderSide(color: tokens.actionSuccess, width: 4.w),
             borderRadius: BorderRadius.circular(12.r),
           ),
         ),
         InputDecorationPart.focusedBorder(
           UnderlineInputBorder(
-            borderSide: BorderSide(color: tokens.actionSuccess, width: 4),
+            borderSide: BorderSide(color: tokens.actionSuccess, width: 4.w),
             borderRadius: BorderRadius.circular(12.r),
           ),
         ),
         (theme) => theme.copyWith(
           disabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: tokens.actionSuccess, width: 4),
+            borderSide: BorderSide(color: tokens.actionSuccess, width: 4.w),
             borderRadius: BorderRadius.circular(12.r),
           ),
         ),
@@ -149,19 +149,19 @@ final appTextFieldStyle = VariantStyle.textFieldParts<AppTokens>(
         ),
         InputDecorationPart.enabledBorder(
           UnderlineInputBorder(
-            borderSide: BorderSide(color: tokens.actionError, width: 4),
+            borderSide: BorderSide(color: tokens.actionError, width: 4.w),
             borderRadius: BorderRadius.circular(12.r),
           ),
         ),
         InputDecorationPart.focusedBorder(
           UnderlineInputBorder(
-            borderSide: BorderSide(color: tokens.actionError, width: 4),
+            borderSide: BorderSide(color: tokens.actionError, width: 4.w),
             borderRadius: BorderRadius.circular(12.r),
           ),
         ),
         (theme) => theme.copyWith(
           disabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: tokens.actionError, width: 4),
+            borderSide: BorderSide(color: tokens.actionError, width: 4.w),
             borderRadius: BorderRadius.circular(12.r),
           ),
         ),

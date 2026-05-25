@@ -22,19 +22,24 @@ class LocalDB {
     reviewCard = await ReviewCardsLocalDB().init() as ReviewCardsLocalDB;
     fsrsCard = await FsrsCardsLocalDB().init() as FsrsCardsLocalDB;
     drillSession = await DrillSessionsLocalDB().init() as DrillSessionsLocalDB;
-    reviewSession = await ReviewSessionsLocalDB().init() as ReviewSessionsLocalDB;
+    reviewSession =
+        await ReviewSessionsLocalDB().init() as ReviewSessionsLocalDB;
     reviewLog = await ReviewLogsLocalDB().init() as ReviewLogsLocalDB;
     drillAnswer = await DrillAnswersLocalDB().init() as DrillAnswersLocalDB;
     streak = await StreakLocalDB().init() as StreakLocalDB;
   }
 
-  static void clearAll() {
-    deck.clear();
-    cardTemplate.clear();
-    fsrsCard.clear();
-    drillSession.clear();
-    reviewLog.clear();
-    profile.clear();
-    cachedProfile.clear();
+  static Future<void> clearAll() async {
+    await deck.clear();
+    await cardTemplate.clear();
+    await fsrsCard.clear();
+    await drillSession.clear();
+    await reviewSession.clear();
+    await drillAnswer.clear();
+    await reviewLog.clear();
+    await streak.clear();
+    await cachedProfile.clear();
+    await profile.clear();
+    profile.getOrCreate();
   }
 }

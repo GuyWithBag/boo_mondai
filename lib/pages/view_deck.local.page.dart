@@ -55,7 +55,9 @@ class ViewDeckLocalSheet extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final deck = LocalDB.deck.selectByPk({'id': deckId});
+    final deckState = useState(LocalDB.deck.selectByPk({'id': deckId}));
+    final isSavingPublishState = useState(false);
+    final deck = deckState.value;
 
     if (deck == null) {
       return ErrorState(
@@ -65,16 +67,9 @@ class ViewDeckLocalSheet extends HookWidget {
     }
 
     final controller = context.read<ViewDecksLocalController>();
-    final author = LocalDB.cachedProfile.selectByPk({'id': deck.userId});
-    final sourceDeck = deck.sourceDeckId == null
-        ? null
-        : LocalDB.deck.selectByPk({'id': deck.sourceDeckId});
-    final sourceAuthor = sourceDeck == null
-        ? null
-        : LocalDB.cachedProfile.selectByPk({'id': sourceDeck.userId});
     final reviewCards = LocalDB.reviewCard.getByDeckId(deckId);
     final templates = LocalDB.cardTemplate.getByDeckId(deckId);
-    // final userId = LocalDB.profile.getOrCreate().userId;
+    // final userId = LocalDB.profile.getOrCreate().id;
     // final eligibleCards = DrillService.getEligibleDrillCards(deckId, userId);
     // final canDrill = eligibleCards.isNotEmpty;
     // final navigator = Navigator.of(context);
@@ -87,6 +82,53 @@ class ViewDeckLocalSheet extends HookWidget {
         ? 'No long description yet.'
         : deck.longDescription;
     final coverImageUrl = _nonEmptyOrNull(deck.coverImageUrl);
+
+    Future<void> setPublished(bool isPublished) async {
+      if (isSavingPublishState.value || deck.isPublished == isPublished) {
+        return;
+      }
+
+      final actionLabel = isPublished ? 'Publish' : 'Unpublish';
+      final confirmed = await showAppChoiceDialog<bool>(
+        context: context,
+        title: '$actionLabel deck?',
+        body: isPublished
+            ? 'Publishing "$title" makes it available after your next sync.'
+            : 'Unpublishing "$title" removes it from public browsing after your next sync.',
+        leading: Icon(
+          isPublished
+              ? Icons.cloud_upload_outlined
+              : Icons.visibility_off_outlined,
+        ),
+        actions: [
+          const AppDialogAction<bool>(
+            value: false,
+            label: 'Cancel',
+            tone: TactileTone.ghost,
+          ),
+          AppDialogAction<bool>(
+            value: true,
+            label: actionLabel,
+            tone: isPublished ? TactileTone.success : TactileTone.error,
+          ),
+        ],
+      );
+      if (confirmed != true) return;
+
+      isSavingPublishState.value = true;
+      final updatedDeck = deck.copyWith(
+        isPublished: isPublished,
+        updatedAt: DateTime.now(),
+      );
+
+      try {
+        await LocalDB.deck.upsert(updatedDeck);
+        deckState.value = updatedDeck;
+        controller.load();
+      } finally {
+        isSavingPublishState.value = false;
+      }
+    }
 
     Future<void> deleteDeckDialog() async {
       final confirmed = await showDialog<bool>(
@@ -115,8 +157,8 @@ class ViewDeckLocalSheet extends HookWidget {
       context.pop();
     }
 
-    final horizontalPadding = 24.w;
-    final verticalPadding = 16.h;
+    final horizontalPadding = tokens.spacePanelPadding;
+    final verticalPadding = tokens.spacePanelPaddingSm;
 
     return DraggableScrollableSheet(
       expand: false,
@@ -179,16 +221,14 @@ class ViewDeckLocalSheet extends HookWidget {
                   deck: deck,
                   title: title,
                   coverImageUrl: coverImageUrl,
+                  isSavingPublishState: isSavingPublishState.value,
+                  onPublishedChanged: setPublished,
                 ),
                 Padding(
                   padding: EdgeInsets.all(tokens.spacePanelPadding),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      AuthorAvatarRow(
-                        author: author,
-                        sourceAuthor: sourceAuthor,
-                      ),
                       SizedBox(height: tokens.spacePanelGapLg),
                       _MetadataPanel(
                         deck: deck,
@@ -231,7 +271,7 @@ class _BottomNavBar extends StatelessWidget {
     final tokens = context.themeTokens<AppTokens>();
 
     final deck = LocalDB.deck.selectByPk({'id': deckId});
-    final userId = LocalDB.profile.getOrCreate().userId;
+    final userId = LocalDB.profile.getOrCreate().id;
     final eligibleCards = DrillService.getEligibleDrillCards(deckId, userId);
     final canDrill = eligibleCards.isNotEmpty;
     return Surface(
@@ -267,76 +307,155 @@ class _SheetHero extends StatelessWidget {
     required this.deck,
     required this.title,
     required this.coverImageUrl,
+    required this.isSavingPublishState,
+    required this.onPublishedChanged,
   });
 
   final Deck deck;
   final String title;
   final String? coverImageUrl;
+  final bool isSavingPublishState;
+  final ValueChanged<bool> onPublishedChanged;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-
-    return SizedBox(
-      height: 320,
+    final publishChipStyle = appChipStyle.resolve(tokens, [
+      deck.isPublished ? AppChipTone.filled : AppChipTone.hard,
+    ]);
+    final author =
+        LocalDB.cachedProfile.selectByPk({'id': deck.userId}) ??
+        LocalDB.profile.getOrCreate();
+    final authorName = switch (author) {
+      CachedProfile(:final username) => username,
+      Profile(:final username) => username,
+      _ => 'Unknown user',
+    };
+    final authorAvatarUrl = switch (author) {
+      CachedProfile(:final avatarUrl) => avatarUrl,
+      Profile(:final avatarUrl) => avatarUrl,
+      _ => null,
+    };
+    final sourceDeck = deck.sourceDeckId == null
+        ? null
+        : LocalDB.deck.selectByPk({'id': deck.sourceDeckId});
+    final sourceAuthor = sourceDeck == null
+        ? null
+        : LocalDB.cachedProfile.selectByPk({'id': sourceDeck.userId});
+    return Container(
+      height: 320.h,
+      padding: EdgeInsets.all(tokens.spacePanelPadding),
+      decoration: BoxDecoration(
+        color: tokens.softGray,
+        image: coverImageUrl == null
+            ? null
+            : DecorationImage(
+                image: NetworkImage(coverImageUrl!),
+                fit: BoxFit.cover,
+              ),
+      ),
       child: Stack(
         fit: StackFit.expand,
         children: [
-          if (coverImageUrl != null)
-            Image.network(coverImageUrl!, fit: BoxFit.cover)
-          else
-            ColoredBox(color: tokens.softGray),
           Align(
             alignment: Alignment.topRight,
-            child: Padding(
-              padding: EdgeInsets.all(tokens.spacePanelGapMd),
-              child: Wrap(
-                spacing: tokens.spacePanelGapSm,
-                runSpacing: tokens.spacePanelGapSm,
-                children: [
-                  if (deck.isPremade) const StatusBadge(label: 'Premade'),
-                  StatusBadge(label: deck.isPublished ? 'Published' : 'Draft'),
-                  StatusBadge(label: deck.isEditable ? 'Editable' : 'Locked'),
-                ],
-              ),
+            child: Wrap(
+              spacing: tokens.spacePanelGapSm,
+              runSpacing: tokens.spacePanelGapSm,
+              children: [
+                if (deck.isPremade) const HeaderBadge(label: 'Premade'),
+                ChipTheme(
+                  data: publishChipStyle,
+                  child: ChoiceChip(
+                    avatar: Icon(
+                      deck.isPublished
+                          ? Icons.public_outlined
+                          : Icons.public_off_outlined,
+                    ),
+                    label: Text(deck.isPublished ? 'Published' : 'Draft'),
+                    selected: deck.isPublished,
+                    onSelected: isSavingPublishState
+                        ? null
+                        : onPublishedChanged,
+                  ),
+                ),
+                Chip(label: Text(deck.isEditable ? 'Editable' : 'Locked')),
+              ],
             ),
           ),
-          Padding(
-            padding: EdgeInsets.all(tokens.spacePanelPadding),
-            child: Align(
-              alignment: Alignment.bottomLeft,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  DeckTile(deck: deck, width: 150),
-                  SizedBox(width: tokens.spacePanelGapLg),
-                  Expanded(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SectionEyebrow(_visibilityLabel(deck.visibilityState)),
-                        Text(
-                          title,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: appTextStyle.resolve(tokens, const [
-                            TextSize.header,
-                            TextWeight.heavy,
-                          ]),
-                        ),
-                        Text(
-                          deck.shortDescription,
-                          style: appTextStyle.resolve(tokens, const [
-                            TextSize.label,
-                            TextWeight.base,
-                          ]),
-                        ),
-                      ],
-                    ),
+          Align(
+            alignment: Alignment.bottomLeft,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                DeckTile(deck: deck, width: 150),
+                SizedBox(width: tokens.spacePanelGapLg),
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AuthorAvatarRow(
+                        authorName: authorName,
+                        authorAvatarUrl: authorAvatarUrl,
+                        sourceAuthorName: sourceAuthor?.username,
+                        sourceAuthorAvatarUrl: sourceAuthor?.avatarUrl,
+                      ),
+                      SizedBox(height: tokens.spacePanelGapMd.h),
+                      MetaLabel(
+                        icon: Icons.visibility_outlined,
+                        label: _visibilityLabel(deck.visibilityState),
+                      ),
+                      SizedBox(height: tokens.lineHeightTextBody),
+                      Text(
+                        title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: appTextStyle.resolve(tokens, const [
+                          TextSize.header,
+                          TextWeight.heavy,
+                        ]),
+                      ),
+                      Text(
+                        deck.shortDescription,
+                        style: appTextStyle.resolve(tokens, const [
+                          TextSize.label,
+                          TextWeight.body,
+                        ]),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                MetaLabel(
+                  icon: Icons.new_releases_outlined,
+                  label: 'v${deck.version}+${deck.buildNumber}',
+                  tooltip: 'Deck version and build number',
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    MetaLabel(
+                      icon: Icons.calendar_today_outlined,
+                      label: _formatDate(deck.createdAt),
+                      tooltip: 'Created ${_formatDate(deck.createdAt)}',
+                    ),
+                    MetaLabel(
+                      icon: Icons.update_outlined,
+                      label: _formatDate(deck.updatedAt),
+                      tooltip: 'Updated ${_formatDate(deck.updatedAt)}',
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ],
@@ -408,22 +527,7 @@ class _MetadataPanel extends StatelessWidget {
             icon: Icons.dashboard_customize_outlined,
             label: '$templateCount templates',
           ),
-          MetaLabel(
-            icon: Icons.new_releases_outlined,
-            label: 'v${deck.version}+${deck.buildNumber}',
-          ),
-          MetaLabel(
-            icon: Icons.visibility_outlined,
-            label: _visibilityLabel(deck.visibilityState),
-          ),
-          MetaLabel(
-            icon: Icons.calendar_today_outlined,
-            label: 'Created ${_formatDate(deck.createdAt)}',
-          ),
-          MetaLabel(
-            icon: Icons.update_outlined,
-            label: 'Updated ${_formatDate(deck.updatedAt)}',
-          ),
+
           if (deck.sourceDeckId != null)
             MetaLabel(icon: Icons.call_split_outlined, label: 'Forked deck'),
         ],
@@ -446,7 +550,7 @@ class _TagsPanel extends StatelessWidget {
           : Wrap(
               spacing: 12,
               runSpacing: 12,
-              children: [for (final tag in tags) StatusBadge(label: tag.name)],
+              children: [for (final tag in tags) HeaderBadge(label: tag.name)],
             ),
     );
   }

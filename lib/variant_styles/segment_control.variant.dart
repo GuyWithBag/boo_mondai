@@ -8,15 +8,15 @@ enum SegmentControlOptionState { idle, selected, disabled }
 final segmentControlOptionStyle = VariantStyle.surfaceParts<AppTokens>(
   base: (tokens) => {
     SurfaceStylePart.padding(
-      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
     ),
     SurfaceStylePart.decoration({
       DecorationPart.color(tokens.colorTransparent),
-      DecorationPart.borderRadius(BorderRadius.circular(tokens.radius2xl)),
+      DecorationPart.borderRadius(BorderRadius.circular(tokens.radius2xl.r)),
       DecorationPart.border(
         Border.all(
           color: tokens.colorTransparent,
-          width: tokens.borderWidthDefault,
+          width: tokens.borderWidthDefault.w,
         ),
       ),
     }),
@@ -35,7 +35,7 @@ final segmentControlOptionStyle = VariantStyle.surfaceParts<AppTokens>(
         DecorationPart.border(
           Border.all(
             color: tokens.borderNeutralSubtle,
-            width: tokens.borderWidthDefault,
+            width: tokens.borderWidthDefault.w,
           ),
         ),
       }),

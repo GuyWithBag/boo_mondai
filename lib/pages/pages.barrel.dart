@@ -3,6 +3,7 @@
 // Other files
 export 'view_account.page.dart';
 export 'view_deck.local.page.dart';
+export 'view_deck.online.page.dart';
 export 'view_decks.local.page.dart';
 export 'view_decks.online.page.dart';
 export 'view_drill_result.local.page.dart';

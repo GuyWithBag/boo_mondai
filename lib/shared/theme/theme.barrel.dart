@@ -3,3 +3,4 @@
 // Other files
 export 'app_theme.dart';
 export 'app_tokens.dart';
+export 'app_tokens.shared.dart';

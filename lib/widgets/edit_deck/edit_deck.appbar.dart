@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
-
-import 'package:boo_mondai/shared/theme/theme.barrel.dart';
-import '../../variant_styles/tactile_button.variant.dart';
-import '../../widgets/meta_label.dart';
-import '../../widgets/status_badge.dart';
-import '../../widgets/tactile_button.dart';
+import 'package:boo_mondai/lib.barrel.dart';
+import 'package:theme_variants/theme_variants.dart';
 
 class EditDeckAppbar extends StatelessWidget implements PreferredSizeWidget {
   const EditDeckAppbar({
@@ -29,27 +24,13 @@ class EditDeckAppbar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final horizontalPadding = 24.w;
-    final verticalPadding = 16.h;
+    final tokens = context.themeTokens<AppTokens>();
+    final horizontalPadding = tokens.spacePanelPadding;
+    final verticalPadding = tokens.spacePanelPaddingSm;
 
     return AppBar(
       leadingWidth: 100.w,
-      leading: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: horizontalPadding,
-          vertical: verticalPadding + 4,
-        ),
-        child: TactileButton.icon(
-          icon: Icons.arrow_back,
-          onPressed: () {
-            if (context.canPop()) {
-              context.pop();
-              return;
-            }
-            context.go('/');
-          },
-        ),
-      ),
+      leading: TactileBackButton(),
       title: SizedBox(
         height: preferredSize.height,
         child: Padding(
@@ -63,7 +44,7 @@ class EditDeckAppbar extends StatelessWidget implements PreferredSizeWidget {
                 runSpacing: 8.h,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  const StatusBadge(label: 'Draft Deck'),
+                  const HeaderBadge(label: 'Draft Deck'),
                   const MetaLabel(icon: Icons.lock, label: 'Private'),
                 ],
               ),

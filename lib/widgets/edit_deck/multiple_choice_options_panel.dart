@@ -1,13 +1,6 @@
+import 'package:boo_mondai/lib.barrel.dart';
 import 'package:flutter/material.dart';
-import 'package:boo_mondai/models/models.barrel.dart';
 import 'package:theme_variants/theme_variants.dart';
-
-import 'package:boo_mondai/shared/theme/theme.barrel.dart';
-import '../../variant_styles/variant_styles.barrel.dart';
-import '../../widgets/section_eyebrow.dart';
-import '../../widgets/status_badge.dart';
-import '../../widgets/tactile_button.dart';
-import 'multiple_choice_option.dart' as editor;
 
 class MultipleChoiceOptionsPanel extends StatelessWidget {
   const MultipleChoiceOptionsPanel({
@@ -36,7 +29,7 @@ class MultipleChoiceOptionsPanel extends StatelessWidget {
           Row(
             children: [
               const Expanded(child: SectionEyebrow('Answer Options')),
-              const StatusBadge(label: 'Select correct'),
+              const HeaderBadge(label: 'Select correct'),
             ],
           ),
           const SizedBox(height: 22),
@@ -44,7 +37,7 @@ class MultipleChoiceOptionsPanel extends StatelessWidget {
             child: ListView(
               children: [
                 for (final entry in options.asMap().entries) ...[
-                  editor.EditMultipleChoiceOption(
+                  EditMultipleChoiceOption(
                     value: entry.value.text,
                     correct: entry.value.isCorrect,
                     showRadio: true,

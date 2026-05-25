@@ -39,7 +39,7 @@
 //   Widget build(BuildContext context) {
 //     return Card(
 //       child: ListTile(
-//         leading: StatusBadge.fsrsState(state: fsrsCard.state),
+//         leading: HeaderBadge.fsrsState(state: fsrsCard.state),
 //         title: Text(
 //           fsrsCard.cardId,
 //           maxLines: 1,

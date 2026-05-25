@@ -55,7 +55,7 @@ class ReviewSessionController
     notifyListeners();
 
     try {
-      final userId = LocalDB.profile.getOrCreate().userId;
+      final userId = LocalDB.profile.getOrCreate().id;
       final now = DateTime.now();
 
       final allFsrsCards = LocalDB.fsrsCard.getByUserId(userId);

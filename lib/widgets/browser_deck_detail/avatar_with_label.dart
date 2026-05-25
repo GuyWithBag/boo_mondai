@@ -5,27 +5,31 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/lib.barrel.dart';
+import 'package:boo_mondai/shared/shared.barrel.dart';
 import 'package:flutter/material.dart';
 
 class AvatarWithLabel extends StatelessWidget {
   const AvatarWithLabel({
     super.key,
-    required this.profile,
+    required this.displayName,
     required this.label,
+    this.avatarUrl,
     this.isSourceAuthor = false,
   });
 
-  final CachedProfile? profile;
+  final String displayName;
   final String label;
+  final String? avatarUrl;
   final bool isSourceAuthor;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final name = profile?.username ?? '…';
+    final name = displayName.trim().isEmpty ? '...' : displayName.trim();
     final initials = name.isNotEmpty ? name[0].toUpperCase() : '?';
+    final imageUrl = avatarUrl?.trim();
+    final hasImage = imageUrl != null && imageUrl.isNotEmpty;
 
     return Row(
       children: [
@@ -36,10 +40,8 @@ class AvatarWithLabel extends StatelessWidget {
               backgroundColor: isSourceAuthor
                   ? scheme.tertiaryContainer
                   : scheme.primaryContainer,
-              backgroundImage: profile?.avatarUrl != null
-                  ? NetworkImage(profile!.avatarUrl!)
-                  : null,
-              child: profile?.avatarUrl == null
+              backgroundImage: hasImage ? NetworkImage(imageUrl) : null,
+              child: !hasImage
                   ? Text(
                       initials,
                       style: theme.textTheme.labelSmall?.copyWith(

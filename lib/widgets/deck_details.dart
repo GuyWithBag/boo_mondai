@@ -44,7 +44,12 @@ class DeckDetails extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.md),
         // Author avatars row
-        AuthorAvatarRow(author: author, sourceAuthor: sourceAuthor),
+        AuthorAvatarRow(
+          authorName: author?.username ?? 'Unknown user',
+          authorAvatarUrl: author?.avatarUrl,
+          sourceAuthorName: sourceAuthor?.username,
+          sourceAuthorAvatarUrl: sourceAuthor?.avatarUrl,
+        ),
         const SizedBox(height: AppSpacing.sm),
         // Metadata chips
         Wrap(

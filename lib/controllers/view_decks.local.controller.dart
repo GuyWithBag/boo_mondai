@@ -88,10 +88,17 @@ class ViewDecksLocalController extends Controller {
     notifyListeners();
 
     try {
-      SyncService.sync(
+      final profile = LocalDB.profile.getOrCreate();
+      await LocalDB.deck.adoptLegacyOwnerId(
+        legacyUserId: profile.userId,
+        currentProfileId: profile.id,
+      );
+
+      await SyncService.sync(
         localDb: LocalDB.deck,
         remoteDb: RemoteDB.deck,
-        userId: LocalDB.profile.getOrCreate().userId,
+        userId: profile.id,
+        localWhere: (deck) => deck.userId == profile.id,
       );
 
       // ── 3. Reload ────────────────────────────────────────
