@@ -35,4 +35,4 @@ class DrillSessionsRemoteDB extends SupabaseRemoteDB<DrillSession> {
 }
 
 const _drillSessionWithRelationsSelect =
-    '*, deck:decks(*), user_profile:profiles(id, username, avatar_url, created_at)';
+    '*, deck:decks(*), user_profile:profiles!drill_sessions_user_id_fkey(id, username, avatar_url, created_at)';

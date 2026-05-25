@@ -138,7 +138,7 @@ class DeckFavoritesRemoteDB extends SupabaseRemoteDB<DeckFavorite> {
 }
 
 const _deckFavoriteWithRelationsSelect =
-    '*, deck:decks(*, user_profile:profiles(id, username, avatar_url, created_at), listing:deck_listings(*), tags(*)), user_profile:profiles(id, username, avatar_url, created_at)';
+    '*, deck:decks(*, user_profile:profiles!decks_user_id_fkey(id, username, avatar_url, created_at), listing:deck_listings(*), tags(*)), user_profile:profiles!deck_favorites_user_id_fkey(id, username, avatar_url, created_at)';
 
 class DeckInteractionsRemoteDB {
   DeckInteractionsRemoteDB({

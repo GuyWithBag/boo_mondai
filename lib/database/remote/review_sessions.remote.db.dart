@@ -34,4 +34,4 @@ class ReviewSessionsRemoteDB extends SupabaseRemoteDB<ReviewSession> {
 }
 
 const _reviewSessionWithRelationsSelect =
-    '*, deck:decks(*), user_profile:profiles(id, username, avatar_url, created_at)';
+    '*, deck:decks(*), user_profile:profiles!review_sessions_user_id_fkey(id, username, avatar_url, created_at)';
