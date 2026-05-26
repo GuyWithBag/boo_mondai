@@ -19,6 +19,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         MatchMadnessPair,
         CardType;
 
+/// Downloads an online deck into the current user's local deck library.
+///
+/// The downloaded deck is stored as a private, editable local copy. The
+/// original remote deck and template IDs are preserved in `source*Id` fields so
+/// the app can recognize repeated downloads and trace local content back to the
+/// published source.
 class DeckDownloadsOnlineService {
   DeckDownloadsOnlineService({
     DecksRemoteDB? decksRemoteDB,
@@ -30,6 +36,13 @@ class DeckDownloadsOnlineService {
   final DecksRemoteDB _decksRemoteDB;
   final CardTemplatesRemoteDB _cardTemplatesRemoteDB;
 
+  /// Creates a local copy of [sourceDeck] and all of its card templates.
+  ///
+  /// If the deck was already downloaded, this returns the existing local deck
+  /// instead of creating duplicates. Otherwise it fetches the latest remote
+  /// deck row when available, clones the deck/templates with fresh local IDs,
+  /// creates the review cards needed by FSRS, persists everything locally, and
+  /// returns the new local deck.
   Future<Deck> downloadDeck(Deck sourceDeck) async {
     final existingDeck = _findExistingDownload(sourceDeck.id);
     if (existingDeck != null) return existingDeck;
@@ -52,11 +65,17 @@ class DeckDownloadsOnlineService {
       listing: null,
     );
 
+    // Fetch templates in author-defined order so the local deck preserves the
+    // same card sequence as the published deck.
     final remoteTemplates = await _cardTemplatesRemoteDB.selectMany(
       filters: {'deck_id': remoteDeck.id},
       orderBy: 'sort_order',
       ascending: true,
     );
+
+    // Precompute every remote-template -> local-template ID mapping before
+    // copying templates. Some child records, such as Match Madness auto-picked
+    // pairs, can refer to another template in the same deck.
     final templateIdMap = {
       for (final template in remoteTemplates) template.id: uuid.v7(),
     };
@@ -82,6 +101,7 @@ class DeckDownloadsOnlineService {
     return localDeck;
   }
 
+  /// Returns the local deck previously cloned from [sourceDeckId], if present.
   Deck? _findExistingDownload(String sourceDeckId) {
     final matches = LocalDB.deck.selectMany(
       where: (deck) => deck.sourceDeckId == sourceDeckId,
@@ -97,6 +117,8 @@ class DeckDownloadsOnlineService {
     required Map<String, String> templateIdMap,
     required DateTime now,
   }) {
+    // Each template subtype owns different nested data, so copying is explicit
+    // instead of relying on a base-class copy that could miss subtype fields.
     return switch (template) {
       FlashcardTemplate t => FlashcardTemplate(
         id: localTemplateId,
@@ -182,6 +204,9 @@ class DeckDownloadsOnlineService {
             MatchMadnessPair(
               id: uuid.v7(),
               templateId: localTemplateId,
+              // Auto-picked pairs can point at a source template. Prefer the
+              // newly generated local ID when the referenced template was part
+              // of this download; otherwise keep the original external ID.
               sourceTemplateId: pair.sourceTemplateId == null
                   ? null
                   : templateIdMap[pair.sourceTemplateId] ??
@@ -219,6 +244,8 @@ class DeckDownloadsOnlineService {
 
     for (final template in templates) {
       if (template is FlashcardTemplate) {
+        // Flashcards can produce one normal review card, one reversed review
+        // card, or both, depending on the template's cardType setting.
         final needsNormal = template.cardType != CardType.reversed;
         final needsReversed = template.cardType != CardType.normal;
 
