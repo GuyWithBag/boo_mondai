@@ -8,7 +8,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppSpacing,
         ErrorText,
         TactileTone,
-        Button,
+        TactileButton,
         TactileDepth,
         AppTextFieldSize,
         AppTextFieldFrame,
@@ -115,7 +115,7 @@ class LoginPage extends HookWidget {
                     ErrorText(auth.error),
                   ],
                   const SizedBox(height: AppSpacing.lg),
-                  Button(
+                  TactileButton(
                     tone: TactileTone.filled,
                     onPressed: auth.isLoading ? null : performSignIn,
                     child: auth.isLoading
@@ -123,7 +123,7 @@ class LoginPage extends HookWidget {
                         : const Text('Sign In'),
                   ),
                   const SizedBox(height: AppSpacing.md),
-                  Button(
+                  TactileButton(
                     tone: TactileTone.text,
                     depth: TactileDepth.flat,
                     onPressed: navigateToRegister,

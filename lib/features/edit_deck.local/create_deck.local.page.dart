@@ -15,7 +15,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         Deck,
         surfaceStyle,
         SurfacePadding,
-        Button,
+        TactileButton,
         PanelHeader,
         TactileTone,
         appTextFieldStyle,
@@ -184,7 +184,7 @@ class CreateDeckSheet extends HookWidget {
                 PanelHeader(
                   title: isEdit ? 'Edit Deck' : 'Create Deck',
                   trailing: showCloseButton
-                      ? Button.icon(
+                      ? TactileButton.icon(
                           icon: Icons.close,
                           onPressed: () => context.pop(),
                         )
@@ -243,7 +243,7 @@ class CreateDeckSheet extends HookWidget {
                         onChanged: (value) => isPublished.value = value,
                       ),
                       SizedBox(height: tokens.spacePanelGapLg),
-                      Button(
+                      TactileButton(
                         tone: TactileTone.filled,
                         leading: Icon(isEdit ? Icons.save : Icons.add),
                         onPressed: handleSave,

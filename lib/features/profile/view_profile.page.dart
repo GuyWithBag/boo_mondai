@@ -13,7 +13,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         TactileTone,
         TactileDepth,
-        Button,
+        TactileButton,
         LocalDB,
         AppModalTone,
         appTextStyle,
@@ -58,7 +58,7 @@ class ViewAccountPage extends StatelessWidget {
             const SizedBox(height: AppSpacing.md),
 
             // Kept the Force Sign Out for dev convenience
-            Button(
+            TactileButton(
               tone: TactileTone.text,
               depth: TactileDepth.flat,
               onPressed: () async {
@@ -128,14 +128,14 @@ class _AuthenticatedActions extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (profile.role != 'researcher') ...[
-          Button(
+          TactileButton(
             onPressed: () => context.push('/research/code'),
             leading: const Icon(Icons.vpn_key),
             child: const Text('Enter Research Code'),
           ),
           const SizedBox(height: AppSpacing.xl),
         ],
-        Button(
+        TactileButton(
           tone: TactileTone.error,
           onPressed: () => _showSignOutDialog(context),
           leading: const Icon(Icons.logout),
@@ -175,13 +175,13 @@ class _SignInActions extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: AppSpacing.lg),
-          Button(
+          TactileButton(
             tone: TactileTone.filled,
             onPressed: () => context.push('/login'),
             child: const Text('Sign In'),
           ),
           const SizedBox(height: AppSpacing.sm),
-          Button(
+          TactileButton(
             onPressed: () => context.push('/register'),
             child: const Text('Create Account'),
           ),
@@ -225,7 +225,7 @@ class _GoogleSignInButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final auth = context.read<AuthController>();
 
-    return Button(
+    return TactileButton(
       onPressed: () async {
         // 1. Trigger the actual browser launch (don't await it yet so we can show the dialog)
         final loginFuture = auth.signInWithGoogle();
@@ -263,7 +263,7 @@ class _AppleSignInButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Button(
+    return TactileButton(
       onPressed: null,
       leading: const Icon(Icons.apple, size: 24),
       child: const Text('Continue with Apple'),
@@ -288,12 +288,12 @@ class _DevManualLoginDialog extends HookWidget {
         tone: AppModalTone.surface,
         leading: const Icon(Icons.link),
         actions: [
-          Button(
+          TactileButton(
             tone: TactileTone.ghost,
             onPressed: () => Navigator.of(context).pop(),
             child: const Text('Cancel'),
           ),
-          Button(
+          TactileButton(
             tone: TactileTone.filled,
             onPressed: () => Navigator.of(context).pop(controller.text),
             child: const Text('Submit Code'),
@@ -348,12 +348,12 @@ class _SignOutDialog extends StatelessWidget {
         tone: AppModalTone.error,
         leading: const Icon(Icons.logout),
         actions: [
-          Button(
+          TactileButton(
             tone: TactileTone.ghost,
             onPressed: () => Navigator.of(context).pop(),
             child: const Text('Cancel'),
           ),
-          Button(
+          TactileButton(
             tone: TactileTone.ghost,
             onPressed: () {
               Navigator.of(context).pop();
@@ -361,7 +361,7 @@ class _SignOutDialog extends StatelessWidget {
             },
             child: const Text('Keep data'),
           ),
-          Button(
+          TactileButton(
             tone: TactileTone.error,
             onPressed: () async {
               Navigator.of(context).pop();
