@@ -4,7 +4,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart'
-    show CardTemplate, Controller, StudyRating, ReviewCard, SessionException;
+    show CardTemplate, Controller, StudyRating, StudyCard, SessionException;
 import 'package:flutter/material.dart';
 
 abstract class StudySessionController<TCard, VSession> extends Controller {
@@ -21,16 +21,15 @@ abstract class StudySessionController<TCard, VSession> extends Controller {
 
   // ── Abstract Contract (Subclasses MUST implement) ──
   bool get isComplete;
-  ReviewCard? get currentReviewCard;
+  StudyCard? get currentStudyCard;
 
   Future<void> submitAnswer(String userAnswer, StudyRating type);
   @protected
   Future<void> completeSession(); // <-- Pulled up to the base class
   void reset();
 
-  CardTemplate? get currentTemplate => currentReviewCard != null
-      ? templates[currentReviewCard!.templateId]
-      : null;
+  CardTemplate? get currentTemplate =>
+      currentStudyCard != null ? templates[currentStudyCard!.templateId] : null;
 
   Never failSession(String message, {required String code}) {
     final exception = SessionException(message, code: code);

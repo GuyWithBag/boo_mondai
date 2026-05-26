@@ -143,7 +143,7 @@ Key files in `lib/models/dtos/`:
 - `deck_listing.dto.dart`
 - `deck_tag.dto.dart`
 - `card_template_tag.dto.dart`
-- `user_review_card_tag.dto.dart`
+- `user_study_cards_tag.dto.dart`
 - `visibility_state.dto.dart`
 
 `Deck` was expanded for the online browser:
@@ -181,7 +181,7 @@ New models were registered:
 - `DeckListing`
 - `DeckTag`
 - `CardTemplateTag`
-- `UserReviewCardTag`
+- `UserStudyCardTag`
 
 Generated Hive files were rebuilt after registration.
 
@@ -199,9 +199,9 @@ New/updated DB classes include:
 - `DeckTagRemoteDB` / `DeckTagLocalDB`
 - `CardTemplateRemoteDB` / `CardTemplateLocalDB`
 - `CardTemplateTagsRemoteDB` / `CardTemplateTagLocalDB`
-- `ReviewCardRemoteDB` / `ReviewCardLocalDB`
+- `StudyCardRemoteDB` / `StudyCardLocalDB`
 - `DrillSessionRemoteDB` / `DrillSessionLocalDB`
-- `UserReviewCardTagRemoteDB` / `UserReviewCardTagLocalDB`
+- `UserStudyCardTagRemoteDB` / `UserStudyCardTagLocalDB`
 - FSRS/review/profile/streak related DB classes
 
 Barrel files were regenerated/updated after file additions and renames.

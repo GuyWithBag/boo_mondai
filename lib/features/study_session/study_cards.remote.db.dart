@@ -6,27 +6,27 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart'
-    show SupabaseRemoteDB, ReviewCard, ReviewCardMapper;
+    show SupabaseRemoteDB, StudyCard, StudyCardMapper;
 
-class ReviewCardsRemoteDB extends SupabaseRemoteDB<ReviewCard> {
+class StudyCardsRemoteDB extends SupabaseRemoteDB<StudyCard> {
   @override
-  String get tableName => 'review_cards';
-
-  @override
-  ReviewCard Function(Map<String, dynamic>) get fromMap =>
-      ReviewCardMapper.fromMap;
+  String get tableName => 'study_cards';
 
   @override
-  Map<String, dynamic> toMap(ReviewCard item) => item.toMap();
+  StudyCard Function(Map<String, dynamic>) get fromMap =>
+      StudyCardMapper.fromMap;
 
   @override
-  Map<String, Object?> primaryKeyFromItem(ReviewCard item) => {'id': item.id};
+  Map<String, dynamic> toMap(StudyCard item) => item.toMap();
+
+  @override
+  Map<String, Object?> primaryKeyFromItem(StudyCard item) => {'id': item.id};
 
   @override
   String get upsertConflictTarget => 'id';
 
   @override
-  String get defaultSelect => _reviewCardWithRelationsSelect;
+  String get defaultSelect => _studyCardWithRelationsSelect;
 
   @override
   Set<String> get joinedFields => const {
@@ -37,5 +37,5 @@ class ReviewCardsRemoteDB extends SupabaseRemoteDB<ReviewCard> {
   };
 }
 
-const _reviewCardWithRelationsSelect =
+const _studyCardWithRelationsSelect =
     '*, deck:decks(*), template:card_templates(*, tags(*), options:multiple_choice_options(*), segments:fill_in_the_blank_segments(*), pairs:match_madness_pairs(*)), personal_tags:tags(*)';

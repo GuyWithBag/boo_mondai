@@ -9,8 +9,8 @@
 | Layer | Table | Dart DTO | Role |
 |---|---|---|---|
 | **Blueprint** | `card_templates` | `CardTemplate` subclasses | Stores the raw content and card type |
-| **Reviewable unit** | `review_cards` | `ReviewCard` | One testable instance per direction (forward / reversed) |
-| **FSRS tracker** | `fsrs_cards` | `FsrsCard` | One per user per `review_card`; holds the scheduling state |
+| **Reviewable unit** | `study_cards` | `StudyCard` | One testable instance per direction (forward / reversed) |
+| **FSRS tracker** | `fsrs_cards` | `FsrsCard` | One per user per `study_cards`; holds the scheduling state |
 
 ---
 
@@ -85,7 +85,7 @@ erDiagram
     int display_order
   }
 
-  review_cards {
+  study_cards {
     uuid id PK
     uuid template_id FK
     uuid deck_id FK
@@ -102,7 +102,7 @@ erDiagram
   fsrs_cards {
     uuid id PK
     uuid user_id FK "auth.users.id"
-    uuid review_card_id FK
+    uuid study_cards_id FK
     jsonb state
     timestamptz created_at
     timestamptz updated_at
@@ -119,10 +119,10 @@ erDiagram
   card_templates     ||--o{ multiple_choice_options : "template_id"
   card_templates     ||--o{ fill_in_the_blank_segments : "card_id"
   card_templates     ||--o{ match_madness_pairs     : "template_id"
-  card_templates     ||--|{ review_cards             : "template_id"
-  decks              ||--o{ review_cards             : "deck_id"
+  card_templates     ||--|{ study_cards             : "template_id"
+  decks              ||--o{ study_cards             : "deck_id"
   profiles           ||--o{ fsrs_cards               : "user_id"
-  review_cards       ||--o{ fsrs_cards               : "review_card_id"
+  study_cards       ||--o{ fsrs_cards               : "study_cards_id"
   fsrs_cards         ||--o{ review_logs              : "fsrs_card_id"
 ```
 
@@ -146,7 +146,7 @@ only the columns relevant to that type are populated. All others are `NULL`.
 
 ## `card_type` Enum (flashcard only)
 
-Controls how many `review_cards` the app generates when a flashcard template is saved.
+Controls how many `study_cards` the app generates when a flashcard template is saved.
 
 | Value | Review cards created | What the learner sees |
 |---|---|---|
@@ -204,16 +204,16 @@ Rating values: `1` = Again, `2` = Hard, `3` = Good, `4` = Easy.
 1. AUTHOR creates a deck and adds a FlashcardTemplate (card_type = both)
         │
         ▼
-2. App generates 2 ReviewCards:
-     review_cards (template_id=X, is_reversed=false, deck_id=Y)
-     review_cards (template_id=X, is_reversed=true,  deck_id=Y)
+2. App generates 2 StudyCards:
+     study_cards (template_id=X, is_reversed=false, deck_id=Y)
+     study_cards (template_id=X, is_reversed=true,  deck_id=Y)
         │
         ▼
 3. LEARNER drills the deck → DrillAnswer recorded against card_templates.id
         │  (drill uses the blueprint directly; FSRS not involved yet)
         ▼
 4. On drill completion, for each answered card with a self-rating:
-     FsrsCard.create(reviewCardId, userId)
+     FsrsCard.create(studyCardId, userId)
      → inserts a row into fsrs_cards with a fresh FSRS state (state=0 New)
         │
         ▼

@@ -105,9 +105,9 @@ class StudySessionPage extends HookWidget {
 
     // 4. Extract card data
     final template = controller.currentTemplate;
-    final reviewCard = controller.currentReviewCard;
+    final studyCard = controller.currentStudyCard;
 
-    if (template == null || reviewCard == null) {
+    if (template == null || studyCard == null) {
       return ErrorText(controller.error);
     }
 
@@ -120,11 +120,11 @@ class StudySessionPage extends HookWidget {
     }
 
     final interactionsController = useStudySessionCardStageController(
-      cardId: reviewCard.id,
+      cardId: studyCard.id,
       cardIndex: controller.currentIndex,
       canReveal: template is FlashcardTemplate,
       initialAnswer: template is FlashcardTemplate
-          ? template.getAnswer(isReversed: reviewCard.isReversed)
+          ? template.getAnswer(isReversed: studyCard.isReversed)
           : null,
     );
 

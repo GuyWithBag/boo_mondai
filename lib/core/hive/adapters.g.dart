@@ -552,17 +552,17 @@ class IdentificationTemplateAdapter
           typeId == other.typeId;
 }
 
-class ReviewCardAdapter extends TypeAdapter<ReviewCard> {
+class StudyCardAdapter extends TypeAdapter<StudyCard> {
   @override
   final typeId = 9;
 
   @override
-  ReviewCard read(BinaryReader reader) {
+  StudyCard read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return ReviewCard(
+    return StudyCard(
       id: fields[0] as String,
       templateId: fields[1] as String,
       isReversed: fields[2] == null ? false : fields[2] as bool,
@@ -576,7 +576,7 @@ class ReviewCardAdapter extends TypeAdapter<ReviewCard> {
   }
 
   @override
-  void write(BinaryWriter writer, ReviewCard obj) {
+  void write(BinaryWriter writer, StudyCard obj) {
     writer
       ..writeByte(7)
       ..writeByte(0)
@@ -601,7 +601,7 @@ class ReviewCardAdapter extends TypeAdapter<ReviewCard> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is ReviewCardAdapter &&
+      other is StudyCardAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
@@ -1000,9 +1000,9 @@ class FsrsCardAdapter extends TypeAdapter<FsrsCard> {
       createdAt: fields[1] as DateTime,
       updatedAt: fields[2] as DateTime,
       userId: fields[3] as String,
-      reviewCardId: fields[4] as String,
+      studyCardId: fields[4] as String,
       state: fields[5] as Card,
-      reviewCard: fields[6] as ReviewCard?,
+      studyCard: fields[6] as StudyCard?,
     );
   }
 
@@ -1019,11 +1019,11 @@ class FsrsCardAdapter extends TypeAdapter<FsrsCard> {
       ..writeByte(3)
       ..write(obj.userId)
       ..writeByte(4)
-      ..write(obj.reviewCardId)
+      ..write(obj.studyCardId)
       ..writeByte(5)
       ..write(obj.state)
       ..writeByte(6)
-      ..write(obj.reviewCard);
+      ..write(obj.studyCard);
   }
 
   @override
@@ -1741,31 +1741,31 @@ class CardTemplateTagAdapter extends TypeAdapter<CardTemplateTag> {
           typeId == other.typeId;
 }
 
-class UserReviewCardTagAdapter extends TypeAdapter<UserReviewCardTag> {
+class UserStudyCardTagAdapter extends TypeAdapter<UserStudyCardTag> {
   @override
   final typeId = 32;
 
   @override
-  UserReviewCardTag read(BinaryReader reader) {
+  UserStudyCardTag read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return UserReviewCardTag(
+    return UserStudyCardTag(
       userId: fields[0] as String,
-      reviewCardId: fields[1] as String,
+      studyCardId: fields[1] as String,
       tagId: fields[2] as String,
     );
   }
 
   @override
-  void write(BinaryWriter writer, UserReviewCardTag obj) {
+  void write(BinaryWriter writer, UserStudyCardTag obj) {
     writer
       ..writeByte(3)
       ..writeByte(0)
       ..write(obj.userId)
       ..writeByte(1)
-      ..write(obj.reviewCardId)
+      ..write(obj.studyCardId)
       ..writeByte(2)
       ..write(obj.tagId);
   }
@@ -1776,7 +1776,7 @@ class UserReviewCardTagAdapter extends TypeAdapter<UserReviewCardTag> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is UserReviewCardTagAdapter &&
+      other is UserStudyCardTagAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

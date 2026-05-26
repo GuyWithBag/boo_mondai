@@ -1,20 +1,20 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/repositories/deck_card_repository.dart
-// PURPOSE: Hive CRUD for ReviewCard — source of truth for cards belonging to a deck
+// PURPOSE: Hive CRUD for StudyCard — source of truth for cards belonging to a deck
 // PROVIDERS: none
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/lib.barrel.dart' show ReviewCard, HiveLocalDB;
+import 'package:boo_mondai/lib.barrel.dart' show StudyCard, HiveLocalDB;
 
-class ReviewCardsLocalDB extends HiveLocalDB<ReviewCard> {
+class StudyCardsLocalDB extends HiveLocalDB<StudyCard> {
   @override
-  String get boxName => 'review_cards';
+  String get boxName => 'study_cards';
 
   @override
-  Map<String, Object?> primaryKeyFromItem(ReviewCard item) => {'id': item.id};
+  Map<String, Object?> primaryKeyFromItem(StudyCard item) => {'id': item.id};
 
-  List<ReviewCard> getByDeckId(String deckId) => guardSync(
+  List<StudyCard> getByDeckId(String deckId) => guardSync(
     () => box.values.where((c) => c.deckId == deckId).toList(),
     action: 'getByDeckId($deckId)',
   );

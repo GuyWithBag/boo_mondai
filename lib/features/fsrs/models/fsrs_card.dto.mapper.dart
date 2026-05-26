@@ -13,7 +13,7 @@ class FsrsCardMapper extends ClassMapperBase<FsrsCard> {
   static FsrsCardMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = FsrsCardMapper._());
-      ReviewCardMapper.ensureInitialized();
+      StudyCardMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -32,14 +32,14 @@ class FsrsCardMapper extends ClassMapperBase<FsrsCard> {
   static String _$userId(FsrsCard v) => v.userId;
   static const Field<FsrsCard, String> _f$userId =
       Field('userId', _$userId, key: r'user_id');
-  static String _$reviewCardId(FsrsCard v) => v.reviewCardId;
-  static const Field<FsrsCard, String> _f$reviewCardId =
-      Field('reviewCardId', _$reviewCardId, key: r'review_card_id');
+  static String _$studyCardId(FsrsCard v) => v.studyCardId;
+  static const Field<FsrsCard, String> _f$studyCardId =
+      Field('studyCardId', _$studyCardId, key: r'study_card_id');
   static Card _$state(FsrsCard v) => v.state;
   static const Field<FsrsCard, Card> _f$state = Field('state', _$state);
-  static ReviewCard? _$reviewCard(FsrsCard v) => v.reviewCard;
-  static const Field<FsrsCard, ReviewCard> _f$reviewCard =
-      Field('reviewCard', _$reviewCard, key: r'review_card', opt: true);
+  static StudyCard? _$studyCard(FsrsCard v) => v.studyCard;
+  static const Field<FsrsCard, StudyCard> _f$studyCard =
+      Field('studyCard', _$studyCard, key: r'study_card', opt: true);
 
   @override
   final MappableFields<FsrsCard> fields = const {
@@ -47,9 +47,9 @@ class FsrsCardMapper extends ClassMapperBase<FsrsCard> {
     #createdAt: _f$createdAt,
     #updatedAt: _f$updatedAt,
     #userId: _f$userId,
-    #reviewCardId: _f$reviewCardId,
+    #studyCardId: _f$studyCardId,
     #state: _f$state,
-    #reviewCard: _f$reviewCard,
+    #studyCard: _f$studyCard,
   };
 
   static FsrsCard _instantiate(DecodingData data) {
@@ -58,9 +58,9 @@ class FsrsCardMapper extends ClassMapperBase<FsrsCard> {
         createdAt: data.dec(_f$createdAt),
         updatedAt: data.dec(_f$updatedAt),
         userId: data.dec(_f$userId),
-        reviewCardId: data.dec(_f$reviewCardId),
+        studyCardId: data.dec(_f$studyCardId),
         state: data.dec(_f$state),
-        reviewCard: data.dec(_f$reviewCard));
+        studyCard: data.dec(_f$studyCard));
   }
 
   @override
@@ -113,15 +113,15 @@ extension FsrsCardValueCopy<$R, $Out> on ObjectCopyWith<$R, FsrsCard, $Out> {
 
 abstract class FsrsCardCopyWith<$R, $In extends FsrsCard, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  ReviewCardCopyWith<$R, ReviewCard, ReviewCard>? get reviewCard;
+  StudyCardCopyWith<$R, StudyCard, StudyCard>? get studyCard;
   $R call(
       {String? id,
       DateTime? createdAt,
       DateTime? updatedAt,
       String? userId,
-      String? reviewCardId,
+      String? studyCardId,
       Card? state,
-      ReviewCard? reviewCard});
+      StudyCard? studyCard});
   FsrsCardCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -134,25 +134,25 @@ class _FsrsCardCopyWithImpl<$R, $Out>
   late final ClassMapperBase<FsrsCard> $mapper =
       FsrsCardMapper.ensureInitialized();
   @override
-  ReviewCardCopyWith<$R, ReviewCard, ReviewCard>? get reviewCard =>
-      $value.reviewCard?.copyWith.$chain((v) => call(reviewCard: v));
+  StudyCardCopyWith<$R, StudyCard, StudyCard>? get studyCard =>
+      $value.studyCard?.copyWith.$chain((v) => call(studyCard: v));
   @override
   $R call(
           {String? id,
           DateTime? createdAt,
           DateTime? updatedAt,
           String? userId,
-          String? reviewCardId,
+          String? studyCardId,
           Card? state,
-          Object? reviewCard = $none}) =>
+          Object? studyCard = $none}) =>
       $apply(FieldCopyWithData({
         if (id != null) #id: id,
         if (createdAt != null) #createdAt: createdAt,
         if (updatedAt != null) #updatedAt: updatedAt,
         if (userId != null) #userId: userId,
-        if (reviewCardId != null) #reviewCardId: reviewCardId,
+        if (studyCardId != null) #studyCardId: studyCardId,
         if (state != null) #state: state,
-        if (reviewCard != $none) #reviewCard: reviewCard
+        if (studyCard != $none) #studyCard: studyCard
       }));
   @override
   FsrsCard $make(CopyWithData data) => FsrsCard(
@@ -160,9 +160,9 @@ class _FsrsCardCopyWithImpl<$R, $Out>
       createdAt: data.get(#createdAt, or: $value.createdAt),
       updatedAt: data.get(#updatedAt, or: $value.updatedAt),
       userId: data.get(#userId, or: $value.userId),
-      reviewCardId: data.get(#reviewCardId, or: $value.reviewCardId),
+      studyCardId: data.get(#studyCardId, or: $value.studyCardId),
       state: data.get(#state, or: $value.state),
-      reviewCard: data.get(#reviewCard, or: $value.reviewCard));
+      studyCard: data.get(#studyCard, or: $value.studyCard));
 
   @override
   FsrsCardCopyWith<$R2, FsrsCard, $Out2> $chain<$R2, $Out2>(

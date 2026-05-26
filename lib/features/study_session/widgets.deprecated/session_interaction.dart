@@ -7,7 +7,7 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         CardTemplate,
         StudySessionController,
-        ReviewCard,
+        StudyCard,
         StudySessionCardStageController,
         FlashcardTemplate,
         FillInTheBlanksTemplate,
@@ -24,14 +24,14 @@ class SessionInteraction extends HookWidget {
   const SessionInteraction({
     super.key,
     required this.template,
-    required this.reviewCard,
+    required this.studyCard,
     required this.controller,
     required this.shakeController,
     required this.interactionsController,
   });
 
   final CardTemplate template;
-  final ReviewCard reviewCard;
+  final StudyCard studyCard;
   final StudySessionController controller;
   final StudySessionCardStageController interactionsController;
   final AnimationController shakeController;
@@ -47,7 +47,7 @@ class SessionInteraction extends HookWidget {
     return switch (template) {
       FlashcardTemplate f => FlashcardInteraction(
         template: f,
-        isReversed: reviewCard.isReversed,
+        isReversed: studyCard.isReversed,
         controller: interactionsController,
       ),
       // IdentificationTemplate i => IdentificationInteraction(
@@ -62,7 +62,7 @@ class SessionInteraction extends HookWidget {
       // ),
       FillInTheBlanksTemplate fb => FitbInteraction(
         template: fb,
-        isReversed: reviewCard.isReversed,
+        isReversed: studyCard.isReversed,
         controller: controller,
         shakeController: shakeController,
       ),

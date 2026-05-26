@@ -14,10 +14,10 @@ class FlashcardTemplate extends CardTemplate with FlashcardTemplateMappable {
   final String? frontAudioUrl;
   final String? backAudioUrl;
 
-  /// Controls how many ReviewCards are generated for this template.
-  /// - [CardType.normal]   → 1 ReviewCard (isReversed: false)
-  /// - [CardType.reversed] → 1 ReviewCard (isReversed: true)
-  /// - [CardType.both]     → 2 ReviewCards (one each)
+  /// Controls how many StudyCards are generated for this template.
+  /// - [CardType.normal]   → 1 StudyCard (isReversed: false)
+  /// - [CardType.reversed] → 1 StudyCard (isReversed: true)
+  /// - [CardType.both]     → 2 StudyCards (one each)
   final CardType cardType;
 
   const FlashcardTemplate({

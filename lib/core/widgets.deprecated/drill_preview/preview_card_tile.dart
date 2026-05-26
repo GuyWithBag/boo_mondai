@@ -1,5 +1,5 @@
 // // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// // PATH: lib/pages/drill_preview/preview_card_tile.dart
+// // PATH: lib/pages/drill_preview/pstudy_cards_tile.dart
 // // PURPOSE: Numbered card tile for the drill preview list
 // // PROVIDERS: none
 // // HOOKS: none
@@ -8,12 +8,12 @@
 // import 'package:flutter/material.dart';
 // import 'package:boo_mondai/shared/shared.barrel.dart';
 
-// class PreviewCardTile extends StatelessWidget {
+// class PstudyCardTile extends StatelessWidget {
 //   final int index;
 //   final String question;
 //   final String answer;
 
-//   const PreviewCardTile({
+//   const PstudyCardTile({
 //     super.key,
 //     required this.index,
 //     required this.question,

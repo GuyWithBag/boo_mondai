@@ -21,8 +21,8 @@ class DrillAnswersLocalDB extends HiveLocalDB<DrillAnswer> {
   );
 
   /// Fetches the history of a specific card (useful for future stats screens!)
-  List<DrillAnswer> getByReviewCardId(String reviewCardId) => guardSync(
-    () => box.values.where((a) => a.cardId == reviewCardId).toList(),
-    action: 'getByReviewCardId($reviewCardId)',
+  List<DrillAnswer> getByStudyCardId(String studyCardId) => guardSync(
+    () => box.values.where((a) => a.cardId == studyCardId).toList(),
+    action: 'getByStudyCardId($studyCardId)',
   );
 }

@@ -16,10 +16,10 @@ class FsrsCardsLocalDB extends HiveLocalDB<FsrsCard> {
 
   // ── Domain Queries ──────────────────────────────────────
 
-  /// Renamed to match the new ReviewCard nomenclature
-  FsrsCard? getByReviewCardId(String reviewCardId) => guardSync(
-    () => box.values.where((s) => s.reviewCardId == reviewCardId).firstOrNull,
-    action: 'getByReviewCardId($reviewCardId)',
+  /// Renamed to match the new StudyCard nomenclature
+  FsrsCard? getByStudyCardId(String studyCardId) => guardSync(
+    () => box.values.where((s) => s.studyCardId == studyCardId).firstOrNull,
+    action: 'getByStudyCardId($studyCardId)',
   );
 
   /// Gets all cards for a specific user
@@ -30,12 +30,12 @@ class FsrsCardsLocalDB extends HiveLocalDB<FsrsCard> {
 
   /// Highly optimized: Returns just a Set of IDs.
   /// Perfect for checking if a card is already enrolled!
-  Set<String> getEnrolledReviewCardIds(String userId) => guardSync(
+  Set<String> getEnrolledStudyCardIds(String userId) => guardSync(
     () => box.values
         .where((s) => s.userId == userId)
-        .map((s) => s.reviewCardId)
+        .map((s) => s.studyCardId)
         .toSet(),
-    action: 'getEnrolledReviewCardIds($userId)',
+    action: 'getEnrolledStudyCardIds($userId)',
   );
 
   /// Gets cards that are ready to be reviewed right now

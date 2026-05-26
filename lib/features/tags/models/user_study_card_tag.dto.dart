@@ -1,22 +1,22 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// PATH: lib/models/dtos/user_review_card_tag.dto.dart
+// PATH: lib/models/dtos/user_study_cards_tag.dto.dart
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 import 'package:dart_mappable/dart_mappable.dart';
 
-part 'user_review_card_tag.dto.mapper.dart';
+part 'user_study_card_tag.dto.mapper.dart';
 
 @MappableClass()
-class UserReviewCardTag with UserReviewCardTagMappable {
+class UserStudyCardTag with UserStudyCardTagMappable {
   final String userId;
-  final String reviewCardId;
+  final String studyCardId;
   final String tagId;
 
-  const UserReviewCardTag({
+  const UserStudyCardTag({
     required this.userId,
-    required this.reviewCardId,
+    required this.studyCardId,
     required this.tagId,
   });
 
   // Unique composite ID for Hive storage
-  String get compositeId => '${userId}_${reviewCardId}_$tagId';
+  String get compositeId => '${userId}_${studyCardId}_$tagId';
 }

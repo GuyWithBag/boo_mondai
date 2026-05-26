@@ -1,7 +1,7 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         FlashcardTemplate,
-        ReviewCard,
+        StudyCard,
         AppTokens,
         SurfaceTone,
         appTextStyle,
@@ -16,12 +16,12 @@ import 'package:theme_variants/theme_variants.dart';
 class FlashcardBackSide extends StatelessWidget {
   const FlashcardBackSide({
     required this.template,
-    required this.reviewCard,
+    required this.studyCard,
     super.key,
   });
 
   final FlashcardTemplate template;
-  final ReviewCard reviewCard;
+  final StudyCard studyCard;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +36,7 @@ class FlashcardBackSide extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              template.getQuestion(isReversed: reviewCard.isReversed),
+              template.getQuestion(isReversed: studyCard.isReversed),
               textAlign: TextAlign.center,
               style: appTextStyle.resolve(tokens, [
                 TextSize.cardBackFront,
@@ -55,7 +55,7 @@ class FlashcardBackSide extends StatelessWidget {
             ),
             SizedBox(height: 32.h),
             Text(
-              template.getAnswer(isReversed: reviewCard.isReversed),
+              template.getAnswer(isReversed: studyCard.isReversed),
               textAlign: TextAlign.center,
               style: appTextStyle.resolve(tokens, [
                 TextSize.cardBackContent,

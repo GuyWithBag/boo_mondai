@@ -10,7 +10,7 @@ import 'package:fsrs/fsrs.dart' as fsrs;
 class ReviewSessionController
     extends StudySessionController<FsrsCard, ReviewSession> {
   // ── Specific State ──
-  final Map<String, ReviewCard> _reviewCards = {};
+  final Map<String, StudyCard> _studyCards = {};
   late DueFilterThreshold dueFilter;
 
   // ── BATCH SAVING STATE ──
@@ -29,8 +29,8 @@ class ReviewSessionController
       : null;
 
   @override
-  ReviewCard? get currentReviewCard => currentFsrsCard != null
-      ? _reviewCards[currentFsrsCard!.reviewCardId]
+  StudyCard? get currentStudyCard => currentFsrsCard != null
+      ? _studyCards[currentFsrsCard!.studyCardId]
       : null;
 
   // ── Initialization ──
@@ -45,7 +45,7 @@ class ReviewSessionController
     session = null;
     queue.clear();
     templates.clear();
-    _reviewCards.clear();
+    _studyCards.clear();
     _pendingCards.clear();
     _pendingLogs.clear();
     nextIntervals.clear();
@@ -59,7 +59,7 @@ class ReviewSessionController
       final now = DateTime.now();
 
       final allFsrsCards = LocalDB.fsrsCard.getByUserId(userId);
-      final allReviewCards = LocalDB.reviewCard.selectMany();
+      final allStudyCards = LocalDB.studyCard.selectMany();
 
       // Fetch and populate templates
       final allTemplates = LocalDB.cardTemplate.selectMany();
@@ -67,17 +67,17 @@ class ReviewSessionController
         templates[t.id] = t;
       }
 
-      final rcToDeck = {for (final rc in allReviewCards) rc.id: rc.deckId};
+      final rcToDeck = {for (final rc in allStudyCards) rc.id: rc.deckId};
 
       // Populate review cards map
-      for (final rc in allReviewCards) {
-        _reviewCards[rc.id] = rc;
+      for (final rc in allStudyCards) {
+        _studyCards[rc.id] = rc;
       }
 
       var targetCards = allFsrsCards;
       if (deckId != null) {
         targetCards = targetCards.where((c) {
-          return rcToDeck[c.reviewCardId] == deckId;
+          return rcToDeck[c.studyCardId] == deckId;
         }).toList();
       }
 
@@ -252,7 +252,7 @@ class ReviewSessionController
     queue.clear();
     _pendingLogs.clear();
     _pendingCards.clear();
-    _reviewCards.clear();
+    _studyCards.clear();
     templates.clear();
     nextIntervals.clear();
     currentIndex = 0;

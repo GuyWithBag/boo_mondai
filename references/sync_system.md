@@ -72,7 +72,7 @@ User                  DrillProvider              Hive          Supabase
  │                         │                     │               │
  │                         │── enrollCardsFromDrill()              │
  │                         │   for each rated card:               │
- │                         │   FsrsService.reviewCard()           │
+ │                         │   FsrsService.studyCard()           │
  │                         │   ─────────────────►│               │
  │                         │   saveFsrsCard()     │               │
  │                         │   saveReviewLog()    │               │
@@ -152,7 +152,7 @@ User                  FsrsProvider              Hive          Supabase
  │                         │                     │               │
  │── submitReview(3) ───────►│                     │               │
  │                         │ FsrsService          │               │
- │                         │   .reviewCard(state, 3)              │
+ │                         │   .studyCard(state, 3)              │
  │                         │ ─────────────────────►               │
  │                         │ saveFsrsCard(updated)│               │
  │                         │ saveReviewLog(entry) │               │
@@ -163,7 +163,7 @@ User                  FsrsProvider              Hive          Supabase
  │                         │   ── on AppException: silent ────────│
  │                         │                     │               │
  │                         │ _currentIndex++      │               │
- │◄── currentReviewCard ────│                     │               │
+ │◄── currentStudyCard ────│                     │               │
  │   advances to next       │                     │               │
 ```
 

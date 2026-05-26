@@ -276,7 +276,7 @@ VALUES
   (ct_sakana, '魚 means fish in English', 8, 12, 'fish');
 
 -- ── Review Cards ──────────────────────────────────────
-INSERT INTO review_cards (id, template_id, is_reversed, deck_id) VALUES
+INSERT INTO study_cards (id, template_id, is_reversed, deck_id) VALUES
   -- N5 deck
   (rc_inu,      ct_inu,    false, deck_n5),
   (rc_neko,     ct_neko,   false, deck_n5),
@@ -348,7 +348,7 @@ INSERT INTO drill_answers (session_id, card_id, user_answer, type, created_at) V
 
 -- ── FSRS Cards (Alice's review schedule after her drill) ─
 -- state is a JSONB snapshot of the fsrs package Card object
-INSERT INTO fsrs_cards (id, user_id, review_card_id, state, created_at, updated_at) VALUES
+INSERT INTO fsrs_cards (id, user_id, study_cards_id, state, created_at, updated_at) VALUES
   (fsrs_inu, p_alice, rc_inu,
    '{"due":"2026-03-26T10:00:00Z","stability":4.5,"difficulty":5.0,"elapsed_days":1,"scheduled_days":3,"reps":1,"lapses":0,"state":2,"last_review":"2026-03-25T10:02:00Z"}'::jsonb,
    now(), now()),

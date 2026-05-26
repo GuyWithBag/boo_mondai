@@ -232,26 +232,26 @@ CREATE POLICY "match_madness: owner manages" ON match_madness_pairs FOR ALL USIN
 -- 6. LOCAL STUDY DATA (Review Cards & Logs)
 -- ══════════════════════════════════════════════════════
 
-CREATE TABLE review_cards (
+CREATE TABLE study_cards (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   template_id uuid NOT NULL REFERENCES card_templates(id) ON DELETE CASCADE,
   is_reversed bool NOT NULL DEFAULT false,
   deck_id     uuid NOT NULL REFERENCES decks(id) ON DELETE CASCADE,
   UNIQUE (template_id, is_reversed)
 );
-ALTER TABLE review_cards ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "review_cards: read access" ON review_cards FOR SELECT USING (EXISTS (SELECT 1 FROM decks d WHERE d.id = review_cards.deck_id AND (d.visibility_state IN ('public', 'unlisted') OR d.user_id = current_profile_id())));
-CREATE POLICY "review_cards: owner manages" ON review_cards FOR ALL USING (EXISTS (SELECT 1 FROM decks d WHERE d.id = review_cards.deck_id AND d.user_id = current_profile_id()));
+ALTER TABLE study_cards ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "study_cards: read access" ON study_cards FOR SELECT USING (EXISTS (SELECT 1 FROM decks d WHERE d.id = study_cards.deck_id AND (d.visibility_state IN ('public', 'unlisted') OR d.user_id = current_profile_id())));
+CREATE POLICY "study_cards: owner manages" ON study_cards FOR ALL USING (EXISTS (SELECT 1 FROM decks d WHERE d.id = study_cards.deck_id AND d.user_id = current_profile_id()));
 
-CREATE TABLE user_review_card_tags (
+CREATE TABLE user_study_cards_tags (
   user_id        uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-  review_card_id uuid NOT NULL REFERENCES review_cards(id) ON DELETE CASCADE,
+  study_cards_id uuid NOT NULL REFERENCES study_cards(id) ON DELETE CASCADE,
   tag_id         uuid NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
   created_at     timestamptz NOT NULL DEFAULT now(),
-  PRIMARY KEY (user_id, review_card_id, tag_id)
+  PRIMARY KEY (user_id, study_cards_id, tag_id)
 );
-ALTER TABLE user_review_card_tags ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "user_review_card_tags: private" ON user_review_card_tags FOR ALL USING (user_id = current_profile_id());
+ALTER TABLE user_study_cards_tags ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "user_study_cards_tags: private" ON user_study_cards_tags FOR ALL USING (user_id = current_profile_id());
 
 CREATE TABLE drill_sessions (
   id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -294,7 +294,7 @@ CREATE POLICY "drill_answers: owner manages" ON drill_answers FOR ALL USING (EXI
 CREATE TABLE fsrs_cards (
   id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id        uuid NOT NULL REFERENCES profiles(id)     ON DELETE CASCADE,
-  review_card_id uuid NOT NULL REFERENCES review_cards(id) ON DELETE CASCADE,
+  study_cards_id uuid NOT NULL REFERENCES study_cards(id) ON DELETE CASCADE,
   state          jsonb NOT NULL DEFAULT '{}',
   created_at     timestamptz NOT NULL DEFAULT now(),
   updated_at     timestamptz NOT NULL DEFAULT now()

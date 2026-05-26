@@ -5,7 +5,7 @@
 
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        ReviewCard,
+        StudyCard,
         DrillSession,
         StudySessionController,
         DrillAnswer,
@@ -21,7 +21,7 @@ import 'package:flutter/material.dart';
 import 'package:fsrs/fsrs.dart' as fsrs;
 
 class DrillSessionController
-    extends StudySessionController<ReviewCard, DrillSession> {
+    extends StudySessionController<StudyCard, DrillSession> {
   static const int defaultBatchSize = 20;
 
   final List<DrillAnswer> _currentAnswers = [];
@@ -34,7 +34,7 @@ class DrillSessionController
   bool get isComplete => _isComplete;
 
   @override
-  ReviewCard? get currentReviewCard =>
+  StudyCard? get currentStudyCard =>
       queue.isNotEmpty && currentIndex < queue.length
       ? queue[currentIndex]
       : null;
@@ -70,12 +70,12 @@ class DrillSessionController
       final allTemplates = LocalDB.cardTemplate.getByDeckId(deckId);
       templates = {for (final t in allTemplates) t.id: t};
 
-      final allReviewCards = LocalDB.reviewCard.getByDeckId(deckId);
+      final allStudyCards = LocalDB.studyCard.getByDeckId(deckId);
       final eligibleCards = DrillService.getEligibleDrillCards(deckId, userId);
 
       if (eligibleCards.isEmpty) {
         throw SessionException(
-          allReviewCards.isEmpty
+          allStudyCards.isEmpty
               ? 'No reviewable cards found in this deck.'
               : 'You have already drillzed all the cards in this deck! Head to FSRS Reviews to practice them.',
           code: 'DRILL_NO_ELIGIBLE_CARDS',
@@ -113,14 +113,14 @@ class DrillSessionController
     }
   }
 
-  void _createStrike(ReviewCard reviewCard) {
-    _strikes[reviewCard.id] = (_strikes[reviewCard.id] ?? 0) + 1;
+  void _createStrike(StudyCard studyCard) {
+    _strikes[studyCard.id] = (_strikes[studyCard.id] ?? 0) + 1;
   }
 
   @override
   Future<void> submitAnswer(String userAnswer, StudyRating type) async {
-    final reviewCard = currentReviewCard;
-    if (reviewCard == null) {
+    final studyCard = currentStudyCard;
+    if (studyCard == null) {
       failSession(
         'Cannot submit a drill answer without a current review card.',
         code: 'DRILL_CARD_MISSING',
@@ -133,11 +133,11 @@ class DrillSessionController
       );
     }
 
-    _createStrike(reviewCard);
+    _createStrike(studyCard);
 
     final newAnswer = DrillAnswer.create(
       sessionId: session!.id,
-      cardId: reviewCard.id,
+      cardId: studyCard.id,
       userAnswer: userAnswer,
       type: type,
     );
@@ -154,11 +154,11 @@ class DrillSessionController
       // Real-time FSRS enrollment for correct answers
       if (type != StudyRating.incorrect) {
         // SAFETY CHECK: Ensure it isn't already enrolled
-        final existing = LocalDB.fsrsCard.getByReviewCardId(reviewCard.id);
+        final existing = LocalDB.fsrsCard.getByStudyCardId(studyCard.id);
 
         if (existing == null) {
           final fsrsCard = await FsrsCard.create(
-            reviewCardId: reviewCard.id,
+            studyCardId: studyCard.id,
             userId: session!.userId,
           );
           // Make sure to await this so the Hive box finishes writing!
@@ -171,7 +171,7 @@ class DrillSessionController
     }
 
     if (type == StudyRating.incorrect) {
-      queue.add(reviewCard);
+      queue.add(studyCard);
       session = session!.copyWith(totalQuestions: queue.length);
     }
 
@@ -230,11 +230,11 @@ class DrillSessionController
         // 2. Process enrollments safely
         for (final answer in eligibleAnswersMap.values) {
           // SAFETY CHECK: Ensure it isn't already enrolled
-          final existing = LocalDB.fsrsCard.getByReviewCardId(answer.cardId);
+          final existing = LocalDB.fsrsCard.getByStudyCardId(answer.cardId);
           if (existing != null) continue;
 
           final fsrsCard = await FsrsCard.create(
-            reviewCardId: answer.cardId,
+            studyCardId: answer.cardId,
             userId: session!.userId,
           );
 

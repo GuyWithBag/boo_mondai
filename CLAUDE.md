@@ -675,7 +675,7 @@ Dependencies (injected via constructor):
 
 Private state fields:
   - _dueCards (List<FsrsCardState>)
-  - _currentReviewCard (FsrsCardState?)
+  - _currentStudyCard (FsrsCardState?)
   - _currentDeckCard (DeckCard?)
   - _dueCount (int)
   - _isLoading (bool)
@@ -683,7 +683,7 @@ Private state fields:
 
 Public getters:
   - dueCards → List<FsrsCardState>
-  - currentReviewCard → FsrsCardState?
+  - currentStudyCard → FsrsCardState?
   - currentDeckCard → DeckCard?
   - dueCount → int
   - isLoading → bool
@@ -696,11 +696,11 @@ Public methods:
     Error handling: sets _error
 
   - startReview() → void
-    Does: sets _currentReviewCard to first due card
+    Does: sets _currentStudyCard to first due card
     Notifies: yes
 
   - submitReview(rating) → Future<void>
-    Does: calls FsrsService.reviewCard, updates FsrsCardState in Hive, logs ReviewLogEntry, syncs to Supabase, advances to next due card
+    Does: calls FsrsService.studyCard, updates FsrsCardState in Hive, logs ReviewLogEntry, syncs to Supabase, advances to next due card
     Notifies: yes
     Error handling: sets _error
 
@@ -1198,7 +1198,7 @@ Responsibility: Wraps the fsrs dart package — computes scheduling, new card cr
 Methods:
   - createNewCard() → Card (from fsrs package)
   - scheduleCard(Card card, Rating rating) → SchedulingInfo
-  - reviewCard(FsrsCardState state, int rating) → FsrsCardState
+  - studyCard(FsrsCardState state, int rating) → FsrsCardState
   - getDueDate(FsrsCardState state) → DateTime
 
 Platform differences: none

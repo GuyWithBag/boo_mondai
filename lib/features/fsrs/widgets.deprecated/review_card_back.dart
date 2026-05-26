@@ -1,5 +1,5 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// PATH: lib/pages/review/review_card_back.dart
+// PATH: lib/pages/review/study_cards_back.dart
 // PURPOSE: Back side of the review flip card showing the answer
 // PROVIDERS: none
 // HOOKS: none
@@ -8,8 +8,8 @@
 import 'package:boo_mondai/lib.barrel.dart' show AppSpacing;
 import 'package:flutter/material.dart';
 
-class ReviewCardBack extends StatelessWidget {
-  const ReviewCardBack({super.key, required this.answer, this.imageUrl});
+class StudyCardBack extends StatelessWidget {
+  const StudyCardBack({super.key, required this.answer, this.imageUrl});
 
   final String answer;
   final String? imageUrl;

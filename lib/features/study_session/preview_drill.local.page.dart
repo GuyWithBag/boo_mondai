@@ -45,7 +45,7 @@
 //                       itemCount: cardProvider.cards.length,
 //                       itemBuilder: (context, i) {
 //                         final card = cardProvider.cards[i];
-//                         return PreviewCardTile(
+//                         return PstudyCardTile(
 //                           index: i + 1,
 //                           question: card.question,
 //                           answer: card.answer,
@@ -84,12 +84,12 @@
 //   }
 // }
 
-// class PreviewCardTile extends StatelessWidget {
+// class PstudyCardTile extends StatelessWidget {
 //   final int index;
 //   final String question;
 //   final String answer;
 
-//   const PreviewCardTile({
+//   const PstudyCardTile({
 //     super.key,
 //     required this.index,
 //     required this.question,

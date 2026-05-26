@@ -1,5 +1,5 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// PATH: lib/pages/home/due_review_card.dart
+// PATH: lib/pages/home/due_study_cards.dart
 // PURPOSE: Card showing count of due FSRS reviews with tap-to-start action
 // PROVIDERS: none
 // HOOKS: none
@@ -8,10 +8,10 @@
 import 'package:boo_mondai/lib.barrel.dart' show AppRadii, AppSpacing;
 import 'package:flutter/material.dart';
 
-class DueReviewCard extends StatelessWidget {
+class DueStudyCard extends StatelessWidget {
   final int dueCount;
   final VoidCallback onTap;
-  const DueReviewCard({super.key, required this.dueCount, required this.onTap});
+  const DueStudyCard({super.key, required this.dueCount, required this.onTap});
 
   @override
   Widget build(BuildContext context) {

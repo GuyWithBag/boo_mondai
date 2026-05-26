@@ -29,15 +29,15 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(ProfileAdapter());
     registerAdapter(QuestionTypeAdapter());
     registerAdapter(RatingAdapter());
-    registerAdapter(ReviewCardAdapter());
     registerAdapter(ReviewLogAdapter());
     registerAdapter(ReviewSessionAdapter());
     registerAdapter(StateAdapter());
     registerAdapter(StreakAdapter());
+    registerAdapter(StudyCardAdapter());
     registerAdapter(StudyRatingAdapter());
     registerAdapter(TagAdapter());
     registerAdapter(UserAdapter());
-    registerAdapter(UserReviewCardTagAdapter());
+    registerAdapter(UserStudyCardTagAdapter());
     registerAdapter(VisibilityStateAdapter());
     registerAdapter(WordScrambleTemplateAdapter());
   }
@@ -67,15 +67,15 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(ProfileAdapter());
     registerAdapter(QuestionTypeAdapter());
     registerAdapter(RatingAdapter());
-    registerAdapter(ReviewCardAdapter());
     registerAdapter(ReviewLogAdapter());
     registerAdapter(ReviewSessionAdapter());
     registerAdapter(StateAdapter());
     registerAdapter(StreakAdapter());
+    registerAdapter(StudyCardAdapter());
     registerAdapter(StudyRatingAdapter());
     registerAdapter(TagAdapter());
     registerAdapter(UserAdapter());
-    registerAdapter(UserReviewCardTagAdapter());
+    registerAdapter(UserStudyCardTagAdapter());
     registerAdapter(VisibilityStateAdapter());
     registerAdapter(WordScrambleTemplateAdapter());
   }

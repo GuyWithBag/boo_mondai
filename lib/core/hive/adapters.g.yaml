@@ -215,7 +215,7 @@ types:
         index: 9
       tags:
         index: 10
-  ReviewCard:
+  StudyCard:
     typeId: 9
     nextIndex: 7
     fields:
@@ -379,11 +379,11 @@ types:
         index: 2
       userId:
         index: 3
-      reviewCardId:
+      studyCardId:
         index: 4
       state:
         index: 5
-      reviewCard:
+      studyCard:
         index: 6
   ReviewLog:
     typeId: 18
@@ -613,13 +613,13 @@ types:
         index: 0
       tagId:
         index: 1
-  UserReviewCardTag:
+  UserStudyCardTag:
     typeId: 32
     nextIndex: 3
     fields:
       userId:
         index: 0
-      reviewCardId:
+      studyCardId:
         index: 1
       tagId:
         index: 2

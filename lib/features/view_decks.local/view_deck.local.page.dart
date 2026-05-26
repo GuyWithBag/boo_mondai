@@ -91,7 +91,7 @@ class ViewDeckLocalSheet extends HookWidget {
     }
 
     final controller = context.read<ViewDecksLocalController>();
-    final reviewCards = LocalDB.reviewCard.getByDeckId(deckId);
+    final studyCards = LocalDB.studyCard.getByDeckId(deckId);
     final templates = LocalDB.cardTemplate.getByDeckId(deckId);
     // final userId = LocalDB.profile.getOrCreate().id;
     // final eligibleCards = DrillService.getEligibleDrillCards(deckId, userId);
@@ -256,7 +256,7 @@ class ViewDeckLocalSheet extends HookWidget {
                       SizedBox(height: tokens.spacePanelGapLg),
                       _MetadataPanel(
                         deck: deck,
-                        reviewCardCount: reviewCards.length,
+                        studyCardCount: studyCards.length,
                         templateCount: templates.length,
                       ),
                       SizedBox(height: tokens.spacePanelGapLg),
@@ -518,12 +518,12 @@ class _StartDrilButton extends StatelessWidget {
 class _MetadataPanel extends StatelessWidget {
   const _MetadataPanel({
     required this.deck,
-    required this.reviewCardCount,
+    required this.studyCardCount,
     required this.templateCount,
   });
 
   final Deck deck;
-  final int reviewCardCount;
+  final int studyCardCount;
   final int templateCount;
 
   @override
@@ -542,7 +542,7 @@ class _MetadataPanel extends StatelessWidget {
           ),
           MetaLabel(
             icon: Icons.layers_outlined,
-            label: '$reviewCardCount review cards',
+            label: '$studyCardCount review cards',
           ),
           MetaLabel(
             icon: Icons.dashboard_customize_outlined,

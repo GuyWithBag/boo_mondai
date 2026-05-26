@@ -9,7 +9,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         CardTemplate,
         Deck,
         DeckCardFormState,
-        ReviewCard,
+        StudyCard,
         FlashcardTemplate,
         IdentificationTemplate,
         MultipleChoiceTemplate,
@@ -162,18 +162,18 @@ class EditDeckController extends Controller {
       // ── REVIEW CARD GENERATION ───────────────────────────
 
       // 1. Fetch review cards that already exist for this deck
-      final existingReviewCards = LocalDB.reviewCard.getByDeckId(_deck!.id);
+      final existingStudyCards = LocalDB.studyCard.getByDeckId(_deck!.id);
 
       // 2. Build a lookup: templateId → Set of isReversed values already stored
       final existingDirections = <String, Set<bool>>{};
-      for (final rc in existingReviewCards) {
+      for (final rc in existingStudyCards) {
         existingDirections
             .putIfAbsent(rc.templateId, () => {})
             .add(rc.isReversed);
       }
 
-      // 3. Determine which ReviewCards are missing and create them
-      final newReviewCards = <ReviewCard>[];
+      // 3. Determine which StudyCards are missing and create them
+      final newStudyCards = <StudyCard>[];
       for (final template in _templates) {
         final existing = existingDirections[template.id] ?? {};
 
@@ -183,8 +183,8 @@ class EditDeckController extends Controller {
           final needsReversed = template.cardType != CardType.normal;
 
           if (needsNormal && !existing.contains(false)) {
-            newReviewCards.add(
-              ReviewCard(
+            newStudyCards.add(
+              StudyCard(
                 id: uuid.v7(),
                 deckId: template.deckId,
                 templateId: template.id,
@@ -193,8 +193,8 @@ class EditDeckController extends Controller {
             );
           }
           if (needsReversed && !existing.contains(true)) {
-            newReviewCards.add(
-              ReviewCard(
+            newStudyCards.add(
+              StudyCard(
                 id: uuid.v7(),
                 deckId: template.deckId,
                 templateId: template.id,
@@ -203,10 +203,10 @@ class EditDeckController extends Controller {
             );
           }
         } else {
-          // All other template types: exactly one non-reversed ReviewCard
+          // All other template types: exactly one non-reversed StudyCard
           if (!existing.contains(false)) {
-            newReviewCards.add(
-              ReviewCard(
+            newStudyCards.add(
+              StudyCard(
                 id: uuid.v7(),
                 deckId: template.deckId,
                 templateId: template.id,
@@ -218,8 +218,8 @@ class EditDeckController extends Controller {
       }
 
       // 4. Save only the newly generated ones
-      if (newReviewCards.isNotEmpty) {
-        await LocalDB.reviewCard.upsertMany(newReviewCards);
+      if (newStudyCards.isNotEmpty) {
+        await LocalDB.studyCard.upsertMany(newStudyCards);
       }
       // ─────────────────────────────────────────────────────
 

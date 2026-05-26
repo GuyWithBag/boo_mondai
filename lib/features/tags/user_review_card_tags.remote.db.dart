@@ -1,39 +1,39 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// PATH: lib/database/remote/user_review_card_tag_remote_db.dart
+// PATH: lib/database/remote/user_study_cards_tag_remote_db.dart
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart'
-    show UserReviewCardTag, SupabaseRemoteDB, UserReviewCardTagMapper;
+    show UserStudyCardTag, SupabaseRemoteDB, UserStudyCardTagMapper;
 
-class UserReviewCardTagsRemoteDB extends SupabaseRemoteDB<UserReviewCardTag> {
+class UserStudyCardTagsRemoteDB extends SupabaseRemoteDB<UserStudyCardTag> {
   @override
-  String get tableName => 'user_review_card_tags';
-
-  @override
-  UserReviewCardTag Function(Map<String, dynamic>) get fromMap =>
-      UserReviewCardTagMapper.fromMap;
+  String get tableName => 'user_study_cards_tags';
 
   @override
-  Map<String, dynamic> toMap(UserReviewCardTag item) => item.toMap();
+  UserStudyCardTag Function(Map<String, dynamic>) get fromMap =>
+      UserStudyCardTagMapper.fromMap;
 
   @override
-  Map<String, Object?> primaryKeyFromItem(UserReviewCardTag item) => {
+  Map<String, dynamic> toMap(UserStudyCardTag item) => item.toMap();
+
+  @override
+  Map<String, Object?> primaryKeyFromItem(UserStudyCardTag item) => {
     'user_id': item.userId,
-    'review_card_id': item.reviewCardId,
+    'study_cards_id': item.studyCardId,
     'tag_id': item.tagId,
   };
 
   @override
-  String get upsertConflictTarget => 'user_id,review_card_id,tag_id';
+  String get upsertConflictTarget => 'user_id,study_cards_id,tag_id';
 
   // Override delete because this table uses a composite primary key
   Future<void> deleteComposite({
     required String userId,
-    required String reviewCardId,
+    required String studyCardId,
     required String tagId,
   }) => deleteWhere({
     'user_id': userId,
-    'review_card_id': reviewCardId,
+    'study_cards_id': studyCardId,
     'tag_id': tagId,
   });
 }

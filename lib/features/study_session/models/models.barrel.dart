@@ -2,4 +2,6 @@
 
 // Other files
 export 'due_filter_threshold.dart';
+export 'study_card.dto.dart';
+export 'study_rating.dto.dart';
 export 'study_session.dto.dart';

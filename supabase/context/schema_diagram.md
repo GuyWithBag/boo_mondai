@@ -146,26 +146,26 @@ erDiagram
     profiles ||--o{ drill_sessions : "starts"
     profiles ||--o{ review_sessions : "starts"
     
-    decks ||--o{ review_cards : "groups"
-    card_templates ||--o{ review_cards : "generates"
+    decks ||--o{ study_cards : "groups"
+    card_templates ||--o{ study_cards : "generates"
     
-    review_cards {
+    study_cards {
         uuid id PK
         uuid template_id FK
         uuid deck_id FK
         bool is_reversed
     }
 
-    user_review_card_tags {
+    user_study_cards_tags {
         uuid user_id PK, FK
-        uuid review_card_id PK, FK
+        uuid study_cards_id PK, FK
         uuid tag_id PK, FK
     }
 
     fsrs_cards {
         uuid id PK
         uuid user_id FK
-        uuid review_card_id FK
+        uuid study_cards_id FK
         jsonb state
     }
 
@@ -190,10 +190,10 @@ erDiagram
         study_rating type
     }
 
-    profiles ||--o{ user_review_card_tags : "adds personal tags"
-    review_cards ||--o{ user_review_card_tags : "has personal tags"
+    profiles ||--o{ user_study_cards_tags : "adds personal tags"
+    study_cards ||--o{ user_study_cards_tags : "has personal tags"
     
-    review_cards ||--|| fsrs_cards : "tracks algorithm state"
+    study_cards ||--|| fsrs_cards : "tracks algorithm state"
     fsrs_cards ||--o{ review_logs : "creates history"
     
     drill_sessions ||--o{ drill_answers : "records"

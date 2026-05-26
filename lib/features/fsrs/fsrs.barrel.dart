@@ -7,7 +7,4 @@ export 'widgets.deprecated/widgets.deprecated.barrel.dart';
 export 'fsrs.service.dart';
 export 'fsrs_cards.local.db.dart';
 export 'fsrs_cards.remote.db.dart';
-export 'review_cards.remote.db.dart';
 export 'review_logs.local.db.dart';
-export 'review_sessions.local.db.dart';
-export 'review_sessions.remote.db.dart';

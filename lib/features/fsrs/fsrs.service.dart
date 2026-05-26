@@ -49,8 +49,8 @@ class FsrsService {
   }) {
     final now = DateTime.now();
     final allFsrsCards = LocalDB.fsrsCard.getByUserId(userId);
-    final allReviewCards = LocalDB.reviewCard.selectMany();
-    final rcToDeck = {for (final rc in allReviewCards) rc.id: rc.deckId};
+    final allStudyCards = LocalDB.studyCard.selectMany();
+    final rcToDeck = {for (final rc in allStudyCards) rc.id: rc.deckId};
 
     // We only need logs to determine if a card is "New" or "Learning"
     final studiedCardIds = LocalDB.reviewLog
@@ -63,7 +63,7 @@ class FsrsService {
     final dueReviewMap = <String, int>{};
 
     for (final fsrsCard in allFsrsCards) {
-      final deckId = rcToDeck[fsrsCard.reviewCardId];
+      final deckId = rcToDeck[fsrsCard.studyCardId];
       if (deckId == null) continue;
 
       // Let your filter decide, regardless of whether it's Learning or Review!
@@ -103,8 +103,8 @@ class FsrsService {
   }) {
     final allLogs = LocalDB.reviewLog.selectMany();
     // In a real app, you'd want to query logs by userId, but relying on the card relation works for now
-    final allReviewCards = LocalDB.reviewCard.selectMany();
-    final rcToDeck = {for (final rc in allReviewCards) rc.id: rc.deckId};
+    final allStudyCards = LocalDB.studyCard.selectMany();
+    final rcToDeck = {for (final rc in allStudyCards) rc.id: rc.deckId};
 
     final againMap = <String, int>{};
     final hardMap = <String, int>{};
@@ -115,7 +115,7 @@ class FsrsService {
       final fsrsCard = LocalDB.fsrsCard.selectByPk({'id': log.fsrsCardId});
       if (fsrsCard == null) continue;
 
-      final deckId = rcToDeck[fsrsCard.reviewCardId];
+      final deckId = rcToDeck[fsrsCard.studyCardId];
       if (deckId == null) continue;
 
       switch (log.rating) {

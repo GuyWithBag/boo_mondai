@@ -8,5 +8,6 @@ export 'widgets.deprecated/widgets.deprecated.barrel.dart';
 // Other files
 export 'preview_drill.local.page.dart';
 export 'session_mode.dart';
+export 'study_cards.remote.db.dart';
 export 'study_session.local.page.dart';
 export 'study_session.service.dart';

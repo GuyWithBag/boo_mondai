@@ -32,7 +32,7 @@ All models now use `dart_mappable`. This means **all DB tables use camelCase quo
 | `Profile` | `profiles` | `id` = local UUID; `"userId"` = FK to `auth.users` |
 | `Deck` | `decks` | |
 | `CardTemplate` subclasses | `card_templates` | Discriminator key: `'type'` |
-| `ReviewCard` | `review_cards` | |
+| `StudyCard` | `study_cards` | |
 | `DrillSession` | `drill_sessions` | Extends `StudySession` (discriminatorKey: `'session_type'`) |
 | `ReviewSession` | `review_sessions` | Extends `StudySession` |
 | `DrillAnswer` | `drill_answers` | `type` = `StudyRating` enum string |
@@ -103,7 +103,7 @@ classDiagram
     class MatchMadnessTemplate { }
     class WordScrambleTemplate { }
 
-    class ReviewCard {
+    class StudyCard {
         +String id
         +String templateId
         +bool isReversed
@@ -145,7 +145,7 @@ classDiagram
     class FsrsCard {
         +String id
         +String userId
-        +String reviewCardId
+        +String studyCardId
         +Card state
     }
 
@@ -161,7 +161,7 @@ classDiagram
         +String deckId
         +int newCardsCount
         +int learningCardsCount
-        +int reviewCardsCount
+        +int studyCardsCount
         +int totalDrilled
         +DateTime lastStudiedAt
     }
@@ -239,7 +239,7 @@ classDiagram
     Profile "1" --> "many" VocabularyTestResult : userId
 
     Deck "1" --> "many" CardTemplate : deckId
-    Deck "1" --> "many" ReviewCard : deckId
+    Deck "1" --> "many" StudyCard : deckId
     Deck "1" --> "many" DrillSession : deckId
     Deck "1" --> "many" ReviewSession : deckId
     Deck "1" --> "many" UserDeckProgress : deckId
@@ -254,8 +254,8 @@ classDiagram
     StudySession <|-- DrillSession
     StudySession <|-- ReviewSession
 
-    CardTemplate "1" --> "many" ReviewCard : templateId
-    ReviewCard "1" --> "0..1" FsrsCard : reviewCardId
+    CardTemplate "1" --> "many" StudyCard : templateId
+    StudyCard "1" --> "0..1" FsrsCard : studyCardId
     FsrsCard "1" --> "many" FsrsReviewLog : cardId
 
     DrillSession "1" --> "many" DrillAnswer : sessionId
@@ -298,14 +298,14 @@ classDiagram
 | Old | New | Change |
 |---|---|---|
 | `deck_id` | `"deckId"` | Renamed |
-| `card_type` | *(removed)* | Handled by `ReviewCard.isReversed` |
+| `card_type` | *(removed)* | Handled by `StudyCard.isReversed` |
 | `question_type` | `type` | Renamed; discriminator key |
 | `sort_order` | `"sortOrder"` | Renamed |
 | `source_card_id` | `"sourceTemplateId"` | Renamed |
 | `created_at` | `"createdAt"` | Renamed |
 
-### New table: `review_cards`
-Maps to `ReviewCard`. Links a `CardTemplate` to an FSRS tracking unit, with an `isReversed` flag.
+### New table: `study_cards`
+Maps to `StudyCard`. Links a `CardTemplate` to an FSRS tracking unit, with an `isReversed` flag.
 
 ### New table: `review_sessions`
 Maps to `ReviewSession`. Tracks FSRS review session state (`totalCards`, `cardsReviewed`).
@@ -333,7 +333,7 @@ Maps to `ReviewSession`. Tracks FSRS review session state (`totalCards`, `cardsR
 | Old | New | Change |
 |---|---|---|
 | `user_id` | `"userId"` | Renamed |
-| `card_id uuid REFERENCES deck_cards` | `"reviewCardId" uuid REFERENCES review_cards` | Renamed + FK target changed |
+| `card_id uuid REFERENCES deck_cards` | `"studyCardId" uuid REFERENCES study_cards` | Renamed + FK target changed |
 | `due`, `stability`, `difficulty`, etc. | `state jsonb` | Collapsed into single JSONB |
 
 ### `review_logs`

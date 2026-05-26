@@ -36,16 +36,16 @@ class StudySessionCardStage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final template = studySessionController.currentTemplate;
-    final reviewCard = studySessionController.currentReviewCard;
+    final studyCard = studySessionController.currentStudyCard;
 
-    if (template == null || reviewCard == null) {
+    if (template == null || studyCard == null) {
       return const Center(child: Text('No card available'));
     }
 
     final child = switch (template) {
       FlashcardTemplate f => FlashcardCard(
         template: f,
-        reviewCard: reviewCard,
+        studyCard: studyCard,
         interactionsController: interactionsController,
         studySessionController: studySessionController,
       ),

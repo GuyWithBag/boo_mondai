@@ -18,7 +18,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         FlashcardTemplate,
         MatchMadnessTemplate,
         IdentificationTemplate,
-        ReviewCard,
+        StudyCard,
         FillInTheBlankSegment,
         WordScrambleTemplate,
         MatchMadnessPair,
@@ -37,7 +37,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         DeckTag,
         CardTemplateTag,
         CardTemplate,
-        UserReviewCardTag;
+        UserStudyCardTag;
 import 'package:fsrs/fsrs.dart';
 import 'package:hive_ce/hive_ce.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -52,7 +52,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
   AdapterSpec<FlashcardTemplate>(),
   AdapterSpec<MatchMadnessTemplate>(),
   AdapterSpec<IdentificationTemplate>(),
-  AdapterSpec<ReviewCard>(),
+  AdapterSpec<StudyCard>(),
   AdapterSpec<FillInTheBlankSegment>(),
   AdapterSpec<WordScrambleTemplate>(),
   AdapterSpec<MatchMadnessPair>(),
@@ -75,7 +75,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
   AdapterSpec<DeckListing>(),
   AdapterSpec<DeckTag>(),
   AdapterSpec<CardTemplateTag>(),
-  AdapterSpec<UserReviewCardTag>(),
+  AdapterSpec<UserStudyCardTag>(),
 ])
 // ignore: unused_element
 part 'adapters.g.dart';

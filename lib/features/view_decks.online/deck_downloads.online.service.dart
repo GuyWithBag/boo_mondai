@@ -10,7 +10,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         FillInTheBlanksTemplate,
         MatchMadnessTemplate,
         WordScrambleTemplate,
-        ReviewCard,
+        StudyCard,
         LocalDB,
         uuid,
         VisibilityState,
@@ -89,14 +89,14 @@ class DeckDownloadsOnlineService {
           now: now,
         ),
     ];
-    final reviewCards = _buildReviewCards(
+    final studyCards = _buildStudyCards(
       localDeckId: localDeckId,
       templates: localTemplates,
     );
 
     await LocalDB.deck.upsert(localDeck);
     await LocalDB.cardTemplate.upsertMany(localTemplates);
-    await LocalDB.reviewCard.upsertMany(reviewCards);
+    await LocalDB.studyCard.upsertMany(studyCards);
 
     return localDeck;
   }
@@ -236,11 +236,11 @@ class DeckDownloadsOnlineService {
     };
   }
 
-  List<ReviewCard> _buildReviewCards({
+  List<StudyCard> _buildStudyCards({
     required String localDeckId,
     required List<CardTemplate> templates,
   }) {
-    final reviewCards = <ReviewCard>[];
+    final studyCards = <StudyCard>[];
 
     for (final template in templates) {
       if (template is FlashcardTemplate) {
@@ -250,8 +250,8 @@ class DeckDownloadsOnlineService {
         final needsReversed = template.cardType != CardType.normal;
 
         if (needsNormal) {
-          reviewCards.add(
-            ReviewCard(
+          studyCards.add(
+            StudyCard(
               id: uuid.v7(),
               deckId: localDeckId,
               templateId: template.id,
@@ -260,8 +260,8 @@ class DeckDownloadsOnlineService {
           );
         }
         if (needsReversed) {
-          reviewCards.add(
-            ReviewCard(
+          studyCards.add(
+            StudyCard(
               id: uuid.v7(),
               deckId: localDeckId,
               templateId: template.id,
@@ -270,8 +270,8 @@ class DeckDownloadsOnlineService {
           );
         }
       } else {
-        reviewCards.add(
-          ReviewCard(
+        studyCards.add(
+          StudyCard(
             id: uuid.v7(),
             deckId: localDeckId,
             templateId: template.id,
@@ -281,6 +281,6 @@ class DeckDownloadsOnlineService {
       }
     }
 
-    return reviewCards;
+    return studyCards;
   }
 }

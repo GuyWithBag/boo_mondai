@@ -16,7 +16,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         WordScrambleTemplate,
         MatchMadnessTemplate,
         DrillQuestionCard,
-        ReviewCardBack;
+        StudyCardBack;
 import 'package:flutter/material.dart';
 
 class FlipCard extends StatelessWidget {
@@ -101,7 +101,7 @@ class FlipCard extends StatelessWidget {
               : Transform(
                   alignment: Alignment.center,
                   transform: Matrix4.identity()..rotateY(pi),
-                  child: ReviewCardBack(
+                  child: StudyCardBack(
                     answer: _getBackText(), // <-- Extracted
                     imageUrl: _getBackImage(), // <-- Extracted
                   ),

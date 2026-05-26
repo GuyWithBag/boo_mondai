@@ -13,7 +13,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppSpacing,
         LocalDB,
         StreakCard,
-        DueReviewCard,
+        DueStudyCard,
         LeaderboardSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -57,7 +57,7 @@ class HomePage extends HookWidget {
               const SizedBox(height: AppSpacing.lg),
               StreakCard(streak: LocalDB.streak.retrieve()),
               const SizedBox(height: AppSpacing.md),
-              DueReviewCard(
+              DueStudyCard(
                 dueCount: reviewDashboard.totalDue,
                 onTap: () => context.push('/review/session'),
               ),

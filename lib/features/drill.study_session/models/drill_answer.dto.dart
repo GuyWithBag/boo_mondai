@@ -7,7 +7,7 @@
 
 import 'package:boo_mondai/features/cards/models/card_template.dto.dart';
 import 'package:boo_mondai/features/drill.study_session/models/drill.study_session.dto.dart';
-import 'package:boo_mondai/features/fsrs/models/study_rating.dto.dart';
+import 'package:boo_mondai/features/study_session/models/study_rating.dto.dart';
 import 'package:boo_mondai/lib.barrel.dart' show WriteOnceDTO, uuid;
 import 'package:dart_mappable/dart_mappable.dart';
 
