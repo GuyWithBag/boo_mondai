@@ -10,7 +10,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         ReviewLogsLocalDB,
         StreakLocalDB,
         ProfileLocalDB,
-        CachedProfileLocalDB;
+        CachedProfileLocalDB,
+        ImportExportBackupsLocalDB,
+        UserSettingsLocalDB;
 
 class LocalDB {
   static late final DecksLocalDB deck;
@@ -25,6 +27,8 @@ class LocalDB {
   static late final StreakLocalDB streak;
   static late final ProfileLocalDB profile;
   static late final CachedProfileLocalDB cachedProfile;
+  static late final ImportExportBackupsLocalDB importExportBackup;
+  static late final UserSettingsLocalDB userSettings;
 
   static Future<void> init() async {
     profile = await ProfileLocalDB().init() as ProfileLocalDB;
@@ -39,6 +43,9 @@ class LocalDB {
     reviewLog = await ReviewLogsLocalDB().init() as ReviewLogsLocalDB;
     drillAnswer = await DrillAnswersLocalDB().init() as DrillAnswersLocalDB;
     streak = await StreakLocalDB().init() as StreakLocalDB;
+    importExportBackup =
+        await ImportExportBackupsLocalDB().init() as ImportExportBackupsLocalDB;
+    userSettings = await UserSettingsLocalDB().init() as UserSettingsLocalDB;
   }
 
   static Future<void> clearAll() async {
@@ -50,6 +57,8 @@ class LocalDB {
     await drillAnswer.clear();
     await reviewLog.clear();
     await streak.clear();
+    await importExportBackup.clear();
+    await userSettings.clear();
     await cachedProfile.clear();
     await profile.clear();
     profile.getOrCreate();

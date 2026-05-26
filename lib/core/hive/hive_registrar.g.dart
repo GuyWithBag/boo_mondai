@@ -22,6 +22,7 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(FsrsCardAdapter());
     registerAdapter(FsrsReviewLogAdapter());
     registerAdapter(IdentificationTemplateAdapter());
+    registerAdapter(ImportExportBackupAdapter());
     registerAdapter(MatchMadnessPairAdapter());
     registerAdapter(MatchMadnessTemplateAdapter());
     registerAdapter(MultipleChoiceOptionAdapter());
@@ -37,6 +38,7 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(StudyRatingAdapter());
     registerAdapter(TagAdapter());
     registerAdapter(UserAdapter());
+    registerAdapter(UserSettingsAdapter());
     registerAdapter(UserStudyCardTagAdapter());
     registerAdapter(VisibilityStateAdapter());
     registerAdapter(WordScrambleTemplateAdapter());
@@ -60,6 +62,7 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(FsrsCardAdapter());
     registerAdapter(FsrsReviewLogAdapter());
     registerAdapter(IdentificationTemplateAdapter());
+    registerAdapter(ImportExportBackupAdapter());
     registerAdapter(MatchMadnessPairAdapter());
     registerAdapter(MatchMadnessTemplateAdapter());
     registerAdapter(MultipleChoiceOptionAdapter());
@@ -75,6 +78,7 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(StudyRatingAdapter());
     registerAdapter(TagAdapter());
     registerAdapter(UserAdapter());
+    registerAdapter(UserSettingsAdapter());
     registerAdapter(UserStudyCardTagAdapter());
     registerAdapter(VisibilityStateAdapter());
     registerAdapter(WordScrambleTemplateAdapter());

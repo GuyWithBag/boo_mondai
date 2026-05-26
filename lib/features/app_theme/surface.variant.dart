@@ -9,6 +9,8 @@ enum SurfaceShape { rounded, cardShape, sharp }
 
 enum SurfacePadding { normal, text, none }
 
+enum SurfaceBorder { normal, sidebar, none }
+
 final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
   base: (tokens) => {
     SurfaceStylePart.padding(EdgeInsets.all(tokens.spacePanelPadding.r)),
@@ -17,12 +19,7 @@ final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
       DecorationPart.borderRadius(
         BorderRadius.circular(tokens.radiusContainerLarge.r),
       ),
-      DecorationPart.border(
-        Border.all(
-          color: tokens.borderNeutralSubtle,
-          width: tokens.borderWidthDefault.w,
-        ),
-      ),
+
       DecorationPart.boxShadow([
         BoxShadow(
           color: tokens.borderNeutralSubtle.withValues(alpha: 0.55),
@@ -32,8 +29,46 @@ final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
       ]),
     }),
   },
-  defaultVariants: const [SurfaceTone.surface],
+  defaultVariants: const [
+    SurfaceTone.surface,
+    SurfaceBorder.normal,
+    SurfacePadding.normal,
+    SurfaceShape.rounded,
+  ],
   variants: {
+    SurfaceBorder.normal: (tokens) => {
+      SurfaceStylePart.decoration({
+        DecorationPart.border(
+          Border.all(
+            color: tokens.borderNeutralSubtle,
+            width: tokens.borderWidthDefault.w,
+          ),
+        ),
+      }),
+    },
+    SurfaceBorder.sidebar: (tokens) => {
+      SurfaceStylePart.decoration({
+        DecorationPart.border(
+          BorderDirectional(
+            end: BorderSide(
+              color: tokens.borderNeutralSubtle,
+              width: tokens.borderWidthDefault.w,
+            ),
+            start: BorderSide(),
+            top: BorderSide(),
+            bottom: BorderSide(),
+          ),
+        ),
+      }),
+    },
+    SurfaceBorder.none: (tokens) => {
+      SurfaceStylePart.decoration({
+        DecorationPart.border(
+          Border.all(color: tokens.colorTransparent, width: 0),
+        ),
+        DecorationPart.boxShadow([BoxShadow(color: tokens.colorTransparent)]),
+      }),
+    },
     SurfaceShape.rounded: (_) => const {},
     SurfaceShape.cardShape: (tokens) => {
       SurfaceStylePart.decoration({

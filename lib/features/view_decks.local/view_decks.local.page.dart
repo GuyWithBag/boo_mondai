@@ -11,8 +11,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         AuthController,
         Deck,
         ListingStatesWrapper,
-        AppSnackbarTone,
-        showAppSnackbar,
+        SnackbarTone,
+        showSnackbar,
         SyncButton,
         DeckTile,
         showCreateDeckLocalSheet,
@@ -45,12 +45,12 @@ class ViewDecksLocalPage extends HookWidget {
       if (err == null) return null;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!context.mounted) return;
-        showAppSnackbar(
+        showSnackbar(
           context: context,
           message: 'Sync failed: $err',
           leading: const Icon(Icons.sync_problem_outlined),
           duration: const Duration(seconds: 3),
-          tone: AppSnackbarTone.error,
+          tone: SnackbarTone.error,
         );
         controller.clearSyncError();
       });

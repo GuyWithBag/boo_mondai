@@ -13,14 +13,23 @@ import 'package:boo_mondai/lib.barrel.dart';
 
 class BooMondaiApp extends HookWidget {
   final AuthController authController;
-  const BooMondaiApp({super.key, required this.authController});
+  final UserSettings initialUserSettings;
+
+  const BooMondaiApp({
+    super.key,
+    required this.authController,
+    required this.initialUserSettings,
+  });
 
   @override
   Widget build(BuildContext context) {
     // ── Create Router ───────────────────────────────────
     // Hand the controller to GoRouter before starting the app
     final router = createRouter(authController);
-    final controller = useMemoized(createAppThemeController);
+    final controller = useMemoized(
+      () => UserSettingsThemeBridge.createController(initialUserSettings),
+      [initialUserSettings],
+    );
     return ThemeVariantsProvider<AppTokens>(
       controller: controller,
       child: ScreenUtilInit(

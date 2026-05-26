@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
 import 'package:theme_variants/theme_variants.dart';
 
-enum AppSnackbarTone {
+enum SnackbarTone {
   primary,
   surface,
   success,
@@ -53,9 +53,9 @@ final appSnackbarStyle = VariantStyle.surfaceParts<AppTokens>(
       }),
     }),
   },
-  defaultVariants: const [AppSnackbarTone.surface],
+  defaultVariants: const [SnackbarTone.surface],
   variants: {
-    AppSnackbarTone.primary: (tokens) => {
+    SnackbarTone.primary: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.primary),
         DecorationPart.border(
@@ -73,7 +73,7 @@ final appSnackbarStyle = VariantStyle.surfaceParts<AppTokens>(
         ContentStylePart.icon({IconThemePart.color(tokens.colorTextOnBrand)}),
       }),
     },
-    AppSnackbarTone.surface: (tokens) => {
+    SnackbarTone.surface: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.backgroundSurface),
         DecorationPart.border(
@@ -94,7 +94,7 @@ final appSnackbarStyle = VariantStyle.surfaceParts<AppTokens>(
         ContentStylePart.icon({IconThemePart.color(tokens.textPrimary)}),
       }),
     },
-    AppSnackbarTone.success: (tokens) => {
+    SnackbarTone.success: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.actionSuccessBackground),
         DecorationPart.border(
@@ -115,7 +115,7 @@ final appSnackbarStyle = VariantStyle.surfaceParts<AppTokens>(
         ContentStylePart.icon({IconThemePart.color(tokens.actionSuccess)}),
       }),
     },
-    AppSnackbarTone.error: (tokens) => {
+    SnackbarTone.error: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.actionErrorBackground),
         DecorationPart.border(
@@ -136,7 +136,7 @@ final appSnackbarStyle = VariantStyle.surfaceParts<AppTokens>(
         ContentStylePart.icon({IconThemePart.color(tokens.actionError)}),
       }),
     },
-    AppSnackbarTone.streak: (tokens) => {
+    SnackbarTone.streak: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.streak),
         DecorationPart.border(
@@ -154,7 +154,7 @@ final appSnackbarStyle = VariantStyle.surfaceParts<AppTokens>(
         ContentStylePart.icon({IconThemePart.color(tokens.colorTextOnBrand)}),
       }),
     },
-    AppSnackbarTone.dashed: (tokens) => {
+    SnackbarTone.dashed: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.softGray),
         DecorationPart.border(
@@ -170,7 +170,7 @@ final appSnackbarStyle = VariantStyle.surfaceParts<AppTokens>(
         ContentStylePart.icon({IconThemePart.color(tokens.textMuted)}),
       }),
     },
-    AppSnackbarTone.again: (tokens) => {
+    SnackbarTone.again: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.ratingAgainBackground),
         DecorationPart.border(
@@ -185,7 +185,7 @@ final appSnackbarStyle = VariantStyle.surfaceParts<AppTokens>(
         ContentStylePart.icon({IconThemePart.color(tokens.ratingAgainText)}),
       }),
     },
-    AppSnackbarTone.hard: (tokens) => {
+    SnackbarTone.hard: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.ratingHardBackground),
         DecorationPart.border(
@@ -200,7 +200,7 @@ final appSnackbarStyle = VariantStyle.surfaceParts<AppTokens>(
         ContentStylePart.icon({IconThemePart.color(tokens.ratingHardText)}),
       }),
     },
-    AppSnackbarTone.good: (tokens) => {
+    SnackbarTone.good: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.ratingGoodBackground),
         DecorationPart.border(
@@ -215,7 +215,7 @@ final appSnackbarStyle = VariantStyle.surfaceParts<AppTokens>(
         ContentStylePart.icon({IconThemePart.color(tokens.ratingGoodText)}),
       }),
     },
-    AppSnackbarTone.easy: (tokens) => {
+    SnackbarTone.easy: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.ratingEasyBackground),
         DecorationPart.border(

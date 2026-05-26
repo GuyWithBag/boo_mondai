@@ -7,6 +7,7 @@ export 'section_eyebrow.dart';
 export 'section_eyebrow.variant.dart';
 export 'segmented_control.dart';
 export 'segment_control.variant.dart';
+export 'sliver_app_bar.dart';
 export 'snackbar.dart';
 export 'snackbar.variant.dart';
 export 'surface.variant.dart';

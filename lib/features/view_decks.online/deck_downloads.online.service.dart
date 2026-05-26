@@ -10,14 +10,13 @@ import 'package:boo_mondai/lib.barrel.dart'
         FillInTheBlanksTemplate,
         MatchMadnessTemplate,
         WordScrambleTemplate,
-        StudyCard,
         LocalDB,
         uuid,
         VisibilityState,
         MultipleChoiceOption,
         FillInTheBlankSegment,
         MatchMadnessPair,
-        CardType;
+        StudyCardService;
 
 /// Downloads an online deck into the current user's local deck library.
 ///
@@ -89,14 +88,12 @@ class DeckDownloadsOnlineService {
           now: now,
         ),
     ];
-    final studyCards = _buildStudyCards(
-      localDeckId: localDeckId,
-      templates: localTemplates,
-    );
-
     await LocalDB.deck.upsert(localDeck);
     await LocalDB.cardTemplate.upsertMany(localTemplates);
-    await LocalDB.studyCard.upsertMany(studyCards);
+    await StudyCardService.syncDeckStudyCards(
+      deckId: localDeckId,
+      templates: localTemplates,
+    );
 
     return localDeck;
   }
@@ -234,53 +231,5 @@ class DeckDownloadsOnlineService {
         'Unsupported card template type: ${template.runtimeType}',
       ),
     };
-  }
-
-  List<StudyCard> _buildStudyCards({
-    required String localDeckId,
-    required List<CardTemplate> templates,
-  }) {
-    final studyCards = <StudyCard>[];
-
-    for (final template in templates) {
-      if (template is FlashcardTemplate) {
-        // Flashcards can produce one normal review card, one reversed review
-        // card, or both, depending on the template's cardType setting.
-        final needsNormal = template.cardType != CardType.reversed;
-        final needsReversed = template.cardType != CardType.normal;
-
-        if (needsNormal) {
-          studyCards.add(
-            StudyCard(
-              id: uuid.v7(),
-              deckId: localDeckId,
-              templateId: template.id,
-              isReversed: false,
-            ),
-          );
-        }
-        if (needsReversed) {
-          studyCards.add(
-            StudyCard(
-              id: uuid.v7(),
-              deckId: localDeckId,
-              templateId: template.id,
-              isReversed: true,
-            ),
-          );
-        }
-      } else {
-        studyCards.add(
-          StudyCard(
-            id: uuid.v7(),
-            deckId: localDeckId,
-            templateId: template.id,
-            isReversed: false,
-          ),
-        );
-      }
-    }
-
-    return studyCards;
   }
 }

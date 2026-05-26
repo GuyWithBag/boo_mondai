@@ -5,6 +5,13 @@ import 'package:boo_mondai/lib.barrel.dart'
         ProfilesRemoteDB,
         DecksRemoteDB,
         DeckInteractionsRemoteDB,
+        DeckCommentsRemoteDB,
+        DeckCommentEditLogsRemoteDB,
+        DeckVoteReviewsRemoteDB,
+        DeckVoteReviewEditLogsRemoteDB,
+        DeckVoteReviewCommentsRemoteDB,
+        DeckVoteReviewCommentEditLogsRemoteDB,
+        UserSettingsRemoteDB,
         ReviewSessionsRemoteDB,
         DrillAnswersRemoteDB,
         FsrsCardsRemoteDB,
@@ -18,6 +25,14 @@ class RemoteDB {
   static late final ProfilesRemoteDB profile;
   static late final DecksRemoteDB deck;
   static late final DeckInteractionsRemoteDB deckInteractions;
+  static late final DeckCommentsRemoteDB deckComment;
+  static late final DeckCommentEditLogsRemoteDB deckCommentEditLog;
+  static late final DeckVoteReviewsRemoteDB deckVoteReview;
+  static late final DeckVoteReviewEditLogsRemoteDB deckVoteReviewEditLog;
+  static late final DeckVoteReviewCommentsRemoteDB deckVoteReviewComment;
+  static late final DeckVoteReviewCommentEditLogsRemoteDB
+  deckVoteReviewCommentEditLog;
+  static late final UserSettingsRemoteDB userSettings;
   static late final CardTemplatesRemoteDB card;
   static late final DrillSessionsRemoteDB drill;
   static late final ReviewSessionsRemoteDB reviewSession;
@@ -32,6 +47,13 @@ class RemoteDB {
     profile = ProfilesRemoteDB();
     deck = DecksRemoteDB();
     deckInteractions = DeckInteractionsRemoteDB();
+    deckComment = DeckCommentsRemoteDB();
+    deckCommentEditLog = DeckCommentEditLogsRemoteDB();
+    deckVoteReview = DeckVoteReviewsRemoteDB();
+    deckVoteReviewEditLog = DeckVoteReviewEditLogsRemoteDB();
+    deckVoteReviewComment = DeckVoteReviewCommentsRemoteDB();
+    deckVoteReviewCommentEditLog = DeckVoteReviewCommentEditLogsRemoteDB();
+    userSettings = UserSettingsRemoteDB();
     card = CardTemplatesRemoteDB();
     drill = DrillSessionsRemoteDB();
     reviewSession = ReviewSessionsRemoteDB();

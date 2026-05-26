@@ -470,6 +470,8 @@ CREATE TABLE deck_vote_review_edit_logs (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   review_id   uuid NOT NULL REFERENCES deck_vote_reviews(id) ON DELETE CASCADE,
   edited_by   uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  old_vote_value_at_creation int NOT NULL CHECK (old_vote_value_at_creation IN (1, -1)),
+  new_vote_value_at_creation int NOT NULL CHECK (new_vote_value_at_creation IN (1, -1)),
   old_title   text NOT NULL,
   new_title   text NOT NULL,
   old_body    text NOT NULL,
@@ -485,6 +487,66 @@ CREATE POLICY "deck_vote_review_edit_logs: read visible" ON deck_vote_review_edi
       AND (d.visibility_state IN ('public', 'unlisted') OR d.user_id = current_profile_id())
   ));
 CREATE INDEX ON deck_vote_review_edit_logs (review_id, edited_at DESC);
+
+CREATE TABLE deck_vote_review_comments (
+  id                uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  review_id         uuid NOT NULL REFERENCES deck_vote_reviews(id) ON DELETE CASCADE,
+  user_id           uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  parent_comment_id uuid,
+  body              text NOT NULL,
+  is_deleted        bool NOT NULL DEFAULT false,
+  created_at        timestamptz NOT NULL DEFAULT now(),
+  updated_at        timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (id, review_id),
+  CONSTRAINT deck_vote_review_comments_parent_fk
+    FOREIGN KEY (parent_comment_id, review_id)
+    REFERENCES deck_vote_review_comments(id, review_id)
+    ON DELETE CASCADE
+);
+ALTER TABLE deck_vote_review_comments ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "deck_vote_review_comments: read visible" ON deck_vote_review_comments FOR SELECT
+  USING (EXISTS (
+    SELECT 1 FROM deck_vote_reviews r
+    JOIN decks d ON d.id = r.deck_id
+    WHERE r.id = deck_vote_review_comments.review_id
+      AND (d.visibility_state IN ('public', 'unlisted') OR d.user_id = current_profile_id())
+  ));
+CREATE POLICY "deck_vote_review_comments: insert own" ON deck_vote_review_comments FOR INSERT
+  WITH CHECK (
+    user_id = current_profile_id()
+    AND EXISTS (
+      SELECT 1 FROM deck_vote_reviews r
+      JOIN decks d ON d.id = r.deck_id
+      WHERE r.id = deck_vote_review_comments.review_id
+        AND (d.visibility_state IN ('public', 'unlisted') OR d.user_id = current_profile_id())
+    )
+  );
+CREATE POLICY "deck_vote_review_comments: update own" ON deck_vote_review_comments FOR UPDATE
+  USING (user_id = current_profile_id())
+  WITH CHECK (user_id = current_profile_id());
+CREATE INDEX ON deck_vote_review_comments (review_id, created_at) WHERE parent_comment_id IS NULL;
+CREATE INDEX ON deck_vote_review_comments (parent_comment_id, created_at);
+CREATE INDEX ON deck_vote_review_comments (user_id, created_at DESC);
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON deck_vote_review_comments FOR EACH ROW EXECUTE FUNCTION moddatetime(updated_at);
+
+CREATE TABLE deck_vote_review_comment_edit_logs (
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  comment_id  uuid NOT NULL REFERENCES deck_vote_review_comments(id) ON DELETE CASCADE,
+  edited_by   uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  old_body    text NOT NULL,
+  new_body    text NOT NULL,
+  edited_at   timestamptz NOT NULL DEFAULT now()
+);
+ALTER TABLE deck_vote_review_comment_edit_logs ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "deck_vote_review_comment_edit_logs: read visible" ON deck_vote_review_comment_edit_logs FOR SELECT
+  USING (EXISTS (
+    SELECT 1 FROM deck_vote_review_comments c
+    JOIN deck_vote_reviews r ON r.id = c.review_id
+    JOIN decks d ON d.id = r.deck_id
+    WHERE c.id = deck_vote_review_comment_edit_logs.comment_id
+      AND (d.visibility_state IN ('public', 'unlisted') OR d.user_id = current_profile_id())
+  ));
+CREATE INDEX ON deck_vote_review_comment_edit_logs (comment_id, edited_at DESC);
 
 CREATE TABLE deck_comments (
   id                uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -642,17 +704,32 @@ CREATE TRIGGER trigger_sync_deck_review_vote_snapshot BEFORE INSERT ON deck_vote
 
 CREATE OR REPLACE FUNCTION log_deck_vote_review_edit() RETURNS TRIGGER AS $$
 BEGIN
-  IF (OLD.title IS DISTINCT FROM NEW.title OR OLD.body IS DISTINCT FROM NEW.body) THEN
+  IF (
+    OLD.vote_value_at_creation IS DISTINCT FROM NEW.vote_value_at_creation
+    OR OLD.title IS DISTINCT FROM NEW.title
+    OR OLD.body IS DISTINCT FROM NEW.body
+  ) THEN
     INSERT INTO deck_vote_review_edit_logs (
-      review_id, edited_by, old_title, new_title, old_body, new_body
+      review_id, edited_by, old_vote_value_at_creation, new_vote_value_at_creation, old_title, new_title, old_body, new_body
     ) VALUES (
-      OLD.id, NEW.user_id, OLD.title, NEW.title, OLD.body, NEW.body
+      OLD.id, NEW.user_id, OLD.vote_value_at_creation, NEW.vote_value_at_creation, OLD.title, NEW.title, OLD.body, NEW.body
     );
   END IF;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 CREATE TRIGGER trigger_log_deck_vote_review_edit BEFORE UPDATE ON deck_vote_reviews FOR EACH ROW EXECUTE FUNCTION log_deck_vote_review_edit();
+
+CREATE OR REPLACE FUNCTION log_deck_vote_review_comment_edit() RETURNS TRIGGER AS $$
+BEGIN
+  IF (OLD.body IS DISTINCT FROM NEW.body) THEN
+    INSERT INTO deck_vote_review_comment_edit_logs (comment_id, edited_by, old_body, new_body)
+    VALUES (OLD.id, NEW.user_id, OLD.body, NEW.body);
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+CREATE TRIGGER trigger_log_deck_vote_review_comment_edit BEFORE UPDATE ON deck_vote_review_comments FOR EACH ROW EXECUTE FUNCTION log_deck_vote_review_comment_edit();
 
 CREATE OR REPLACE FUNCTION update_deck_review_counts() RETURNS TRIGGER AS $$
 BEGIN

@@ -37,6 +37,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         DeckTag,
         CardTemplateTag,
         CardTemplate,
+        ImportExportBackup,
+        ThemeOverride,
+        CustomThemePreset,
+        UserSettings,
         UserStudyCardTag;
 import 'package:fsrs/fsrs.dart';
 import 'package:hive_ce/hive_ce.dart';
@@ -76,6 +80,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
   AdapterSpec<DeckTag>(),
   AdapterSpec<CardTemplateTag>(),
   AdapterSpec<UserStudyCardTag>(),
+  AdapterSpec<ImportExportBackup>(),
+  AdapterSpec<UserSettings>(),
 ])
 // ignore: unused_element
 part 'adapters.g.dart';

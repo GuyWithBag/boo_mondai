@@ -26,6 +26,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         ViewLeaderboardController,
         StreakController,
         ResearchController,
+        UserSettingsService,
         BooMondaiApp;
 import 'package:flutter/material.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
@@ -60,6 +61,8 @@ Future<void> main() async {
   // ── Restore session ─────────────────────────────────
   final authController = AuthController();
   await authController.restoreSession();
+  final initialUserSettings =
+      await UserSettingsService.getOrCreateForCurrentProfile();
 
   // This is what catches the link on Linux when the OS tries
   // to open the app via the .desktop file
@@ -81,7 +84,10 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => StreakController()),
         ChangeNotifierProvider(create: (_) => ResearchController()),
       ],
-      child: BooMondaiApp(authController: authController),
+      child: BooMondaiApp(
+        authController: authController,
+        initialUserSettings: initialUserSettings,
+      ),
     ),
   );
 }

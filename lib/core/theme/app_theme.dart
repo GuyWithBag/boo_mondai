@@ -99,7 +99,8 @@ TextTheme _textTheme(AppTokens tokens) {
   );
 }
 
-ThemeData _themeData(AppTokens tokens, Brightness brightness) {
+/// Builds `ThemeData` from typed app tokens for a given [brightness].
+ThemeData buildAppThemeData(AppTokens tokens, Brightness brightness) {
   final scheme = ColorScheme.fromSeed(
     seedColor: tokens.primary,
     brightness: brightness,
@@ -185,14 +186,14 @@ ThemeData _themeData(AppTokens tokens, Brightness brightness) {
 final booMondaiLight = ThemeVariant<AppTokens>(
   themePresetId: 'boomondai',
   brightness: ThemeVariantBrightness.light,
-  themeData: _themeData(defaultLight, Brightness.light),
+  themeData: buildAppThemeData(defaultLight, Brightness.light),
   tokens: defaultLight,
 );
 
 final booMondaiDark = ThemeVariant<AppTokens>(
   themePresetId: 'boomondai',
   brightness: ThemeVariantBrightness.dark,
-  themeData: _themeData(defaultDark, Brightness.dark),
+  themeData: buildAppThemeData(defaultDark, Brightness.dark),
   tokens: defaultDark,
 );
 

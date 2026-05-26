@@ -3,6 +3,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         Deck,
         AppTokens,
         ViewDecksOnlineController,
+        DeckDiscussionController,
+        DeckComment,
+        DeckVoteReview,
         HeaderBadge,
         LoadingIndicator,
         Tag,
@@ -10,8 +13,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         surfaceStyle,
         SurfacePadding,
         DeckTile,
-        AppSnackbarTone,
-        showAppSnackbar,
+        SnackbarTone,
+        showSnackbar,
         appTextStyle,
         TextSize,
         TextWeight,
@@ -33,7 +36,10 @@ Future<void> showViewDeckOnlineSheet(BuildContext context, Deck deck) {
     isScrollControlled: true,
     useSafeArea: true,
     backgroundColor: Colors.transparent,
-    builder: (_) => ViewDeckOnlineSheet(deck: deck),
+    builder: (_) => ChangeNotifierProvider(
+      create: (_) => DeckDiscussionController(deck: deck)..load(),
+      child: ViewDeckOnlineSheet(deck: deck),
+    ),
   );
 }
 
@@ -205,20 +211,20 @@ class _StoreSummary extends StatelessWidget {
         final message =
             controller.error?.toString().replaceFirst('Exception: ', '') ??
             'Deck download failed.';
-        showAppSnackbar(
+        showSnackbar(
           context: context,
           message: message,
           leading: const Icon(Icons.error_outline),
-          tone: AppSnackbarTone.error,
+          tone: SnackbarTone.error,
         );
         return;
       }
 
-      showAppSnackbar(
+      showSnackbar(
         context: context,
         message: '"${downloadedDeck.title}" downloaded to My Decks.',
         leading: const Icon(Icons.download_done_outlined),
-        tone: AppSnackbarTone.success,
+        tone: SnackbarTone.success,
       );
     }
 
@@ -331,6 +337,8 @@ class _StoreBody extends StatelessWidget {
       _TagsPanel(tags: deck.tags),
       _FeaturedCardsPanel(cards: listing?.featuredCards ?? const []),
       _DetailsPanel(deck: deck),
+      const _ReviewsPanel(),
+      const _CommentsPanel(),
     ];
 
     if (!isDesktop) {
@@ -356,6 +364,10 @@ class _StoreBody extends StatelessWidget {
               _DescriptionPanel(deck: deck),
               SizedBox(height: tokens.spacePanelGapLg),
               _FeaturedCardsPanel(cards: listing?.featuredCards ?? const []),
+              SizedBox(height: tokens.spacePanelGapLg),
+              const _ReviewsPanel(),
+              SizedBox(height: tokens.spacePanelGapLg),
+              const _CommentsPanel(),
             ],
           ),
         ),
@@ -568,6 +580,469 @@ class _DetailsPanel extends StatelessWidget {
             tooltip: 'Updated ${_formatDate(deck.updatedAt)}',
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _ReviewsPanel extends StatelessWidget {
+  const _ReviewsPanel();
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = context.watch<DeckDiscussionController>();
+    final tokens = context.themeTokens<AppTokens>();
+
+    return _Panel(
+      title: 'Reviews',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const _DiscussionErrorBanner(),
+          const _ReviewComposer(),
+          SizedBox(height: tokens.spacePanelGapMd),
+          if (controller.isLoading)
+            const LoadingIndicator()
+          else if (controller.reviews.isEmpty)
+            const MetaLabel(
+              icon: Icons.rate_review_outlined,
+              label: 'No reviews yet',
+            )
+          else
+            Column(
+              children: [
+                for (final review in controller.reviews) ...[
+                  _ReviewTile(review: review),
+                  SizedBox(height: tokens.spacePanelGapMd),
+                ],
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CommentsPanel extends StatelessWidget {
+  const _CommentsPanel();
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = context.watch<DeckDiscussionController>();
+    final tokens = context.themeTokens<AppTokens>();
+    final rootComments = controller.comments
+        .where((comment) => comment.parentCommentId == null)
+        .toList(growable: false);
+
+    return _Panel(
+      title: 'Comments',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const _DiscussionErrorBanner(),
+          const _CommentComposer(),
+          SizedBox(height: tokens.spacePanelGapMd),
+          if (controller.isLoading)
+            const LoadingIndicator()
+          else if (rootComments.isEmpty)
+            const MetaLabel(
+              icon: Icons.chat_bubble_outline,
+              label: 'No comments yet',
+            )
+          else
+            Column(
+              children: [
+                for (final comment in rootComments) ...[
+                  _CommentThread(comment: comment),
+                  SizedBox(height: tokens.spacePanelGapMd),
+                ],
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ReviewComposer extends StatefulWidget {
+  const _ReviewComposer();
+
+  @override
+  State<_ReviewComposer> createState() => _ReviewComposerState();
+}
+
+class _ReviewComposerState extends State<_ReviewComposer> {
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _bodyController = TextEditingController();
+  int _voteValue = 1;
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _bodyController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = context.watch<DeckDiscussionController>();
+    final tokens = context.themeTokens<AppTokens>();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Wrap(
+          spacing: tokens.spacePanelGapSm,
+          runSpacing: tokens.spacePanelGapSm,
+          children: [
+            Button(
+              tone: ButtonTone.ghost,
+              selected: _voteValue == 1,
+              leading: const Icon(Icons.arrow_circle_up_outlined),
+              onPressed: () => setState(() => _voteValue = 1),
+              child: const Text('Upvote'),
+            ),
+            Button(
+              tone: ButtonTone.ghost,
+              selected: _voteValue == -1,
+              leading: const Icon(Icons.arrow_circle_down_outlined),
+              onPressed: () => setState(() => _voteValue = -1),
+              child: const Text('Downvote'),
+            ),
+          ],
+        ),
+        SizedBox(height: tokens.spacePanelGapSm),
+        _DiscussionTextField(
+          controller: _titleController,
+          hintText: 'Review title',
+          maxLines: 1,
+        ),
+        SizedBox(height: tokens.spacePanelGapSm),
+        _DiscussionTextField(
+          controller: _bodyController,
+          hintText: 'Write a review',
+          maxLines: 4,
+        ),
+        SizedBox(height: tokens.spacePanelGapSm),
+        Button(
+          tone: ButtonTone.filled,
+          leading: controller.isSubmittingReview
+              ? const LoadingIndicator()
+              : const Icon(Icons.rate_review_outlined),
+          onPressed: controller.isSubmittingReview
+              ? null
+              : () async {
+                  final saved = await controller.addReview(
+                    voteValue: _voteValue,
+                    title: _titleController.text,
+                    body: _bodyController.text,
+                  );
+                  if (!saved || !mounted) return;
+                  _titleController.clear();
+                  _bodyController.clear();
+                },
+          child: Text(
+            controller.isSubmittingReview ? 'Posting' : 'Post Review',
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _CommentComposer extends StatefulWidget {
+  const _CommentComposer({this.parentCommentId});
+
+  final String? parentCommentId;
+
+  @override
+  State<_CommentComposer> createState() => _CommentComposerState();
+}
+
+class _CommentComposerState extends State<_CommentComposer> {
+  final TextEditingController _bodyController = TextEditingController();
+
+  @override
+  void dispose() {
+    _bodyController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = context.watch<DeckDiscussionController>();
+    final isReply = widget.parentCommentId != null;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _DiscussionTextField(
+          controller: _bodyController,
+          hintText: isReply ? 'Write a reply' : 'Write a comment',
+          maxLines: isReply ? 2 : 3,
+        ),
+        SizedBox(height: context.themeTokens<AppTokens>().spacePanelGapSm),
+        Button(
+          tone: isReply ? ButtonTone.ghost : ButtonTone.filled,
+          leading: controller.isSubmittingComment
+              ? const LoadingIndicator()
+              : Icon(isReply ? Icons.reply_outlined : Icons.chat_outlined),
+          onPressed: controller.isSubmittingComment
+              ? null
+              : () async {
+                  final saved = await controller.addComment(
+                    _bodyController.text,
+                    parentCommentId: widget.parentCommentId,
+                  );
+                  if (!saved || !mounted) return;
+                  _bodyController.clear();
+                },
+          child: Text(
+            controller.isSubmittingComment
+                ? 'Posting'
+                : isReply
+                ? 'Reply'
+                : 'Post Comment',
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ReviewTile extends StatelessWidget {
+  const _ReviewTile({required this.review});
+
+  final DeckVoteReview review;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = context.themeTokens<AppTokens>();
+    final authorName = review.userProfile?.username ?? 'Unknown user';
+    final voteIcon = review.voteValueAtCreation == 1
+        ? Icons.arrow_circle_up_outlined
+        : Icons.arrow_circle_down_outlined;
+    final voteLabel = review.voteValueAtCreation == 1 ? 'Upvote' : 'Downvote';
+
+    return _DiscussionItem(
+      authorName: authorName,
+      avatarUrl: review.userProfile?.avatarUrl,
+      createdAt: review.createdAt,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Wrap(
+            spacing: tokens.spacePanelGapSm,
+            runSpacing: tokens.spacePanelGapSm,
+            children: [
+              MetaLabel(icon: voteIcon, label: voteLabel),
+              if (review.title.trim().isNotEmpty)
+                Text(
+                  review.title.trim(),
+                  style: appTextStyle.resolve(tokens, const [
+                    TextSize.labelLarge,
+                    TextWeight.heavy,
+                  ]),
+                ),
+            ],
+          ),
+          SizedBox(height: tokens.spacePanelGapSm),
+          Text(
+            review.body,
+            style: appTextStyle.resolve(tokens, const [
+              TextSize.label,
+              TextWeight.body,
+              TextTone.secondary,
+            ]),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CommentThread extends StatefulWidget {
+  const _CommentThread({required this.comment, this.depth = 0});
+
+  final DeckComment comment;
+  final int depth;
+
+  @override
+  State<_CommentThread> createState() => _CommentThreadState();
+}
+
+class _CommentThreadState extends State<_CommentThread> {
+  bool _isReplying = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = context.watch<DeckDiscussionController>();
+    final tokens = context.themeTokens<AppTokens>();
+    final replies = controller.repliesFor(widget.comment.id);
+
+    return Padding(
+      padding: EdgeInsets.only(left: widget.depth == 0 ? 0 : 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _DiscussionItem(
+            authorName: widget.comment.userProfile?.username ?? 'Unknown user',
+            avatarUrl: widget.comment.userProfile?.avatarUrl,
+            createdAt: widget.comment.createdAt,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.comment.body,
+                  style: appTextStyle.resolve(tokens, const [
+                    TextSize.label,
+                    TextWeight.body,
+                    TextTone.secondary,
+                  ]),
+                ),
+                SizedBox(height: tokens.spacePanelGapSm),
+                Button(
+                  tone: ButtonTone.ghost,
+                  leading: const Icon(Icons.reply_outlined),
+                  onPressed: () => setState(() => _isReplying = !_isReplying),
+                  child: Text(_isReplying ? 'Cancel' : 'Reply'),
+                ),
+              ],
+            ),
+          ),
+          if (_isReplying) ...[
+            SizedBox(height: tokens.spacePanelGapSm),
+            _CommentComposer(parentCommentId: widget.comment.id),
+          ],
+          if (replies.isNotEmpty) ...[
+            SizedBox(height: tokens.spacePanelGapMd),
+            for (final reply in replies) ...[
+              _CommentThread(comment: reply, depth: widget.depth + 1),
+              SizedBox(height: tokens.spacePanelGapSm),
+            ],
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _DiscussionItem extends StatelessWidget {
+  const _DiscussionItem({
+    required this.authorName,
+    required this.createdAt,
+    required this.child,
+    this.avatarUrl,
+  });
+
+  final String authorName;
+  final String? avatarUrl;
+  final DateTime createdAt;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = context.themeTokens<AppTokens>();
+
+    return Surface(
+      style: surfaceStyle.resolve(tokens, const [SurfaceTone.muted]),
+      child: Padding(
+        padding: EdgeInsets.all(tokens.spacePanelGapMd),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 14,
+                  backgroundImage: avatarUrl == null
+                      ? null
+                      : NetworkImage(avatarUrl!),
+                  child: avatarUrl == null
+                      ? Text(authorName.isEmpty ? '?' : authorName[0])
+                      : null,
+                ),
+                SizedBox(width: tokens.spacePanelGapSm),
+                Expanded(
+                  child: Text(
+                    authorName,
+                    overflow: TextOverflow.ellipsis,
+                    style: appTextStyle.resolve(tokens, const [
+                      TextSize.label,
+                      TextWeight.heavy,
+                    ]),
+                  ),
+                ),
+                MetaLabel(
+                  icon: Icons.calendar_today_outlined,
+                  label: _formatDate(createdAt),
+                ),
+              ],
+            ),
+            SizedBox(height: tokens.spacePanelGapSm),
+            child,
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DiscussionTextField extends StatelessWidget {
+  const _DiscussionTextField({
+    required this.controller,
+    required this.hintText,
+    required this.maxLines,
+  });
+
+  final TextEditingController controller;
+  final String hintText;
+  final int maxLines;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = context.themeTokens<AppTokens>();
+
+    return TextField(
+      controller: controller,
+      maxLines: maxLines,
+      style: appTextStyle.resolve(tokens, const [
+        TextSize.label,
+        TextWeight.body,
+      ]),
+      decoration: InputDecoration(
+        hintText: hintText,
+        filled: true,
+        fillColor: tokens.backgroundSurface,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(tokens.radius2xl),
+          borderSide: BorderSide(color: tokens.borderNeutralSubtle),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(tokens.radius2xl),
+          borderSide: BorderSide(color: tokens.borderNeutralSubtle),
+        ),
+      ),
+    );
+  }
+}
+
+class _DiscussionErrorBanner extends StatelessWidget {
+  const _DiscussionErrorBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = context.watch<DeckDiscussionController>();
+    final error = controller.error;
+    if (error == null) return const SizedBox.shrink();
+
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: context.themeTokens<AppTokens>().spacePanelGapSm,
+      ),
+      child: MetaLabel(
+        icon: Icons.error_outline,
+        label: error.toString().replaceFirst('Exception: ', ''),
       ),
     );
   }

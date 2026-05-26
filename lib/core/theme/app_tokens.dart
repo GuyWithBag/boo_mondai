@@ -33,7 +33,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         colorTransparent,
         colorTextOnBrand,
         cardAspectRatio;
+import 'package:dart_mappable/dart_mappable.dart';
 import 'package:flutter/material.dart';
+
+part 'app_tokens.mapper.dart';
 
 /*
 Token naming guide
@@ -109,87 +112,156 @@ matchingTypeInputBorderWidth
 tactileButtonPressedYOffset
 */
 
-typedef AppTokens = ({
-  String name,
-  String fontFamily,
-  Color primary,
-  Color primaryDim,
-  Color primaryBright,
-  Color streak,
-  Color streakDim,
-  Color backgroundPage,
-  Color backgroundSurface,
-  Color borderNeutralSubtle,
-  Color actionSuccess,
-  Color actionSuccessBackground,
-  Color actionSuccessBorder,
-  Color actionError,
-  Color actionErrorBackground,
-  Color actionErrorBorder,
-  Color textPrimary,
-  Color textSecondary,
-  Color textMuted,
-  Color softGray,
-  Color primarySoft,
-  Color greenSoft,
-  Color ratingAgainBackground,
-  Color ratingAgainText,
-  Color ratingAgainBorder,
-  Color ratingAgainHoverBackground,
-  Color ratingHardBackground,
-  Color ratingHardText,
-  Color ratingHardBorder,
-  Color ratingHardHoverBackground,
-  Color ratingGoodBackground,
-  Color ratingGoodText,
-  Color ratingGoodBorder,
-  Color ratingGoodHoverBackground,
-  Color ratingEasyBackground,
-  Color ratingEasyText,
-  Color ratingEasyBorder,
-  Color ratingEasyHoverBackground,
-  Color colorTransparent,
-  Color colorTextOnBrand,
+@MappableClass()
+class AppTokens with AppTokensMappable {
+  const AppTokens({
+    required this.name,
+    required this.fontFamily,
+    required this.primary,
+    required this.primaryDim,
+    required this.primaryBright,
+    required this.streak,
+    required this.streakDim,
+    required this.backgroundPage,
+    required this.backgroundSurface,
+    required this.borderNeutralSubtle,
+    required this.actionSuccess,
+    required this.actionSuccessBackground,
+    required this.actionSuccessBorder,
+    required this.actionError,
+    required this.actionErrorBackground,
+    required this.actionErrorBorder,
+    required this.textPrimary,
+    required this.textSecondary,
+    required this.textMuted,
+    required this.softGray,
+    required this.primarySoft,
+    required this.greenSoft,
+    required this.ratingAgainBackground,
+    required this.ratingAgainText,
+    required this.ratingAgainBorder,
+    required this.ratingAgainHoverBackground,
+    required this.ratingHardBackground,
+    required this.ratingHardText,
+    required this.ratingHardBorder,
+    required this.ratingHardHoverBackground,
+    required this.ratingGoodBackground,
+    required this.ratingGoodText,
+    required this.ratingGoodBorder,
+    required this.ratingGoodHoverBackground,
+    required this.ratingEasyBackground,
+    required this.ratingEasyText,
+    required this.ratingEasyBorder,
+    required this.ratingEasyHoverBackground,
+    required this.colorTransparent,
+    required this.colorTextOnBrand,
+    required this.surfaceShadowOffset,
+    required this.modalShadowOffset,
+    required this.fontWeightTextBody,
+    required this.fontWeightTextStrong,
+    required this.fontWeightTextHeavy,
+    required this.lineHeightTextBody,
+    required this.lineHeightTextTitle,
+    required this.lineHeightTextDisplay,
+    required this.lineHeightFieldDisplay,
+    required this.lineHeightTactile,
+    required this.letterSpacingTextEyebrow,
+    required this.radiusContainerLarge,
+    required this.radius2xl,
+    required this.radius3xl,
+    required this.borderWidthDefault,
+    required this.spacePanelPadding,
+    required this.spacePanelPaddingSm,
+    required this.spacePanelGapLg,
+    required this.spacePanelGapMd,
+    required this.spacePanelGapSm,
+    required this.textSizeHeader,
+    required this.textSizeLabelLarge,
+    required this.textSizeLabel,
+    required this.textSizeLabelSmall,
+    required this.textSizeBodyLarge,
+    required this.textSizeCardFront,
+    required this.textSizeCardBackFront,
+    required this.textSizeCardBackContent,
+    required this.sizeIconMd,
+    required this.sizeIconLg,
+    required this.cardAspectRatio,
+  });
 
-  double surfaceShadowOffset,
-  double modalShadowOffset,
+  final String name;
+  final String fontFamily;
+  final Color primary;
+  final Color primaryDim;
+  final Color primaryBright;
+  final Color streak;
+  final Color streakDim;
+  final Color backgroundPage;
+  final Color backgroundSurface;
+  final Color borderNeutralSubtle;
+  final Color actionSuccess;
+  final Color actionSuccessBackground;
+  final Color actionSuccessBorder;
+  final Color actionError;
+  final Color actionErrorBackground;
+  final Color actionErrorBorder;
+  final Color textPrimary;
+  final Color textSecondary;
+  final Color textMuted;
+  final Color softGray;
+  final Color primarySoft;
+  final Color greenSoft;
+  final Color ratingAgainBackground;
+  final Color ratingAgainText;
+  final Color ratingAgainBorder;
+  final Color ratingAgainHoverBackground;
+  final Color ratingHardBackground;
+  final Color ratingHardText;
+  final Color ratingHardBorder;
+  final Color ratingHardHoverBackground;
+  final Color ratingGoodBackground;
+  final Color ratingGoodText;
+  final Color ratingGoodBorder;
+  final Color ratingGoodHoverBackground;
+  final Color ratingEasyBackground;
+  final Color ratingEasyText;
+  final Color ratingEasyBorder;
+  final Color ratingEasyHoverBackground;
+  final Color colorTransparent;
+  final Color colorTextOnBrand;
+  final double surfaceShadowOffset;
+  final double modalShadowOffset;
+  final FontWeight fontWeightTextBody;
+  final FontWeight fontWeightTextStrong;
+  final FontWeight fontWeightTextHeavy;
+  final double lineHeightTextBody;
+  final double lineHeightTextTitle;
+  final double lineHeightTextDisplay;
+  final double lineHeightFieldDisplay;
+  final double lineHeightTactile;
+  final double letterSpacingTextEyebrow;
+  final double radiusContainerLarge;
+  final double radius2xl;
+  final double radius3xl;
+  final double borderWidthDefault;
+  final double spacePanelPadding;
+  final double spacePanelPaddingSm;
+  final double spacePanelGapLg;
+  final double spacePanelGapMd;
+  final double spacePanelGapSm;
+  final double textSizeHeader;
+  final double textSizeLabelLarge;
+  final double textSizeLabel;
+  final double textSizeLabelSmall;
+  final double textSizeBodyLarge;
+  final double textSizeCardFront;
+  final double textSizeCardBackFront;
+  final double textSizeCardBackContent;
+  final double sizeIconMd;
+  final double sizeIconLg;
+  final double cardAspectRatio;
+}
 
-  FontWeight fontWeightTextBody,
-  FontWeight fontWeightTextStrong,
-  FontWeight fontWeightTextHeavy,
-
-  double lineHeightTextBody,
-  double lineHeightTextTitle,
-  double lineHeightTextDisplay,
-  double lineHeightFieldDisplay,
-  double lineHeightTactile,
-  double letterSpacingTextEyebrow,
-
-  double radiusContainerLarge,
-  double radius2xl,
-  double radius3xl,
-
-  double borderWidthDefault,
-  double spacePanelPadding,
-  double spacePanelPaddingSm,
-  double spacePanelGapLg,
-  double spacePanelGapMd,
-  double spacePanelGapSm,
-
-  double textSizeHeader,
-  double textSizeLabelLarge,
-  double textSizeLabel,
-  double textSizeLabelSmall,
-  double textSizeBodyLarge,
-  double textSizeCardFront,
-  double textSizeCardBackFront,
-  double textSizeCardBackContent,
-  double sizeIconMd,
-  double sizeIconLg,
-  double cardAspectRatio,
-});
-
-final AppTokens defaultLight = (
+final AppTokens defaultLight = AppTokens(
   name: 'BooMondai Light',
   fontFamily: fontFamily,
   primary: Color(0xff6366f1),
@@ -263,7 +335,7 @@ final AppTokens defaultLight = (
   cardAspectRatio: cardAspectRatio,
 );
 
-final AppTokens defaultDark = (
+final AppTokens defaultDark = AppTokens(
   name: 'BooMondai Dark',
   fontFamily: fontFamily,
   primary: Color(0xff6366f1),

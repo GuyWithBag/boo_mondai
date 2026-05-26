@@ -1,5 +1,5 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppSnackbarTone, AppTokens, appSnackbarStyle;
+    show SnackbarTone, AppTokens, appSnackbarStyle;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -8,13 +8,13 @@ class Snackbar extends StatelessWidget {
     super.key,
     required this.message,
     this.leading,
-    this.tone = AppSnackbarTone.surface,
+    this.tone = SnackbarTone.surface,
     this.maxWidth = 520,
   });
 
   final String message;
   final Widget? leading;
-  final AppSnackbarTone tone;
+  final SnackbarTone tone;
   final double maxWidth;
 
   @override
@@ -42,11 +42,11 @@ class Snackbar extends StatelessWidget {
   }
 }
 
-void showAppSnackbar({
+void showSnackbar({
   required BuildContext context,
   required String message,
   Widget? leading,
-  AppSnackbarTone tone = AppSnackbarTone.surface,
+  SnackbarTone tone = SnackbarTone.surface,
   Duration duration = const Duration(seconds: 2),
   bool clearCurrent = true,
 }) {

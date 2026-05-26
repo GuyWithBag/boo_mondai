@@ -1,26 +1,19 @@
-import 'package:flutter/material.dart' hide BackButton;
+import 'package:flutter/material.dart' hide SliverAppBar;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:boo_mondai/lib.barrel.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-class EditDeckAppbar extends StatelessWidget implements PreferredSizeWidget {
+class EditDeckAppbar extends StatelessWidget {
   const EditDeckAppbar({
-    required this.tokens,
     required this.titleController,
     required this.onSave,
     this.isSaving = false,
     super.key,
   });
 
-  static const double height = 88;
-
-  final AppTokens tokens;
   final TextEditingController titleController;
   final Future<void> Function() onSave;
   final bool isSaving;
-
-  @override
-  Size get preferredSize => const Size.fromHeight(height);
 
   @override
   Widget build(BuildContext context) {
@@ -28,11 +21,10 @@ class EditDeckAppbar extends StatelessWidget implements PreferredSizeWidget {
     final horizontalPadding = tokens.spacePanelPadding;
     final verticalPadding = tokens.spacePanelPaddingSm;
 
-    return AppBar(
+    return SliverAppBar(
       leadingWidth: 100.w,
-      leading: BackButton(),
       title: SizedBox(
-        height: preferredSize.height,
+        height: 88,
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: verticalPadding),
           child: Column(

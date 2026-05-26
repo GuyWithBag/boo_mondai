@@ -6,56 +6,26 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart'
-    show
-        ResponsiveScaffold,
-        AuthController,
-        ErrorPage,
-        RouteException,
-        ViewDecksOnlinePage,
-        EnterResearchCodePage,
-        HomePage,
-        ViewDecksLocalPage,
-        ViewReviewsPage,
-        ViewAccountPage,
-        VariantShowcasePage,
-        LoginPage,
-        RegisterPage,
-        CreateDeckPage,
-        StudySessionPage,
-        ResearcherDashboardPage,
-        ViewLeaderboardPage,
-        ViewDeckLocalPage,
-        EditDeckPage,
-        SessionMode,
-        ViewDrillResultPage,
-        AnswerSurveyPage,
-        VocabularyTestPage;
+    show AuthController, ErrorPage, RouteException, Pages, MainScaffold;
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 
 GoRouter createRouter(AuthController authController) {
   return GoRouter(
-    initialLocation: '/',
+    initialLocation: Pages.home.url,
     refreshListenable: authController,
     errorBuilder: (context, state) {
-      // 1. Wrap the GoRouter error in your custom RouteException
       final exception = RouteException(
         'Error 404: The requested page could not be found.',
         code: 'ROUTE_NOT_FOUND',
-        originalError:
-            state.error, // state.error contains the actual GoRouter exception
+        originalError: state.error,
       );
-
-      // 2. Return a Scaffold containing your ErrorText widget
       return ErrorPage(exception: exception);
     },
     redirect: (context, state) {
-      // This checks every dynamic segment (e.g., :deckId, :surveyType, :sessionId)
       if (state.pathParameters.isNotEmpty) {
         for (final entry in state.pathParameters.entries) {
           final value = entry.value;
           if (value.isEmpty || value == 'null') {
-            // Throwing here sends the user straight to errorBuilder
             throw Exception("Missing required parameter: ${entry.key}");
           }
         }
@@ -65,163 +35,77 @@ GoRouter createRouter(AuthController authController) {
       final isAnonymous = !auth.currentProfile.isAnonymous;
       final loc = state.matchedLocation;
 
-      // Authenticated users landing on /login or /register → go home
       if (auth.service.isAuthenticatedRemote &&
           !auth.hasPendingGuestMerge &&
-          (loc == '/login' || loc == '/register')) {
-        return '/';
+          (loc == Pages.login.url || loc == Pages.register.url)) {
+        return Pages.home.url;
       }
 
-      // Researcher dashboard requires a real account with the researcher role
-      if (loc == '/research' &&
+      if (loc == Pages.research.url &&
           (isAnonymous || auth.currentProfile.role != 'researcher')) {
-        return '/';
+        return Pages.home.url;
       }
 
-      // Group B guard — redirect to code entry for non-allowed routes
       if (!isAnonymous && auth.currentProfile.role == 'group_b_participant') {
-        final allowed = ['/', '/research/code', '/account'];
+        final allowed = [
+          Pages.home.url,
+          Pages.researchCode.url,
+          Pages.account.url,
+        ];
         if (!allowed.contains(loc) &&
             !loc.startsWith('/research/survey') &&
             !loc.startsWith('/research/test')) {
-          return '/research/code';
+          return Pages.researchCode.url;
         }
       }
 
       return null;
     },
     routes: [
-      // ── Shell routes (with bottom nav / rail) ─────────
       ShellRoute(
         builder: (context, state, child) {
           final index = _shellIndex(state.matchedLocation);
-          return ResponsiveScaffold(currentIndex: index, child: child);
+          return MainScaffold(currentIndex: index, child: child);
         },
         routes: [
-          GoRoute(
-            path: '/',
-            builder: (context, state) {
-              final auth = context.watch<AuthController>();
-
-              if (auth.currentProfile.role == 'group_b_participant') {
-                return const EnterResearchCodePage();
-              }
-              return const HomePage();
-            },
-          ),
-          GoRoute(
-            path: '/decks-online',
-            builder: (context, state) => const ViewDecksOnlinePage(),
-          ),
-          GoRoute(
-            path: '/decks-local',
-            builder: (context, state) => const ViewDecksLocalPage(),
-          ),
-          GoRoute(
-            path: '/reviews',
-            builder: (context, state) => const ViewReviewsPage(),
-          ),
-          GoRoute(
-            path: '/account',
-            builder: (context, state) => const ViewAccountPage(),
-          ),
-          GoRoute(
-            path: '/variants',
-            builder: (context, state) => const VariantShowcasePage(),
-          ),
+          for (final page in Pages.shell)
+            GoRoute(
+              path: page.url,
+              builder: (context, state) => page.builder(
+                context,
+                pathParameters: state.pathParameters,
+                queryParameters: state.uri.queryParameters,
+              ),
+            ),
         ],
       ),
-
-      // ── Auth routes (no shell) ────────────────────────
-      GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
-      GoRoute(
-        path: '/register',
-        builder: (context, state) => const RegisterPage(),
-      ),
-
-      // ── Non-shell routes ──────────────────────────────
-      GoRoute(
-        path: '/decks-local/create',
-        builder: (context, state) => const CreateDeckPage(),
-      ),
-      GoRoute(
-        path: '/decks-local/:deckId',
-        builder: (context, state) =>
-            ViewDeckLocalPage(deckId: state.pathParameters['deckId']!),
-      ),
-      GoRoute(
-        path: '/decks-local/:deckId/edit',
-        builder: (context, state) => EditDeckPage(
-          deckId: state.pathParameters['deckId']!,
-          initialTemplateId: state.uri.queryParameters['initialTemplateId'],
+      for (final page in Pages.auth)
+        GoRoute(
+          path: page.url,
+          builder: (context, state) => page.builder(
+            context,
+            pathParameters: state.pathParameters,
+            queryParameters: state.uri.queryParameters,
+          ),
         ),
-      ),
-      // GoRoute(
-      //   path: '/decks-local/:deckId/preview',
-      //   builder: (context, state) =>
-      //       DrillPreviewPage(deckId: state.pathParameters['deckId']!),
-      // ),
-      GoRoute(
-        path: '/drill/:deckId/session',
-        builder: (context, state) => StudySessionPage(
-          deckId: state.pathParameters['deckId'],
-          mode: SessionMode.drill,
+      for (final page in Pages.nonShell)
+        GoRoute(
+          path: page.url,
+          builder: (context, state) => page.builder(
+            context,
+            pathParameters: state.pathParameters,
+            queryParameters: state.uri.queryParameters,
+          ),
         ),
-      ),
-      GoRoute(
-        path: '/drill/:sessionId/result',
-        builder: (context, state) =>
-            ViewDrillResultPage(sessionId: state.pathParameters['sessionId']!),
-      ),
-
-      // Global Review (all due cards across all decks)
-      GoRoute(
-        path: '/review/session',
-        builder: (context, state) =>
-            const StudySessionPage(deckId: null, mode: SessionMode.review),
-      ),
-
-      // Deck-Specific Review
-      GoRoute(
-        path: '/review/:deckId/session',
-        builder: (context, state) => StudySessionPage(
-          deckId: state.pathParameters['deckId'],
-          mode: SessionMode.review,
-        ),
-      ),
-      GoRoute(
-        path: '/research',
-        builder: (context, state) => const ResearcherDashboardPage(),
-      ),
-      GoRoute(
-        path: '/leaderboard',
-        builder: (context, state) => const ViewLeaderboardPage(),
-      ),
-      GoRoute(
-        path: '/research/code',
-        builder: (context, state) => const EnterResearchCodePage(),
-      ),
-      GoRoute(
-        path: '/research/survey/:surveyType',
-        builder: (context, state) => AnswerSurveyPage(
-          surveyType: state.pathParameters['surveyType']!,
-          timePoint: state.uri.queryParameters['timePoint'],
-        ),
-      ),
-      GoRoute(
-        path: '/research/test/:testSet',
-        builder: (context, state) =>
-            VocabularyTestPage(testSet: state.pathParameters['testSet']!),
-      ),
     ],
   );
 }
 
 int _shellIndex(String location) {
-  if (location.startsWith('/decks-online')) return 1;
-  if (location.startsWith('/decks-local')) return 2;
-  if (location.startsWith('/review')) return 3;
-  if (location.startsWith('/account')) return 4;
-  if (location.startsWith('/variants')) return 5;
-  return 0; // home
+  for (var i = 0; i < Pages.shell.length; i++) {
+    final page = Pages.shell[i];
+    if (page.url == Pages.home.url) continue;
+    if (location.startsWith(page.url)) return i;
+  }
+  return 0;
 }

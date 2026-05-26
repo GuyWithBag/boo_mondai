@@ -16,6 +16,7 @@ enum ButtonTone {
   error,
   streak,
   dashed,
+  textGhostSelect,
   text,
   again,
   hard,
@@ -163,6 +164,17 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
       }),
       SurfaceStylePart.text({TextStylePart.color(tokens.textMuted)}),
       SurfaceStylePart.icon({IconThemePart.color(tokens.textMuted)}),
+    },
+    ButtonTone.textGhostSelect: (tokens) => {
+      SurfaceStylePart.decoration({
+        DecorationPart.color(tokens.colorTransparent),
+        DecorationPart.border(
+          Border.all(color: tokens.colorTransparent, width: 0),
+        ),
+        DecorationPart.boxShadow(const []),
+      }),
+      SurfaceStylePart.text({TextStylePart.color(tokens.textSecondary)}),
+      SurfaceStylePart.icon({IconThemePart.color(tokens.textSecondary)}),
     },
     ButtonTone.text: (tokens) => {
       SurfaceStylePart.decoration({
@@ -350,6 +362,28 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
     ButtonDepth.mechanical: (_) => const <StylePart<SurfaceStyle>>{},
   },
   compoundVariants: [
+    CompoundVariantParts<AppTokens, SurfaceStyle>(
+      when: const {ButtonTone.textGhostSelect, ButtonState.selected},
+      build: (tokens) => {
+        SurfaceStylePart.decoration({
+          DecorationPart.color(tokens.primarySoft),
+          DecorationPart.border(
+            Border.all(
+              color: tokens.primaryBright,
+              width: tokens.borderWidthDefault.w,
+            ),
+          ),
+          DecorationPart.boxShadow([
+            BoxShadow(
+              color: tokens.primaryBright,
+              offset: Offset(0, tokens.surfaceShadowOffset.h),
+            ),
+          ]),
+        }),
+        SurfaceStylePart.text({TextStylePart.color(tokens.primary)}),
+        SurfaceStylePart.icon({IconThemePart.color(tokens.primary)}),
+      },
+    ),
     CompoundVariantParts<AppTokens, SurfaceStyle>(
       when: const {ButtonTone.mechanicalFilled, ButtonState.hovered},
       build: (tokens) => {

@@ -1,64 +1,44 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/widgets/responsive_scaffold.dart
-// PURPOSE: Responsive shell — mobile bottom nav, desktop navigation rail
-// PROVIDERS: AuthController
-// HOOKS: none
+// PURPOSE: Generic Responsive shell — mobile bottom nav, desktop navigation rail
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/lib.barrel.dart';
+import 'package:boo_mondai/lib.barrel.dart' show Breakpoints;
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 
-class ResponsiveScaffold extends HookWidget {
-  final int currentIndex;
+class ResponsiveScaffold extends StatelessWidget {
   final Widget child;
+  final Widget sidebar;
+  final PreferredSizeWidget? appbar;
+  final Widget bottomNavbar;
+  final bool hideNavigation;
 
   const ResponsiveScaffold({
     super.key,
-    required this.currentIndex,
     required this.child,
+    required this.sidebar,
+    required this.bottomNavbar,
+    this.appbar,
+    this.hideNavigation = false,
   });
-
-  static const _routes = [
-    '/',
-    '/decks-online',
-    '/decks-local',
-    '/reviews',
-    '/account',
-    '/variants',
-  ];
 
   @override
   Widget build(BuildContext context) {
-    final auth = context.watch<AuthController>();
-    final isCreateDeck = useState(false);
-
-    void onTap(BuildContext context, int index) {
-      if (index == currentIndex) return;
-      final goTo = _routes[index];
-      context.go(goTo);
-      isCreateDeck.value = goTo == '/decks-local';
-    }
-
-    // Group B only sees code entry — no shell nav
-    if (auth.currentProfile.role == 'group_b_participant') {
-      return Scaffold(body: child);
+    // If navigation is hidden (e.g., for your Group B participants),
+    // just return the raw scaffold with the child and optional appbar.
+    if (hideNavigation) {
+      return Scaffold(appBar: appbar, body: child);
     }
 
     return LayoutBuilder(
       builder: (context, constraints) {
+        // Desktop Layout: Sidebar on the left, child on the right
         if (Breakpoints.isDesktop(constraints.maxWidth)) {
           return Scaffold(
+            appBar: appbar,
             body: Row(
               children: [
-                NavigationRail(
-                  extended: constraints.maxWidth > 1200,
-                  selectedIndex: currentIndex,
-                  onDestinationSelected: (i) => onTap(context, i),
-                  destinations: _buildRailDestinations(),
-                ),
+                sidebar,
                 const VerticalDivider(width: 1),
                 Expanded(child: child),
               ],
@@ -66,85 +46,13 @@ class ResponsiveScaffold extends HookWidget {
           );
         }
 
+        // Mobile Layout: Standard bottom navigation
         return Scaffold(
+          appBar: appbar,
           body: child,
-          bottomNavigationBar: NavigationBar(
-            selectedIndex: currentIndex,
-            onDestinationSelected: (i) => onTap(context, i),
-            destinations: _buildNavDestinations(),
-          ),
+          bottomNavigationBar: bottomNavbar,
         );
       },
     );
-  }
-
-  List<NavigationDestination> _buildNavDestinations() {
-    return const [
-      NavigationDestination(
-        icon: Icon(Icons.home_outlined),
-        selectedIcon: Icon(Icons.home),
-        label: 'Home',
-      ),
-      NavigationDestination(
-        icon: Icon(Icons.explore_outlined),
-        selectedIcon: Icon(Icons.explore),
-        label: 'Browse',
-      ),
-      NavigationDestination(
-        icon: Icon(Icons.library_books_outlined),
-        selectedIcon: Icon(Icons.library_books),
-        label: 'My Decks',
-      ),
-      NavigationDestination(
-        icon: Icon(Icons.replay_outlined),
-        selectedIcon: Icon(Icons.replay),
-        label: 'Review',
-      ),
-      NavigationDestination(
-        icon: Icon(Icons.person_outlined),
-        selectedIcon: Icon(Icons.person),
-        label: 'Account',
-      ),
-      NavigationDestination(
-        icon: Icon(Icons.palette_outlined),
-        selectedIcon: Icon(Icons.palette),
-        label: 'Variants',
-      ),
-    ];
-  }
-
-  List<NavigationRailDestination> _buildRailDestinations() {
-    return const [
-      NavigationRailDestination(
-        icon: Icon(Icons.home_outlined),
-        selectedIcon: Icon(Icons.home),
-        label: Text('Home'),
-      ),
-      NavigationRailDestination(
-        icon: Icon(Icons.explore_outlined),
-        selectedIcon: Icon(Icons.explore),
-        label: Text('Browse'),
-      ),
-      NavigationRailDestination(
-        icon: Icon(Icons.library_books_outlined),
-        selectedIcon: Icon(Icons.library_books),
-        label: Text('My Decks'),
-      ),
-      NavigationRailDestination(
-        icon: Icon(Icons.replay_outlined),
-        selectedIcon: Icon(Icons.replay),
-        label: Text('Review'),
-      ),
-      NavigationRailDestination(
-        icon: Icon(Icons.person_outlined),
-        selectedIcon: Icon(Icons.person),
-        label: Text('Account'),
-      ),
-      NavigationRailDestination(
-        icon: Icon(Icons.palette_outlined),
-        selectedIcon: Icon(Icons.palette),
-        label: Text('Variants'),
-      ),
-    ];
   }
 }

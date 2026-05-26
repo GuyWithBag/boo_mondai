@@ -9,7 +9,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         CardTemplate,
         Deck,
         DeckCardFormState,
-        StudyCard,
         FlashcardTemplate,
         IdentificationTemplate,
         MultipleChoiceTemplate,
@@ -23,6 +22,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         uuid,
         CardType,
         QuestionType,
+        StudyCardService,
         MultipleChoiceOptionData,
         defaultMultipleChoiceOptions,
         MatchPairData,
@@ -158,70 +158,10 @@ class EditDeckController extends Controller {
 
       await LocalDB.deck.upsert(updatedDeck);
       await LocalDB.cardTemplate.upsertMany(_templates);
-
-      // ── REVIEW CARD GENERATION ───────────────────────────
-
-      // 1. Fetch review cards that already exist for this deck
-      final existingStudyCards = LocalDB.studyCard.getByDeckId(_deck!.id);
-
-      // 2. Build a lookup: templateId → Set of isReversed values already stored
-      final existingDirections = <String, Set<bool>>{};
-      for (final rc in existingStudyCards) {
-        existingDirections
-            .putIfAbsent(rc.templateId, () => {})
-            .add(rc.isReversed);
-      }
-
-      // 3. Determine which StudyCards are missing and create them
-      final newStudyCards = <StudyCard>[];
-      for (final template in _templates) {
-        final existing = existingDirections[template.id] ?? {};
-
-        if (template is FlashcardTemplate) {
-          // Flashcards support reversal — generate based on cardType
-          final needsNormal = template.cardType != CardType.reversed;
-          final needsReversed = template.cardType != CardType.normal;
-
-          if (needsNormal && !existing.contains(false)) {
-            newStudyCards.add(
-              StudyCard(
-                id: uuid.v7(),
-                deckId: template.deckId,
-                templateId: template.id,
-                isReversed: false,
-              ),
-            );
-          }
-          if (needsReversed && !existing.contains(true)) {
-            newStudyCards.add(
-              StudyCard(
-                id: uuid.v7(),
-                deckId: template.deckId,
-                templateId: template.id,
-                isReversed: true,
-              ),
-            );
-          }
-        } else {
-          // All other template types: exactly one non-reversed StudyCard
-          if (!existing.contains(false)) {
-            newStudyCards.add(
-              StudyCard(
-                id: uuid.v7(),
-                deckId: template.deckId,
-                templateId: template.id,
-                isReversed: false,
-              ),
-            );
-          }
-        }
-      }
-
-      // 4. Save only the newly generated ones
-      if (newStudyCards.isNotEmpty) {
-        await LocalDB.studyCard.upsertMany(newStudyCards);
-      }
-      // ─────────────────────────────────────────────────────
+      await StudyCardService.syncDeckStudyCards(
+        deckId: updatedDeck.id,
+        templates: _templates,
+      );
 
       _deck = updatedDeck;
       _isDirty = false;

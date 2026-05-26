@@ -244,6 +244,26 @@ erDiagram
         uuid id PK
         uuid review_id FK
         uuid edited_by FK
+        int old_vote_value_at_creation
+        int new_vote_value_at_creation
+        text old_title
+        text new_title
+        text old_body
+        text new_body
+    }
+
+    deck_vote_review_comments {
+        uuid id PK
+        uuid review_id FK
+        uuid user_id FK
+        uuid parent_comment_id FK
+        text body
+    }
+
+    deck_vote_review_comment_edit_logs {
+        uuid id PK
+        uuid comment_id FK
+        uuid edited_by FK
         text old_body
         text new_body
     }
@@ -290,6 +310,9 @@ erDiagram
     profiles ||--o{ deck_vote_reviews : "writes"
     decks ||--o{ deck_vote_reviews : "receives"
     deck_vote_reviews ||--o{ deck_vote_review_edit_logs : "keeps edit history"
+    deck_vote_reviews ||--o{ deck_vote_review_comments : "has discussion"
+    deck_vote_review_comments ||--o{ deck_vote_review_comments : "threads replies"
+    deck_vote_review_comments ||--o{ deck_vote_review_comment_edit_logs : "keeps edit history"
 
     profiles ||--o{ deck_comments : "comments"
     decks ||--o{ deck_comments : "receives"

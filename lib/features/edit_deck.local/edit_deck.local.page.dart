@@ -211,65 +211,68 @@ class EditDeckPage extends HookWidget {
           }
 
           return Scaffold(
-            appBar: EditDeckAppbar(
-              tokens: tokens,
-              titleController: titleController,
-              onSave: handleSaveDeck,
-              isSaving: controller.isLoading,
-            ),
-            floatingActionButton: LayoutBuilder(
-              builder: (ctx, constraints) {
-                if (constraints.maxWidth >= 960) return const SizedBox.shrink();
-                return FloatingActionButton(
-                  onPressed: addTemplate,
-                  tooltip: 'Add new card',
-                  child: const Icon(Icons.add),
-                );
-              },
-            ),
+            floatingActionButton: MediaQuery.of(context).size.width >= 960
+                ? const SizedBox.shrink()
+                : FloatingActionButton(
+                    onPressed: addTemplate,
+                    tooltip: 'Add new card',
+                    child: const Icon(Icons.add),
+                  ),
             body: Form(
               key: formKey,
-              child: LayoutBuilder(
-                builder: (ctx, constraints) {
-                  final showSidebar = constraints.maxWidth >= 960;
-                  return Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (showSidebar)
-                        EditDeckSidebar(
-                          templates: controller.templates,
-                          activeTemplateId: controller.activeTemplateId,
-                          onAdd: addTemplate,
-                          onTemplateSelected: selectTemplate,
-                        ),
-                      Expanded(
-                        child: !hasActiveTemplate
-                            ? Center(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      'No card selected',
-                                      style: TextStyle(
-                                        color: tokens.textPrimary,
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.w900,
+              child: CustomScrollView(
+                slivers: [
+                  EditDeckAppbar(
+                    titleController: titleController,
+                    onSave: handleSaveDeck,
+                    isSaving: controller.isLoading,
+                  ),
+                  SliverFillRemaining(
+                    hasScrollBody: true,
+                    child: LayoutBuilder(
+                      builder: (ctx, constraints) {
+                        final showSidebar = constraints.maxWidth >= 960;
+                        return Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (showSidebar)
+                              EditDeckSidebar(
+                                templates: controller.templates,
+                                activeTemplateId: controller.activeTemplateId,
+                                onAdd: addTemplate,
+                                onTemplateSelected: selectTemplate,
+                              ),
+                            Expanded(
+                              child: !hasActiveTemplate
+                                  ? Center(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            'No card selected',
+                                            style: TextStyle(
+                                              color: tokens.textPrimary,
+                                              fontSize: 24,
+                                              fontWeight: FontWeight.w900,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 16),
+                                          Button(
+                                            leading: const Icon(Icons.add),
+                                            onPressed: addTemplate,
+                                            child: const Text('Add Card'),
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                    const SizedBox(height: 16),
-                                    Button(
-                                      leading: const Icon(Icons.add),
-                                      onPressed: addTemplate,
-                                      child: const Text('Add Card'),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            : buildEditor(),
-                      ),
-                    ],
-                  );
-                },
+                                    )
+                                  : buildEditor(),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
           );
