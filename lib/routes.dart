@@ -5,12 +5,32 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/exceptions/route_exception.dart';
-import 'package:boo_mondai/models/models.barrel.dart';
+import 'package:boo_mondai/lib.barrel.dart'
+    show
+        ResponsiveScaffold,
+        AuthController,
+        ErrorPage,
+        RouteException,
+        ViewDecksOnlinePage,
+        EnterResearchCodePage,
+        HomePage,
+        ViewDecksLocalPage,
+        ViewReviewsPage,
+        ViewAccountPage,
+        VariantShowcasePage,
+        LoginPage,
+        RegisterPage,
+        CreateDeckPage,
+        StudySessionPage,
+        ResearcherDashboardPage,
+        ViewLeaderboardPage,
+        ViewDeckLocalPage,
+        EditDeckPage,
+        SessionMode,
+        ViewDrillResultPage,
+        AnswerSurveyPage,
+        VocabularyTestPage;
 import 'package:go_router/go_router.dart';
-import 'package:boo_mondai/pages/pages.barrel.dart';
-import 'package:boo_mondai/controllers/controllers.barrel.dart';
-import 'package:boo_mondai/widgets/widgets.barrel.dart';
 import 'package:provider/provider.dart';
 
 GoRouter createRouter(AuthController authController) {

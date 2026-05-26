@@ -1,0 +1,38 @@
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// PATH: lib/models/survey_response.dart
+// PURPOSE: Generic survey response wrapping all survey types
+// PROVIDERS: none
+// HOOKS: none
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+import 'package:boo_mondai/features/profile/models/cached_profile.dart';
+import 'package:boo_mondai/features/research/models/research_profile.dto.dart';
+
+import 'package:dart_mappable/dart_mappable.dart';
+
+part 'survey_response.dto.mapper.dart';
+
+@MappableClass()
+class SurveyResponse with SurveyResponseMappable {
+  final String id;
+  final String userId;
+  final String surveyType;
+  final String? timePoint;
+  final Map<String, dynamic> responses;
+  final double? computedScore;
+  final DateTime submittedAt;
+  final CachedProfile? userProfile;
+  final ResearchProfile? researchProfile;
+
+  const SurveyResponse({
+    required this.id,
+    required this.userId,
+    required this.surveyType,
+    this.timePoint,
+    required this.responses,
+    this.computedScore,
+    required this.submittedAt,
+    this.userProfile,
+    this.researchProfile,
+  });
+}

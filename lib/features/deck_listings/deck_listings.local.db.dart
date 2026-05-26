@@ -1,0 +1,17 @@
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// PATH: lib/database/local/deck_listing_local.db.dart
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+import 'package:boo_mondai/lib.barrel.dart' show HiveLocalDB, DeckListing;
+
+class DeckListingsLocalDB extends HiveLocalDB<DeckListing> {
+  @override
+  String get boxName => 'deck_listings';
+
+  @override
+  Map<String, Object?> primaryKeyFromItem(DeckListing item) => {
+    'deck_id': item.deckId,
+  };
+
+  // ── All standard CRUD (put, getById, delete, etc.) is inherited! ──
+}

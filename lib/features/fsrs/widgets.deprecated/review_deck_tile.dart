@@ -1,0 +1,215 @@
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// PATH: lib/pages/review_dashboard/review_deck_tile.dart
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+import 'package:boo_mondai/lib.barrel.dart'
+    show DeckReviewStats, AppSpacing, AppColors;
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+class ReviewDeckTile extends StatelessWidget {
+  const ReviewDeckTile({super.key, this.stats, this.onPressed});
+
+  final DeckReviewStats? stats;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    void onTap() {
+      if (stats == null) return;
+      stats!.totalDue > 0
+          ? context.push('/review/${stats!.deckId}/session')
+          : null;
+    }
+
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap, // Disable if nothing is due
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ── Header: Title & Total Due ─────────────
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      stats?.deckTitle ?? 'null',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  if ((stats?.totalDue ?? -1) > 0)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        '${stats?.totalDue} Due',
+                        style: TextStyle(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onPrimaryContainer,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    )
+                  else
+                    const Icon(
+                      Icons.check_circle,
+                      color: AppColors.correct,
+                      size: 20,
+                    ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.md),
+
+              // ── Middle: Classic Anki Due Counts ──────────
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _StatColumn(
+                    label: 'New',
+                    count: stats?.due.dueNew ?? -1, // Updated accessor
+                    color: Colors.blue,
+                  ),
+                  _StatColumn(
+                    label: 'Learn',
+                    count: stats?.due.dueLearning ?? -1, // Updated accessor
+                    color: AppColors.incorrect,
+                  ),
+                  _StatColumn(
+                    label: 'Review',
+                    count: stats?.due.dueReview ?? -1, // Updated accessor
+                    color: AppColors.correct,
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: AppSpacing.md),
+              const Divider(height: 1),
+              const SizedBox(height: AppSpacing.sm),
+
+              // ── Bottom: Historical FSRS Ratings ──────────
+              Text(
+                'Historical Performance',
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _HistoryBadge(
+                    label: 'Again',
+                    count: stats?.historical.again ?? -1, // Updated accessor
+                    color: AppColors.incorrect,
+                  ),
+                  _HistoryBadge(
+                    label: 'Hard',
+                    count: stats?.historical.hard ?? -1, // Updated accessor
+                    color: AppColors.hard,
+                  ),
+                  _HistoryBadge(
+                    label: 'Good',
+                    count: stats?.historical.good ?? -1, // Updated accessor
+                    color: AppColors.correct,
+                  ),
+                  _HistoryBadge(
+                    label: 'Easy',
+                    count: stats?.historical.easy ?? -1, // Updated accessor
+                    color: Colors.blue,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Helper Widgets for the Tile ──────────────────────────────
+
+class _StatColumn extends StatelessWidget {
+  final String label;
+  final int count;
+  final Color color;
+
+  const _StatColumn({
+    required this.label,
+    required this.count,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          count.toString(),
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: count > 0
+                ? color
+                : AppColors.textSecondary.withValues(alpha: 0.5),
+          ),
+        ),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+        ),
+      ],
+    );
+  }
+}
+
+class _HistoryBadge extends StatelessWidget {
+  final String label;
+  final int count;
+  final Color color;
+
+  const _HistoryBadge({
+    required this.label,
+    required this.count,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          Icons.circle,
+          size: 8,
+          color: count > 0
+              ? color
+              : AppColors.textSecondary.withValues(alpha: 0.3),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          '$label: $count',
+          style: TextStyle(
+            fontSize: 12,
+            color: count > 0
+                ? AppColors.textPrimary
+                : AppColors.textSecondary.withValues(alpha: 0.5),
+          ),
+        ),
+      ],
+    );
+  }
+}

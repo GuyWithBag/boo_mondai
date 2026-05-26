@@ -9,22 +9,35 @@ import 'dart:developer' as developer;
 
 import 'package:app_links/app_links.dart';
 import 'package:barrel_annotation/barrel_annotation.dart';
-import 'package:boo_mondai/database/database.barrel.dart';
-import 'package:boo_mondai/hive/hive_registrar.g.dart';
+import 'package:boo_mondai/core/hive/hive_registrar.g.dart' show HiveRegistrar;
+import 'package:boo_mondai/env.dart' show Env;
+import 'package:boo_mondai/lib.barrel.dart'
+    show
+        RemoteDB,
+        LocalDB,
+        Services,
+        NotificationService,
+        AuthController,
+        DrillSessionController,
+        ViewReviewsController,
+        ReviewSessionController,
+        ViewDecksLocalController,
+        ViewDecksOnlineController,
+        ViewLeaderboardController,
+        StreakController,
+        ResearchController,
+        BooMondaiApp;
 import 'package:flutter/material.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:boo_mondai/app.dart';
-import 'package:boo_mondai/controllers/controllers.barrel.dart';
-import 'package:boo_mondai/services/services.barrel.dart';
-import 'package:boo_mondai/shared/shared.barrel.dart';
 
 @BarrelConfig(
   exclude: [
-    'lib/hive/hive.barrel.dart',
-    'lib/models/*.mapper.dart',
-    'lib/models/dtos/*.mapper.dart',
+    'lib/core/hive/hive.barrel.dart',
+    'lib/**/**/*.mapper.dart',
+    'lib/**/*.mapper.dart',
+    'lib/*.mapper.dart',
   ],
 )
 Future<void> main() async {
@@ -33,8 +46,6 @@ Future<void> main() async {
   // ── Hive ────────────────────────────────────────────
   await Hive.initFlutter('boo_mondai');
   Hive.registerAdapters();
-  // final hiveService = HiveService();
-  // await hiveService.init();
 
   // ── Supabase ────────────────────────────────────────
   await Supabase.initialize(url: Env.supabaseUrl, anonKey: Env.supabaseAnonKey);
