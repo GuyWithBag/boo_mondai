@@ -14,8 +14,8 @@ class CreateDeckTile extends StatelessWidget {
       width: 300,
       child: AspectRatio(
         aspectRatio: tokens.cardAspectRatio,
-        child: TactileButton.icon(
-          tone: TactileTone.dashed,
+        child: Button.icon(
+          tone: ButtonTone.dashed,
           icon: Icons.add,
           onPressed: onPressed,
         ),

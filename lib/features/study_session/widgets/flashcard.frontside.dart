@@ -7,8 +7,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextSize,
         TextWeight,
         TextTone,
-        TactileTone,
-        TactileButton,
+        ButtonTone,
+        Button,
         PhysicalCardSide;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -48,8 +48,8 @@ class FlashcardFrontSide extends StatelessWidget {
             ),
             Align(
               alignment: Alignment.bottomCenter,
-              child: TactileButton(
-                tone: TactileTone.text,
+              child: Button(
+                tone: ButtonTone.text,
                 leading: Icon(Icons.touch_app),
                 onPressed: onReveal,
                 child: const Text('Tap to reveal'),

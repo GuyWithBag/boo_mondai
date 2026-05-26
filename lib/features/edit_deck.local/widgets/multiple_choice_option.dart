@@ -4,14 +4,14 @@ import 'package:boo_mondai/lib.barrel.dart'
         MultipleChoiceOptionTone,
         AppTokens,
         multipleChoiceOptionStyle,
-        TactileTone,
+        ButtonTone,
         TextTone,
         appTextStyle,
         TextSize,
         TextWeight,
-        TactileDepth,
+        ButtonDepth,
         TactileRadioCircle,
-        TactileButton;
+        Button;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -67,7 +67,7 @@ class EditMultipleChoiceOption extends HookWidget {
     ]);
     final effectiveTone =
         resolvedStyle.buttonTone ??
-        (correct ? TactileTone.success : TactileTone.ghost);
+        (correct ? ButtonTone.success : ButtonTone.ghost);
     final effectiveSelected = resolvedStyle.selected ?? false;
     final effectiveOpacity = resolvedStyle.opacity ?? 1;
     final effectiveTextTone = resolvedStyle.textTone ?? TextTone.primary;
@@ -100,9 +100,9 @@ class EditMultipleChoiceOption extends HookWidget {
         ignoring: onPressed == null && !isEditable,
         child: Opacity(
           opacity: effectiveOpacity,
-          child: TactileButton(
+          child: Button(
             tone: effectiveTone,
-            depth: TactileDepth.flat,
+            depth: ButtonDepth.flat,
             selected: effectiveSelected,
             mainAxisAlignment: MainAxisAlignment.start,
             onPressed: effectiveOnPressed,

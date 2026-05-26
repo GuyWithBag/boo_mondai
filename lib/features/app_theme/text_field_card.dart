@@ -6,14 +6,13 @@ import 'package:boo_mondai/lib.barrel.dart'
         appTextStyle,
         TextWeight,
         TextTone,
-        AppTextFieldSize,
+        TextFieldSize,
         AppTextFieldFrame,
-        AppTextFieldTone;
+        AppTextFieldTone,
+        Button,
+        VariantTextField;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
-
-import 'tactile_button.dart';
-import 'variant_text_field.dart';
 
 class TextFieldCard extends StatelessWidget {
   const TextFieldCard({
@@ -61,7 +60,7 @@ class TextFieldCard extends StatelessWidget {
                 textAlignVertical: TextAlignVertical.top,
                 placeholder: placeholder,
                 variants: const [
-                  AppTextFieldSize.bodyLarge,
+                  TextFieldSize.bodyLarge,
                   AppTextFieldFrame.none,
                   AppTextFieldTone.neutral,
                 ],
@@ -75,12 +74,9 @@ class TextFieldCard extends StatelessWidget {
             ),
             Row(
               children: [
-                TactileButton.icon(
-                  onPressed: () {},
-                  icon: Icons.image_outlined,
-                ),
+                Button.icon(onPressed: () {}, icon: Icons.image_outlined),
                 SizedBox(width: tokens.spacePanelGapSm),
-                TactileButton.icon(onPressed: () {}, icon: Icons.mic),
+                Button.icon(onPressed: () {}, icon: Icons.mic),
               ],
             ),
           ],

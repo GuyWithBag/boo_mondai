@@ -3,8 +3,8 @@ import 'package:boo_mondai/lib.barrel.dart'
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-class AppModal extends StatelessWidget {
-  const AppModal({
+class Modal extends StatelessWidget {
+  const Modal({
     super.key,
     this.leading,
     required this.child,

@@ -1,5 +1,5 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show AuthController, showAppChoiceDialog, TactileTone, AppDialogAction;
+    show AuthController, showChoiceModal, ButtonTone, ModalAction;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -9,7 +9,7 @@ Future<void> showGuestMergeDialog({
   required BuildContext context,
   required AuthController auth,
 }) async {
-  final choice = await showAppChoiceDialog<GuestMergeChoice>(
+  final choice = await showChoiceModal<GuestMergeChoice>(
     context: context,
     barrierDismissible: false,
     title: 'You have local data',
@@ -17,15 +17,15 @@ Future<void> showGuestMergeDialog({
         'Merge your decks and study progress into this account, or discard the local data and load your account data instead.',
     leading: const Icon(Icons.sync_alt),
     actions: const [
-      AppDialogAction<GuestMergeChoice>(
+      ModalAction<GuestMergeChoice>(
         value: GuestMergeChoice.discard,
         label: 'Discard local data',
-        tone: TactileTone.error,
+        tone: ButtonTone.error,
       ),
-      AppDialogAction<GuestMergeChoice>(
+      ModalAction<GuestMergeChoice>(
         value: GuestMergeChoice.merge,
         label: 'Merge into account',
-        tone: TactileTone.filled,
+        tone: ButtonTone.filled,
       ),
     ],
   );

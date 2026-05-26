@@ -8,9 +8,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         IdentificationTemplate,
         WordScrambleTemplate,
         AppTokens,
-        TactileButton,
+        Button,
         PanelHeader,
-        TactileTone;
+        ButtonTone;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -75,14 +75,14 @@ class EditDeckSidebar extends StatelessWidget {
         children: [
           PanelHeader(
             title: 'Cards (${templates.length})',
-            trailing: TactileButton.icon(onPressed: onAdd, icon: Icons.add),
+            trailing: Button.icon(onPressed: onAdd, icon: Icons.add),
           ),
           Expanded(
             child: ListView(
               padding: EdgeInsets.all(16.w),
               children: [
                 for (final template in templates) ...[
-                  TactileButton(
+                  Button(
                     selected: template.id == activeTemplateId,
                     onPressed: template.id == activeTemplateId
                         ? null
@@ -90,8 +90,8 @@ class EditDeckSidebar extends StatelessWidget {
                     leading: Icon(_iconFor(template)),
                     mainAxisAlignment: MainAxisAlignment.start,
                     tone: template.id == activeTemplateId
-                        ? TactileTone.ghost
-                        : TactileTone.text,
+                        ? ButtonTone.ghost
+                        : ButtonTone.text,
                     child: Text(
                       _labelFor(template),
                       maxLines: 2,

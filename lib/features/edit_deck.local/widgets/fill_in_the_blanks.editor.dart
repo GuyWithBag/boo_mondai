@@ -9,8 +9,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextWeight,
         TextTone,
         TextFieldCard,
-        TactileButton,
-        TactileSize;
+        Button,
+        ButtonSize;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -67,7 +67,7 @@ class FillInTheBlanksEditor extends HookWidget {
           const SizedBox(height: 14),
           Align(
             alignment: Alignment.centerRight,
-            child: TactileButton(
+            child: Button(
               leading: const Icon(Icons.cleaning_services),
               onPressed: editor.canCreateBlank
                   ? editor.createBlankFromSelection
@@ -123,8 +123,8 @@ class FillInTheBlanksEditor extends HookWidget {
                 style: surfaceStyle.resolve(tokens, const [SurfaceTone.muted]),
                 child: Row(
                   children: [
-                    TactileButton(
-                      size: TactileSize.lg,
+                    Button(
+                      size: ButtonSize.lg,
                       child: Text('${entry.key + 1}'),
                     ),
                     const SizedBox(width: 20),

@@ -8,18 +8,18 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AuthController,
-        TactileBackButton,
+        BackButton,
         showGuestMergeDialog,
         AppSpacing,
         ErrorText,
-        TactileTone,
-        TactileButton,
-        TactileDepth,
-        AppTextFieldSize,
+        ButtonTone,
+        Button,
+        ButtonDepth,
+        TextFieldSize,
         AppTextFieldFrame,
         AppTextFieldTone,
         VariantTextField;
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide BackButton;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -77,7 +77,7 @@ class RegisterPage extends HookWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(leading: const TactileBackButton(), leadingWidth: 100),
+      appBar: AppBar(leading: const BackButton(), leadingWidth: 100),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -130,8 +130,8 @@ class RegisterPage extends HookWidget {
                     ErrorText(auth.error),
                   ],
                   const SizedBox(height: AppSpacing.lg),
-                  TactileButton(
-                    tone: TactileTone.filled,
+                  Button(
+                    tone: ButtonTone.filled,
                     onPressed: auth.isLoading ? null : signUp,
                     child: auth.isLoading
                         ? const SizedBox(
@@ -142,9 +142,9 @@ class RegisterPage extends HookWidget {
                         : const Text('Sign Up'),
                   ),
                   const SizedBox(height: AppSpacing.md),
-                  TactileButton(
-                    tone: TactileTone.text,
-                    depth: TactileDepth.flat,
+                  Button(
+                    tone: ButtonTone.text,
+                    depth: ButtonDepth.flat,
                     onPressed: () => context.push('/login'),
                     child: const Text('Already have an account? Sign In'),
                   ),
@@ -197,7 +197,7 @@ class _RegisterField extends StatelessWidget {
           obscureText: obscureText,
           onSubmitted: onSubmitted,
           variants: const [
-            AppTextFieldSize.normal,
+            TextFieldSize.normal,
             AppTextFieldFrame.outline,
             AppTextFieldTone.neutral,
           ],

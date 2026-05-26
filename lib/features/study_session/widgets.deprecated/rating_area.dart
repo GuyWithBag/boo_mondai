@@ -12,8 +12,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         StudySessionCardStageController,
         AppTokens,
         StudySessionService,
-        TactileButton,
-        TactileTone,
+        Button,
+        ButtonTone,
         appTextStyle,
         TextSize,
         TextWeight,
@@ -118,19 +118,19 @@ class RatingArea extends HookWidget {
               child: submissionStyle == SubmissionStyle.none
                   ? const SizedBox(height: 54)
                   : submissionStyle == SubmissionStyle.showAnswer
-                  ? TactileButton(
+                  ? Button(
                       onPressed: interactionsController.canReveal
                           ? onSubmit
                           : null,
                       leading: const Icon(Icons.visibility_outlined),
                       child: const Text('Show Answer'),
                     )
-                  : TactileButton(
+                  : Button(
                       onPressed: interactionsController.canReveal
                           ? onSubmit
                           : null,
                       leading: const Icon(Icons.check),
-                      tone: TactileTone.filled,
+                      tone: ButtonTone.filled,
                       child: const Text('Submit'),
                     ),
             ),
@@ -155,10 +155,10 @@ class RatingArea extends HookWidget {
             },
             child: SizedBox(
               width: double.infinity,
-              child: TactileButton(
+              child: Button(
                 onPressed: onContinue,
                 leading: const Icon(Icons.arrow_forward),
-                tone: TactileTone.filled,
+                tone: ButtonTone.filled,
                 child: const Text('Continue'),
               ),
             ),

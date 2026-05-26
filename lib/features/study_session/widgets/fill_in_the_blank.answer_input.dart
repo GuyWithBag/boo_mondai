@@ -3,7 +3,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         AppTextFieldTone,
         AppTextFieldState,
-        AppTextFieldSize,
+        TextFieldSize,
         AppTextFieldFrame,
         VariantTextField,
         appTextStyle,
@@ -49,7 +49,7 @@ class FillInTheBlankAnswerInput extends StatelessWidget {
             enabled: !revealed,
             onChanged: onChanged,
             variants: [
-              AppTextFieldSize.labelLarge,
+              TextFieldSize.labelLarge,
               AppTextFieldFrame.underline,
               tone,
               state,

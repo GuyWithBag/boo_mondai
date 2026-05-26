@@ -7,7 +7,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         LocalDB,
         AppTokens,
         ViewDecksLocalController,
-        AppDialogAction,
+        ModalAction,
         Deck,
         CachedProfile,
         Profile,
@@ -16,16 +16,16 @@ import 'package:boo_mondai/lib.barrel.dart'
         MetaLabel,
         VisibilityState,
         ErrorState,
-        TactileTone,
-        showAppChoiceDialog,
-        TactileButton,
+        ButtonTone,
+        showChoiceModal,
+        Button,
         surfaceStyle,
         SurfaceShape,
         SurfacePadding,
         DrillService,
         SurfaceTone,
         appChipStyle,
-        AppChipTone,
+        ChipTone,
         DeckTile,
         AuthorAvatarRow,
         appTextStyle,
@@ -113,7 +113,7 @@ class ViewDeckLocalSheet extends HookWidget {
       }
 
       final actionLabel = isPublished ? 'Publish' : 'Unpublish';
-      final confirmed = await showAppChoiceDialog<bool>(
+      final confirmed = await showChoiceModal<bool>(
         context: context,
         title: '$actionLabel deck?',
         body: isPublished
@@ -125,15 +125,15 @@ class ViewDeckLocalSheet extends HookWidget {
               : Icons.visibility_off_outlined,
         ),
         actions: [
-          const AppDialogAction<bool>(
+          const ModalAction<bool>(
             value: false,
             label: 'Cancel',
-            tone: TactileTone.ghost,
+            tone: ButtonTone.ghost,
           ),
-          AppDialogAction<bool>(
+          ModalAction<bool>(
             value: true,
             label: actionLabel,
-            tone: isPublished ? TactileTone.success : TactileTone.error,
+            tone: isPublished ? ButtonTone.success : ButtonTone.error,
           ),
         ],
       );
@@ -194,16 +194,16 @@ class ViewDeckLocalSheet extends HookWidget {
           bottomNavigationBar: _BottomNavBar(deckId: deckId),
           appBar: AppBar(
             actions: [
-              TactileButton.icon(
+              Button.icon(
                 icon: Icons.edit,
                 onPressed: deck.isEditable
                     ? () => context.push('/decks-local/$deckId/edit')
                     : null,
               ),
               SizedBox(width: 10),
-              TactileButton.icon(
+              Button.icon(
                 icon: Icons.delete,
-                tone: TactileTone.error,
+                tone: ButtonTone.error,
                 onPressed: () {
                   if (context.canPop()) {
                     context.pop();
@@ -220,7 +220,7 @@ class ViewDeckLocalSheet extends HookWidget {
                 horizontal: horizontalPadding,
                 vertical: verticalPadding + 4,
               ),
-              child: TactileButton.icon(
+              child: Button.icon(
                 icon: Icons.arrow_back,
                 onPressed: () {
                   if (context.canPop()) {
@@ -307,10 +307,7 @@ class _BottomNavBar extends StatelessWidget {
         spacing: 10,
         children: [
           Expanded(
-            child: TactileButton(
-              tone: TactileTone.ghost,
-              child: Text("View Cards"),
-            ),
+            child: Button(tone: ButtonTone.ghost, child: Text("View Cards")),
           ),
           Expanded(
             child: _StartDrilButton(
@@ -345,7 +342,7 @@ class _SheetHero extends StatelessWidget {
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
     final publishChipStyle = appChipStyle.resolve(tokens, [
-      deck.isPublished ? AppChipTone.filled : AppChipTone.hard,
+      deck.isPublished ? ChipTone.filled : ChipTone.hard,
     ]);
     final author =
         LocalDB.cachedProfile.selectByPk({'id': deck.userId}) ??
@@ -509,8 +506,8 @@ class _StartDrilButton extends StatelessWidget {
         ? 'Start drill ($eligibleCount)'
         : 'Completed';
 
-    return TactileButton(
-      tone: TactileTone.filled,
+    return Button(
+      tone: ButtonTone.filled,
       leading: const Icon(Icons.play_arrow_rounded),
       onPressed: onPressed,
       child: Text(drillLabel),

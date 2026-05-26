@@ -17,8 +17,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextWeight,
         TextTone,
         AuthorAvatarRow,
-        TactileTone,
-        TactileButton,
+        ButtonTone,
+        Button,
         SurfaceTone,
         SectionEyebrowTone,
         SectionEyebrow;
@@ -299,8 +299,8 @@ class _StoreSummary extends StatelessWidget {
             SizedBox(height: tokens.spacePanelGapLg),
             SizedBox(
               width: double.infinity,
-              child: TactileButton(
-                tone: TactileTone.filled,
+              child: Button(
+                tone: ButtonTone.filled,
                 leading: isDownloading
                     ? const LoadingIndicator()
                     : const Icon(Icons.download_rounded),

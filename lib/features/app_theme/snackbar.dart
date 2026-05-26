@@ -3,8 +3,8 @@ import 'package:boo_mondai/lib.barrel.dart'
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-class AppSnackbar extends StatelessWidget {
-  const AppSnackbar({
+class Snackbar extends StatelessWidget {
+  const Snackbar({
     super.key,
     required this.message,
     this.leading,
@@ -58,7 +58,7 @@ void showAppSnackbar({
 
   messenger.showSnackBar(
     SnackBar(
-      content: AppSnackbar(message: message, leading: leading, tone: tone),
+      content: Snackbar(message: message, leading: leading, tone: tone),
       backgroundColor: Colors.transparent,
       elevation: 0,
       behavior: SnackBarBehavior.floating,

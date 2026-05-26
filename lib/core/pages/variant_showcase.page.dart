@@ -1,11 +1,12 @@
-import 'package:boo_mondai/features/app_theme/tactile_button.variant.dart'
+import 'package:boo_mondai/lib.barrel.dart'
     show
-        TactileTone,
-        tactileButtonStyle,
-        TactileSize,
-        TactileState,
-        TactileDepth;
-import 'package:boo_mondai/lib.barrel.dart' show AppTokens, AppSpacing;
+        AppTokens,
+        AppSpacing,
+        ButtonTone,
+        buttonStyle,
+        ButtonSize,
+        ButtonState,
+        ButtonDepth;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -21,25 +22,25 @@ class VariantShowcasePage extends StatelessWidget {
         children: [
           VariantShowcaseGrid<AppTokens>(
             title: const Text('Button tones'),
-            style: tactileButtonStyle,
+            style: buttonStyle,
             previewText: 'Action',
             axes: const [
               VariantShowcaseAxis(
                 label: 'Tone',
                 variants: [
-                  TactileTone.filled,
-                  TactileTone.ghost,
-                  TactileTone.success,
-                  TactileTone.error,
-                  TactileTone.streak,
-                  TactileTone.dashed,
-                  TactileTone.text,
-                  TactileTone.again,
-                  TactileTone.hard,
-                  TactileTone.good,
-                  TactileTone.easy,
-                  TactileTone.mechanicalFilled,
-                  TactileTone.mechanicalGhost,
+                  ButtonTone.filled,
+                  ButtonTone.ghost,
+                  ButtonTone.success,
+                  ButtonTone.error,
+                  ButtonTone.streak,
+                  ButtonTone.dashed,
+                  ButtonTone.text,
+                  ButtonTone.again,
+                  ButtonTone.hard,
+                  ButtonTone.good,
+                  ButtonTone.easy,
+                  ButtonTone.mechanicalFilled,
+                  ButtonTone.mechanicalGhost,
                 ],
               ),
             ],
@@ -47,18 +48,18 @@ class VariantShowcasePage extends StatelessWidget {
           const SizedBox(height: AppSpacing.xl),
           VariantShowcaseGrid<AppTokens>(
             title: const Text('Button sizes'),
-            style: tactileButtonStyle,
+            style: buttonStyle,
             previewText: 'Action',
             axes: const [
               VariantShowcaseAxis(
                 label: 'Size',
                 variants: [
-                  TactileSize.sm,
-                  TactileSize.md,
-                  TactileSize.lg,
-                  TactileSize.icon,
-                  TactileSize.fab,
-                  TactileSize.extendedFab,
+                  ButtonSize.sm,
+                  ButtonSize.md,
+                  ButtonSize.lg,
+                  ButtonSize.icon,
+                  ButtonSize.fab,
+                  ButtonSize.extendedFab,
                 ],
               ),
             ],
@@ -66,17 +67,17 @@ class VariantShowcasePage extends StatelessWidget {
           const SizedBox(height: AppSpacing.xl),
           VariantShowcaseGrid<AppTokens>(
             title: const Text('Button states'),
-            style: tactileButtonStyle,
+            style: buttonStyle,
             previewText: 'Action',
             axes: const [
               VariantShowcaseAxis(
                 label: 'State',
                 variants: [
-                  TactileState.idle,
-                  TactileState.hovered,
-                  TactileState.selected,
-                  TactileState.disabled,
-                  TactileState.pressed,
+                  ButtonState.idle,
+                  ButtonState.hovered,
+                  ButtonState.selected,
+                  ButtonState.disabled,
+                  ButtonState.pressed,
                 ],
               ),
             ],
@@ -84,23 +85,23 @@ class VariantShowcasePage extends StatelessWidget {
           const SizedBox(height: AppSpacing.xl),
           VariantShowcaseGrid<AppTokens>(
             title: const Text('Mechanical FAB variants'),
-            style: tactileButtonStyle,
+            style: buttonStyle,
             previewText: 'Action',
             axes: const [
               VariantShowcaseAxis(
                 label: 'Tone',
                 variants: [
-                  TactileTone.mechanicalFilled,
-                  TactileTone.mechanicalGhost,
+                  ButtonTone.mechanicalFilled,
+                  ButtonTone.mechanicalGhost,
                 ],
               ),
               VariantShowcaseAxis(
                 label: 'Size',
-                variants: [TactileSize.fab, TactileSize.extendedFab],
+                variants: [ButtonSize.fab, ButtonSize.extendedFab],
               ),
               VariantShowcaseAxis(
                 label: 'Depth',
-                variants: [TactileDepth.mechanical],
+                variants: [ButtonDepth.mechanical],
               ),
             ],
           ),

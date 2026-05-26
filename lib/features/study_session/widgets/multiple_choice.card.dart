@@ -4,13 +4,13 @@ import 'package:boo_mondai/lib.barrel.dart'
         StudySessionCardStageController,
         AppTokens,
         MultipleChoiceOption,
-        TactileTone,
+        ButtonTone,
         appTextStyle,
         TextSize,
         TextWeight,
         TextTone,
-        TactileDepth,
-        TactileButton,
+        ButtonDepth,
+        Button,
         PhysicalCardSide;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -70,9 +70,9 @@ class MultipleChoiceCard extends HookWidget {
               for (final entry in template.options.asMap().entries) ...[
                 SizedBox(
                   width: double.infinity,
-                  child: TactileButton(
+                  child: Button(
                     tone: _optionTone(entry.value),
-                    depth: TactileDepth.flat,
+                    depth: ButtonDepth.flat,
                     selected:
                         !interactionsController.isRevealed &&
                         selectedOption.value == entry.value.id,
@@ -104,16 +104,16 @@ class MultipleChoiceCard extends HookWidget {
     );
   }
 
-  TactileTone _optionTone(MultipleChoiceOption option) {
+  ButtonTone _optionTone(MultipleChoiceOption option) {
     final isSelected = interactionsController.answer == option.id;
     final isCorrect = option.isCorrect;
     if (interactionsController.isRevealed && isCorrect) {
-      return TactileTone.success;
+      return ButtonTone.success;
     }
     if (interactionsController.isRevealed && isSelected) {
-      return TactileTone.error;
+      return ButtonTone.error;
     }
-    return TactileTone.ghost;
+    return ButtonTone.ghost;
   }
 
   String _optionLabel(MultipleChoiceOption option, int index) {

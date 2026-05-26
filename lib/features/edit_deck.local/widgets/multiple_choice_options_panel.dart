@@ -69,9 +69,9 @@ class MultipleChoiceOptionsPanel extends StatelessWidget {
           ),
           if (options.length < 6) ...[
             const SizedBox(height: 20),
-            TactileButton(
+            Button(
               leading: const Icon(Icons.add),
-              tone: TactileTone.dashed,
+              tone: ButtonTone.dashed,
               onPressed: onOptionAdd,
               child: const Text('Add Option'),
             ),

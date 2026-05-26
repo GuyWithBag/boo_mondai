@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-enum AppTextFieldSize { labelLarge, bodyLarge, normal }
+enum TextFieldSize { labelLarge, bodyLarge, normal }
 
 enum AppTextFieldFrame { none, outline, underline }
 
@@ -28,27 +28,27 @@ final appTextFieldStyle = VariantStyle.textFieldParts<AppTokens>(
     }),
   },
   defaultVariants: const [
-    AppTextFieldSize.normal,
+    TextFieldSize.normal,
     AppTextFieldFrame.none,
     AppTextFieldTone.neutral,
     AppTextFieldState.idle,
   ],
   variants: {
-    AppTextFieldSize.labelLarge: (tokens) => {
+    TextFieldSize.labelLarge: (tokens) => {
       TextFieldStylePart.text({
         TextStylePart.fontSize(tokens.textSizeLabelLarge.sp),
         TextStylePart.fontWeight(tokens.fontWeightTextHeavy),
         TextStylePart.height(tokens.lineHeightTextTitle),
       }),
     },
-    AppTextFieldSize.bodyLarge: (tokens) => {
+    TextFieldSize.bodyLarge: (tokens) => {
       TextFieldStylePart.text({
         TextStylePart.fontSize(tokens.textSizeBodyLarge.sp),
         TextStylePart.fontWeight(tokens.fontWeightTextStrong),
         TextStylePart.height(tokens.lineHeightFieldDisplay),
       }),
     },
-    AppTextFieldSize.normal: (tokens) => {
+    TextFieldSize.normal: (tokens) => {
       TextFieldStylePart.text({
         TextStylePart.fontSize(tokens.textSizeLabel.sp),
       }),

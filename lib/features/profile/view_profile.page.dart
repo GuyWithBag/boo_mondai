@@ -11,19 +11,19 @@ import 'package:boo_mondai/lib.barrel.dart'
         AuthController,
         AppSpacing,
         AppTokens,
-        TactileTone,
-        TactileDepth,
-        TactileButton,
+        ButtonTone,
+        ButtonDepth,
+        Button,
         LocalDB,
         AppModalTone,
         appTextStyle,
         TextSize,
         TextWeight,
-        AppTextFieldSize,
+        TextFieldSize,
         AppTextFieldFrame,
         AppTextFieldTone,
         VariantTextField,
-        AppModal,
+        Modal,
         TextTone;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -58,9 +58,9 @@ class ViewAccountPage extends StatelessWidget {
             const SizedBox(height: AppSpacing.md),
 
             // Kept the Force Sign Out for dev convenience
-            TactileButton(
-              tone: TactileTone.text,
-              depth: TactileDepth.flat,
+            Button(
+              tone: ButtonTone.text,
+              depth: ButtonDepth.flat,
               onPressed: () async {
                 await auth.signOut();
               },
@@ -128,15 +128,15 @@ class _AuthenticatedActions extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (profile.role != 'researcher') ...[
-          TactileButton(
+          Button(
             onPressed: () => context.push('/research/code'),
             leading: const Icon(Icons.vpn_key),
             child: const Text('Enter Research Code'),
           ),
           const SizedBox(height: AppSpacing.xl),
         ],
-        TactileButton(
-          tone: TactileTone.error,
+        Button(
+          tone: ButtonTone.error,
           onPressed: () => _showSignOutDialog(context),
           leading: const Icon(Icons.logout),
           child: const Text('Sign Out'),
@@ -175,13 +175,13 @@ class _SignInActions extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: AppSpacing.lg),
-          TactileButton(
-            tone: TactileTone.filled,
+          Button(
+            tone: ButtonTone.filled,
             onPressed: () => context.push('/login'),
             child: const Text('Sign In'),
           ),
           const SizedBox(height: AppSpacing.sm),
-          TactileButton(
+          Button(
             onPressed: () => context.push('/register'),
             child: const Text('Create Account'),
           ),
@@ -225,7 +225,7 @@ class _GoogleSignInButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final auth = context.read<AuthController>();
 
-    return TactileButton(
+    return Button(
       onPressed: () async {
         // 1. Trigger the actual browser launch (don't await it yet so we can show the dialog)
         final loginFuture = auth.signInWithGoogle();
@@ -263,7 +263,7 @@ class _AppleSignInButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TactileButton(
+    return Button(
       onPressed: null,
       leading: const Icon(Icons.apple, size: 24),
       child: const Text('Continue with Apple'),
@@ -284,17 +284,17 @@ class _DevManualLoginDialog extends HookWidget {
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: EdgeInsets.all(tokens.spacePanelGapLg),
-      child: AppModal(
+      child: Modal(
         tone: AppModalTone.surface,
         leading: const Icon(Icons.link),
         actions: [
-          TactileButton(
-            tone: TactileTone.ghost,
+          Button(
+            tone: ButtonTone.ghost,
             onPressed: () => Navigator.of(context).pop(),
             child: const Text('Cancel'),
           ),
-          TactileButton(
-            tone: TactileTone.filled,
+          Button(
+            tone: ButtonTone.filled,
             onPressed: () => Navigator.of(context).pop(controller.text),
             child: const Text('Submit Code'),
           ),
@@ -319,7 +319,7 @@ class _DevManualLoginDialog extends HookWidget {
               textInputAction: TextInputAction.done,
               onSubmitted: (_) => Navigator.of(context).pop(controller.text),
               variants: const [
-                AppTextFieldSize.normal,
+                TextFieldSize.normal,
                 AppTextFieldFrame.outline,
                 AppTextFieldTone.neutral,
               ],
@@ -344,25 +344,25 @@ class _SignOutDialog extends StatelessWidget {
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: EdgeInsets.all(tokens.spacePanelGapLg),
-      child: AppModal(
+      child: Modal(
         tone: AppModalTone.error,
         leading: const Icon(Icons.logout),
         actions: [
-          TactileButton(
-            tone: TactileTone.ghost,
+          Button(
+            tone: ButtonTone.ghost,
             onPressed: () => Navigator.of(context).pop(),
             child: const Text('Cancel'),
           ),
-          TactileButton(
-            tone: TactileTone.ghost,
+          Button(
+            tone: ButtonTone.ghost,
             onPressed: () {
               Navigator.of(context).pop();
               auth.signOut();
             },
             child: const Text('Keep data'),
           ),
-          TactileButton(
-            tone: TactileTone.error,
+          Button(
+            tone: ButtonTone.error,
             onPressed: () async {
               Navigator.of(context).pop();
               await auth.signOut();

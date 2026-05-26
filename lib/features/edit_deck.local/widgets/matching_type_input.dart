@@ -1,9 +1,5 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show
-        AppTextFieldSize,
-        VariantTextField,
-        AppTextFieldFrame,
-        AppTextFieldTone;
+    show TextFieldSize, VariantTextField, AppTextFieldFrame, AppTextFieldTone;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
@@ -27,7 +23,7 @@ class MatchingTypeInput extends HookWidget {
       controller: controller,
       onChanged: onChanged,
       variants: const [
-        AppTextFieldSize.labelLarge,
+        TextFieldSize.labelLarge,
         AppTextFieldFrame.outline,
         AppTextFieldTone.neutral,
       ],

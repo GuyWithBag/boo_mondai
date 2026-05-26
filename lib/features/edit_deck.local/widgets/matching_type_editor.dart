@@ -8,8 +8,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextSize,
         TextWeight,
         TextTone,
-        TactileTone,
-        TactileButton;
+        ButtonTone,
+        Button;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -93,9 +93,9 @@ class MatchingTypeEditor extends StatelessWidget {
             const SizedBox(height: 14),
           ],
           const SizedBox(height: 28),
-          TactileButton(
+          Button(
             leading: const Icon(Icons.add),
-            tone: TactileTone.dashed,
+            tone: ButtonTone.dashed,
             onPressed: onPairAdd,
             child: const Text('Add Pair'),
           ),

@@ -18,7 +18,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         ErrorText,
         EditDeckAppbar,
         EditDeckSidebar,
-        TactileButton;
+        Button;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
@@ -257,7 +257,7 @@ class EditDeckPage extends HookWidget {
                                       ),
                                     ),
                                     const SizedBox(height: 16),
-                                    TactileButton(
+                                    Button(
                                       leading: const Icon(Icons.add),
                                       onPressed: addTemplate,
                                       child: const Text('Add Card'),

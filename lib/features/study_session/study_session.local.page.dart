@@ -87,7 +87,7 @@ class StudySessionPage extends HookWidget {
                 const SizedBox(height: AppSpacing.lg),
                 const Text('Deck Review Finished!'),
                 const SizedBox(height: AppSpacing.lg),
-                TactileButton(
+                Button(
                   onPressed: () {
                     controller.reset();
                     dashboardController?.load();

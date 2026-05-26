@@ -1,31 +1,31 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        TactileTone,
+        ButtonTone,
         AppModalTone,
         AppTokens,
-        TactileButton,
+        Button,
         appTextStyle,
         TextSize,
         TextWeight,
         TextTone,
-        AppModal;
+        Modal;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-class AppDialogAction<T> {
-  const AppDialogAction({
+class ModalAction<T> {
+  const ModalAction({
     required this.value,
     required this.label,
-    this.tone = TactileTone.ghost,
+    this.tone = ButtonTone.ghost,
   });
 
   final T value;
   final String label;
-  final TactileTone tone;
+  final ButtonTone tone;
 }
 
-class AppChoiceDialog<T> extends StatelessWidget {
-  const AppChoiceDialog({
+class ChoiceModal<T> extends StatelessWidget {
+  const ChoiceModal({
     super.key,
     required this.title,
     required this.body,
@@ -36,7 +36,7 @@ class AppChoiceDialog<T> extends StatelessWidget {
 
   final String title;
   final String body;
-  final List<AppDialogAction<T>> actions;
+  final List<ModalAction<T>> actions;
   final Widget? leading;
   final AppModalTone tone;
 
@@ -47,12 +47,12 @@ class AppChoiceDialog<T> extends StatelessWidget {
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: EdgeInsets.all(tokens.spacePanelGapLg),
-      child: AppModal(
+      child: Modal(
         tone: tone,
         leading: leading,
         actions: [
           for (final action in actions)
-            TactileButton(
+            Button(
               tone: action.tone,
               onPressed: () => Navigator.pop(context, action.value),
               child: Text(action.label),
@@ -87,11 +87,11 @@ class AppChoiceDialog<T> extends StatelessWidget {
   }
 }
 
-Future<T?> showAppChoiceDialog<T>({
+Future<T?> showChoiceModal<T>({
   required BuildContext context,
   required String title,
   required String body,
-  required List<AppDialogAction<T>> actions,
+  required List<ModalAction<T>> actions,
   Widget? leading,
   AppModalTone tone = AppModalTone.surface,
   bool barrierDismissible = true,
@@ -99,7 +99,7 @@ Future<T?> showAppChoiceDialog<T>({
   return showDialog<T>(
     context: context,
     barrierDismissible: barrierDismissible,
-    builder: (_) => AppChoiceDialog<T>(
+    builder: (_) => ChoiceModal<T>(
       title: title,
       body: body,
       actions: actions,

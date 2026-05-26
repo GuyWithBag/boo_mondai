@@ -1,5 +1,5 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppChipTone, AppTokens, appChipStyle;
+    show ChipTone, AppTokens, appChipStyle;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -9,16 +9,16 @@ class ToggleChip extends StatelessWidget {
     required this.label,
     required this.selected,
     this.onChanged,
-    this.selectedTone = AppChipTone.filled,
-    this.unselectedTone = AppChipTone.easy,
+    this.selectedTone = ChipTone.filled,
+    this.unselectedTone = ChipTone.easy,
     this.isBusy = false,
   });
 
   final String label;
   final bool selected;
   final ValueChanged<bool>? onChanged;
-  final AppChipTone selectedTone;
-  final AppChipTone unselectedTone;
+  final ChipTone selectedTone;
+  final ChipTone unselectedTone;
   final bool isBusy;
 
   @override

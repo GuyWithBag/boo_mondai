@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide BackButton;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:boo_mondai/lib.barrel.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -30,7 +30,7 @@ class EditDeckAppbar extends StatelessWidget implements PreferredSizeWidget {
 
     return AppBar(
       leadingWidth: 100.w,
-      leading: TactileBackButton(),
+      leading: BackButton(),
       title: SizedBox(
         height: preferredSize.height,
         child: Padding(
@@ -71,8 +71,8 @@ class EditDeckAppbar extends StatelessWidget implements PreferredSizeWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TactileButton(
-                tone: TactileTone.filled,
+              Button(
+                tone: ButtonTone.filled,
                 onPressed: isSaving ? null : onSave,
                 child: isSaving
                     ? const SizedBox.square(

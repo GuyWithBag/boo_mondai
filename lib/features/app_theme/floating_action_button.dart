@@ -1,8 +1,8 @@
-import 'package:boo_mondai/lib.barrel.dart' show TactileButton, TactileTone;
+import 'package:boo_mondai/lib.barrel.dart' show Button, ButtonTone;
 import 'package:flutter/material.dart';
 
-class AppFloatingActionButton extends StatelessWidget {
-  const AppFloatingActionButton({
+class FloatingActionButton extends StatelessWidget {
+  const FloatingActionButton({
     super.key,
     required this.onPressed,
     required this.icon,
@@ -15,8 +15,8 @@ class AppFloatingActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TactileButton.icon(
-      tone: TactileTone.mechanicalFilled,
+    return Button.icon(
+      tone: ButtonTone.mechanicalFilled,
       onPressed: onPressed,
       icon: icon,
     );

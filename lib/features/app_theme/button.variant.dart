@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-enum TactileSize { sm, md, lg, icon, fab, extendedFab }
+enum ButtonSize { sm, md, lg, icon, fab, extendedFab }
 
-enum TactileState { idle, hovered, selected, disabled, pressed }
+enum ButtonState { idle, hovered, selected, disabled, pressed }
 
-enum TactileDepth { flat, elevated, mechanical }
+enum ButtonDepth { flat, elevated, mechanical }
 
-enum TactileTone {
+enum ButtonTone {
   filled,
   ghost,
   success,
@@ -25,7 +25,7 @@ enum TactileTone {
   mechanicalGhost,
 }
 
-final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
+final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
   base: (tokens) => {
     SurfaceStylePart.decoration({
       DecorationPart.color(tokens.backgroundSurface),
@@ -55,13 +55,13 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
     }),
   },
   defaultVariants: const [
-    TactileTone.ghost,
-    TactileSize.md,
-    TactileState.idle,
-    TactileDepth.elevated,
+    ButtonTone.ghost,
+    ButtonSize.md,
+    ButtonState.idle,
+    ButtonDepth.elevated,
   ],
   variants: {
-    TactileTone.filled: (tokens) => {
+    ButtonTone.filled: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.primary),
         DecorationPart.border(
@@ -77,7 +77,7 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
       SurfaceStylePart.text({TextStylePart.color(tokens.colorTextOnBrand)}),
       SurfaceStylePart.icon({IconThemePart.color(tokens.colorTextOnBrand)}),
     },
-    TactileTone.ghost: (tokens) => {
+    ButtonTone.ghost: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.backgroundSurface),
         DecorationPart.border(
@@ -96,7 +96,7 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
       SurfaceStylePart.text({TextStylePart.color(tokens.textPrimary)}),
       SurfaceStylePart.icon({IconThemePart.color(tokens.textPrimary)}),
     },
-    TactileTone.success: (tokens) => {
+    ButtonTone.success: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.actionSuccessBackground),
         DecorationPart.border(
@@ -115,7 +115,7 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
       SurfaceStylePart.text({TextStylePart.color(tokens.actionSuccess)}),
       SurfaceStylePart.icon({IconThemePart.color(tokens.actionSuccess)}),
     },
-    TactileTone.error: (tokens) => {
+    ButtonTone.error: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.actionErrorBackground),
         DecorationPart.border(
@@ -134,7 +134,7 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
       SurfaceStylePart.text({TextStylePart.color(tokens.actionError)}),
       SurfaceStylePart.icon({IconThemePart.color(tokens.actionError)}),
     },
-    TactileTone.streak: (tokens) => {
+    ButtonTone.streak: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.streak),
         DecorationPart.border(
@@ -150,7 +150,7 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
       SurfaceStylePart.text({TextStylePart.color(tokens.colorTextOnBrand)}),
       SurfaceStylePart.icon({IconThemePart.color(tokens.colorTextOnBrand)}),
     },
-    TactileTone.dashed: (tokens) => {
+    ButtonTone.dashed: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.softGray),
         DecorationPart.border(
@@ -164,7 +164,7 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
       SurfaceStylePart.text({TextStylePart.color(tokens.textMuted)}),
       SurfaceStylePart.icon({IconThemePart.color(tokens.textMuted)}),
     },
-    TactileTone.text: (tokens) => {
+    ButtonTone.text: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.colorTransparent),
         DecorationPart.border(
@@ -175,7 +175,7 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
       SurfaceStylePart.text({TextStylePart.color(tokens.textSecondary)}),
       SurfaceStylePart.icon({IconThemePart.color(tokens.textSecondary)}),
     },
-    TactileTone.again: (tokens) => {
+    ButtonTone.again: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.ratingAgainBackground),
         DecorationPart.border(
@@ -194,7 +194,7 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
       SurfaceStylePart.text({TextStylePart.color(tokens.ratingAgainText)}),
       SurfaceStylePart.icon({IconThemePart.color(tokens.ratingAgainText)}),
     },
-    TactileTone.hard: (tokens) => {
+    ButtonTone.hard: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.ratingHardBackground),
         DecorationPart.border(
@@ -213,7 +213,7 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
       SurfaceStylePart.text({TextStylePart.color(tokens.ratingHardText)}),
       SurfaceStylePart.icon({IconThemePart.color(tokens.ratingHardText)}),
     },
-    TactileTone.good: (tokens) => {
+    ButtonTone.good: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.ratingGoodBackground),
         DecorationPart.border(
@@ -232,7 +232,7 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
       SurfaceStylePart.text({TextStylePart.color(tokens.ratingGoodText)}),
       SurfaceStylePart.icon({IconThemePart.color(tokens.ratingGoodText)}),
     },
-    TactileTone.easy: (tokens) => {
+    ButtonTone.easy: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.ratingEasyBackground),
         DecorationPart.border(
@@ -251,7 +251,7 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
       SurfaceStylePart.text({TextStylePart.color(tokens.ratingEasyText)}),
       SurfaceStylePart.icon({IconThemePart.color(tokens.ratingEasyText)}),
     },
-    TactileTone.mechanicalFilled: (tokens) => {
+    ButtonTone.mechanicalFilled: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.primary),
         DecorationPart.border(
@@ -267,7 +267,7 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
       SurfaceStylePart.text({TextStylePart.color(tokens.colorTextOnBrand)}),
       SurfaceStylePart.icon({IconThemePart.color(tokens.colorTextOnBrand)}),
     },
-    TactileTone.mechanicalGhost: (tokens) => {
+    ButtonTone.mechanicalGhost: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.backgroundSurface),
         DecorationPart.border(
@@ -286,29 +286,29 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
       SurfaceStylePart.text({TextStylePart.color(tokens.textPrimary)}),
       SurfaceStylePart.icon({IconThemePart.color(tokens.textSecondary)}),
     },
-    TactileSize.sm: (tokens) => {
+    ButtonSize.sm: (tokens) => {
       SurfaceStylePart.text({TextStylePart.fontSize(tokens.textSizeLabel.sp)}),
       SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconMd.sp)}),
     },
-    TactileSize.md: (tokens) => {
+    ButtonSize.md: (tokens) => {
       SurfaceStylePart.text({TextStylePart.fontSize(tokens.textSizeLabel.sp)}),
       SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconMd.sp)}),
     },
-    TactileSize.lg: (tokens) => {
+    ButtonSize.lg: (tokens) => {
       SurfaceStylePart.text({TextStylePart.fontSize(tokens.textSizeLabel.sp)}),
       SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconLg.sp)}),
     },
-    TactileSize.icon: (tokens) => {
+    ButtonSize.icon: (tokens) => {
       SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconLg.sp)}),
       SurfaceStylePart.height(48.h),
       SurfaceStylePart.width(48.w),
     },
-    TactileSize.fab: (tokens) => {
+    ButtonSize.fab: (tokens) => {
       SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconLg.sp)}),
       SurfaceStylePart.height(64.h),
       SurfaceStylePart.width(64.w),
     },
-    TactileSize.extendedFab: (tokens) => {
+    ButtonSize.extendedFab: (tokens) => {
       SurfaceStylePart.text({
         TextStylePart.fontSize(tokens.textSizeLabel.sp),
         TextStylePart.fontWeight(tokens.fontWeightTextHeavy),
@@ -316,12 +316,12 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
       SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconMd.sp)}),
       SurfaceStylePart.height(64.h),
     },
-    TactileState.idle: (_) => const <StylePart<SurfaceStyle>>{},
-    TactileState.hovered: (_) => const <StylePart<SurfaceStyle>>{},
-    TactileState.pressed: (_) => {
+    ButtonState.idle: (_) => const <StylePart<SurfaceStyle>>{},
+    ButtonState.hovered: (_) => const <StylePart<SurfaceStyle>>{},
+    ButtonState.pressed: (_) => {
       SurfaceStylePart.decoration({DecorationPart.boxShadow(const [])}),
     },
-    TactileState.selected: (tokens) => {
+    ButtonState.selected: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.primarySoft),
         DecorationPart.border(
@@ -340,18 +340,18 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
       SurfaceStylePart.text({TextStylePart.color(tokens.primary)}),
       SurfaceStylePart.icon({IconThemePart.color(tokens.primary)}),
     },
-    TactileState.disabled: (_) => {
+    ButtonState.disabled: (_) => {
       SurfaceStylePart.decoration({DecorationPart.boxShadow(const [])}),
     },
-    TactileDepth.elevated: (_) => const <StylePart<SurfaceStyle>>{},
-    TactileDepth.flat: (_) => {
+    ButtonDepth.elevated: (_) => const <StylePart<SurfaceStyle>>{},
+    ButtonDepth.flat: (_) => {
       SurfaceStylePart.decoration({DecorationPart.boxShadow(const [])}),
     },
-    TactileDepth.mechanical: (_) => const <StylePart<SurfaceStyle>>{},
+    ButtonDepth.mechanical: (_) => const <StylePart<SurfaceStyle>>{},
   },
   compoundVariants: [
     CompoundVariantParts<AppTokens, SurfaceStyle>(
-      when: const {TactileTone.mechanicalFilled, TactileState.hovered},
+      when: const {ButtonTone.mechanicalFilled, ButtonState.hovered},
       build: (tokens) => {
         SurfaceStylePart.decoration({
           DecorationPart.color(tokens.primary.withValues(alpha: 0.88)),
@@ -359,26 +359,26 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
       },
     ),
     CompoundVariantParts<AppTokens, SurfaceStyle>(
-      when: const {TactileTone.mechanicalGhost, TactileState.hovered},
+      when: const {ButtonTone.mechanicalGhost, ButtonState.hovered},
       build: (tokens) => {
         SurfaceStylePart.decoration({DecorationPart.color(tokens.softGray)}),
       },
     ),
     CompoundVariantParts<AppTokens, SurfaceStyle>(
-      when: const {TactileDepth.mechanical, TactileState.pressed},
+      when: const {ButtonDepth.mechanical, ButtonState.pressed},
       build: (_) => {
         SurfaceStylePart.decoration({DecorationPart.boxShadow(const [])}),
       },
     ),
     CompoundVariantParts<AppTokens, SurfaceStyle>(
-      when: const {TactileDepth.mechanical, TactileState.disabled},
+      when: const {ButtonDepth.mechanical, ButtonState.disabled},
       build: (_) => {
         SurfaceStylePart.decoration({DecorationPart.boxShadow(const [])}),
         SurfaceStylePart.opacity(0.5),
       },
     ),
     CompoundVariantParts<AppTokens, SurfaceStyle>(
-      when: const {TactileTone.dashed, TactileState.hovered},
+      when: const {ButtonTone.dashed, ButtonState.hovered},
       build: (tokens) => {
         SurfaceStylePart.decoration({DecorationPart.color(tokens.primarySoft)}),
         SurfaceStylePart.text({TextStylePart.color(tokens.primary)}),
@@ -386,7 +386,7 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
       },
     ),
     CompoundVariantParts<AppTokens, SurfaceStyle>(
-      when: const {TactileTone.ghost, TactileState.selected},
+      when: const {ButtonTone.ghost, ButtonState.selected},
       build: (tokens) => {
         SurfaceStylePart.decoration({
           DecorationPart.color(tokens.primarySoft),
@@ -408,7 +408,7 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
       },
     ),
     CompoundVariantParts<AppTokens, SurfaceStyle>(
-      when: const {TactileTone.again, TactileState.hovered},
+      when: const {ButtonTone.again, ButtonState.hovered},
       build: (tokens) => {
         SurfaceStylePart.decoration({
           DecorationPart.color(tokens.ratingAgainHoverBackground),
@@ -416,7 +416,7 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
       },
     ),
     CompoundVariantParts<AppTokens, SurfaceStyle>(
-      when: const {TactileTone.hard, TactileState.hovered},
+      when: const {ButtonTone.hard, ButtonState.hovered},
       build: (tokens) => {
         SurfaceStylePart.decoration({
           DecorationPart.color(tokens.ratingHardHoverBackground),
@@ -424,7 +424,7 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
       },
     ),
     CompoundVariantParts<AppTokens, SurfaceStyle>(
-      when: const {TactileTone.good, TactileState.hovered},
+      when: const {ButtonTone.good, ButtonState.hovered},
       build: (tokens) => {
         SurfaceStylePart.decoration({
           DecorationPart.color(tokens.ratingGoodHoverBackground),
@@ -432,7 +432,7 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
       },
     ),
     CompoundVariantParts<AppTokens, SurfaceStyle>(
-      when: const {TactileTone.easy, TactileState.hovered},
+      when: const {ButtonTone.easy, ButtonState.hovered},
       build: (tokens) => {
         SurfaceStylePart.decoration({
           DecorationPart.color(tokens.ratingEasyHoverBackground),
@@ -440,11 +440,11 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
       },
     ),
     CompoundVariantParts<AppTokens, SurfaceStyle>(
-      when: const {TactileDepth.flat, TactileState.disabled, TactileTone.ghost},
+      when: const {ButtonDepth.flat, ButtonState.disabled, ButtonTone.ghost},
       build: (_) => {SurfaceStylePart.opacity(0.5)},
     ),
     CompoundVariantParts<AppTokens, SurfaceStyle>(
-      when: const {TactileTone.success, TactileState.disabled},
+      when: const {ButtonTone.success, ButtonState.disabled},
       build: (tokens) => {
         SurfaceStylePart.decoration({
           DecorationPart.color(tokens.actionSuccessBackground),
@@ -466,7 +466,7 @@ final tactileButtonStyle = VariantStyle.surfaceParts<AppTokens>(
       },
     ),
     CompoundVariantParts<AppTokens, SurfaceStyle>(
-      when: const {TactileTone.error, TactileState.disabled},
+      when: const {ButtonTone.error, ButtonState.disabled},
       build: (tokens) => {
         SurfaceStylePart.decoration({
           DecorationPart.color(tokens.actionErrorBackground),
@@ -516,12 +516,12 @@ final mechanicalFabIconBadgeStyle = VariantStyle.surfaceParts<AppTokens>(
 //     AppTokens tokens, [
 //     Iterable<Object> variants = const [],
 //   ]) {
-//     return tactileButtonStyle.resolve(tokens, variants).decoration;
+//     return buttonStyle.resolve(tokens, variants).decoration;
 //   }
 // }
 
 // class _ButtonTextStyle {
 //   TextStyle resolve(AppTokens tokens, [Iterable<Object> variants = const []]) {
-//     return tactileButtonStyle.resolve(tokens, variants).textStyle;
+//     return buttonStyle.resolve(tokens, variants).textStyle;
 //   }
 // }

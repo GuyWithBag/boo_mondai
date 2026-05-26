@@ -1,24 +1,24 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        TactileSize,
-        TactileDepth,
-        TactileTone,
-        TactileState,
+        ButtonSize,
+        ButtonDepth,
+        ButtonTone,
+        ButtonState,
         AppTokens,
-        tactileButtonStyle;
+        buttonStyle;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-class TactileButton extends HookWidget {
-  const TactileButton({
+class Button extends HookWidget {
+  const Button({
     this.child,
     this.onPressed,
     this.leading,
     this.trailing,
-    this.tone = TactileTone.ghost,
-    this.size = TactileSize.md,
-    this.depth = TactileDepth.elevated,
+    this.tone = ButtonTone.ghost,
+    this.size = ButtonSize.md,
+    this.depth = ButtonDepth.elevated,
     this.selected = false,
     this.mainAxisAlignment = MainAxisAlignment.center,
     super.key,
@@ -28,44 +28,44 @@ class TactileButton extends HookWidget {
   final VoidCallback? onPressed;
   final Widget? leading;
   final Widget? trailing;
-  final TactileTone tone;
-  final TactileSize size;
-  final TactileDepth depth;
+  final ButtonTone tone;
+  final ButtonSize size;
+  final ButtonDepth depth;
   final bool selected;
   final MainAxisAlignment mainAxisAlignment;
 
-  static TactileButton icon({
+  static Button icon({
     VoidCallback? onPressed,
     IconData? icon,
-    TactileTone tone = TactileTone.ghost,
+    ButtonTone tone = ButtonTone.ghost,
     bool selected = false,
   }) {
-    return TactileButton(
+    return Button(
       onPressed: onPressed,
       leading: icon == null ? null : Icon(icon),
       tone: tone,
-      size: TactileSize.icon,
+      size: ButtonSize.icon,
       selected: selected,
     );
   }
 
-  TactileState getState() {
+  ButtonState getState() {
     if (onPressed == null) {
-      return TactileState.disabled;
+      return ButtonState.disabled;
     } else if (selected) {
-      return TactileState.selected;
+      return ButtonState.selected;
     } else {
-      return TactileState.idle;
+      return ButtonState.idle;
     }
   }
 
-  TactileState getHoverState() {
+  ButtonState getHoverState() {
     final currentState = getState();
-    if (currentState == TactileState.disabled ||
-        currentState == TactileState.selected) {
+    if (currentState == ButtonState.disabled ||
+        currentState == ButtonState.selected) {
       return currentState;
     }
-    return TactileState.hovered;
+    return ButtonState.hovered;
   }
 
   @override
@@ -76,7 +76,7 @@ class TactileButton extends HookWidget {
       state.value = getState();
       return null;
     }, [onPressed, selected, tone]);
-    final resolvedStyle = tactileButtonStyle.resolve(tokens, <Object>[
+    final resolvedStyle = buttonStyle.resolve(tokens, <Object>[
       tone,
       size,
       state.value,
@@ -84,42 +84,33 @@ class TactileButton extends HookWidget {
     ]);
 
     final padding = switch (size) {
-      TactileSize.sm => const EdgeInsets.symmetric(
-        horizontal: 18,
-        vertical: 12,
-      ),
-      TactileSize.md => const EdgeInsets.symmetric(
-        horizontal: 24,
-        vertical: 16,
-      ),
-      TactileSize.lg => const EdgeInsets.symmetric(
-        horizontal: 32,
-        vertical: 18,
-      ),
-      TactileSize.icon => EdgeInsets.zero,
-      TactileSize.fab => EdgeInsets.zero,
-      TactileSize.extendedFab => const EdgeInsets.symmetric(horizontal: 24),
+      ButtonSize.sm => const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+      ButtonSize.md => const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      ButtonSize.lg => const EdgeInsets.symmetric(horizontal: 32, vertical: 18),
+      ButtonSize.icon => EdgeInsets.zero,
+      ButtonSize.fab => EdgeInsets.zero,
+      ButtonSize.extendedFab => const EdgeInsets.symmetric(horizontal: 24),
     };
 
     final minSize = switch (size) {
-      TactileSize.icon => const Size.square(48),
-      TactileSize.fab => const Size.square(64),
-      TactileSize.extendedFab => const Size(0, 64),
+      ButtonSize.icon => const Size.square(48),
+      ButtonSize.fab => const Size.square(64),
+      ButtonSize.extendedFab => const Size(0, 64),
       _ => Size.zero,
     };
 
     final pressedOffset = switch (depth) {
-      TactileDepth.mechanical => 8.0,
-      TactileDepth.elevated => 4.0,
-      TactileDepth.flat => 0.0,
+      ButtonDepth.mechanical => 8.0,
+      ButtonDepth.elevated => 4.0,
+      ButtonDepth.flat => 0.0,
     };
 
     final contentStyle = resolvedStyle.copyWith(
       transform: Matrix4.translationValues(
         0,
-        depth != TactileDepth.flat &&
-                state.value == TactileState.pressed &&
-                !(state.value == TactileState.disabled)
+        depth != ButtonDepth.flat &&
+                state.value == ButtonState.pressed &&
+                !(state.value == ButtonState.disabled)
             ? pressedOffset
             : 0,
         0,
@@ -153,12 +144,12 @@ class TactileButton extends HookWidget {
       ),
     );
 
-    final paintedContent = tone == TactileTone.dashed
+    final paintedContent = tone == ButtonTone.dashed
         ? SizedBox(
             width: double.infinity,
             child: CustomPaint(
               foregroundPainter: _DashedBorderPainter(
-                color: state.value == TactileState.hovered
+                color: state.value == ButtonState.hovered
                     ? tokens.primary
                     : tokens.borderNeutralSubtle,
                 radius: tokens.radius2xl,
@@ -169,24 +160,24 @@ class TactileButton extends HookWidget {
         : content;
 
     return MouseRegion(
-      cursor: state.value == TactileState.disabled
+      cursor: state.value == ButtonState.disabled
           ? SystemMouseCursors.forbidden
           : SystemMouseCursors.click,
-      onEnter: state.value == TactileState.disabled
+      onEnter: state.value == ButtonState.disabled
           ? null
           : (_) => state.value = getHoverState(),
-      onExit: state.value == TactileState.disabled
+      onExit: state.value == ButtonState.disabled
           ? null
           : (_) => state.value = getState(),
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTapDown: state.value == TactileState.disabled
+        onTapDown: state.value == ButtonState.disabled
             ? null
-            : (_) => state.value = TactileState.pressed,
-        onTapCancel: state.value == TactileState.disabled
+            : (_) => state.value = ButtonState.pressed,
+        onTapCancel: state.value == ButtonState.disabled
             ? null
             : () => state.value = getState(),
-        onTapUp: state.value == TactileState.disabled
+        onTapUp: state.value == ButtonState.disabled
             ? null
             : (_) {
                 onPressed?.call();

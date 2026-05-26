@@ -2,7 +2,7 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         StudySessionController,
         AppTokens,
-        TactileButton,
+        Button,
         ProgressBar,
         appTextStyle,
         TextSize,
@@ -38,7 +38,7 @@ class StudySessionAppbar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          TactileButton.icon(icon: Icons.close, onPressed: onClose),
+          Button.icon(icon: Icons.close, onPressed: onClose),
           SizedBox(width: 18.w),
           Expanded(
             child: ProgressBar(value: controller.getProgressPercentage()),

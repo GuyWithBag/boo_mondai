@@ -15,11 +15,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         Deck,
         surfaceStyle,
         SurfacePadding,
-        TactileButton,
+        Button,
         PanelHeader,
-        TactileTone,
+        ButtonTone,
         appTextFieldStyle,
-        AppTextFieldSize,
+        TextFieldSize,
         AppTextFieldFrame,
         SectionEyebrowTone,
         SegmentOption,
@@ -184,7 +184,7 @@ class CreateDeckSheet extends HookWidget {
                 PanelHeader(
                   title: isEdit ? 'Edit Deck' : 'Create Deck',
                   trailing: showCloseButton
-                      ? TactileButton.icon(
+                      ? Button.icon(
                           icon: Icons.close,
                           onPressed: () => context.pop(),
                         )
@@ -243,8 +243,8 @@ class CreateDeckSheet extends HookWidget {
                         onChanged: (value) => isPublished.value = value,
                       ),
                       SizedBox(height: tokens.spacePanelGapLg),
-                      TactileButton(
-                        tone: TactileTone.filled,
+                      Button(
+                        tone: ButtonTone.filled,
                         leading: Icon(isEdit ? Icons.save : Icons.add),
                         onPressed: handleSave,
                         child: Text(isEdit ? 'Save Deck' : 'Create Deck'),
@@ -284,7 +284,7 @@ class _TextFieldPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
     final fieldStyle = appTextFieldStyle.resolve(tokens, [
-      AppTextFieldSize.normal,
+      TextFieldSize.normal,
       AppTextFieldFrame.outline,
       tone,
     ]);

@@ -1,5 +1,5 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, TactileTone, TextTone;
+    show AppTokens, ButtonTone, TextTone;
 import 'package:theme_variants/theme_variants.dart';
 
 enum MultipleChoiceOptionState { idle, hovered, selected, faded, disabled }
@@ -14,7 +14,7 @@ class MultipleChoiceOptionStyle {
     this.textTone,
   });
 
-  final TactileTone? buttonTone;
+  final ButtonTone? buttonTone;
   final bool? selected;
   final double? opacity;
   final TextTone? textTone;
@@ -32,7 +32,7 @@ class MultipleChoiceOptionStyle {
 final multipleChoiceOptionStyle =
     VariantStyle<AppTokens, MultipleChoiceOptionStyle>(
       base: (_) => const MultipleChoiceOptionStyle(
-        buttonTone: TactileTone.ghost,
+        buttonTone: ButtonTone.ghost,
         selected: false,
         opacity: 1,
         textTone: TextTone.primary,
@@ -60,14 +60,14 @@ final multipleChoiceOptionStyle =
         MultipleChoiceOptionState.disabled: (_) =>
             const MultipleChoiceOptionStyle(opacity: 0.5),
         MultipleChoiceOptionTone.neutral: (_) =>
-            const MultipleChoiceOptionStyle(buttonTone: TactileTone.ghost),
+            const MultipleChoiceOptionStyle(buttonTone: ButtonTone.ghost),
         MultipleChoiceOptionTone.success: (_) =>
             const MultipleChoiceOptionStyle(
-              buttonTone: TactileTone.success,
+              buttonTone: ButtonTone.success,
               textTone: TextTone.primary,
             ),
         MultipleChoiceOptionTone.error: (_) => const MultipleChoiceOptionStyle(
-          buttonTone: TactileTone.error,
+          buttonTone: ButtonTone.error,
           textTone: TextTone.primary,
         ),
       },

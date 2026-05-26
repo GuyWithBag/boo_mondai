@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-enum AppChipTone {
+enum ChipTone {
   filled,
   ghost,
   success,
@@ -42,9 +42,9 @@ final appChipStyle = VariantStyle.chipParts<AppTokens>(
     ChipPart.elevation(0),
     ChipPart.showCheckmark(false),
   },
-  defaultVariants: const [AppChipTone.ghost],
+  defaultVariants: const [ChipTone.ghost],
   variants: {
-    AppChipTone.filled: (tokens) => {
+    ChipTone.filled: (tokens) => {
       ChipPart.selectedColor(tokens.primarySoft),
       ChipPart.secondaryLabelStyle(
         _chipLabelStyle(tokens, tokens.colorTextOnBrand),
@@ -58,7 +58,7 @@ final appChipStyle = VariantStyle.chipParts<AppTokens>(
       ),
       ChipPart.labelStyle(_chipLabelStyle(tokens, tokens.colorTextOnBrand)),
     },
-    AppChipTone.ghost: (tokens) => {
+    ChipTone.ghost: (tokens) => {
       ChipPart.selectedColor(tokens.backgroundSurface),
       ChipPart.secondaryLabelStyle(_chipLabelStyle(tokens, tokens.textPrimary)),
       ChipPart.backgroundColor(tokens.backgroundSurface),
@@ -70,7 +70,7 @@ final appChipStyle = VariantStyle.chipParts<AppTokens>(
       ),
       ChipPart.labelStyle(_chipLabelStyle(tokens, tokens.textPrimary)),
     },
-    AppChipTone.success: (tokens) => {
+    ChipTone.success: (tokens) => {
       ChipPart.selectedColor(tokens.actionSuccess.withValues(alpha: 0.12)),
       ChipPart.secondaryLabelStyle(
         _chipLabelStyle(tokens, tokens.actionSuccess),
@@ -84,7 +84,7 @@ final appChipStyle = VariantStyle.chipParts<AppTokens>(
       ),
       ChipPart.labelStyle(_chipLabelStyle(tokens, tokens.actionSuccess)),
     },
-    AppChipTone.error: (tokens) => {
+    ChipTone.error: (tokens) => {
       ChipPart.selectedColor(tokens.actionError.withValues(alpha: 0.12)),
       ChipPart.secondaryLabelStyle(_chipLabelStyle(tokens, tokens.actionError)),
       ChipPart.backgroundColor(tokens.actionError.withValues(alpha: 0.12)),
@@ -96,7 +96,7 @@ final appChipStyle = VariantStyle.chipParts<AppTokens>(
       ),
       ChipPart.labelStyle(_chipLabelStyle(tokens, tokens.actionError)),
     },
-    AppChipTone.streak: (tokens) => {
+    ChipTone.streak: (tokens) => {
       ChipPart.selectedColor(tokens.streak),
       ChipPart.secondaryLabelStyle(
         _chipLabelStyle(tokens, tokens.colorTextOnBrand),
@@ -107,7 +107,7 @@ final appChipStyle = VariantStyle.chipParts<AppTokens>(
       ),
       ChipPart.labelStyle(_chipLabelStyle(tokens, tokens.colorTextOnBrand)),
     },
-    AppChipTone.dashed: (tokens) => {
+    ChipTone.dashed: (tokens) => {
       ChipPart.selectedColor(tokens.softGray),
       ChipPart.secondaryLabelStyle(_chipLabelStyle(tokens, tokens.textMuted)),
       ChipPart.backgroundColor(tokens.softGray),
@@ -119,7 +119,7 @@ final appChipStyle = VariantStyle.chipParts<AppTokens>(
       ),
       ChipPart.labelStyle(_chipLabelStyle(tokens, tokens.textMuted)),
     },
-    AppChipTone.text: (tokens) => {
+    ChipTone.text: (tokens) => {
       ChipPart.selectedColor(tokens.colorTransparent),
       ChipPart.secondaryLabelStyle(
         _chipLabelStyle(tokens, tokens.textSecondary),
@@ -128,7 +128,7 @@ final appChipStyle = VariantStyle.chipParts<AppTokens>(
       ChipPart.side(BorderSide(color: tokens.colorTransparent, width: 0)),
       ChipPart.labelStyle(_chipLabelStyle(tokens, tokens.textSecondary)),
     },
-    AppChipTone.again: (tokens) => {
+    ChipTone.again: (tokens) => {
       ChipPart.selectedColor(tokens.ratingAgainBackground),
       ChipPart.secondaryLabelStyle(
         _chipLabelStyle(tokens, tokens.ratingAgainText),
@@ -142,7 +142,7 @@ final appChipStyle = VariantStyle.chipParts<AppTokens>(
       ),
       ChipPart.labelStyle(_chipLabelStyle(tokens, tokens.ratingAgainText)),
     },
-    AppChipTone.hard: (tokens) => {
+    ChipTone.hard: (tokens) => {
       ChipPart.selectedColor(tokens.ratingHardBackground),
       ChipPart.secondaryLabelStyle(
         _chipLabelStyle(tokens, tokens.ratingHardText),
@@ -156,7 +156,7 @@ final appChipStyle = VariantStyle.chipParts<AppTokens>(
       ),
       ChipPart.labelStyle(_chipLabelStyle(tokens, tokens.ratingHardText)),
     },
-    AppChipTone.good: (tokens) => {
+    ChipTone.good: (tokens) => {
       ChipPart.selectedColor(tokens.ratingGoodBackground),
       ChipPart.secondaryLabelStyle(
         _chipLabelStyle(tokens, tokens.ratingGoodText),
@@ -170,7 +170,7 @@ final appChipStyle = VariantStyle.chipParts<AppTokens>(
       ),
       ChipPart.labelStyle(_chipLabelStyle(tokens, tokens.ratingGoodText)),
     },
-    AppChipTone.easy: (tokens) => {
+    ChipTone.easy: (tokens) => {
       ChipPart.selectedColor(tokens.ratingEasyBackground),
       ChipPart.secondaryLabelStyle(
         _chipLabelStyle(tokens, tokens.ratingEasyText),

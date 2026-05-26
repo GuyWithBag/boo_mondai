@@ -1,4 +1,4 @@
-import 'package:boo_mondai/lib.barrel.dart' show TactileButton;
+import 'package:boo_mondai/lib.barrel.dart' show Button;
 import 'package:flutter/material.dart';
 
 class FormatSelector extends StatelessWidget {
@@ -25,7 +25,7 @@ class FormatSelector extends StatelessWidget {
       child: Row(
         children: [
           for (var index = 0; index < formats.length; index++) ...[
-            TactileButton(
+            Button(
               leading: Icon(formats[index].$1),
               selected: selectedIndex == index,
               onPressed: () => onChanged(index),

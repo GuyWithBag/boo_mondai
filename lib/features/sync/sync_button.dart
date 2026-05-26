@@ -1,7 +1,7 @@
 // ── _SyncButton ─────────────────────────────────────────────────────────
 
 import 'package:boo_mondai/lib.barrel.dart'
-    show TactileButton, TactileTone, AppSnackbarTone, showAppSnackbar;
+    show Button, ButtonTone, AppSnackbarTone, showAppSnackbar;
 import 'package:flutter/material.dart';
 
 /// AppBar action that drives the deck sync operation.
@@ -35,9 +35,9 @@ class SyncButton extends StatelessWidget {
 
     return Tooltip(
       message: isAuthenticated ? 'Sync decks' : 'Sign in to sync',
-      child: TactileButton.icon(
+      child: Button.icon(
         icon: Icons.sync_rounded,
-        tone: TactileTone.ghost,
+        tone: ButtonTone.ghost,
         onPressed: () {
           if (!isAuthenticated) {
             showAppSnackbar(

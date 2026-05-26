@@ -8,7 +8,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextWeight,
         TextTone,
         PhysicalCardSide,
-        TactileButton;
+        Button;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -156,7 +156,7 @@ class _MatchButton extends StatelessWidget {
         opacity: matched ? 0 : 1,
         child: SizedBox(
           width: double.infinity,
-          child: TactileButton(
+          child: Button(
             selected: selected,
             mainAxisAlignment: MainAxisAlignment.center,
             onPressed: onPressed,
