@@ -2,4 +2,5 @@
 
 // Other files
 export 'notification.service.dart';
+export 'platform.service.dart';
 export 'uuid.dart';

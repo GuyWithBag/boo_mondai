@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-enum ButtonSize { sm, md, lg, icon, fab, extendedFab }
+enum ButtonSize { sm, md, lg, icon, iconWithLabel, fab, extendedFab }
 
 enum ButtonState { idle, hovered, selected, disabled, pressed }
 
@@ -299,28 +299,51 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
       SurfaceStylePart.icon({IconThemePart.color(tokens.textSecondary)}),
     },
     ButtonSize.sm: (tokens) => {
+      SurfaceStylePart.padding(
+        const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+      ),
       SurfaceStylePart.text({TextStylePart.fontSize(tokens.textSizeLabel.sp)}),
       SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconMd.sp)}),
     },
     ButtonSize.md: (tokens) => {
+      SurfaceStylePart.padding(
+        const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      ),
       SurfaceStylePart.text({TextStylePart.fontSize(tokens.textSizeLabel.sp)}),
       SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconMd.sp)}),
     },
     ButtonSize.lg: (tokens) => {
+      SurfaceStylePart.padding(
+        const EdgeInsets.symmetric(horizontal: 32, vertical: 18),
+      ),
       SurfaceStylePart.text({TextStylePart.fontSize(tokens.textSizeLabel.sp)}),
       SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconLg.sp)}),
     },
     ButtonSize.icon: (tokens) => {
+      SurfaceStylePart.padding(EdgeInsets.zero),
       SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconLg.sp)}),
+      SurfaceStylePart.text({TextStylePart.fontSize(tokens.textSizeLabel.sp)}),
       SurfaceStylePart.height(48.h),
       SurfaceStylePart.width(48.w),
     },
+    ButtonSize.iconWithLabel: (tokens) => {
+      SurfaceStylePart.padding(
+        const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+      ),
+      SurfaceStylePart.constraints(const BoxConstraints(minWidth: 48)),
+      SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconLg.sp)}),
+      SurfaceStylePart.text({
+        TextStylePart.fontSize(tokens.textSizeLabelSmall.sp),
+      }),
+    },
     ButtonSize.fab: (tokens) => {
+      SurfaceStylePart.padding(EdgeInsets.zero),
       SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconLg.sp)}),
       SurfaceStylePart.height(64.h),
       SurfaceStylePart.width(64.w),
     },
     ButtonSize.extendedFab: (tokens) => {
+      SurfaceStylePart.padding(const EdgeInsets.symmetric(horizontal: 24)),
       SurfaceStylePart.text({
         TextStylePart.fontSize(tokens.textSizeLabel.sp),
         TextStylePart.fontWeight(tokens.fontWeightTextHeavy),
@@ -541,21 +564,3 @@ final mechanicalFabIconBadgeStyle = VariantStyle.surfaceParts<AppTokens>(
     SurfaceStylePart.padding(EdgeInsets.zero),
   },
 );
-
-// final tactileButtonDecoration = _ButtonDecorationStyle();
-// final tactileButtonText = _ButtonTextStyle();
-
-// class _ButtonDecorationStyle {
-//   BoxDecoration resolve(
-//     AppTokens tokens, [
-//     Iterable<Object> variants = const [],
-//   ]) {
-//     return buttonStyle.resolve(tokens, variants).decoration;
-//   }
-// }
-
-// class _ButtonTextStyle {
-//   TextStyle resolve(AppTokens tokens, [Iterable<Object> variants = const []]) {
-//     return buttonStyle.resolve(tokens, variants).textStyle;
-//   }
-// }

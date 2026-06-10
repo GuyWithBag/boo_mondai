@@ -8,8 +8,8 @@ export 'widgets.vocabulary_test/widgets.vocabulary_test.barrel.dart';
 // Other files
 export 'answer_survey.page.dart';
 export 'enter_research_code.online.page.dart';
-export 'research.controller.dart';
 export 'research.remote.db.dart';
 export 'research.service.dart';
 export 'researcher_dashboard.online.page.dart';
 export 'vocabulary_test.online.page.dart';
+export 'research.controller.dart';

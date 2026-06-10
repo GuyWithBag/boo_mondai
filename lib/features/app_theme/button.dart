@@ -21,6 +21,7 @@ class Button extends HookWidget {
     this.depth = ButtonDepth.elevated,
     this.selected = false,
     this.mainAxisAlignment = MainAxisAlignment.center,
+    this.axis = Axis.horizontal,
     super.key,
   });
 
@@ -33,6 +34,7 @@ class Button extends HookWidget {
   final ButtonDepth depth;
   final bool selected;
   final MainAxisAlignment mainAxisAlignment;
+  final Axis axis;
 
   static Button icon({
     VoidCallback? onPressed,
@@ -46,6 +48,29 @@ class Button extends HookWidget {
       tone: tone,
       size: ButtonSize.icon,
       selected: selected,
+    );
+  }
+
+  static Button iconWithLabel({
+    VoidCallback? onPressed,
+    IconData? icon,
+    required String label,
+    ButtonTone tone = ButtonTone.ghost,
+    bool selected = false,
+  }) {
+    return Button(
+      onPressed: onPressed,
+      leading: icon == null ? null : Icon(icon),
+      tone: tone,
+      size: ButtonSize.iconWithLabel,
+      selected: selected,
+      axis: Axis.vertical,
+      child: Text(
+        label,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        textAlign: TextAlign.center,
+      ),
     );
   }
 
@@ -83,22 +108,6 @@ class Button extends HookWidget {
       depth,
     ]);
 
-    final padding = switch (size) {
-      ButtonSize.sm => const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-      ButtonSize.md => const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      ButtonSize.lg => const EdgeInsets.symmetric(horizontal: 32, vertical: 18),
-      ButtonSize.icon => EdgeInsets.zero,
-      ButtonSize.fab => EdgeInsets.zero,
-      ButtonSize.extendedFab => const EdgeInsets.symmetric(horizontal: 24),
-    };
-
-    final minSize = switch (size) {
-      ButtonSize.icon => const Size.square(48),
-      ButtonSize.fab => const Size.square(64),
-      ButtonSize.extendedFab => const Size(0, 64),
-      _ => Size.zero,
-    };
-
     final pressedOffset = switch (depth) {
       ButtonDepth.mechanical => 8.0,
       ButtonDepth.elevated => 4.0,
@@ -115,19 +124,11 @@ class Button extends HookWidget {
             : 0,
         0,
       ),
-      constraints: BoxConstraints(
-        minWidth: minSize.width,
-        minHeight: minSize.height,
-      ),
-      padding: padding,
       contentStyle: resolvedStyle.contentStyle,
     );
 
-    final content = Surface(
-      style: contentStyle,
-      duration: const Duration(milliseconds: 130),
-      curve: Curves.easeOutCubic,
-      child: Row(
+    final contentChild = switch (axis) {
+      Axis.horizontal => Row(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: mainAxisAlignment,
         children: [
@@ -142,6 +143,28 @@ class Button extends HookWidget {
           ],
         ],
       ),
+      Axis.vertical => Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: mainAxisAlignment,
+        children: [
+          ...leading != null ? [leading!] : const [],
+          if (child != null) ...[
+            if (leading != null) const SizedBox(height: 6),
+            child!,
+          ],
+          if (trailing != null) ...[
+            if (child != null || leading != null) const SizedBox(height: 6),
+            trailing!,
+          ],
+        ],
+      ),
+    };
+
+    final content = Surface(
+      style: contentStyle,
+      duration: const Duration(milliseconds: 130),
+      curve: Curves.easeOutCubic,
+      child: contentChild,
     );
 
     final paintedContent = tone == ButtonTone.dashed

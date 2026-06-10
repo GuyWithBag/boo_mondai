@@ -45,10 +45,9 @@ final appChipStyle = VariantStyle.chipParts<AppTokens>(
   defaultVariants: const [ChipTone.ghost],
   variants: {
     ChipTone.filled: (tokens) => {
+      ChipPart.iconTheme(IconThemeData(color: tokens.primary)),
       ChipPart.selectedColor(tokens.primarySoft),
-      ChipPart.secondaryLabelStyle(
-        _chipLabelStyle(tokens, tokens.colorTextOnBrand),
-      ),
+      ChipPart.secondaryLabelStyle(_chipLabelStyle(tokens, tokens.primary)),
       ChipPart.backgroundColor(tokens.primarySoft),
       ChipPart.side(
         BorderSide(
@@ -56,7 +55,7 @@ final appChipStyle = VariantStyle.chipParts<AppTokens>(
           width: tokens.borderWidthDefault.w,
         ),
       ),
-      ChipPart.labelStyle(_chipLabelStyle(tokens, tokens.colorTextOnBrand)),
+      ChipPart.labelStyle(_chipLabelStyle(tokens, tokens.primary)),
     },
     ChipTone.ghost: (tokens) => {
       ChipPart.selectedColor(tokens.backgroundSurface),
@@ -143,6 +142,7 @@ final appChipStyle = VariantStyle.chipParts<AppTokens>(
       ChipPart.labelStyle(_chipLabelStyle(tokens, tokens.ratingAgainText)),
     },
     ChipTone.hard: (tokens) => {
+      ChipPart.iconTheme(IconThemeData(color: tokens.ratingHardText)),
       ChipPart.selectedColor(tokens.ratingHardBackground),
       ChipPart.secondaryLabelStyle(
         _chipLabelStyle(tokens, tokens.ratingHardText),

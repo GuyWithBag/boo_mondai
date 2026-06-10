@@ -13,7 +13,7 @@ class AppPage {
   const AppPage({
     this.scaffoldHeader,
     required this.url,
-    required this.icon,
+    this.icon,
     required this.name,
     required this.builder,
     this.selectedIcon,
@@ -21,8 +21,8 @@ class AppPage {
 
   final Widget? scaffoldHeader;
   final String url;
-  final Widget icon;
-  final Widget? selectedIcon;
-  final Widget name;
+  final IconData? icon;
+  final IconData? selectedIcon;
+  final String name;
   final PageBuilder builder;
 }

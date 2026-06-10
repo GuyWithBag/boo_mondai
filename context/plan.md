@@ -6,6 +6,14 @@ Move BooMondai local persistence from Hive plus hand-written DTO repositories to
 
 The app should use generated Drift table rows, companions, and typed queries for local data instead of maintaining parallel DTOs solely for local storage. Supabase remains Postgres and keeps its existing migrations, RLS policies, functions, and remote schema contract.
 
+Local Supabase development database:
+
+```text
+postgresql://postgres:postgres@127.0.0.1:54322/postgres
+```
+
+Use this connection string only for local schema inspection, migration validation, and tooling. Do not bake it into app runtime code or committed production config.
+
 ## Key Decision
 
 Keep the current repository layout. The Flutter app stays at the repo root, and shared Drift code goes under `packages/`.
@@ -70,6 +78,44 @@ Responsibilities:
 - Expose a small public API through `boo_mondai_db.dart`.
 
 The shared database class should import only `package:drift/drift.dart`. Platform-specific database opening belongs in the Flutter app, not in this pure Dart package.
+
+### Abstract Local DAO Base
+
+Use an abstract base class for the new Drift-backed local DB/DAO classes so table-specific DAOs share logging, guarded execution, and naming conventions without recreating a generic Hive-style repository.
+
+Recommended shape:
+
+```dart
+typedef DriftPrimaryKey = Map<String, Object?>;
+
+abstract class AppDriftDao {
+  AppDriftDao(this.db);
+
+  final BooMondaiDatabase db;
+
+  String get tableName;
+
+  Future<T> guard<T>(
+    Future<T> Function() fn, {
+    required String action,
+  }) async {
+    // Centralized debug logging and exception mapping.
+    return fn();
+  }
+}
+```
+
+For entity tables, add a narrower abstract class only when it removes real duplication:
+
+```dart
+abstract class EntityDriftDao<Row, InsertableRow> extends AppDriftDao {
+  EntityDriftDao(super.db);
+
+  DriftPrimaryKey primaryKeyFromRow(Row row);
+}
+```
+
+Do not force every table into a single generic CRUD abstraction. Drift's generated tables, companions, composite keys, joins, and watched queries are strongly typed, and a too-generic base class would hide useful SQL shape. Keep common concerns in the abstract base, then implement typed methods in table-specific DAOs such as `DecksDao`, `CardTemplatesDao`, and `FsrsCardsDao`.
 
 ### `packages/boo_mondai_migrations`
 
@@ -206,6 +252,41 @@ Implement the Drift schema in groups that match the Supabase migration and curre
 - `fill_in_the_blank_segments`
 - `match_madness_pairs`
 
+### Card Template Polymorphism
+
+Keep the database shape aligned with Supabase:
+
+- one `card_templates` table for common template identity plus type-specific scalar columns
+- child tables for repeated/normalized data:
+  - `multiple_choice_options`
+  - `fill_in_the_blank_segments`
+  - `match_madness_pairs`
+  - `card_template_tags`
+
+Do not create separate Drift tables named `flashcard_templates`, `identification_templates`, and so on unless the remote schema changes too. The current Supabase contract already stores all template types in `card_templates` using the `type` discriminator and nullable type-specific columns.
+
+Keep polymorphic Dart behavior as domain/query models, not as separate local storage DTOs:
+
+```text
+CardTemplates table row + joined child rows
+└── CardTemplateDomain / existing CardTemplate subclass
+    ├── FlashcardTemplate.checkAnswer()
+    ├── IdentificationTemplate.checkAnswer()
+    ├── MultipleChoiceTemplate.checkAnswer()
+    ├── FillInTheBlanksTemplate.checkAnswer()
+    ├── MatchMadnessTemplate.checkAnswer()
+    └── WordScrambleTemplate.checkAnswer()
+```
+
+The recommended implementation is:
+
+- Drift stores generated rows and companions matching the local SQLite schema.
+- `CardTemplatesDao` exposes row-level methods for inserts, updates, deletes, and joins.
+- A small `CardTemplateAssembler` or DAO method converts a joined Drift result into the existing `CardTemplate` subclass when UI/study logic needs `checkAnswer`.
+- Writes go the other direction through explicit companion builders, for example `CardTemplateWriteMapper.toCardTemplatesCompanion(template)`.
+
+This means a Dart class like `FlashcardTemplate extends CardTemplate` remains useful for behavior, but it should not own a Drift `Table` instance. A Drift table is schema metadata; a `CardTemplate` object is an app/domain value.
+
 ### Study Runtime
 
 - `study_cards`
@@ -282,6 +363,8 @@ Feature service
 
 The current generic `SyncService<T extends DTO>` should be replaced because Drift rows and Supabase maps will not share a single DTO type cleanly.
 
+RLS policies remain entirely on Supabase. Drift/SQLite does not enforce Supabase RLS locally. Local DAOs should filter by active profile/deck ownership for user experience and data isolation, but the authoritative security check happens when PostgREST/Supabase receives the insert, update, delete, or select. If a local row violates RLS, the push fails and the sync adapter must surface or record that failure.
+
 Use table-specific sync adapters:
 
 - `pullRemoteSince(lastPulledAt)`
@@ -296,6 +379,40 @@ Add local sync metadata where needed:
 - `last_synced_at`
 - `deleted_at` for tombstones where deletes must sync
 - `dirty_fields` only if partial-field conflict handling becomes necessary
+
+### Drift To Supabase Writes
+
+Do not insert Drift table classes directly into Supabase. The write path should be explicit:
+
+```text
+Drift row/companion
+└── table-specific sync payload or map
+    └── SupabaseRemoteDB.upsert/insert/update
+```
+
+For example:
+
+```dart
+final row = await cardTemplatesDao.selectById(id);
+final payload = CardTemplateSyncMapper.rowToRemoteMap(row);
+await cardTemplatesRemoteDB.upsertMap(payload);
+```
+
+The exact method names can change, but the boundary should stay table-specific. A mapper is still needed at sync boundaries because:
+
+- Drift uses generated row/companion classes.
+- Supabase writes use JSON-like `Map<String, dynamic>` payloads and PostgREST column names.
+- joined relation fields such as `tags`, `options`, `segments`, and `pairs` must not be written to the parent table.
+- DateTime, enum, JSON, tombstone, and sync metadata conversions need one obvious home.
+
+Keep mappers small and directional:
+
+- `remoteMapToCompanion`
+- `rowToRemoteMap`
+- `domainToCompanion`
+- `joinedRowsToDomain`
+
+Avoid rebuilding one large app-wide DTO mapper layer. Keep mappers beside the DAO/sync adapter for the table group they serve.
 
 ## DAO Naming
 

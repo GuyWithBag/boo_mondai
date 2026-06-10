@@ -49,7 +49,10 @@ Future<void> main() async {
   Hive.registerAdapters();
 
   // ── Supabase ────────────────────────────────────────
-  await Supabase.initialize(url: Env.supabaseUrl, anonKey: Env.supabaseAnonKey);
+  await Supabase.initialize(
+    url: Env.supabaseUrl,
+    publishableKey: Env.supabaseAnonKey,
+  );
   await RemoteDB.init();
   await LocalDB.init();
   Services.init();

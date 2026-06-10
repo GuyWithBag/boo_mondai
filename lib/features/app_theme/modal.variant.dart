@@ -1,4 +1,4 @@
-import 'package:boo_mondai/core/theme/app_tokens.dart' show AppTokens;
+import 'package:boo_mondai/lib.barrel.dart' show AppTokens;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
 import 'package:theme_variants/theme_variants.dart';

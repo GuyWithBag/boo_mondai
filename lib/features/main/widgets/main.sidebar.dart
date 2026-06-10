@@ -51,13 +51,17 @@ class Sidebar extends StatelessWidget {
               final isSelected = index == currentPageIndex;
 
               return Button(
-                leading: page.icon,
+                leading: Icon(
+                  isSelected && page.selectedIcon != null
+                      ? page.selectedIcon!
+                      : page.icon!,
+                ),
                 tone: ButtonTone.textGhostSelect,
                 selected: isSelected,
                 depth: ButtonDepth.flat,
                 mainAxisAlignment: MainAxisAlignment.start,
                 onPressed: () => context.go(pages[index].url),
-                child: page.name,
+                child: Text(page.name),
               );
             },
           ),

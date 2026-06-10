@@ -190,86 +190,92 @@ class ViewDeckLocalSheet extends HookWidget {
       minChildSize: showCloseButton ? 0.5 : 1,
       maxChildSize: 1,
       builder: (context, scrollController) {
-        return Scaffold(
-          bottomNavigationBar: _BottomNavBar(deckId: deckId),
-          appBar: AppBar(
-            actions: [
-              Button.icon(
-                icon: Icons.edit,
-                onPressed: deck.isEditable
-                    ? () => context.push('/decks-local/$deckId/edit')
-                    : null,
-              ),
-              SizedBox(width: 10),
-              Button.icon(
-                icon: Icons.delete,
-                tone: ButtonTone.error,
-                onPressed: () {
-                  if (context.canPop()) {
-                    context.pop();
-                    return;
-                  }
-                  context.go('/');
-                },
-              ),
-              SizedBox(width: horizontalPadding),
-            ],
-            leadingWidth: 100.w,
-            leading: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: horizontalPadding,
-                vertical: verticalPadding + 4,
-              ),
-              child: Button.icon(
-                icon: Icons.arrow_back,
-                onPressed: () {
-                  if (context.canPop()) {
-                    context.pop();
-                    return;
-                  }
-                  context.go('/');
-                },
+        return Surface(
+          style: surfaceStyle.resolve(tokens, const [
+            SurfaceShape.rounded,
+            SurfacePadding.none,
+          ]),
+          child: Scaffold(
+            bottomNavigationBar: _BottomNavBar(deckId: deckId),
+            appBar: AppBar(
+              actions: [
+                Button.icon(
+                  icon: Icons.edit,
+                  onPressed: deck.isEditable
+                      ? () => context.push('/decks-local/$deckId/edit')
+                      : null,
+                ),
+                SizedBox(width: 10),
+                Button.icon(
+                  icon: Icons.delete,
+                  tone: ButtonTone.error,
+                  onPressed: () {
+                    if (context.canPop()) {
+                      context.pop();
+                      return;
+                    }
+                    context.go('/');
+                  },
+                ),
+                SizedBox(width: horizontalPadding),
+              ],
+              leadingWidth: 100.w,
+              leading: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: horizontalPadding,
+                  vertical: verticalPadding + 4,
+                ),
+                child: Button.icon(
+                  icon: Icons.arrow_back,
+                  onPressed: () {
+                    if (context.canPop()) {
+                      context.pop();
+                      return;
+                    }
+                    context.go('/');
+                  },
+                ),
               ),
             ),
-          ),
-          body: Surface(
-            style: surfaceStyle.resolve(tokens, const [
-              SurfaceShape.sharp,
-              SurfacePadding.none,
-            ]),
-            child: ListView(
-              controller: scrollController,
-              padding: EdgeInsets.zero,
-              children: [
-                _SheetHero(
-                  deck: deck,
-                  title: title,
-                  coverImageUrl: coverImageUrl,
-                  isSavingPublishState: isSavingPublishState.value,
-                  onPublishedChanged: setPublished,
-                ),
-                Padding(
-                  padding: EdgeInsets.all(tokens.spacePanelPadding),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      SizedBox(height: tokens.spacePanelGapLg),
-                      _MetadataPanel(
-                        deck: deck,
-                        studyCardCount: studyCards.length,
-                        templateCount: templates.length,
-                      ),
-                      SizedBox(height: tokens.spacePanelGapLg),
-                      _TagsPanel(tags: deck.tags),
-                      SizedBox(height: tokens.spacePanelGapLg),
-                      _DescriptionPanel(
-                        shortDescription: shortDescription,
-                        longDescription: longDescription,
-                      ),
-                    ],
+            body: Surface(
+              style: surfaceStyle.resolve(tokens, const [
+                SurfaceShape.sharp,
+                SurfacePadding.none,
+              ]),
+              child: ListView(
+                controller: scrollController,
+                padding: EdgeInsets.zero,
+                children: [
+                  _SheetHero(
+                    deck: deck,
+                    title: title,
+                    coverImageUrl: coverImageUrl,
+                    isSavingPublishState: isSavingPublishState.value,
+                    onPublishedChanged: setPublished,
                   ),
-                ),
-              ],
+                  Padding(
+                    padding: EdgeInsets.all(tokens.spacePanelPadding),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        SizedBox(height: tokens.spacePanelGapLg),
+                        _MetadataPanel(
+                          deck: deck,
+                          studyCardCount: studyCards.length,
+                          templateCount: templates.length,
+                        ),
+                        SizedBox(height: tokens.spacePanelGapLg),
+                        _TagsPanel(tags: deck.tags),
+                        SizedBox(height: tokens.spacePanelGapLg),
+                        _DescriptionPanel(
+                          shortDescription: shortDescription,
+                          longDescription: longDescription,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         );

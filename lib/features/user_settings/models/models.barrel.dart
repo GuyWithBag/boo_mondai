@@ -3,5 +3,5 @@
 // Other files
 export 'custom_theme_preset.dto.dart';
 export 'theme_override.dto.dart';
-export 'user_settings.dto.dart';
 export 'user_settings_change_log.dart';
+export 'user_settings.dto.dart';

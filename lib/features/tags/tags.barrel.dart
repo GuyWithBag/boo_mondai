@@ -3,12 +3,12 @@
 // Barrel files
 export 'models/models.barrel.dart';
 // Other files
-export 'card_template_tags.local.db.dart';
 export 'card_template_tags.remote.db.dart';
-export 'deck_tags.local.db.dart';
 export 'deck_tags.remote.db.dart';
+export 'tags.remote.db.dart';
+export 'user_review_card_tags.remote.db.dart';
+export 'card_template_tags.local.db.dart';
+export 'deck_tags.local.db.dart';
 export 'review_cards.local.db.dart';
 export 'tags.local.db.dart';
-export 'tags.remote.db.dart';
 export 'user_review_card_tags.local.db.dart';
-export 'user_review_card_tags.remote.db.dart';

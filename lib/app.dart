@@ -11,6 +11,15 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
 import 'package:boo_mondai/lib.barrel.dart';
 
+bool _scaleScreenUtilForSmallAndMediumWidth() {
+  if (PlatformService.isDesktop) {
+    return false;
+  }
+  return Breakpoints.isMobile(
+    Size(ScreenUtil().screenWidth, ScreenUtil().screenHeight),
+  );
+}
+
 class BooMondaiApp extends HookWidget {
   final AuthController authController;
   final UserSettings initialUserSettings;
@@ -33,8 +42,11 @@ class BooMondaiApp extends HookWidget {
     return ThemeVariantsProvider<AppTokens>(
       controller: controller,
       child: ScreenUtilInit(
-        designSize: const Size(1920, 1080),
+        designSize: Breakpoints.mobile,
         minTextAdapt: true,
+        splitScreenMode: true,
+        enableScaleWH: _scaleScreenUtilForSmallAndMediumWidth,
+        enableScaleText: _scaleScreenUtilForSmallAndMediumWidth,
         builder: (context, child) => MaterialApp.router(
           title: 'BooMondai',
           debugShowCheckedModeBanner: false,

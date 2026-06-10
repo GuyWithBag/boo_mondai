@@ -7,7 +7,7 @@ export 'widgets/widgets.barrel.dart';
 // Other files
 export 'leaderboard_entries.remote.db.dart';
 export 'streak.controller.dart';
-export 'streak.local.db.dart';
 export 'streaks.remote.db.dart';
 export 'view_leaderboard.controller.dart';
 export 'view_leaderboard.online.page.dart';
+export 'streak.local.db.dart';

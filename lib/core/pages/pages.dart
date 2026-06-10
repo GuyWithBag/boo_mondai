@@ -27,8 +27,8 @@ import 'package:provider/provider.dart' show WatchContext;
 class Pages {
   static final home = AppPage(
     url: '/',
-    icon: const Icon(Icons.home_outlined),
-    name: const Text('Home'),
+    icon: Icons.home_outlined,
+    name: 'Home',
     builder:
         (context, {pathParameters = const {}, queryParameters = const {}}) {
           final auth = context.watch<AuthController>();
@@ -41,8 +41,8 @@ class Pages {
 
   static final decksOnline = AppPage(
     url: '/decks-online',
-    icon: const Icon(Icons.public_outlined),
-    name: const Text('Decks Online'),
+    icon: Icons.public_outlined,
+    name: 'Decks Online',
     builder:
         (context, {pathParameters = const {}, queryParameters = const {}}) =>
             const ViewDecksOnlinePage(),
@@ -50,8 +50,8 @@ class Pages {
 
   static final decksLocal = AppPage(
     url: '/decks-local',
-    icon: const Icon(Icons.library_books_outlined),
-    name: const Text('Decks Local'),
+    icon: Icons.library_books_outlined,
+    name: 'Decks Local',
     builder:
         (context, {pathParameters = const {}, queryParameters = const {}}) =>
             const ViewDecksLocalPage(),
@@ -59,8 +59,8 @@ class Pages {
 
   static final reviews = AppPage(
     url: '/reviews',
-    icon: const Icon(Icons.rate_review_outlined),
-    name: const Text('Reviews'),
+    icon: Icons.rate_review_outlined,
+    name: 'Reviews',
     builder:
         (context, {pathParameters = const {}, queryParameters = const {}}) =>
             const ViewReviewsPage(),
@@ -68,8 +68,8 @@ class Pages {
 
   static final account = AppPage(
     url: '/account',
-    icon: const Icon(Icons.person_outline),
-    name: const Text('Account'),
+    icon: Icons.person_outline,
+    name: 'Account',
     builder:
         (context, {pathParameters = const {}, queryParameters = const {}}) =>
             const ViewAccountPage(),
@@ -77,8 +77,8 @@ class Pages {
 
   static final variants = AppPage(
     url: '/variants',
-    icon: const Icon(Icons.palette_outlined),
-    name: const Text('Variants'),
+    icon: Icons.palette_outlined,
+    name: 'Variants',
     builder:
         (context, {pathParameters = const {}, queryParameters = const {}}) =>
             const VariantShowcasePage(),
@@ -86,8 +86,7 @@ class Pages {
 
   static final login = AppPage(
     url: '/login',
-    icon: const SizedBox.shrink(),
-    name: const Text('Login'),
+    name: 'Login',
     builder:
         (context, {pathParameters = const {}, queryParameters = const {}}) =>
             const LoginPage(),
@@ -95,8 +94,7 @@ class Pages {
 
   static final register = AppPage(
     url: '/register',
-    icon: const SizedBox.shrink(),
-    name: const Text('Register'),
+    name: 'Register',
     builder:
         (context, {pathParameters = const {}, queryParameters = const {}}) =>
             const RegisterPage(),
@@ -104,8 +102,7 @@ class Pages {
 
   static final createDeck = AppPage(
     url: '/decks-local/create',
-    icon: const SizedBox.shrink(),
-    name: const Text('Create Deck'),
+    name: 'Create Deck',
     builder:
         (context, {pathParameters = const {}, queryParameters = const {}}) =>
             const CreateDeckPage(),
@@ -113,8 +110,7 @@ class Pages {
 
   static final viewDeckLocal = AppPage(
     url: '/decks-local/:deckId',
-    icon: const SizedBox.shrink(),
-    name: const Text('Deck'),
+    name: 'Deck',
     builder:
         (context, {pathParameters = const {}, queryParameters = const {}}) =>
             ViewDeckLocalPage(deckId: pathParameters['deckId']!),
@@ -122,8 +118,7 @@ class Pages {
 
   static final editDeck = AppPage(
     url: '/decks-local/:deckId/edit',
-    icon: const SizedBox.shrink(),
-    name: const Text('Edit Deck'),
+    name: 'Edit Deck',
     builder:
         (context, {pathParameters = const {}, queryParameters = const {}}) =>
             EditDeckPage(
@@ -134,8 +129,7 @@ class Pages {
 
   static final drillSession = AppPage(
     url: '/drill/:deckId/session',
-    icon: const SizedBox.shrink(),
-    name: const Text('Drill Session'),
+    name: 'Drill Session',
     builder:
         (context, {pathParameters = const {}, queryParameters = const {}}) =>
             StudySessionPage(
@@ -146,8 +140,7 @@ class Pages {
 
   static final drillResult = AppPage(
     url: '/drill/:sessionId/result',
-    icon: const SizedBox.shrink(),
-    name: const Text('Drill Result'),
+    name: 'Drill Result',
     builder:
         (context, {pathParameters = const {}, queryParameters = const {}}) =>
             ViewDrillResultPage(sessionId: pathParameters['sessionId']!),
@@ -155,8 +148,7 @@ class Pages {
 
   static final reviewSession = AppPage(
     url: '/review/session',
-    icon: const SizedBox.shrink(),
-    name: const Text('Review Session'),
+    name: 'Review Session',
     builder:
         (context, {pathParameters = const {}, queryParameters = const {}}) =>
             const StudySessionPage(deckId: null, mode: SessionMode.review),
@@ -164,8 +156,7 @@ class Pages {
 
   static final reviewDeckSession = AppPage(
     url: '/review/:deckId/session',
-    icon: const SizedBox.shrink(),
-    name: const Text('Deck Review Session'),
+    name: 'Deck Review Session',
     builder:
         (context, {pathParameters = const {}, queryParameters = const {}}) =>
             StudySessionPage(
@@ -176,8 +167,7 @@ class Pages {
 
   static final research = AppPage(
     url: '/research',
-    icon: const SizedBox.shrink(),
-    name: const Text('Research'),
+    name: 'Research',
     builder:
         (context, {pathParameters = const {}, queryParameters = const {}}) =>
             const ResearcherDashboardPage(),
@@ -185,8 +175,7 @@ class Pages {
 
   static final leaderboard = AppPage(
     url: '/leaderboard',
-    icon: const SizedBox.shrink(),
-    name: const Text('Leaderboard'),
+    name: 'Leaderboard',
     builder:
         (context, {pathParameters = const {}, queryParameters = const {}}) =>
             const ViewLeaderboardPage(),
@@ -194,8 +183,7 @@ class Pages {
 
   static final researchCode = AppPage(
     url: '/research/code',
-    icon: const SizedBox.shrink(),
-    name: const Text('Research Code'),
+    name: 'Research Code',
     builder:
         (context, {pathParameters = const {}, queryParameters = const {}}) =>
             const EnterResearchCodePage(),
@@ -203,8 +191,7 @@ class Pages {
 
   static final researchSurvey = AppPage(
     url: '/research/survey/:surveyType',
-    icon: const SizedBox.shrink(),
-    name: const Text('Survey'),
+    name: 'Survey',
     builder:
         (context, {pathParameters = const {}, queryParameters = const {}}) =>
             AnswerSurveyPage(
@@ -215,8 +202,7 @@ class Pages {
 
   static final researchTest = AppPage(
     url: '/research/test/:testSet',
-    icon: const SizedBox.shrink(),
-    name: const Text('Vocabulary Test'),
+    name: 'Vocabulary Test',
     builder:
         (context, {pathParameters = const {}, queryParameters = const {}}) =>
             VocabularyTestPage(testSet: pathParameters['testSet']!),

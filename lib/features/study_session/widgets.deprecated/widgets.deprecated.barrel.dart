@@ -4,7 +4,6 @@
 export 'anki_counter.dart';
 export 'first_pass_screen.dart';
 export 'fitb_interaction.dart';
-export 'flashcard_interaction.dart';
 export 'identification_feedback.dart';
 export 'identification_interaction.dart';
 export 'match_madness_interaction.dart';
@@ -15,3 +14,4 @@ export 'session_interaction.dart';
 export 'strike_chip.dart';
 export 'word_chip_area.dart';
 export 'word_scramble_interaction.dart';
+export 'flashcard_interaction.dart';

@@ -3,5 +3,5 @@
 // Barrel files
 export 'models/models.barrel.dart';
 // Other files
-export 'decks.local.db.dart';
 export 'decks.remote.db.dart';
+export 'decks.local.db.dart';

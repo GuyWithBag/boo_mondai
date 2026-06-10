@@ -32,8 +32,10 @@ class ResponsiveScaffold extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
+        final size = constraints.biggest;
+
         // Desktop Layout: Sidebar on the left, child on the right
-        if (Breakpoints.isDesktop(constraints.maxWidth)) {
+        if (!Breakpoints.isMobile(size)) {
           return Scaffold(
             appBar: appbar,
             body: Row(

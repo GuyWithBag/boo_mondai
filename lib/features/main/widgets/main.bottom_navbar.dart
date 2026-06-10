@@ -3,8 +3,9 @@
 // PURPOSE: Custom Bottom Navigation using Surface and custom Buttons
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/features/app_theme/app_theme.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, surfaceStyle, ButtonTone, ButtonDepth, Button, Pages;
+    show AppTokens, surfaceStyle, ButtonTone, Button, Pages;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart' show GoRouterHelper;
 import 'package:theme_variants/theme_variants.dart';
@@ -18,30 +19,40 @@ class BottomNavbar extends StatelessWidget {
   Widget build(BuildContext context) {
     final pages = Pages.shell;
     final tokens = context.themeTokens<AppTokens>();
-    return Surface(
-      style: surfaceStyle.resolve(tokens),
-      child: SafeArea(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: List.generate(pages.length, (index) {
-            final page = pages[index];
-            final isSelected = index == currentPageIndex;
+    return Container(
+      decoration: BoxDecoration(
+        border: BorderDirectional(
+          top: BorderSide(
+            color: tokens.borderNeutralSubtle,
+            width: tokens.borderWidthDefault,
+          ),
+        ),
+      ),
+      child: Surface(
+        style: surfaceStyle.resolve(tokens, const [
+          SurfaceShape.sharp,
+          SurfaceBorder.none,
+        ]),
+        child: SafeArea(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: List.generate(pages.length, (index) {
+              final page = pages[index];
+              final isSelected = index == currentPageIndex;
 
-            return Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                child: Button(
-                  leading: page.icon,
-                  tone: ButtonTone.filled,
-                  depth: ButtonDepth.flat,
+              return Expanded(
+                child: Button.iconWithLabel(
+                  icon: isSelected && page.selectedIcon != null
+                      ? page.selectedIcon
+                      : page.icon,
+                  label: page.name,
+                  tone: ButtonTone.textGhostSelect,
                   selected: isSelected,
-                  mainAxisAlignment: MainAxisAlignment.center,
                   onPressed: () => context.go(pages[index].url),
-                  child: page.name,
                 ),
-              ),
-            );
-          }),
+              );
+            }),
+          ),
         ),
       ),
     );

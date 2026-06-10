@@ -1,15 +1,31 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// PATH: lib/shared/breakpoints.dart
+// PATH: lib/core/theme/breakpoints.dart
 // PURPOSE: Responsive breakpoint constants for mobile/tablet/desktop
 // PROVIDERS: none
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-abstract final class Breakpoints {
-  static const double mobile = 600;
-  static const double tablet = 1024;
+import 'dart:ui';
 
-  static bool isMobile(double width) => width < mobile;
-  static bool isTablet(double width) => width >= mobile && width < tablet;
-  static bool isDesktop(double width) => width >= tablet;
+abstract final class Breakpoints {
+  static const Size mobile = Size(600, 800);
+  static const Size tablet = Size(840, 1024);
+  static const Size desktop = Size(1200, 900);
+  static const Size tv = Size(1600, 1200);
+
+  static bool isMobile(Size size) =>
+      size.width < mobile.width && size.height < mobile.height;
+
+  static bool isTablet(Size size) =>
+      size.width >= mobile.width &&
+      size.height >= mobile.height &&
+      (size.width < tablet.width || size.height < tablet.height);
+
+  static bool isDesktop(Size size) =>
+      size.width >= tablet.width &&
+      size.height >= tablet.height &&
+      (size.width < tv.width || size.height < tv.height);
+
+  static bool isTv(Size size) =>
+      size.width >= tv.width && size.height >= tv.height;
 }
