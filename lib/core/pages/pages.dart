@@ -16,7 +16,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         StudySessionPage,
         ResearcherDashboardPage,
         ViewLeaderboardPage,
-        ViewDeckLocalPage,
         EditDeckPage,
         SessionMode,
         ViewDrillResultPage,
@@ -106,14 +105,6 @@ class Pages {
     builder:
         (context, {pathParameters = const {}, queryParameters = const {}}) =>
             const CreateDeckPage(),
-  );
-
-  static final viewDeckLocal = AppPage(
-    url: '/decks-local/:deckId',
-    name: 'Deck',
-    builder:
-        (context, {pathParameters = const {}, queryParameters = const {}}) =>
-            ViewDeckLocalPage(deckId: pathParameters['deckId']!),
   );
 
   static final editDeck = AppPage(
@@ -219,7 +210,6 @@ class Pages {
   static final auth = <AppPage>[login, register];
   static final nonShell = <AppPage>[
     createDeck,
-    viewDeckLocal,
     editDeck,
     drillSession,
     drillResult,

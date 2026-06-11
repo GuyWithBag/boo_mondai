@@ -2,9 +2,8 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
         fontFamily,
-        radiusContainerLarge,
-        radius2xl,
-        radius3xl,
+        radiusSurface,
+        radiusSurfaceSm,
         surfaceShadowOffset,
         modalShadowOffset,
         borderWidthDefault,
@@ -34,7 +33,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         colorTransparent,
         colorTextOnBrand,
         cardAspectRatio,
-        buildAppThemeData;
+        widthCard,
+        radiusCard,
+        buildAppThemeData,
+        radiusSurfaceLg;
 import 'package:flutter/material.dart' show Color, Brightness;
 import 'package:theme_variants/theme_variants.dart'
     show ThemeVariant, ThemeVariantBrightness;
@@ -78,9 +80,9 @@ final AppTokens defaultDark = AppTokens(
   ratingEasyText: Color(0xff64b5f6),
   ratingEasyBorder: Color(0xff075985),
   ratingEasyHoverBackground: Color(0xff0c4a6e),
-  radiusContainerLarge: radiusContainerLarge,
-  radius2xl: radius2xl,
-  radius3xl: radius3xl,
+  radiusSurfaceLg: radiusSurfaceLg,
+  radiusSurface: radiusSurface,
+  radiusSurfaceSm: radiusSurfaceSm,
   surfaceShadowOffset: surfaceShadowOffset,
   modalShadowOffset: modalShadowOffset,
   borderWidthDefault: borderWidthDefault,
@@ -111,6 +113,8 @@ final AppTokens defaultDark = AppTokens(
   colorTransparent: colorTransparent,
   colorTextOnBrand: colorTextOnBrand,
   cardAspectRatio: cardAspectRatio,
+  widthCard: widthCard,
+  radiusCard: radiusCard,
 );
 
 final booMondaiDark = ThemeVariant<AppTokens>(

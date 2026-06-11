@@ -175,7 +175,7 @@ class Button extends HookWidget {
                 color: state.value == ButtonState.hovered
                     ? tokens.primary
                     : tokens.borderNeutralSubtle,
-                radius: tokens.radius2xl,
+                radius: tokens.radiusSurfaceSm,
               ),
               child: content,
             ),

@@ -18,7 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-// enum DeckTileState { idle, pressed, hovered }
+enum DeckTileState { defaultView, bare, spread }
 
 class DeckTile extends HookWidget {
   final Deck? deck;
@@ -49,6 +49,15 @@ class DeckTile extends HookWidget {
 
   final VoidCallback? onPressed;
 
+  /// Reports pointer hover without changing the visual state.
+  final ValueChanged<bool>? onHover;
+
+  /// Controls the deck tile layout. Hover does not mutate this state.
+  final DeckTileState state;
+
+  /// Shows deck tags on the default tile's front cover.
+  final bool hasTags;
+
   final double? width;
 
   const DeckTile({
@@ -63,6 +72,9 @@ class DeckTile extends HookWidget {
     this.onSelect,
     this.onLongPress,
     this.onPressed,
+    this.onHover,
+    this.state = DeckTileState.defaultView,
+    this.hasTags = false,
     this.width,
   });
 
@@ -71,9 +83,9 @@ class DeckTile extends HookWidget {
     final tokens = context.themeTokens<AppTokens>();
     const stackedCardCount = 3;
     final cardAspectRatio = tokens.cardAspectRatio;
-    final cardWidth = width ?? 300;
+    final cardWidth = width ?? tokens.widthCard;
     final cardHeight = cardWidth / cardAspectRatio;
-    final animationScale = cardWidth / 300;
+    final animationScale = cardWidth / tokens.widthCard;
     final coverImageUrl = _coverImageUrl(deck);
     // final scale = 1.3;
     final cardControllers = useMemoized(
@@ -105,62 +117,91 @@ class DeckTile extends HookWidget {
       // scale: scale,
     );
 
-    void animate(bool reveal) {
+    void applyTileState() {
       final positionX = -80.0 * animationScale;
       final positionY = -30.0 * animationScale;
       final stackSpreadX = 20.0 * animationScale;
       final stackSpreadY = 10.0 * animationScale;
       final (roll, pitch, yaw) = (0.20, 0.30, -0.10);
-      if (reveal) {
-        for (var i = 0; i < cardControllers.length; i++) {
-          final controller = cardControllers[i];
-          controller.setPosition(
-            x: positionX + i * stackSpreadX,
-            y: positionY + i * stackSpreadY,
-          );
-          controller.setRotation(roll: -roll, pitch: -pitch, yaw: 0);
-        }
-        physicalDeckController.setPosition(x: -positionX, y: positionY + 10);
-        physicalDeckController.setRotation(roll: roll, pitch: pitch, yaw: yaw);
-      } else {
-        for (final controller in cardControllers) {
-          controller.resetRotation();
-          controller.resetPosition();
-        }
-        physicalDeckController.resetRotation();
-        physicalDeckController.resetPosition();
+
+      for (final controller in cardControllers) {
+        controller.resetRotation();
+        controller.resetPosition();
       }
+      physicalDeckController.resetRotation();
+      physicalDeckController.resetPosition();
+
+      if (state != DeckTileState.spread) {
+        return;
+      }
+
+      for (var i = 0; i < cardControllers.length; i++) {
+        final controller = cardControllers[i];
+        controller.setPosition(
+          x: positionX + i * stackSpreadX,
+          y: positionY + i * stackSpreadY,
+        );
+        controller.setRotation(roll: -roll, pitch: -pitch, yaw: 0);
+      }
+      physicalDeckController.setPosition(x: -positionX, y: positionY + 10);
+      physicalDeckController.setRotation(roll: roll, pitch: pitch, yaw: yaw);
     }
 
+    useEffect(() {
+      applyTileState();
+      return null;
+    }, [state, cardControllers, physicalDeckController, animationScale]);
+
     return MouseRegion(
-      onHover: (_) {
-        animate(true);
+      onEnter: (_) {
+        onHover?.call(true);
       },
       onExit: (_) {
-        animate(false);
+        onHover?.call(false);
       },
       child: GestureDetector(
-        onTap: onPressed,
+        onTap: isSelecting ? onSelect : onPressed,
+        onLongPress: onLongPress,
         child: SizedBox(
           width: cardWidth,
           child: AspectRatio(
             aspectRatio: cardAspectRatio,
             child: Stack(
+              clipBehavior: Clip.none,
               fit: StackFit.expand,
-              children: [
-                for (final controller in cardControllers)
-                  PhysicalCard(
-                    controller: controller,
-                    front: PhysicalCardSide(
-                      child: Image.network(coverImageUrl, fit: BoxFit.cover),
-                    ),
+              children: switch (state) {
+                DeckTileState.defaultView => [
+                  PhysicalDeck(
+                    deck: deck,
+                    controller: physicalDeckController,
+                    hasTags: hasTags,
+                    textScaleBaseWidth: cardWidth,
                   ),
-                PhysicalDeck(
-                  deck: deck,
-                  controller: physicalDeckController,
-                  textScaleBaseWidth: cardWidth,
-                ),
-              ],
+                ],
+                DeckTileState.bare => [
+                  PhysicalDeck(
+                    controller: physicalDeckController,
+                    showInfoCover: false,
+                    textScaleBaseWidth: cardWidth,
+                  ),
+                ],
+                DeckTileState.spread => [
+                  for (final controller in cardControllers)
+                    PhysicalCard(
+                      controller: controller,
+                      front: PhysicalCardSide(
+                        maxWidth: cardWidth,
+                        child: Image.network(coverImageUrl, fit: BoxFit.cover),
+                      ),
+                    ),
+                  PhysicalDeck(
+                    deck: deck,
+                    controller: physicalDeckController,
+                    showInfoCover: false,
+                    textScaleBaseWidth: cardWidth,
+                  ),
+                ],
+              },
             ),
           ),
         ),

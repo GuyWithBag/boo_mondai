@@ -2,3 +2,6 @@
 
 // Other files
 export 'deck_tile.dart';
+export 'view_deck.local.sheet.dart';
+export 'view_deck.local.bottom_navbar.dart';
+export 'view_deck.local.hook.dart';

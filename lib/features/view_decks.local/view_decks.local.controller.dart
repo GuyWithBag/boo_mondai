@@ -5,7 +5,16 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/lib.barrel.dart';
+import 'package:boo_mondai/lib.barrel.dart'
+    show
+        DecksLocalDB,
+        LocalDB,
+        Controller,
+        Deck,
+        AppException,
+        showViewDeckLocalSheet,
+        SyncService,
+        RemoteDB;
 import 'package:flutter/material.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 

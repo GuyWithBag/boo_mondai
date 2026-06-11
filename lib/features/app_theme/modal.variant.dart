@@ -21,7 +21,9 @@ final appModalStyle = VariantStyle.surfaceParts<AppTokens>(
     SurfaceStylePart.padding(EdgeInsets.all(tokens.spacePanelPadding.r)),
     SurfaceStylePart.decoration({
       DecorationPart.color(tokens.backgroundSurface),
-      DecorationPart.borderRadius(BorderRadius.circular(tokens.radius3xl.r)),
+      DecorationPart.borderRadius(
+        BorderRadius.circular(tokens.radiusSurface.r),
+      ),
       DecorationPart.border(
         Border.all(
           color: tokens.borderNeutralSubtle,

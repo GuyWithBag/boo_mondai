@@ -205,16 +205,12 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
   static const Field<AppTokens, double> _f$letterSpacingTextEyebrow = Field(
       'letterSpacingTextEyebrow', _$letterSpacingTextEyebrow,
       key: r'letter_spacing_text_eyebrow');
-  static double _$radiusContainerLarge(AppTokens v) => v.radiusContainerLarge;
-  static const Field<AppTokens, double> _f$radiusContainerLarge = Field(
-      'radiusContainerLarge', _$radiusContainerLarge,
-      key: r'radius_container_large');
-  static double _$radius2xl(AppTokens v) => v.radius2xl;
-  static const Field<AppTokens, double> _f$radius2xl =
-      Field('radius2xl', _$radius2xl);
-  static double _$radius3xl(AppTokens v) => v.radius3xl;
-  static const Field<AppTokens, double> _f$radius3xl =
-      Field('radius3xl', _$radius3xl);
+  static double _$radiusSurface(AppTokens v) => v.radiusSurface;
+  static const Field<AppTokens, double> _f$radiusSurface =
+      Field('radiusSurface', _$radiusSurface, key: r'radius_surface');
+  static double _$radiusSurfaceSm(AppTokens v) => v.radiusSurfaceSm;
+  static const Field<AppTokens, double> _f$radiusSurfaceSm =
+      Field('radiusSurfaceSm', _$radiusSurfaceSm, key: r'radius_surface_sm');
   static double _$borderWidthDefault(AppTokens v) => v.borderWidthDefault;
   static const Field<AppTokens, double> _f$borderWidthDefault = Field(
       'borderWidthDefault', _$borderWidthDefault,
@@ -276,6 +272,15 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
   static double _$cardAspectRatio(AppTokens v) => v.cardAspectRatio;
   static const Field<AppTokens, double> _f$cardAspectRatio =
       Field('cardAspectRatio', _$cardAspectRatio, key: r'card_aspect_ratio');
+  static double _$widthCard(AppTokens v) => v.widthCard;
+  static const Field<AppTokens, double> _f$widthCard =
+      Field('widthCard', _$widthCard, key: r'width_card');
+  static double _$radiusCard(AppTokens v) => v.radiusCard;
+  static const Field<AppTokens, double> _f$radiusCard =
+      Field('radiusCard', _$radiusCard, key: r'radius_card');
+  static double _$radiusSurfaceLg(AppTokens v) => v.radiusSurfaceLg;
+  static const Field<AppTokens, double> _f$radiusSurfaceLg =
+      Field('radiusSurfaceLg', _$radiusSurfaceLg, key: r'radius_surface_lg');
 
   @override
   final MappableFields<AppTokens> fields = const {
@@ -330,9 +335,8 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
     #lineHeightFieldDisplay: _f$lineHeightFieldDisplay,
     #lineHeightTactile: _f$lineHeightTactile,
     #letterSpacingTextEyebrow: _f$letterSpacingTextEyebrow,
-    #radiusContainerLarge: _f$radiusContainerLarge,
-    #radius2xl: _f$radius2xl,
-    #radius3xl: _f$radius3xl,
+    #radiusSurface: _f$radiusSurface,
+    #radiusSurfaceSm: _f$radiusSurfaceSm,
     #borderWidthDefault: _f$borderWidthDefault,
     #spacePanelPadding: _f$spacePanelPadding,
     #spacePanelPaddingSm: _f$spacePanelPaddingSm,
@@ -350,6 +354,9 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
     #sizeIconMd: _f$sizeIconMd,
     #sizeIconLg: _f$sizeIconLg,
     #cardAspectRatio: _f$cardAspectRatio,
+    #widthCard: _f$widthCard,
+    #radiusCard: _f$radiusCard,
+    #radiusSurfaceLg: _f$radiusSurfaceLg,
   };
 
   static AppTokens _instantiate(DecodingData data) {
@@ -405,9 +412,8 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
         lineHeightFieldDisplay: data.dec(_f$lineHeightFieldDisplay),
         lineHeightTactile: data.dec(_f$lineHeightTactile),
         letterSpacingTextEyebrow: data.dec(_f$letterSpacingTextEyebrow),
-        radiusContainerLarge: data.dec(_f$radiusContainerLarge),
-        radius2xl: data.dec(_f$radius2xl),
-        radius3xl: data.dec(_f$radius3xl),
+        radiusSurface: data.dec(_f$radiusSurface),
+        radiusSurfaceSm: data.dec(_f$radiusSurfaceSm),
         borderWidthDefault: data.dec(_f$borderWidthDefault),
         spacePanelPadding: data.dec(_f$spacePanelPadding),
         spacePanelPaddingSm: data.dec(_f$spacePanelPaddingSm),
@@ -424,7 +430,10 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
         textSizeCardBackContent: data.dec(_f$textSizeCardBackContent),
         sizeIconMd: data.dec(_f$sizeIconMd),
         sizeIconLg: data.dec(_f$sizeIconLg),
-        cardAspectRatio: data.dec(_f$cardAspectRatio));
+        cardAspectRatio: data.dec(_f$cardAspectRatio),
+        widthCard: data.dec(_f$widthCard),
+        radiusCard: data.dec(_f$radiusCard),
+        radiusSurfaceLg: data.dec(_f$radiusSurfaceLg));
   }
 
   @override
@@ -530,9 +539,8 @@ abstract class AppTokensCopyWith<$R, $In extends AppTokens, $Out>
       double? lineHeightFieldDisplay,
       double? lineHeightTactile,
       double? letterSpacingTextEyebrow,
-      double? radiusContainerLarge,
-      double? radius2xl,
-      double? radius3xl,
+      double? radiusSurface,
+      double? radiusSurfaceSm,
       double? borderWidthDefault,
       double? spacePanelPadding,
       double? spacePanelPaddingSm,
@@ -549,7 +557,10 @@ abstract class AppTokensCopyWith<$R, $In extends AppTokens, $Out>
       double? textSizeCardBackContent,
       double? sizeIconMd,
       double? sizeIconLg,
-      double? cardAspectRatio});
+      double? cardAspectRatio,
+      double? widthCard,
+      double? radiusCard,
+      double? radiusSurfaceLg});
   AppTokensCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -614,9 +625,8 @@ class _AppTokensCopyWithImpl<$R, $Out>
           double? lineHeightFieldDisplay,
           double? lineHeightTactile,
           double? letterSpacingTextEyebrow,
-          double? radiusContainerLarge,
-          double? radius2xl,
-          double? radius3xl,
+          double? radiusSurface,
+          double? radiusSurfaceSm,
           double? borderWidthDefault,
           double? spacePanelPadding,
           double? spacePanelPaddingSm,
@@ -633,7 +643,10 @@ class _AppTokensCopyWithImpl<$R, $Out>
           double? textSizeCardBackContent,
           double? sizeIconMd,
           double? sizeIconLg,
-          double? cardAspectRatio}) =>
+          double? cardAspectRatio,
+          double? widthCard,
+          double? radiusCard,
+          double? radiusSurfaceLg}) =>
       $apply(FieldCopyWithData({
         if (name != null) #name: name,
         if (fontFamily != null) #fontFamily: fontFamily,
@@ -705,10 +718,8 @@ class _AppTokensCopyWithImpl<$R, $Out>
         if (lineHeightTactile != null) #lineHeightTactile: lineHeightTactile,
         if (letterSpacingTextEyebrow != null)
           #letterSpacingTextEyebrow: letterSpacingTextEyebrow,
-        if (radiusContainerLarge != null)
-          #radiusContainerLarge: radiusContainerLarge,
-        if (radius2xl != null) #radius2xl: radius2xl,
-        if (radius3xl != null) #radius3xl: radius3xl,
+        if (radiusSurface != null) #radiusSurface: radiusSurface,
+        if (radiusSurfaceSm != null) #radiusSurfaceSm: radiusSurfaceSm,
         if (borderWidthDefault != null) #borderWidthDefault: borderWidthDefault,
         if (spacePanelPadding != null) #spacePanelPadding: spacePanelPadding,
         if (spacePanelPaddingSm != null)
@@ -728,7 +739,10 @@ class _AppTokensCopyWithImpl<$R, $Out>
           #textSizeCardBackContent: textSizeCardBackContent,
         if (sizeIconMd != null) #sizeIconMd: sizeIconMd,
         if (sizeIconLg != null) #sizeIconLg: sizeIconLg,
-        if (cardAspectRatio != null) #cardAspectRatio: cardAspectRatio
+        if (cardAspectRatio != null) #cardAspectRatio: cardAspectRatio,
+        if (widthCard != null) #widthCard: widthCard,
+        if (radiusCard != null) #radiusCard: radiusCard,
+        if (radiusSurfaceLg != null) #radiusSurfaceLg: radiusSurfaceLg
       }));
   @override
   AppTokens $make(CopyWithData data) => AppTokens(
@@ -810,9 +824,8 @@ class _AppTokensCopyWithImpl<$R, $Out>
       lineHeightFieldDisplay: data.get(#lineHeightFieldDisplay, or: $value.lineHeightFieldDisplay),
       lineHeightTactile: data.get(#lineHeightTactile, or: $value.lineHeightTactile),
       letterSpacingTextEyebrow: data.get(#letterSpacingTextEyebrow, or: $value.letterSpacingTextEyebrow),
-      radiusContainerLarge: data.get(#radiusContainerLarge, or: $value.radiusContainerLarge),
-      radius2xl: data.get(#radius2xl, or: $value.radius2xl),
-      radius3xl: data.get(#radius3xl, or: $value.radius3xl),
+      radiusSurface: data.get(#radiusSurface, or: $value.radiusSurface),
+      radiusSurfaceSm: data.get(#radiusSurfaceSm, or: $value.radiusSurfaceSm),
       borderWidthDefault: data.get(#borderWidthDefault, or: $value.borderWidthDefault),
       spacePanelPadding: data.get(#spacePanelPadding, or: $value.spacePanelPadding),
       spacePanelPaddingSm: data.get(#spacePanelPaddingSm, or: $value.spacePanelPaddingSm),
@@ -829,7 +842,10 @@ class _AppTokensCopyWithImpl<$R, $Out>
       textSizeCardBackContent: data.get(#textSizeCardBackContent, or: $value.textSizeCardBackContent),
       sizeIconMd: data.get(#sizeIconMd, or: $value.sizeIconMd),
       sizeIconLg: data.get(#sizeIconLg, or: $value.sizeIconLg),
-      cardAspectRatio: data.get(#cardAspectRatio, or: $value.cardAspectRatio));
+      cardAspectRatio: data.get(#cardAspectRatio, or: $value.cardAspectRatio),
+      widthCard: data.get(#widthCard, or: $value.widthCard),
+      radiusCard: data.get(#radiusCard, or: $value.radiusCard),
+      radiusSurfaceLg: data.get(#radiusSurfaceLg, or: $value.radiusSurfaceLg));
 
   @override
   AppTokensCopyWith<$R2, AppTokens, $Out2> $chain<$R2, $Out2>(

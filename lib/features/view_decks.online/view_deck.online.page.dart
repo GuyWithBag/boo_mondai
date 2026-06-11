@@ -19,7 +19,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextSize,
         TextWeight,
         TextTone,
-        AuthorAvatarRow,
+        DeckProfilesLabel,
         ButtonTone,
         Button,
         SurfaceTone,
@@ -61,7 +61,7 @@ class ViewDeckOnlineSheet extends StatelessWidget {
         return Material(
           color: tokens.backgroundPage,
           borderRadius: BorderRadius.vertical(
-            top: Radius.circular(tokens.radius3xl.r),
+            top: Radius.circular(tokens.radiusSurface.r),
           ),
           clipBehavior: Clip.antiAlias,
           child: SingleChildScrollView(
@@ -266,9 +266,9 @@ class _StoreSummary extends StatelessWidget {
               ]),
             ),
             SizedBox(height: tokens.spacePanelGapLg),
-            AuthorAvatarRow(
-              authorName: authorName,
-              authorAvatarUrl: deck.userProfile?.avatarUrl,
+            DeckProfilesLabel(
+              profileName: authorName,
+              profileAvatarUrl: deck.userProfile?.avatarUrl,
             ),
             SizedBox(height: tokens.spacePanelGapLg),
             Wrap(
@@ -1015,11 +1015,11 @@ class _DiscussionTextField extends StatelessWidget {
         filled: true,
         fillColor: tokens.backgroundSurface,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(tokens.radius2xl),
+          borderRadius: BorderRadius.circular(tokens.radiusSurfaceSm),
           borderSide: BorderSide(color: tokens.borderNeutralSubtle),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(tokens.radius2xl),
+          borderRadius: BorderRadius.circular(tokens.radiusSurfaceSm),
           borderSide: BorderSide(color: tokens.borderNeutralSubtle),
         ),
       ),

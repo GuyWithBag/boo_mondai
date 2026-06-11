@@ -33,7 +33,7 @@ class SegmentedControl<T> extends StatelessWidget {
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: tokens.softGray,
-          borderRadius: BorderRadius.circular(tokens.radius3xl),
+          borderRadius: BorderRadius.circular(tokens.radiusSurface),
         ),
       ),
 
@@ -79,7 +79,7 @@ class _SegmentedControlOption<T> extends StatelessWidget {
     return InkWell(
       borderRadius:
           style.decoration.borderRadius as BorderRadius? ??
-          BorderRadius.circular(tokens.radius2xl),
+          BorderRadius.circular(tokens.radiusSurfaceSm),
       onTap: enabled ? onTap : null,
       child: Surface(style: style, child: Text(option.label)),
     );

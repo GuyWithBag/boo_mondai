@@ -26,9 +26,9 @@ final double spacePanelGapLg = 24;
 final double spacePanelGapMd = 18;
 final double spacePanelGapSm = 12;
 
-final double radiusContainerLarge = 40;
-final double radius2xl = 16;
-final double radius3xl = 24;
+final double radiusSurfaceLg = 60;
+final double radiusSurface = 40;
+final double radiusSurfaceSm = 16;
 
 final double textSizeHeader = 24;
 final double textSizeLabelLarge = 16;
@@ -42,3 +42,5 @@ final double sizeIconMd = 18;
 final double sizeIconLg = 24;
 
 final double cardAspectRatio = 5 / 7;
+const double widthCard = 300;
+const double radiusCard = 16;

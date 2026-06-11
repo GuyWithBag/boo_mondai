@@ -30,7 +30,9 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
   base: (tokens) => {
     SurfaceStylePart.decoration({
       DecorationPart.color(tokens.backgroundSurface),
-      DecorationPart.borderRadius(BorderRadius.circular(tokens.radius2xl.r)),
+      DecorationPart.borderRadius(
+        BorderRadius.circular(tokens.radiusSurfaceSm.r),
+      ),
       DecorationPart.border(
         Border.all(
           color: tokens.borderNeutralSubtle,

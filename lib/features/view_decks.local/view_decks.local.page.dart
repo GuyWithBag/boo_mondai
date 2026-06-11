@@ -7,17 +7,18 @@
 
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        ViewDecksLocalController,
         AuthController,
+        CreateDeckTile,
         Deck,
+        DeckTile,
+        DeckTileState,
+        EmptyState,
         ListingStatesWrapper,
         SnackbarTone,
-        showSnackbar,
         SyncButton,
-        DeckTile,
+        ViewDecksLocalController,
         showCreateDeckLocalSheet,
-        EmptyState,
-        CreateDeckTile;
+        showSnackbar;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -125,6 +126,7 @@ class _DeckListBody extends StatelessWidget {
       itemBuilder: (_, _, deck) {
         return DeckTile(
           deck: deck,
+          state: DeckTileState.defaultView,
           onPressed: () {
             onPressed(context, deck);
           },

@@ -8,8 +8,8 @@
 import 'package:boo_mondai/lib.barrel.dart' show AppSpacing, AppColors;
 import 'package:flutter/material.dart';
 
-class AvatarWithLabel extends StatelessWidget {
-  const AvatarWithLabel({
+class ProfileLabel extends StatelessWidget {
+  const ProfileLabel({
     super.key,
     required this.displayName,
     required this.label,

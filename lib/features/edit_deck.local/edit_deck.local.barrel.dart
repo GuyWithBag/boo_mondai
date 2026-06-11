@@ -5,6 +5,6 @@ export 'hooks/hooks.barrel.dart';
 export 'models/models.barrel.dart';
 export 'widgets/widgets.barrel.dart';
 // Other files
-export 'create_deck.local.page.dart';
 export 'edit_deck.controller.dart';
 export 'edit_deck.local.page.dart';
+export 'create_deck.local.page.dart';

@@ -68,7 +68,7 @@ final appTextFieldStyle = VariantStyle.textFieldParts<AppTokens>(
         InputDecorationPart.contentPadding(EdgeInsets.all(16.r)),
         InputDecorationPart.enabledBorder(
           OutlineInputBorder(
-            borderRadius: BorderRadius.circular(tokens.radius2xl.r),
+            borderRadius: BorderRadius.circular(tokens.radiusSurfaceSm.r),
             borderSide: BorderSide(
               color: tokens.borderNeutralSubtle,
               width: tokens.borderWidthDefault.w,
@@ -77,7 +77,7 @@ final appTextFieldStyle = VariantStyle.textFieldParts<AppTokens>(
         ),
         InputDecorationPart.focusedBorder(
           OutlineInputBorder(
-            borderRadius: BorderRadius.circular(tokens.radius2xl.r),
+            borderRadius: BorderRadius.circular(tokens.radiusSurfaceSm.r),
             borderSide: BorderSide(
               color: tokens.primary,
               width: tokens.borderWidthDefault.w,

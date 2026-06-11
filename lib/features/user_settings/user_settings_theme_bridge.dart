@@ -96,15 +96,12 @@ class UserSettingsThemeBridge {
     final nextTokens = theme.tokens.copyWith(
       primary: hasPrimary ? Color(override.primaryColorValue!) : null,
       fontFamily: hasFont ? override.fontFamily!.trim() : null,
-      radiusContainerLarge: radiusScale == null
+      radiusSurface: radiusScale == null
           ? null
-          : theme.tokens.radiusContainerLarge * radiusScale,
-      radius2xl: radiusScale == null
+          : theme.tokens.radiusSurface * radiusScale,
+      radiusSurfaceSm: radiusScale == null
           ? null
-          : theme.tokens.radius2xl * radiusScale,
-      radius3xl: radiusScale == null
-          ? null
-          : theme.tokens.radius3xl * radiusScale,
+          : theme.tokens.radiusSurfaceSm * radiusScale,
       spacePanelPadding: spacingScale == null
           ? null
           : theme.tokens.spacePanelPadding * spacingScale,

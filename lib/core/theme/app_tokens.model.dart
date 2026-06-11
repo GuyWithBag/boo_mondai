@@ -30,7 +30,7 @@ fontWeightTextStrong
 lineHeightTextBody
 spacePanelGapLg
 surfaceShadowOffset
-radiusContainerLarge
+radiusSurface
 borderWidthDefault
 
 Color tokens should describe use.
@@ -59,8 +59,8 @@ spacePanelGapMd
 spacePanelGapLg
 sizeIconMd
 sizeIconLg
-radius2xl
-radius3xl
+radiusSurfaceSm
+radiusSurface
 
 Avoid adding scale names if there is only one value:
 spacePanelGapDefault
@@ -131,9 +131,8 @@ class AppTokens with AppTokensMappable {
     required this.lineHeightFieldDisplay,
     required this.lineHeightTactile,
     required this.letterSpacingTextEyebrow,
-    required this.radiusContainerLarge,
-    required this.radius2xl,
-    required this.radius3xl,
+    required this.radiusSurface,
+    required this.radiusSurfaceSm,
     required this.borderWidthDefault,
     required this.spacePanelPadding,
     required this.spacePanelPaddingSm,
@@ -151,6 +150,9 @@ class AppTokens with AppTokensMappable {
     required this.sizeIconMd,
     required this.sizeIconLg,
     required this.cardAspectRatio,
+    required this.widthCard,
+    required this.radiusCard,
+    required this.radiusSurfaceLg,
   });
 
   final String name;
@@ -204,9 +206,9 @@ class AppTokens with AppTokensMappable {
   final double lineHeightFieldDisplay;
   final double lineHeightTactile;
   final double letterSpacingTextEyebrow;
-  final double radiusContainerLarge;
-  final double radius2xl;
-  final double radius3xl;
+  final double radiusSurfaceLg;
+  final double radiusSurface;
+  final double radiusSurfaceSm;
   final double borderWidthDefault;
   final double spacePanelPadding;
   final double spacePanelPaddingSm;
@@ -224,4 +226,6 @@ class AppTokens with AppTokensMappable {
   final double sizeIconMd;
   final double sizeIconLg;
   final double cardAspectRatio;
+  final double widthCard;
+  final double radiusCard;
 }

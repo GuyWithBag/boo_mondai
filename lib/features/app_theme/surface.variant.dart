@@ -5,11 +5,13 @@ import 'package:theme_variants/theme_variants.dart';
 
 enum SurfaceTone { surface, muted, dark, primaryOutline, header }
 
-enum SurfaceShape { rounded, cardShape, sharp }
+enum SurfaceShape { rounded, cardShape, sharp, topRounded }
 
 enum SurfacePadding { normal, text, none }
 
-enum SurfaceBorder { normal, sidebar, none }
+enum SurfaceBorder { normal, sidebar, none, top }
+
+enum SurfaceShadow { normal, none }
 
 final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
   base: (tokens) => {
@@ -17,16 +19,8 @@ final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
     SurfaceStylePart.decoration({
       DecorationPart.color(tokens.backgroundSurface),
       DecorationPart.borderRadius(
-        BorderRadius.circular(tokens.radiusContainerLarge.r),
+        BorderRadius.circular(tokens.radiusSurface.r),
       ),
-
-      DecorationPart.boxShadow([
-        BoxShadow(
-          color: tokens.borderNeutralSubtle.withValues(alpha: 0.55),
-          offset: Offset(0, 4.h),
-          blurRadius: 12.r,
-        ),
-      ]),
     }),
   },
   defaultVariants: const [
@@ -36,6 +30,20 @@ final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
     SurfaceShape.rounded,
   ],
   variants: {
+    SurfaceShadow.normal: (tokens) => {
+      SurfaceStylePart.decoration({
+        DecorationPart.boxShadow([
+          BoxShadow(
+            color: tokens.borderNeutralSubtle.withValues(alpha: 0.55),
+            offset: Offset(0, 4.h),
+            blurRadius: 12.r,
+          ),
+        ]),
+      }),
+    },
+    SurfaceShadow.none: (tokens) => {
+      SurfaceStylePart.decoration({DecorationPart.boxShadow([])}),
+    },
     SurfaceBorder.normal: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.border(
@@ -54,9 +62,6 @@ final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
               color: tokens.borderNeutralSubtle,
               width: tokens.borderWidthDefault.w,
             ),
-            start: BorderSide(),
-            top: BorderSide(),
-            bottom: BorderSide(),
           ),
         ),
       }),
@@ -69,11 +74,32 @@ final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
         DecorationPart.boxShadow([BoxShadow(color: tokens.colorTransparent)]),
       }),
     },
+    SurfaceBorder.top: (tokens) => {
+      SurfaceStylePart.decoration({
+        DecorationPart.border(
+          BorderDirectional(
+            top: BorderSide(
+              color: tokens.borderNeutralSubtle,
+              width: tokens.borderWidthDefault.w,
+            ),
+          ),
+        ),
+      }),
+    },
     SurfaceShape.rounded: (_) => const {},
     SurfaceShape.cardShape: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.borderRadius(
-          BorderRadiusGeometry.circular(tokens.radius2xl.r),
+          BorderRadiusGeometry.circular(tokens.radiusCard.r),
+        ),
+      }),
+    },
+    SurfaceShape.topRounded: (tokens) => {
+      SurfaceStylePart.decoration({
+        DecorationPart.borderRadius(
+          BorderRadiusGeometry.vertical(
+            top: Radius.circular(tokens.radiusSurfaceLg.r),
+          ),
         ),
       }),
     },
@@ -137,7 +163,7 @@ final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
     SurfaceTone.dark: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.primaryDim),
-        DecorationPart.radius(tokens.radiusContainerLarge.r),
+        DecorationPart.radius(tokens.radiusSurface.r),
         DecorationPart.border(
           Border.all(
             color: tokens.primaryDim,

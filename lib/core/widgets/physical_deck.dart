@@ -6,10 +6,13 @@ import 'package:boo_mondai/lib.barrel.dart'
         appTextStyle,
         TextSize,
         TextWeight,
+        SurfaceBorder,
         surfaceStyle,
         SurfaceShape,
         SurfacePadding,
-        Cube;
+        SurfaceTone,
+        Cube,
+        widthCard;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -18,11 +21,15 @@ class PhysicalDeck extends StatelessWidget {
     super.key,
     this.deck,
     required this.controller,
-    this.textScaleBaseWidth = 300,
+    this.hasTags = false,
+    this.showInfoCover = true,
+    this.textScaleBaseWidth = widthCard,
   });
 
   final Deck? deck;
   final CubeController controller;
+  final bool hasTags;
+  final bool showInfoCover;
   final double textScaleBaseWidth;
 
   @override
@@ -32,10 +39,14 @@ class PhysicalDeck extends StatelessWidget {
     final titleStyle = appTextStyle
         .resolve(tokens, const [TextSize.labelLarge, TextWeight.heavy])
         .scaledBy(textScale);
+    final tagStyle = appTextStyle
+        .resolve(tokens, const [TextSize.labelSmall, TextWeight.heavy])
+        .scaledBy(textScale);
     final descriptionStyle = appTextStyle
         .resolve(tokens, const [TextSize.labelSmall, TextWeight.body])
         .scaledBy(textScale);
     final coverImageUrl = _coverImageUrl(deck);
+    final visibleTags = deck?.tags.take(8).toList() ?? const [];
 
     return Cube(
       controller: controller,
@@ -62,43 +73,75 @@ class PhysicalDeck extends StatelessWidget {
         ]),
         child: Stack(
           fit: StackFit.expand,
+          clipBehavior: Clip.none,
           // alignment: Alignment.center,
           children: [
             Image.network(coverImageUrl, fit: BoxFit.cover),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // SizedBox.expand(),
-                  const Spacer(),
-                  Surface(
-                    style: surfaceStyle.resolve(tokens, const [
-                      SurfaceShape.sharp,
-                      SurfacePadding.text,
-                    ]),
-                    child: Column(
-                      children: [
-                        Text(
-                          deck?.title ?? 'Untitled deck',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: titleStyle,
+            if (showInfoCover)
+              Positioned(
+                left: -controller.width * 0.06,
+                right: -controller.width * 0.06,
+                bottom: -controller.height * 0.08,
+                child: Surface(
+                  style: surfaceStyle.resolve(tokens, const [
+                    SurfaceTone.muted,
+                    SurfaceShape.sharp,
+                    SurfacePadding.text,
+                  ]),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        deck?.title ?? 'Untitled deck',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        style: titleStyle,
+                      ),
+                      if (hasTags && visibleTags.isNotEmpty) ...[
+                        SizedBox(height: controller.height * 0.025),
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: controller.width * 0.025,
+                          runSpacing: controller.height * 0.015,
+                          children: [
+                            for (final tag in visibleTags)
+                              Surface(
+                                style: surfaceStyle.resolve(tokens, const [
+                                  SurfaceShape.cardShape,
+                                  SurfacePadding.none,
+                                  SurfaceBorder.normal,
+                                ]),
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: controller.width * 0.035,
+                                    vertical: controller.height * 0.01,
+                                  ),
+                                  child: Text(
+                                    tag.name,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: tagStyle,
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
+                      ],
+                      if ((deck?.shortDescription ?? '').trim().isNotEmpty) ...[
+                        SizedBox(height: controller.height * 0.025),
                         Text(
-                          deck?.shortDescription ?? 'No description yet',
+                          deck!.shortDescription,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           textAlign: TextAlign.center,
                           style: descriptionStyle,
                         ),
                       ],
-                    ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
           ],
         ),
       ),
