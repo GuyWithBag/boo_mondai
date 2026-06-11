@@ -2,24 +2,25 @@ import 'package:boo_mondai/lib.barrel.dart'
     show AppTokens, SurfaceShape, surfaceStyle;
 import 'package:flutter/material.dart'
     show
-        StatelessWidget,
-        BoxFit,
-        ImageProvider,
-        Widget,
-        AlignmentGeometry,
-        IconData,
-        BuildContext,
         Alignment,
-        Icons,
-        EdgeInsets,
-        Clip,
-        StackFit,
-        Positioned,
-        Image,
-        Icon,
+        AlignmentGeometry,
+        BoxFit,
+        BuildContext,
         Center,
+        Clip,
+        EdgeInsets,
+        Icon,
+        IconData,
+        IconTheme,
+        Icons,
+        Image,
+        ImageProvider,
         Padding,
-        Stack;
+        Positioned,
+        Stack,
+        StackFit,
+        StatelessWidget,
+        Widget;
 import 'package:theme_variants/theme_variants.dart';
 
 class BackgroundImageSurface extends StatelessWidget {
@@ -63,7 +64,12 @@ class BackgroundImageSurface extends StatelessWidget {
               child: Image(image: image, fit: fit, alignment: imageAlignment),
             )
           else
-            Center(child: Icon(missingImageIcon, size: missingImageIconSize)),
+            Center(
+              child: IconTheme(
+                data: finalStyle.iconTheme,
+                child: Icon(missingImageIcon, size: missingImageIconSize),
+              ),
+            ),
           if (child != null)
             Positioned.fill(
               child: Padding(padding: childPadding, child: child),

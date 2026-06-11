@@ -12,9 +12,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         surfaceStyle,
         SurfaceShape,
-        SurfaceBorder,
-        SurfacePadding,
-        SurfaceTone;
+        SurfaceBorder;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart' show GoRouterHelper;
 import 'package:theme_variants/theme_variants.dart';

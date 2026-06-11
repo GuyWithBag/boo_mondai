@@ -1,15 +1,5 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show
-        AppTokens,
-        LocalDB,
-        DrillService,
-        surfaceStyle,
-        SurfaceTone,
-        SurfaceShape,
-        SurfacePadding,
-        ButtonTone,
-        ButtonDepth,
-        Button;
+    show AppTokens, LocalDB, DrillService, ButtonTone, Button;
 import 'package:flutter/material.dart'
     show
         StatelessWidget,
@@ -23,8 +13,7 @@ import 'package:flutter/material.dart'
         SafeArea,
         SizedBox;
 import 'package:go_router/go_router.dart' show GoRouterHelper;
-import 'package:theme_variants/theme_variants.dart'
-    show ThemeVariantsContext, Surface;
+import 'package:theme_variants/theme_variants.dart' show ThemeVariantsContext;
 
 class ViewDeckLocalBottomNavbar extends StatelessWidget {
   const ViewDeckLocalBottomNavbar({super.key, required this.deckId});
