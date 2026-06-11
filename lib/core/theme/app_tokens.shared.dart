@@ -5,7 +5,7 @@ final Color colorTextOnBrand = Colors.white;
 
 final String fontFamily = 'Noto Sans';
 
-final double surfaceShadowOffset = 6;
+final double buttonShadowOffset = 8;
 final double modalShadowOffset = 10;
 
 final FontWeight fontWeightTextBody = FontWeight.w600;

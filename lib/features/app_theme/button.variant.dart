@@ -42,7 +42,7 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
       DecorationPart.boxShadow([
         BoxShadow(
           color: tokens.borderNeutralSubtle,
-          offset: Offset(0, tokens.surfaceShadowOffset.h),
+          offset: Offset(0, tokens.buttonShadowOffset.h),
         ),
       ]),
     }),
@@ -73,7 +73,7 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
         DecorationPart.boxShadow([
           BoxShadow(
             color: tokens.primaryDim,
-            offset: Offset(0, tokens.surfaceShadowOffset.h),
+            offset: Offset(0, tokens.buttonShadowOffset.h),
           ),
         ]),
       }),
@@ -92,7 +92,7 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
         DecorationPart.boxShadow([
           BoxShadow(
             color: tokens.borderNeutralSubtle,
-            offset: Offset(0, tokens.surfaceShadowOffset.h),
+            offset: Offset(0, tokens.buttonShadowOffset.h),
           ),
         ]),
       }),
@@ -111,7 +111,7 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
         DecorationPart.boxShadow([
           BoxShadow(
             color: tokens.actionSuccessBorder,
-            offset: Offset(0, tokens.surfaceShadowOffset.h),
+            offset: Offset(0, tokens.buttonShadowOffset.h),
           ),
         ]),
       }),
@@ -130,7 +130,7 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
         DecorationPart.boxShadow([
           BoxShadow(
             color: tokens.actionErrorBorder,
-            offset: Offset(0, tokens.surfaceShadowOffset.h),
+            offset: Offset(0, tokens.buttonShadowOffset.h),
           ),
         ]),
       }),
@@ -146,7 +146,7 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
         DecorationPart.boxShadow([
           BoxShadow(
             color: tokens.streakDim,
-            offset: Offset(0, tokens.surfaceShadowOffset.h),
+            offset: Offset(0, tokens.buttonShadowOffset.h),
           ),
         ]),
       }),
@@ -201,7 +201,7 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
         DecorationPart.boxShadow([
           BoxShadow(
             color: tokens.ratingAgainBorder,
-            offset: Offset(0, tokens.surfaceShadowOffset.h),
+            offset: Offset(0, tokens.buttonShadowOffset.h),
           ),
         ]),
       }),
@@ -220,7 +220,7 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
         DecorationPart.boxShadow([
           BoxShadow(
             color: tokens.ratingHardBorder,
-            offset: Offset(0, tokens.surfaceShadowOffset.h),
+            offset: Offset(0, tokens.buttonShadowOffset.h),
           ),
         ]),
       }),
@@ -239,7 +239,7 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
         DecorationPart.boxShadow([
           BoxShadow(
             color: tokens.ratingGoodBorder,
-            offset: Offset(0, tokens.surfaceShadowOffset.h),
+            offset: Offset(0, tokens.buttonShadowOffset.h),
           ),
         ]),
       }),
@@ -258,7 +258,7 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
         DecorationPart.boxShadow([
           BoxShadow(
             color: tokens.ratingEasyBorder,
-            offset: Offset(0, tokens.surfaceShadowOffset.h),
+            offset: Offset(0, tokens.buttonShadowOffset.h),
           ),
         ]),
       }),
@@ -370,7 +370,7 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
         DecorationPart.boxShadow([
           BoxShadow(
             color: tokens.primaryBright,
-            offset: Offset(0, tokens.surfaceShadowOffset.h),
+            offset: Offset(0, tokens.buttonShadowOffset.h),
           ),
         ]),
       }),
@@ -401,7 +401,7 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
           DecorationPart.boxShadow([
             BoxShadow(
               color: tokens.primaryBright,
-              offset: Offset(0, tokens.surfaceShadowOffset.h),
+              offset: Offset(0, tokens.buttonShadowOffset.h),
             ),
           ]),
         }),
@@ -458,7 +458,7 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
           DecorationPart.boxShadow([
             BoxShadow(
               color: tokens.primaryBright,
-              offset: Offset(0, tokens.surfaceShadowOffset.h),
+              offset: Offset(0, tokens.buttonShadowOffset.h),
             ),
           ]),
         }),
@@ -516,7 +516,7 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
           DecorationPart.boxShadow([
             BoxShadow(
               color: tokens.actionSuccessBorder,
-              offset: Offset(0, tokens.surfaceShadowOffset.h),
+              offset: Offset(0, tokens.buttonShadowOffset.h),
             ),
           ]),
         }),

@@ -29,7 +29,7 @@ textSizeBodyLarge
 fontWeightTextStrong
 lineHeightTextBody
 spacePanelGapLg
-surfaceShadowOffset
+buttonShadowOffset
 radiusSurface
 borderWidthDefault
 
@@ -120,7 +120,7 @@ class AppTokens with AppTokensMappable {
     required this.ratingEasyHoverBackground,
     required this.colorTransparent,
     required this.colorTextOnBrand,
-    required this.surfaceShadowOffset,
+    required this.buttonShadowOffset,
     required this.modalShadowOffset,
     required this.fontWeightTextBody,
     required this.fontWeightTextStrong,
@@ -195,7 +195,7 @@ class AppTokens with AppTokensMappable {
   final Color ratingEasyHoverBackground;
   final Color colorTransparent;
   final Color colorTextOnBrand;
-  final double surfaceShadowOffset;
+  final double buttonShadowOffset;
   final double modalShadowOffset;
   final FontWeight fontWeightTextBody;
   final FontWeight fontWeightTextStrong;

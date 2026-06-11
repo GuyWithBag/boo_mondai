@@ -158,10 +158,10 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
   static const Field<AppTokens, Color> _f$colorTextOnBrand = Field(
       'colorTextOnBrand', _$colorTextOnBrand,
       key: r'color_text_on_brand');
-  static double _$surfaceShadowOffset(AppTokens v) => v.surfaceShadowOffset;
-  static const Field<AppTokens, double> _f$surfaceShadowOffset = Field(
-      'surfaceShadowOffset', _$surfaceShadowOffset,
-      key: r'surface_shadow_offset');
+  static double _$buttonShadowOffset(AppTokens v) => v.buttonShadowOffset;
+  static const Field<AppTokens, double> _f$buttonShadowOffset = Field(
+      'buttonShadowOffset', _$buttonShadowOffset,
+      key: r'button_shadow_offset');
   static double _$modalShadowOffset(AppTokens v) => v.modalShadowOffset;
   static const Field<AppTokens, double> _f$modalShadowOffset = Field(
       'modalShadowOffset', _$modalShadowOffset,
@@ -324,7 +324,7 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
     #ratingEasyHoverBackground: _f$ratingEasyHoverBackground,
     #colorTransparent: _f$colorTransparent,
     #colorTextOnBrand: _f$colorTextOnBrand,
-    #surfaceShadowOffset: _f$surfaceShadowOffset,
+    #buttonShadowOffset: _f$buttonShadowOffset,
     #modalShadowOffset: _f$modalShadowOffset,
     #fontWeightTextBody: _f$fontWeightTextBody,
     #fontWeightTextStrong: _f$fontWeightTextStrong,
@@ -401,7 +401,7 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
         ratingEasyHoverBackground: data.dec(_f$ratingEasyHoverBackground),
         colorTransparent: data.dec(_f$colorTransparent),
         colorTextOnBrand: data.dec(_f$colorTextOnBrand),
-        surfaceShadowOffset: data.dec(_f$surfaceShadowOffset),
+        buttonShadowOffset: data.dec(_f$buttonShadowOffset),
         modalShadowOffset: data.dec(_f$modalShadowOffset),
         fontWeightTextBody: data.dec(_f$fontWeightTextBody),
         fontWeightTextStrong: data.dec(_f$fontWeightTextStrong),
@@ -528,7 +528,7 @@ abstract class AppTokensCopyWith<$R, $In extends AppTokens, $Out>
       Color? ratingEasyHoverBackground,
       Color? colorTransparent,
       Color? colorTextOnBrand,
-      double? surfaceShadowOffset,
+      double? buttonShadowOffset,
       double? modalShadowOffset,
       FontWeight? fontWeightTextBody,
       FontWeight? fontWeightTextStrong,
@@ -614,7 +614,7 @@ class _AppTokensCopyWithImpl<$R, $Out>
           Color? ratingEasyHoverBackground,
           Color? colorTransparent,
           Color? colorTextOnBrand,
-          double? surfaceShadowOffset,
+          double? buttonShadowOffset,
           double? modalShadowOffset,
           FontWeight? fontWeightTextBody,
           FontWeight? fontWeightTextStrong,
@@ -700,8 +700,7 @@ class _AppTokensCopyWithImpl<$R, $Out>
           #ratingEasyHoverBackground: ratingEasyHoverBackground,
         if (colorTransparent != null) #colorTransparent: colorTransparent,
         if (colorTextOnBrand != null) #colorTextOnBrand: colorTextOnBrand,
-        if (surfaceShadowOffset != null)
-          #surfaceShadowOffset: surfaceShadowOffset,
+        if (buttonShadowOffset != null) #buttonShadowOffset: buttonShadowOffset,
         if (modalShadowOffset != null) #modalShadowOffset: modalShadowOffset,
         if (fontWeightTextBody != null) #fontWeightTextBody: fontWeightTextBody,
         if (fontWeightTextStrong != null)
@@ -806,8 +805,8 @@ class _AppTokensCopyWithImpl<$R, $Out>
           data.get(#colorTransparent, or: $value.colorTransparent),
       colorTextOnBrand:
           data.get(#colorTextOnBrand, or: $value.colorTextOnBrand),
-      surfaceShadowOffset:
-          data.get(#surfaceShadowOffset, or: $value.surfaceShadowOffset),
+      buttonShadowOffset:
+          data.get(#buttonShadowOffset, or: $value.buttonShadowOffset),
       modalShadowOffset:
           data.get(#modalShadowOffset, or: $value.modalShadowOffset),
       fontWeightTextBody:
