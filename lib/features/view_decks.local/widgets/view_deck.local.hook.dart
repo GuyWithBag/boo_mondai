@@ -1,10 +1,13 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
+        CachedProfile,
         ButtonTone,
         Deck,
         LocalDB,
         ModalAction,
         Tag,
+        Profile,
+        VisibilityState,
         ViewDecksLocalController,
         showChoiceModal;
 import 'package:flutter/material.dart';
@@ -18,6 +21,11 @@ class ViewDeckLocalSheetState {
     required this.shortDescription,
     required this.longDescription,
     required this.coverImageUrl,
+    required this.profileName,
+    required this.profileAvatarUrl,
+    required this.sourceProfileName,
+    required this.sourceProfileAvatarUrl,
+    required this.visibilityLabel,
     required this.isSavingPublishState,
     required this.onPublishedChanged,
     required this.onTitleChanged,
@@ -31,6 +39,11 @@ class ViewDeckLocalSheetState {
   final String shortDescription;
   final String longDescription;
   final String? coverImageUrl;
+  final String profileName;
+  final String? profileAvatarUrl;
+  final String? sourceProfileName;
+  final String? sourceProfileAvatarUrl;
+  final String visibilityLabel;
   final bool isSavingPublishState;
   final ValueChanged<bool> onPublishedChanged;
   final Future<void> Function(String value) onTitleChanged;
@@ -60,6 +73,35 @@ ViewDeckLocalSheetState useViewDeckLocalSheet({
       ? 'No long description yet.'
       : deck.longDescription;
   final coverImageUrl = _nonEmptyOrNull(deck?.coverImageUrl);
+  final profile = deck == null
+      ? null
+      : LocalDB.cachedProfile.selectByPk({'id': deck.userId}) ??
+            LocalDB.profile.getOrCreate();
+  final profileName = switch (profile) {
+    CachedProfile(:final username) => username,
+    Profile(:final username) => username,
+    _ => 'Unknown user',
+  };
+  final profileAvatarUrl = switch (profile) {
+    CachedProfile(:final avatarUrl) => avatarUrl,
+    Profile(:final avatarUrl) => avatarUrl,
+    _ => null,
+  };
+  final sourceDeck = deck?.sourceDeckId == null
+      ? null
+      : LocalDB.deck.selectByPk({'id': deck!.sourceDeckId});
+  final sourceProfile = sourceDeck == null
+      ? null
+      : LocalDB.cachedProfile.selectByPk({'id': sourceDeck.userId});
+  final sourceProfileName = sourceProfile?.username;
+  final sourceProfileAvatarUrl = sourceProfile?.avatarUrl;
+  final visibilityLabel = deck == null
+      ? 'Private'
+      : switch (deck.visibilityState) {
+          VisibilityState.private => 'Private',
+          VisibilityState.public => 'Public',
+          VisibilityState.unlisted => 'Unlisted',
+        };
 
   Future<void> setPublished(bool isPublished) async {
     if (deck == null ||
@@ -182,6 +224,11 @@ ViewDeckLocalSheetState useViewDeckLocalSheet({
     shortDescription: shortDescription,
     longDescription: longDescription,
     coverImageUrl: coverImageUrl,
+    profileName: profileName,
+    profileAvatarUrl: profileAvatarUrl,
+    sourceProfileName: sourceProfileName,
+    sourceProfileAvatarUrl: sourceProfileAvatarUrl,
+    visibilityLabel: visibilityLabel,
     isSavingPublishState: isSavingPublishState.value,
     onPublishedChanged: setPublished,
     onTitleChanged: setTitle,
