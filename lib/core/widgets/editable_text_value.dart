@@ -129,7 +129,7 @@ class EditableTextValue extends HookWidget {
         if (enabled) ...[
           SizedBox(width: tokens.spacePanelGapSm),
           Button.icon(
-            icon: Icons.edit,
+            icon: Icons.edit_outlined,
             tone: ButtonTone.text,
             depth: ButtonDepth.flat,
             onPressed: edit,
