@@ -70,6 +70,27 @@ class DeckVoteReviewsService {
     );
   }
 
+  static Future<void> updateReview({
+    required String reviewId,
+    required int voteValue,
+    required String title,
+    required String body,
+  }) async {
+    final trimmedBody = body.trim();
+    if (trimmedBody.isEmpty) return;
+
+    await RemoteDB.deckVoteReview.updateWhere(
+      filters: {'id': reviewId},
+      values: {
+        'vote_value_at_creation': voteValue,
+        'title': title.trim(),
+        'body': trimmedBody,
+        'is_deleted': false,
+        'updated_at': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
   static Future<void> addComment({
     required String reviewId,
     required String userId,
