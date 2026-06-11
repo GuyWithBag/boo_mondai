@@ -32,3 +32,4 @@ export 'text_field_card.dart';
 export 'toggle_chip.dart';
 export 'variant_text_field.dart';
 export 'chip_input.dart';
+export 'chip_input.hook.dart';
