@@ -15,7 +15,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         Deck,
         DeckProfilesLabel,
         DeckTile,
-        ErrorState,
         HeaderBadge,
         LocalDB,
         MetaLabel,
@@ -38,24 +37,24 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-Future<void> showViewDeckLocalSheet(BuildContext context, String deckId) {
+Future<void> showViewDeckLocalSheet(BuildContext context, Deck deck) {
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
     useSafeArea: true,
     backgroundColor: Colors.transparent,
-    builder: (_) => ViewDeckLocalSheet(deckId: deckId),
+    builder: (_) => ViewDeckLocalSheet(deck: deck),
   );
 }
 
 class ViewDeckLocalSheet extends HookWidget {
   const ViewDeckLocalSheet({
     super.key,
-    required this.deckId,
+    required this.deck,
     this.showCloseButton = true,
   });
 
-  final String deckId;
+  final Deck deck;
   final bool showCloseButton;
 
   @override
@@ -64,46 +63,12 @@ class ViewDeckLocalSheet extends HookWidget {
     final controller = context.read<ViewDecksLocalController>();
     final sheet = useViewDeckLocalSheet(
       context: context,
-      deckId: deckId,
+      initialDeck: deck,
       controller: controller,
     );
-    final deck = sheet.deck;
-
-    if (deck == null) {
-      return ErrorState(
-        exception: Exception('Deck not found.'),
-        onRetry: () => context.pop(),
-      );
-    }
-    final studyCards = LocalDB.studyCard.getByDeckId(deckId);
-    final templates = LocalDB.cardTemplate.getByDeckId(deckId);
-
-    Future<void> deleteDeckDialog() async {
-      final confirmed = await showDialog<bool>(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Delete deck?'),
-          content: Text('"${sheet.title}" and all its cards will be removed.'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Delete'),
-            ),
-          ],
-        ),
-      );
-
-      if (confirmed != true) return;
-
-      await controller.deleteDeck(deckId);
-      if (!context.mounted) return;
-
-      context.pop();
-    }
+    final sheetDeck = sheet.deck;
+    final studyCards = LocalDB.studyCard.getByDeckId(sheetDeck.id);
+    final templates = LocalDB.cardTemplate.getByDeckId(sheetDeck.id);
 
     return DraggableScrollableSheet(
       expand: false,
@@ -119,10 +84,12 @@ class ViewDeckLocalSheet extends HookWidget {
           hasClipRRect: true,
           child: Scaffold(
             backgroundColor: Colors.transparent,
-            bottomNavigationBar: ViewDeckLocalBottomNavbar(deckId: deckId),
+            bottomNavigationBar: ViewDeckLocalBottomNavbar(
+              deckId: sheetDeck.id,
+            ),
             body: _Body(
               scrollController: scrollController,
-              deck: deck,
+              deck: sheetDeck,
               title: sheet.title,
               coverImageUrl: sheet.coverImageUrl,
               profileName: sheet.profileName,
@@ -148,10 +115,10 @@ class ViewDeckLocalSheet extends HookWidget {
                 }
                 context.go('/');
               },
-              onEditPressed: deck.isEditable
-                  ? () => context.push('/decks-local/$deckId/edit')
+              onEditPressed: sheetDeck.isEditable
+                  ? () => context.push('/decks-local/${sheetDeck.id}/edit')
                   : null,
-              onDeletePressed: deleteDeckDialog,
+              onDeletePressed: sheet.onDeletePressed,
             ),
           ),
         );

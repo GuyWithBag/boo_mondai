@@ -32,9 +32,10 @@ class ViewDeckLocalSheetState {
     required this.onShortDescriptionChanged,
     required this.onLongDescriptionChanged,
     required this.onTagsChanged,
+    required this.onDeletePressed,
   });
 
-  final Deck? deck;
+  final Deck deck;
   final String title;
   final String shortDescription;
   final String longDescription;
@@ -50,33 +51,31 @@ class ViewDeckLocalSheetState {
   final Future<void> Function(String value) onShortDescriptionChanged;
   final Future<void> Function(String value) onLongDescriptionChanged;
   final ValueChanged<List<String>> onTagsChanged;
+  final VoidCallback onDeletePressed;
 }
 
 ViewDeckLocalSheetState useViewDeckLocalSheet({
   required BuildContext context,
-  required String deckId,
+  required Deck initialDeck,
   required ViewDecksLocalController controller,
 }) {
   final deckListenable = useMemoized(() => LocalDB.deck.box.listenable());
   useListenable(deckListenable);
 
-  final deck = LocalDB.deck.selectByPk({'id': deckId});
+  final deck = LocalDB.deck.selectByPk({'id': initialDeck.id}) ?? initialDeck;
   final isSavingPublishState = useState(false);
 
-  final title = deck == null || deck.title.isEmpty
-      ? 'Untitled deck'
-      : deck.title;
-  final shortDescription = deck == null || deck.shortDescription.isEmpty
+  final title = deck.title.isEmpty ? 'Untitled deck' : deck.title;
+  final shortDescription = deck.shortDescription.isEmpty
       ? 'No short description yet.'
       : deck.shortDescription;
-  final longDescription = deck == null || deck.longDescription.isEmpty
+  final longDescription = deck.longDescription.isEmpty
       ? 'No long description yet.'
       : deck.longDescription;
-  final coverImageUrl = _nonEmptyOrNull(deck?.coverImageUrl);
-  final profile = deck == null
-      ? null
-      : LocalDB.cachedProfile.selectByPk({'id': deck.userId}) ??
-            LocalDB.profile.getOrCreate();
+  final coverImageUrl = _nonEmptyOrNull(deck.coverImageUrl);
+  final profile =
+      LocalDB.cachedProfile.selectByPk({'id': deck.userId}) ??
+      LocalDB.profile.getOrCreate();
   final profileName = switch (profile) {
     CachedProfile(:final username) => username,
     Profile(:final username) => username,
@@ -87,26 +86,22 @@ ViewDeckLocalSheetState useViewDeckLocalSheet({
     Profile(:final avatarUrl) => avatarUrl,
     _ => null,
   };
-  final sourceDeck = deck?.sourceDeckId == null
+  final sourceDeck = deck.sourceDeckId == null
       ? null
-      : LocalDB.deck.selectByPk({'id': deck!.sourceDeckId});
+      : LocalDB.deck.selectByPk({'id': deck.sourceDeckId});
   final sourceProfile = sourceDeck == null
       ? null
       : LocalDB.cachedProfile.selectByPk({'id': sourceDeck.userId});
   final sourceProfileName = sourceProfile?.username;
   final sourceProfileAvatarUrl = sourceProfile?.avatarUrl;
-  final visibilityLabel = deck == null
-      ? 'Private'
-      : switch (deck.visibilityState) {
-          VisibilityState.private => 'Private',
-          VisibilityState.public => 'Public',
-          VisibilityState.unlisted => 'Unlisted',
-        };
+  final visibilityLabel = switch (deck.visibilityState) {
+    VisibilityState.private => 'Private',
+    VisibilityState.public => 'Public',
+    VisibilityState.unlisted => 'Unlisted',
+  };
 
   Future<void> setPublished(bool isPublished) async {
-    if (deck == null ||
-        isSavingPublishState.value ||
-        deck.isPublished == isPublished) {
+    if (isSavingPublishState.value || deck.isPublished == isPublished) {
       return;
     }
 
@@ -152,10 +147,6 @@ ViewDeckLocalSheetState useViewDeckLocalSheet({
   }
 
   Future<void> setTags(List<String> tagNames) async {
-    if (deck == null) {
-      return;
-    }
-
     final normalizedTagNames = tagNames
         .map((tagName) => tagName.trim())
         .where((tagName) => tagName.isNotEmpty)
@@ -218,6 +209,34 @@ ViewDeckLocalSheetState useViewDeckLocalSheet({
     );
   }
 
+  Future<void> deleteDeckDialog() async {
+    final confirmed = await showChoiceModal<bool>(
+      context: context,
+      title: 'Delete deck?',
+      body: '"$title" and all its cards will be removed.',
+      leading: const Icon(Icons.delete_outline),
+      actions: [
+        const ModalAction<bool>(
+          value: false,
+          label: 'Cancel',
+          tone: ButtonTone.ghost,
+        ),
+        const ModalAction<bool>(
+          value: true,
+          label: 'Delete',
+          tone: ButtonTone.error,
+        ),
+      ],
+    );
+
+    if (confirmed != true) return;
+
+    await controller.deleteDeck(deck.id);
+    if (context.mounted) {
+      Navigator.of(context).pop();
+    }
+  }
+
   return ViewDeckLocalSheetState(
     deck: deck,
     title: title,
@@ -235,6 +254,7 @@ ViewDeckLocalSheetState useViewDeckLocalSheet({
     onShortDescriptionChanged: setShortDescription,
     onLongDescriptionChanged: setLongDescription,
     onTagsChanged: setTags,
+    onDeletePressed: deleteDeckDialog,
   );
 }
 

@@ -61,7 +61,7 @@ class ViewDecksLocalController extends Controller {
   }
 
   void goToDeck(BuildContext context, Deck deck) {
-    showViewDeckLocalSheet(context, deck.id);
+    showViewDeckLocalSheet(context, deck);
   }
 
   /// Deletes the deck with the given [id] from the repository, then reloads.
