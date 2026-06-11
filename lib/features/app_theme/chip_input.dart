@@ -22,7 +22,7 @@ class ChipInput extends HookWidget {
     this.onChipPressed,
     this.onChipDeleted,
     this.placeholder,
-    this.enabled = true,
+    this.isEnabled = true,
     this.separatorPattern,
     this.allowDuplicates = false,
     this.createChipOnSubmit = true,
@@ -43,7 +43,7 @@ class ChipInput extends HookWidget {
   final ValueChanged<String>? onChipPressed;
   final ValueChanged<String>? onChipDeleted;
   final String? placeholder;
-  final bool enabled;
+  final bool isEnabled;
   final Pattern? separatorPattern;
   final bool allowDuplicates;
   final bool createChipOnSubmit;
@@ -58,6 +58,12 @@ class ChipInput extends HookWidget {
     final tokens = context.themeTokens<AppTokens>();
     final textFieldStyle = appTextFieldStyle.resolve(tokens, textFieldVariants);
     final chipTheme = appChipStyle.resolve(tokens, [chipTone]);
+    Widget readOnlyChipBuilder(String value) {
+      return Padding(
+        padding: EdgeInsetsDirectional.only(end: 6.w, bottom: 3.h),
+        child: InputChip(label: Text(value)),
+      );
+    }
 
     void removeValue(String value) {
       onChipDeleted?.call(value);
@@ -69,10 +75,10 @@ class ChipInput extends HookWidget {
         padding: EdgeInsetsDirectional.only(end: 6.w, bottom: 3.h),
         child: InputChip(
           label: Text(value),
-          onPressed: enabled && onChipPressed != null
+          onPressed: isEnabled && onChipPressed != null
               ? () => onChipPressed!(value)
               : null,
-          onDeleted: enabled ? () => removeValue(value) : null,
+          onDeleted: isEnabled ? () => removeValue(value) : null,
         ),
       );
     }
@@ -209,21 +215,32 @@ class ChipInput extends HookWidget {
 
     return ChipTheme(
       data: chipTheme,
-      child: TextField(
-        controller: chipController,
-        focusNode: effectiveFocusNode,
-        enabled: enabled,
-        onChanged: handleTextChanged,
-        onSubmitted: handleSubmitted,
-        minLines: 1,
-        maxLines: null,
-        textInputAction: TextInputAction.done,
-        cursorColor: textFieldStyle.cursorColor,
-        style: textFieldStyle.textStyle,
-        decoration: InputDecoration(
-          hintText: placeholder,
-        ).applyDefaults(textFieldStyle.decorationTheme),
-      ),
+      child: isEnabled
+          ? TextField(
+              controller: chipController,
+              focusNode: effectiveFocusNode,
+              enabled: true,
+              onChanged: handleTextChanged,
+              onSubmitted: handleSubmitted,
+              minLines: 1,
+              maxLines: null,
+              textInputAction: TextInputAction.done,
+              cursorColor: textFieldStyle.cursorColor,
+              style: textFieldStyle.textStyle,
+              decoration: InputDecoration(
+                hintText: placeholder,
+              ).applyDefaults(textFieldStyle.decorationTheme),
+            )
+          : Wrap(
+              spacing: 0,
+              runSpacing: 0,
+              children: [
+                if (values.isEmpty)
+                  Text(placeholder ?? '', style: textFieldStyle.textStyle)
+                else
+                  for (final value in values) readOnlyChipBuilder(value),
+              ],
+            ),
     );
   }
 }

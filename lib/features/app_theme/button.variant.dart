@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-enum ButtonSize { sm, md, lg, icon, iconWithLabel, fab, extendedFab }
+enum ButtonSize { sm, md, lg, icon, smallIcon, iconWithLabel, fab, extendedFab }
 
 enum ButtonState { idle, hovered, selected, disabled, pressed }
 
@@ -18,6 +18,7 @@ enum ButtonTone {
   dashed,
   textGhostSelect,
   text,
+  smallIcon,
   again,
   hard,
   good,
@@ -324,6 +325,13 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
     ButtonSize.icon: (tokens) => {
       SurfaceStylePart.padding(EdgeInsets.zero),
       SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconLg.sp)}),
+      SurfaceStylePart.text({TextStylePart.fontSize(tokens.textSizeLabel.sp)}),
+      SurfaceStylePart.height(48.h),
+      SurfaceStylePart.width(48.w),
+    },
+    ButtonSize.smallIcon: (tokens) => {
+      SurfaceStylePart.padding(EdgeInsets.zero),
+      SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconMd.sp)}),
       SurfaceStylePart.text({TextStylePart.fontSize(tokens.textSizeLabel.sp)}),
       SurfaceStylePart.height(48.h),
       SurfaceStylePart.width(48.w),

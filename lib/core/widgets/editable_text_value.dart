@@ -4,6 +4,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         Button,
         ButtonDepth,
         ButtonTone,
+        MarkdownText,
+        MarkdownTextMode,
         VariantTextField,
         TextFieldFrame,
         TextFieldTone,
@@ -23,6 +25,8 @@ class EditableTextValue extends HookWidget {
     this.placeholder,
     this.textStyle,
     this.maxLines = 1,
+    this.isMarkdown = false,
+    this.markdownMode = MarkdownTextMode.input,
     this.fieldVariants = const [
       TextFieldSize.normal,
       TextFieldFrame.underline,
@@ -38,6 +42,8 @@ class EditableTextValue extends HookWidget {
   final String? placeholder;
   final TextStyle? textStyle;
   final int? maxLines;
+  final bool isMarkdown;
+  final MarkdownTextMode markdownMode;
   final Iterable<Object> fieldVariants;
 
   @override
@@ -46,11 +52,13 @@ class EditableTextValue extends HookWidget {
     final isEditing = useState(false);
     final isSaving = useState(false);
     final controller = useTextEditingController(text: editingValue ?? value);
+    final markdownValue = useState(editingValue ?? value);
     final focusNode = useFocusNode();
 
     useEffect(() {
       if (!isEditing.value) {
         controller.text = editingValue ?? value;
+        markdownValue.value = editingValue ?? value;
       }
       return null;
     }, [editingValue, value, isEditing.value]);
@@ -60,7 +68,7 @@ class EditableTextValue extends HookWidget {
 
       isSaving.value = true;
       try {
-        await onSave(controller.text);
+        await onSave(isMarkdown ? markdownValue.value : controller.text);
         isEditing.value = false;
       } finally {
         isSaving.value = false;
@@ -69,11 +77,13 @@ class EditableTextValue extends HookWidget {
 
     void cancel() {
       controller.text = editingValue ?? value;
+      markdownValue.value = editingValue ?? value;
       isEditing.value = false;
     }
 
     void edit() {
       controller.text = editingValue ?? value;
+      markdownValue.value = editingValue ?? value;
       isEditing.value = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         focusNode.requestFocus();
@@ -87,19 +97,38 @@ class EditableTextValue extends HookWidget {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          VariantTextField(
-            controller: controller,
-            focusNode: focusNode,
-            enabled: !isSaving.value,
-            maxLines: maxLines,
-            placeholder: placeholder,
-            textStyle: textStyle,
-            textInputAction: maxLines == 1
-                ? TextInputAction.done
-                : TextInputAction.newline,
-            onSubmitted: maxLines == 1 ? (_) => save() : null,
-            variants: fieldVariants,
-          ),
+          if (isMarkdown)
+            MarkdownText(
+              data: markdownValue.value,
+              controller: controller,
+              focusNode: focusNode,
+              onChanged: (value) {
+                markdownValue.value = value;
+              },
+              mode: markdownMode,
+              enabled: !isSaving.value,
+              maxLines: maxLines,
+              placeholder: placeholder,
+              textStyle: textStyle,
+              textInputAction: maxLines == 1
+                  ? TextInputAction.done
+                  : TextInputAction.newline,
+              variants: fieldVariants,
+            )
+          else
+            VariantTextField(
+              controller: controller,
+              focusNode: focusNode,
+              enabled: !isSaving.value,
+              maxLines: maxLines,
+              placeholder: placeholder,
+              textStyle: textStyle,
+              textInputAction: maxLines == 1
+                  ? TextInputAction.done
+                  : TextInputAction.newline,
+              onSubmitted: maxLines == 1 ? (_) => save() : null,
+              variants: fieldVariants,
+            ),
           SizedBox(height: tokens.spacePanelGapSm),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
@@ -125,10 +154,14 @@ class EditableTextValue extends HookWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Expanded(child: Text(value, style: textStyle)),
+        Expanded(
+          child: isMarkdown && value.trim().isNotEmpty
+              ? MarkdownText(data: value, textStyle: textStyle)
+              : Text(value, style: textStyle),
+        ),
         if (enabled) ...[
           SizedBox(width: tokens.spacePanelGapSm),
-          Button.icon(
+          Button.iconSmall(
             icon: Icons.edit_outlined,
             tone: ButtonTone.text,
             depth: ButtonDepth.flat,

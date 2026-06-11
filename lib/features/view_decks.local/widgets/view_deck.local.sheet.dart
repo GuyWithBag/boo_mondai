@@ -10,15 +10,13 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         Button,
         ButtonTone,
-        ChipInput,
         ChipTone,
+        DeckDetails,
         Deck,
         DeckProfilesLabel,
         DeckTile,
         HeaderBadge,
-        LocalDB,
         MetaLabel,
-        SectionEyebrow,
         SurfacePadding,
         SurfaceShape,
         SurfaceTone,
@@ -67,8 +65,6 @@ class ViewDeckLocalSheet extends HookWidget {
       controller: controller,
     );
     final sheetDeck = sheet.deck;
-    final studyCards = LocalDB.studyCard.getByDeckId(sheetDeck.id);
-    final templates = LocalDB.cardTemplate.getByDeckId(sheetDeck.id);
 
     return DraggableScrollableSheet(
       expand: false,
@@ -91,7 +87,6 @@ class ViewDeckLocalSheet extends HookWidget {
               scrollController: scrollController,
               deck: sheetDeck,
               title: sheet.title,
-              coverImageUrl: sheet.coverImageUrl,
               profileName: sheet.profileName,
               profileAvatarUrl: sheet.profileAvatarUrl,
               sourceProfileName: sheet.sourceProfileName,
@@ -99,8 +94,6 @@ class ViewDeckLocalSheet extends HookWidget {
               visibilityLabel: sheet.visibilityLabel,
               shortDescription: sheet.shortDescription,
               longDescription: sheet.longDescription,
-              studyCardCount: studyCards.length,
-              templateCount: templates.length,
               showCloseButton: showCloseButton,
               isSavingPublishState: sheet.isSavingPublishState,
               onPublishedChanged: sheet.onPublishedChanged,
@@ -132,7 +125,6 @@ class _Body extends StatelessWidget {
     required this.scrollController,
     required this.deck,
     required this.title,
-    required this.coverImageUrl,
     required this.profileName,
     required this.profileAvatarUrl,
     required this.sourceProfileName,
@@ -140,8 +132,6 @@ class _Body extends StatelessWidget {
     required this.visibilityLabel,
     required this.shortDescription,
     required this.longDescription,
-    required this.studyCardCount,
-    required this.templateCount,
     required this.showCloseButton,
     required this.isSavingPublishState,
     required this.onPublishedChanged,
@@ -157,7 +147,6 @@ class _Body extends StatelessWidget {
   final ScrollController scrollController;
   final Deck deck;
   final String title;
-  final String? coverImageUrl;
   final String profileName;
   final String? profileAvatarUrl;
   final String? sourceProfileName;
@@ -165,8 +154,6 @@ class _Body extends StatelessWidget {
   final String visibilityLabel;
   final String shortDescription;
   final String longDescription;
-  final int studyCardCount;
-  final int templateCount;
   final bool showCloseButton;
   final bool isSavingPublishState;
   final ValueChanged<bool> onPublishedChanged;
@@ -214,16 +201,14 @@ class _Body extends StatelessWidget {
                         deckWidth: deckWidth,
                         scrollController: scrollController,
                         collapseDistance: headerHeight * 0.55,
+                        title: title,
                         profileName: profileName,
                         profileAvatarUrl: profileAvatarUrl,
                         sourceProfileName: sourceProfileName,
                         sourceProfileAvatarUrl: sourceProfileAvatarUrl,
                         visibilityLabel: visibilityLabel,
-                        title: title,
                         shortDescription: shortDescription,
                         longDescription: longDescription,
-                        studyCardCount: studyCardCount,
-                        templateCount: templateCount,
                         onTitleChanged: onTitleChanged,
                         onShortDescriptionChanged: onShortDescriptionChanged,
                         onLongDescriptionChanged: onLongDescriptionChanged,
@@ -332,16 +317,14 @@ class _BodySubSection extends StatelessWidget {
     required this.deckWidth,
     required this.scrollController,
     required this.collapseDistance,
+    required this.title,
     required this.profileName,
     required this.profileAvatarUrl,
     required this.sourceProfileName,
     required this.sourceProfileAvatarUrl,
     required this.visibilityLabel,
-    required this.title,
     required this.shortDescription,
     required this.longDescription,
-    required this.studyCardCount,
-    required this.templateCount,
     required this.onTitleChanged,
     required this.onShortDescriptionChanged,
     required this.onLongDescriptionChanged,
@@ -353,16 +336,14 @@ class _BodySubSection extends StatelessWidget {
   final double deckWidth;
   final ScrollController scrollController;
   final double collapseDistance;
+  final String title;
   final String profileName;
   final String? profileAvatarUrl;
   final String? sourceProfileName;
   final String? sourceProfileAvatarUrl;
   final String visibilityLabel;
-  final String title;
   final String shortDescription;
   final String longDescription;
-  final int studyCardCount;
-  final int templateCount;
   final Future<void> Function(String value) onTitleChanged;
   final Future<void> Function(String value) onShortDescriptionChanged;
   final Future<void> Function(String value) onLongDescriptionChanged;
@@ -370,6 +351,8 @@ class _BodySubSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tags = deck.tags.map((tag) => tag.name).toList(growable: false);
+
     return SizedBox(
       width: double.infinity,
       child: Stack(
@@ -382,22 +365,85 @@ class _BodySubSection extends StatelessWidget {
               SurfaceBorder.top,
               SurfaceShadow.none,
             ]),
-            child: _DeckDetails(
-              deck: deck,
-              profileName: profileName,
-              profileAvatarUrl: profileAvatarUrl,
-              sourceProfileName: sourceProfileName,
-              sourceProfileAvatarUrl: sourceProfileAvatarUrl,
-              visibilityLabel: visibilityLabel,
-              title: title,
-              shortDescription: shortDescription,
-              longDescription: longDescription,
-              studyCardCount: studyCardCount,
-              templateCount: templateCount,
-              onTitleChanged: onTitleChanged,
-              onShortDescriptionChanged: onShortDescriptionChanged,
-              onLongDescriptionChanged: onLongDescriptionChanged,
-              onTagsChanged: onTagsChanged,
+            child: Padding(
+              padding: EdgeInsets.all(tokens.spacePanelPadding),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      DeckProfilesLabel(
+                        profileName: profileName,
+                        profileAvatarUrl: profileAvatarUrl,
+                        sourceProfileName: sourceProfileName,
+                        sourceProfileAvatarUrl: sourceProfileAvatarUrl,
+                      ),
+                    ],
+                  ),
+                  DeckDetails(
+                    title: EditableTextValue(
+                      value: title,
+                      editingValue: deck.title,
+                      enabled: deck.isEditable,
+                      placeholder: 'Deck title',
+                      onSave: onTitleChanged,
+                      textStyle: appTextStyle.resolve(tokens, const [
+                        TextSize.header,
+                        TextWeight.heavy,
+                      ]),
+                    ),
+                    metaLabels: Wrap(
+                      spacing: tokens.spacePanelGapMd,
+                      runSpacing: tokens.spacePanelGapSm,
+                      children: [
+                        MetaLabel(
+                          icon: Icons.visibility_outlined,
+                          label: visibilityLabel,
+                        ),
+                        MetaLabel(
+                          icon: Icons.style_outlined,
+                          label: '${deck.cardCount} cards',
+                        ),
+                      ],
+                    ),
+                    shortDescription: EditableTextValue(
+                      value: shortDescription,
+                      editingValue: deck.shortDescription,
+                      enabled: deck.isEditable,
+                      placeholder: 'Short description',
+                      isMarkdown: true,
+                      onSave: onShortDescriptionChanged,
+                      textStyle: appTextStyle.resolve(tokens, const [
+                        TextSize.labelSmall,
+                        TextWeight.body,
+                        TextTone.primary,
+                      ]),
+                    ),
+                    longDescription: EditableTextValue(
+                      value: longDescription,
+                      editingValue: deck.longDescription,
+                      enabled: deck.isEditable,
+                      placeholder: 'Long description',
+                      maxLines: null,
+                      isMarkdown: true,
+                      onSave: onLongDescriptionChanged,
+                      textStyle: appTextStyle.resolve(tokens, const [
+                        TextSize.bodyLarge,
+                        TextWeight.body,
+                        TextTone.primary,
+                      ]),
+                    ),
+                    tags: tags,
+                    onTagsChanged: onTagsChanged,
+                    tagsEnabled: deck.isEditable,
+                    tagsPlaceholder: deck.isEditable
+                        ? 'Add tags'
+                        : 'No tags yet',
+                    tagsTone: ChipTone.ghost,
+                  ),
+                ],
+              ),
             ),
           ),
           Positioned(
@@ -446,120 +492,6 @@ class _BodySubSection extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _DeckDetails extends StatelessWidget {
-  const _DeckDetails({
-    required this.deck,
-    required this.profileName,
-    required this.profileAvatarUrl,
-    required this.sourceProfileName,
-    required this.sourceProfileAvatarUrl,
-    required this.visibilityLabel,
-    required this.title,
-    required this.shortDescription,
-    required this.longDescription,
-    required this.studyCardCount,
-    required this.templateCount,
-    required this.onTitleChanged,
-    required this.onShortDescriptionChanged,
-    required this.onLongDescriptionChanged,
-    required this.onTagsChanged,
-  });
-
-  final Deck deck;
-  final String profileName;
-  final String? profileAvatarUrl;
-  final String? sourceProfileName;
-  final String? sourceProfileAvatarUrl;
-  final String visibilityLabel;
-  final String title;
-  final String shortDescription;
-  final String longDescription;
-  final int studyCardCount;
-  final int templateCount;
-  final Future<void> Function(String value) onTitleChanged;
-  final Future<void> Function(String value) onShortDescriptionChanged;
-  final Future<void> Function(String value) onLongDescriptionChanged;
-  final ValueChanged<List<String>> onTagsChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            DeckProfilesLabel(
-              profileName: profileName,
-              profileAvatarUrl: profileAvatarUrl,
-              sourceProfileName: sourceProfileName,
-              sourceProfileAvatarUrl: sourceProfileAvatarUrl,
-            ),
-          ],
-        ),
-        Row(
-          spacing: tokens.spacePanelGapMd.w,
-          children: [
-            MetaLabel(icon: Icons.visibility_outlined, label: visibilityLabel),
-            MetaLabel(
-              icon: Icons.style_outlined,
-              label: '${deck.cardCount} cards',
-            ),
-          ],
-        ),
-        EditableTextValue(
-          value: title,
-          editingValue: deck.title,
-          enabled: deck.isEditable,
-          placeholder: 'Deck title',
-          onSave: onTitleChanged,
-          textStyle: appTextStyle.resolve(tokens, const [
-            TextSize.header,
-            TextWeight.heavy,
-          ]),
-        ),
-        EditableTextValue(
-          value: shortDescription,
-          editingValue: deck.shortDescription,
-          enabled: deck.isEditable,
-          placeholder: 'Short description',
-          onSave: onShortDescriptionChanged,
-          textStyle: appTextStyle.resolve(tokens, const [
-            TextSize.labelSmall,
-            TextWeight.body,
-            TextTone.primary,
-          ]),
-        ),
-        EditableTextValue(
-          value: longDescription,
-          editingValue: deck.longDescription,
-          enabled: deck.isEditable,
-          placeholder: 'Long description',
-          maxLines: null,
-          onSave: onLongDescriptionChanged,
-          textStyle: appTextStyle.resolve(tokens, const [
-            TextSize.bodyLarge,
-            TextWeight.body,
-            TextTone.primary,
-          ]),
-        ),
-        SizedBox(height: tokens.spacePanelGapLg * 2),
-        SectionEyebrow('Tags'),
-        SizedBox(height: tokens.spacePanelGapMd),
-        ChipInput(
-          values: deck.tags.map((tag) => tag.name).toList(),
-          onChanged: onTagsChanged,
-          placeholder: deck.isEditable ? 'Add tags' : 'No tags yet',
-          enabled: deck.isEditable,
-          chipTone: ChipTone.ghost,
-        ),
-      ],
     );
   }
 }

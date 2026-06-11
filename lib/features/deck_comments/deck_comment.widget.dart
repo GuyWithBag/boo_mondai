@@ -5,6 +5,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         DeckComment,
         DeckVoteReview,
         DeckVoteReviewComment,
+        MarkdownText,
+        MarkdownTextMode,
         ProfileLabel;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -120,8 +122,8 @@ class DeckCommentWidget extends HookWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final replies = repliesFor(item.id);
-    final replyController = useTextEditingController();
-    final editBodyController = useTextEditingController(text: item.body);
+    final replyBody = useState('');
+    final editBody = useState(item.body);
     final editTitleController = useTextEditingController(
       text: item.title ?? '',
     );
@@ -135,7 +137,7 @@ class DeckCommentWidget extends HookWidget {
     useEffect(() {
       if (!isEditing.value) {
         editTitleController.text = item.title ?? '';
-        editBodyController.text = item.body;
+        editBody.value = item.body;
       }
       return null;
     }, [item.title, item.body, isEditing.value]);
@@ -165,7 +167,10 @@ class DeckCommentWidget extends HookWidget {
                 _EditableBody(
                   item: item,
                   titleController: editTitleController,
-                  bodyController: editBodyController,
+                  body: editBody.value,
+                  onBodyChanged: (value) {
+                    editBody.value = value;
+                  },
                 )
               else
                 _CommentBody(item: item),
@@ -179,7 +184,7 @@ class DeckCommentWidget extends HookWidget {
                           ? null
                           : () {
                               editTitleController.text = item.title ?? '';
-                              editBodyController.text = item.body;
+                              editBody.value = item.body;
                               isEditing.value = false;
                             },
                       child: const Text('Cancel'),
@@ -191,7 +196,7 @@ class DeckCommentWidget extends HookWidget {
                           : () async {
                               final saved = await onEdit!(
                                 item,
-                                editBodyController.text,
+                                editBody.value,
                                 title: item.isReview
                                     ? editTitleController.text
                                     : null,
@@ -224,7 +229,7 @@ class DeckCommentWidget extends HookWidget {
                             ? null
                             : () {
                                 editTitleController.text = item.title ?? '';
-                                editBodyController.text = item.body;
+                                editBody.value = item.body;
                                 isEditing.value = true;
                               },
                         icon: const Icon(Icons.edit_outlined),
@@ -251,9 +256,12 @@ class DeckCommentWidget extends HookWidget {
               if (isReplying.value) ...[
                 const SizedBox(height: AppSpacing.sm),
                 _CommentInput(
-                  controller: replyController,
+                  value: replyBody.value,
+                  onChanged: (value) {
+                    replyBody.value = value;
+                  },
                   hintText: 'Write a reply',
-                  minLines: 2,
+                  maxLines: 6,
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 Align(
@@ -263,11 +271,11 @@ class DeckCommentWidget extends HookWidget {
                         ? null
                         : () async {
                             final posted = await onReply!(
-                              replyController.text,
+                              replyBody.value,
                               parentCommentId: item.id,
                             );
                             if (posted) {
-                              replyController.clear();
+                              replyBody.value = '';
                               isReplying.value = false;
                             }
                           },
@@ -354,15 +362,19 @@ class _CommentBody extends StatelessWidget {
               ),
             ),
           ),
-        Text(
-          item.isDeleted
-              ? 'This ${item.isReview ? 'review' : 'comment'} was deleted.'
-              : item.body,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: textColor,
-            fontStyle: item.isDeleted ? FontStyle.italic : FontStyle.normal,
+        if (item.isDeleted)
+          Text(
+            'This ${item.isReview ? 'review' : 'comment'} was deleted.',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: textColor,
+              fontStyle: FontStyle.italic,
+            ),
+          )
+        else
+          DefaultTextStyle.merge(
+            style: theme.textTheme.bodyMedium?.copyWith(color: textColor),
+            child: MarkdownText(data: item.body),
           ),
-        ),
       ],
     );
   }
@@ -372,30 +384,37 @@ class _EditableBody extends StatelessWidget {
   const _EditableBody({
     required this.item,
     required this.titleController,
-    required this.bodyController,
+    required this.body,
+    required this.onBodyChanged,
   });
 
   final DeckCommentItem item;
   final TextEditingController titleController;
-  final TextEditingController bodyController;
+  final String body;
+  final ValueChanged<String> onBodyChanged;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         if (item.isReview) ...[
-          _CommentInput(
+          TextField(
             controller: titleController,
-            hintText: 'Review title',
-            minLines: 1,
             maxLines: 1,
+            textInputAction: TextInputAction.next,
+            decoration: const InputDecoration(
+              hintText: 'Review title',
+              alignLabelWithHint: true,
+              border: OutlineInputBorder(),
+            ),
           ),
           const SizedBox(height: AppSpacing.sm),
         ],
         _CommentInput(
-          controller: bodyController,
+          value: body,
+          onChanged: onBodyChanged,
           hintText: item.isReview ? 'Update review' : 'Update comment',
-          minLines: 3,
+          maxLines: 8,
         ),
       ],
     );
@@ -467,29 +486,25 @@ class _DateChip extends StatelessWidget {
 
 class _CommentInput extends StatelessWidget {
   const _CommentInput({
-    required this.controller,
+    required this.value,
+    required this.onChanged,
     required this.hintText,
-    required this.minLines,
     this.maxLines = 6,
   });
 
-  final TextEditingController controller;
+  final String value;
+  final ValueChanged<String> onChanged;
   final String hintText;
-  final int minLines;
   final int maxLines;
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      minLines: minLines,
+    return MarkdownText(
+      data: value,
+      onChanged: onChanged,
+      mode: MarkdownTextMode.input,
+      placeholder: hintText,
       maxLines: maxLines,
-      textInputAction: TextInputAction.newline,
-      decoration: InputDecoration(
-        hintText: hintText,
-        alignLabelWithHint: true,
-        border: const OutlineInputBorder(),
-      ),
     );
   }
 }

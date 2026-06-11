@@ -8,9 +8,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         DeckTile,
         DeckTileState,
         ErrorState,
-        HeaderBadge,
+        EditableTextValue,
         MetaLabel,
-        ProfileLabel,
         SectionEyebrow,
         SurfacePadding,
         SurfaceShape,
@@ -18,6 +17,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextSize,
         TextTone,
         TextWeight,
+        DeckDetails,
+        ProfileLabel,
+        MarkdownTextMode,
         ViewDeckOnlineSheetState,
         ViewDecksOnlineController,
         appTextStyle,
@@ -147,6 +149,14 @@ class _Body extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _HeroCarousel(imageUrls: sheet.carouselImageUrls),
+                  SizedBox(height: tokens.spacePanelGapMd),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: tokens.spacePanelPadding,
+                    ),
+                    child: _InteractionSummary(sheet: sheet),
+                  ),
+                  SizedBox(height: tokens.spacePanelGapMd),
                   Surface(
                     style: surfaceStyle.resolve(tokens, const [
                       SurfaceShape.topRounded,
@@ -155,7 +165,136 @@ class _Body extends StatelessWidget {
                     ]),
                     child: Padding(
                       padding: EdgeInsets.all(tokens.spacePanelPadding),
-                      child: _DeckDetails(deck: deck, sheet: sheet),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Wrap(
+                                  spacing: tokens.spacePanelGapMd,
+                                  runSpacing: tokens.spacePanelGapSm,
+                                  children: [
+                                    ProfileLabel(
+                                      label: 'By',
+                                      displayName: sheet.profileName,
+                                      avatarUrl: sheet.profileAvatarUrl,
+                                    ),
+                                    MetaLabel(
+                                      icon: Icons.calendar_today_outlined,
+                                      label: _formatDate(deck.createdAt),
+                                      tooltip:
+                                          'Created ${_formatDate(deck.createdAt)}',
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              _InteractionButton(
+                                icon: sheet.isFavorite
+                                    ? Icons.favorite
+                                    : Icons.favorite_border,
+                                label: _formatCount(sheet.favoritesCount),
+                                selected: sheet.isFavorite,
+                                onPressed:
+                                    sheet.isBusy ||
+                                        sheet.onFavoritePressed == null
+                                    ? null
+                                    : () {
+                                        sheet.onFavoritePressed!();
+                                      },
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: tokens.spacePanelGapMd),
+                          _InteractionSummary(sheet: sheet),
+                          SizedBox(height: tokens.spacePanelGapLg),
+                          Center(
+                            child: DeckTile(
+                              deck: deck,
+                              state: DeckTileState.spread,
+                              width: 190,
+                            ),
+                          ),
+                          SizedBox(height: tokens.spacePanelGapLg),
+                          DeckDetails(
+                            title: EditableTextValue(
+                              value: sheet.title,
+                              enabled: false,
+                              onSave: (_) async {},
+                              textStyle: appTextStyle.resolve(tokens, const [
+                                TextSize.header,
+                                TextWeight.heavy,
+                              ]),
+                            ),
+                            metaLabels: Wrap(
+                              spacing: tokens.spacePanelGapMd,
+                              runSpacing: tokens.spacePanelGapSm,
+                              children: [
+                                MetaLabel(
+                                  icon: Icons.style_outlined,
+                                  label: '${deck.cardCount} cards',
+                                ),
+                                MetaLabel(
+                                  icon: Icons.new_releases_outlined,
+                                  label: 'v${deck.version}+${deck.buildNumber}',
+                                ),
+                                MetaLabel(
+                                  icon: Icons.visibility_outlined,
+                                  label: _visibilityLabel(deck),
+                                ),
+                                MetaLabel(
+                                  icon: Icons.update_outlined,
+                                  label: _formatDate(deck.updatedAt),
+                                  tooltip:
+                                      'Updated ${_formatDate(deck.updatedAt)}',
+                                ),
+                              ],
+                            ),
+                            shortDescription: EditableTextValue(
+                              value: sheet.shortDescription,
+                              enabled: false,
+                              onSave: (_) async {},
+                              textStyle: appTextStyle.resolve(tokens, const [
+                                TextSize.label,
+                                TextWeight.strong,
+                                TextTone.primary,
+                              ]),
+                            ),
+                            longDescription: EditableTextValue(
+                              value: sheet.longDescription,
+                              enabled: false,
+                              isMarkdown: true,
+                              markdownMode: MarkdownTextMode.preview,
+                              onSave: (_) async {},
+                              textStyle: appTextStyle.resolve(tokens, const [
+                                TextSize.bodyLarge,
+                                TextWeight.body,
+                                TextTone.primary,
+                              ]),
+                            ),
+                            tags: deck.tags
+                                .map((tag) => tag.name)
+                                .toList(growable: false),
+                            tagsEnabled: false,
+                            tagsPlaceholder: 'No tags yet',
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: tokens.spacePanelGapLg),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: tokens.spacePanelPadding,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SectionEyebrow('Featured Cards'),
+                        SizedBox(height: tokens.spacePanelGapLg),
+                        _DiscussionSection(sheet: sheet),
+                      ],
                     ),
                   ),
                 ],
@@ -264,141 +403,9 @@ class _NetworkImageTile extends StatelessWidget {
   }
 }
 
-class _DeckDetails extends StatelessWidget {
-  const _DeckDetails({required this.deck, required this.sheet});
-
-  final Deck deck;
-  final ViewDeckOnlineSheetState sheet;
-
-  @override
-  Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
-    final tags = deck.tags.map((tag) => tag.name).toList(growable: false);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Wrap(
-                spacing: tokens.spacePanelGapMd,
-                runSpacing: tokens.spacePanelGapSm,
-                children: [
-                  ProfileLabel(
-                    label: 'By',
-                    displayName: sheet.profileName,
-                    avatarUrl: sheet.profileAvatarUrl,
-                  ),
-                  MetaLabel(
-                    icon: Icons.calendar_today_outlined,
-                    label: _formatDate(deck.createdAt),
-                    tooltip: 'Created ${_formatDate(deck.createdAt)}',
-                  ),
-                ],
-              ),
-            ),
-            _InteractionButton(
-              icon: sheet.isFavorite ? Icons.favorite : Icons.favorite_border,
-              label: _formatCount(sheet.favoritesCount),
-              selected: sheet.isFavorite,
-              onPressed: sheet.isBusy || sheet.onFavoritePressed == null
-                  ? null
-                  : () {
-                      sheet.onFavoritePressed!();
-                    },
-            ),
-          ],
-        ),
-        SizedBox(height: tokens.spacePanelGapMd),
-        _InteractionSummary(deck: deck, sheet: sheet),
-        SizedBox(height: tokens.spacePanelGapLg),
-        Center(
-          child: DeckTile(deck: deck, state: DeckTileState.spread, width: 190),
-        ),
-        SizedBox(height: tokens.spacePanelGapLg),
-        Text(
-          sheet.title,
-          style: appTextStyle.resolve(tokens, const [
-            TextSize.header,
-            TextWeight.heavy,
-          ]),
-        ),
-        SizedBox(height: tokens.spacePanelGapSm),
-        Wrap(
-          spacing: tokens.spacePanelGapMd,
-          runSpacing: tokens.spacePanelGapSm,
-          children: [
-            MetaLabel(
-              icon: Icons.style_outlined,
-              label: '${deck.cardCount} cards',
-            ),
-            MetaLabel(
-              icon: Icons.new_releases_outlined,
-              label: 'v${deck.version}+${deck.buildNumber}',
-            ),
-            MetaLabel(
-              icon: Icons.visibility_outlined,
-              label: _visibilityLabel(deck),
-            ),
-            MetaLabel(
-              icon: Icons.update_outlined,
-              label: _formatDate(deck.updatedAt),
-              tooltip: 'Updated ${_formatDate(deck.updatedAt)}',
-            ),
-          ],
-        ),
-        SizedBox(height: tokens.spacePanelGapMd),
-        Text(
-          sheet.shortDescription,
-          style: appTextStyle.resolve(tokens, const [
-            TextSize.label,
-            TextWeight.strong,
-            TextTone.primary,
-          ]),
-        ),
-        SizedBox(height: tokens.spacePanelGapSm),
-        Text(
-          sheet.longDescription,
-          style: appTextStyle.resolve(tokens, const [
-            TextSize.bodyLarge,
-            TextWeight.body,
-            TextTone.primary,
-          ]),
-        ),
-        SizedBox(height: tokens.spacePanelGapLg),
-        SectionEyebrow('Tags'),
-        SizedBox(height: tokens.spacePanelGapMd),
-        Wrap(
-          spacing: tokens.spacePanelGapSm,
-          runSpacing: tokens.spacePanelGapSm,
-          children: [
-            if (tags.isEmpty)
-              Text(
-                'No tags yet',
-                style: appTextStyle.resolve(tokens, const [
-                  TextSize.label,
-                  TextTone.secondary,
-                ]),
-              )
-            else
-              for (final tag in tags) HeaderBadge(label: tag),
-          ],
-        ),
-        SizedBox(height: tokens.spacePanelGapLg),
-        SectionEyebrow('Featured Cards'),
-        SizedBox(height: tokens.spacePanelGapLg),
-        _DiscussionSection(sheet: sheet),
-      ],
-    );
-  }
-}
-
 class _InteractionSummary extends StatelessWidget {
-  const _InteractionSummary({required this.deck, required this.sheet});
+  const _InteractionSummary({required this.sheet});
 
-  final Deck deck;
   final ViewDeckOnlineSheetState sheet;
 
   @override

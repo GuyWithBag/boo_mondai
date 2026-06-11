@@ -53,6 +53,23 @@ class Button extends HookWidget {
     );
   }
 
+  static Button iconSmall({
+    VoidCallback? onPressed,
+    IconData? icon,
+    ButtonTone tone = ButtonTone.ghost,
+    ButtonDepth depth = ButtonDepth.elevated,
+    bool selected = false,
+  }) {
+    return Button(
+      onPressed: onPressed,
+      leading: icon == null ? null : Icon(icon),
+      tone: tone,
+      size: ButtonSize.smallIcon,
+      depth: depth,
+      selected: selected,
+    );
+  }
+
   static Button iconWithLabel({
     VoidCallback? onPressed,
     IconData? icon,
