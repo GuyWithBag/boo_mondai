@@ -14,3 +14,4 @@ export 'rating_button.dart';
 export 'deck_profiles_label.dart';
 export 'profile_label.dart';
 export 'background_image_surface.dart';
+export 'editable_text_value.dart';

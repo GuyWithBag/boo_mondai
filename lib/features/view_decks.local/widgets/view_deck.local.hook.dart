@@ -20,6 +20,9 @@ class ViewDeckLocalSheetState {
     required this.coverImageUrl,
     required this.isSavingPublishState,
     required this.onPublishedChanged,
+    required this.onTitleChanged,
+    required this.onShortDescriptionChanged,
+    required this.onLongDescriptionChanged,
     required this.onTagsChanged,
   });
 
@@ -30,6 +33,9 @@ class ViewDeckLocalSheetState {
   final String? coverImageUrl;
   final bool isSavingPublishState;
   final ValueChanged<bool> onPublishedChanged;
+  final Future<void> Function(String value) onTitleChanged;
+  final Future<void> Function(String value) onShortDescriptionChanged;
+  final Future<void> Function(String value) onLongDescriptionChanged;
   final ValueChanged<List<String>> onTagsChanged;
 }
 
@@ -137,6 +143,39 @@ ViewDeckLocalSheetState useViewDeckLocalSheet({
     controller.load();
   }
 
+  Future<void> setTitle(String value) {
+    return _updateDeckText(
+      deck: deck,
+      controller: controller,
+      value: value,
+      allowEmpty: false,
+      selectCurrentValue: (deck) => deck.title,
+      copyWithValue: (deck, value) => deck.copyWith(title: value),
+    );
+  }
+
+  Future<void> setShortDescription(String value) {
+    return _updateDeckText(
+      deck: deck,
+      controller: controller,
+      value: value,
+      allowEmpty: true,
+      selectCurrentValue: (deck) => deck.shortDescription,
+      copyWithValue: (deck, value) => deck.copyWith(shortDescription: value),
+    );
+  }
+
+  Future<void> setLongDescription(String value) {
+    return _updateDeckText(
+      deck: deck,
+      controller: controller,
+      value: value,
+      allowEmpty: true,
+      selectCurrentValue: (deck) => deck.longDescription,
+      copyWithValue: (deck, value) => deck.copyWith(longDescription: value),
+    );
+  }
+
   return ViewDeckLocalSheetState(
     deck: deck,
     title: title,
@@ -145,8 +184,40 @@ ViewDeckLocalSheetState useViewDeckLocalSheet({
     coverImageUrl: coverImageUrl,
     isSavingPublishState: isSavingPublishState.value,
     onPublishedChanged: setPublished,
+    onTitleChanged: setTitle,
+    onShortDescriptionChanged: setShortDescription,
+    onLongDescriptionChanged: setLongDescription,
     onTagsChanged: setTags,
   );
+}
+
+Future<void> _updateDeckText({
+  required Deck? deck,
+  required ViewDecksLocalController controller,
+  required String value,
+  required bool allowEmpty,
+  required String Function(Deck deck) selectCurrentValue,
+  required Deck Function(Deck deck, String value) copyWithValue,
+}) async {
+  if (deck == null || !deck.isEditable) {
+    return;
+  }
+
+  final trimmedValue = value.trim();
+  if (!allowEmpty && trimmedValue.isEmpty) {
+    return;
+  }
+  if (trimmedValue == selectCurrentValue(deck)) {
+    return;
+  }
+
+  final updatedDeck = copyWithValue(
+    deck,
+    trimmedValue,
+  ).copyWith(updatedAt: DateTime.now());
+
+  await LocalDB.deck.upsert(updatedDeck);
+  controller.load();
 }
 
 String? _nonEmptyOrNull(String? value) {

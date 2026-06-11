@@ -7,8 +7,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextWeight,
         TextTone,
         TextFieldSize,
-        AppTextFieldFrame,
-        AppTextFieldTone,
+        TextFieldFrame,
+        TextFieldTone,
         Button,
         VariantTextField;
 import 'package:flutter/material.dart';
@@ -61,8 +61,8 @@ class TextFieldCard extends StatelessWidget {
                 placeholder: placeholder,
                 variants: const [
                   TextFieldSize.bodyLarge,
-                  AppTextFieldFrame.none,
-                  AppTextFieldTone.neutral,
+                  TextFieldFrame.none,
+                  TextFieldTone.neutral,
                 ],
               ),
             ),

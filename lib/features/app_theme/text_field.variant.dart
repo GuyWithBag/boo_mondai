@@ -5,15 +5,18 @@ import 'package:theme_variants/theme_variants.dart';
 
 enum TextFieldSize { labelLarge, bodyLarge, normal }
 
-enum AppTextFieldFrame { none, outline, underline }
+enum TextFieldFrame { none, outline, underline }
 
-enum AppTextFieldTone { neutral, brand, success, error }
+enum TextFieldTone { neutral, brand, success, error }
 
-enum AppTextFieldState { idle, incorrect }
+enum TextFieldState { idle, incorrect }
+
+enum TextFieldAlign { start, center }
+
+// enum TextFieldShape { rounded, sharp }
 
 final appTextFieldStyle = VariantStyle.textFieldParts<AppTokens>(
   base: (tokens) => {
-    TextFieldStylePart.textAlign(TextAlign.start),
     TextFieldStylePart.cursorColor(tokens.primary),
     TextFieldStylePart.text({
       TextStylePart.color(tokens.textPrimary),
@@ -29,11 +32,20 @@ final appTextFieldStyle = VariantStyle.textFieldParts<AppTokens>(
   },
   defaultVariants: const [
     TextFieldSize.normal,
-    AppTextFieldFrame.none,
-    AppTextFieldTone.neutral,
-    AppTextFieldState.idle,
+    TextFieldFrame.none,
+    TextFieldTone.neutral,
+    TextFieldState.idle,
+    TextFieldAlign.start,
+    // TextFieldShape.rounded
   ],
   variants: {
+    // TextFieldShape.rounded: (tokens) => {},
+    TextFieldAlign.start: (tokens) => {
+      TextFieldStylePart.textAlign(TextAlign.start),
+    },
+    TextFieldAlign.center: (tokens) => {
+      TextFieldStylePart.textAlign(TextAlign.center),
+    },
     TextFieldSize.labelLarge: (tokens) => {
       TextFieldStylePart.text({
         TextStylePart.fontSize(tokens.textSizeLabelLarge.sp),
@@ -53,7 +65,7 @@ final appTextFieldStyle = VariantStyle.textFieldParts<AppTokens>(
         TextStylePart.fontSize(tokens.textSizeLabel.sp),
       }),
     },
-    AppTextFieldFrame.none: (_) => {
+    TextFieldFrame.none: (_) => {
       TextFieldStylePart.decoration({
         InputDecorationPart.border(InputBorder.none),
         InputDecorationPart.enabledBorder(InputBorder.none),
@@ -61,7 +73,7 @@ final appTextFieldStyle = VariantStyle.textFieldParts<AppTokens>(
         InputDecorationPart.contentPadding(EdgeInsets.zero),
       }),
     },
-    AppTextFieldFrame.outline: (tokens) => {
+    TextFieldFrame.outline: (tokens) => {
       TextFieldStylePart.decoration({
         InputDecorationPart.filled(true),
         InputDecorationPart.fillColor(tokens.backgroundPage),
@@ -86,36 +98,33 @@ final appTextFieldStyle = VariantStyle.textFieldParts<AppTokens>(
         ),
       }),
     },
-    AppTextFieldFrame.underline: (tokens) => {
-      TextFieldStylePart.textAlign(TextAlign.center),
+    TextFieldFrame.underline: (tokens) => {
       TextFieldStylePart.decoration({
         InputDecorationPart.filled(true),
         InputDecorationPart.fillColor(tokens.softGray),
-        InputDecorationPart.contentPadding(
-          EdgeInsets.symmetric(horizontal: 18.w, vertical: 12.h),
-        ),
+        // InputDecorationPart.contentPadding(
+        //   EdgeInsets.symmetric(horizontal: 18.w, vertical: 12.h),
+        // ),
         InputDecorationPart.enabledBorder(
           UnderlineInputBorder(
             borderSide: BorderSide(color: tokens.primary, width: 4.w),
-            borderRadius: BorderRadius.circular(12.r),
           ),
         ),
         InputDecorationPart.focusedBorder(
           UnderlineInputBorder(
             borderSide: BorderSide(color: tokens.primary, width: 4.w),
-            borderRadius: BorderRadius.circular(12.r),
           ),
         ),
       }),
     },
-    AppTextFieldTone.neutral: (tokens) => {
+    TextFieldTone.neutral: (tokens) => {
       TextFieldStylePart.text({TextStylePart.color(tokens.textPrimary)}),
     },
-    AppTextFieldTone.brand: (tokens) => {
+    TextFieldTone.brand: (tokens) => {
       TextFieldStylePart.cursorColor(tokens.primary),
       TextFieldStylePart.text({TextStylePart.color(tokens.primary)}),
     },
-    AppTextFieldTone.success: (tokens) => {
+    TextFieldTone.success: (tokens) => {
       TextFieldStylePart.text({TextStylePart.color(tokens.actionSuccess)}),
       TextFieldStylePart.decoration({
         InputDecorationPart.fillColor(
@@ -141,7 +150,7 @@ final appTextFieldStyle = VariantStyle.textFieldParts<AppTokens>(
         ),
       }),
     },
-    AppTextFieldTone.error: (tokens) => {
+    TextFieldTone.error: (tokens) => {
       TextFieldStylePart.text({TextStylePart.color(tokens.actionError)}),
       TextFieldStylePart.decoration({
         InputDecorationPart.fillColor(
@@ -167,8 +176,8 @@ final appTextFieldStyle = VariantStyle.textFieldParts<AppTokens>(
         ),
       }),
     },
-    AppTextFieldState.idle: (_) => const <StylePart<TextFieldStyle>>{},
-    AppTextFieldState.incorrect: (_) => {
+    TextFieldState.idle: (_) => const <StylePart<TextFieldStyle>>{},
+    TextFieldState.incorrect: (_) => {
       TextFieldStylePart.text({
         TextStylePart.decoration(TextDecoration.lineThrough),
       }),

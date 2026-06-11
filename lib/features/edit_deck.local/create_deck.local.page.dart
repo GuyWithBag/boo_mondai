@@ -9,7 +9,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         VisibilityState,
         AuthController,
         ViewDecksLocalController,
-        AppTextFieldTone,
+        TextFieldTone,
         SectionEyebrow,
         LocalDB,
         Deck,
@@ -20,7 +20,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         ButtonTone,
         appTextFieldStyle,
         TextFieldSize,
-        AppTextFieldFrame,
+        TextFieldFrame,
         SectionEyebrowTone,
         SegmentOption,
         SegmentedControl,
@@ -230,7 +230,7 @@ class CreateDeckSheet extends HookWidget {
                         title: 'Version',
                         placeholder: '1.0.0',
                         controller: versionController,
-                        tone: AppTextFieldTone.brand,
+                        tone: TextFieldTone.brand,
                       ),
                       SizedBox(height: tokens.spacePanelGapLg),
                       _VisibilityPanel(
@@ -269,7 +269,7 @@ class _TextFieldPanel extends StatelessWidget {
     this.validator,
     this.maxLines = 1,
     this.keyboardType,
-    this.tone = AppTextFieldTone.neutral,
+    this.tone = TextFieldTone.neutral,
   });
 
   final String title;
@@ -278,14 +278,14 @@ class _TextFieldPanel extends StatelessWidget {
   final FormFieldValidator<String>? validator;
   final int maxLines;
   final TextInputType? keyboardType;
-  final AppTextFieldTone tone;
+  final TextFieldTone tone;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
     final fieldStyle = appTextFieldStyle.resolve(tokens, [
       TextFieldSize.normal,
-      AppTextFieldFrame.outline,
+      TextFieldFrame.outline,
       tone,
     ]);
 

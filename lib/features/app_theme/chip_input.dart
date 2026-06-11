@@ -1,7 +1,7 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        AppTextFieldFrame,
-        AppTextFieldTone,
+        TextFieldFrame,
+        TextFieldTone,
         AppTokens,
         ChipTone,
         TextFieldSize,
@@ -23,11 +23,12 @@ class ChipInput extends StatefulWidget {
     this.enabled = true,
     this.separatorPattern,
     this.allowDuplicates = false,
+    this.createChipOnSubmit = true,
     this.chipTone = ChipTone.ghost,
     this.textFieldVariants = const [
       TextFieldSize.normal,
-      AppTextFieldFrame.outline,
-      AppTextFieldTone.neutral,
+      TextFieldFrame.outline,
+      TextFieldTone.neutral,
     ],
     this.normalizer,
     this.focusNode,
@@ -43,6 +44,7 @@ class ChipInput extends StatefulWidget {
   final bool enabled;
   final Pattern? separatorPattern;
   final bool allowDuplicates;
+  final bool createChipOnSubmit;
   final ChipTone chipTone;
   final Iterable<Object> textFieldVariants;
   final ChipInputNormalizer? normalizer;
@@ -54,31 +56,29 @@ class ChipInput extends StatefulWidget {
 }
 
 class _ChipInputState extends State<ChipInput> {
-  late TextEditingController _controller;
+  late _ChipInputEditingController _controller;
   late FocusNode _focusNode;
-  late bool _ownsController;
   late bool _ownsFocusNode;
+  bool _syncingExternalController = false;
 
   Pattern get _separatorPattern => widget.separatorPattern ?? RegExp(r'[,;\n]');
 
   @override
   void initState() {
     super.initState();
-    _ownsController = widget.controller == null;
     _ownsFocusNode = widget.focusNode == null;
-    _controller = widget.controller ?? TextEditingController();
+    _controller = _createController(widget.values);
     _focusNode = widget.focusNode ?? FocusNode();
+    widget.controller?.addListener(_handleExternalTextChanged);
   }
 
   @override
   void didUpdateWidget(covariant ChipInput oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.controller != oldWidget.controller) {
-      if (_ownsController) {
-        _controller.dispose();
-      }
-      _ownsController = widget.controller == null;
-      _controller = widget.controller ?? TextEditingController();
+      oldWidget.controller?.removeListener(_handleExternalTextChanged);
+      widget.controller?.addListener(_handleExternalTextChanged);
+      _controller.setTextWithoutReplacements(widget.controller?.text ?? '');
     }
     if (widget.focusNode != oldWidget.focusNode) {
       if (_ownsFocusNode) {
@@ -91,22 +91,39 @@ class _ChipInputState extends State<ChipInput> {
 
   @override
   void dispose() {
-    if (_ownsController) {
-      _controller.dispose();
-    }
+    widget.controller?.removeListener(_handleExternalTextChanged);
+    _controller.dispose();
     if (_ownsFocusNode) {
       _focusNode.dispose();
     }
     super.dispose();
   }
 
-  void _handleTextChanged(String value) {
-    if (!value.contains(_separatorPattern)) {
+  _ChipInputEditingController _createController(List<String> values) {
+    return _ChipInputEditingController(
+      values: values,
+      chipBuilder: _buildChip,
+      text: widget.controller?.text ?? '',
+    );
+  }
+
+  void _handleExternalTextChanged() {
+    if (_syncingExternalController) {
+      return;
+    }
+    _controller.setTextWithoutReplacements(widget.controller?.text ?? '');
+  }
+
+  void _handleTextChanged(String _) {
+    _syncExternalText();
+    _handleChipDeletionFromKeyboard();
+    final inputText = _controller.textWithoutReplacements;
+    if (!inputText.contains(_separatorPattern)) {
       return;
     }
 
-    final keepTrailingText = !_endsWithSeparator(value);
-    final parts = value.split(_separatorPattern);
+    final keepTrailingText = !_endsWithSeparator(inputText);
+    final parts = inputText.split(_separatorPattern);
     final chipParts = keepTrailingText ? parts.take(parts.length - 1) : parts;
     final trailingText = keepTrailingText ? parts.last : '';
 
@@ -115,7 +132,10 @@ class _ChipInputState extends State<ChipInput> {
   }
 
   void _handleSubmitted(String value) {
-    _addValues([value]);
+    if (!widget.createChipOnSubmit) {
+      return;
+    }
+    _addValues([_controller.textWithoutReplacements]);
     _setInputText('');
   }
 
@@ -145,6 +165,19 @@ class _ChipInputState extends State<ChipInput> {
     widget.onChanged(widget.values.where((item) => item != value).toList());
   }
 
+  void _handleChipDeletionFromKeyboard() {
+    final replacementCount = _controller.replacementCount;
+    if (replacementCount >= widget.values.length) {
+      return;
+    }
+
+    final nextValues = widget.values.take(replacementCount).toList();
+    for (final value in widget.values.skip(replacementCount)) {
+      widget.onChipDeleted?.call(value);
+    }
+    widget.onChanged(nextValues);
+  }
+
   String _normalize(String value) {
     final normalized = widget.normalizer?.call(value) ?? value.trim();
     return normalized.trim();
@@ -161,9 +194,39 @@ class _ChipInputState extends State<ChipInput> {
   }
 
   void _setInputText(String value) {
-    _controller.value = TextEditingValue(
-      text: value,
-      selection: TextSelection.collapsed(offset: value.length),
+    _controller.setTextWithoutReplacements(value);
+    _syncExternalText();
+  }
+
+  void _syncExternalText() {
+    final externalController = widget.controller;
+    if (externalController == null) {
+      return;
+    }
+
+    final text = _controller.textWithoutReplacements;
+    if (externalController.text == text) {
+      return;
+    }
+
+    _syncingExternalController = true;
+    externalController.value = TextEditingValue(
+      text: text,
+      selection: TextSelection.collapsed(offset: text.length),
+    );
+    _syncingExternalController = false;
+  }
+
+  Widget _buildChip(BuildContext context, String value) {
+    return Padding(
+      padding: EdgeInsetsDirectional.only(end: 6.w, bottom: 3.h),
+      child: InputChip(
+        label: Text(value),
+        onPressed: widget.enabled && widget.onChipPressed != null
+            ? () => widget.onChipPressed!(value)
+            : null,
+        onDeleted: widget.enabled ? () => _removeValue(value) : null,
+      ),
     );
   }
 
@@ -175,65 +238,108 @@ class _ChipInputState extends State<ChipInput> {
       widget.textFieldVariants,
     );
     final chipTheme = appChipStyle.resolve(tokens, [widget.chipTone]);
-    final shouldShowHint = widget.values.isEmpty && _controller.text.isEmpty;
+    _controller.updateValues(widget.values);
 
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: widget.enabled ? _focusNode.requestFocus : null,
-      child: AnimatedBuilder(
-        animation: Listenable.merge([_focusNode, _controller]),
-        builder: (context, child) {
-          return InputDecorator(
-            isFocused: _focusNode.hasFocus,
-            isEmpty: shouldShowHint,
-            decoration: InputDecoration(
-              hintText: shouldShowHint ? widget.placeholder : null,
-            ).applyDefaults(textFieldStyle.decorationTheme),
-            child: child,
-          );
-        },
-        child: ChipTheme(
-          data: chipTheme,
-          child: Wrap(
-            spacing: 6.w,
-            runSpacing: 6.h,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              for (final value in widget.values)
-                InputChip(
-                  label: Text(value),
-                  onPressed: widget.enabled && widget.onChipPressed != null
-                      ? () => widget.onChipPressed!(value)
-                      : null,
-                  onDeleted: widget.enabled ? () => _removeValue(value) : null,
-                ),
-              ConstrainedBox(
-                constraints: BoxConstraints(minWidth: 96.w, maxWidth: 240.w),
-                child: TextField(
-                  controller: _controller,
-                  focusNode: _focusNode,
-                  enabled: widget.enabled,
-                  onChanged: _handleTextChanged,
-                  onSubmitted: _handleSubmitted,
-                  minLines: 1,
-                  maxLines: null,
-                  textInputAction: TextInputAction.done,
-                  cursorColor: textFieldStyle.cursorColor,
-                  style: textFieldStyle.textStyle,
-                  decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    disabledBorder: InputBorder.none,
-                    isDense: true,
-                    contentPadding: EdgeInsets.zero,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+    return ChipTheme(
+      data: chipTheme,
+      child: TextField(
+        controller: _controller,
+        focusNode: _focusNode,
+        enabled: widget.enabled,
+        onChanged: _handleTextChanged,
+        onSubmitted: _handleSubmitted,
+        minLines: 1,
+        maxLines: null,
+        textInputAction: TextInputAction.done,
+        cursorColor: textFieldStyle.cursorColor,
+        style: textFieldStyle.textStyle,
+        decoration: InputDecoration(
+          hintText: widget.placeholder,
+        ).applyDefaults(textFieldStyle.decorationTheme),
       ),
     );
+  }
+}
+
+class _ChipInputEditingController extends TextEditingController {
+  _ChipInputEditingController({
+    required List<String> values,
+    required this.chipBuilder,
+    String text = '',
+  }) : values = [...values],
+       super(text: _replacementChar * values.length + text);
+
+  static const int kObjectReplacementChar = 0xFFFE;
+  static final String _replacementChar = String.fromCharCode(
+    kObjectReplacementChar,
+  );
+
+  List<String> values;
+  final Widget Function(BuildContext context, String value) chipBuilder;
+
+  int get replacementCount {
+    return text.codeUnits
+        .where((unit) => unit == kObjectReplacementChar)
+        .length;
+  }
+
+  String get textWithoutReplacements {
+    return text.replaceAll(_replacementChar, '');
+  }
+
+  void updateValues(List<String> nextValues) {
+    if (_listEquals(values, nextValues)) {
+      return;
+    }
+
+    final inputText = textWithoutReplacements;
+    values = [...nextValues];
+    value = TextEditingValue(
+      text: _replacementChar * values.length + inputText,
+      selection: TextSelection.collapsed(
+        offset: values.length + inputText.length,
+      ),
+    );
+  }
+
+  void setTextWithoutReplacements(String inputText) {
+    value = TextEditingValue(
+      text: _replacementChar * values.length + inputText,
+      selection: TextSelection.collapsed(
+        offset: values.length + inputText.length,
+      ),
+    );
+  }
+
+  @override
+  TextSpan buildTextSpan({
+    required BuildContext context,
+    TextStyle? style,
+    required bool withComposing,
+  }) {
+    return TextSpan(
+      style: style,
+      children: [
+        for (final value in values)
+          WidgetSpan(
+            alignment: PlaceholderAlignment.middle,
+            child: chipBuilder(context, value),
+          ),
+        if (textWithoutReplacements.isNotEmpty)
+          TextSpan(text: textWithoutReplacements),
+      ],
+    );
+  }
+
+  static bool _listEquals(List<String> left, List<String> right) {
+    if (left.length != right.length) {
+      return false;
+    }
+    for (var index = 0; index < left.length; index += 1) {
+      if (left[index] != right[index]) {
+        return false;
+      }
+    }
+    return true;
   }
 }

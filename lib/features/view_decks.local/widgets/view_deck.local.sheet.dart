@@ -134,6 +134,9 @@ class ViewDeckLocalSheet extends HookWidget {
               showCloseButton: showCloseButton,
               isSavingPublishState: sheet.isSavingPublishState,
               onPublishedChanged: sheet.onPublishedChanged,
+              onTitleChanged: sheet.onTitleChanged,
+              onShortDescriptionChanged: sheet.onShortDescriptionChanged,
+              onLongDescriptionChanged: sheet.onLongDescriptionChanged,
               onTagsChanged: sheet.onTagsChanged,
               onBackPressed: () {
                 if (context.canPop()) {
@@ -166,6 +169,9 @@ class _Body extends StatelessWidget {
     required this.showCloseButton,
     required this.isSavingPublishState,
     required this.onPublishedChanged,
+    required this.onTitleChanged,
+    required this.onShortDescriptionChanged,
+    required this.onLongDescriptionChanged,
     required this.onTagsChanged,
     required this.onBackPressed,
     required this.onEditPressed,
@@ -182,6 +188,9 @@ class _Body extends StatelessWidget {
   final bool showCloseButton;
   final bool isSavingPublishState;
   final ValueChanged<bool> onPublishedChanged;
+  final Future<void> Function(String value) onTitleChanged;
+  final Future<void> Function(String value) onShortDescriptionChanged;
+  final Future<void> Function(String value) onLongDescriptionChanged;
   final ValueChanged<List<String>> onTagsChanged;
   final VoidCallback onBackPressed;
   final VoidCallback? onEditPressed;
@@ -225,6 +234,9 @@ class _Body extends StatelessWidget {
                   longDescription: longDescription,
                   studyCardCount: studyCardCount,
                   templateCount: templateCount,
+                  onTitleChanged: onTitleChanged,
+                  onShortDescriptionChanged: onShortDescriptionChanged,
+                  onLongDescriptionChanged: onLongDescriptionChanged,
                   onTagsChanged: onTagsChanged,
                 ),
               ),
@@ -281,7 +293,7 @@ class _Body extends StatelessWidget {
         ),
         Positioned(
           right: tokens.spacePanelPadding,
-          top: 210.h,
+          bottom: 0,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -323,6 +335,9 @@ class _DeckDetails extends StatelessWidget {
     required this.longDescription,
     required this.studyCardCount,
     required this.templateCount,
+    required this.onTitleChanged,
+    required this.onShortDescriptionChanged,
+    required this.onLongDescriptionChanged,
     required this.onTagsChanged,
   });
 
@@ -332,6 +347,9 @@ class _DeckDetails extends StatelessWidget {
   final String longDescription;
   final int studyCardCount;
   final int templateCount;
+  final Future<void> Function(String value) onTitleChanged;
+  final Future<void> Function(String value) onShortDescriptionChanged;
+  final Future<void> Function(String value) onLongDescriptionChanged;
   final ValueChanged<List<String>> onTagsChanged;
 
   @override
@@ -386,26 +404,39 @@ class _DeckDetails extends StatelessWidget {
         ),
 
         SizedBox(height: tokens.spacePanelGapLg),
-        Text(
-          title,
-          style: appTextStyle.resolve(tokens, const [
+        EditableTextValue(
+          value: title,
+          editingValue: deck.title,
+          enabled: deck.isEditable,
+          placeholder: 'Deck title',
+          onSave: onTitleChanged,
+          textStyle: appTextStyle.resolve(tokens, const [
             TextSize.header,
             TextWeight.heavy,
           ]),
         ),
         SizedBox(height: tokens.spacePanelGapMd),
-        Text(
-          shortDescription,
-          style: appTextStyle.resolve(tokens, const [
+        EditableTextValue(
+          value: shortDescription,
+          editingValue: deck.shortDescription,
+          enabled: deck.isEditable,
+          placeholder: 'Short description',
+          onSave: onShortDescriptionChanged,
+          textStyle: appTextStyle.resolve(tokens, const [
             TextSize.labelSmall,
             TextWeight.body,
             TextTone.primary,
           ]),
         ),
         SizedBox(height: tokens.spacePanelGapMd),
-        Text(
-          longDescription,
-          style: appTextStyle.resolve(tokens, const [
+        EditableTextValue(
+          value: longDescription,
+          editingValue: deck.longDescription,
+          enabled: deck.isEditable,
+          placeholder: 'Long description',
+          maxLines: null,
+          onSave: onLongDescriptionChanged,
+          textStyle: appTextStyle.resolve(tokens, const [
             TextSize.bodyLarge,
             TextWeight.body,
             TextTone.primary,

@@ -20,8 +20,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextSize,
         TextWeight,
         TextFieldSize,
-        AppTextFieldFrame,
-        AppTextFieldTone,
+        TextFieldFrame,
+        TextFieldTone,
         VariantTextField,
         Modal,
         TextTone;
@@ -320,8 +320,8 @@ class _DevManualLoginDialog extends HookWidget {
               onSubmitted: (_) => Navigator.of(context).pop(controller.text),
               variants: const [
                 TextFieldSize.normal,
-                AppTextFieldFrame.outline,
-                AppTextFieldTone.neutral,
+                TextFieldFrame.outline,
+                TextFieldTone.neutral,
               ],
             ),
           ],

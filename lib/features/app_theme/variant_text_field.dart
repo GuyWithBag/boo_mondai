@@ -11,6 +11,7 @@ class VariantTextField extends StatelessWidget {
     this.onChanged,
     this.onSubmitted,
     this.placeholder,
+    this.textStyle,
     this.keyboardType,
     this.textInputAction,
     this.obscureText = false,
@@ -27,6 +28,7 @@ class VariantTextField extends StatelessWidget {
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onSubmitted;
   final String? placeholder;
+  final TextStyle? textStyle;
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
   final bool obscureText;
@@ -53,7 +55,7 @@ class VariantTextField extends StatelessWidget {
       maxLines: maxLines,
       expands: expands,
       textAlignVertical: textAlignVertical,
-      style: style.textStyle,
+      style: textStyle ?? style.textStyle,
       decoration: InputDecoration(
         hintText: placeholder,
       ).applyDefaults(style.decorationTheme),

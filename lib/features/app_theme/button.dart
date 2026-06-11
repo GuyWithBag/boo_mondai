@@ -40,6 +40,7 @@ class Button extends HookWidget {
     VoidCallback? onPressed,
     IconData? icon,
     ButtonTone tone = ButtonTone.ghost,
+    ButtonDepth depth = ButtonDepth.elevated,
     bool selected = false,
   }) {
     return Button(
@@ -47,6 +48,7 @@ class Button extends HookWidget {
       leading: icon == null ? null : Icon(icon),
       tone: tone,
       size: ButtonSize.icon,
+      depth: depth,
       selected: selected,
     );
   }

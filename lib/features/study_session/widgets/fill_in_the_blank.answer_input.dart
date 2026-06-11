@@ -1,10 +1,10 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
-        AppTextFieldTone,
-        AppTextFieldState,
+        TextFieldTone,
+        TextFieldState,
         TextFieldSize,
-        AppTextFieldFrame,
+        TextFieldFrame,
         VariantTextField,
         appTextStyle,
         TextSize,
@@ -33,12 +33,12 @@ class FillInTheBlankAnswerInput extends StatelessWidget {
     final tokens = context.themeTokens<AppTokens>();
     final tone = revealed
         ? correct
-              ? AppTextFieldTone.success
-              : AppTextFieldTone.error
-        : AppTextFieldTone.brand;
+              ? TextFieldTone.success
+              : TextFieldTone.error
+        : TextFieldTone.brand;
     final state = revealed && !correct
-        ? AppTextFieldState.incorrect
-        : AppTextFieldState.idle;
+        ? TextFieldState.incorrect
+        : TextFieldState.idle;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -50,7 +50,7 @@ class FillInTheBlankAnswerInput extends StatelessWidget {
             onChanged: onChanged,
             variants: [
               TextFieldSize.labelLarge,
-              AppTextFieldFrame.underline,
+              TextFieldFrame.underline,
               tone,
               state,
             ],
