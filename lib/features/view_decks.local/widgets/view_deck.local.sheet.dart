@@ -203,7 +203,7 @@ class _Body extends StatelessWidget {
       deck.isPublished ? ChipTone.filled : ChipTone.hard,
     ]);
 
-    final deckWidth = 150.w.clamp(118.0, 170.0).toDouble();
+    final deckWidth = 160.w;
     final headerHeight = 350.h.clamp(300.0, 390.0).toDouble();
 
     return Stack(
@@ -220,25 +220,57 @@ class _Body extends StatelessWidget {
             SizedBox(height: headerHeight),
             SizedBox(
               width: double.infinity,
-              child: Surface(
-                style: surfaceStyle.resolve(tokens, const [
-                  SurfaceShape.topRounded,
-                  SurfaceTone.muted,
-                  SurfaceBorder.top,
-                  SurfaceShadow.none,
-                ]),
-                child: _DeckDetails(
-                  deck: deck,
-                  title: title,
-                  shortDescription: shortDescription,
-                  longDescription: longDescription,
-                  studyCardCount: studyCardCount,
-                  templateCount: templateCount,
-                  onTitleChanged: onTitleChanged,
-                  onShortDescriptionChanged: onShortDescriptionChanged,
-                  onLongDescriptionChanged: onLongDescriptionChanged,
-                  onTagsChanged: onTagsChanged,
-                ),
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Surface(
+                    style: surfaceStyle.resolve(tokens, const [
+                      SurfaceShape.topRounded,
+                      SurfaceTone.muted,
+                      SurfaceBorder.top,
+                      SurfaceShadow.none,
+                    ]),
+                    child: _DeckDetails(
+                      deck: deck,
+                      title: title,
+                      shortDescription: shortDescription,
+                      longDescription: longDescription,
+                      studyCardCount: studyCardCount,
+                      templateCount: templateCount,
+                      onTitleChanged: onTitleChanged,
+                      onShortDescriptionChanged: onShortDescriptionChanged,
+                      onLongDescriptionChanged: onLongDescriptionChanged,
+                      onTagsChanged: onTagsChanged,
+                    ),
+                  ),
+                  Positioned(
+                    right: tokens.spacePanelPadding,
+                    top: -tokens.radiusSurfaceLg - tokens.spacePanelPadding,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        MetaLabel(
+                          icon: Icons.new_releases_outlined,
+                          label: 'v${deck.version}.${deck.buildNumber}',
+                          tooltip: 'Deck version and build number',
+                        ),
+                        SizedBox(height: tokens.spacePanelGapSm),
+                        MetaLabel(
+                          icon: Icons.calendar_today_outlined,
+                          label: _formatDate(deck.createdAt),
+                          tooltip: 'Created ${_formatDate(deck.createdAt)}',
+                        ),
+                        SizedBox(height: tokens.spacePanelGapSm),
+                        MetaLabel(
+                          icon: Icons.update_outlined,
+                          label: _formatDate(deck.updatedAt),
+                          tooltip: 'Updated ${_formatDate(deck.updatedAt)}',
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -292,34 +324,11 @@ class _Body extends StatelessWidget {
           ),
         ),
         Positioned(
-          right: tokens.spacePanelPadding,
-          bottom: 0,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              MetaLabel(
-                icon: Icons.new_releases_outlined,
-                label: 'v${deck.version}.${deck.buildNumber}',
-                tooltip: 'Deck version and build number',
-              ),
-              SizedBox(height: tokens.spacePanelGapSm),
-              MetaLabel(
-                icon: Icons.calendar_today_outlined,
-                label: _formatDate(deck.createdAt),
-                tooltip: 'Created ${_formatDate(deck.createdAt)}',
-              ),
-              SizedBox(height: tokens.spacePanelGapSm),
-              MetaLabel(
-                icon: Icons.update_outlined,
-                label: _formatDate(deck.updatedAt),
-                tooltip: 'Updated ${_formatDate(deck.updatedAt)}',
-              ),
-            ],
-          ),
-        ),
-        Positioned(
           left: tokens.spacePanelPadding,
-          top: headerHeight - (deckWidth / tokens.cardAspectRatio) - 10.h,
+          top:
+              headerHeight -
+              (deckWidth / tokens.cardAspectRatio) +
+              (tokens.radiusSurfaceLg - tokens.spacePanelPadding),
           child: DeckTile(deck: deck, width: deckWidth),
         ),
       ],
@@ -402,8 +411,6 @@ class _DeckDetails extends StatelessWidget {
             ),
           ],
         ),
-
-        SizedBox(height: tokens.spacePanelGapLg),
         EditableTextValue(
           value: title,
           editingValue: deck.title,
@@ -415,7 +422,6 @@ class _DeckDetails extends StatelessWidget {
             TextWeight.heavy,
           ]),
         ),
-        SizedBox(height: tokens.spacePanelGapMd),
         EditableTextValue(
           value: shortDescription,
           editingValue: deck.shortDescription,
@@ -428,7 +434,6 @@ class _DeckDetails extends StatelessWidget {
             TextTone.primary,
           ]),
         ),
-        SizedBox(height: tokens.spacePanelGapMd),
         EditableTextValue(
           value: longDescription,
           editingValue: deck.longDescription,
