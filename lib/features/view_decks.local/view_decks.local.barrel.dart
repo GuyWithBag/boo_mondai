@@ -3,7 +3,5 @@
 // Barrel files
 export 'widgets/widgets.barrel.dart';
 // Other files
-export 'view_decks.service.dart';
-export 'view_reviews.controller.dart';
 export 'view_decks.local.controller.dart';
 export 'view_decks.local.page.dart';

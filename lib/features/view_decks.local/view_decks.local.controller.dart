@@ -11,23 +11,36 @@ import 'package:boo_mondai/lib.barrel.dart'
         LocalDB,
         Controller,
         Deck,
+        DeckSearchFilterCodec,
+        DeckSearchResults,
         AppException,
+        SnackbarTone,
         showViewDeckLocalSheet,
+        showSnackbar,
         SyncService,
         RemoteDB;
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 
 /// Drives the My Decks page — loads all decks sorted by [updatedAt] descending
 /// and exposes delete operations.
 class ViewDecksLocalController extends Controller {
+  static const deckSearchFilterCodec = DeckSearchFilterCodec();
+  static const deckSearchResults = DeckSearchResults();
+
   final DecksLocalDB _deckDB = LocalDB.deck;
-  // Inside your Controller
-  void init() {
-    // Listen to Hive changes directly
-    _deckDB.box.listenable().addListener(() {
-      load(); // Automatically refresh whenever the box changes
-    });
+  late final Listenable _deckListenable;
+
+  ViewDecksLocalController() {
+    _deckListenable = _deckDB.box.listenable();
+    _deckListenable.addListener(load);
+  }
+
+  @override
+  void dispose() {
+    _deckListenable.removeListener(load);
+    super.dispose();
   }
   // ── private state ────────────────────────────────────────
 
@@ -62,6 +75,32 @@ class ViewDecksLocalController extends Controller {
 
   void goToDeck(BuildContext context, Deck deck) {
     showViewDeckLocalSheet(context, deck);
+  }
+
+  void loadOnNextFrame() {
+    SchedulerBinding.instance.addPostFrameCallback((_) => load());
+  }
+
+  void showSyncErrorIfPresent(BuildContext context) {
+    final err = syncError;
+    if (err == null) return;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!context.mounted) return;
+      showSnackbar(
+        context: context,
+        message: 'Sync failed: $err',
+        leading: const Icon(Icons.sync_problem_outlined),
+        duration: const Duration(seconds: 3),
+        tone: SnackbarTone.error,
+      );
+      clearSyncError();
+    });
+  }
+
+  void submitSearch(BuildContext context, List<Deck> visibleDecks) {
+    if (visibleDecks.length != 1) return;
+    goToDeck(context, visibleDecks.single);
   }
 
   /// Deletes the deck with the given [id] from the repository, then reloads.

@@ -10,17 +10,17 @@ import 'package:boo_mondai/lib.barrel.dart'
         AuthController,
         CreateDeckTile,
         Deck,
+        DeckSearchFilter,
         DeckTile,
         DeckTileState,
         EmptyState,
+        FilteredSearchBar,
         ListingStatesWrapper,
-        SnackbarTone,
         SyncButton,
         ViewDecksLocalController,
         showCreateDeckLocalSheet,
-        showSnackbar;
+        useFilteredSearchBarController;
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
 
@@ -34,29 +34,33 @@ class ViewDecksLocalPage extends HookWidget {
     // final scrollController = useScrollController();
 
     useEffect(() {
-      // Defer past the current build frame to avoid
-      // "setState called during build" when mounted inside a LayoutBuilder.
-      SchedulerBinding.instance.addPostFrameCallback((_) => controller.load());
+      controller.loadOnNextFrame();
       return null;
     }, const []);
 
-    // Show a snackbar whenever a sync error arrives.
     useEffect(() {
-      final err = controller.syncError;
-      if (err == null) return null;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!context.mounted) return;
-        showSnackbar(
-          context: context,
-          message: 'Sync failed: $err',
-          leading: const Icon(Icons.sync_problem_outlined),
-          duration: const Duration(seconds: 3),
-          tone: SnackbarTone.error,
-        );
-        controller.clearSyncError();
-      });
+      controller.showSyncErrorIfPresent(context);
       return null;
     }, [controller.syncError]);
+
+    final searchController =
+        useFilteredSearchBarController<Deck, DeckSearchFilter>(
+          filterCodec: ViewDecksLocalController.deckSearchFilterCodec,
+          searchResults: ViewDecksLocalController.deckSearchResults,
+          items: controller.decks,
+        );
+    final visibleDecks = searchController.results;
+    final hasSearchQuery = searchController.text.trim().isNotEmpty;
+
+    final searchBar = FilteredSearchBar<Deck, DeckSearchFilter>(
+      controller: searchController,
+      filterCodec: ViewDecksLocalController.deckSearchFilterCodec,
+      searchResults: ViewDecksLocalController.deckSearchResults,
+      items: controller.decks,
+      placeholder: 'Search decks',
+      onResultSelected: (deck) => controller.goToDeck(context, deck),
+      onSubmitted: (_) => controller.submitSearch(context, visibleDecks),
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -71,13 +75,23 @@ class ViewDecksLocalPage extends HookWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(100.0),
-        child: _DeckListBody(
-          error: controller.error,
-          isLoading: controller.isLoading,
-          onRetry: () {},
-          onDeleteDeck: (id) {},
-          onPressed: controller.goToDeck,
-          decks: controller.decks,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              searchBar,
+              const SizedBox(height: 24),
+              _DeckListBody(
+                error: controller.error,
+                isLoading: controller.isLoading,
+                onRetry: controller.load,
+                onDeleteDeck: controller.deleteDeck,
+                onPressed: controller.goToDeck,
+                decks: visibleDecks,
+                hasSearchQuery: hasSearchQuery,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -94,6 +108,7 @@ class _DeckListBody extends StatelessWidget {
     required this.onRetry,
     required this.onDeleteDeck,
     required this.onPressed,
+    required this.hasSearchQuery,
   });
 
   final bool isLoading;
@@ -102,23 +117,31 @@ class _DeckListBody extends StatelessWidget {
   final VoidCallback onRetry;
   final Function(BuildContext context, Deck deck) onPressed;
   final void Function(String id) onDeleteDeck;
+  final bool hasSearchQuery;
 
   @override
   Widget build(BuildContext context) {
     return ListingStatesWrapper<Deck>.wrap(
       isLoading: isLoading,
+      exception: error,
       items: decks,
       onRetry: onRetry,
       skeletonTile: DeckTile(deck: null),
-      emptyState: EmptyState(
-        icon: Icons.layers,
-        title: 'No decks yet',
-        message: 'Create your first deck to get started',
-        action: ElevatedButton(
-          child: Text('Create Deck'),
-          onPressed: () => showCreateDeckLocalSheet(context),
-        ),
-      ),
+      emptyState: hasSearchQuery
+          ? const EmptyState(
+              icon: Icons.search_off,
+              title: 'No decks found',
+              message: 'Try another search or remove filters',
+            )
+          : EmptyState(
+              icon: Icons.layers,
+              title: 'No decks yet',
+              message: 'Create your first deck to get started',
+              action: ElevatedButton(
+                child: Text('Create Deck'),
+                onPressed: () => showCreateDeckLocalSheet(context),
+              ),
+            ),
       spacing: 100,
       leadingItem: CreateDeckTile(
         onPressed: () => showCreateDeckLocalSheet(context),
