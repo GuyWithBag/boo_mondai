@@ -9,8 +9,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         DecksRemoteDB,
         DeckDownloadsOnlineService,
         Deck,
-        Tag,
-        ViewDecksService;
+        DeckSearchResults,
+        Tag;
 
 class ViewDecksOnlineController extends Controller {
   final DecksRemoteDB _deckRemoteDB = DecksRemoteDB();
@@ -27,8 +27,9 @@ class ViewDecksOnlineController extends Controller {
     setLoading(true);
     try {
       final publicDecks = await _deckRemoteDB.selectManyPublic();
-      decks = ViewDecksService.sortDecks(publicDecks);
-      availableTags = ViewDecksService.availableTags(decks);
+      const deckSearchResults = DeckSearchResults();
+      decks = deckSearchResults.sortDecks(publicDecks);
+      availableTags = deckSearchResults.availableTags(decks);
     } catch (e) {
       setError(e is Exception ? e : Exception(e.toString()));
     } finally {

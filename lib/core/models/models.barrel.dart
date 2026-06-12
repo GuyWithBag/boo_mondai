@@ -2,5 +2,4 @@
 
 // Other files
 export 'app_page.dart';
-export 'browse_sort.dart';
 export 'dto.dart';

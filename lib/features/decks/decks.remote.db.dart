@@ -4,12 +4,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart'
-    show
-        SupabaseRemoteDB,
-        Deck,
-        BrowseSortField,
-        BrowseSortDirection,
-        DeckMapper;
+    show SupabaseRemoteDB, Deck, DeckSortField, SearchSortDirection, DeckMapper;
 
 class DecksRemoteDB extends SupabaseRemoteDB<Deck> {
   @override
@@ -53,12 +48,12 @@ class DecksRemoteDB extends SupabaseRemoteDB<Deck> {
   Future<List<Deck>> selectManyPublic({
     int? limit,
     int offset = 0,
-    BrowseSortField sortField = BrowseSortField.createdAt,
-    BrowseSortDirection sortDirection = BrowseSortDirection.descending,
+    DeckSortField sortField = DeckSortField.createdAt,
+    SearchSortDirection sortDirection = SearchSortDirection.descending,
   }) => selectMany(
     filters: const {'visibility_state': 'public', 'is_published': true},
     orderBy: _columnForSortField(sortField),
-    ascending: sortDirection == BrowseSortDirection.ascending,
+    ascending: sortDirection == SearchSortDirection.ascending,
     limit: limit,
     offset: offset,
   );
@@ -71,11 +66,11 @@ class DecksRemoteDB extends SupabaseRemoteDB<Deck> {
     ascending: false,
   );
 
-  String _columnForSortField(BrowseSortField field) {
+  String _columnForSortField(DeckSortField field) {
     return switch (field) {
-      BrowseSortField.letters => 'title',
-      BrowseSortField.createdAt => 'created_at',
-      BrowseSortField.updatedAt => 'updated_at',
+      DeckSortField.letters => 'title',
+      DeckSortField.createdAt => 'created_at',
+      DeckSortField.updatedAt => 'updated_at',
     };
   }
 }

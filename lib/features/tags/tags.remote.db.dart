@@ -3,7 +3,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart'
-    show Tag, SupabaseRemoteDB, BrowseSortField, BrowseSortDirection, TagMapper;
+    show Tag, SupabaseRemoteDB, SearchSortDirection, TagMapper, TagSortField;
 
 class TagsRemoteDB extends SupabaseRemoteDB<Tag> {
   @override
@@ -35,8 +35,8 @@ class TagsRemoteDB extends SupabaseRemoteDB<Tag> {
     String query = '',
     String? userId,
     bool includeGlobalTags = true,
-    BrowseSortField sortField = BrowseSortField.letters,
-    BrowseSortDirection sortDirection = BrowseSortDirection.ascending,
+    TagSortField sortField = TagSortField.letters,
+    SearchSortDirection sortDirection = SearchSortDirection.ascending,
     int? limit,
   }) => guard(() async {
     dynamic request = client.from(tableName).select();
@@ -54,7 +54,7 @@ class TagsRemoteDB extends SupabaseRemoteDB<Tag> {
 
     request = request.order(
       _columnForSortField(sortField),
-      ascending: sortDirection == BrowseSortDirection.ascending,
+      ascending: sortDirection == SearchSortDirection.ascending,
     );
 
     if (limit != null) {
@@ -65,11 +65,11 @@ class TagsRemoteDB extends SupabaseRemoteDB<Tag> {
     return List<Map<String, dynamic>>.from(response).map(fromMap).toList();
   }, action: 'selectManyFiltered($query, $userId)');
 
-  String _columnForSortField(BrowseSortField field) {
+  String _columnForSortField(TagSortField field) {
     return switch (field) {
-      BrowseSortField.letters => 'name',
-      BrowseSortField.createdAt => 'created_at',
-      BrowseSortField.updatedAt => 'created_at',
+      TagSortField.letters => 'name',
+      TagSortField.createdAt => 'created_at',
+      TagSortField.updatedAt => 'created_at',
     };
   }
 }

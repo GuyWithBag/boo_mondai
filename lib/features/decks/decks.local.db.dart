@@ -44,8 +44,8 @@ class DecksLocalDB extends HiveLocalDB<Deck> {
 
   List<Deck> filterDecks({
     String query = '',
-    BrowseSortField sortField = BrowseSortField.updatedAt,
-    BrowseSortDirection sortDirection = BrowseSortDirection.descending,
+    DeckSortField sortField = DeckSortField.updatedAt,
+    SearchSortDirection sortDirection = SearchSortDirection.descending,
   }) => guardSync(() {
     final normalizedQuery = query.trim().toLowerCase();
     final currentProfileId = LocalDB.profile.getOrCreate().id;
@@ -78,20 +78,20 @@ class DecksLocalDB extends HiveLocalDB<Deck> {
 
   List<Deck> _sortDecks(
     Iterable<Deck> decks, {
-    required BrowseSortField field,
-    required BrowseSortDirection direction,
+    required DeckSortField field,
+    required SearchSortDirection direction,
   }) {
     final sorted = decks.toList();
     sorted.sort((a, b) {
       final comparison = switch (field) {
-        BrowseSortField.letters => a.title.toLowerCase().compareTo(
+        DeckSortField.letters => a.title.toLowerCase().compareTo(
           b.title.toLowerCase(),
         ),
-        BrowseSortField.createdAt => a.createdAt.compareTo(b.createdAt),
-        BrowseSortField.updatedAt => a.updatedAt.compareTo(b.updatedAt),
+        DeckSortField.createdAt => a.createdAt.compareTo(b.createdAt),
+        DeckSortField.updatedAt => a.updatedAt.compareTo(b.updatedAt),
       };
 
-      return direction == BrowseSortDirection.ascending
+      return direction == SearchSortDirection.ascending
           ? comparison
           : -comparison;
     });

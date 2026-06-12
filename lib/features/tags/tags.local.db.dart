@@ -3,7 +3,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart'
-    show HiveLocalDB, Tag, BrowseSortField, BrowseSortDirection;
+    show HiveLocalDB, Tag, SearchSortDirection, TagSortField;
 
 class TagLocalDB extends HiveLocalDB<Tag> {
   @override
@@ -22,8 +22,8 @@ class TagLocalDB extends HiveLocalDB<Tag> {
     String query = '',
     String? userId,
     bool includeGlobalTags = true,
-    BrowseSortField sortField = BrowseSortField.letters,
-    BrowseSortDirection sortDirection = BrowseSortDirection.ascending,
+    TagSortField sortField = TagSortField.letters,
+    SearchSortDirection sortDirection = SearchSortDirection.ascending,
   }) => guardSync(() {
     final normalizedQuery = query.trim().toLowerCase();
     final filtered = box.values.where((tag) {
@@ -41,20 +41,20 @@ class TagLocalDB extends HiveLocalDB<Tag> {
 
   List<Tag> _sortTags(
     Iterable<Tag> tags, {
-    required BrowseSortField field,
-    required BrowseSortDirection direction,
+    required TagSortField field,
+    required SearchSortDirection direction,
   }) {
     final sorted = tags.toList();
     sorted.sort((a, b) {
       final comparison = switch (field) {
-        BrowseSortField.letters => a.name.toLowerCase().compareTo(
+        TagSortField.letters => a.name.toLowerCase().compareTo(
           b.name.toLowerCase(),
         ),
-        BrowseSortField.createdAt => a.createdAt.compareTo(b.createdAt),
-        BrowseSortField.updatedAt => a.createdAt.compareTo(b.createdAt),
+        TagSortField.createdAt => a.createdAt.compareTo(b.createdAt),
+        TagSortField.updatedAt => a.createdAt.compareTo(b.createdAt),
       };
 
-      return direction == BrowseSortDirection.ascending
+      return direction == SearchSortDirection.ascending
           ? comparison
           : -comparison;
     });
