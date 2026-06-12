@@ -5,5 +5,4 @@ export 'models/models.barrel.dart';
 // Other files
 export 'review.study_session.controller.dart';
 export 'review_sessions.remote.db.dart';
-export 'view_reviews.local.page.dart';
 export 'review_sessions.local.db.dart';
