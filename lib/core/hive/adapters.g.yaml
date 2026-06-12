@@ -293,7 +293,7 @@ types:
         index: 6
   DrillSession:
     typeId: 13
-    nextIndex: 10
+    nextIndex: 17
     fields:
       previewed:
         index: 0
@@ -302,19 +302,19 @@ types:
       correctCount:
         index: 2
       id:
-        index: 3
+        index: 10
       userId:
-        index: 4
+        index: 11
       deckId:
-        index: 5
+        index: 12
       startedAt:
-        index: 6
+        index: 13
       completedAt:
-        index: 7
+        index: 14
       userProfile:
-        index: 8
+        index: 15
       deck:
-        index: 9
+        index: 16
   DrillAnswer:
     typeId: 14
     nextIndex: 8
@@ -399,26 +399,26 @@ types:
         index: 3
   ReviewSession:
     typeId: 19
-    nextIndex: 9
+    nextIndex: 16
     fields:
       totalCards:
         index: 0
       cardsReviewed:
         index: 1
       id:
-        index: 2
+        index: 9
       userId:
-        index: 3
+        index: 10
       deckId:
-        index: 4
+        index: 11
       startedAt:
-        index: 5
+        index: 12
       completedAt:
-        index: 6
+        index: 13
       userProfile:
-        index: 7
+        index: 14
       deck:
-        index: 8
+        index: 15
   FsrsReviewLog:
     typeId: 20
     nextIndex: 4
@@ -645,7 +645,7 @@ types:
         index: 7
   UserSettings:
     typeId: 35
-    nextIndex: 9
+    nextIndex: 12
     fields:
       userId:
         index: 0
@@ -660,8 +660,8 @@ types:
       customThemePresets:
         index: 5
       id:
-        index: 6
+        index: 9
       createdAt:
-        index: 7
+        index: 10
       updatedAt:
-        index: 8
+        index: 11
