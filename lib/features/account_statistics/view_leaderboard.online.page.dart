@@ -5,10 +5,21 @@
 // HOOKS: useEffect, useScrollController
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/lib.barrel.dart' show ViewLeaderboardController, AppSpacing, LeaderboardTileWidget;
+import 'package:boo_mondai/lib.barrel.dart'
+    show
+        AppTokens,
+        AuthController,
+        LeaderboardTileWidget,
+        SurfaceBorder,
+        SurfaceShape,
+        SurfaceTone,
+        ViewLeaderboardController,
+        surfaceStyle;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:theme_variants/theme_variants.dart';
 
 class ViewLeaderboardPage extends HookWidget {
   const ViewLeaderboardPage({super.key});
@@ -16,6 +27,8 @@ class ViewLeaderboardPage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final leaderboard = context.watch<ViewLeaderboardController>();
+    final auth = context.watch<AuthController>();
+    final tokens = context.themeTokens<AppTokens>();
     final scrollController = useScrollController();
 
     useEffect(() {
@@ -24,22 +37,7 @@ class ViewLeaderboardPage extends HookWidget {
     }, const []);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Leaderboard'),
-        actions: [
-          PopupMenuButton<String?>(
-            icon: const Icon(Icons.filter_list),
-            tooltip: 'Filter by language',
-            onSelected: (lang) => context
-                .read<ViewLeaderboardController>()
-                .setLanguageFilter(lang),
-            itemBuilder: (_) => [
-              const PopupMenuItem(value: null, child: Text('All languages')),
-              const PopupMenuItem(value: 'japanese', child: Text('Japanese')),
-            ],
-          ),
-        ],
-      ),
+      appBar: AppBar(title: const Text('Leaderboard')),
       body: leaderboard.isLoading
           ? const Center(child: CircularProgressIndicator())
           : leaderboard.entries.isEmpty
@@ -48,11 +46,64 @@ class ViewLeaderboardPage extends HookWidget {
               onRefresh: () => leaderboard.fetchLeaderboard(),
               child: ListView.builder(
                 controller: scrollController,
-                padding: const EdgeInsets.all(AppSpacing.md),
-                itemCount: leaderboard.entries.length,
+                padding: EdgeInsets.all(16.r),
+                itemCount: leaderboard.entries.length + 1,
                 itemBuilder: (context, i) {
-                  final entry = leaderboard.entries[i];
-                  return LeaderboardTileWidget(rank: i + 1, entry: entry);
+                  if (i == 0) {
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: 16.h),
+                      child: Surface(
+                        style: surfaceStyle.resolve(tokens, const [
+                          SurfaceTone.surface,
+                          SurfaceShape.rounded,
+                          SurfaceBorder.none,
+                        ]),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Rankings',
+                                    style: TextStyle(
+                                      fontSize: 24.sp,
+                                      fontWeight: tokens.fontWeightTextHeavy,
+                                      color: tokens.textPrimary,
+                                    ),
+                                  ),
+                                  SizedBox(height: 8.h),
+                                  Text(
+                                    'Sorted by drill score. Streaks are shown on the right.',
+                                    style: TextStyle(
+                                      fontSize: tokens.textSizeLabel.sp,
+                                      fontWeight: tokens.fontWeightTextStrong,
+                                      color: tokens.textSecondary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Icon(
+                              Icons.workspace_premium_outlined,
+                              size: 34.sp,
+                              color: tokens.textPrimary,
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+
+                  final entry = leaderboard.entries[i - 1];
+                  return Padding(
+                    padding: EdgeInsets.only(bottom: 10.h),
+                    child: LeaderboardTileWidget(
+                      rank: i,
+                      entry: entry,
+                      isCurrentUser: entry.userId == auth.currentProfile.id,
+                    ),
+                  );
                 },
               ),
             ),

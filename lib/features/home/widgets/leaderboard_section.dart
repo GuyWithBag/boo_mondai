@@ -1,78 +1,144 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/pages/home/leaderboard_section.dart
-// PURPOSE: Home page leaderboard preview with top 5 entries
+// PURPOSE: Home page leaderboard preview with current-user rank context
 // PROVIDERS: none
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart'
     show
+        AppTokens,
+        Button,
+        ButtonSize,
+        ButtonTone,
         LeaderboardEntry,
-        AppSpacing,
-        ScoringInfoDialog,
-        AppColors,
-        LeaderboardTileWidget;
+        LeaderboardTileWidget,
+        SurfaceBorder,
+        SurfaceShape,
+        SurfaceTone,
+        surfaceStyle;
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:theme_variants/theme_variants.dart';
 
 class LeaderboardSection extends StatelessWidget {
   const LeaderboardSection({
     super.key,
     required this.entries,
     required this.isLoading,
+    required this.currentUserId,
   });
 
   final List<LeaderboardEntry> entries;
   final bool isLoading;
+  final String currentUserId;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(
-              'Leaderboard',
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
+    final tokens = context.themeTokens<AppTokens>();
+    final previewEntries = _previewEntries(entries, currentUserId);
+
+    return Surface(
+      style: surfaceStyle.resolve(tokens, const [
+        SurfaceTone.surface,
+        SurfaceShape.rounded,
+        SurfaceBorder.none,
+      ]),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Leaderboard',
+                      style: TextStyle(
+                        fontSize: 22.sp,
+                        fontWeight: tokens.fontWeightTextHeavy,
+                        color: tokens.textPrimary,
+                      ),
+                    ),
+                    SizedBox(height: 8.h),
+                    Text(
+                      'Keep your reviews consistent to advance',
+                      style: TextStyle(
+                        fontSize: tokens.textSizeLabel.sp,
+                        fontWeight: tokens.fontWeightTextStrong,
+                        color: tokens.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(width: AppSpacing.xs),
-            IconButton(
-              icon: const Icon(Icons.info_outline, size: 18),
-              tooltip: 'How scoring works',
-              color: AppColors.textSecondary,
-              visualDensity: VisualDensity.compact,
-              padding: EdgeInsets.zero,
-              onPressed: () => showDialog<void>(
-                context: context,
-                builder: (_) => const ScoringInfoDialog(),
+              Icon(
+                Icons.workspace_premium_outlined,
+                color: tokens.textPrimary,
+                size: 30.sp,
               ),
-            ),
-            const Spacer(),
-            TextButton(
-              onPressed: () => context.push('/leaderboard'),
-              child: const Text('See All'),
-            ),
-          ],
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        if (isLoading)
-          const Center(child: CircularProgressIndicator())
-        else if (entries.isEmpty)
-          Text(
-            'No scores yet — complete a drill to appear here!',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: AppColors.textSecondary,
-            ),
-          )
-        else
-          ...entries.asMap().entries.map(
-            (e) => LeaderboardTileWidget(rank: e.key + 1, entry: e.value),
+            ],
           ),
-      ],
+          SizedBox(height: 20.h),
+          if (isLoading)
+            const Center(child: CircularProgressIndicator())
+          else if (previewEntries.isEmpty)
+            Text(
+              'No scores yet. Complete a drill to appear here.',
+              style: TextStyle(
+                color: tokens.textSecondary,
+                fontWeight: tokens.fontWeightTextStrong,
+              ),
+            )
+          else
+            ...previewEntries.map(
+              (entry) => Padding(
+                padding: EdgeInsets.only(bottom: 10.h),
+                child: LeaderboardTileWidget(
+                  rank: entries.indexOf(entry) + 1,
+                  entry: entry,
+                  isCurrentUser: entry.userId == currentUserId,
+                ),
+              ),
+            ),
+          SizedBox(height: 12.h),
+          SizedBox(
+            width: double.infinity,
+            child: Button(
+              onPressed: () => context.push('/leaderboard'),
+              tone: ButtonTone.ghost,
+              size: ButtonSize.lg,
+              child: const Text('SEE ALL RANKINGS'),
+            ),
+          ),
+        ],
+      ),
     );
+  }
+
+  List<LeaderboardEntry> _previewEntries(
+    List<LeaderboardEntry> entries,
+    String currentUserId,
+  ) {
+    if (entries.isEmpty) {
+      return const [];
+    }
+
+    final currentIndex = entries.indexWhere(
+      (entry) => entry.userId == currentUserId,
+    );
+    if (currentIndex == -1) {
+      return [entries.first];
+    }
+
+    final result = <LeaderboardEntry>[entries[currentIndex]];
+    final behindIndex = currentIndex + 1;
+    if (behindIndex < entries.length) {
+      result.add(entries[behindIndex]);
+    }
+    return result;
   }
 }

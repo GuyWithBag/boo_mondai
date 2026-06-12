@@ -2,6 +2,8 @@
 
 // Other files
 export 'due_review_card.dart';
-export 'leaderboard_section.dart';
 export 'score_row.dart';
 export 'scoring_info_dialog.dart';
+export 'ready_to_review_card.dart';
+export 'streaks_card.dart';
+export 'leaderboard_section.dart';

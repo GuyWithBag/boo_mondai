@@ -12,9 +12,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         ViewLeaderboardController,
         AppSpacing,
         LocalDB,
-        StreakCard,
-        DueStudyCard,
-        LeaderboardSection;
+        LeaderboardSection,
+        ReadyToReviewCard,
+        StreaksCard;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
@@ -38,7 +38,6 @@ class HomePage extends HookWidget {
     }, []);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Home')),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {
@@ -50,35 +49,17 @@ class HomePage extends HookWidget {
           child: ListView(
             padding: const EdgeInsets.all(AppSpacing.md),
             children: [
-              Text(
-                'Welcome, ${auth.currentProfile.username}!',
-                style: Theme.of(context).textTheme.headlineMedium,
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              StreakCard(streak: LocalDB.streak.retrieve()),
-              const SizedBox(height: AppSpacing.md),
-              DueStudyCard(
+              ReadyToReviewCard(
                 dueCount: reviewDashboard.totalDue,
-                onTap: () => context.push('/review/session'),
+                onStartSession: () => context.push('/review/session'),
               ),
-              const SizedBox(height: AppSpacing.lg),
-              FilledButton.icon(
-                onPressed: () => context.go('/decks-local'),
-                icon: const Icon(Icons.library_books),
-                label: const Text('Browse Decks'),
-              ),
-              if (auth.currentProfile.role == 'researcher') ...[
-                const SizedBox(height: AppSpacing.sm),
-                OutlinedButton.icon(
-                  onPressed: () => context.push('/research'),
-                  icon: const Icon(Icons.science),
-                  label: const Text('Research Dashboard'),
-                ),
-              ],
-              const SizedBox(height: AppSpacing.xl),
+              const SizedBox(height: AppSpacing.md),
+              StreaksCard(streak: LocalDB.streak.retrieve()),
+              const SizedBox(height: AppSpacing.md),
               LeaderboardSection(
-                entries: leaderboard.entries.take(5).toList(),
+                entries: leaderboard.entries,
                 isLoading: leaderboard.isLoading,
+                currentUserId: auth.currentProfile.id,
               ),
             ],
           ),

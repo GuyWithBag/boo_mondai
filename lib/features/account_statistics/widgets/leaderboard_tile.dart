@@ -1,77 +1,164 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/widgets/leaderboard_tile.dart
-// PURPOSE: Reusable leaderboard entry tile with rank, name, score, streak
+// PURPOSE: Reusable leaderboard entry tile with rank, medal, score, streak
 // PROVIDERS: none
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart'
-    show Streak, Profile, LeaderboardEntry, RemoteDB, AppColors, StreakCard;
+    show
+        AppTokens,
+        LeaderboardEntry,
+        RemoteDB,
+        Streak,
+        SurfaceBorder,
+        SurfaceShape,
+        SurfaceTone,
+        surfaceStyle;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:theme_variants/theme_variants.dart';
 
 class LeaderboardTileWidget extends HookWidget {
   final int rank;
   final LeaderboardEntry entry;
+  final bool isCurrentUser;
 
   const LeaderboardTileWidget({
     super.key,
     required this.rank,
     required this.entry,
+    this.isCurrentUser = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final isTop3 = rank <= 3;
+    final tokens = context.themeTokens<AppTokens>();
+    final medal = _RankMedal.forRank(rank);
+    final tileVariants = isCurrentUser
+        ? const [SurfaceShape.cardShape, SurfaceTone.primaryOutline]
+        : const [SurfaceTone.muted, SurfaceShape.cardShape, SurfaceBorder.none];
 
-    final dataFuture =
-        useMemoized<Future<({Profile? profile, Streak? streak})>>(() async {
-          final profile = await RemoteDB.profile.selectByAuthUserId(
-            entry.userId,
-          );
-          final streak = profile == null
-              ? null
-              : await RemoteDB.streak.selectOne(
-                  filters: {'user_id': profile.id},
-                );
-          return (profile: profile, streak: streak);
-        }, [entry.userId]);
+    final streakFuture = useMemoized<Future<Streak?>>(
+      () => RemoteDB.streak.selectOne(filters: {'user_id': entry.userId}),
+      [entry.userId],
+    );
 
-    final snapshot = useFuture(dataFuture);
+    final snapshot = useFuture(streakFuture);
     final isLoading = !snapshot.hasData && !snapshot.hasError;
-    final profile = snapshot.data?.profile;
-    final streak = snapshot.data?.streak;
+    final streak = snapshot.data;
+    final profile = entry.userProfile;
+    final name = profile?.username ?? 'Unknown user';
 
     return Skeletonizer(
       enabled: isLoading,
-      child: Card(
-        child: ListTile(
-          leading: CircleAvatar(
-            backgroundColor: isTop3
-                ? AppColors.streakFire.withValues(alpha: 0.2)
-                : null,
-            child: Text(
-              '$rank',
-              style: TextStyle(
-                fontWeight: isTop3 ? FontWeight.bold : FontWeight.normal,
-                color: isTop3 ? AppColors.streakFire : null,
+      child: Surface(
+        style: surfaceStyle.resolve(tokens, tileVariants),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 28.w,
+              child: Text(
+                '$rank',
+                style: TextStyle(
+                  fontSize: tokens.textSizeLabelLarge.sp,
+                  fontWeight: tokens.fontWeightTextHeavy,
+                ),
               ),
             ),
-          ),
-          title: Text(
-            profile?.username ?? 'Loading...',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          subtitle: Text(
-            '${entry.drillScore} pts  ·  ${entry.reviewCount} reviews',
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
-          trailing: streak != null && streak.currentStreak > 0
-              ? StreakCard(streak: streak, compact: true)
-              : null,
+            SizedBox(width: 10.w),
+            Icon(medal.icon, color: medal.color, size: 28.sp),
+            SizedBox(width: 12.w),
+            CircleAvatar(
+              radius: 16.r,
+              backgroundColor: tokens.primarySoft,
+              backgroundImage: profile?.avatarUrl == null
+                  ? null
+                  : NetworkImage(profile!.avatarUrl!),
+              child: profile?.avatarUrl == null
+                  ? Icon(
+                      Icons.person_outline,
+                      color: tokens.primary,
+                      size: 20.sp,
+                    )
+                  : null,
+            ),
+            SizedBox(width: 14.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    isCurrentUser ? '$name (You)' : name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: tokens.textSizeLabelLarge.sp,
+                      fontWeight: tokens.fontWeightTextHeavy,
+                      color: tokens.textPrimary,
+                    ),
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    '${entry.drillScore} points  ${entry.reviewCount} reviews',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: tokens.textSizeLabelSmall.sp,
+                      fontWeight: tokens.fontWeightTextStrong,
+                      color: tokens.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(width: 12.w),
+            Text(
+              '${streak?.currentStreak ?? 0}',
+              style: TextStyle(
+                fontSize: tokens.textSizeLabelLarge.sp,
+                fontWeight: tokens.fontWeightTextHeavy,
+                color: tokens.textPrimary,
+              ),
+            ),
+          ],
         ),
       ),
     );
+  }
+}
+
+class _RankMedal {
+  const _RankMedal({required this.icon, required this.color});
+
+  final IconData icon;
+  final Color color;
+
+  static _RankMedal forRank(int rank) {
+    return switch (rank) {
+      1 => const _RankMedal(
+        icon: Icons.diamond_outlined,
+        color: Color(0xFF38BDF8),
+      ),
+      2 => const _RankMedal(
+        icon: Icons.workspace_premium_outlined,
+        color: Color(0xFFF59E0B),
+      ),
+      3 => const _RankMedal(
+        icon: Icons.workspace_premium_outlined,
+        color: Color(0xFF94A3B8),
+      ),
+      4 => const _RankMedal(
+        icon: Icons.workspace_premium_outlined,
+        color: Color(0xFFB45309),
+      ),
+      _ => const _RankMedal(
+        icon: Icons.workspace_premium_outlined,
+        color: Colors.transparent,
+      ),
+    };
   }
 }

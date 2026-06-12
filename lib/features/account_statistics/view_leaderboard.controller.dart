@@ -8,10 +8,8 @@ import 'package:boo_mondai/lib.barrel.dart'
 
 class ViewLeaderboardController extends Controller {
   List<LeaderboardEntry> _entries = [];
-  String? _filteredLanguage;
 
   List<LeaderboardEntry> get entries => List.unmodifiable(_entries);
-  String? get filteredLanguage => _filteredLanguage;
 
   Future<void> fetchLeaderboard() async {
     setLoading(true);
@@ -26,10 +24,5 @@ class ViewLeaderboardController extends Controller {
       setLoading(false);
       notifyListeners();
     }
-  }
-
-  void setLanguageFilter(String? language) {
-    _filteredLanguage = language;
-    fetchLeaderboard();
   }
 }

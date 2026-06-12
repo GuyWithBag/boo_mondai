@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-enum SurfaceTone { surface, muted, dark, primaryOutline, header }
+enum SurfaceTone { surface, muted, dark, primary, primaryOutline, header }
 
 enum SurfaceShape { rounded, cardShape, sharp, topRounded }
 
@@ -116,6 +116,22 @@ final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
       ),
     },
     SurfaceTone.surface: (_) => const {},
+    SurfaceTone.primary: (tokens) => {
+      SurfaceStylePart.decoration({
+        DecorationPart.color(tokens.primary),
+        DecorationPart.border(
+          Border.all(color: tokens.colorTransparent, width: 0),
+        ),
+        DecorationPart.boxShadow([
+          BoxShadow(
+            color: tokens.primaryDim,
+            offset: Offset(0, tokens.buttonShadowOffset.h),
+          ),
+        ]),
+      }),
+      SurfaceStylePart.text({TextStylePart.color(tokens.colorTextOnBrand)}),
+      SurfaceStylePart.icon({IconThemePart.color(tokens.colorTextOnBrand)}),
+    },
     SurfaceTone.primaryOutline: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.backgroundSurface),
