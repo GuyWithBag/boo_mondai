@@ -19,9 +19,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         SyncButton,
         ViewDecksLocalController,
         showCreateDeckLocalSheet,
-        useFilteredSearchBarController;
+        useFilteredSearchBarController,
+        Button;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class ViewDecksLocalPage extends HookWidget {
@@ -70,6 +72,10 @@ class ViewDecksLocalPage extends HookWidget {
             isSyncing: controller.isSyncing,
             isAuthenticated: auth.service.isAuthenticatedRemote,
             onSync: () => controller.sync(),
+          ),
+          Button.icon(
+            icon: Icons.layers_rounded,
+            onPressed: () => context.push('/view-cards'),
           ),
         ],
       ),

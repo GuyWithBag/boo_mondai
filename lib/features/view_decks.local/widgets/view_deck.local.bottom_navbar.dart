@@ -37,8 +37,10 @@ class ViewDeckLocalBottomNavbar extends StatelessWidget {
             Expanded(
               child: Button(
                 tone: ButtonTone.ghost,
-                onPressed: () => context.push('/decks-local/$deckId/edit'),
-                child: const Text('VIEW CARDS'),
+                onPressed: () => context.push(
+                  '/view-cards?deckId=${Uri.encodeQueryComponent(deckId)}',
+                ),
+                child: const Text('Cards'),
               ),
             ),
             Expanded(

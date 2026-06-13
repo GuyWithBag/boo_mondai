@@ -19,10 +19,15 @@ class MatchingTypeCard extends HookWidget {
     super.key,
     required this.template,
     required this.interactionsController,
-  });
+  }) : previewRevealed = false;
+
+  const MatchingTypeCard.preview({super.key, required this.template})
+    : interactionsController = null,
+      previewRevealed = true;
 
   final MatchMadnessTemplate template;
-  final StudySessionCardStageController interactionsController;
+  final StudySessionCardStageController? interactionsController;
+  final bool previewRevealed;
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +36,8 @@ class MatchingTypeCard extends HookWidget {
     final matches = template.pairs.map((pair) => pair.match).toList();
     final selectedMatch = useState<String?>(null);
     final matchedItems = useState<Set<String>>({});
+    final isRevealed =
+        previewRevealed || interactionsController?.isRevealed == true;
 
     useEffect(() {
       selectedMatch.value = null;
@@ -39,6 +46,7 @@ class MatchingTypeCard extends HookWidget {
     }, [template.id, interactionsController]);
 
     void handleMatchTap(String item) {
+      if (isRevealed) return;
       final selected = selectedMatch.value;
       if (selected == null) {
         selectedMatch.value = item;
@@ -55,7 +63,7 @@ class MatchingTypeCard extends HookWidget {
         final nextMatched = {...matchedItems.value, selected, item};
         matchedItems.value = nextMatched;
         if (nextMatched.length == template.pairs.length * 2) {
-          interactionsController.revealWithAnswer('Matched all pairs');
+          interactionsController?.revealWithAnswer('Matched all pairs');
         }
       }
 
@@ -84,6 +92,7 @@ class MatchingTypeCard extends HookWidget {
                   items: terms,
                   selectedMatch: selectedMatch.value,
                   matchedItems: matchedItems.value,
+                  previewRevealed: isRevealed,
                   onItemPressed: handleMatchTap,
                 ),
               ),
@@ -93,6 +102,7 @@ class MatchingTypeCard extends HookWidget {
                   items: matches,
                   selectedMatch: selectedMatch.value,
                   matchedItems: matchedItems.value,
+                  previewRevealed: isRevealed,
                   onItemPressed: handleMatchTap,
                 ),
               ),
@@ -109,13 +119,15 @@ class _MatchColumn extends StatelessWidget {
     required this.items,
     required this.selectedMatch,
     required this.matchedItems,
+    required this.previewRevealed,
     required this.onItemPressed,
   });
 
   final List<String> items;
   final String? selectedMatch;
   final Set<String> matchedItems;
-  final ValueChanged<String> onItemPressed;
+  final bool previewRevealed;
+  final ValueChanged<String>? onItemPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -125,8 +137,10 @@ class _MatchColumn extends StatelessWidget {
           _MatchButton(
             value: item,
             selected: selectedMatch == item,
-            matched: matchedItems.contains(item),
-            onPressed: () => onItemPressed(item),
+            matched: previewRevealed ? false : matchedItems.contains(item),
+            onPressed: previewRevealed || onItemPressed == null
+                ? null
+                : () => onItemPressed!(item),
           ),
           if (item != items.last) SizedBox(height: 14.h),
         ],
@@ -146,7 +160,7 @@ class _MatchButton extends StatelessWidget {
   final String value;
   final bool selected;
   final bool matched;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {

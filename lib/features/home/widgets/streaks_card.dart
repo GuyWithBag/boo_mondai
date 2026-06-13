@@ -5,7 +5,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         SurfaceBorder,
         SurfaceShape,
         SurfaceTone,
-        surfaceStyle;
+        surfaceStyle,
+        SurfaceShadow;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -21,9 +22,10 @@ class StreaksCard extends StatelessWidget {
 
     return Surface(
       style: surfaceStyle.resolve(tokens, const [
-        SurfaceTone.muted,
-        SurfaceShape.rounded,
-        SurfaceBorder.none,
+        SurfaceTone.streak,
+        // SurfaceShadow.tactile,
+        // SurfaceShape.rounded,
+        // SurfaceBorder.none,
       ]),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,

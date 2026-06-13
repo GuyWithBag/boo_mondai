@@ -325,6 +325,7 @@ class AuthService {
       userId: newUserId,
       role: null,
       username: newUsername,
+      displayName: newUsername,
       updatedAt: DateTime.now(),
       createdAt: DateTime.now(),
       isAnonymous: false,

@@ -1,3 +1,4 @@
+import 'package:boo_mondai/core/widgets/background_image_surface.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         Deck,
@@ -37,7 +38,8 @@ class DeckListingTile extends HookWidget {
         ? 'No description yet'
         : deck.shortDescription;
     final version = deck.version.isEmpty ? '1.0.0' : deck.version;
-    final backgroundImageUrl = _listingImageUrl(deck);
+    final backgroundImage =
+        backgroundImageProviderFromSource(_listingImageUrl(deck));
     final creatorName = deck.userProfile?.username ?? 'Unknown creator';
 
     useEffect(() {
@@ -69,48 +71,54 @@ class DeckListingTile extends HookWidget {
           children: [
             AspectRatio(
               aspectRatio: 16 / 8.5,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  Image.network(backgroundImageUrl, fit: BoxFit.cover),
-                  _HeaderScrim(color: tokens.backgroundSurface),
-                  Positioned(
-                    top: tokens.spacePanelGapMd,
-                    right: tokens.spacePanelGapLg,
-                    child: Wrap(
-                      alignment: WrapAlignment.end,
-                      spacing: tokens.spacePanelGapMd,
-                      runSpacing: tokens.spacePanelGapSm,
-                      children: [
-                        MetaLabel(
-                          icon: Icons.download_outlined,
-                          label: _formatCount(listing?.downloadsCount ?? 0),
-                        ),
-                        MetaLabel(
-                          icon: Icons.call_split_outlined,
-                          label: _formatCount(listing?.forksCount ?? 0),
-                        ),
-                        MetaLabel(
-                          icon: Icons.chat_bubble_outline,
-                          label: _formatCount(listing?.commentsCount ?? 0),
-                        ),
-                      ],
+              child: BackgroundImageSurface(
+                image: backgroundImage,
+                style: surfaceStyle.resolve(tokens, const [
+                  SurfacePadding.none,
+                  SurfaceShape.sharp,
+                ]),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    _HeaderScrim(color: tokens.backgroundSurface),
+                    Positioned(
+                      top: tokens.spacePanelGapMd,
+                      right: tokens.spacePanelGapLg,
+                      child: Wrap(
+                        alignment: WrapAlignment.end,
+                        spacing: tokens.spacePanelGapMd,
+                        runSpacing: tokens.spacePanelGapSm,
+                        children: [
+                          MetaLabel(
+                            icon: Icons.download_outlined,
+                            label: _formatCount(listing?.downloadsCount ?? 0),
+                          ),
+                          MetaLabel(
+                            icon: Icons.call_split_outlined,
+                            label: _formatCount(listing?.forksCount ?? 0),
+                          ),
+                          MetaLabel(
+                            icon: Icons.chat_bubble_outline,
+                            label: _formatCount(listing?.commentsCount ?? 0),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  Positioned(
-                    left: tokens.spacePanelGapLg,
-                    bottom: tokens.spacePanelGapMd,
-                    child: DeckTile(deck: deck, width: 150),
-                  ),
-                  Positioned(
-                    right: tokens.spacePanelGapLg,
-                    bottom: tokens.spacePanelGapMd,
-                    child: _CreatorBadge(
-                      name: creatorName,
-                      avatarUrl: deck.userProfile?.avatarUrl,
+                    Positioned(
+                      left: tokens.spacePanelGapLg,
+                      bottom: tokens.spacePanelGapMd,
+                      child: DeckTile(deck: deck, width: 150),
                     ),
-                  ),
-                ],
+                    Positioned(
+                      right: tokens.spacePanelGapLg,
+                      bottom: tokens.spacePanelGapMd,
+                      child: _CreatorBadge(
+                        name: creatorName,
+                        avatarUrl: deck.userProfile?.avatarUrl,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
             DecoratedBox(
@@ -233,12 +241,10 @@ class DeckListingTile extends HookWidget {
     );
   }
 
-  String _listingImageUrl(Deck deck) {
+  String? _listingImageUrl(Deck deck) {
     final featuredImageUrl = _firstNonEmpty(deck.listing?.featuredImages);
 
-    return featuredImageUrl ??
-        _nonEmptyOrNull(deck.coverImageUrl) ??
-        _fallbackImageUrl;
+    return featuredImageUrl ?? _nonEmptyOrNull(deck.coverImageUrl);
   }
 
   String? _firstNonEmpty(List<String>? values) {
@@ -272,8 +278,6 @@ class DeckListingTile extends HookWidget {
     return value.toString();
   }
 }
-
-const _fallbackImageUrl = "https://i.redd.it/jvu7xrv8qug11.jpg";
 
 class _HeaderScrim extends StatelessWidget {
   const _HeaderScrim({required this.color});

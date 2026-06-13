@@ -5,6 +5,7 @@ import 'package:flutter/material.dart'
         Alignment,
         AlignmentGeometry,
         BoxFit,
+        AssetImage,
         BuildContext,
         Center,
         Clip,
@@ -15,6 +16,7 @@ import 'package:flutter/material.dart'
         Icons,
         Image,
         ImageProvider,
+        NetworkImage,
         Padding,
         Positioned,
         Stack,
@@ -22,6 +24,18 @@ import 'package:flutter/material.dart'
         StatelessWidget,
         Widget;
 import 'package:theme_variants/theme_variants.dart';
+
+ImageProvider? backgroundImageProviderFromSource(String? source) {
+  final value = source?.trim();
+  if (value == null || value.isEmpty) return null;
+
+  final uri = Uri.tryParse(value);
+  if (uri != null && (uri.scheme == 'http' || uri.scheme == 'https')) {
+    return NetworkImage(value);
+  }
+
+  return AssetImage(value);
+}
 
 class BackgroundImageSurface extends StatelessWidget {
   const BackgroundImageSurface({
@@ -31,6 +45,7 @@ class BackgroundImageSurface extends StatelessWidget {
     this.style,
     this.fit = BoxFit.cover,
     this.imageAlignment = Alignment.center,
+    this.clipBehavior = Clip.antiAlias,
     this.missingImageIcon = Icons.image_not_supported_outlined,
     this.missingImageIconSize = 40,
   });
@@ -40,6 +55,7 @@ class BackgroundImageSurface extends StatelessWidget {
   final SurfaceStyle? style;
   final BoxFit fit;
   final AlignmentGeometry imageAlignment;
+  final Clip clipBehavior;
   final IconData missingImageIcon;
   final double missingImageIconSize;
 
@@ -51,7 +67,7 @@ class BackgroundImageSurface extends StatelessWidget {
     final childPadding = resolvedStyle.padding ?? EdgeInsets.zero;
     final finalStyle = resolvedStyle.copyWith(
       padding: EdgeInsets.zero,
-      clipBehavior: resolvedStyle.clipBehavior ?? Clip.antiAlias,
+      clipBehavior: resolvedStyle.clipBehavior ?? clipBehavior,
     );
 
     return Surface(

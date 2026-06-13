@@ -8,6 +8,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextWeight,
         TextTone,
         FillInTheBlankAnswerInput,
+        MarkdownText,
         PhysicalCardSide;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -19,10 +20,15 @@ class FillInTheBlanksCard extends HookWidget {
     super.key,
     required this.template,
     required this.interactionsController,
-  });
+  }) : previewRevealed = false;
+
+  const FillInTheBlanksCard.preview({super.key, required this.template})
+    : interactionsController = null,
+      previewRevealed = true;
 
   final FillInTheBlanksTemplate template;
-  final StudySessionCardStageController interactionsController;
+  final StudySessionCardStageController? interactionsController;
+  final bool previewRevealed;
 
   bool _isCorrect(int index, List<String> blankInputs) {
     final answer = index < blankInputs.length ? blankInputs[index] : '';
@@ -35,6 +41,8 @@ class FillInTheBlanksCard extends HookWidget {
     final blankInputs = useState<List<String>>(
       List.filled(template.segments.length, ''),
     );
+    final isRevealed =
+        previewRevealed || interactionsController?.isRevealed == true;
 
     useEffect(() {
       blankInputs.value = List.filled(template.segments.length, '');
@@ -47,8 +55,8 @@ class FillInTheBlanksCard extends HookWidget {
       inputs[index] = value;
       blankInputs.value = inputs;
 
-      interactionsController.setAnswer(inputs.join('|'));
-      interactionsController.setCanReveal(
+      interactionsController?.setAnswer(inputs.join('|'));
+      interactionsController?.setCanReveal(
         template.segments.isNotEmpty &&
             inputs.length == template.segments.length &&
             inputs.every((answer) => answer.trim().isNotEmpty),
@@ -90,12 +98,16 @@ class FillInTheBlanksCard extends HookWidget {
                         ],
                       ),
                     ),
-                    FillInTheBlankAnswerInput(
-                      revealed: interactionsController.isRevealed,
-                      correct: _isCorrect(entry.key, blankInputs.value),
-                      correctAnswer: entry.value.correctAnswer,
-                      onChanged: (value) => updateBlankInput(entry.key, value),
-                    ),
+                    isRevealed
+                        ? _PreviewAnswer(label: entry.value.correctAnswer)
+                        : FillInTheBlankAnswerInput(
+                            revealed:
+                                interactionsController?.isRevealed ?? false,
+                            correct: _isCorrect(entry.key, blankInputs.value),
+                            correctAnswer: entry.value.correctAnswer,
+                            onChanged: (value) =>
+                                updateBlankInput(entry.key, value),
+                          ),
                     Text(
                       entry.value.suffix,
                       style: appTextStyle.resolve(
@@ -116,6 +128,27 @@ class FillInTheBlanksCard extends HookWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _PreviewAnswer extends StatelessWidget {
+  const _PreviewAnswer({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = context.themeTokens<AppTokens>();
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+      decoration: BoxDecoration(
+        color: tokens.actionSuccess.withValues(alpha: 0.12),
+        border: Border.all(color: tokens.actionSuccess),
+        borderRadius: BorderRadius.circular(10.r),
+      ),
+      child: MarkdownText(data: label),
     );
   }
 }

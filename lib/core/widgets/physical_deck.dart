@@ -1,3 +1,4 @@
+import 'package:boo_mondai/core/widgets/background_image_surface.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         CubeController,
@@ -45,7 +46,7 @@ class PhysicalDeck extends StatelessWidget {
     final descriptionStyle = appTextStyle
         .resolve(tokens, const [TextSize.labelSmall, TextWeight.body])
         .scaledBy(textScale);
-    final coverImageUrl = _coverImageUrl(deck);
+    final coverImage = backgroundImageProviderFromSource(deck?.coverImageUrl);
     final visibleTags = deck?.tags.take(8).toList() ?? const [];
 
     return Cube(
@@ -66,100 +67,89 @@ class PhysicalDeck extends StatelessWidget {
         style: surfaceStyle.resolve(tokens, const [SurfaceShape.sharp]),
         child: SizedBox.shrink(),
       ),
-      front: Surface(
+      front: BackgroundImageSurface(
+        image: coverImage,
+        clipBehavior: Clip.none,
         style: surfaceStyle.resolve(tokens, const [
           SurfaceShape.sharp,
           SurfacePadding.none,
         ]),
-        child: Stack(
-          fit: StackFit.expand,
-          clipBehavior: Clip.none,
-          // alignment: Alignment.center,
-          children: [
-            Image.network(coverImageUrl, fit: BoxFit.cover),
-            if (showInfoCover)
-              Positioned(
-                left: -controller.width * 0.06,
-                right: -controller.width * 0.06,
-                bottom: -controller.height * 0.08,
-                child: Surface(
-                  style: surfaceStyle.resolve(tokens, const [
-                    SurfaceTone.muted,
-                    SurfaceShape.sharp,
-                    SurfacePadding.text,
-                  ]),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        deck?.title ?? 'Untitled deck',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.center,
-                        style: titleStyle,
-                      ),
-                      if (hasTags && visibleTags.isNotEmpty) ...[
-                        SizedBox(height: controller.height * 0.025),
-                        Wrap(
-                          alignment: WrapAlignment.center,
-                          spacing: controller.width * 0.025,
-                          runSpacing: controller.height * 0.015,
-                          children: [
-                            for (final tag in visibleTags)
-                              Surface(
-                                style: surfaceStyle.resolve(tokens, const [
-                                  SurfaceShape.cardShape,
-                                  SurfacePadding.none,
-                                  SurfaceBorder.normal,
-                                ]),
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: controller.width * 0.035,
-                                    vertical: controller.height * 0.01,
+        child: showInfoCover
+            ? Stack(
+                fit: StackFit.expand,
+                clipBehavior: Clip.none,
+                children: [
+                  Positioned(
+                    left: -controller.width * 0.06,
+                    right: -controller.width * 0.06,
+                    bottom: -controller.height * 0.08,
+                    child: Surface(
+                      style: surfaceStyle.resolve(tokens, const [
+                        SurfaceTone.muted,
+                        SurfaceShape.sharp,
+                        SurfacePadding.text,
+                      ]),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            deck?.title ?? 'Untitled deck',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
+                            style: titleStyle,
+                          ),
+                          if (hasTags && visibleTags.isNotEmpty) ...[
+                            SizedBox(height: controller.height * 0.025),
+                            Wrap(
+                              alignment: WrapAlignment.center,
+                              spacing: controller.width * 0.025,
+                              runSpacing: controller.height * 0.015,
+                              children: [
+                                for (final tag in visibleTags)
+                                  Surface(
+                                    style: surfaceStyle.resolve(tokens, const [
+                                      SurfaceShape.cardShape,
+                                      SurfacePadding.none,
+                                      SurfaceBorder.normal,
+                                    ]),
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: controller.width * 0.035,
+                                        vertical: controller.height * 0.01,
+                                      ),
+                                      child: Text(
+                                        tag.name,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: tagStyle,
+                                      ),
+                                    ),
                                   ),
-                                  child: Text(
-                                    tag.name,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: tagStyle,
-                                  ),
-                                ),
-                              ),
+                              ],
+                            ),
                           ],
-                        ),
-                      ],
-                      if ((deck?.shortDescription ?? '').trim().isNotEmpty) ...[
-                        SizedBox(height: controller.height * 0.025),
-                        Text(
-                          deck!.shortDescription,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
-                          style: descriptionStyle,
-                        ),
-                      ],
-                    ],
+                          if ((deck?.shortDescription ?? '').trim().isNotEmpty) ...[
+                            SizedBox(height: controller.height * 0.025),
+                            Text(
+                              deck!.shortDescription,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
+                              style: descriptionStyle,
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-              ),
-          ],
-        ),
+                ],
+              )
+            : null,
       ),
     );
   }
-
-  String _coverImageUrl(Deck? deck) {
-    final coverImageUrl = deck?.coverImageUrl;
-    if (coverImageUrl == null || coverImageUrl.trim().isEmpty) {
-      return _fallbackDeckImageUrl;
-    }
-
-    return coverImageUrl;
-  }
 }
-
-const _fallbackDeckImageUrl =
-    "https://w0.peakpx.com/wallpaper/314/133/HD-wallpaper-world-of-warcraft-clans-game-wow.jpg";
 
 extension on TextStyle {
   TextStyle scaledBy(double scale) {

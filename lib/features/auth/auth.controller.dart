@@ -9,6 +9,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         AuthService,
         AuthServiceResponse,
         Profile,
+        RemoteDB,
         Services,
         LocalDB;
 
@@ -21,6 +22,8 @@ class AuthController extends Controller {
   // ── Getters ─────────────────────────────────────────────
 
   Profile get currentProfile => LocalDB.profile.getOrCreate();
+
+  String? get currentEmail => service.currentUser?.email;
 
   /// Drives the UI prompt for merging guest data based on the latest auth response.
   bool get hasPendingGuestMerge => authServiceResponse?.needsMerge ?? false;
@@ -98,6 +101,22 @@ class AuthController extends Controller {
     } finally {
       setLoading(false);
     }
+  }
+
+  Future<void> updateDisplayName(String displayName) async {
+    final trimmed = displayName.trim();
+    if (trimmed.isEmpty) return;
+
+    final profile = currentProfile;
+    final updated = profile.copyWith(
+      displayName: trimmed,
+      updatedAt: DateTime.now(),
+    );
+    await LocalDB.profile.upsert(updated);
+    if (service.isAuthenticatedRemote) {
+      await RemoteDB.profile.upsert(updated);
+    }
+    notifyListeners();
   }
 
   Future<void> manualDevSignIn(String url) async {

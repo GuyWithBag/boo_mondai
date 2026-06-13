@@ -78,7 +78,7 @@ ViewDeckLocalSheetState useViewDeckLocalSheet({
       LocalDB.profile.getOrCreate();
   final profileName = switch (profile) {
     CachedProfile(:final username) => username,
-    Profile(:final username) => username,
+    Profile(:final displayName) => displayName,
     _ => 'Unknown user',
   };
   final profileAvatarUrl = switch (profile) {

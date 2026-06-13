@@ -31,7 +31,7 @@ class ReadyToReviewCard extends StatelessWidget {
       style: surfaceStyle.resolve(tokens, const [
         SurfaceBorder.none,
         SurfaceShape.rounded,
-        SurfaceTone.primary,
+        SurfaceTone.primarySoft,
       ]),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

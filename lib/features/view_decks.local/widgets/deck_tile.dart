@@ -5,6 +5,7 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/core/widgets/background_image_surface.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         Deck,
@@ -86,7 +87,7 @@ class DeckTile extends HookWidget {
     final cardWidth = width ?? tokens.widthCard;
     final cardHeight = cardWidth / cardAspectRatio;
     final animationScale = cardWidth / tokens.widthCard;
-    final coverImageUrl = _coverImageUrl(deck);
+    final coverImage = backgroundImageProviderFromSource(deck?.coverImageUrl);
     // final scale = 1.3;
     final cardControllers = useMemoized(
       () => List.generate(
@@ -191,7 +192,7 @@ class DeckTile extends HookWidget {
                       controller: controller,
                       front: PhysicalCardSide(
                         maxWidth: cardWidth,
-                        child: Image.network(coverImageUrl, fit: BoxFit.cover),
+                        child: BackgroundImageSurface(image: coverImage),
                       ),
                     ),
                   PhysicalDeck(
@@ -209,15 +210,4 @@ class DeckTile extends HookWidget {
     );
   }
 
-  String _coverImageUrl(Deck? deck) {
-    final coverImageUrl = deck?.coverImageUrl;
-    if (coverImageUrl == null || coverImageUrl.trim().isEmpty) {
-      return _fallbackCardImageUrl;
-    }
-
-    return coverImageUrl;
-  }
 }
-
-const _fallbackCardImageUrl =
-    "https://d15f34w2p8l1cc.cloudfront.net/hearthstone/976deb814af94af02426e32f96f82f4b19d07a5601b2f86372dc5bc58cdccea2.png";

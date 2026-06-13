@@ -11,7 +11,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextTone,
         ButtonDepth,
         Button,
-        PhysicalCardSide;
+        PhysicalCardSide,
+        MarkdownText;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -22,15 +23,22 @@ class MultipleChoiceCard extends HookWidget {
     super.key,
     required this.template,
     required this.interactionsController,
-  });
+  }) : previewRevealed = false;
+
+  const MultipleChoiceCard.preview({super.key, required this.template})
+    : interactionsController = null,
+      previewRevealed = true;
 
   final MultipleChoiceTemplate template;
-  final StudySessionCardStageController interactionsController;
+  final StudySessionCardStageController? interactionsController;
+  final bool previewRevealed;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
     final selectedOption = useState<String?>(null);
+    final isRevealed =
+        previewRevealed || interactionsController?.isRevealed == true;
 
     useEffect(() {
       selectedOption.value = null;
@@ -53,15 +61,7 @@ class MultipleChoiceCard extends HookWidget {
                 ]),
               ),
               SizedBox(height: 28.h),
-              Text(
-                template.questionPrompt,
-                textAlign: TextAlign.center,
-                style: appTextStyle.resolve(tokens, [
-                  TextSize.header,
-                  TextWeight.heavy,
-                  TextTone.primary,
-                ]),
-              ),
+              MarkdownText(data: template.questionPrompt),
             ],
           ),
           SizedBox(height: 32.h),
@@ -74,23 +74,17 @@ class MultipleChoiceCard extends HookWidget {
                     tone: _optionTone(entry.value),
                     depth: ButtonDepth.flat,
                     selected:
-                        !interactionsController.isRevealed &&
-                        selectedOption.value == entry.value.id,
+                        !isRevealed && selectedOption.value == entry.value.id,
                     mainAxisAlignment: MainAxisAlignment.start,
-                    onPressed: interactionsController.isRevealed
+                    onPressed: isRevealed
                         ? null
                         : () {
                             selectedOption.value = entry.value.id;
-                            interactionsController.setAnswer(entry.value.id);
-                            interactionsController.setCanReveal(true);
+                            interactionsController?.setAnswer(entry.value.id);
+                            interactionsController?.setCanReveal(true);
                           },
-                    child: Text(
-                      _optionLabel(entry.value, entry.key),
-                      style: appTextStyle.resolve(tokens, [
-                        TextSize.labelLarge,
-                        TextWeight.heavy,
-                        TextTone.primary,
-                      ]),
+                    child: MarkdownText(
+                      data: _optionLabel(entry.value, entry.key),
                     ),
                   ),
                 ),
@@ -105,12 +99,14 @@ class MultipleChoiceCard extends HookWidget {
   }
 
   ButtonTone _optionTone(MultipleChoiceOption option) {
-    final isSelected = interactionsController.answer == option.id;
+    final isSelected = interactionsController?.answer == option.id;
     final isCorrect = option.isCorrect;
-    if (interactionsController.isRevealed && isCorrect) {
+    final isRevealed =
+        previewRevealed || interactionsController?.isRevealed == true;
+    if (isRevealed && isCorrect) {
       return ButtonTone.success;
     }
-    if (interactionsController.isRevealed && isSelected) {
+    if (isRevealed && isSelected) {
       return ButtonTone.error;
     }
     return ButtonTone.ghost;

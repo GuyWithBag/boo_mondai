@@ -3,7 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-enum SurfaceTone { surface, muted, dark, primary, primaryOutline, header }
+enum SurfaceTone {
+  surface,
+  muted,
+  dark,
+  primarySoft,
+  primaryOutline,
+  header,
+  streak,
+}
 
 enum SurfaceShape { rounded, cardShape, sharp, topRounded }
 
@@ -11,7 +19,7 @@ enum SurfacePadding { normal, text, none }
 
 enum SurfaceBorder { normal, sidebar, none, top }
 
-enum SurfaceShadow { normal, none }
+enum SurfaceShadow { normal, none, tactile }
 
 final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
   base: (tokens) => {
@@ -30,6 +38,16 @@ final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
     SurfaceShape.rounded,
   ],
   variants: {
+    SurfaceShadow.tactile: (tokens) => {
+      SurfaceStylePart.decoration({
+        DecorationPart.boxShadow([
+          BoxShadow(
+            color: tokens.primaryDim,
+            offset: Offset(0, tokens.buttonShadowOffset.h),
+          ),
+        ]),
+      }),
+    },
     SurfaceShadow.normal: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.boxShadow([
@@ -115,19 +133,23 @@ final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
         EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
       ),
     },
-    SurfaceTone.surface: (_) => const {},
-    SurfaceTone.primary: (tokens) => {
+    SurfaceTone.streak: (tokens) => {
       SurfaceStylePart.decoration({
-        DecorationPart.color(tokens.primary),
+        DecorationPart.color(tokens.streak),
+        DecorationPart.border(
+          Border.all(color: tokens.streak, width: tokens.borderWidthDefault.w),
+        ),
+      }),
+      SurfaceStylePart.text({TextStylePart.color(tokens.colorTextOnBrand)}),
+      SurfaceStylePart.icon({IconThemePart.color(tokens.colorTextOnBrand)}),
+    },
+    SurfaceTone.surface: (_) => const {},
+    SurfaceTone.primarySoft: (tokens) => {
+      SurfaceStylePart.decoration({
+        DecorationPart.color(tokens.primarySoft),
         DecorationPart.border(
           Border.all(color: tokens.colorTransparent, width: 0),
         ),
-        DecorationPart.boxShadow([
-          BoxShadow(
-            color: tokens.primaryDim,
-            offset: Offset(0, tokens.buttonShadowOffset.h),
-          ),
-        ]),
       }),
       SurfaceStylePart.text({TextStylePart.color(tokens.colorTextOnBrand)}),
       SurfaceStylePart.icon({IconThemePart.color(tokens.colorTextOnBrand)}),

@@ -19,7 +19,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         EditDeckPage,
         SessionMode,
         ViewDrillResultPage,
+        PlaceholderAppPage,
         AnswerSurveyPage;
+import 'package:boo_mondai/features/view_cards/view_cards.page.dart'
+    show ViewCardsPage;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart' show WatchContext;
 
@@ -118,6 +121,14 @@ class Pages {
             ),
   );
 
+  static final viewCards = AppPage(
+    url: '/view-cards',
+    name: 'View Cards',
+    builder:
+        (context, {pathParameters = const {}, queryParameters = const {}}) =>
+            ViewCardsPage(queryParameters: queryParameters),
+  );
+
   static final drillSession = AppPage(
     url: '/drill/:deckId/session',
     name: 'Drill Session',
@@ -172,6 +183,42 @@ class Pages {
             const ViewLeaderboardPage(),
   );
 
+  static final settings = AppPage(
+    url: '/settings',
+    icon: Icons.settings_outlined,
+    name: 'Settings',
+    builder:
+        (context, {pathParameters = const {}, queryParameters = const {}}) =>
+            const PlaceholderAppPage(title: 'Settings'),
+  );
+
+  static final notifications = AppPage(
+    url: '/notifications',
+    icon: Icons.notifications_outlined,
+    name: 'Notifications',
+    builder:
+        (context, {pathParameters = const {}, queryParameters = const {}}) =>
+            const PlaceholderAppPage(title: 'Notifications'),
+  );
+
+  static final privacyPolicy = AppPage(
+    url: '/privacy-policy',
+    icon: Icons.privacy_tip_outlined,
+    name: 'Privacy Policy',
+    builder:
+        (context, {pathParameters = const {}, queryParameters = const {}}) =>
+            const PlaceholderAppPage(title: 'Privacy Policy'),
+  );
+
+  static final termsOfService = AppPage(
+    url: '/terms-of-service',
+    icon: Icons.description_outlined,
+    name: 'Terms of Service',
+    builder:
+        (context, {pathParameters = const {}, queryParameters = const {}}) =>
+            const PlaceholderAppPage(title: 'Terms of Service'),
+  );
+
   static final researchCode = AppPage(
     url: '/research/code',
     name: 'Research Code',
@@ -208,9 +255,16 @@ class Pages {
     variants,
   ];
   static final auth = <AppPage>[login, register];
+  static final appDetails = <AppPage>[
+    settings,
+    notifications,
+    privacyPolicy,
+    termsOfService,
+  ];
   static final nonShell = <AppPage>[
     createDeck,
     editDeck,
+    viewCards,
     drillSession,
     drillResult,
     reviewSession,

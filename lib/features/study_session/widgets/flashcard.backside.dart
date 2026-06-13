@@ -4,11 +4,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         StudyCard,
         AppTokens,
         SurfaceTone,
-        appTextStyle,
-        TextSize,
-        TextWeight,
-        TextTone,
-        PhysicalCardSide;
+        PhysicalCardSide,
+        MarkdownText;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -17,32 +14,28 @@ class FlashcardBackSide extends StatelessWidget {
   const FlashcardBackSide({
     required this.template,
     required this.studyCard,
+    this.maxWidth = 460,
     super.key,
   });
 
   final FlashcardTemplate template;
   final StudyCard studyCard;
+  final double maxWidth;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
 
     return PhysicalCardSide(
-      maxWidth: 460,
+      maxWidth: maxWidth,
       tone: SurfaceTone.primaryOutline,
       child: Center(
         child: Column(
           key: const ValueKey('flashcard-back'),
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              template.getQuestion(isReversed: studyCard.isReversed),
-              textAlign: TextAlign.center,
-              style: appTextStyle.resolve(tokens, [
-                TextSize.cardBackFront,
-                TextWeight.heavy,
-                TextTone.primary,
-              ]),
+            MarkdownText(
+              data: template.getQuestion(isReversed: studyCard.isReversed),
             ),
             SizedBox(height: 26.h),
             Container(
@@ -54,14 +47,8 @@ class FlashcardBackSide extends StatelessWidget {
               ),
             ),
             SizedBox(height: 32.h),
-            Text(
-              template.getAnswer(isReversed: studyCard.isReversed),
-              textAlign: TextAlign.center,
-              style: appTextStyle.resolve(tokens, [
-                TextSize.cardBackContent,
-                TextWeight.heavy,
-                TextTone.brand,
-              ]),
+            MarkdownText(
+              data: template.getAnswer(isReversed: studyCard.isReversed),
             ),
           ],
         ),

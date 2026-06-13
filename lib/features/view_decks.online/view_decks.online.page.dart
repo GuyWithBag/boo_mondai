@@ -8,12 +8,17 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         ViewDecksOnlineController,
         Deck,
+        DeckSearchFilter,
+        DeckSearchFilterCodec,
+        DeckSearchResults,
+        FilteredSearchBar,
         ListingStatesWrapper,
         EmptyState,
         AppSpacing,
         DeckListingTile,
         VisibilityState,
-        showViewDeckOnlineSheet;
+        showViewDeckOnlineSheet,
+        useFilteredSearchBarController;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
@@ -37,30 +42,59 @@ class _ViewDecksOnlineView extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<ViewDecksOnlineController>();
+    final searchController =
+        useFilteredSearchBarController<Deck, DeckSearchFilter>(
+          filterCodec: const DeckSearchFilterCodec(),
+          searchResults: const DeckSearchResults(),
+          items: controller.decks,
+        );
+    final visibleDecks = searchController.results;
+    final hasSearchQuery = searchController.text.trim().isNotEmpty;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Browse Decks')),
       body: Padding(
         padding: const EdgeInsets.all(AppSpacing.lg),
-        child: ListingStatesWrapper<Deck>.wrap(
-          isLoading: controller.isLoading,
-          exception: controller.error,
-          items: controller.decks,
-          emptyState: const EmptyState(
-            icon: Icons.public,
-            title: 'No public decks yet',
-            message: 'Published community decks will appear here.',
-          ),
-          onRetry: controller.loadPublicDecks,
-          skeletonTile: DeckListingTile(deck: _skeletonDeck),
-          spacing: AppSpacing.xl,
-          runSpacing: AppSpacing.xl,
-          itemBuilder: (context, _, deck) {
-            return DeckListingTile(
-              deck: deck,
-              onPressed: () => showViewDeckOnlineSheet(context, deck),
-            );
-          },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            FilteredSearchBar<Deck, DeckSearchFilter>(
+              controller: searchController,
+              filterCodec: const DeckSearchFilterCodec(),
+              searchResults: const DeckSearchResults(),
+              items: controller.decks,
+              placeholder: 'Search public decks',
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            Expanded(
+              child: ListingStatesWrapper<Deck>.wrap(
+                isLoading: controller.isLoading,
+                exception: controller.error,
+                items: visibleDecks,
+                emptyState: hasSearchQuery
+                    ? const EmptyState(
+                        icon: Icons.search_off,
+                        title: 'No decks found',
+                        message: 'Try a different query or remove filters.',
+                      )
+                    : const EmptyState(
+                        icon: Icons.public,
+                        title: 'No public decks yet',
+                        message: 'Published community decks will appear here.',
+                      ),
+                onRetry: controller.loadPublicDecks,
+                skeletonTile: DeckListingTile(deck: _skeletonDeck),
+                spacing: AppSpacing.xl,
+                runSpacing: AppSpacing.xl,
+                itemBuilder: (context, _, deck) {
+                  return DeckListingTile(
+                    deck: deck,
+                    onPressed: () => showViewDeckOnlineSheet(context, deck),
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );

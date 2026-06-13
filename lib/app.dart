@@ -32,13 +32,15 @@ class BooMondaiApp extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ── Create Router ───────────────────────────────────
-    // Hand the controller to GoRouter before starting the app
-    final router = createRouter(authController);
+    final router = useMemoized(() => createRouter(authController), [
+      authController,
+    ]);
     final controller = useMemoized(
       () => UserSettingsThemeBridge.createController(initialUserSettings),
       [initialUserSettings],
     );
+    useListenable(controller);
+
     return ThemeVariantsProvider<AppTokens>(
       controller: controller,
       child: ScreenUtilInit(

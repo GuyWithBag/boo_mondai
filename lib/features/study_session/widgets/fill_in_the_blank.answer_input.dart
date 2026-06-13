@@ -1,15 +1,16 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
-        TextFieldTone,
-        TextFieldState,
-        TextFieldSize,
+        MarkdownText,
         TextFieldFrame,
-        VariantTextField,
-        appTextStyle,
+        TextFieldSize,
+        TextFieldState,
+        TextFieldTone,
         TextSize,
+        TextTone,
         TextWeight,
-        TextTone;
+        VariantTextField,
+        appTextStyle;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -65,16 +66,7 @@ class FillInTheBlankAnswerInput extends StatelessWidget {
               border: Border.all(color: tokens.actionSuccess),
               borderRadius: BorderRadius.circular(10.r),
             ),
-            child: Text(
-              correctAnswer,
-              style: appTextStyle
-                  .resolve(tokens, [
-                    TextSize.label,
-                    TextWeight.heavy,
-                    TextTone.primary,
-                  ])
-                  .copyWith(color: tokens.actionSuccess),
-            ),
+            child: MarkdownText(data: correctAnswer),
           ),
         ],
       ],
