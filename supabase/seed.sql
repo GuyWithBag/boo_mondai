@@ -144,11 +144,13 @@ ON CONFLICT (id) DO NOTHING;
 
 -- ── Profiles ──────────────────────────────────────────
 -- id = local app UUID (p_*), user_id = auth UUID (auth_*)
-INSERT INTO profiles (id, user_id, username, role, is_anonymous, created_at, updated_at) VALUES
-  (p_researcher, auth_researcher, 'Dr. Test', 'researcher',          false, now(), now()),
-  (p_alice,      auth_alice,      'Alice',    'group_a_participant',  false, now(), now()),
-  (p_bob,        auth_bob,        'Bob',      'group_a_participant',  false, now(), now()),
-  (p_carol,      auth_carol,      'Carol',    'group_b_participant',  false, now(), now())
+INSERT INTO profiles (
+  id, user_id, username, display_name, role, is_anonymous, created_at, updated_at
+) VALUES
+  (p_researcher, auth_researcher, 'dr_test', 'Dr. Test', 'researcher',          false, now(), now()),
+  (p_alice,      auth_alice,      'alice',   'Alice',    'group_a_participant',  false, now(), now()),
+  (p_bob,        auth_bob,        'bob',     'Bob',      'group_a_participant',  false, now(), now()),
+  (p_carol,      auth_carol,      'carol',   'Carol',    'group_b_participant',  false, now(), now())
 ON CONFLICT (id) DO NOTHING;
 
 -- ── Tags ──────────────────────────────────────────────

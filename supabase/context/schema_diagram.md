@@ -16,6 +16,7 @@ erDiagram
         uuid id PK
         uuid user_id FK
         text username
+        text display_name
         text role
         bool is_anonymous
     }

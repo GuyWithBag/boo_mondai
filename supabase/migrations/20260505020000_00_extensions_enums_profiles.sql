@@ -24,6 +24,7 @@ CREATE TABLE profiles (
   id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id       uuid NOT NULL UNIQUE REFERENCES auth.users(id) ON DELETE CASCADE,
   username      text NOT NULL,
+  display_name  text NOT NULL,
   role          text,
   avatar_url    text,
   is_anonymous  bool NOT NULL DEFAULT true,
@@ -43,4 +44,3 @@ CREATE POLICY "profiles: update own" ON profiles FOR UPDATE USING ((select auth.
 CREATE OR REPLACE FUNCTION current_profile_id() RETURNS uuid LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
   SELECT id FROM profiles WHERE user_id = (select auth.uid()) LIMIT 1
 $$;
-

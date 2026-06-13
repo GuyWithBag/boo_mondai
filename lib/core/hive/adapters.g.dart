@@ -19,19 +19,20 @@ class ProfileAdapter extends TypeAdapter<Profile> {
     return Profile(
       id: fields[0] as String,
       username: fields[2] as String,
-      role: fields[3] as String?,
-      avatarUrl: fields[4] as String?,
-      createdAt: fields[5] as DateTime,
+      displayName: fields[3] as String,
+      role: fields[4] as String?,
+      avatarUrl: fields[5] as String?,
+      createdAt: fields[6] as DateTime,
       userId: fields[1] as String,
-      updatedAt: fields[6] as DateTime,
-      isAnonymous: fields[7] == null ? true : fields[7] as bool,
+      updatedAt: fields[7] as DateTime,
+      isAnonymous: fields[8] == null ? true : fields[8] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, Profile obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -39,14 +40,16 @@ class ProfileAdapter extends TypeAdapter<Profile> {
       ..writeByte(2)
       ..write(obj.username)
       ..writeByte(3)
-      ..write(obj.role)
+      ..write(obj.displayName)
       ..writeByte(4)
-      ..write(obj.avatarUrl)
+      ..write(obj.role)
       ..writeByte(5)
-      ..write(obj.createdAt)
+      ..write(obj.avatarUrl)
       ..writeByte(6)
-      ..write(obj.updatedAt)
+      ..write(obj.createdAt)
       ..writeByte(7)
+      ..write(obj.updatedAt)
+      ..writeByte(8)
       ..write(obj.isAnonymous);
   }
 
@@ -779,13 +782,13 @@ class DrillSessionAdapter extends TypeAdapter<DrillSession> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return DrillSession(
-      id: fields[10] as String,
-      userId: fields[11] as String,
-      deckId: fields[12] as String?,
-      startedAt: fields[13] as DateTime,
-      completedAt: fields[14] as DateTime?,
-      userProfile: fields[15] as CachedProfile?,
-      deck: fields[16] as Deck?,
+      id: fields[3] as String,
+      userId: fields[4] as String,
+      deckId: fields[5] as String?,
+      startedAt: fields[6] as DateTime,
+      completedAt: fields[7] as DateTime?,
+      userProfile: fields[8] as CachedProfile?,
+      deck: fields[9] as Deck?,
       previewed: fields[0] == null ? false : fields[0] as bool,
       totalQuestions: (fields[1] as num).toInt(),
       correctCount: fields[2] == null ? 0 : (fields[2] as num).toInt(),
@@ -802,19 +805,19 @@ class DrillSessionAdapter extends TypeAdapter<DrillSession> {
       ..write(obj.totalQuestions)
       ..writeByte(2)
       ..write(obj.correctCount)
-      ..writeByte(10)
+      ..writeByte(3)
       ..write(obj.id)
-      ..writeByte(11)
+      ..writeByte(4)
       ..write(obj.userId)
-      ..writeByte(12)
+      ..writeByte(5)
       ..write(obj.deckId)
-      ..writeByte(13)
+      ..writeByte(6)
       ..write(obj.startedAt)
-      ..writeByte(14)
+      ..writeByte(7)
       ..write(obj.completedAt)
-      ..writeByte(15)
+      ..writeByte(8)
       ..write(obj.userProfile)
-      ..writeByte(16)
+      ..writeByte(9)
       ..write(obj.deck);
   }
 
@@ -1091,13 +1094,13 @@ class ReviewSessionAdapter extends TypeAdapter<ReviewSession> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return ReviewSession(
-      id: fields[9] as String,
-      userId: fields[10] as String,
-      deckId: fields[11] as String?,
-      startedAt: fields[12] as DateTime,
-      completedAt: fields[13] as DateTime?,
-      userProfile: fields[14] as CachedProfile?,
-      deck: fields[15] as Deck?,
+      id: fields[2] as String,
+      userId: fields[3] as String,
+      deckId: fields[4] as String?,
+      startedAt: fields[5] as DateTime,
+      completedAt: fields[6] as DateTime?,
+      userProfile: fields[7] as CachedProfile?,
+      deck: fields[8] as Deck?,
       totalCards: (fields[0] as num).toInt(),
       cardsReviewed: fields[1] == null ? 0 : (fields[1] as num).toInt(),
     );
@@ -1111,19 +1114,19 @@ class ReviewSessionAdapter extends TypeAdapter<ReviewSession> {
       ..write(obj.totalCards)
       ..writeByte(1)
       ..write(obj.cardsReviewed)
-      ..writeByte(9)
+      ..writeByte(2)
       ..write(obj.id)
-      ..writeByte(10)
+      ..writeByte(3)
       ..write(obj.userId)
-      ..writeByte(11)
+      ..writeByte(4)
       ..write(obj.deckId)
-      ..writeByte(12)
+      ..writeByte(5)
       ..write(obj.startedAt)
-      ..writeByte(13)
+      ..writeByte(6)
       ..write(obj.completedAt)
-      ..writeByte(14)
+      ..writeByte(7)
       ..write(obj.userProfile)
-      ..writeByte(15)
+      ..writeByte(8)
       ..write(obj.deck);
   }
 
@@ -1783,7 +1786,7 @@ class UserStudyCardTagAdapter extends TypeAdapter<UserStudyCardTag> {
 
 class ImportExportBackupAdapter extends TypeAdapter<ImportExportBackup> {
   @override
-  final typeId = 34;
+  final typeId = 33;
 
   @override
   ImportExportBackup read(BinaryReader reader) {
@@ -1838,7 +1841,7 @@ class ImportExportBackupAdapter extends TypeAdapter<ImportExportBackup> {
 
 class UserSettingsAdapter extends TypeAdapter<UserSettings> {
   @override
-  final typeId = 35;
+  final typeId = 34;
 
   @override
   UserSettings read(BinaryReader reader) {
@@ -1847,7 +1850,7 @@ class UserSettingsAdapter extends TypeAdapter<UserSettings> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return UserSettings(
-      id: fields[9] as String,
+      id: fields[6] as String,
       userId: fields[0] as String,
       themeModeName: fields[1] as String,
       lightThemePresetId: fields[2] as String,
@@ -1856,8 +1859,8 @@ class UserSettingsAdapter extends TypeAdapter<UserSettings> {
       customThemePresets: fields[5] == null
           ? const []
           : (fields[5] as List).cast<CustomThemePreset>(),
-      createdAt: fields[10] as DateTime,
-      updatedAt: fields[11] as DateTime,
+      createdAt: fields[7] as DateTime,
+      updatedAt: fields[8] as DateTime,
     );
   }
 
@@ -1877,11 +1880,11 @@ class UserSettingsAdapter extends TypeAdapter<UserSettings> {
       ..write(obj.themeOverride)
       ..writeByte(5)
       ..write(obj.customThemePresets)
-      ..writeByte(9)
+      ..writeByte(6)
       ..write(obj.id)
-      ..writeByte(10)
+      ..writeByte(7)
       ..write(obj.createdAt)
-      ..writeByte(11)
+      ..writeByte(8)
       ..write(obj.updatedAt);
   }
 
