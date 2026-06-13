@@ -9,12 +9,12 @@ abstract final class Env {
   // Replace with your Supabase project credentials
   static const supabaseUrl = String.fromEnvironment(
     'SUPABASE_URL',
-    defaultValue: 'http://127.0.0.1:54321',
+    defaultValue: 'https://libppyuvpbjutvdmrpma.supabase.co',
   );
 
   static const supabaseAnonKey = String.fromEnvironment(
     'SUPABASE_ANON_KEY',
-    defaultValue: 'sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH',
+    defaultValue: 'sb_publishable_VHL5Rr4h-7NOQeJ8C6HmPA_UdmUw6fP',
   );
 
   static const storageBucket = 'card-images';

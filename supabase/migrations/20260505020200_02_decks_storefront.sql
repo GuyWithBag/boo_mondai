@@ -1,3 +1,5 @@
+create extension if not exists moddatetime schema extensions;
+
 -- ══════════════════════════════════════════════════════
 -- 4. DECKS & LISTINGS (STOREFRONT)
 -- ══════════════════════════════════════════════════════
@@ -73,4 +75,3 @@ ALTER TABLE deck_tags ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "deck_tags: read access" ON deck_tags FOR SELECT USING (EXISTS (SELECT 1 FROM decks d WHERE d.id = deck_tags.deck_id AND (d.visibility_state IN ('public', 'unlisted') OR d.user_id = current_profile_id())));
 CREATE POLICY "deck_tags: owner manages" ON deck_tags FOR ALL USING (EXISTS (SELECT 1 FROM decks d WHERE d.id = deck_tags.deck_id AND d.user_id = current_profile_id())) WITH CHECK (EXISTS (SELECT 1 FROM decks d WHERE d.id = deck_tags.deck_id AND d.user_id = current_profile_id()));
 CREATE INDEX ON deck_tags (tag_id);
-
