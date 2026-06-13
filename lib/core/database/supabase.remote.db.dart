@@ -5,7 +5,9 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'dart:async';
 import 'dart:developer' as developer;
+import 'dart:io';
 import 'package:boo_mondai/core/exceptions/app_exception.dart'
     show AppException;
 import 'package:flutter/foundation.dart';
@@ -89,7 +91,33 @@ abstract class SupabaseRemoteDB<T> {
       // );
 
       throw AppException(e.message, code: e.code);
+    } on SocketException catch (e, stack) {
+      _debugLog('SocketException: $e', error: e, stackTrace: stack);
+      throw AppException(
+        'Unable to reach the server. Check your network connection and try again.',
+        code: 'NETWORK_ERROR',
+        originalError: e,
+        stackTrace: stack,
+      );
+    } on TimeoutException catch (e, stack) {
+      _debugLog('TimeoutException: $e', error: e, stackTrace: stack);
+      throw AppException(
+        'The request timed out. Please try again.',
+        code: 'TIMEOUT',
+        originalError: e,
+        stackTrace: stack,
+      );
     } catch (e, stack) {
+      if (_isNetworkTransportError(e)) {
+        _debugLog('Network transport error: $e', error: e, stackTrace: stack);
+        throw AppException(
+          'Unable to reach the server. Check your network connection and try again.',
+          code: 'NETWORK_ERROR',
+          originalError: e,
+          stackTrace: stack,
+        );
+      }
+
       _debugLog('Unknown Exception: $e', error: e, stackTrace: stack);
 
       // Catch unexpected app crashes (e.g., mapping errors, null pointers)
@@ -141,6 +169,15 @@ abstract class SupabaseRemoteDB<T> {
       updates.remove(key);
     }
     return updates;
+  }
+
+  bool _isNetworkTransportError(Object e) {
+    final typeName = e.runtimeType.toString();
+    final message = e.toString();
+    return typeName == 'ClientException' ||
+        message.contains('ClientException') ||
+        message.contains('Failed host lookup') ||
+        message.contains('SocketException');
   }
 
   // ── Primary-table CRUD ───────────────────────────────────
