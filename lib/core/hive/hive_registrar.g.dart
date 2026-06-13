@@ -14,6 +14,8 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(DeckAdapter());
     registerAdapter(DeckListingAdapter());
     registerAdapter(DeckTagAdapter());
+    registerAdapter(DownloadCheckpointAdapter());
+    registerAdapter(DownloadCheckpointStatusAdapter());
     registerAdapter(DrillAnswerAdapter());
     registerAdapter(DrillSessionAdapter());
     registerAdapter(FillInTheBlankSegmentAdapter());
@@ -54,6 +56,8 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(DeckAdapter());
     registerAdapter(DeckListingAdapter());
     registerAdapter(DeckTagAdapter());
+    registerAdapter(DownloadCheckpointAdapter());
+    registerAdapter(DownloadCheckpointStatusAdapter());
     registerAdapter(DrillAnswerAdapter());
     registerAdapter(DrillSessionAdapter());
     registerAdapter(FillInTheBlankSegmentAdapter());

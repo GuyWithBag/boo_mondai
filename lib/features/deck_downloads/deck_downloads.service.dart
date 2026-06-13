@@ -1,3 +1,7 @@
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// PATH: lib/services/deck_downloads_service.dart
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 import 'package:boo_mondai/lib.barrel.dart'
     show
         DecksRemoteDB,
@@ -22,79 +26,223 @@ import 'package:boo_mondai/lib.barrel.dart'
         ChangeResult,
         ChangeReviewDiffService,
         ChangeReviewStatus,
-        ChangeReviewStore,
+        ChangeReviewController,
         ChangeSource,
         ChangeType,
-        DeckDownloadPayload;
+        DeckDownloadPayload,
+        DownloadCheckpoint,
+        DownloadCheckpointStatus,
+        DownloadCheckpointLocalDB;
 
-/// Downloads an online deck into the current user's local deck library.
-///
-/// The downloaded deck is stored as a private, editable local copy. The
-/// original remote deck and template IDs are preserved in `source*Id` fields so
-/// the app can recognize repeated downloads and trace local content back to the
-/// published source.
+const _kPageSize = 20;
+
 class DeckDownloadsService {
   DeckDownloadsService({
     DecksRemoteDB? decksRemoteDB,
     CardTemplatesRemoteDB? cardTemplatesRemoteDB,
+    DownloadCheckpointLocalDB? checkpointDB,
   }) : _decksRemoteDB = decksRemoteDB ?? DecksRemoteDB(),
        _cardTemplatesRemoteDB =
-           cardTemplatesRemoteDB ?? CardTemplatesRemoteDB();
+           cardTemplatesRemoteDB ?? CardTemplatesRemoteDB(),
+       _checkpointDB = checkpointDB ?? LocalDB.downloadCheckpoint;
 
   final DecksRemoteDB _decksRemoteDB;
   final CardTemplatesRemoteDB _cardTemplatesRemoteDB;
+  final DownloadCheckpointLocalDB _checkpointDB;
 
-  /// Creates a local copy of [sourceDeck] and all of its card templates.
-  ///
-  /// If the deck was already downloaded, this returns the existing local deck
-  /// instead of creating duplicates. Otherwise it fetches the latest remote
-  /// deck row when available, clones the deck/templates with fresh local IDs,
-  /// creates the review cards needed by FSRS, persists everything locally, and
-  /// returns the new local deck.
+  final Set<String> _pausedPlanIds = {};
+
+  // ── Public API ────────────────────────────────────────────────────────────
+
   Future<ChangeResult<DeckDownloadPayload>> downloadDeck(
     Deck sourceDeck,
-  ) async {
-    final reviewPlan = ChangeReviewStore.instance.start(
-      source: ChangeSource.deckDownload,
-      title: 'Deck Download',
-      status: ChangeReviewStatus.previewing,
-      progress: 0,
-    );
+    ChangeReviewController reviewController, {
+    String? resumePlanId,
+  }) async {
+    final reviewPlan = resumePlanId != null
+        ? reviewController.planById(resumePlanId)!
+        : reviewController.start(
+            source: ChangeSource.deckDownload,
+            title: sourceDeck.title,
+            status: ChangeReviewStatus.previewing,
+            progress: 0,
+          );
+
+    _pausedPlanIds.remove(reviewPlan.id);
 
     try {
-      ChangeReviewStore.instance.update(reviewPlan.id, progress: 0.25);
-      final plan = await previewDeckDownload(sourceDeck);
-      ChangeReviewStore.instance.update(
-        reviewPlan.id,
-        status: ChangeReviewStatus.applying,
-        progress: 0.5,
-        changes: plan.changes,
-      );
+      // 1. Fetch remote deck metadata
+      reviewController.update(reviewPlan.id, progress: 0.05);
+      final remoteDeck =
+          await _decksRemoteDB.selectById(sourceDeck.id) ?? sourceDeck;
 
-      if (plan.payload.localDeck != null) {
-        ChangeReviewStore.instance.complete(
-          reviewPlan.id,
-          changes: plan.changes,
+      // 2. Check for an existing local copy
+      final localDeck = _findExistingDownload(remoteDeck.id);
+
+      // 3. If already downloaded and no changes needed, return immediately
+      final existingPlan = await previewDeckDownload(sourceDeck);
+      if (localDeck != null && existingPlan.changes.isEmpty) {
+        reviewController.complete(reviewPlan.id, changes: existingPlan.changes);
+        return ChangeResult(
+          value: existingPlan.payload,
+          changes: existingPlan.changes,
         );
-        return ChangeResult(value: plan.payload, changes: plan.changes);
       }
 
-      final localDeck = await _createLocalCopy(
-        remoteDeck: plan.payload.remoteDeck,
-        remoteTemplates: plan.payload.remoteTemplates,
-        reviewPlanId: reviewPlan.id,
+      // 4. Load or create a checkpoint — existing is nullable, checkpoint is not
+      final existing = _checkpointDB.getByDeckId(remoteDeck.id);
+      final alreadyFetchedIds =
+          existing?.fetchedTemplateIds.toSet() ?? <String>{};
+
+      final totalCount =
+          existing?.totalTemplates ??
+          await _fetchTotalTemplateCount(remoteDeck.id);
+
+      var checkpoint = DownloadCheckpoint(
+        deckId: remoteDeck.id,
+        deckTitle: remoteDeck.title,
+        totalTemplates: totalCount,
+        fetchedTemplateIds: alreadyFetchedIds.toList(),
+        status: DownloadCheckpointStatus.downloading,
+        createdAt: existing?.createdAt ?? DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+      await _checkpointDB.upsert(checkpoint);
+
+      // 5. Stream templates in pages
+      final allFetchedTemplates = <CardTemplate>[];
+      var offset = alreadyFetchedIds.length;
+
+      reviewController.update(
+        reviewPlan.id,
+        status: ChangeReviewStatus.applying,
+        progress: _downloadProgress(offset, totalCount),
       );
 
-      ChangeReviewStore.instance.complete(reviewPlan.id, changes: plan.changes);
+      while (offset < totalCount) {
+        // Check if paused between pages
+        if (_pausedPlanIds.contains(reviewPlan.id)) {
+          await _checkpointDB.upsert(
+            checkpoint.copyWith(
+              status: DownloadCheckpointStatus.paused,
+              updatedAt: DateTime.now(),
+            ),
+          );
+          reviewController.update(
+            reviewPlan.id,
+            status: ChangeReviewStatus.paused,
+          );
+          return ChangeResult(
+            value: existingPlan.payload,
+            changes: existingPlan.changes,
+          );
+        }
+
+        final page = await _cardTemplatesRemoteDB.selectManyPaged(
+          deckId: remoteDeck.id,
+          offset: offset,
+          pageSize: _kPageSize,
+        );
+
+        if (page.isEmpty) break;
+
+        final newTemplates = page
+            .where((t) => !alreadyFetchedIds.contains(t.id))
+            .toList();
+        allFetchedTemplates.addAll(newTemplates);
+        alreadyFetchedIds.addAll(newTemplates.map((t) => t.id));
+        offset = alreadyFetchedIds.length;
+
+        checkpoint = checkpoint.copyWith(
+          fetchedTemplateIds: alreadyFetchedIds.toList(),
+          updatedAt: DateTime.now(),
+        );
+        await _checkpointDB.upsert(checkpoint);
+
+        reviewController.update(
+          reviewPlan.id,
+          progress: _downloadProgress(offset, totalCount),
+        );
+      }
+
+      // 6. All templates fetched — write to local DB
+      final localDeckId = localDeck?.id ?? uuid.v7();
+      final now = DateTime.now();
+      final newLocalDeck = remoteDeck.copyWith(
+        id: localDeckId,
+        userId: LocalDB.profile.getOrCreate().id,
+        sourceDeckId: remoteDeck.id,
+        visibilityState: VisibilityState.private,
+        isPublished: false,
+        isEditable: true,
+        createdAt: localDeck?.createdAt ?? now,
+        updatedAt: now,
+        userProfile: null,
+        listing: null,
+      );
+
+      final templateIdMap = {
+        for (final t in allFetchedTemplates) t.id: uuid.v7(),
+      };
+      final localTemplates = [
+        for (final t in allFetchedTemplates)
+          _copyTemplate(
+            t,
+            localDeckId: localDeckId,
+            localTemplateId: templateIdMap[t.id]!,
+            templateIdMap: templateIdMap,
+            now: now,
+          ),
+      ];
+
+      await LocalDB.deck.upsert(newLocalDeck);
+      await LocalDB.cardTemplate.upsertMany(localTemplates);
+      await StudyCardService.syncDeckStudyCards(
+        deckId: localDeckId,
+        templates: localTemplates,
+      );
+
+      // 7. Clean up checkpoint
+      await _checkpointDB.deleteByPk({'deck_id': remoteDeck.id});
+
+      final changes = _buildDownloadChanges(
+        remoteDeck: remoteDeck,
+        localDeck: localDeck,
+        remoteTemplates: allFetchedTemplates,
+        localTemplates: localDeck == null
+            ? []
+            : LocalDB.cardTemplate.getByDeckId(localDeckId),
+      );
+
+      reviewController.complete(reviewPlan.id, changes: changes);
       return ChangeResult(
-        value: plan.payload.copyWith(downloadedDeck: localDeck),
-        changes: plan.changes,
+        value: DeckDownloadPayload(
+          remoteDeck: remoteDeck,
+          localDeck: newLocalDeck,
+          remoteTemplates: allFetchedTemplates,
+          localTemplates: localTemplates,
+        ).copyWith(downloadedDeck: newLocalDeck),
+        changes: changes,
       );
     } catch (e) {
-      ChangeReviewStore.instance.fail(reviewPlan.id, e);
+      reviewController.fail(reviewPlan.id, e);
       rethrow;
     }
   }
+
+  void pauseDownload(String planId) {
+    _pausedPlanIds.add(planId);
+  }
+
+  Future<ChangeResult<DeckDownloadPayload>> resumeDownload(
+    Deck sourceDeck,
+    ChangeReviewController reviewController,
+    String planId,
+  ) {
+    return downloadDeck(sourceDeck, reviewController, resumePlanId: planId);
+  }
+
+  // ── Preview ───────────────────────────────────────────────────────────────
 
   Future<ChangePlan<DeckDownloadPayload>> previewDeckDownload(
     Deck sourceDeck,
@@ -103,8 +251,6 @@ class DeckDownloadsService {
         await _decksRemoteDB.selectById(sourceDeck.id) ?? sourceDeck;
     final localDeck = _findExistingDownload(remoteDeck.id);
 
-    // Fetch templates in author-defined order so the local deck preserves the
-    // same card sequence as the published deck.
     final remoteTemplates = await _cardTemplatesRemoteDB.selectMany(
       filters: {'deck_id': remoteDeck.id},
       orderBy: 'sort_order',
@@ -130,54 +276,27 @@ class DeckDownloadsService {
     );
   }
 
-  Future<Deck> _createLocalCopy({
-    required Deck remoteDeck,
-    required List<CardTemplate> remoteTemplates,
-    required String reviewPlanId,
-  }) async {
-    final currentProfile = LocalDB.profile.getOrCreate();
-    final now = DateTime.now();
-    final localDeckId = uuid.v7();
-    final localDeck = remoteDeck.copyWith(
-      id: localDeckId,
-      userId: currentProfile.id,
-      sourceDeckId: remoteDeck.id,
-      visibilityState: VisibilityState.private,
-      isPublished: false,
-      isEditable: true,
-      createdAt: now,
-      updatedAt: now,
-      userProfile: null,
-      listing: null,
+  // ── Helpers ───────────────────────────────────────────────────────────────
+
+  Future<int> _fetchTotalTemplateCount(String deckId) async {
+    final rows = await _cardTemplatesRemoteDB.client
+        .from(_cardTemplatesRemoteDB.tableName)
+        .select('id')
+        .eq('deck_id', deckId);
+    return rows.length;
+  }
+
+  double _downloadProgress(int fetched, int total) {
+    if (total == 0) return 0.5;
+    return 0.1 + (fetched / total) * 0.8;
+  }
+
+  Deck? _findExistingDownload(String sourceDeckId) {
+    final matches = LocalDB.deck.selectMany(
+      where: (deck) => deck.sourceDeckId == sourceDeckId,
+      limit: 1,
     );
-
-    ChangeReviewStore.instance.update(reviewPlanId, progress: 0.75);
-
-    // Precompute every remote-template -> local-template ID mapping before
-    // copying templates. Some child records, such as Match Madness auto-picked
-    // pairs, can refer to another template in the same deck.
-    final templateIdMap = {
-      for (final template in remoteTemplates) template.id: uuid.v7(),
-    };
-    final localTemplates = [
-      for (final template in remoteTemplates)
-        _copyTemplate(
-          template,
-          localDeckId: localDeckId,
-          localTemplateId: templateIdMap[template.id]!,
-          templateIdMap: templateIdMap,
-          now: now,
-        ),
-    ];
-    await LocalDB.deck.upsert(localDeck);
-    await LocalDB.cardTemplate.upsertMany(localTemplates);
-    ChangeReviewStore.instance.update(reviewPlanId, progress: 0.9);
-    await StudyCardService.syncDeckStudyCards(
-      deckId: localDeckId,
-      templates: localTemplates,
-    );
-
-    return localDeck;
+    return matches.isEmpty ? null : matches.first;
   }
 
   List<ChangeLog> _buildDownloadChanges({
@@ -187,6 +306,7 @@ class DeckDownloadsService {
     required List<CardTemplate> localTemplates,
   }) {
     final changes = <ChangeLog>[];
+
     if (localDeck == null) {
       changes.add(
         ChangeLog(
@@ -203,16 +323,16 @@ class DeckDownloadsService {
       );
       changes.addAll(
         remoteTemplates.map(
-          (template) => ChangeLog(
+          (t) => ChangeLog(
             type: ChangeType.added,
             source: ChangeSource.deckDownload,
             entityType: 'card_template',
-            entityId: template.id,
-            title: ChangeReviewDiffService.templateTitle(template),
+            entityId: t.id,
+            title: ChangeReviewDiffService.templateTitle(t),
             subtitle: 'Card will be copied from the published deck.',
-            after: template,
-            remoteId: template.id,
-            remoteUpdatedAt: template.updatedAt,
+            after: t,
+            remoteId: t.id,
+            remoteUpdatedAt: t.updatedAt,
           ),
         ),
       );
@@ -240,11 +360,10 @@ class DeckDownloadsService {
     }
 
     final localBySourceId = {
-      for (final template in localTemplates)
-        if (template.sourceTemplateId != null)
-          template.sourceTemplateId!: template,
+      for (final t in localTemplates)
+        if (t.sourceTemplateId != null) t.sourceTemplateId!: t,
     };
-    final remoteIds = remoteTemplates.map((template) => template.id).toSet();
+    final remoteIds = remoteTemplates.map((t) => t.id).toSet();
 
     for (final remoteTemplate in remoteTemplates) {
       final localTemplate = localBySourceId[remoteTemplate.id];
@@ -287,10 +406,8 @@ class DeckDownloadsService {
     }
 
     for (final localTemplate in localTemplates) {
-      final sourceTemplateId = localTemplate.sourceTemplateId;
-      if (sourceTemplateId == null || remoteIds.contains(sourceTemplateId)) {
-        continue;
-      }
+      final sourceId = localTemplate.sourceTemplateId;
+      if (sourceId == null || remoteIds.contains(sourceId)) continue;
       changes.add(
         ChangeLog(
           type: ChangeType.removed,
@@ -302,22 +419,13 @@ class DeckDownloadsService {
               'Local card points to a published card that no longer exists.',
           before: localTemplate,
           localId: localTemplate.id,
-          remoteId: sourceTemplateId,
+          remoteId: sourceId,
           localUpdatedAt: localTemplate.updatedAt,
         ),
       );
     }
 
     return changes;
-  }
-
-  /// Returns the local deck previously cloned from [sourceDeckId], if present.
-  Deck? _findExistingDownload(String sourceDeckId) {
-    final matches = LocalDB.deck.selectMany(
-      where: (deck) => deck.sourceDeckId == sourceDeckId,
-      limit: 1,
-    );
-    return matches.isEmpty ? null : matches.first;
   }
 
   CardTemplate _copyTemplate(
@@ -327,8 +435,6 @@ class DeckDownloadsService {
     required Map<String, String> templateIdMap,
     required DateTime now,
   }) {
-    // Each template subtype owns different nested data, so copying is explicit
-    // instead of relying on a base-class copy that could miss subtype fields.
     return switch (template) {
       FlashcardTemplate t => FlashcardTemplate(
         id: localTemplateId,
@@ -414,9 +520,6 @@ class DeckDownloadsService {
             MatchMadnessPair(
               id: uuid.v7(),
               templateId: localTemplateId,
-              // Auto-picked pairs can point at a source template. Prefer the
-              // newly generated local ID when the referenced template was part
-              // of this download; otherwise keep the original external ID.
               sourceTemplateId: pair.sourceTemplateId == null
                   ? null
                   : templateIdMap[pair.sourceTemplateId] ??

@@ -32,6 +32,23 @@ class CardTemplatesRemoteDB extends SupabaseRemoteDB<CardTemplate> {
     'segments',
     'pairs',
   };
+
+  /// Fetches a single page of templates for [deckId], ordered by sort_order.
+  /// [offset] is the number of already-fetched templates to skip.
+  Future<List<CardTemplate>> selectManyPaged({
+    required String deckId,
+    required int offset,
+    required int pageSize,
+  }) async {
+    final rows = await client
+        .from(tableName)
+        .select(defaultSelect)
+        .eq('deck_id', deckId)
+        .order('sort_order', ascending: true)
+        .range(offset, offset + pageSize - 1);
+
+    return rows.map<CardTemplate>(fromMap).toList();
+  }
 }
 
 const _cardTemplateWithRelationsSelect =

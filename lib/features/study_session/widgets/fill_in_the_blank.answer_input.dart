@@ -6,11 +6,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextFieldSize,
         TextFieldState,
         TextFieldTone,
-        TextSize,
-        TextTone,
-        TextWeight,
-        VariantTextField,
-        appTextStyle;
+        VariantTextField;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';

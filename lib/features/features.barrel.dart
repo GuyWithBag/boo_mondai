@@ -29,3 +29,4 @@ export 'sync/sync.barrel.dart';
 export 'view_reviews/view_reviews.barrel.dart';
 export 'deck_downloads/deck_downloads.barrel.dart';
 export 'change_review/change_review.barrel.dart';
+export 'view_deck_downloads/view_deck_downloads.barrel.dart';

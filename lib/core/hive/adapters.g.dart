@@ -1898,3 +1898,93 @@ class UserSettingsAdapter extends TypeAdapter<UserSettings> {
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
+
+class DownloadCheckpointAdapter extends TypeAdapter<DownloadCheckpoint> {
+  @override
+  final typeId = 35;
+
+  @override
+  DownloadCheckpoint read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return DownloadCheckpoint(
+      deckId: fields[0] as String,
+      deckTitle: fields[1] as String,
+      totalTemplates: (fields[2] as num).toInt(),
+      fetchedTemplateIds: (fields[3] as List).cast<String>(),
+      status: fields[4] as DownloadCheckpointStatus,
+      createdAt: fields[5] as DateTime,
+      updatedAt: fields[6] as DateTime,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, DownloadCheckpoint obj) {
+    writer
+      ..writeByte(7)
+      ..writeByte(0)
+      ..write(obj.deckId)
+      ..writeByte(1)
+      ..write(obj.deckTitle)
+      ..writeByte(2)
+      ..write(obj.totalTemplates)
+      ..writeByte(3)
+      ..write(obj.fetchedTemplateIds)
+      ..writeByte(4)
+      ..write(obj.status)
+      ..writeByte(5)
+      ..write(obj.createdAt)
+      ..writeByte(6)
+      ..write(obj.updatedAt);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is DownloadCheckpointAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class DownloadCheckpointStatusAdapter
+    extends TypeAdapter<DownloadCheckpointStatus> {
+  @override
+  final typeId = 36;
+
+  @override
+  DownloadCheckpointStatus read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return DownloadCheckpointStatus.downloading;
+      case 1:
+        return DownloadCheckpointStatus.paused;
+      default:
+        return DownloadCheckpointStatus.downloading;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, DownloadCheckpointStatus obj) {
+    switch (obj) {
+      case DownloadCheckpointStatus.downloading:
+        writer.writeByte(0);
+      case DownloadCheckpointStatus.paused:
+        writer.writeByte(1);
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is DownloadCheckpointStatusAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}

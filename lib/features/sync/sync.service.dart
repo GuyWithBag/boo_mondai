@@ -13,11 +13,18 @@ import 'package:boo_mondai/lib.barrel.dart'
         ChangePlan,
         ChangeResult,
         ChangeReviewStatus,
-        ChangeReviewStore,
+        ChangeReviewController,
         ChangeSource,
         ChangeType,
         SyncPlanPayload,
         SyncSummary;
+
+/// Compares two DateTimes at millisecond precision, ignoring sub-millisecond
+/// differences introduced by Supabase's microsecond storage vs Dart/Hive's
+/// millisecond storage.
+bool _isStrictlyAfterMs(DateTime a, DateTime b) {
+  return a.toUtc().millisecondsSinceEpoch > b.toUtc().millisecondsSinceEpoch;
+}
 
 class SyncService {
   static void _ensureAuthenticated({required String userId}) {
@@ -29,20 +36,73 @@ class SyncService {
     }
   }
 
-  /// Builds a sync preview and registers its apply step with ChangeReviewStore.
-  static Future<ChangePlan<SyncPlanPayload<T>>> sync<T extends DTO>({
+  /// Performs a highly-optimized network request to check if a sync is needed
+  /// by ONLY downloading IDs and timestamps, bypassing heavy joined data.
+  static Future<bool> needsSync<T extends DTO>({
     required HiveLocalDB<T> localDb,
     required SupabaseRemoteDB<T> remoteDb,
     required String userId,
     bool Function(T item)? localWhere,
   }) async {
+    _ensureAuthenticated(userId: userId);
+
+    try {
+      final localData = localDb.selectMany(where: localWhere);
+      final localMap = {for (final local in localData) local.id: local};
+
+      final remoteData = await remoteDb.client
+          .from(remoteDb.tableName)
+          .select('id, updated_at')
+          .eq('user_id', userId);
+
+      final remoteMap = <String, DateTime>{};
+      for (final row in remoteData) {
+        final id = row['id'] as String;
+        final updatedAtStr = row['updated_at'] as String?;
+        if (updatedAtStr != null) {
+          remoteMap[id] = DateTime.parse(updatedAtStr);
+        }
+      }
+
+      for (final entry in remoteMap.entries) {
+        final local = localMap[entry.key];
+        if (local == null || _isStrictlyAfterMs(entry.value, local.updatedAt)) {
+          return true;
+        }
+      }
+
+      for (final local in localData) {
+        final remoteUpdatedAt = remoteMap[local.id];
+        if (remoteUpdatedAt == null ||
+            _isStrictlyAfterMs(local.updatedAt, remoteUpdatedAt)) {
+          return true;
+        }
+      }
+
+      return false;
+    } catch (e) {
+      return true;
+    }
+  }
+
+  /// Builds a sync preview and registers its apply step with the ChangeReviewController.
+  static Future<ChangePlan<SyncPlanPayload<T>>> sync<T extends DTO>({
+    required HiveLocalDB<T> localDb,
+    required SupabaseRemoteDB<T> remoteDb,
+    required String userId,
+    required ChangeReviewController reviewController,
+    bool Function(T item)? localWhere,
+  }) async {
     late final ChangePlan<SyncPlanPayload<T>> syncPlan;
-    final reviewPlan = ChangeReviewStore.instance.start(
+
+    // 1. Force the _SyncPage loading screen to appear immediately
+    final reviewPlan = reviewController.start(
       source: ChangeSource.sync,
       title: 'Sync',
       status: ChangeReviewStatus.previewing,
-      progress: 0,
+      progress: 0.1,
       onApply: () async {
+        // This captures the 'syncPlan' variable once it's populated below
         final result = await applySync(
           plan: syncPlan,
           localDb: localDb,
@@ -54,28 +114,71 @@ class SyncService {
 
     try {
       _ensureAuthenticated(userId: userId);
-      ChangeReviewStore.instance.update(reviewPlan.id, progress: 0.35);
+
+      // 2. Perform the ultra-fast check
+      final isSyncNeeded = await needsSync(
+        localDb: localDb,
+        remoteDb: remoteDb,
+        userId: userId,
+        localWhere: localWhere,
+      );
+
+      // 3. IF NO SYNC NEEDED: Bail out instantly to the new status
+      if (!isSyncNeeded) {
+        reviewController.update(
+          reviewPlan.id,
+          status: ChangeReviewStatus.alreadyUpToDate,
+          progress: 1.0,
+        );
+
+        // Initialize the late variable to an empty state
+        syncPlan = ChangePlan(
+          payload: SyncPlanPayload<T>(
+            tableName: remoteDb.tableName,
+            pullItems: const [],
+            pushItems: const [],
+            skipped: 0,
+          ),
+          changes: const [],
+        );
+        return syncPlan;
+      }
+
+      // 4. IF SYNC NEEDED: Do the heavy lifting (download and diff)
+      reviewController.update(reviewPlan.id, progress: 0.4);
       syncPlan = await previewSync(
         localDb: localDb,
         remoteDb: remoteDb,
         userId: userId,
         localWhere: localWhere,
       );
-      ChangeReviewStore.instance.update(
+
+      // 5. Double check (just in case previewSync found no actionable changes)
+      if (syncPlan.changes.isEmpty) {
+        reviewController.update(
+          reviewPlan.id,
+          status: ChangeReviewStatus.alreadyUpToDate,
+          progress: 1.0,
+        );
+        return syncPlan;
+      }
+
+      // 6. We have confirmed changes! Move to reviewing so the user can Apply.
+      reviewController.update(
         reviewPlan.id,
         status: ChangeReviewStatus.reviewing,
-        progress: 1,
+        progress: 1.0,
         changes: syncPlan.changes,
       );
+
       return syncPlan;
     } catch (e) {
-      ChangeReviewStore.instance.fail(reviewPlan.id, e);
+      reviewController.fail(reviewPlan.id, e);
 
       if (e is SyncException) rethrow;
-
       throw SyncException(
-        'Unexpected error during sync preview: $e',
-        code: 'SYNC_PREVIEW_FAILED',
+        'Unexpected error during sync: $e',
+        code: 'SYNC_FAILED',
       );
     }
   }
@@ -119,7 +222,7 @@ class SyncService {
           continue;
         }
 
-        if (remote.updatedAt.isAfter(local.updatedAt)) {
+        if (_isStrictlyAfterMs(remote.updatedAt, local.updatedAt)) {
           pullItems.add(remote);
           changes.add(
             ChangeLog(
@@ -134,7 +237,7 @@ class SyncService {
               remoteUpdatedAt: remote.updatedAt,
             ),
           );
-        } else if (!local.updatedAt.isAfter(remote.updatedAt)) {
+        } else if (!_isStrictlyAfterMs(local.updatedAt, remote.updatedAt)) {
           skipped++;
         }
       }
@@ -157,7 +260,7 @@ class SyncService {
           continue;
         }
 
-        if (local.updatedAt.isAfter(remote.updatedAt)) {
+        if (_isStrictlyAfterMs(local.updatedAt, remote.updatedAt)) {
           pushItems.add(local);
           changes.add(
             ChangeLog(
@@ -221,6 +324,20 @@ class SyncService {
     required String userId,
     bool Function(T item)? localWhere,
   }) async {
+    final isSyncNeeded = await needsSync(
+      localDb: localDb,
+      remoteDb: remoteDb,
+      userId: userId,
+      localWhere: localWhere,
+    );
+
+    if (!isSyncNeeded) {
+      return const ChangeResult(
+        value: SyncSummary(pulled: 0, pushed: 0, skipped: 0),
+        changes: [],
+      );
+    }
+
     final plan = await previewSync(
       localDb: localDb,
       remoteDb: remoteDb,

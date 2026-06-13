@@ -7,3 +7,4 @@ export 'models/models.barrel.dart';
 export 'sync_button.dart';
 export 'guest_migration.service.dart';
 export 'sync.service.dart';
+export 'sync.page.dart';
