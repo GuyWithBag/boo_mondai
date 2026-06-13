@@ -16,7 +16,14 @@ import 'package:boo_mondai/lib.barrel.dart'
         MultipleChoiceOption,
         FillInTheBlankSegment,
         MatchMadnessPair,
-        StudyCardService;
+        StudyCardService,
+        SyncChangeLog,
+        SyncChangeType,
+        SyncOperationType,
+        SyncOperationLog,
+        SyncOperationProgress,
+        DeckDownloadResult,
+        DeckDownloadPlan;
 
 /// Downloads an online deck into the current user's local deck library.
 ///
@@ -24,8 +31,8 @@ import 'package:boo_mondai/lib.barrel.dart'
 /// original remote deck and template IDs are preserved in `source*Id` fields so
 /// the app can recognize repeated downloads and trace local content back to the
 /// published source.
-class DeckDownloadsOnlineService {
-  DeckDownloadsOnlineService({
+class DeckDownloadsService {
+  DeckDownloadsService({
     DecksRemoteDB? decksRemoteDB,
     CardTemplatesRemoteDB? cardTemplatesRemoteDB,
   }) : _decksRemoteDB = decksRemoteDB ?? DecksRemoteDB(),
@@ -42,12 +49,114 @@ class DeckDownloadsOnlineService {
   /// deck row when available, clones the deck/templates with fresh local IDs,
   /// creates the review cards needed by FSRS, persists everything locally, and
   /// returns the new local deck.
-  Future<Deck> downloadDeck(Deck sourceDeck) async {
-    final existingDeck = _findExistingDownload(sourceDeck.id);
-    if (existingDeck != null) return existingDeck;
+  Future<DeckDownloadResult> downloadDeck(Deck sourceDeck) async {
+    final operation = SyncOperationLog.instance.start(
+      kind: SyncOperationType.deckDownload,
+      subjectId: sourceDeck.id,
+      subjectTitle: sourceDeck.title,
+      progress: const SyncOperationProgress.indeterminate(
+        label: 'Preparing download',
+      ),
+    );
 
+    try {
+      SyncOperationLog.instance.update(
+        operation.id,
+        progress: const SyncOperationProgress(
+          completed: 0,
+          total: 4,
+          label: 'Fetching deck',
+        ),
+      );
+      final plan = await previewDeckDownload(sourceDeck);
+      SyncOperationLog.instance.update(
+        operation.id,
+        progress: const SyncOperationProgress(
+          completed: 1,
+          total: 4,
+          label: 'Planning changes',
+        ),
+        changes: plan.changes,
+      );
+
+      if (plan.localDeck != null) {
+        SyncOperationLog.instance.succeed(
+          operation.id,
+          progress: const SyncOperationProgress(
+            completed: 4,
+            total: 4,
+            label: 'Already downloaded',
+          ),
+          changes: plan.changes,
+        );
+        return DeckDownloadResult(
+          deck: plan.localDeck!,
+          plan: plan,
+          alreadyDownloaded: true,
+        );
+      }
+
+      final localDeck = await _createLocalCopy(
+        remoteDeck: plan.remoteDeck,
+        remoteTemplates: plan.remoteTemplates,
+        operationId: operation.id,
+      );
+
+      SyncOperationLog.instance.succeed(
+        operation.id,
+        progress: const SyncOperationProgress(
+          completed: 4,
+          total: 4,
+          label: 'Download complete',
+        ),
+        changes: plan.changes,
+      );
+      return DeckDownloadResult(
+        deck: localDeck,
+        plan: plan,
+        alreadyDownloaded: false,
+      );
+    } catch (e) {
+      SyncOperationLog.instance.fail(operation.id, e);
+      rethrow;
+    }
+  }
+
+  Future<DeckDownloadPlan> previewDeckDownload(Deck sourceDeck) async {
     final remoteDeck =
         await _decksRemoteDB.selectById(sourceDeck.id) ?? sourceDeck;
+    final localDeck = _findExistingDownload(remoteDeck.id);
+
+    // Fetch templates in author-defined order so the local deck preserves the
+    // same card sequence as the published deck.
+    final remoteTemplates = await _cardTemplatesRemoteDB.selectMany(
+      filters: {'deck_id': remoteDeck.id},
+      orderBy: 'sort_order',
+      ascending: true,
+    );
+    final localTemplates = localDeck == null
+        ? <CardTemplate>[]
+        : LocalDB.cardTemplate.getByDeckId(localDeck.id);
+
+    return DeckDownloadPlan(
+      remoteDeck: remoteDeck,
+      localDeck: localDeck,
+      remoteTemplates: remoteTemplates,
+      localTemplates: localTemplates,
+      changes: _buildDownloadChanges(
+        remoteDeck: remoteDeck,
+        localDeck: localDeck,
+        remoteTemplates: remoteTemplates,
+        localTemplates: localTemplates,
+      ),
+    );
+  }
+
+  Future<Deck> _createLocalCopy({
+    required Deck remoteDeck,
+    required List<CardTemplate> remoteTemplates,
+    required String operationId,
+  }) async {
     final currentProfile = LocalDB.profile.getOrCreate();
     final now = DateTime.now();
     final localDeckId = uuid.v7();
@@ -64,12 +173,13 @@ class DeckDownloadsOnlineService {
       listing: null,
     );
 
-    // Fetch templates in author-defined order so the local deck preserves the
-    // same card sequence as the published deck.
-    final remoteTemplates = await _cardTemplatesRemoteDB.selectMany(
-      filters: {'deck_id': remoteDeck.id},
-      orderBy: 'sort_order',
-      ascending: true,
+    SyncOperationLog.instance.update(
+      operationId,
+      progress: const SyncOperationProgress(
+        completed: 2,
+        total: 4,
+        label: 'Copying cards',
+      ),
     );
 
     // Precompute every remote-template -> local-template ID mapping before
@@ -90,12 +200,126 @@ class DeckDownloadsOnlineService {
     ];
     await LocalDB.deck.upsert(localDeck);
     await LocalDB.cardTemplate.upsertMany(localTemplates);
+    SyncOperationLog.instance.update(
+      operationId,
+      progress: const SyncOperationProgress(
+        completed: 3,
+        total: 4,
+        label: 'Creating study cards',
+      ),
+    );
     await StudyCardService.syncDeckStudyCards(
       deckId: localDeckId,
       templates: localTemplates,
     );
 
     return localDeck;
+  }
+
+  List<SyncChangeLog> _buildDownloadChanges({
+    required Deck remoteDeck,
+    required Deck? localDeck,
+    required List<CardTemplate> remoteTemplates,
+    required List<CardTemplate> localTemplates,
+  }) {
+    final changes = <SyncChangeLog>[];
+    if (localDeck == null) {
+      changes.add(
+        SyncChangeLog(
+          type: SyncChangeType.created,
+          entityType: 'deck',
+          entityId: remoteDeck.id,
+          remoteId: remoteDeck.id,
+          remoteUpdatedAt: remoteDeck.updatedAt,
+          message: 'Deck will be added to your local library.',
+        ),
+      );
+      changes.addAll(
+        remoteTemplates.map(
+          (template) => SyncChangeLog(
+            type: SyncChangeType.created,
+            entityType: 'card_template',
+            entityId: template.id,
+            remoteId: template.id,
+            remoteUpdatedAt: template.updatedAt,
+            message: 'Card will be copied from the published deck.',
+          ),
+        ),
+      );
+      return changes;
+    }
+
+    if (remoteDeck.updatedAt.isAfter(localDeck.updatedAt)) {
+      changes.add(
+        SyncChangeLog(
+          type: SyncChangeType.updated,
+          entityType: 'deck',
+          entityId: localDeck.id,
+          localId: localDeck.id,
+          remoteId: remoteDeck.id,
+          localUpdatedAt: localDeck.updatedAt,
+          remoteUpdatedAt: remoteDeck.updatedAt,
+          message: 'Published deck metadata is newer than your local copy.',
+        ),
+      );
+    }
+
+    final localBySourceId = {
+      for (final template in localTemplates)
+        if (template.sourceTemplateId != null)
+          template.sourceTemplateId!: template,
+    };
+    final remoteIds = remoteTemplates.map((template) => template.id).toSet();
+
+    for (final remoteTemplate in remoteTemplates) {
+      final localTemplate = localBySourceId[remoteTemplate.id];
+      if (localTemplate == null) {
+        changes.add(
+          SyncChangeLog(
+            type: SyncChangeType.created,
+            entityType: 'card_template',
+            entityId: remoteTemplate.id,
+            remoteId: remoteTemplate.id,
+            remoteUpdatedAt: remoteTemplate.updatedAt,
+            message: 'Published deck has a card missing locally.',
+          ),
+        );
+      } else if (remoteTemplate.updatedAt.isAfter(localTemplate.updatedAt)) {
+        changes.add(
+          SyncChangeLog(
+            type: SyncChangeType.updated,
+            entityType: 'card_template',
+            entityId: localTemplate.id,
+            localId: localTemplate.id,
+            remoteId: remoteTemplate.id,
+            localUpdatedAt: localTemplate.updatedAt,
+            remoteUpdatedAt: remoteTemplate.updatedAt,
+            message: 'Published card is newer than your local copy.',
+          ),
+        );
+      }
+    }
+
+    for (final localTemplate in localTemplates) {
+      final sourceTemplateId = localTemplate.sourceTemplateId;
+      if (sourceTemplateId == null || remoteIds.contains(sourceTemplateId)) {
+        continue;
+      }
+      changes.add(
+        SyncChangeLog(
+          type: SyncChangeType.deletedRemotely,
+          entityType: 'card_template',
+          entityId: localTemplate.id,
+          localId: localTemplate.id,
+          remoteId: sourceTemplateId,
+          localUpdatedAt: localTemplate.updatedAt,
+          message:
+              'Local card points to a published card that no longer exists.',
+        ),
+      );
+    }
+
+    return changes;
   }
 
   /// Returns the local deck previously cloned from [sourceDeckId], if present.

@@ -2,7 +2,9 @@
 
 // Barrel files
 export 'widgets/widgets.barrel.dart';
+export 'models/models.barrel.dart';
 // Other files
 export 'sync_button.dart';
 export 'guest_migration.service.dart';
 export 'sync.service.dart';
+export 'sync_operation_log.dart';

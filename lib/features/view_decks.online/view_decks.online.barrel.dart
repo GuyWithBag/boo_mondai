@@ -3,7 +3,6 @@
 // Barrel files
 export 'widgets/widgets.barrel.dart';
 // Other files
-export 'deck_downloads.online.service.dart';
 export 'deck_listing_interactions.controller.dart';
 export 'view_decks.online.controller.dart';
 export 'view_decks.online.page.dart';
