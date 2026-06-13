@@ -128,6 +128,16 @@ class ViewDecksLocalController extends Controller {
     notifyListeners();
   }
 
+  /// Dismisses the local sync UI without canceling the underlying request.
+  ///
+  /// The sync operation itself continues in the background, but the page
+  /// should return to the normal deck list immediately.
+  void dismissSyncReview() {
+    _isSyncing = false;
+    _syncError = null;
+    notifyListeners();
+  }
+
   /// Pull remote decks (newer [updatedAt] wins), then push all local decks.
   ///
   Future<void> sync() async {
@@ -152,7 +162,9 @@ class ViewDecksLocalController extends Controller {
       // ── 3. Reload ────────────────────────────────────────
       load();
     } on AppException catch (e) {
-      _syncError = e.message;
+      if (_isSyncing) {
+        _syncError = e.message;
+      }
     } finally {
       _isSyncing = false;
       notifyListeners();

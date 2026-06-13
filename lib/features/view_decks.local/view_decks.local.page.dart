@@ -7,8 +7,14 @@
 
 import 'package:boo_mondai/lib.barrel.dart'
     show
+        AppTokens,
         AuthController,
         CreateDeckTile,
+        ChangeReviewPlan,
+        ChangeReviewStatus,
+        ChangeReviewStore,
+        ChangeSource,
+        ChangeSummaryChips,
         Deck,
         DeckSearchFilter,
         DeckTile,
@@ -16,15 +22,19 @@ import 'package:boo_mondai/lib.barrel.dart'
         EmptyState,
         FilteredSearchBar,
         ListingStatesWrapper,
+        ProgressBar,
         SyncButton,
         ViewDecksLocalController,
         showCreateDeckLocalSheet,
         useFilteredSearchBarController,
-        Button;
+        Button,
+        ButtonTone;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:theme_variants/theme_variants.dart';
 
 class ViewDecksLocalPage extends HookWidget {
   const ViewDecksLocalPage({super.key});
@@ -33,6 +43,7 @@ class ViewDecksLocalPage extends HookWidget {
   Widget build(BuildContext context) {
     final controller = context.watch<ViewDecksLocalController>();
     final auth = context.watch<AuthController>();
+    final reviewStore = ChangeReviewStore.instance;
     // final scrollController = useScrollController();
 
     useEffect(() {
@@ -45,6 +56,8 @@ class ViewDecksLocalPage extends HookWidget {
       return null;
     }, [controller.syncError]);
 
+    useListenable(reviewStore);
+
     final searchController =
         useFilteredSearchBarController<Deck, DeckSearchFilter>(
           filterCodec: ViewDecksLocalController.deckSearchFilterCodec,
@@ -53,6 +66,21 @@ class ViewDecksLocalPage extends HookWidget {
         );
     final visibleDecks = searchController.results;
     final hasSearchQuery = searchController.text.trim().isNotEmpty;
+    final syncPlan = _currentSyncPlan(reviewStore.plans);
+
+    if (auth.service.isAuthenticatedRemote && syncPlan != null) {
+      return _SyncReviewScaffold(
+        plan: syncPlan,
+        onDismiss: () {
+          controller.dismissSyncReview();
+          reviewStore.cancel(syncPlan.id);
+          reviewStore.remove(syncPlan.id);
+        },
+        onViewResults: () {
+          context.push('/change-review/${syncPlan.id}');
+        },
+      );
+    }
 
     final searchBar = FilteredSearchBar<Deck, DeckSearchFilter>(
       controller: searchController,
@@ -102,6 +130,124 @@ class ViewDecksLocalPage extends HookWidget {
       ),
     );
   }
+}
+
+class _SyncReviewScaffold extends StatelessWidget {
+  const _SyncReviewScaffold({
+    required this.plan,
+    required this.onDismiss,
+    required this.onViewResults,
+  });
+
+  final ChangeReviewPlan plan;
+  final VoidCallback onDismiss;
+  final VoidCallback onViewResults;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = context.themeTokens<AppTokens>();
+    final progress = (plan.progress ?? 0).clamp(0.0, 1.0);
+    final isComplete =
+        plan.status == ChangeReviewStatus.completed ||
+        plan.status == ChangeReviewStatus.results ||
+        plan.status == ChangeReviewStatus.reviewing;
+    final isReviewing = plan.status == ChangeReviewStatus.reviewing;
+
+    return Scaffold(
+      backgroundColor: tokens.backgroundPage,
+      body: SafeArea(
+        child: Center(
+          child: Padding(
+            padding: EdgeInsets.all(tokens.spacePanelPadding.r),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 560),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.sync_rounded, size: 76, color: tokens.textMuted),
+                  SizedBox(height: tokens.spacePanelGapMd.h),
+                  Text(
+                    isComplete ? 'Sync Complete!' : 'Syncing',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: tokens.textPrimary,
+                      fontFamily: tokens.fontFamily,
+                      fontSize: tokens.textSizeHeader.sp,
+                      fontWeight: tokens.fontWeightTextStrong,
+                    ),
+                  ),
+                  SizedBox(height: tokens.spacePanelGapSm.h),
+                  Text(
+                    isComplete
+                        ? isReviewing
+                              ? 'Review changes before applying.'
+                              : 'Review the results or return to your decks.'
+                        : '${(progress * 100).round()}%',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: tokens.textSecondary,
+                      fontFamily: tokens.fontFamily,
+                      fontSize: tokens.textSizeLabelLarge.sp,
+                      fontWeight: tokens.fontWeightTextStrong,
+                    ),
+                  ),
+                  if (!isComplete) ...[
+                    SizedBox(height: tokens.spacePanelGapMd.h),
+                    ProgressBar(value: progress),
+                  ] else ...[
+                    SizedBox(height: tokens.spacePanelGapMd.h),
+                    ChangeSummaryChips(plan: plan),
+                  ],
+                  SizedBox(height: tokens.spacePanelGapLg.h),
+                  if (isComplete) ...[
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Button(
+                            tone: ButtonTone.filled,
+                            onPressed: onViewResults,
+                            child: const Text('VIEW RESULTS'),
+                          ),
+                        ),
+                        SizedBox(width: tokens.spacePanelGapSm.w),
+                        Expanded(
+                          child: Button(
+                            onPressed: onDismiss,
+                            child: const Text('CANCEL'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ] else ...[
+                    SizedBox(
+                      width: double.infinity,
+                      child: Button(
+                        onPressed: onDismiss,
+                        child: const Text('CANCEL'),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+ChangeReviewPlan? _currentSyncPlan(List<ChangeReviewPlan> plans) {
+  for (final plan in plans) {
+    if (plan.source != ChangeSource.sync) continue;
+    if (plan.status == ChangeReviewStatus.canceled ||
+        plan.status == ChangeReviewStatus.failed ||
+        plan.status == ChangeReviewStatus.idle) {
+      continue;
+    }
+    return plan;
+  }
+  return null;
 }
 
 // ── _DeckListBody ─────────────────────────────────────────────────────────────

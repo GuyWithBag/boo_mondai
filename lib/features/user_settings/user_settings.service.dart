@@ -366,7 +366,7 @@ class UserSettingsService {
   /// Syncs local settings row for [userId] with remote settings table.
   static Future<UserSettings> syncForUser(String userId) async {
     await getOrCreateForUser(userId);
-    await SyncService.sync<UserSettings>(
+    await SyncService.syncImmediately<UserSettings>(
       localDb: LocalDB.userSettings,
       remoteDb: RemoteDB.userSettings,
       userId: userId,

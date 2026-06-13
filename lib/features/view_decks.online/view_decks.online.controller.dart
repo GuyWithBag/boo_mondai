@@ -43,7 +43,7 @@ class ViewDecksOnlineController extends Controller {
 
     try {
       final result = await _deckDownloadsService.downloadDeck(deck);
-      return result.deck;
+      return result.value.deck;
     } catch (e) {
       setError(e is Exception ? e : Exception(e.toString()));
       return null;

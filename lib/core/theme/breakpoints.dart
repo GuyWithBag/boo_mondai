@@ -14,7 +14,8 @@ abstract final class Breakpoints {
   static const Size tv = Size(1600, 1200);
 
   static bool isMobile(Size size) =>
-      size.width < mobile.width && size.height < mobile.height;
+      // size.width < mobile.width && size.height < mobile.height;
+      size.width < mobile.width;
 
   static bool isTablet(Size size) =>
       size.width >= mobile.width &&

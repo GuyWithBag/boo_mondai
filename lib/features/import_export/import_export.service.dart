@@ -12,12 +12,15 @@ import 'package:boo_mondai/lib.barrel.dart'
         FlashcardTemplate,
         IdentificationTemplate,
         ImportCardMatchCandidate,
-        ImportCardsPlan,
+        ChangePlan,
+        ImportCardsPayload,
         ImportExportBackup,
-        ImportExportBatchResult,
-        ImportExportChangeLog,
-        ImportExportChangeType,
-        ImportExportResult,
+        ChangeBatchResult,
+        ChangeLog,
+        ChangeReviewDiffService,
+        ChangeSource,
+        ChangeType,
+        ChangeResult,
         LocalDB,
         MatchMadnessPair,
         MatchMadnessTemplate,
@@ -35,7 +38,7 @@ class ImportExportService {
   const ImportExportService._();
 
   /// Exports one deck with templates, tags, and media URL references.
-  static Future<ImportExportResult<Map<String, dynamic>>> exportDeck(
+  static Future<ChangeResult<Map<String, dynamic>>> exportDeck(
     String deckId,
   ) async {
     final deck = LocalDB.deck.selectByPk({'id': deckId});
@@ -45,11 +48,14 @@ class ImportExportService {
     final templates = LocalDB.cardTemplate.getByDeckId(deckId);
     final payload = _buildDeckPayload(deck: deck, templates: templates);
     final logs = [
-      ImportExportChangeLog(
-        type: ImportExportChangeType.created,
+      ChangeLog(
+        type: ChangeType.added,
+        source: ChangeSource.importExport,
         entityType: 'deck',
         entityId: deck.id,
-        message: 'Exported "${deck.title}" with ${templates.length} cards.',
+        title: 'Exported ${deck.title}',
+        subtitle: '${templates.length} cards',
+        after: deck,
       ),
     ];
     await _storeBackup(
@@ -60,36 +66,32 @@ class ImportExportService {
       payload: payload,
       logs: logs,
     );
-    return ImportExportResult(value: payload, changeLogs: logs);
+    return ChangeResult(value: payload, changes: logs);
   }
 
   /// Exports multiple decks and returns per-deck partial failures.
-  static Future<ImportExportBatchResult<Map<String, dynamic>>> exportDecks(
+  static Future<ChangeBatchResult<Map<String, dynamic>>> exportDecks(
     List<String> deckIds,
   ) async {
     final values = <Map<String, dynamic>>[];
     final failures = <String>[];
-    final logs = <ImportExportChangeLog>[];
+    final logs = <ChangeLog>[];
 
     for (final deckId in deckIds) {
       try {
         final result = await exportDeck(deckId);
         values.add(result.value);
-        logs.addAll(result.changeLogs);
+        logs.addAll(result.changes);
       } on Exception catch (e) {
         failures.add('Deck $deckId: $e');
       }
     }
 
-    return ImportExportBatchResult(
-      values: values,
-      failures: failures,
-      changeLogs: logs,
-    );
+    return ChangeBatchResult(values: values, failures: failures, changes: logs);
   }
 
   /// Exports cards from one deck, optionally scoped to [templateIds].
-  static Future<ImportExportResult<Map<String, dynamic>>> exportCards({
+  static Future<ChangeResult<Map<String, dynamic>>> exportCards({
     required String deckId,
     List<String>? templateIds,
   }) async {
@@ -113,11 +115,13 @@ class ImportExportService {
     };
 
     final logs = [
-      ImportExportChangeLog(
-        type: ImportExportChangeType.created,
+      ChangeLog(
+        type: ChangeType.added,
+        source: ChangeSource.importExport,
         entityType: 'card_templates',
         entityId: deckId,
-        message: 'Exported ${selected.length} cards from "${deck.title}".',
+        title: 'Exported cards from ${deck.title}',
+        subtitle: '${selected.length} cards',
       ),
     ];
 
@@ -130,11 +134,11 @@ class ImportExportService {
       logs: logs,
     );
 
-    return ImportExportResult(value: payload, changeLogs: logs);
+    return ChangeResult(value: payload, changes: logs);
   }
 
   /// Imports one deck payload using [mode] and optional [targetDeckId].
-  static Future<ImportExportResult<Deck?>> importDeck({
+  static Future<ChangeResult<Deck?>> importDeck({
     required Map<String, dynamic> payload,
     DeckImportMode mode = DeckImportMode.createNew,
     String? targetDeckId,
@@ -145,18 +149,20 @@ class ImportExportService {
     final incomingDeck = DeckMapper.fromMap(deckMap);
     final incomingTemplateMaps = _extractTemplateMaps(payload);
     final incomingTemplates = _decodeTemplates(incomingTemplateMaps);
-    final logs = <ImportExportChangeLog>[];
+    final logs = <ChangeLog>[];
 
     if (mode == DeckImportMode.skip) {
       logs.add(
-        ImportExportChangeLog(
-          type: ImportExportChangeType.skipped,
+        ChangeLog(
+          type: ChangeType.skipped,
+          source: ChangeSource.importExport,
           entityType: 'deck',
           entityId: incomingDeck.id,
-          message: 'Skipped importing "${incomingDeck.title}".',
+          title: 'Skipped ${incomingDeck.title}',
+          after: incomingDeck,
         ),
       );
-      return ImportExportResult(value: null, changeLogs: logs);
+      return ChangeResult(value: null, changes: logs);
     }
 
     if (mode == DeckImportMode.updateExisting) {
@@ -191,12 +197,16 @@ class ImportExportService {
       );
 
       logs.add(
-        ImportExportChangeLog(
-          type: ImportExportChangeType.updated,
+        ChangeLog(
+          type: ChangeType.modified,
+          source: ChangeSource.importExport,
           entityType: 'deck',
           entityId: target.id,
-          message:
-              'Updated "${target.title}" with ${copiedTemplates.length} imported cards.',
+          title: 'Updated ${target.title}',
+          subtitle: '${copiedTemplates.length} imported cards',
+          before: target,
+          after: updatedDeck,
+          fields: ChangeReviewDiffService.diffDecks(target, updatedDeck),
         ),
       );
 
@@ -209,7 +219,7 @@ class ImportExportService {
         logs: logs,
       );
 
-      return ImportExportResult(value: updatedDeck, changeLogs: logs);
+      return ChangeResult(value: updatedDeck, changes: logs);
     }
 
     final profile = LocalDB.profile.getOrCreate();
@@ -238,12 +248,14 @@ class ImportExportService {
     );
 
     logs.add(
-      ImportExportChangeLog(
-        type: ImportExportChangeType.created,
+      ChangeLog(
+        type: ChangeType.added,
+        source: ChangeSource.importExport,
         entityType: 'deck',
         entityId: createdDeck.id,
-        message:
-            'Imported new deck "${createdDeck.title}" with ${copiedTemplates.length} cards.',
+        title: createdDeck.title,
+        subtitle: '${copiedTemplates.length} imported cards',
+        after: createdDeck,
       ),
     );
 
@@ -256,11 +268,11 @@ class ImportExportService {
       logs: logs,
     );
 
-    return ImportExportResult(value: createdDeck, changeLogs: logs);
+    return ChangeResult(value: createdDeck, changes: logs);
   }
 
   /// Imports one deck from raw JSON.
-  static Future<ImportExportResult<Deck?>> importDeckJson({
+  static Future<ChangeResult<Deck?>> importDeckJson({
     required String rawJson,
     DeckImportMode mode = DeckImportMode.createNew,
     String? targetDeckId,
@@ -273,14 +285,14 @@ class ImportExportService {
   }
 
   /// Imports multiple deck payloads with partial success.
-  static Future<ImportExportBatchResult<Deck?>> importDecks({
+  static Future<ChangeBatchResult<Deck?>> importDecks({
     required List<Map<String, dynamic>> payloads,
     DeckImportMode mode = DeckImportMode.createNew,
     Map<int, String> updateTargetsByIndex = const {},
   }) async {
     final values = <Deck?>[];
     final failures = <String>[];
-    final logs = <ImportExportChangeLog>[];
+    final logs = <ChangeLog>[];
 
     for (var i = 0; i < payloads.length; i++) {
       try {
@@ -290,21 +302,17 @@ class ImportExportService {
           targetDeckId: updateTargetsByIndex[i],
         );
         values.add(result.value);
-        logs.addAll(result.changeLogs);
+        logs.addAll(result.changes);
       } on Exception catch (e) {
         failures.add('Index $i: $e');
       }
     }
 
-    return ImportExportBatchResult(
-      values: values,
-      failures: failures,
-      changeLogs: logs,
-    );
+    return ChangeBatchResult(values: values, failures: failures, changes: logs);
   }
 
   /// Imports multiple decks from raw JSON. Accepts either `{decks:[...]}` or `[...]`.
-  static Future<ImportExportBatchResult<Deck?>> importDecksJson({
+  static Future<ChangeBatchResult<Deck?>> importDecksJson({
     required String rawJson,
     DeckImportMode mode = DeckImportMode.createNew,
     Map<int, String> updateTargetsByIndex = const {},
@@ -332,7 +340,7 @@ class ImportExportService {
   }
 
   /// Previews card import and detects likely update candidates.
-  static Future<ImportCardsPlan> previewCardImport({
+  static Future<ChangePlan<ImportCardsPayload>> previewCardImport({
     required String deckId,
     required List<Map<String, dynamic>> incomingTemplateMaps,
     CardSimilarityConfig similarity = const CardSimilarityConfig(),
@@ -340,6 +348,7 @@ class ImportExportService {
     final incoming = _decodeTemplates(incomingTemplateMaps);
     final existing = LocalDB.cardTemplate.getByDeckId(deckId);
     final candidates = <ImportCardMatchCandidate>[];
+    final changes = <ChangeLog>[];
 
     for (final template in incoming) {
       final incomingPreview = _templatePreview(template);
@@ -372,18 +381,52 @@ class ImportExportService {
           best = candidate;
         }
       }
-      if (best != null) candidates.add(best);
+      if (best != null) {
+        candidates.add(best);
+        final existingTemplateId = best.existingTemplateId;
+        final local = existing.firstWhere(
+          (template) => template.id == existingTemplateId,
+        );
+        changes.add(
+          ChangeLog(
+            type: ChangeType.modified,
+            source: ChangeSource.importExport,
+            entityType: 'card_template',
+            entityId: local.id,
+            title: ChangeReviewDiffService.templateTitle(local),
+            subtitle: 'Likely imported card update',
+            before: local,
+            after: template,
+            fields: ChangeReviewDiffService.diffTemplates(local, template),
+          ),
+        );
+      } else {
+        changes.add(
+          ChangeLog(
+            type: ChangeType.added,
+            source: ChangeSource.importExport,
+            entityType: 'card_template',
+            entityId: template.id,
+            title: ChangeReviewDiffService.templateTitle(template),
+            subtitle: 'Imported card will be added',
+            after: template,
+          ),
+        );
+      }
     }
 
-    return ImportCardsPlan(
-      deckId: deckId,
-      incomingTemplates: incomingTemplateMaps,
-      candidates: candidates,
+    return ChangePlan<ImportCardsPayload>(
+      payload: ImportCardsPayload(
+        deckId: deckId,
+        incomingTemplates: incomingTemplateMaps,
+        candidates: candidates,
+      ),
+      changes: changes,
     );
   }
 
   /// JSON helper for [previewCardImport].
-  static Future<ImportCardsPlan> previewCardImportJson({
+  static Future<ChangePlan<ImportCardsPayload>> previewCardImportJson({
     required String deckId,
     required String rawJson,
     CardSimilarityConfig similarity = const CardSimilarityConfig(),
@@ -412,12 +455,13 @@ class ImportExportService {
   }
 
   /// Applies card import decisions and returns detailed change logs.
-  static Future<ImportExportResult<List<CardTemplate>>> applyCardImportPlan({
-    required ImportCardsPlan plan,
+  static Future<ChangeResult<List<CardTemplate>>> applyCardImportPlan({
+    required ChangePlan<ImportCardsPayload> plan,
     required List<CardImportDecision> decisions,
   }) async {
-    final logs = <ImportExportChangeLog>[];
-    final incoming = _decodeTemplates(plan.incomingTemplates);
+    final logs = <ChangeLog>[];
+    final payload = plan.payload;
+    final incoming = _decodeTemplates(payload.incomingTemplates);
     final decisionByIncomingId = {
       for (final decision in decisions) decision.incomingTemplateId: decision,
     };
@@ -427,11 +471,14 @@ class ImportExportService {
       final decision = decisionByIncomingId[template.id];
       if (decision?.action == CardImportAction.skip) {
         logs.add(
-          ImportExportChangeLog(
-            type: ImportExportChangeType.skipped,
+          ChangeLog(
+            type: ChangeType.skipped,
+            source: ChangeSource.importExport,
             entityType: 'card_template',
             entityId: template.id,
-            message: 'Skipped imported card ${_templatePreview(template)}.',
+            title: ChangeReviewDiffService.templateTitle(template),
+            subtitle: 'Skipped imported card',
+            after: template,
           ),
         );
         continue;
@@ -444,12 +491,13 @@ class ImportExportService {
         });
         if (existing == null) {
           logs.add(
-            ImportExportChangeLog(
-              type: ImportExportChangeType.skipped,
+            ChangeLog(
+              type: ChangeType.skipped,
+              source: ChangeSource.importExport,
               entityType: 'card_template',
               entityId: decision.targetTemplateId!,
-              message:
-                  'Skipped update because target template was not found locally.',
+              title: 'Skipped card update',
+              subtitle: 'Target template was not found locally.',
             ),
           );
           continue;
@@ -458,17 +506,22 @@ class ImportExportService {
         final updated = _copyTemplateWithIdentity(
           source: template,
           targetId: existing.id,
-          deckId: plan.deckId,
+          deckId: payload.deckId,
           createdAt: existing.createdAt,
         );
         await LocalDB.cardTemplate.upsert(updated);
         written.add(updated);
         logs.add(
-          ImportExportChangeLog(
-            type: ImportExportChangeType.updated,
+          ChangeLog(
+            type: ChangeType.modified,
+            source: ChangeSource.importExport,
             entityType: 'card_template',
             entityId: existing.id,
-            message: 'Updated card ${_templatePreview(updated)}.',
+            title: ChangeReviewDiffService.templateTitle(updated),
+            subtitle: 'Updated imported card',
+            before: existing,
+            after: updated,
+            fields: ChangeReviewDiffService.diffTemplates(existing, updated),
           ),
         );
         continue;
@@ -477,41 +530,44 @@ class ImportExportService {
       final created = _copyTemplateWithIdentity(
         source: template,
         targetId: uuid.v7(),
-        deckId: plan.deckId,
+        deckId: payload.deckId,
         createdAt: DateTime.now(),
       );
       await LocalDB.cardTemplate.upsert(created);
       written.add(created);
       logs.add(
-        ImportExportChangeLog(
-          type: ImportExportChangeType.created,
+        ChangeLog(
+          type: ChangeType.added,
+          source: ChangeSource.importExport,
           entityType: 'card_template',
           entityId: created.id,
-          message: 'Imported new card ${_templatePreview(created)}.',
+          title: ChangeReviewDiffService.templateTitle(created),
+          subtitle: 'Imported new card',
+          after: created,
         ),
       );
     }
 
-    final allTemplates = LocalDB.cardTemplate.getByDeckId(plan.deckId);
+    final allTemplates = LocalDB.cardTemplate.getByDeckId(payload.deckId);
     await StudyCardService.syncDeckStudyCards(
-      deckId: plan.deckId,
+      deckId: payload.deckId,
       templates: allTemplates,
     );
 
     await _storeBackup(
       operation: 'import_cards',
       entityType: 'card_templates',
-      entityId: plan.deckId,
-      title: 'Import cards into ${plan.deckId}',
+      entityId: payload.deckId,
+      title: 'Import cards into ${payload.deckId}',
       payload: {
-        'deck_id': plan.deckId,
-        'incoming_count': plan.incomingTemplates.length,
+        'deck_id': payload.deckId,
+        'incoming_count': payload.incomingTemplates.length,
         'decision_count': decisions.length,
       },
       logs: logs,
     );
 
-    return ImportExportResult(value: written, changeLogs: logs);
+    return ChangeResult(value: written, changes: logs);
   }
 
   static Map<String, dynamic> _buildDeckPayload({
@@ -776,7 +832,7 @@ class ImportExportService {
     required String? entityId,
     required String title,
     required Map<String, dynamic> payload,
-    required List<ImportExportChangeLog> logs,
+    required List<ChangeLog> logs,
   }) async {
     final backup = ImportExportBackup(
       id: uuid.v7(),
@@ -785,15 +841,7 @@ class ImportExportService {
       entityId: entityId,
       title: title,
       payloadJson: jsonEncode(payload),
-      changeLogsJson: jsonEncode([
-        for (final log in logs)
-          {
-            'type': log.type.name,
-            'entity_type': log.entityType,
-            'entity_id': log.entityId,
-            'message': log.message,
-          },
-      ]),
+      changeLogsJson: jsonEncode([for (final log in logs) log.toJson()]),
       createdAt: DateTime.now(),
     );
     await LocalDB.importExportBackup.upsert(backup);

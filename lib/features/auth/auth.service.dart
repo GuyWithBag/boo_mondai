@@ -48,10 +48,65 @@ class AuthService {
       // FirebaseCrashlytics.instance.recordError(e, stack, reason: 'Auth: $action');
 
       throw AppException(e.message, code: e.statusCode);
-    } catch (e) {
-      developer.log('Unexpected Error during $action: $e', name: 'AuthService');
+    } on SocketException catch (e, stack) {
+      developer.log(
+        'Network Error during $action: $e',
+        name: 'AuthService',
+        error: e,
+        stackTrace: stack,
+      );
+      throw AppException(
+        'Unable to reach the server. Check your network connection and try again.',
+        code: 'NETWORK_ERROR',
+        originalError: e,
+        stackTrace: stack,
+      );
+    } on TimeoutException catch (e, stack) {
+      developer.log(
+        'Timeout Error during $action: $e',
+        name: 'AuthService',
+        error: e,
+        stackTrace: stack,
+      );
+      throw AppException(
+        'The request timed out. Please try again.',
+        code: 'TIMEOUT',
+        originalError: e,
+        stackTrace: stack,
+      );
+    } catch (e, stack) {
+      if (_isNetworkTransportError(e)) {
+        developer.log(
+          'Network Error during $action: $e',
+          name: 'AuthService',
+          error: e,
+          stackTrace: stack,
+        );
+        throw AppException(
+          'Unable to reach the server. Check your network connection and try again.',
+          code: 'NETWORK_ERROR',
+          originalError: e,
+          stackTrace: stack,
+        );
+      }
+
+      developer.log(
+        'Unexpected Error during $action: $e',
+        name: 'AuthService',
+        error: e,
+        stackTrace: stack,
+      );
       rethrow;
     }
+  }
+
+  bool _isNetworkTransportError(Object e) {
+    final typeName = e.runtimeType.toString();
+    final message = e.toString();
+    return typeName == 'ClientException' ||
+        message.contains('ClientException') ||
+        message.contains('Failed host lookup') ||
+        message.contains('SocketException');
   }
 
   // ── Logic ──────────────────────────────────────────────────

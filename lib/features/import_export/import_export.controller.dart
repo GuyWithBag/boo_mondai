@@ -7,14 +7,15 @@ import 'package:boo_mondai/lib.barrel.dart'
         Controller,
         Deck,
         DeckImportMode,
-        ImportCardsPlan,
-        ImportExportChangeLog,
+        ChangePlan,
+        ImportCardsPayload,
+        ChangeLog,
         ImportExportService;
 
 /// UI-facing state holder for import/export workflows.
 class ImportExportController extends Controller {
-  ImportCardsPlan? currentPlan;
-  List<ImportExportChangeLog> latestChangeLogs = const [];
+  ChangePlan<ImportCardsPayload>? currentPlan;
+  List<ChangeLog> latestChanges = const [];
   List<String> latestFailures = const [];
 
   /// Exports one deck and stores change logs.
@@ -22,7 +23,7 @@ class ImportExportController extends Controller {
     setLoading(true);
     try {
       final result = await ImportExportService.exportDeck(deckId);
-      latestChangeLogs = result.changeLogs;
+      latestChanges = result.changes;
       latestFailures = const [];
       return result.value;
     } on Exception catch (e) {
@@ -38,7 +39,7 @@ class ImportExportController extends Controller {
     setLoading(true);
     try {
       final result = await ImportExportService.exportDecks(deckIds);
-      latestChangeLogs = result.changeLogs;
+      latestChanges = result.changes;
       latestFailures = result.failures;
       return result.values;
     } on Exception catch (e) {
@@ -62,7 +63,7 @@ class ImportExportController extends Controller {
         mode: mode,
         targetDeckId: targetDeckId,
       );
-      latestChangeLogs = result.changeLogs;
+      latestChanges = result.changes;
       latestFailures = const [];
       return result.value;
     } on Exception catch (e) {
@@ -99,7 +100,7 @@ class ImportExportController extends Controller {
         mode: mode,
         updateTargetsByIndex: updateTargetsByIndex,
       );
-      latestChangeLogs = result.changeLogs;
+      latestChanges = result.changes;
       latestFailures = result.failures;
       return result.values;
     } on Exception catch (e) {
@@ -123,7 +124,7 @@ class ImportExportController extends Controller {
         mode: mode,
         updateTargetsByIndex: updateTargetsByIndex,
       );
-      latestChangeLogs = result.changeLogs;
+      latestChanges = result.changes;
       latestFailures = result.failures;
       return result.values;
     } on Exception catch (e) {
@@ -145,7 +146,7 @@ class ImportExportController extends Controller {
         deckId: deckId,
         templateIds: templateIds,
       );
-      latestChangeLogs = result.changeLogs;
+      latestChanges = result.changes;
       latestFailures = const [];
       return result.value;
     } on Exception catch (e) {
@@ -157,7 +158,7 @@ class ImportExportController extends Controller {
   }
 
   /// Builds a similarity plan for importing cards into one deck.
-  Future<ImportCardsPlan?> previewCardImport({
+  Future<ChangePlan<ImportCardsPayload>?> previewCardImport({
     required String deckId,
     required List<Map<String, dynamic>> incomingTemplateMaps,
     CardSimilarityConfig similarity = const CardSimilarityConfig(),
@@ -170,6 +171,7 @@ class ImportExportController extends Controller {
         similarity: similarity,
       );
       currentPlan = plan;
+      latestChanges = plan.changes;
       latestFailures = const [];
       return plan;
     } on Exception catch (e) {
@@ -181,7 +183,7 @@ class ImportExportController extends Controller {
   }
 
   /// Builds a similarity plan from raw JSON.
-  Future<ImportCardsPlan?> previewCardImportJson({
+  Future<ChangePlan<ImportCardsPayload>?> previewCardImportJson({
     required String deckId,
     required String rawJson,
     CardSimilarityConfig similarity = const CardSimilarityConfig(),
@@ -194,6 +196,7 @@ class ImportExportController extends Controller {
         similarity: similarity,
       );
       currentPlan = plan;
+      latestChanges = plan.changes;
       latestFailures = const [];
       return plan;
     } on Exception catch (e) {
@@ -220,7 +223,7 @@ class ImportExportController extends Controller {
         plan: plan,
         decisions: decisions,
       );
-      latestChangeLogs = result.changeLogs;
+      latestChanges = result.changes;
       latestFailures = const [];
     } on Exception catch (e) {
       setError(e);
