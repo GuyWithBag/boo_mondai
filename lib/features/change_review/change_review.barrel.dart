@@ -4,6 +4,6 @@
 export 'models/models.barrel.dart';
 export 'widgets/widgets.barrel.dart';
 // Other files
-export 'change_review_store.dart';
 export 'change_review_diff.service.dart';
 export 'change_review.page.dart';
+export 'change_review_controller.dart';

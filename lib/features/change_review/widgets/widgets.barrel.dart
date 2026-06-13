@@ -4,6 +4,4 @@
 export 'change_summary_chips.dart';
 export 'change_field_diff.dart';
 export 'change_review_card.dart';
-export 'change_review_loading_view.dart';
-export 'change_review_complete_view.dart';
 export 'change_review_actions.dart';

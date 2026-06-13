@@ -11,6 +11,7 @@ import 'package:app_links/app_links.dart';
 import 'package:barrel_annotation/barrel_annotation.dart';
 import 'package:boo_mondai/core/hive/hive_registrar.g.dart' show HiveRegistrar;
 import 'package:boo_mondai/env.dart' show Env;
+import 'package:boo_mondai/features/change_review/change_review.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         RemoteDB,
@@ -86,6 +87,7 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => ViewLeaderboardController()),
         ChangeNotifierProvider(create: (_) => StreakController()),
         ChangeNotifierProvider(create: (_) => ResearchController()),
+        ChangeNotifierProvider(create: (_) => ChangeReviewController()),
       ],
       child: BooMondaiApp(
         authController: authController,

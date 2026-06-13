@@ -3,8 +3,10 @@ enum ChangeReviewStatus {
   previewing,
   reviewing,
   results,
+  paused,
   applying,
   completed,
   failed,
   canceled,
+  alreadyUpToDate,
 }

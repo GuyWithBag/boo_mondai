@@ -1,14 +1,18 @@
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// PATH: lib/features/change_review/change_review_controller.dart
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 import 'package:boo_mondai/lib.barrel.dart'
-    show ChangeLog, ChangeReviewPlan, ChangeReviewStatus, ChangeSource;
-import 'package:flutter/material.dart' show ChangeNotifier;
+    show
+        ChangeLog,
+        ChangeReviewPlan,
+        ChangeReviewStatus,
+        ChangeSource,
+        Controller;
 
 typedef ChangeReviewApply = Future<List<ChangeLog>> Function();
 
-class ChangeReviewStore extends ChangeNotifier {
-  ChangeReviewStore._();
-
-  static final ChangeReviewStore instance = ChangeReviewStore._();
-
+class ChangeReviewController extends Controller {
   final List<ChangeReviewPlan> _plans = [];
   final Map<String, ChangeReviewApply> _applyByPlanId = {};
 
@@ -85,15 +89,15 @@ class ChangeReviewStore extends ChangeNotifier {
   }
 
   Future<void> apply(String planId) async {
-    final apply = _applyByPlanId[planId];
-    if (apply == null) {
+    final applyFn = _applyByPlanId[planId];
+    if (applyFn == null) {
       complete(planId);
       return;
     }
 
     update(planId, status: ChangeReviewStatus.applying, progress: 0);
     try {
-      final changes = await apply();
+      final changes = await applyFn();
       complete(planId, changes: changes);
     } catch (e) {
       fail(planId, e);
@@ -102,9 +106,36 @@ class ChangeReviewStore extends ChangeNotifier {
     }
   }
 
+  /// Marks the plan as paused. The actual pause signal is sent to
+  /// DeckDownloadsService separately via its pauseDownload() method.
+  void pause(String planId) {
+    final current = planById(planId);
+    if (current == null) return;
+    if (current.status == ChangeReviewStatus.canceled ||
+        current.status == ChangeReviewStatus.completed ||
+        current.status == ChangeReviewStatus.failed)
+      return;
+    _replace(
+      planId,
+      (plan) => plan.copyWith(status: ChangeReviewStatus.paused),
+    );
+  }
+
+  /// Marks the plan as applying again so the UI reflects resuming.
+  /// The caller is responsible for actually re-running the download.
+  void resume(String planId) {
+    final current = planById(planId);
+    if (current?.status != ChangeReviewStatus.paused) return;
+    _replace(
+      planId,
+      (plan) => plan.copyWith(status: ChangeReviewStatus.applying),
+    );
+  }
+
   void fail(String planId, Object error) {
     final current = planById(planId);
     if (current?.status == ChangeReviewStatus.canceled) return;
+    setError(error is Exception ? error : Exception(error.toString()));
     _replace(
       planId,
       (plan) => plan.copyWith(
