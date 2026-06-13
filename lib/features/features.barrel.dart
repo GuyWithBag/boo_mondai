@@ -28,3 +28,4 @@ export 'tags/tags.barrel.dart';
 export 'sync/sync.barrel.dart';
 export 'view_reviews/view_reviews.barrel.dart';
 export 'deck_downloads/deck_downloads.barrel.dart';
+export 'change_review/change_review.barrel.dart';

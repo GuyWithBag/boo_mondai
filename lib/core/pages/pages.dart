@@ -20,7 +20,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         SessionMode,
         ViewDrillResultPage,
         PlaceholderAppPage,
-        AnswerSurveyPage;
+        AnswerSurveyPage,
+        ChangeReviewPage;
 import 'package:boo_mondai/features/view_cards/view_cards.page.dart'
     show ViewCardsPage;
 import 'package:flutter/material.dart';
@@ -167,6 +168,14 @@ class Pages {
             ),
   );
 
+  static final changeReview = AppPage(
+    url: '/change-review/:planId',
+    name: 'Change Review',
+    builder:
+        (context, {pathParameters = const {}, queryParameters = const {}}) =>
+            ChangeReviewPage(planId: pathParameters['planId']!),
+  );
+
   static final research = AppPage(
     url: '/research',
     name: 'Research',
@@ -269,6 +278,7 @@ class Pages {
     drillResult,
     reviewSession,
     reviewDeckSession,
+    changeReview,
     research,
     leaderboard,
     researchCode,
