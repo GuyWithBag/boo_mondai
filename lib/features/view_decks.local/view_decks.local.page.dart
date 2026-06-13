@@ -7,14 +7,13 @@
 
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        AppTokens,
         AuthController,
-        CreateDeckTile,
+        Button,
+        ChangeReviewController,
         ChangeReviewPlan,
         ChangeReviewStatus,
-        ChangeReviewStore,
         ChangeSource,
-        ChangeSummaryChips,
+        CreateDeckTile,
         Deck,
         DeckSearchFilter,
         DeckTile,
@@ -22,19 +21,16 @@ import 'package:boo_mondai/lib.barrel.dart'
         EmptyState,
         FilteredSearchBar,
         ListingStatesWrapper,
-        ProgressBar,
         SyncButton,
+        SyncPage,
         ViewDecksLocalController,
         showCreateDeckLocalSheet,
-        useFilteredSearchBarController,
-        Button,
-        ButtonTone;
+        showSnackbar,
+        useFilteredSearchBarController;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class ViewDecksLocalPage extends HookWidget {
   const ViewDecksLocalPage({super.key});
@@ -43,8 +39,7 @@ class ViewDecksLocalPage extends HookWidget {
   Widget build(BuildContext context) {
     final controller = context.watch<ViewDecksLocalController>();
     final auth = context.watch<AuthController>();
-    final reviewStore = ChangeReviewStore.instance;
-    // final scrollController = useScrollController();
+    final reviewController = context.watch<ChangeReviewController>();
 
     useEffect(() {
       controller.loadOnNextFrame();
@@ -56,7 +51,18 @@ class ViewDecksLocalPage extends HookWidget {
       return null;
     }, [controller.syncError]);
 
-    useListenable(reviewStore);
+    useEffect(() {
+      final changePlan = controller.changePlan;
+      if (changePlan == null) return null;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!context.mounted) return;
+        showSnackbar(context: context, message: 'Everything is up to date!');
+        controller.changePlan = null;
+      });
+
+      return null;
+    }, [controller.changePlan]);
 
     final searchController =
         useFilteredSearchBarController<Deck, DeckSearchFilter>(
@@ -64,20 +70,29 @@ class ViewDecksLocalPage extends HookWidget {
           searchResults: ViewDecksLocalController.deckSearchResults,
           items: controller.decks,
         );
+
     final visibleDecks = searchController.results;
     final hasSearchQuery = searchController.text.trim().isNotEmpty;
-    final syncPlan = _currentSyncPlan(reviewStore.plans);
+    final syncPlan = _currentSyncPlan(reviewController.plans);
 
+    // If there's an active sync plan, show SyncPage regardless of which
+    // tab the user navigated to and back from — the plan survives in
+    // ChangeReviewController which lives above the ShellRoute.
     if (auth.service.isAuthenticatedRemote && syncPlan != null) {
-      return _SyncReviewScaffold(
+      return SyncPage(
         plan: syncPlan,
-        onDismiss: () {
-          controller.dismissSyncReview();
-          reviewStore.cancel(syncPlan.id);
-          reviewStore.remove(syncPlan.id);
-        },
-        onViewResults: () {
+        onViewChanges: () {
           context.push('/change-review/${syncPlan.id}');
+        },
+        onApply: () {
+          controller.clearSyncing();
+          context.read<ChangeReviewController>().apply(syncPlan.id);
+        },
+        onDiscard: () {
+          controller.dismissSyncReview(
+            context.read<ChangeReviewController>(),
+            syncPlan.id,
+          );
         },
       );
     }
@@ -99,7 +114,7 @@ class ViewDecksLocalPage extends HookWidget {
           SyncButton(
             isSyncing: controller.isSyncing,
             isAuthenticated: auth.service.isAuthenticatedRemote,
-            onSync: () => controller.sync(),
+            onSync: () => controller.sync(reviewController),
           ),
           Button.icon(
             icon: Icons.layers_rounded,
@@ -108,14 +123,14 @@ class ViewDecksLocalPage extends HookWidget {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(100.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              searchBar,
-              const SizedBox(height: 24),
-              _DeckListBody(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            searchBar,
+            const SizedBox(height: 24),
+            Expanded(
+              child: _DeckListBody(
                 error: controller.error,
                 isLoading: controller.isLoading,
                 onRetry: controller.load,
@@ -124,113 +139,8 @@ class ViewDecksLocalPage extends HookWidget {
                 decks: visibleDecks,
                 hasSearchQuery: hasSearchQuery,
               ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _SyncReviewScaffold extends StatelessWidget {
-  const _SyncReviewScaffold({
-    required this.plan,
-    required this.onDismiss,
-    required this.onViewResults,
-  });
-
-  final ChangeReviewPlan plan;
-  final VoidCallback onDismiss;
-  final VoidCallback onViewResults;
-
-  @override
-  Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
-    final progress = (plan.progress ?? 0).clamp(0.0, 1.0);
-    final isComplete =
-        plan.status == ChangeReviewStatus.completed ||
-        plan.status == ChangeReviewStatus.results ||
-        plan.status == ChangeReviewStatus.reviewing;
-    final isReviewing = plan.status == ChangeReviewStatus.reviewing;
-
-    return Scaffold(
-      backgroundColor: tokens.backgroundPage,
-      body: SafeArea(
-        child: Center(
-          child: Padding(
-            padding: EdgeInsets.all(tokens.spacePanelPadding.r),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 560),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.sync_rounded, size: 76, color: tokens.textMuted),
-                  SizedBox(height: tokens.spacePanelGapMd.h),
-                  Text(
-                    isComplete ? 'Sync Complete!' : 'Syncing',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: tokens.textPrimary,
-                      fontFamily: tokens.fontFamily,
-                      fontSize: tokens.textSizeHeader.sp,
-                      fontWeight: tokens.fontWeightTextStrong,
-                    ),
-                  ),
-                  SizedBox(height: tokens.spacePanelGapSm.h),
-                  Text(
-                    isComplete
-                        ? isReviewing
-                              ? 'Review changes before applying.'
-                              : 'Review the results or return to your decks.'
-                        : '${(progress * 100).round()}%',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: tokens.textSecondary,
-                      fontFamily: tokens.fontFamily,
-                      fontSize: tokens.textSizeLabelLarge.sp,
-                      fontWeight: tokens.fontWeightTextStrong,
-                    ),
-                  ),
-                  if (!isComplete) ...[
-                    SizedBox(height: tokens.spacePanelGapMd.h),
-                    ProgressBar(value: progress),
-                  ] else ...[
-                    SizedBox(height: tokens.spacePanelGapMd.h),
-                    ChangeSummaryChips(plan: plan),
-                  ],
-                  SizedBox(height: tokens.spacePanelGapLg.h),
-                  if (isComplete) ...[
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Button(
-                            tone: ButtonTone.filled,
-                            onPressed: onViewResults,
-                            child: const Text('VIEW RESULTS'),
-                          ),
-                        ),
-                        SizedBox(width: tokens.spacePanelGapSm.w),
-                        Expanded(
-                          child: Button(
-                            onPressed: onDismiss,
-                            child: const Text('CANCEL'),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ] else ...[
-                    SizedBox(
-                      width: double.infinity,
-                      child: Button(
-                        onPressed: onDismiss,
-                        child: const Text('CANCEL'),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
             ),
-          ),
+          ],
         ),
       ),
     );
@@ -294,7 +204,7 @@ class _DeckListBody extends StatelessWidget {
                 onPressed: () => showCreateDeckLocalSheet(context),
               ),
             ),
-      spacing: 100,
+      spacing: 16,
       leadingItem: CreateDeckTile(
         onPressed: () => showCreateDeckLocalSheet(context),
       ),

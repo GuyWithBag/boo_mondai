@@ -1,3 +1,4 @@
+import 'package:boo_mondai/features/change_review/change_review_controller.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         Deck,
@@ -119,6 +120,7 @@ ViewDeckOnlineSheetState useViewDeckOnlineSheet({
   required String deckId,
   required Deck initialDeck,
   required ViewDecksOnlineController controller,
+  required ChangeReviewController changeReviewController,
 }) {
   useListenable(controller);
 
@@ -519,7 +521,7 @@ ViewDeckOnlineSheetState useViewDeckOnlineSheet({
     onDownvotePressed: interactionsController.toggleDownvote,
     onFavoritePressed: interactionsController.toggleFavorite,
     onDownloadPressed: () async {
-      await controller.downloadDeck(deck);
+      await controller.downloadDeck(deck, controller: changeReviewController);
     },
     onReviewSubmitted: addReview,
     onReviewReply: addReviewReply,

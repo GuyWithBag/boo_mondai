@@ -3,6 +3,7 @@
 // PURPOSE: State and data fetching for the Online Deck Browser
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/features/change_review/change_review_controller.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         Controller,
@@ -36,13 +37,16 @@ class ViewDecksOnlineController extends Controller {
     }
   }
 
-  Future<Deck?> downloadDeck(Deck deck) async {
+  Future<Deck?> downloadDeck(
+    Deck deck, {
+    required ChangeReviewController controller,
+  }) async {
     downloadingDeckId = deck.id;
     error = null;
     notifyListeners();
 
     try {
-      final result = await _deckDownloadsService.downloadDeck(deck);
+      final result = await _deckDownloadsService.downloadDeck(deck, controller);
       return result.value.deck;
     } catch (e) {
       setError(e is Exception ? e : Exception(e.toString()));

@@ -10,6 +10,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         DecksLocalDB,
         LocalDB,
         Controller,
+        ChangeReviewController,
+        ChangeSource,
         Deck,
         DeckSearchFilterCodec,
         DeckSearchResults,
@@ -18,13 +20,13 @@ import 'package:boo_mondai/lib.barrel.dart'
         showViewDeckLocalSheet,
         showSnackbar,
         SyncService,
-        RemoteDB;
+        RemoteDB,
+        SyncPlanPayload,
+        ChangePlan;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 
-/// Drives the My Decks page — loads all decks sorted by [updatedAt] descending
-/// and exposes delete operations.
 class ViewDecksLocalController extends Controller {
   static const deckSearchFilterCodec = DeckSearchFilterCodec();
   static const deckSearchResults = DeckSearchResults();
@@ -42,10 +44,10 @@ class ViewDecksLocalController extends Controller {
     _deckListenable.removeListener(load);
     super.dispose();
   }
+
   // ── private state ────────────────────────────────────────
 
   List<Deck> _decks = [];
-
   bool _isSyncing = false;
   String? _syncError;
 
@@ -54,10 +56,10 @@ class ViewDecksLocalController extends Controller {
   List<Deck> get decks => List.unmodifiable(_decks);
   bool get isSyncing => _isSyncing;
   String? get syncError => _syncError;
+  ChangePlan<SyncPlanPayload<Deck>>? changePlan;
 
   // ── methods ──────────────────────────────────────────────
 
-  /// Loads all decks from the repository, sorted by [updatedAt] descending.
   void load() {
     setLoading(true);
     setError(null);
@@ -103,7 +105,6 @@ class ViewDecksLocalController extends Controller {
     goToDeck(context, visibleDecks.single);
   }
 
-  /// Deletes the deck with the given [id] from the repository, then reloads.
   Future<void> deleteDeck(String id) async {
     setLoading(true);
     setError(null);
@@ -117,7 +118,6 @@ class ViewDecksLocalController extends Controller {
     }
   }
 
-  /// Clears any active error message and notifies listeners.
   void clearError() {
     setError(null);
     notifyListeners();
@@ -128,19 +128,33 @@ class ViewDecksLocalController extends Controller {
     notifyListeners();
   }
 
-  /// Dismisses the local sync UI without canceling the underlying request.
-  ///
-  /// The sync operation itself continues in the background, but the page
-  /// should return to the normal deck list immediately.
-  void dismissSyncReview() {
+  /// Call this when the user taps Apply — the plan completes naturally
+  /// via ChangeReviewController, we just need to stop the loading indicator.
+  void clearSyncing() {
     _isSyncing = false;
-    _syncError = null;
     notifyListeners();
   }
 
-  /// Pull remote decks (newer [updatedAt] wins), then push all local decks.
-  ///
-  Future<void> sync() async {
+  /// Call this when the user taps Discard/Cancel — cancels and removes
+  /// the plan from the controller and resets local sync state.
+  void dismissSyncReview(
+    ChangeReviewController reviewController,
+    String planId,
+  ) {
+    _isSyncing = false;
+    _syncError = null;
+    reviewController.cancel(planId);
+    reviewController.remove(planId);
+    notifyListeners();
+  }
+
+  Future<void> sync(ChangeReviewController reviewController) async {
+    // Guard: don't start a second sync if one is already active
+    final alreadyActive = reviewController.activePlans.any(
+      (p) => p.source == ChangeSource.sync,
+    );
+    if (alreadyActive) return;
+
     _isSyncing = true;
     _syncError = null;
     notifyListeners();
@@ -152,21 +166,25 @@ class ViewDecksLocalController extends Controller {
         currentProfileId: profile.id,
       );
 
-      await SyncService.sync(
+      changePlan = await SyncService.sync(
         localDb: LocalDB.deck,
         remoteDb: RemoteDB.deck,
         userId: profile.id,
+        reviewController: reviewController,
         localWhere: (deck) => deck.userId == profile.id,
       );
 
-      // ── 3. Reload ────────────────────────────────────────
       load();
     } on AppException catch (e) {
       if (_isSyncing) {
         _syncError = e.message;
       }
-    } finally {
       _isSyncing = false;
+    } finally {
+      // Intentionally NOT setting _isSyncing = false here.
+      // The plan is still alive in ChangeReviewController and SyncPage
+      // is still showing. isSyncing flips only via clearSyncing() or
+      // dismissSyncReview() when the user explicitly acts on the plan.
       notifyListeners();
     }
   }

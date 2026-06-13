@@ -24,7 +24,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         ViewDecksOnlineController,
         appTextStyle,
         surfaceStyle,
-        useViewDeckOnlineSheet;
+        useViewDeckOnlineSheet,
+        ChangeReviewController;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
@@ -60,10 +61,12 @@ class ViewDeckOnlineSheet extends HookWidget {
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
     final controller = context.read<ViewDecksOnlineController>();
+    final changeReviewController = context.read<ChangeReviewController>();
     final sheet = useViewDeckOnlineSheet(
       deckId: deck.id,
       initialDeck: deck,
       controller: controller,
+      changeReviewController: changeReviewController,
     );
     final sheetDeck = sheet.deck;
 
