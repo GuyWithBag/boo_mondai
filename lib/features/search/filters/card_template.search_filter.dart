@@ -5,6 +5,45 @@ import 'package:boo_mondai/lib.barrel.dart'
         SearchDirectiveProperty,
         SearchFilter,
         SearchSortDirection;
+import 'package:boo_mondai/features/search/filters/search_filter_directive.dart';
+
+abstract final class CardTemplateSearchFilterDirective {
+  static const deck = SearchFilterDirective(
+    name: 'deck',
+    aliases: ['deckid'],
+    order: 0,
+  );
+  static const template = SearchFilterDirective(
+    name: 'template',
+    aliases: ['templateid'],
+    order: 1,
+  );
+  static const tag = SearchFilterDirective(
+    name: 'tag',
+    aliases: ['tags'],
+    order: 2,
+  );
+  static const tagId = SearchFilterDirective(
+    name: 'tag_id',
+    aliases: ['tagid'],
+    order: 3,
+  );
+  static const sort = SearchFilterDirective(
+    name: 'sort',
+    aliases: ['field', 'sortby'],
+    order: 4,
+  );
+  static const direction = SearchFilterDirective(
+    name: 'direction',
+    aliases: ['order', 'dir'],
+    order: 5,
+  );
+  static const fuzzy = SearchFilterDirective(
+    name: 'fuzzy',
+    aliases: ['cutoff'],
+    order: 6,
+  );
+}
 
 class CardTemplateSearchFilter implements SearchFilter {
   const CardTemplateSearchFilter({
@@ -66,31 +105,26 @@ class CardTemplateSearchFilter implements SearchFilter {
 
       if (value.isEmpty) continue;
 
-      switch (key) {
-        case 'deck':
-        case 'deckid':
-          deckIds.addAll(SearchTextParser.splitValues(value));
-        case 'template':
-        case 'templateid':
-          templateIds.addAll(SearchTextParser.splitValues(value));
-        case 'tag':
-        case 'tags':
-          tagNames.addAll(SearchTextParser.splitValues(value));
-        case 'tagid':
-          tagIds.addAll(SearchTextParser.splitValues(value));
-        case 'sort':
-        case 'field':
-        case 'sortby':
-          sortField = _parseField(value) ?? sortField;
-        case 'order':
-        case 'dir':
-        case 'direction':
-          sortDirection = _parseDirection(value) ?? sortDirection;
-        case 'cutoff':
-        case 'fuzzy':
-          fuzzyCutoff = int.tryParse(value) ?? fuzzyCutoff;
-        default:
-          freeTextParts.add(token);
+      if (_isViewCardsDataModeDirective(key)) {
+        continue;
+      }
+
+      if (CardTemplateSearchFilterDirective.deck.matches(key)) {
+        deckIds.addAll(SearchTextParser.splitValues(value));
+      } else if (CardTemplateSearchFilterDirective.template.matches(key)) {
+        templateIds.addAll(SearchTextParser.splitValues(value));
+      } else if (CardTemplateSearchFilterDirective.tag.matches(key)) {
+        tagNames.addAll(SearchTextParser.splitValues(value));
+      } else if (CardTemplateSearchFilterDirective.tagId.matches(key)) {
+        tagIds.addAll(SearchTextParser.splitValues(value));
+      } else if (CardTemplateSearchFilterDirective.sort.matches(key)) {
+        sortField = _parseField(value) ?? sortField;
+      } else if (CardTemplateSearchFilterDirective.direction.matches(key)) {
+        sortDirection = _parseDirection(value) ?? sortDirection;
+      } else if (CardTemplateSearchFilterDirective.fuzzy.matches(key)) {
+        fuzzyCutoff = int.tryParse(value) ?? fuzzyCutoff;
+      } else {
+        freeTextParts.add(token);
       }
     }
 
@@ -108,14 +142,19 @@ class CardTemplateSearchFilter implements SearchFilter {
 
   @override
   String toSearchText() {
+    final sortedDeckIds = deckIds.toList()..sort();
+    final sortedTemplateIds = templateIds.toList()..sort();
+    final sortedTagNames = tagNames.toList()..sort();
+    final sortedTagIds = tagIds.toList()..sort();
+
     return [
       freeText,
-      ...deckIds.map((deckId) => 'deck:${_formatValue(deckId)}'),
-      ...templateIds.map(
+      ...sortedDeckIds.map((deckId) => 'deck:${_formatValue(deckId)}'),
+      ...sortedTemplateIds.map(
         (templateId) => 'template:${_formatValue(templateId)}',
       ),
-      ...tagNames.map((tagName) => 'tag:${_formatValue(tagName)}'),
-      ...tagIds.map((tagId) => 'tag_id:${_formatValue(tagId)}'),
+      ...sortedTagNames.map((tagName) => 'tag:${_formatValue(tagName)}'),
+      ...sortedTagIds.map((tagId) => 'tag_id:${_formatValue(tagId)}'),
       'sort:${_formatSortField(sortField)}',
       'direction:${_formatDirection(sortDirection)}',
       'fuzzy:$fuzzyCutoff',
@@ -168,5 +207,9 @@ class CardTemplateSearchFilter implements SearchFilter {
     final trimmed = value.trim();
     if (trimmed.contains(RegExp(r'[\s,]'))) return '"$trimmed"';
     return trimmed;
+  }
+
+  static bool _isViewCardsDataModeDirective(String key) {
+    return key == 'studycards' || key == 'study_cards' || key == 'cards';
   }
 }

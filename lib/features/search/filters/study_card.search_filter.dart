@@ -1,6 +1,40 @@
 import 'package:boo_mondai/features/search/search_text_parser.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show SearchDirectiveProperty, SearchFilter;
+import 'package:boo_mondai/features/search/filters/search_filter_directive.dart';
+
+abstract final class StudyCardSearchFilterDirective {
+  static const deck = SearchFilterDirective(
+    name: 'deck',
+    aliases: ['deckid'],
+    order: 0,
+  );
+  static const template = SearchFilterDirective(
+    name: 'template',
+    aliases: ['templateid'],
+    order: 1,
+  );
+  static const tag = SearchFilterDirective(
+    name: 'tag',
+    aliases: ['tags'],
+    order: 2,
+  );
+  static const tagId = SearchFilterDirective(
+    name: 'tag_id',
+    aliases: ['tagid'],
+    order: 3,
+  );
+  static const reversed = SearchFilterDirective(
+    name: 'reversed',
+    aliases: ['reverse', 'isreversed'],
+    order: 4,
+  );
+  static const fuzzy = SearchFilterDirective(
+    name: 'fuzzy',
+    aliases: ['cutoff'],
+    order: 5,
+  );
+}
 
 class StudyCardSearchFilter implements SearchFilter {
   const StudyCardSearchFilter({
@@ -56,27 +90,24 @@ class StudyCardSearchFilter implements SearchFilter {
 
       if (value.isEmpty) continue;
 
-      switch (key) {
-        case 'deck':
-        case 'deckid':
-          deckIds.addAll(SearchTextParser.splitValues(value));
-        case 'template':
-        case 'templateid':
-          templateIds.addAll(SearchTextParser.splitValues(value));
-        case 'tag':
-        case 'tags':
-          tagNames.addAll(SearchTextParser.splitValues(value));
-        case 'tagid':
-          tagIds.addAll(SearchTextParser.splitValues(value));
-        case 'reversed':
-        case 'reverse':
-        case 'isreversed':
-          isReversed = _parseBool(value) ?? isReversed;
-        case 'cutoff':
-        case 'fuzzy':
-          fuzzyCutoff = int.tryParse(value) ?? fuzzyCutoff;
-        default:
-          freeTextParts.add(token);
+      if (_isViewCardsDataModeDirective(key)) {
+        continue;
+      }
+
+      if (StudyCardSearchFilterDirective.deck.matches(key)) {
+        deckIds.addAll(SearchTextParser.splitValues(value));
+      } else if (StudyCardSearchFilterDirective.template.matches(key)) {
+        templateIds.addAll(SearchTextParser.splitValues(value));
+      } else if (StudyCardSearchFilterDirective.tag.matches(key)) {
+        tagNames.addAll(SearchTextParser.splitValues(value));
+      } else if (StudyCardSearchFilterDirective.tagId.matches(key)) {
+        tagIds.addAll(SearchTextParser.splitValues(value));
+      } else if (StudyCardSearchFilterDirective.reversed.matches(key)) {
+        isReversed = _parseBool(value) ?? isReversed;
+      } else if (StudyCardSearchFilterDirective.fuzzy.matches(key)) {
+        fuzzyCutoff = int.tryParse(value) ?? fuzzyCutoff;
+      } else {
+        freeTextParts.add(token);
       }
     }
 
@@ -93,14 +124,19 @@ class StudyCardSearchFilter implements SearchFilter {
 
   @override
   String toSearchText() {
+    final sortedDeckIds = deckIds.toList()..sort();
+    final sortedTemplateIds = templateIds.toList()..sort();
+    final sortedTagNames = tagNames.toList()..sort();
+    final sortedTagIds = tagIds.toList()..sort();
+
     return [
       freeText,
-      ...deckIds.map((deckId) => 'deck:${_formatValue(deckId)}'),
-      ...templateIds.map(
+      ...sortedDeckIds.map((deckId) => 'deck:${_formatValue(deckId)}'),
+      ...sortedTemplateIds.map(
         (templateId) => 'template:${_formatValue(templateId)}',
       ),
-      ...tagNames.map((tagName) => 'tag:${_formatValue(tagName)}'),
-      ...tagIds.map((tagId) => 'tag_id:${_formatValue(tagId)}'),
+      ...sortedTagNames.map((tagName) => 'tag:${_formatValue(tagName)}'),
+      ...sortedTagIds.map((tagId) => 'tag_id:${_formatValue(tagId)}'),
       if (isReversed != null) 'reversed:$isReversed',
       'fuzzy:$fuzzyCutoff',
     ].where((part) => part.trim().isNotEmpty).join(' ').trim();
@@ -118,5 +154,9 @@ class StudyCardSearchFilter implements SearchFilter {
     final trimmed = value.trim();
     if (trimmed.contains(RegExp(r'[\s,]'))) return '"$trimmed"';
     return trimmed;
+  }
+
+  static bool _isViewCardsDataModeDirective(String key) {
+    return key == 'studycards' || key == 'study_cards' || key == 'cards';
   }
 }

@@ -4,6 +4,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         FilteredSearchBarController,
         SearchFilter,
         SearchFilterCodec,
+        showSearchFilterModal,
         SearchResultTile,
         SearchResults,
         TextFieldFrame,
@@ -251,10 +252,13 @@ class FilteredSearchBar<TObject, TFilter extends SearchFilter>
     useEffect(() => removeDropdownOverlay, const []);
 
     Future<void> openFilters() async {
-      final filter = await onOpenFilterModal?.call(
-        context,
-        searchController.filter,
-      );
+      final filter = onOpenFilterModal == null
+          ? await showSearchFilterModal(
+              context: context,
+              codec: filterCodec,
+              currentFilter: searchController.filter,
+            )
+          : await onOpenFilterModal!.call(context, searchController.filter);
       if (filter == null) return;
 
       searchController.applyFilter(filter);

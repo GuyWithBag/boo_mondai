@@ -1,4 +1,4 @@
-import 'package:boo_mondai/features/search/filters/search_filter.dart';
+import 'package:boo_mondai/lib.barrel.dart' show SearchFilter;
 
 abstract interface class SearchResults<TObject, TFilter extends SearchFilter> {
   List<TObject> resolve({

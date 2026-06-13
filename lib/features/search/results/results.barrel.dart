@@ -6,3 +6,4 @@ export 'deck_listing.search_results.dart';
 export 'card_template.search_results.dart';
 export 'study_card.search_results.dart';
 export 'search_results.dart';
+export 'review_deck.search_results.dart';

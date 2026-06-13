@@ -5,6 +5,35 @@ import 'package:boo_mondai/lib.barrel.dart'
         SearchDirectiveProperty,
         SearchFilter,
         SearchSortDirection;
+import 'package:boo_mondai/features/search/filters/search_filter_directive.dart';
+
+abstract final class DeckSearchFilterDirective {
+  static const tag = SearchFilterDirective(
+    name: 'tag',
+    aliases: ['tags'],
+    order: 0,
+  );
+  static const tagId = SearchFilterDirective(
+    name: 'tag_id',
+    aliases: ['tagid'],
+    order: 1,
+  );
+  static const sort = SearchFilterDirective(
+    name: 'sort',
+    aliases: ['field', 'sortby'],
+    order: 2,
+  );
+  static const direction = SearchFilterDirective(
+    name: 'direction',
+    aliases: ['order', 'dir'],
+    order: 3,
+  );
+  static const fuzzy = SearchFilterDirective(
+    name: 'fuzzy',
+    aliases: ['cutoff'],
+    order: 4,
+  );
+}
 
 class DeckSearchFilter implements SearchFilter {
   const DeckSearchFilter({
@@ -59,32 +88,24 @@ class DeckSearchFilter implements SearchFilter {
 
       if (value.isEmpty) continue;
 
-      switch (key) {
-        case 'tag':
-        case 'tags':
-          tagNames.addAll(SearchTextParser.splitValues(value));
-        case 'tagid':
-          tagIds.addAll(SearchTextParser.splitValues(value));
-        case 'sort':
-          final sort = _parseSort(value);
-          if (sort == null) {
-            freeTextParts.add(token);
-          } else {
-            sortField = sort.$1;
-            sortDirection = sort.$2;
-          }
-        case 'field':
-        case 'sortby':
-          sortField = _parseField(value) ?? sortField;
-        case 'order':
-        case 'dir':
-        case 'direction':
-          sortDirection = _parseDirection(value) ?? sortDirection;
-        case 'cutoff':
-        case 'fuzzy':
-          fuzzyCutoff = int.tryParse(value) ?? fuzzyCutoff;
-        default:
+      if (DeckSearchFilterDirective.tag.matches(key)) {
+        tagNames.addAll(SearchTextParser.splitValues(value));
+      } else if (DeckSearchFilterDirective.tagId.matches(key)) {
+        tagIds.addAll(SearchTextParser.splitValues(value));
+      } else if (DeckSearchFilterDirective.sort.matches(key)) {
+        final sort = _parseSort(value);
+        if (sort == null) {
           freeTextParts.add(token);
+        } else {
+          sortField = sort.$1;
+          sortDirection = sort.$2;
+        }
+      } else if (DeckSearchFilterDirective.direction.matches(key)) {
+        sortDirection = _parseDirection(value) ?? sortDirection;
+      } else if (DeckSearchFilterDirective.fuzzy.matches(key)) {
+        fuzzyCutoff = int.tryParse(value) ?? fuzzyCutoff;
+      } else {
+        freeTextParts.add(token);
       }
     }
 
@@ -100,10 +121,13 @@ class DeckSearchFilter implements SearchFilter {
 
   @override
   String toSearchText() {
+    final sortedTagNames = tagNames.toList()..sort();
+    final sortedTagIds = tagIds.toList()..sort();
+
     return [
       freeText,
-      ...tagNames.map((tagName) => 'tag:${_formatValue(tagName)}'),
-      ...tagIds.map((tagId) => 'tag_id:${_formatValue(tagId)}'),
+      ...sortedTagNames.map((tagName) => 'tag:${_formatValue(tagName)}'),
+      ...sortedTagIds.map((tagId) => 'tag_id:${_formatValue(tagId)}'),
       'sort:${_formatSortField(sortField)}',
       'direction:${_formatDirection(sortDirection)}',
       'fuzzy:$fuzzyCutoff',
@@ -129,18 +153,6 @@ class DeckSearchFilter implements SearchFilter {
       'z-a' => (DeckSearchSortField.letters, SearchSortDirection.descending),
       'created' ||
       'date' => (DeckSearchSortField.createdAt, SearchSortDirection.descending),
-      _ => null,
-    };
-  }
-
-  static DeckSearchSortField? _parseField(String value) {
-    return switch (value.toLowerCase()) {
-      'letters' || 'title' || 'name' || 'az' => DeckSearchSortField.letters,
-      'created' ||
-      'createdat' ||
-      'created_at' ||
-      'date' => DeckSearchSortField.createdAt,
-      'updated' || 'updatedat' || 'updated_at' => DeckSearchSortField.updatedAt,
       _ => null,
     };
   }

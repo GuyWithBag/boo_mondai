@@ -5,6 +5,30 @@ import 'package:boo_mondai/lib.barrel.dart'
         SearchDirectiveProperty,
         SearchFilter,
         SearchSortDirection;
+import 'package:boo_mondai/features/search/filters/search_filter_directive.dart';
+
+abstract final class DeckListingSearchFilterDirective {
+  static const deck = SearchFilterDirective(
+    name: 'deck',
+    aliases: ['deckid'],
+    order: 0,
+  );
+  static const sort = SearchFilterDirective(
+    name: 'sort',
+    aliases: ['field', 'sortby'],
+    order: 1,
+  );
+  static const direction = SearchFilterDirective(
+    name: 'direction',
+    aliases: ['order', 'dir'],
+    order: 2,
+  );
+  static const fuzzy = SearchFilterDirective(
+    name: 'fuzzy',
+    aliases: ['cutoff'],
+    order: 3,
+  );
+}
 
 class DeckListingSearchFilter implements SearchFilter {
   const DeckListingSearchFilter({
@@ -52,23 +76,16 @@ class DeckListingSearchFilter implements SearchFilter {
 
       if (value.isEmpty) continue;
 
-      switch (key) {
-        case 'deck':
-        case 'deckid':
-          deckIds.addAll(SearchTextParser.splitValues(value));
-        case 'sort':
-        case 'field':
-        case 'sortby':
-          sortField = _parseField(value) ?? sortField;
-        case 'order':
-        case 'dir':
-        case 'direction':
-          sortDirection = _parseDirection(value) ?? sortDirection;
-        case 'cutoff':
-        case 'fuzzy':
-          fuzzyCutoff = int.tryParse(value) ?? fuzzyCutoff;
-        default:
-          freeTextParts.add(token);
+      if (DeckListingSearchFilterDirective.deck.matches(key)) {
+        deckIds.addAll(SearchTextParser.splitValues(value));
+      } else if (DeckListingSearchFilterDirective.sort.matches(key)) {
+        sortField = _parseField(value) ?? sortField;
+      } else if (DeckListingSearchFilterDirective.direction.matches(key)) {
+        sortDirection = _parseDirection(value) ?? sortDirection;
+      } else if (DeckListingSearchFilterDirective.fuzzy.matches(key)) {
+        fuzzyCutoff = int.tryParse(value) ?? fuzzyCutoff;
+      } else {
+        freeTextParts.add(token);
       }
     }
 
@@ -83,9 +100,11 @@ class DeckListingSearchFilter implements SearchFilter {
 
   @override
   String toSearchText() {
+    final sortedDeckIds = deckIds.toList()..sort();
+
     return [
       freeText,
-      ...deckIds.map((deckId) => 'deck:${_formatValue(deckId)}'),
+      ...sortedDeckIds.map((deckId) => 'deck:${_formatValue(deckId)}'),
       'sort:${_formatSortField(sortField)}',
       'direction:${_formatDirection(sortDirection)}',
       'fuzzy:$fuzzyCutoff',

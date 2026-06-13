@@ -1,6 +1,5 @@
-import 'package:boo_mondai/features/search/filters/search_filter.dart';
-import 'package:boo_mondai/features/search/filters/search_filter_codec.dart';
-import 'package:boo_mondai/features/search/results/search_results.dart';
+import 'package:boo_mondai/lib.barrel.dart'
+    show SearchFilter, SearchFilterCodec, SearchResults;
 import 'package:flutter/widgets.dart';
 
 class FilteredSearchBarController<TObject, TFilter extends SearchFilter>
