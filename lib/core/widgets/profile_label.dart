@@ -6,6 +6,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart' show AppSpacing, AppColors;
+import 'package:boo_mondai/features/profile/widgets/profile_avatar.dart';
 import 'package:flutter/material.dart';
 
 class ProfileLabel extends StatelessWidget {
@@ -25,49 +26,16 @@ class ProfileLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
     final name = displayName.trim().isEmpty ? '...' : displayName.trim();
-    final initials = name.isNotEmpty ? name[0].toUpperCase() : '?';
     final imageUrl = avatarUrl?.trim();
-    final hasImage = imageUrl != null && imageUrl.isNotEmpty;
 
     return Row(
       children: [
-        Stack(
-          children: [
-            CircleAvatar(
-              radius: isSourceAuthor ? 16 : 18,
-              backgroundColor: isSourceAuthor
-                  ? scheme.tertiaryContainer
-                  : scheme.primaryContainer,
-              backgroundImage: hasImage ? NetworkImage(imageUrl) : null,
-              child: !hasImage
-                  ? Text(
-                      initials,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: isSourceAuthor
-                            ? scheme.onTertiaryContainer
-                            : scheme.onPrimaryContainer,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    )
-                  : null,
-            ),
-            if (isSourceAuthor)
-              Positioned(
-                right: 0,
-                bottom: 0,
-                child: Container(
-                  width: 10,
-                  height: 10,
-                  decoration: BoxDecoration(
-                    color: scheme.tertiary,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: scheme.surface, width: 1.5),
-                  ),
-                ),
-              ),
-          ],
+        ProfileAvatar(
+          displayName: name,
+          avatarUrl: imageUrl,
+          radius: isSourceAuthor ? 16 : 18,
+          isSourceAuthor: isSourceAuthor,
         ),
         const SizedBox(width: AppSpacing.xs),
         Column(

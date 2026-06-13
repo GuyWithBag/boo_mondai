@@ -20,6 +20,7 @@ class ProfileLocalDB extends HiveSingleDataLocalDB<Profile> {
       updatedAt: DateTime.now(),
       createdAt: DateTime.now(),
       username: 'Anonymous',
+      displayName: 'Guest User',
     );
     return profile;
   }

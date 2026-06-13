@@ -16,6 +16,8 @@ class Profile with ProfileMappable implements DTO {
   final String id;
   final String userId;
   final String username;
+  @MappableField(key: r'display_name')
+  final String displayName;
   final String? role;
   final String? avatarUrl;
   @override
@@ -27,6 +29,7 @@ class Profile with ProfileMappable implements DTO {
   const Profile({
     required this.id,
     required this.username,
+    required this.displayName,
     required this.role,
     this.avatarUrl,
     required this.createdAt,

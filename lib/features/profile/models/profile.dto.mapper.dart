@@ -25,6 +25,9 @@ class ProfileMapper extends ClassMapperBase<Profile> {
   static String _$username(Profile v) => v.username;
   static const Field<Profile, String> _f$username =
       Field('username', _$username);
+  static String _$displayName(Profile v) => v.displayName;
+  static const Field<Profile, String> _f$displayName =
+      Field('displayName', _$displayName, key: r'display_name');
   static String? _$role(Profile v) => v.role;
   static const Field<Profile, String> _f$role = Field('role', _$role);
   static String? _$avatarUrl(Profile v) => v.avatarUrl;
@@ -48,6 +51,7 @@ class ProfileMapper extends ClassMapperBase<Profile> {
   final MappableFields<Profile> fields = const {
     #id: _f$id,
     #username: _f$username,
+    #displayName: _f$displayName,
     #role: _f$role,
     #avatarUrl: _f$avatarUrl,
     #createdAt: _f$createdAt,
@@ -60,6 +64,7 @@ class ProfileMapper extends ClassMapperBase<Profile> {
     return Profile(
         id: data.dec(_f$id),
         username: data.dec(_f$username),
+        displayName: data.dec(_f$displayName),
         role: data.dec(_f$role),
         avatarUrl: data.dec(_f$avatarUrl),
         createdAt: data.dec(_f$createdAt),
@@ -121,6 +126,7 @@ abstract class ProfileCopyWith<$R, $In extends Profile, $Out>
   $R call(
       {String? id,
       String? username,
+      String? displayName,
       String? role,
       String? avatarUrl,
       DateTime? createdAt,
@@ -142,6 +148,7 @@ class _ProfileCopyWithImpl<$R, $Out>
   $R call(
           {String? id,
           String? username,
+          String? displayName,
           Object? role = $none,
           Object? avatarUrl = $none,
           DateTime? createdAt,
@@ -151,6 +158,7 @@ class _ProfileCopyWithImpl<$R, $Out>
       $apply(FieldCopyWithData({
         if (id != null) #id: id,
         if (username != null) #username: username,
+        if (displayName != null) #displayName: displayName,
         if (role != $none) #role: role,
         if (avatarUrl != $none) #avatarUrl: avatarUrl,
         if (createdAt != null) #createdAt: createdAt,
@@ -162,6 +170,7 @@ class _ProfileCopyWithImpl<$R, $Out>
   Profile $make(CopyWithData data) => Profile(
       id: data.get(#id, or: $value.id),
       username: data.get(#username, or: $value.username),
+      displayName: data.get(#displayName, or: $value.displayName),
       role: data.get(#role, or: $value.role),
       avatarUrl: data.get(#avatarUrl, or: $value.avatarUrl),
       createdAt: data.get(#createdAt, or: $value.createdAt),

@@ -17,3 +17,4 @@ export 'background_image_surface.dart';
 export 'editable_text_value.dart';
 export 'collapsing_header_item.dart';
 export 'markdown_text.dart';
+export 'placeholder_app_page.dart';
