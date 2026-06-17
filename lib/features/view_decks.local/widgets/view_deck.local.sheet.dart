@@ -9,7 +9,7 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
         Button,
-        ButtonTone,
+        ButtonColor,
         ChipTone,
         DeckDetails,
         Deck,
@@ -21,7 +21,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         SurfaceShape,
         SurfaceColor,
         TextSize,
-        TextTone,
+        TextColor,
         TextWeight,
         ViewDecksLocalController,
         appChipStyle,
@@ -252,7 +252,7 @@ class _Body extends StatelessWidget {
                 alignment: Alignment.topRight,
                 child: Button.icon(
                   icon: Icons.delete_outline,
-                  tone: ButtonTone.error,
+                  color: ButtonColor.error,
                   onPressed: onDeletePressed,
                 ),
               ),

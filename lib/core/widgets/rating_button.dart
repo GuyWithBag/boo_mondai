@@ -4,7 +4,12 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart'
-    show StudySessionController, StudyRating, ButtonTone, Button;
+    show
+        StudySessionController,
+        StudyRating,
+        ButtonVariant,
+        ButtonColor,
+        Button;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -26,26 +31,26 @@ class RatingButton extends StatelessWidget {
 
     late final String shortcut;
     late final String label;
-    late final ButtonTone tone;
+    late final ButtonColor color;
 
     switch (type) {
       case StudyRating.again:
       case StudyRating.incorrect: // Fallback just in case
         label = 'Again';
         shortcut = '1';
-        tone = ButtonTone.again;
+        color = ButtonColor.again;
       case StudyRating.hard:
         label = 'Hard';
         shortcut = '2';
-        tone = ButtonTone.hard;
+        color = ButtonColor.hard;
       case StudyRating.good:
         label = 'Good';
         shortcut = '3';
-        tone = ButtonTone.good;
+        color = ButtonColor.good;
       case StudyRating.easy:
         label = 'Easy';
         shortcut = '4';
-        tone = ButtonTone.easy;
+        color = ButtonColor.easy;
     }
 
     return Expanded(
@@ -53,7 +58,7 @@ class RatingButton extends StatelessWidget {
         message: 'Press $shortcut',
         child: Button(
           onPressed: onTap,
-          variants: [tone],
+          variants: [ButtonVariant.soft, color],
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [

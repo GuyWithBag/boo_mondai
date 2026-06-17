@@ -7,7 +7,7 @@ enum SurfaceTone { none, streak, primarySoft }
 
 enum SurfaceColor { baseline, muted, dark, header }
 
-enum SurfaceShape { rounded, cardShape, sharp, topRounded }
+enum SurfaceShape { rounded, roundedSm, cardShape, sharp, topRounded }
 
 enum SurfacePadding { normal, text, none }
 
@@ -123,6 +123,13 @@ final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
       SurfaceStylePart.decoration({
         DecorationPart.borderRadius(
           BorderRadius.circular(tokens.radiusSurface.r),
+        ),
+      }),
+    },
+    SurfaceShape.roundedSm: (tokens) => {
+      SurfaceStylePart.decoration({
+        DecorationPart.borderRadius(
+          BorderRadius.circular(tokens.radiusSurfaceSm.r),
         ),
       }),
     },

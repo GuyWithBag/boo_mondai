@@ -5,6 +5,7 @@ import 'package:theme_variants/theme_variants.dart';
 enum TextSize {
   headerLarge,
   header,
+  header2,
   labelLarge,
   label,
   labelSmall,
@@ -16,7 +17,7 @@ enum TextSize {
 
 enum TextWeight { body, strong, heavy }
 
-enum TextTone { baseline, secondary, muted, brand }
+enum TextColor { baseline, muted, brand }
 
 final textStyle = VariantStyle.textParts<AppTokens>(
   base: (tokens) => {
@@ -26,7 +27,7 @@ final textStyle = VariantStyle.textParts<AppTokens>(
   defaultVariants: const [
     TextSize.labelSmall,
     TextWeight.body,
-    TextTone.secondary,
+    TextColor.muted,
   ],
   variants: {
     TextSize.headerLarge: (tokens) => {
@@ -36,6 +37,10 @@ final textStyle = VariantStyle.textParts<AppTokens>(
     TextSize.header: (tokens) => {
       TextStylePart.fontSize(tokens.textSizeHeader.sp),
       TextStylePart.height(tokens.lineHeightTextDisplay),
+    },
+    TextSize.header2: (tokens) => {
+      TextStylePart.fontSize(tokens.textSizeHeader2.sp),
+      // TextStylePart.height(tokens.lineHeightTextDisplay),
     },
     TextSize.labelLarge: (tokens) => {
       TextStylePart.fontSize(tokens.textSizeLabelLarge.sp),
@@ -74,13 +79,10 @@ final textStyle = VariantStyle.textParts<AppTokens>(
     TextWeight.heavy: (tokens) => {
       TextStylePart.fontWeight(tokens.fontWeightTextHeavy),
     },
-    TextTone.baseline: (tokens) => {
+    TextColor.baseline: (tokens) => {
       TextStylePart.color(tokens.colorTextBaseline),
     },
-    TextTone.secondary: (tokens) => {
-      TextStylePart.color(tokens.colorTextSecondary),
-    },
-    TextTone.muted: (tokens) => {TextStylePart.color(tokens.colorTextMuted)},
-    TextTone.brand: (tokens) => {TextStylePart.color(tokens.colorPrimary)},
+    TextColor.muted: (tokens) => {TextStylePart.color(tokens.colorTextMuted)},
+    TextColor.brand: (tokens) => {TextStylePart.color(tokens.colorPrimary)},
   },
 );

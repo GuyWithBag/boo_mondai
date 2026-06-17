@@ -64,7 +64,7 @@ class EditDeckAppbar extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Button(
-                variants: const [ButtonTone.filled],
+                variants: const [ButtonVariant.filled, ButtonColor.primary],
                 onPressed: isSaving ? null : onSave,
                 child: isSaving
                     ? const SizedBox.square(

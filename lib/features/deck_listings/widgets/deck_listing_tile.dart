@@ -12,7 +12,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         textStyle,
         TextSize,
         TextWeight,
-        TextTone,
+        TextColor,
         HeaderBadge;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -172,7 +172,7 @@ class DeckListingTile extends HookWidget {
                       style: textStyle.resolve(tokens, const [
                         TextSize.label,
                         TextWeight.body,
-                        TextTone.secondary,
+                        TextColor.muted,
                       ]),
                     ),
                     SizedBox(height: tokens.spaceLayoutGapMd),
@@ -348,7 +348,7 @@ class _CreatorBadge extends StatelessWidget {
               'By',
               style: textStyle.resolve(tokens, const [
                 TextSize.labelSmall,
-                TextTone.secondary,
+                TextColor.muted,
               ]),
             ),
             Text(

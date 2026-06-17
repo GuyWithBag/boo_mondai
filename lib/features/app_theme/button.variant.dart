@@ -9,24 +9,20 @@ enum ButtonState { idle, hovered, selected, disabled, pressed }
 
 enum ButtonDepth { flat, elevated, mechanical }
 
-enum ButtonTone {
-  filled,
-  ghost,
+enum ButtonVariant { filled, ghost, soft, muted, dashed, text }
+
+enum ButtonColor {
+  primary,
+  neutral,
   success,
   error,
   streak,
-  dashed,
-  textGhostSelect,
-  text,
-  smallIcon,
+  google,
+  mono,
   again,
   hard,
   good,
   easy,
-  mechanicalFilled,
-  mechanicalGhost,
-  google,
-  mono,
 }
 
 final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
@@ -42,13 +38,14 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
     }),
   },
   defaultVariants: const [
-    ButtonTone.ghost,
+    ButtonVariant.ghost,
+    ButtonColor.neutral,
     ButtonSize.md,
     ButtonState.idle,
     ButtonDepth.elevated,
   ],
   variants: {
-    ButtonTone.filled: (tokens) => {
+    ButtonVariant.filled: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.colorPrimary),
         DecorationPart.border(
@@ -67,7 +64,7 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
       SurfaceStylePart.text({TextStylePart.color(tokens.colorTextOnBrand)}),
       SurfaceStylePart.icon({IconThemePart.color(tokens.colorTextOnBrand)}),
     },
-    ButtonTone.ghost: (tokens) => {
+    ButtonVariant.ghost: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.colorSurfaceBackground),
         DecorationPart.border(
@@ -86,7 +83,53 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
       SurfaceStylePart.text({TextStylePart.color(tokens.colorTextBaseline)}),
       SurfaceStylePart.icon({IconThemePart.color(tokens.colorTextBaseline)}),
     },
-    ButtonTone.success: (tokens) => {
+    ButtonVariant.soft: (_) => const <StylePart<SurfaceStyle>>{},
+    ButtonVariant.muted: (tokens) => {
+      SurfaceStylePart.decoration({
+        DecorationPart.color(tokens.colorTransparent),
+        DecorationPart.border(
+          Border.all(color: tokens.colorTransparent, width: 0),
+        ),
+        DecorationPart.boxShadow(const []),
+      }),
+
+      SurfaceStylePart.text({TextStylePart.color(tokens.colorTextMuted)}),
+      SurfaceStylePart.icon({IconThemePart.color(tokens.colorTextMuted)}),
+    },
+    ButtonVariant.dashed: (tokens) => {
+      SurfaceStylePart.decoration({
+        DecorationPart.color(tokens.colorMuted),
+        DecorationPart.border(
+          Border.all(
+            color: tokens.colorTransparent,
+            width: tokens.borderWidthDefault.w,
+          ),
+        ),
+        DecorationPart.boxShadow(const []),
+      }),
+      SurfaceStylePart.text({TextStylePart.color(tokens.colorTextMuted)}),
+      SurfaceStylePart.icon({IconThemePart.color(tokens.colorTextMuted)}),
+    },
+    ButtonVariant.text: (tokens) => {
+      SurfaceStylePart.decoration({
+        DecorationPart.color(tokens.colorTransparent),
+        DecorationPart.border(
+          Border.all(color: tokens.colorTransparent, width: 0),
+        ),
+        DecorationPart.boxShadow(const []),
+      }),
+      SurfaceStylePart.text({TextStylePart.color(tokens.colorTextSecondary)}),
+      SurfaceStylePart.icon({IconThemePart.color(tokens.colorTextSecondary)}),
+    },
+    ButtonColor.primary: (tokens) => {
+      SurfaceStylePart.text({TextStylePart.color(tokens.colorTextBaseline)}),
+      SurfaceStylePart.icon({IconThemePart.color(tokens.colorTextBaseline)}),
+    },
+    ButtonColor.neutral: (tokens) => {
+      SurfaceStylePart.text({TextStylePart.color(tokens.colorTextBaseline)}),
+      SurfaceStylePart.icon({IconThemePart.color(tokens.colorTextBaseline)}),
+    },
+    ButtonColor.success: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.colorActionSuccessBackground),
         DecorationPart.border(
@@ -105,7 +148,7 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
       SurfaceStylePart.text({TextStylePart.color(tokens.colorActionSuccess)}),
       SurfaceStylePart.icon({IconThemePart.color(tokens.colorActionSuccess)}),
     },
-    ButtonTone.error: (tokens) => {
+    ButtonColor.error: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.colorActionErrorBackground),
         DecorationPart.border(
@@ -124,7 +167,7 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
       SurfaceStylePart.text({TextStylePart.color(tokens.colorActionError)}),
       SurfaceStylePart.icon({IconThemePart.color(tokens.colorActionError)}),
     },
-    ButtonTone.streak: (tokens) => {
+    ButtonColor.streak: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.colorStreak),
         DecorationPart.border(
@@ -143,21 +186,7 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
       SurfaceStylePart.text({TextStylePart.color(tokens.colorTextOnBrand)}),
       SurfaceStylePart.icon({IconThemePart.color(tokens.colorTextOnBrand)}),
     },
-    ButtonTone.dashed: (tokens) => {
-      SurfaceStylePart.decoration({
-        DecorationPart.color(tokens.colorMuted),
-        DecorationPart.border(
-          Border.all(
-            color: tokens.colorTransparent,
-            width: tokens.borderWidthDefault.w,
-          ),
-        ),
-        DecorationPart.boxShadow(const []),
-      }),
-      SurfaceStylePart.text({TextStylePart.color(tokens.colorTextMuted)}),
-      SurfaceStylePart.icon({IconThemePart.color(tokens.colorTextMuted)}),
-    },
-    ButtonTone.google: (tokens) => {
+    ButtonColor.google: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.colorGoogle),
         DecorationPart.border(
@@ -176,7 +205,7 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
       SurfaceStylePart.text({TextStylePart.color(tokens.colorTextOnBrand)}),
       SurfaceStylePart.icon({IconThemePart.color(tokens.colorTextOnBrand)}),
     },
-    ButtonTone.mono: (tokens) => {
+    ButtonColor.mono: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.colorMono),
         DecorationPart.border(
@@ -195,29 +224,7 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
       SurfaceStylePart.text({TextStylePart.color(tokens.colorTextOnMono)}),
       SurfaceStylePart.icon({IconThemePart.color(tokens.colorTextOnMono)}),
     },
-    ButtonTone.textGhostSelect: (tokens) => {
-      SurfaceStylePart.decoration({
-        DecorationPart.color(tokens.colorTransparent),
-        DecorationPart.border(
-          Border.all(color: tokens.colorTransparent, width: 0),
-        ),
-        DecorationPart.boxShadow(const []),
-      }),
-      SurfaceStylePart.text({TextStylePart.color(tokens.colorTextSecondary)}),
-      SurfaceStylePart.icon({IconThemePart.color(tokens.colorTextSecondary)}),
-    },
-    ButtonTone.text: (tokens) => {
-      SurfaceStylePart.decoration({
-        DecorationPart.color(tokens.colorTransparent),
-        DecorationPart.border(
-          Border.all(color: tokens.colorTransparent, width: 0),
-        ),
-        DecorationPart.boxShadow(const []),
-      }),
-      SurfaceStylePart.text({TextStylePart.color(tokens.colorTextSecondary)}),
-      SurfaceStylePart.icon({IconThemePart.color(tokens.colorTextSecondary)}),
-    },
-    ButtonTone.again: (tokens) => {
+    ButtonColor.again: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.colorRatingAgainBackground),
         DecorationPart.border(
@@ -236,7 +243,7 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
       SurfaceStylePart.text({TextStylePart.color(tokens.colorRatingAgainText)}),
       SurfaceStylePart.icon({IconThemePart.color(tokens.colorRatingAgainText)}),
     },
-    ButtonTone.hard: (tokens) => {
+    ButtonColor.hard: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.colorRatingHardBackground),
         DecorationPart.border(
@@ -255,7 +262,7 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
       SurfaceStylePart.text({TextStylePart.color(tokens.colorRatingHardText)}),
       SurfaceStylePart.icon({IconThemePart.color(tokens.colorRatingHardText)}),
     },
-    ButtonTone.good: (tokens) => {
+    ButtonColor.good: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.colorRatingGoodBackground),
         DecorationPart.border(
@@ -274,7 +281,7 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
       SurfaceStylePart.text({TextStylePart.color(tokens.colorRatingGoodText)}),
       SurfaceStylePart.icon({IconThemePart.color(tokens.colorRatingGoodText)}),
     },
-    ButtonTone.easy: (tokens) => {
+    ButtonColor.easy: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.colorRatingEasyBackground),
         DecorationPart.border(
@@ -292,41 +299,6 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
       }),
       SurfaceStylePart.text({TextStylePart.color(tokens.colorRatingEasyText)}),
       SurfaceStylePart.icon({IconThemePart.color(tokens.colorRatingEasyText)}),
-    },
-    ButtonTone.mechanicalFilled: (tokens) => {
-      SurfaceStylePart.decoration({
-        DecorationPart.color(tokens.colorPrimary),
-        DecorationPart.border(
-          Border.all(
-            color: tokens.colorPrimaryDim,
-            width: tokens.borderWidthDefault.w,
-          ),
-        ),
-        DecorationPart.boxShadow([
-          BoxShadow(color: tokens.colorPrimaryDim, offset: Offset(0, 8.h)),
-        ]),
-      }),
-      SurfaceStylePart.text({TextStylePart.color(tokens.colorTextOnBrand)}),
-      SurfaceStylePart.icon({IconThemePart.color(tokens.colorTextOnBrand)}),
-    },
-    ButtonTone.mechanicalGhost: (tokens) => {
-      SurfaceStylePart.decoration({
-        DecorationPart.color(tokens.colorSurfaceBackground),
-        DecorationPart.border(
-          Border.all(
-            color: tokens.colorTextMuted.withValues(alpha: 0.45),
-            width: tokens.borderWidthDefault.w,
-          ),
-        ),
-        DecorationPart.boxShadow([
-          BoxShadow(
-            color: tokens.colorTextMuted.withValues(alpha: 0.45),
-            offset: Offset(0, 8.h),
-          ),
-        ]),
-      }),
-      SurfaceStylePart.text({TextStylePart.color(tokens.colorTextBaseline)}),
-      SurfaceStylePart.icon({IconThemePart.color(tokens.colorTextSecondary)}),
     },
     ButtonSize.sm: (tokens) => {
       SurfaceStylePart.padding(
@@ -360,8 +332,8 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
       SurfaceStylePart.padding(EdgeInsets.zero),
       SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconMd.sp)}),
       SurfaceStylePart.text({TextStylePart.fontSize(tokens.textSizeLabel.sp)}),
-      SurfaceStylePart.height(48.h),
-      SurfaceStylePart.width(48.w),
+      SurfaceStylePart.height(tokens.sizeIconMd.h),
+      SurfaceStylePart.width(tokens.sizeIconMd.w),
     },
     ButtonSize.iconWithLabel: (tokens) => {
       SurfaceStylePart.padding(
@@ -424,7 +396,7 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
   },
   compoundVariants: [
     CompoundVariantParts<AppTokens, SurfaceStyle>(
-      when: const {ButtonTone.textGhostSelect, ButtonState.selected},
+      when: const {ButtonVariant.text, ButtonState.selected},
       build: (tokens) => {
         SurfaceStylePart.decoration({
           DecorationPart.color(tokens.colorPrimarySoft),
@@ -446,7 +418,47 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
       },
     ),
     CompoundVariantParts<AppTokens, SurfaceStyle>(
-      when: const {ButtonTone.mechanicalFilled, ButtonState.hovered},
+      when: const {ButtonVariant.filled, ButtonDepth.mechanical},
+      build: (tokens) => {
+        SurfaceStylePart.decoration({
+          DecorationPart.border(
+            Border.all(
+              color: tokens.colorPrimaryDim,
+              width: tokens.borderWidthDefault.w,
+            ),
+          ),
+          DecorationPart.boxShadow([
+            BoxShadow(color: tokens.colorPrimaryDim, offset: Offset(0, 8.h)),
+          ]),
+        }),
+      },
+    ),
+    CompoundVariantParts<AppTokens, SurfaceStyle>(
+      when: const {ButtonVariant.ghost, ButtonDepth.mechanical},
+      build: (tokens) => {
+        SurfaceStylePart.decoration({
+          DecorationPart.border(
+            Border.all(
+              color: tokens.colorTextMuted.withValues(alpha: 0.45),
+              width: tokens.borderWidthDefault.w,
+            ),
+          ),
+          DecorationPart.boxShadow([
+            BoxShadow(
+              color: tokens.colorTextMuted.withValues(alpha: 0.45),
+              offset: Offset(0, 8.h),
+            ),
+          ]),
+        }),
+        SurfaceStylePart.icon({IconThemePart.color(tokens.colorTextSecondary)}),
+      },
+    ),
+    CompoundVariantParts<AppTokens, SurfaceStyle>(
+      when: const {
+        ButtonVariant.filled,
+        ButtonDepth.mechanical,
+        ButtonState.hovered,
+      },
       build: (tokens) => {
         SurfaceStylePart.decoration({
           DecorationPart.color(tokens.colorPrimary.withValues(alpha: 0.88)),
@@ -454,7 +466,11 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
       },
     ),
     CompoundVariantParts<AppTokens, SurfaceStyle>(
-      when: const {ButtonTone.mechanicalGhost, ButtonState.hovered},
+      when: const {
+        ButtonVariant.ghost,
+        ButtonDepth.mechanical,
+        ButtonState.hovered,
+      },
       build: (tokens) => {
         SurfaceStylePart.decoration({DecorationPart.color(tokens.colorMuted)}),
       },
@@ -481,7 +497,7 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
       },
     ),
     CompoundVariantParts<AppTokens, SurfaceStyle>(
-      when: const {ButtonTone.dashed, ButtonState.hovered},
+      when: const {ButtonVariant.dashed, ButtonState.hovered},
       build: (tokens) => {
         SurfaceStylePart.decoration({
           DecorationPart.color(tokens.colorPrimarySoft),
@@ -491,7 +507,7 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
       },
     ),
     CompoundVariantParts<AppTokens, SurfaceStyle>(
-      when: const {ButtonTone.ghost, ButtonState.selected},
+      when: const {ButtonVariant.ghost, ButtonState.selected},
       build: (tokens) => {
         SurfaceStylePart.decoration({
           DecorationPart.color(tokens.colorPrimarySoft),
@@ -513,7 +529,7 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
       },
     ),
     CompoundVariantParts<AppTokens, SurfaceStyle>(
-      when: const {ButtonTone.again, ButtonState.hovered},
+      when: const {ButtonColor.again, ButtonState.hovered},
       build: (tokens) => {
         SurfaceStylePart.decoration({
           DecorationPart.color(tokens.colorRatingAgainHoverBackground),
@@ -521,7 +537,7 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
       },
     ),
     CompoundVariantParts<AppTokens, SurfaceStyle>(
-      when: const {ButtonTone.hard, ButtonState.hovered},
+      when: const {ButtonColor.hard, ButtonState.hovered},
       build: (tokens) => {
         SurfaceStylePart.decoration({
           DecorationPart.color(tokens.colorRatingHardHoverBackground),
@@ -529,7 +545,7 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
       },
     ),
     CompoundVariantParts<AppTokens, SurfaceStyle>(
-      when: const {ButtonTone.good, ButtonState.hovered},
+      when: const {ButtonColor.good, ButtonState.hovered},
       build: (tokens) => {
         SurfaceStylePart.decoration({
           DecorationPart.color(tokens.colorRatingGoodHoverBackground),
@@ -537,7 +553,7 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
       },
     ),
     CompoundVariantParts<AppTokens, SurfaceStyle>(
-      when: const {ButtonTone.easy, ButtonState.hovered},
+      when: const {ButtonColor.easy, ButtonState.hovered},
       build: (tokens) => {
         SurfaceStylePart.decoration({
           DecorationPart.color(tokens.colorRatingEasyHoverBackground),
@@ -545,11 +561,11 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
       },
     ),
     CompoundVariantParts<AppTokens, SurfaceStyle>(
-      when: const {ButtonDepth.flat, ButtonState.disabled, ButtonTone.ghost},
+      when: const {ButtonDepth.flat, ButtonState.disabled, ButtonVariant.ghost},
       build: (_) => {SurfaceStylePart.opacity(0.5)},
     ),
     CompoundVariantParts<AppTokens, SurfaceStyle>(
-      when: const {ButtonTone.success, ButtonState.disabled},
+      when: const {ButtonColor.success, ButtonState.disabled},
       build: (tokens) => {
         SurfaceStylePart.decoration({
           DecorationPart.color(tokens.colorActionSuccessBackground),
@@ -571,7 +587,7 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
       },
     ),
     CompoundVariantParts<AppTokens, SurfaceStyle>(
-      when: const {ButtonTone.error, ButtonState.disabled},
+      when: const {ButtonColor.error, ButtonState.disabled},
       build: (tokens) => {
         SurfaceStylePart.decoration({
           DecorationPart.color(tokens.colorActionErrorBackground),
@@ -590,25 +606,25 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
   ],
 );
 
-final mechanicalFabIconBadgeStyle = VariantStyle.surfaceParts<AppTokens>(
-  base: (tokens) => {
-    SurfaceStylePart.decoration({
-      DecorationPart.color(tokens.colorMuted),
-      DecorationPart.borderRadius(BorderRadius.circular(12.r)),
-      DecorationPart.border(
-        Border.all(
-          color: tokens.colorBorderNeutralSubtle,
-          width: tokens.borderWidthDefault.w / 2,
-        ),
-      ),
-      DecorationPart.boxShadow(const []),
-    }),
-    SurfaceStylePart.icon({
-      IconThemePart.color(tokens.colorTextSecondary),
-      IconThemePart.size(tokens.sizeIconMd.sp),
-    }),
-    SurfaceStylePart.height(32.h),
-    SurfaceStylePart.width(32.w),
-    SurfaceStylePart.padding(EdgeInsets.zero),
-  },
-);
+// final mechanicalFabIconBadgeStyle = VariantStyle.surfaceParts<AppTokens>(
+//   base: (tokens) => {
+//     SurfaceStylePart.decoration({
+//       DecorationPart.color(tokens.colorMuted),
+//       DecorationPart.borderRadius(BorderRadius.circular(12.r)),
+//       DecorationPart.border(
+//         Border.all(
+//           color: tokens.colorBorderNeutralSubtle,
+//           width: tokens.borderWidthDefault.w / 2,
+//         ),
+//       ),
+//       DecorationPart.boxShadow(const []),
+//     }),
+//     SurfaceStylePart.icon({
+//       IconThemePart.color(tokens.colorTextSecondary),
+//       IconThemePart.size(tokens.sizeIconMd.sp),
+//     }),
+//     SurfaceStylePart.height(32.h),
+//     SurfaceStylePart.width(32.w),
+//     SurfaceStylePart.padding(EdgeInsets.zero),
+//   },
+// );

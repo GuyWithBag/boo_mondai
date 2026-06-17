@@ -2,7 +2,6 @@
 
 // Other files
 export 'app_theme.dart';
-export 'app_tokens.shared.dart';
 export 'breakpoints.dart';
 export 'default_light.theme.dart';
 export 'default_dark.theme.dart';

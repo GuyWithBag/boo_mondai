@@ -2,7 +2,8 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         ButtonSize,
         ButtonDepth,
-        ButtonTone,
+        ButtonColor,
+        ButtonVariant,
         ButtonState,
         AppTokens,
         buttonStyle;
@@ -20,7 +21,8 @@ class Button extends HookWidget {
     this.mainAxisAlignment = MainAxisAlignment.center,
     this.axis = Axis.horizontal,
     this.variants = const [
-      ButtonTone.ghost,
+      ButtonVariant.ghost,
+      ButtonColor.neutral,
       ButtonSize.md,
       ButtonDepth.elevated,
     ],
@@ -39,7 +41,8 @@ class Button extends HookWidget {
   static Button icon({
     VoidCallback? onPressed,
     IconData? icon,
-    ButtonTone tone = ButtonTone.ghost,
+    ButtonVariant variant = ButtonVariant.ghost,
+    ButtonColor color = ButtonColor.neutral,
     ButtonDepth depth = ButtonDepth.elevated,
     bool selected = false,
   }) {
@@ -47,22 +50,23 @@ class Button extends HookWidget {
       onPressed: onPressed,
       leading: icon == null ? null : Icon(icon),
       selected: selected,
-      variants: [tone, ButtonSize.icon, depth],
+      variants: [variant, color, ButtonSize.icon, depth],
     );
   }
 
   static Button iconSmall({
     VoidCallback? onPressed,
     IconData? icon,
-    ButtonTone tone = ButtonTone.ghost,
-    ButtonDepth depth = ButtonDepth.elevated,
+    ButtonVariant variant = ButtonVariant.text,
+    ButtonColor color = ButtonColor.neutral,
+    ButtonDepth depth = ButtonDepth.flat,
     bool selected = false,
   }) {
     return Button(
       onPressed: onPressed,
       leading: icon == null ? null : Icon(icon),
       selected: selected,
-      variants: [tone, ButtonSize.smallIcon, depth],
+      variants: [variant, color, ButtonSize.smallIcon, depth],
     );
   }
 
@@ -70,7 +74,8 @@ class Button extends HookWidget {
     VoidCallback? onPressed,
     IconData? icon,
     required String label,
-    ButtonTone tone = ButtonTone.ghost,
+    ButtonVariant variant = ButtonVariant.ghost,
+    ButtonColor color = ButtonColor.neutral,
     bool selected = false,
   }) {
     return Button(
@@ -78,7 +83,7 @@ class Button extends HookWidget {
       leading: icon == null ? null : Icon(icon),
       selected: selected,
       axis: Axis.vertical,
-      variants: [tone, ButtonSize.iconWithLabel],
+      variants: [variant, color, ButtonSize.iconWithLabel],
       child: Text(
         label,
         maxLines: 2,
@@ -161,7 +166,7 @@ class Button extends HookWidget {
       child: contentChild,
     );
 
-    final paintedContent = variants.contains(ButtonTone.dashed)
+    final paintedContent = variants.contains(ButtonVariant.dashed)
         ? SizedBox(
             width: double.infinity,
             child: CustomPaint(

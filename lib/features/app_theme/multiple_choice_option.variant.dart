@@ -1,5 +1,5 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, ButtonTone, TextTone;
+    show AppTokens, ButtonVariant, ButtonColor, TextColor;
 import 'package:theme_variants/theme_variants.dart';
 
 enum MultipleChoiceOptionState { idle, hovered, selected, faded, disabled }
@@ -8,20 +8,20 @@ enum MultipleChoiceOptionTone { neutral, success, error }
 
 class MultipleChoiceOptionStyle {
   const MultipleChoiceOptionStyle({
-    this.buttonTone,
+    this.buttonVariants,
     this.selected,
     this.opacity,
     this.textTone,
   });
 
-  final ButtonTone? buttonTone;
+  final List<Object>? buttonVariants;
   final bool? selected;
   final double? opacity;
-  final TextTone? textTone;
+  final TextColor? textTone;
 
   MultipleChoiceOptionStyle merge(MultipleChoiceOptionStyle other) {
     return MultipleChoiceOptionStyle(
-      buttonTone: other.buttonTone ?? buttonTone,
+      buttonVariants: other.buttonVariants ?? buttonVariants,
       selected: other.selected ?? selected,
       opacity: other.opacity ?? opacity,
       textTone: other.textTone ?? textTone,
@@ -32,7 +32,7 @@ class MultipleChoiceOptionStyle {
 final multipleChoiceOptionStyle =
     VariantStyle<AppTokens, MultipleChoiceOptionStyle>(
       base: (_) => const MultipleChoiceOptionStyle(
-        buttonTone: ButtonTone.ghost,
+        buttonVariants: [ButtonVariant.ghost, ButtonColor.neutral],
         selected: false,
         opacity: 1,
       ),
@@ -47,22 +47,27 @@ final multipleChoiceOptionStyle =
         MultipleChoiceOptionState.hovered: (_) =>
             const MultipleChoiceOptionStyle(
               selected: true,
-              textTone: TextTone.brand,
+              textTone: TextColor.brand,
             ),
         MultipleChoiceOptionState.selected: (_) =>
             const MultipleChoiceOptionStyle(
               selected: true,
-              textTone: TextTone.brand,
+              textTone: TextColor.brand,
             ),
         MultipleChoiceOptionState.faded: (_) =>
             const MultipleChoiceOptionStyle(opacity: 0.5),
         MultipleChoiceOptionState.disabled: (_) =>
             const MultipleChoiceOptionStyle(opacity: 0.5),
         MultipleChoiceOptionTone.neutral: (_) =>
-            const MultipleChoiceOptionStyle(buttonTone: ButtonTone.ghost),
+            const MultipleChoiceOptionStyle(
+              buttonVariants: [ButtonVariant.ghost, ButtonColor.neutral],
+            ),
         MultipleChoiceOptionTone.success: (_) =>
-            const MultipleChoiceOptionStyle(buttonTone: ButtonTone.success),
-        MultipleChoiceOptionTone.error: (_) =>
-            const MultipleChoiceOptionStyle(buttonTone: ButtonTone.error),
+            const MultipleChoiceOptionStyle(
+              buttonVariants: [ButtonVariant.soft, ButtonColor.success],
+            ),
+        MultipleChoiceOptionTone.error: (_) => const MultipleChoiceOptionStyle(
+          buttonVariants: [ButtonVariant.soft, ButtonColor.error],
+        ),
       },
     );

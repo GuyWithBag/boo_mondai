@@ -2,11 +2,7 @@
 
 // Other files
 export 'back_button.dart';
-export 'button.dart';
-export 'button.variant.dart';
 export 'chip.variant.dart';
-export 'choice_modal.dart';
-export 'floating_action_button.dart';
 export 'header_badge.dart';
 export 'header_badge.variant.dart';
 export 'loading_indicator.dart';
@@ -14,7 +10,6 @@ export 'meta_label.dart';
 export 'meta_label.variant.dart';
 export 'modal.dart';
 export 'modal.variant.dart';
-export 'multiple_choice_option.variant.dart';
 export 'panel_header.dart';
 export 'progress_bar.dart';
 export 'responsive_scaffold.dart';
@@ -34,3 +29,8 @@ export 'chip_input.dart';
 export 'chip_input.hook.dart';
 export 'snackbar.dart';
 export 'labeled_divider.dart';
+export 'choice_modal.dart';
+export 'floating_action_button.dart';
+export 'multiple_choice_option.variant.dart';
+export 'button.dart';
+export 'button.variant.dart';

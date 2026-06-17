@@ -27,11 +27,11 @@ class ChangeReviewPage extends StatelessWidget {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (context.canPop()) context.pop();
       });
-      return Scaffold(backgroundColor: tokens.colorPageBackground);
+      return Scaffold(backgroundColor: tokens.colorScaffoldBackground);
     }
 
     return Scaffold(
-      backgroundColor: tokens.colorPageBackground,
+      backgroundColor: tokens.colorScaffoldBackground,
       body: SafeArea(
         child: Column(
           children: [

@@ -5,7 +5,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextFieldSize,
         TextFieldTone,
         TextSize,
-        TextTone,
+        TextColor,
         TextWeight,
         VariantTextField,
         textStyle;
@@ -171,7 +171,7 @@ class MarkdownText extends HookWidget {
         textStyle.resolve(tokens, const [
           TextSize.label,
           TextWeight.body,
-          TextTone.baseline,
+          TextColor.baseline,
         ]);
 
     if (mode == MarkdownTextMode.input) {

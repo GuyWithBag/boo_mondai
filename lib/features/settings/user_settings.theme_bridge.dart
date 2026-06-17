@@ -129,46 +129,46 @@ class UserSettingsThemeBridge {
     final t = theme.tokens;
     final nextTokens = t.copyWith(
       colorPrimary: hasPrimary ? Color(override.primaryColorValue!) : null,
-      fontFamily: hasFont ? override.fontFamily!.trim() : null,
-      radiusSurface: radiusScale == null ? null : t.radiusSurface * radiusScale,
-      radiusSurfaceSm: radiusScale == null
-          ? null
-          : t.radiusSurfaceSm * radiusScale,
-      spaceScaffoldPadding: spacingScale == null
-          ? null
-          : t.spaceScaffoldPadding * spacingScale,
-      spaceLayoutPadding: spacingScale == null
-          ? null
-          : t.spaceLayoutPadding * spacingScale,
-      spaceLayoutGapLg: spacingScale == null
-          ? null
-          : t.spaceLayoutGapLg * spacingScale,
-      spaceLayoutGapMd: spacingScale == null
-          ? null
-          : t.spaceLayoutGapMd * spacingScale,
-      spaceLayoutGapSm: spacingScale == null
-          ? null
-          : t.spaceLayoutGapSm * spacingScale,
-      textSizeHeader: textScale == null ? null : t.textSizeHeader * textScale,
-      textSizeLabelLarge: textScale == null
-          ? null
-          : t.textSizeLabelLarge * textScale,
-      textSizeLabel: textScale == null ? null : t.textSizeLabel * textScale,
-      textSizeLabelSmall: textScale == null
-          ? null
-          : t.textSizeLabelSmall * textScale,
-      textSizeBodyLarge: textScale == null
-          ? null
-          : t.textSizeBodyLarge * textScale,
-      studyCardTextSizeFront: textScale == null
-          ? null
-          : t.studyCardTextSizeFront * textScale,
-      studyCardTextSizeBack: textScale == null
-          ? null
-          : t.studyCardTextSizeBack * textScale,
-      studyCardTextSizeBackContent: textScale == null
-          ? null
-          : t.studyCardTextSizeBackContent * textScale,
+      //   fontFamily: hasFont ? override.fontFamily!.trim() : null,
+      //   radiusSurface: radiusScale == null ? null : t.radiusSurface * radiusScale,
+      //   radiusSurfaceSm: radiusScale == null
+      //       ? null
+      //       : t.radiusSurfaceSm * radiusScale,
+      //   spaceScaffoldPadding: spacingScale == null
+      //       ? null
+      //       : t.spaceScaffoldPadding * spacingScale,
+      //   spaceLayoutPadding: spacingScale == null
+      //       ? null
+      //       : t.spaceLayoutPadding * spacingScale,
+      //   spaceLayoutGapLg: spacingScale == null
+      //       ? null
+      //       : t.spaceLayoutGapLg * spacingScale,
+      //   spaceLayoutGapMd: spacingScale == null
+      //       ? null
+      //       : t.spaceLayoutGapMd * spacingScale,
+      //   spaceLayoutGapSm: spacingScale == null
+      //       ? null
+      //       : t.spaceLayoutGapSm * spacingScale,
+      //   textSizeHeader: textScale == null ? null : t.textSizeHeader * textScale,
+      //   textSizeLabelLarge: textScale == null
+      //       ? null
+      //       : t.textSizeLabelLarge * textScale,
+      //   textSizeLabel: textScale == null ? null : t.textSizeLabel * textScale,
+      //   textSizeLabelSmall: textScale == null
+      //       ? null
+      //       : t.textSizeLabelSmall * textScale,
+      //   textSizeBodyLarge: textScale == null
+      //       ? null
+      //       : t.textSizeBodyLarge * textScale,
+      //   studyCardTextSizeFront: textScale == null
+      //       ? null
+      //       : t.studyCardTextSizeFront * textScale,
+      //   studyCardTextSizeBack: textScale == null
+      //       ? null
+      //       : t.studyCardTextSizeBack * textScale,
+      //   studyCardTextSizeBackContent: textScale == null
+      //       ? null
+      //       : t.studyCardTextSizeBackContent * textScale,
     );
 
     final brightness = switch (theme.brightness) {

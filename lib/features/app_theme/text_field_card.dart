@@ -5,7 +5,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         surfaceStyle,
         textStyle,
         TextWeight,
-        TextTone,
+        TextColor,
         TextFieldSize,
         TextFieldFrame,
         TextFieldTone,
@@ -47,7 +47,7 @@ class TextFieldCard extends StatelessWidget {
               style: textStyle.resolve(tokens, [
                 TextSize.labelSmall,
                 TextWeight.heavy,
-                TextTone.muted,
+                TextColor.muted,
               ]),
             ),
             SizedBox(height: tokens.spaceLayoutGapLg),

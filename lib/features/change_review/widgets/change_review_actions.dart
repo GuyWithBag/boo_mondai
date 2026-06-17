@@ -22,7 +22,7 @@ class ChangeReviewActions extends StatelessWidget {
     final tokens = context.themeTokens<AppTokens>();
 
     return DecoratedBox(
-      decoration: BoxDecoration(color: tokens.colorPageBackground),
+      decoration: BoxDecoration(color: tokens.colorScaffoldBackground),
       child: Padding(
         padding: EdgeInsets.all(tokens.spaceLayoutPadding.r),
         child: Column(

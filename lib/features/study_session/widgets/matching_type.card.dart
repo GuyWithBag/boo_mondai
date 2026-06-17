@@ -6,7 +6,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         textStyle,
         TextSize,
         TextWeight,
-        TextTone,
+        TextColor,
         PhysicalCardSide,
         Button;
 import 'package:flutter/material.dart';
@@ -80,7 +80,7 @@ class MatchingTypeCard extends HookWidget {
             style: textStyle.resolve(tokens, [
               TextSize.labelSmall,
               TextWeight.heavy,
-              TextTone.muted,
+              TextColor.muted,
             ]),
           ),
           SizedBox(height: 40.h),

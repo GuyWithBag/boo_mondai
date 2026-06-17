@@ -1,50 +1,58 @@
+import 'dart:ui' show BlendMode, Paint;
+
 import 'package:boo_mondai/lib.barrel.dart'
     show
+        AppSpacing,
         AppTokens,
-        surfaceStyle,
-        SurfaceColor,
         SurfaceBorder,
+        SurfaceColor,
         SurfacePadding,
-        SurfaceShape,
         SurfaceShadow,
-        AppSpacing;
+        SurfaceShape,
+        TextWeight,
+        surfaceStyle,
+        textStyle,
+        TextSize;
 import 'package:flutter/material.dart'
     show
         StatelessWidget,
         Widget,
         BuildContext,
         Color,
+        Clip,
         EdgeInsets,
         SizedBox,
         MediaQuery,
         ThemeMode,
         Brightness,
         HitTestBehavior,
-        Curves,
         BoxShape,
         BoxDecoration,
         AnimatedContainer,
-        AnimatedPositioned,
-        CrossAxisAlignment,
-        Icons,
         Colors,
-        Icon,
-        Container,
         AnimatedRotation,
         TextAlign,
         Theme,
+        TextStyle,
         FontStyle,
         FontWeight,
         Text,
-        Expanded,
-        Row,
+        Center,
         Padding,
         Stack,
-        GestureDetector;
+        GestureDetector,
+        Positioned,
+        LayoutBuilder,
+        Curves,
+        Align,
+        Alignment;
+import 'package:flutter_hooks/flutter_hooks.dart'
+    show HookWidget, useEffect, useRef, useState;
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart'
     show ThemeVariantsContext, Surface;
 
-class DarkModeToggleCard extends StatelessWidget {
+class DarkModeToggleCard extends HookWidget {
   const DarkModeToggleCard({super.key});
 
   @override
@@ -56,107 +64,123 @@ class DarkModeToggleCard extends StatelessWidget {
       ThemeMode.light => false,
       ThemeMode.system => platformBrightness == Brightness.dark,
     };
+    final previousIsDark = useRef(isDark);
+    final orbitTurns = useState(0.0);
+    useEffect(() {
+      if (previousIsDark.value != isDark) {
+        previousIsDark.value = isDark;
+        orbitTurns.value += 1;
+      }
+      return null;
+    }, [isDark]);
+
     final tokens = context.themeTokens<AppTokens>();
+
+    final contrastTextPaint = Paint()
+      ..color = Colors.white
+      ..blendMode = BlendMode.difference;
+    final contrastTextStyle = textStyle
+        .resolve(tokens, const [TextWeight.heavy, TextSize.header2])
+        .copyWith(foreground: contrastTextPaint);
     final baseStyle = surfaceStyle.resolve(tokens, const [
       SurfaceColor.baseline,
-      SurfaceBorder.normal,
+      SurfaceBorder.none,
       SurfacePadding.none,
-      SurfaceShape.cardShape,
+      SurfaceShape.roundedSm,
       SurfaceShadow.normal,
     ]);
+    final height = 120.h;
     final style = baseStyle.copyWith(
       decoration: baseStyle.decoration.copyWith(
         color: isDark ? const Color(0xFF3F3F3F) : const Color(0xFF7EC8F5),
       ),
+      height: height,
+      clipBehavior: Clip.antiAlias,
     );
 
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: () async {
-        final nextMode = isDark ? ThemeMode.light : ThemeMode.dark;
-        controller.setThemeMode(nextMode);
-        // TODO:
-        // await UserSettingsService.updateThemeMode(
-        //   userId: LocalDB.profile.getOrCreate().id,
-        //   themeMode: nextMode,
-        // );
-      },
-      child: Surface(
-        style: style,
-        child: SizedBox(
-          height: 140,
-          child: Stack(
-            children: [
-              AnimatedPositioned(
-                duration: const Duration(milliseconds: 360),
-                curve: Curves.easeOutCubic,
-                left: isDark ? 12 : 120,
-                bottom: -92,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 360),
-                  width: 300,
-                  height: 220,
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? const Color(0xFFD7D7D7)
-                        : const Color(0xFFFFD75A),
-                    shape: BoxShape.circle,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        final orbitRadius = width * 0.95;
+        final orbitDiameter = orbitRadius * 2;
+        final anchorX = -width * 0.3;
+        final anchorY = height * 2.3;
+        final moonDiameter = 300.r;
+
+        return GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () async {
+            final nextMode = isDark ? ThemeMode.light : ThemeMode.dark;
+            controller.setThemeMode(nextMode);
+          },
+          child: Surface(
+            style: style,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Positioned(
+                  left: anchorX - orbitRadius,
+                  top: anchorY - orbitRadius,
+                  child: AnimatedRotation(
+                    turns: orbitTurns.value,
+                    curve: Curves.easeInOut,
+                    duration: const Duration(milliseconds: 600),
+                    child: SizedBox(
+                      width: orbitDiameter,
+                      height: orbitDiameter,
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Positioned(
+                            left: orbitRadius + width * 0.72 - moonDiameter / 2,
+                            top: orbitRadius - height * 0.98 - moonDiameter / 2,
+                            child: _Moon(
+                              isDark: isDark,
+                              diameter: moonDiameter,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.lg,
-                  vertical: AppSpacing.md,
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    AnimatedRotation(
-                      turns: isDark ? 0 : 0.5,
-                      duration: const Duration(milliseconds: 360),
-                      curve: Curves.easeOutCubic,
-                      child: Container(
-                        width: 72,
-                        height: 72,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: isDark
-                              ? const Color(0xFF232323)
-                              : const Color(0xFFFFD75A),
-                        ),
-                        child: Icon(
-                          isDark
-                              ? Icons.nightlight_round
-                              : Icons.wb_sunny_rounded,
-                          color: isDark
-                              ? Colors.white
-                              : const Color(0xFF4A3B00),
-                          size: 38,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: AppSpacing.lg),
-                    Expanded(
+                Positioned.fill(
+                  child: Padding(
+                    padding: EdgeInsets.all(tokens.spaceLayoutGapMd),
+                    child: Align(
+                      alignment: Alignment.centerRight,
                       child: Text(
                         isDark ? 'Toggle Light Mode' : 'Toggle Dark Mode',
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.headlineMedium
-                            ?.copyWith(
-                              color: isDark
-                                  ? Colors.white
-                                  : const Color(0xFF17324B),
-                              fontStyle: FontStyle.italic,
-                              fontWeight: FontWeight.w700,
-                            ),
+                        textAlign: TextAlign.right,
+                        style: contrastTextStyle,
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
+        );
+      },
+    );
+  }
+}
+
+class _Moon extends StatelessWidget {
+  const _Moon({required this.isDark, required this.diameter});
+
+  final bool isDark;
+  final double diameter;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 360),
+      width: diameter,
+      height: diameter,
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFFD7D7D7) : const Color(0xFFFFD75A),
+        shape: BoxShape.circle,
       ),
     );
   }

@@ -5,10 +5,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppModalTone,
         AppTokens,
         Button,
-        ButtonTone,
+        ButtonVariant,
+        ButtonColor,
         Modal,
         TextSize,
-        TextTone,
+        TextColor,
         TextWeight,
         textStyle;
 import 'package:flutter/material.dart';
@@ -80,7 +81,7 @@ class ExportPayloadModal extends StatelessWidget {
           ),
           Button(onPressed: saveToFile, child: const Text('Export to File')),
           Button(
-            variants: const [ButtonTone.filled],
+            variants: const [ButtonVariant.filled, ButtonColor.primary],
             onPressed: copyPayload,
             child: const Text('Copy JSON'),
           ),
@@ -104,7 +105,6 @@ class ExportPayloadModal extends StatelessWidget {
               style: textStyle.resolve(tokens, const [
                 TextSize.label,
                 TextWeight.body,
-                TextTone.secondary,
               ]),
             ),
             SizedBox(height: tokens.spaceLayoutGapLg),

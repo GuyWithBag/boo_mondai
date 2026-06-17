@@ -1,13 +1,13 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        ButtonTone,
+        ButtonVariant,
+        ButtonColor,
         AppModalTone,
         AppTokens,
         Button,
         textStyle,
         TextSize,
         TextWeight,
-        TextTone,
         Modal;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -16,12 +16,14 @@ class ModalAction<T> {
   const ModalAction({
     required this.value,
     required this.label,
-    this.tone = ButtonTone.ghost,
+    this.variant = ButtonVariant.ghost,
+    this.color = ButtonColor.neutral,
   });
 
   final T value;
   final String label;
-  final ButtonTone tone;
+  final ButtonVariant variant;
+  final ButtonColor color;
 }
 
 class ChoiceModal<T> extends StatelessWidget {
@@ -53,7 +55,7 @@ class ChoiceModal<T> extends StatelessWidget {
         actions: [
           for (final action in actions)
             Button(
-              variants: [action.tone],
+              variants: [action.variant, action.color],
               onPressed: () => Navigator.pop(context, action.value),
               child: Text(action.label),
             ),
@@ -77,7 +79,6 @@ class ChoiceModal<T> extends StatelessWidget {
               style: textStyle.resolve(tokens, const [
                 TextSize.label,
                 TextWeight.body,
-                TextTone.secondary,
               ]),
             ),
           ],

@@ -1,7 +1,7 @@
 // ── _SyncButton ─────────────────────────────────────────────────────────
 
 import 'package:boo_mondai/lib.barrel.dart'
-    show Button, ButtonTone, SnackbarTone, showSnackbar;
+    show Button, SnackbarTone, showSnackbar;
 import 'package:flutter/material.dart';
 
 /// AppBar action that drives the deck sync operation.

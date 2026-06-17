@@ -102,7 +102,8 @@ class ViewReviewsController extends Controller {
 
         combinedEntries.add(
           ReviewDeckEntry(
-            deck: deck ??
+            deck:
+                deck ??
                 Deck(
                   id: deckId,
                   userId: userId,

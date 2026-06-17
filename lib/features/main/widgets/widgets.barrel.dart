@@ -2,6 +2,6 @@
 
 // Other files
 export 'main.appbar.dart';
-export 'main.bottom_navbar.dart';
 export 'main.scaffold.dart';
+export 'main.bottom_navbar.dart';
 export 'main.sidebar.dart';

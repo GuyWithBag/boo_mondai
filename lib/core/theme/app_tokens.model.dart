@@ -36,7 +36,7 @@ borderWidthDefault
 Color tokens should describe use, prefixed with 'color'.
 
 Good:
-colorPageBackground
+colorScaffoldBackground
 colorSurfaceBackground
 colorTextBaseline
 colorTextSecondary
@@ -82,14 +82,13 @@ studyCardAspectRatio
 class AppTokens with AppTokensMappable {
   const AppTokens({
     required this.name,
-    required this.fontFamily,
     required this.colorPrimary,
     required this.colorPrimaryDim,
     required this.colorPrimaryBright,
     required this.colorPrimarySoft,
     required this.colorStreak,
     required this.colorStreakDim,
-    required this.colorPageBackground,
+    required this.colorScaffoldBackground,
     required this.colorSurfaceBackground,
     required this.colorBorderNeutralSubtle,
     required this.colorActionSuccess,
@@ -118,53 +117,16 @@ class AppTokens with AppTokensMappable {
     required this.colorRatingEasyText,
     required this.colorRatingEasyBorder,
     required this.colorRatingEasyHoverBackground,
-    required this.colorTransparent,
-    required this.colorTextOnBrand,
     required this.colorGoogle,
     required this.colorGoogleDim,
     required this.colorTextOnGoogle,
     required this.colorMono,
     required this.colorMonoDim,
     required this.colorTextOnMono,
-    required this.buttonShadowOffset,
-    required this.modalShadowOffset,
-    required this.fontWeightTextBody,
-    required this.fontWeightTextStrong,
-    required this.fontWeightTextHeavy,
-    required this.lineHeightTextBody,
-    required this.lineHeightTextTitle,
-    required this.lineHeightTextDisplay,
-    required this.lineHeightFieldDisplay,
-    required this.lineHeightButton,
-    required this.letterSpacingTextEyebrow,
-    required this.radiusSurfaceLg,
-    required this.radiusSurface,
-    required this.radiusSurfaceSm,
-    required this.borderWidthDefault,
-    required this.spaceScaffoldPadding,
-    required this.spaceLayoutPadding,
-    required this.spaceLayoutGapLg,
-    required this.spaceLayoutGapMd,
-    required this.spaceLayoutGapSm,
-    required this.spaceScaffoldMaxWidth,
-    required this.textSizeHeader,
-    required this.textSizeLabelLarge,
-    required this.textSizeLabel,
-    required this.textSizeLabelSmall,
-    required this.textSizeBodyLarge,
-    required this.sizeIconMd,
-    required this.sizeIconLg,
-    required this.studyCardWidth,
-    required this.studyCardAspectRatio,
-    required this.studyCardRadius,
-    required this.studyCardTextSizeFront,
-    required this.studyCardTextSizeBack,
-    required this.studyCardTextSizeBackContent,
-    required this.textSizeHeaderLarge,
   });
 
   final String name;
-  final String fontFamily;
+  final String fontFamily = 'Noto Sans';
 
   // Primary
   final Color colorPrimary;
@@ -177,7 +139,7 @@ class AppTokens with AppTokensMappable {
   final Color colorStreakDim;
 
   // Background
-  final Color colorPageBackground;
+  final Color colorScaffoldBackground;
   final Color colorSurfaceBackground;
 
   // Border
@@ -218,8 +180,8 @@ class AppTokens with AppTokensMappable {
   final Color colorRatingEasyHoverBackground;
 
   // Utility
-  final Color colorTransparent;
-  final Color colorTextOnBrand;
+  final Color colorTransparent = Colors.transparent;
+  final Color colorTextOnBrand = Colors.white;
 
   // Auth providers
   final Color colorGoogle;
@@ -229,58 +191,48 @@ class AppTokens with AppTokensMappable {
   final Color colorMonoDim;
   final Color colorTextOnMono;
 
-  // Shadow
-  final double buttonShadowOffset;
-  final double modalShadowOffset;
+  final double buttonShadowOffset = 8;
+  final double modalShadowOffset = 10;
 
-  // Font weight
-  final FontWeight fontWeightTextBody;
-  final FontWeight fontWeightTextStrong;
-  final FontWeight fontWeightTextHeavy;
+  final FontWeight fontWeightTextBody = FontWeight.w600;
+  final FontWeight fontWeightTextStrong = FontWeight.w800;
+  final FontWeight fontWeightTextHeavy = FontWeight.w900;
 
-  // Line height
-  final double lineHeightTextBody;
-  final double lineHeightTextTitle;
-  final double lineHeightTextDisplay;
-  final double lineHeightFieldDisplay;
-  final double lineHeightButton;
+  final double lineHeightTextBody = 1.45;
+  final double lineHeightTextTitle = 1.1;
+  final double lineHeightTextDisplay = 1.05;
+  final double lineHeightFieldDisplay = 1.15;
+  final double lineHeightButton = 1.1;
+  final double letterSpacingTextEyebrow = 1.6;
 
-  // Letter spacing
-  final double letterSpacingTextEyebrow;
+  final double borderWidthDefault = 2;
 
-  // Radius
-  final double radiusSurfaceLg;
-  final double radiusSurface;
-  final double radiusSurfaceSm;
+  final double spaceScaffoldPadding = 28;
+  final double spaceLayoutPadding = 20;
+  final double spaceLayoutGapLg = 24;
+  final double spaceLayoutGapMd = 18;
+  final double spaceLayoutGapSm = 8;
+  final double spaceScaffoldMaxWidth = 800;
 
-  // Border
-  final double borderWidthDefault;
+  final double radiusSurfaceLg = 60;
+  final double radiusSurface = 40;
+  final double radiusSurfaceSm = 16;
 
-  // Spacing
-  final double spaceScaffoldPadding;
-  final double spaceLayoutPadding;
-  final double spaceLayoutGapLg;
-  final double spaceLayoutGapMd;
-  final double spaceLayoutGapSm;
-  final double spaceScaffoldMaxWidth;
+  final double textSizeHeaderLarge = 36;
+  final double textSizeHeader = 24;
+  final double textSizeHeader2 = 30;
+  final double textSizeLabelLarge = 16;
+  final double textSizeLabel = 14;
+  final double textSizeLabelSmall = 10;
+  final double textSizeBodyLarge = 30;
 
-  // Text size
-  final double textSizeHeaderLarge;
-  final double textSizeHeader;
-  final double textSizeLabelLarge;
-  final double textSizeLabel;
-  final double textSizeLabelSmall;
-  final double textSizeBodyLarge;
+  final double sizeIconMd = 18;
+  final double sizeIconLg = 24;
 
-  // Icon size
-  final double sizeIconMd;
-  final double sizeIconLg;
-
-  // Study card
-  final double studyCardWidth;
-  final double studyCardAspectRatio;
-  final double studyCardRadius;
-  final double studyCardTextSizeFront;
-  final double studyCardTextSizeBack;
-  final double studyCardTextSizeBackContent;
+  final double studyCardAspectRatio = 5 / 7;
+  final double studyCardWidth = 300;
+  final double studyCardRadius = 16;
+  final double studyCardTextSizeFront = 68;
+  final double studyCardTextSizeBack = 42;
+  final double studyCardTextSizeBackContent = 34;
 }

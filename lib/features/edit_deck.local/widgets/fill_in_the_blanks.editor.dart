@@ -7,7 +7,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         textStyle,
         TextSize,
         TextWeight,
-        TextTone,
+        TextColor,
         TextFieldCard,
         Button,
         ButtonSize;
@@ -43,7 +43,7 @@ class FillInTheBlanksEditor extends HookWidget {
             style: textStyle.resolve(tokens, [
               TextSize.labelSmall,
               TextWeight.heavy,
-              TextTone.muted,
+              TextColor.muted,
             ]),
           ),
           const SizedBox(height: 14),
@@ -53,7 +53,7 @@ class FillInTheBlanksEditor extends HookWidget {
                 .resolve(tokens, [
                   TextSize.label,
                   TextWeight.body,
-                  TextTone.secondary,
+                  TextColor.muted,
                 ])
                 .copyWith(fontSize: 17),
           ),
@@ -113,7 +113,7 @@ class FillInTheBlanksEditor extends HookWidget {
               style: textStyle.resolve(tokens, [
                 TextSize.label,
                 TextWeight.body,
-                TextTone.secondary,
+                TextColor.muted,
               ]),
             )
           else
@@ -136,7 +136,7 @@ class FillInTheBlanksEditor extends HookWidget {
                             style: textStyle.resolve(tokens, [
                               TextSize.labelSmall,
                               TextWeight.heavy,
-                              TextTone.muted,
+                              TextColor.muted,
                             ]),
                           ),
                           const SizedBox(height: 4),

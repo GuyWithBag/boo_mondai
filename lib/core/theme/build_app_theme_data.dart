@@ -132,7 +132,7 @@ ThemeData buildAppThemeData(AppTokens tokens, Brightness brightness) {
     useMaterial3: true,
     brightness: brightness,
     colorScheme: scheme,
-    scaffoldBackgroundColor: tokens.colorPageBackground,
+    scaffoldBackgroundColor: tokens.colorScaffoldBackground,
     fontFamily: tokens.fontFamily,
     appBarTheme: AppBarTheme(
       backgroundColor: tokens.colorSurfaceBackground,

@@ -2,7 +2,8 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
         AppSpacing,
-        ButtonTone,
+        ButtonVariant,
+        ButtonColor,
         buttonStyle,
         ButtonSize,
         ButtonState,
@@ -21,26 +22,35 @@ class VariantShowcasePage extends StatelessWidget {
         padding: const EdgeInsets.all(AppSpacing.md),
         children: [
           VariantShowcaseGrid<AppTokens>(
-            title: const Text('Button tones'),
+            title: const Text('Button variants'),
             style: buttonStyle,
             previewText: 'Action',
             axes: const [
               VariantShowcaseAxis(
-                label: 'Tone',
+                label: 'Variant',
                 variants: [
-                  ButtonTone.filled,
-                  ButtonTone.ghost,
-                  ButtonTone.success,
-                  ButtonTone.error,
-                  ButtonTone.streak,
-                  ButtonTone.dashed,
-                  ButtonTone.text,
-                  ButtonTone.again,
-                  ButtonTone.hard,
-                  ButtonTone.good,
-                  ButtonTone.easy,
-                  ButtonTone.mechanicalFilled,
-                  ButtonTone.mechanicalGhost,
+                  ButtonVariant.filled,
+                  ButtonVariant.ghost,
+                  ButtonVariant.soft,
+                  ButtonVariant.muted,
+                  ButtonVariant.dashed,
+                  ButtonVariant.text,
+                ],
+              ),
+              VariantShowcaseAxis(
+                label: 'Color',
+                variants: [
+                  ButtonColor.primary,
+                  ButtonColor.neutral,
+                  ButtonColor.success,
+                  ButtonColor.error,
+                  ButtonColor.streak,
+                  ButtonColor.google,
+                  ButtonColor.mono,
+                  ButtonColor.again,
+                  ButtonColor.hard,
+                  ButtonColor.good,
+                  ButtonColor.easy,
                 ],
               ),
             ],
@@ -89,11 +99,12 @@ class VariantShowcasePage extends StatelessWidget {
             previewText: 'Action',
             axes: const [
               VariantShowcaseAxis(
-                label: 'Tone',
-                variants: [
-                  ButtonTone.mechanicalFilled,
-                  ButtonTone.mechanicalGhost,
-                ],
+                label: 'Variant',
+                variants: [ButtonVariant.filled, ButtonVariant.ghost],
+              ),
+              VariantShowcaseAxis(
+                label: 'Color',
+                variants: [ButtonColor.primary, ButtonColor.neutral],
               ),
               VariantShowcaseAxis(
                 label: 'Size',
@@ -101,7 +112,11 @@ class VariantShowcasePage extends StatelessWidget {
               ),
               VariantShowcaseAxis(
                 label: 'Depth',
-                variants: [ButtonDepth.mechanical],
+                variants: [
+                  ButtonDepth.elevated,
+                  ButtonDepth.flat,
+                  ButtonDepth.mechanical,
+                ],
               ),
             ],
           ),

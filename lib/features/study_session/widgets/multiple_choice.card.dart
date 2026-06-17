@@ -4,11 +4,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         StudySessionCardStageController,
         AppTokens,
         MultipleChoiceOption,
-        ButtonTone,
+        ButtonVariant,
+        ButtonColor,
         textStyle,
         TextSize,
         TextWeight,
-        TextTone,
+        TextColor,
         ButtonDepth,
         Button,
         PhysicalCardSide,
@@ -57,7 +58,7 @@ class MultipleChoiceCard extends HookWidget {
                 style: textStyle.resolve(tokens, [
                   TextSize.labelSmall,
                   TextWeight.heavy,
-                  TextTone.muted,
+                  TextColor.muted,
                 ]),
               ),
               SizedBox(height: 28.h),
@@ -71,7 +72,10 @@ class MultipleChoiceCard extends HookWidget {
                 SizedBox(
                   width: double.infinity,
                   child: Button(
-                    variants: [_optionTone(entry.value), ButtonDepth.flat],
+                    variants: [
+                      ..._optionVariants(entry.value),
+                      ButtonDepth.flat,
+                    ],
                     selected:
                         !isRevealed && selectedOption.value == entry.value.id,
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -97,18 +101,18 @@ class MultipleChoiceCard extends HookWidget {
     );
   }
 
-  ButtonTone _optionTone(MultipleChoiceOption option) {
+  List<Object> _optionVariants(MultipleChoiceOption option) {
     final isSelected = interactionsController?.answer == option.id;
     final isCorrect = option.isCorrect;
     final isRevealed =
         previewRevealed || interactionsController?.isRevealed == true;
     if (isRevealed && isCorrect) {
-      return ButtonTone.success;
+      return [ButtonVariant.soft, ButtonColor.success];
     }
     if (isRevealed && isSelected) {
-      return ButtonTone.error;
+      return [ButtonVariant.soft, ButtonColor.error];
     }
-    return ButtonTone.ghost;
+    return [ButtonVariant.ghost, ButtonColor.neutral];
   }
 
   String _optionLabel(MultipleChoiceOption option, int index) {

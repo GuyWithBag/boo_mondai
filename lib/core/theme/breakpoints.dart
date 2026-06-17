@@ -13,7 +13,7 @@ abstract final class Breakpoints {
   static const Size desktop = Size(1200, 900);
   static const Size tv = Size(1600, 1200);
 
-  static const Size baseMobileSize = Size(1224, 2700);
+  static const Size baseMobileSize = Size(377, 831);
 
   static bool isMobile(Size size) =>
       // size.width < mobile.width && size.height < mobile.height;

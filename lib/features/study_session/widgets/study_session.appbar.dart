@@ -7,7 +7,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         textStyle,
         TextSize,
         TextWeight,
-        TextTone;
+        TextColor;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -29,7 +29,7 @@ class StudySessionAppbar extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
       decoration: BoxDecoration(
-        color: tokens.colorPageBackground,
+        color: tokens.colorScaffoldBackground,
         border: Border(
           bottom: BorderSide(
             color: tokens.colorBorderNeutralSubtle.withValues(alpha: 0.5),
@@ -49,7 +49,7 @@ class StudySessionAppbar extends StatelessWidget {
             style: textStyle.resolve(tokens, [
               TextSize.labelSmall,
               TextWeight.heavy,
-              TextTone.muted,
+              TextColor.muted,
             ]),
           ),
         ],

@@ -1,7 +1,7 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         CachedProfile,
-        ButtonTone,
+        ButtonColor,
         Deck,
         LocalDB,
         ModalAction,
@@ -122,7 +122,7 @@ ViewDeckLocalSheetState useViewDeckLocalSheet({
         ModalAction<bool>(
           value: true,
           label: actionLabel,
-          tone: isPublished ? ButtonTone.success : ButtonTone.error,
+          color: isPublished ? ButtonColor.success : ButtonColor.error,
         ),
       ],
     );
@@ -216,7 +216,7 @@ ViewDeckLocalSheetState useViewDeckLocalSheet({
         const ModalAction<bool>(
           value: true,
           label: 'Delete',
-          tone: ButtonTone.error,
+          color: ButtonColor.error,
         ),
       ],
     );

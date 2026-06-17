@@ -2,7 +2,7 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
         Button,
-        ButtonTone,
+        ButtonColor,
         Deck,
         DeckCommentWidget,
         DeckTile,
@@ -15,7 +15,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         SurfaceShape,
         SurfaceColor,
         TextSize,
-        TextTone,
+        TextColor,
         TextWeight,
         DeckDetails,
         ProfileLabel,
@@ -318,7 +318,7 @@ class _Body extends StatelessWidget {
                 icon: sheet.isDownloading
                     ? Icons.sync
                     : Icons.cloud_download_outlined,
-                tone: ButtonTone.success,
+                color: ButtonColor.success,
                 onPressed:
                     sheet.isDownloading || sheet.onDownloadPressed == null
                     ? null
@@ -728,10 +728,7 @@ class _EmptyDiscussionText extends StatelessWidget {
 
     return Text(
       label,
-      style: textStyle.resolve(tokens, const [
-        TextSize.label,
-        TextTone.secondary,
-      ]),
+      style: textStyle.resolve(tokens, const [TextSize.label]),
     );
   }
 }

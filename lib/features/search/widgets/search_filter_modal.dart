@@ -3,7 +3,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppModalTone,
         AppTokens,
         Button,
-        ButtonTone,
+        ButtonVariant,
+        ButtonColor,
         Modal,
         SearchFilter,
         SearchFilterCodec;
@@ -65,7 +66,7 @@ class _SearchFilterModal<TFilter extends SearchFilter> extends HookWidget {
           ),
           Button(onPressed: reset, child: const Text('Reset')),
           Button(
-            variants: const [ButtonTone.filled],
+            variants: const [ButtonVariant.filled, ButtonColor.primary],
             onPressed: () => Navigator.pop(context, filter.value),
             child: const Text('Apply'),
           ),

@@ -17,7 +17,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         SurfacePadding,
         Button,
         PanelHeader,
-        ButtonTone,
+        ButtonVariant,
+        ButtonColor,
         appTextFieldStyle,
         TextFieldSize,
         TextFieldFrame,
@@ -27,7 +28,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         textStyle,
         TextSize,
         TextWeight,
-        TextTone,
+        TextColor,
         SurfaceColor;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -55,7 +56,7 @@ class CreateDeckPage extends StatelessWidget {
     final tokens = context.themeTokens<AppTokens>();
 
     return Scaffold(
-      backgroundColor: tokens.colorPageBackground,
+      backgroundColor: tokens.colorScaffoldBackground,
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
@@ -244,7 +245,10 @@ class CreateDeckSheet extends HookWidget {
                       ),
                       SizedBox(height: tokens.spaceLayoutGapLg),
                       Button(
-                        variants: const [ButtonTone.filled],
+                        variants: const [
+                          ButtonVariant.filled,
+                          ButtonColor.primary,
+                        ],
                         leading: Icon(isEdit ? Icons.save : Icons.add),
                         onPressed: handleSave,
                         child: Text(isEdit ? 'Save Deck' : 'Create Deck'),
@@ -340,7 +344,7 @@ class _VisibilityPanel extends StatelessWidget {
           style: textStyle.resolve(tokens, const [
             TextSize.label,
             TextWeight.body,
-            TextTone.secondary,
+            TextColor.muted,
           ]),
         ),
       ],
@@ -382,7 +386,7 @@ class _PublishPanel extends StatelessWidget {
           style: textStyle.resolve(tokens, const [
             TextSize.label,
             TextWeight.body,
-            TextTone.secondary,
+            TextColor.muted,
           ]),
         ),
       ),

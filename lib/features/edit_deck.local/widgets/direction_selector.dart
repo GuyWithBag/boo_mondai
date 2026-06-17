@@ -48,7 +48,7 @@ class CardTypeSelector extends StatelessWidget {
                   style: textStyle.resolve(tokens, [
                     TextSize.label,
                     TextWeight.body,
-                    TextTone.secondary,
+                    TextColor.muted,
                   ]),
                 ),
               ],

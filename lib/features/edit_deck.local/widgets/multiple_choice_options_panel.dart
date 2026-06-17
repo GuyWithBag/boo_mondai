@@ -71,7 +71,7 @@ class MultipleChoiceOptionsPanel extends StatelessWidget {
             const SizedBox(height: 20),
             Button(
               leading: const Icon(Icons.add),
-              variants: const [ButtonTone.dashed],
+              variants: const [ButtonVariant.dashed, ButtonColor.neutral],
               onPressed: onOptionAdd,
               child: const Text('Add Option'),
             ),

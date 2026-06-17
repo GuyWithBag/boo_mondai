@@ -1,7 +1,8 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         Button,
-        ButtonTone,
+        ButtonVariant,
+        ButtonColor,
         FlashcardTemplate,
         MarkdownText,
         PhysicalCardSide,
@@ -49,7 +50,7 @@ class FlashcardFrontSide extends StatelessWidget {
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Button(
-                  variants: const [ButtonTone.text],
+                  variants: const [ButtonVariant.text, ButtonColor.neutral],
                   leading: const Icon(Icons.touch_app),
                   onPressed: onReveal,
                   child: const Text('Tap to reveal'),

@@ -1,10 +1,5 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show
-        Controller,
-        DeckInteractionsRemoteDB,
-        Deck,
-        LocalDB,
-        AuthService;
+    show Controller, DeckInteractionsRemoteDB, Deck, LocalDB, AuthService;
 
 class DeckListingInteractionsController extends Controller {
   DeckListingInteractionsController({

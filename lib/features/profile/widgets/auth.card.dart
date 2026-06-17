@@ -5,25 +5,33 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppleSignInButton,
         AuthService,
         Button,
-        ButtonTone,
+        ButtonVariant,
+        ButtonColor,
         GoogleSignInButton,
         LabeledDivider,
         LocalDB,
         Pages,
-        showSignOutDialog;
+        showSignOutDialog,
+        surfaceStyle,
+        textStyle,
+        TextSize,
+        SurfaceBorder,
+        SurfaceShape;
 import 'package:flutter/material.dart'
     show
-        StatelessWidget,
-        Widget,
         BuildContext,
-        SizedBox,
-        Text,
-        Icon,
+        Column,
         CrossAxisAlignment,
         Expanded,
+        Icon,
+        Icons,
+        MainAxisAlignment,
         Row,
-        Column,
-        Icons;
+        SizedBox,
+        StatelessWidget,
+        Text,
+        Widget,
+        TextAlign;
 import 'package:go_router/go_router.dart' show GoRouterHelper;
 import 'package:theme_variants/theme_variants.dart'
     show Surface, ThemeVariantsContext;
@@ -49,7 +57,7 @@ class AuthCard extends StatelessWidget {
             const SizedBox(height: AppSpacing.sm),
           ],
           Button(
-            variants: const [ButtonTone.error],
+            variants: const [ButtonVariant.soft, ButtonColor.error],
             onPressed: () => showSignOutDialog(context),
             leading: const Icon(Icons.logout),
             child: const Text('SIGN OUT'),
@@ -59,13 +67,24 @@ class AuthCard extends StatelessWidget {
     }
 
     return Surface(
+      style: surfaceStyle.resolve(tokens, const [
+        SurfaceBorder.none,
+        SurfaceShape.roundedSm,
+      ]),
       child: Column(
         spacing: tokens.spaceLayoutGapMd,
         crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('Save Your Progress'),
+          Text(
+            'Save Your Progress',
+            style: textStyle.resolve(tokens, const [TextSize.header2]),
+            textAlign: TextAlign.center,
+          ),
           Text(
             'Create an account to sync your FSRS flashcards across all devices and secure your streak.',
+            style: textStyle.resolve(tokens, const []),
+            textAlign: TextAlign.center,
           ),
           const GoogleSignInButton(),
           const AppleSignInButton(),
@@ -75,14 +94,14 @@ class AuthCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Button(
-                  variants: const [ButtonTone.hard],
+                  variants: const [ButtonVariant.soft, ButtonColor.hard],
                   onPressed: () => context.push(Pages.login.url),
                   child: const Text('LOG IN'),
                 ),
               ),
               Expanded(
                 child: Button(
-                  variants: const [ButtonTone.filled],
+                  variants: const [ButtonVariant.filled, ButtonColor.primary],
                   onPressed: () => context.push(Pages.register.url),
                   child: const Text('REGISTER'),
                 ),

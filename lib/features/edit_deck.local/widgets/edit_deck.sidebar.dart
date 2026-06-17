@@ -10,7 +10,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         Button,
         PanelHeader,
-        ButtonTone;
+        ButtonVariant,
+        ButtonColor;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -89,7 +90,7 @@ class EditDeckSidebar extends StatelessWidget {
                         : () => onTemplateSelected(template.id),
                     leading: Icon(_iconFor(template)),
                     mainAxisAlignment: MainAxisAlignment.start,
-                    variants: const [ButtonTone.textGhostSelect],
+                    variants: const [ButtonVariant.text, ButtonColor.neutral],
                     child: Text(
                       _labelFor(template),
                       maxLines: 2,

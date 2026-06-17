@@ -4,14 +4,13 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         Button,
         ButtonDepth,
-        ButtonTone,
         Deck,
         DeckTile,
         DeckReviewStats,
         ProgressBar,
         textStyle,
         TextSize,
-        TextTone,
+        TextColor,
         TextWeight;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

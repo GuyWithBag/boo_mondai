@@ -1,5 +1,5 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show AuthController, showChoiceModal, ButtonTone, ModalAction;
+    show AuthController, showChoiceModal, ButtonColor, ModalAction;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -20,12 +20,12 @@ Future<void> showGuestMergeDialog({
       ModalAction<GuestMergeChoice>(
         value: GuestMergeChoice.discard,
         label: 'Discard local data',
-        tone: ButtonTone.error,
+        color: ButtonColor.error,
       ),
       ModalAction<GuestMergeChoice>(
         value: GuestMergeChoice.merge,
         label: 'Merge into account',
-        tone: ButtonTone.error,
+        color: ButtonColor.error,
       ),
     ],
   );

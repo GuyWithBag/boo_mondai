@@ -7,8 +7,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         textStyle,
         TextSize,
         TextWeight,
-        TextTone,
-        ButtonTone,
+        TextColor,
+        ButtonVariant,
+        ButtonColor,
         Button;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -43,7 +44,7 @@ class MatchingTypeEditor extends StatelessWidget {
             style: textStyle.resolve(tokens, [
               TextSize.labelSmall,
               TextWeight.heavy,
-              TextTone.muted,
+              TextColor.muted,
             ]),
           ),
           const SizedBox(height: 24),
@@ -56,7 +57,7 @@ class MatchingTypeEditor extends StatelessWidget {
                   style: textStyle.resolve(tokens, [
                     TextSize.labelSmall,
                     TextWeight.heavy,
-                    TextTone.muted,
+                    TextColor.muted,
                   ]),
                 ),
               ),
@@ -67,7 +68,7 @@ class MatchingTypeEditor extends StatelessWidget {
                   style: textStyle.resolve(tokens, [
                     TextSize.labelSmall,
                     TextWeight.heavy,
-                    TextTone.muted,
+                    TextColor.muted,
                   ]),
                 ),
               ),
@@ -95,7 +96,7 @@ class MatchingTypeEditor extends StatelessWidget {
           const SizedBox(height: 28),
           Button(
             leading: const Icon(Icons.add),
-            variants: const [ButtonTone.dashed],
+            variants: const [ButtonVariant.dashed, ButtonColor.neutral],
             onPressed: onPairAdd,
             child: const Text('Add Pair'),
           ),

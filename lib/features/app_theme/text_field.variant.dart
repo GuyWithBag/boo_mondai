@@ -76,7 +76,7 @@ final appTextFieldStyle = VariantStyle.textFieldParts<AppTokens>(
     TextFieldFrame.outline: (tokens) => {
       TextFieldStylePart.decoration({
         InputDecorationPart.filled(true),
-        InputDecorationPart.fillColor(tokens.colorPageBackground),
+        InputDecorationPart.fillColor(tokens.colorScaffoldBackground),
         InputDecorationPart.contentPadding(EdgeInsets.all(16.r)),
         InputDecorationPart.enabledBorder(
           OutlineInputBorder(

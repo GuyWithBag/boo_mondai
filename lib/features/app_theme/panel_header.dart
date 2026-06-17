@@ -7,7 +7,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         textStyle,
         TextSize,
         TextWeight,
-        TextTone;
+        TextColor;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 

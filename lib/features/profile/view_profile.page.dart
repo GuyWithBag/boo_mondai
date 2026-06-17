@@ -34,7 +34,6 @@ class ViewAccountPage extends StatelessWidget {
                   spacing: tokens.spaceLayoutGapMd,
                   children: [
                     const ProfileCard(),
-                    const AuthCard(),
                     const DarkModeToggleCard(),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -50,6 +49,7 @@ class ViewAccountPage extends StatelessWidget {
                         ],
                       ],
                     ),
+                    const AuthCard(),
                   ],
                 ),
               ),

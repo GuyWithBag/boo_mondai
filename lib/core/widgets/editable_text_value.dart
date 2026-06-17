@@ -1,9 +1,10 @@
+import 'package:boo_mondai/core/core.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
         Button,
         ButtonDepth,
-        ButtonTone,
+        ButtonColor,
         MarkdownText,
         MarkdownTextMode,
         VariantTextField,
@@ -33,6 +34,7 @@ class EditableTextValue extends HookWidget {
       TextFieldTone.neutral,
     ],
     super.key,
+    this.textAlign,
   });
 
   final String value;
@@ -45,6 +47,7 @@ class EditableTextValue extends HookWidget {
   final bool isMarkdown;
   final MarkdownTextMode markdownMode;
   final Iterable<Object> fieldVariants;
+  final TextAlign? textAlign;
 
   @override
   Widget build(BuildContext context) {
@@ -141,7 +144,7 @@ class EditableTextValue extends HookWidget {
               SizedBox(width: tokens.spaceLayoutGapSm),
               Button.icon(
                 icon: Icons.check,
-                tone: ButtonTone.success,
+                color: ButtonColor.success,
                 depth: ButtonDepth.flat,
                 onPressed: isSaving.value ? null : save,
               ),
@@ -152,22 +155,16 @@ class EditableTextValue extends HookWidget {
     }
 
     return Row(
+      spacing: tokens.spaceLayoutGapSm,
       crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: TextAlignMainAxisAlignmentHelper.fromTextAlign(
+        textAlign,
+      ),
       children: [
-        Expanded(
-          child: isMarkdown && value.trim().isNotEmpty
-              ? MarkdownText(data: value, baseTextStyle: textStyle)
-              : Text(value, style: textStyle),
-        ),
-        if (enabled) ...[
-          SizedBox(width: tokens.spaceLayoutGapSm),
-          Button.iconSmall(
-            icon: Icons.edit_outlined,
-            tone: ButtonTone.text,
-            depth: ButtonDepth.flat,
-            onPressed: edit,
-          ),
-        ],
+        isMarkdown && value.trim().isNotEmpty
+            ? MarkdownText(data: value, baseTextStyle: textStyle)
+            : Text(value, style: textStyle, textAlign: textAlign),
+        if (enabled) ...[Button.iconSmall(icon: Icons.edit, onPressed: edit)],
       ],
     );
   }

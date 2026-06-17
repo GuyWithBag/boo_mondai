@@ -13,11 +13,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         StudySessionService,
         Button,
-        ButtonTone,
+        ButtonVariant,
+        ButtonColor,
         textStyle,
         TextSize,
         TextWeight,
-        TextTone,
+        TextColor,
         RatingButton,
         AppSpacing;
 import 'package:flutter/material.dart';
@@ -130,7 +131,10 @@ class RatingArea extends HookWidget {
                           ? onSubmit
                           : null,
                       leading: const Icon(Icons.check),
-                      variants: const [ButtonTone.filled],
+                      variants: const [
+                        ButtonVariant.filled,
+                        ButtonColor.primary,
+                      ],
                       child: const Text('Submit'),
                     ),
             ),
@@ -158,7 +162,7 @@ class RatingArea extends HookWidget {
               child: Button(
                 onPressed: onContinue,
                 leading: const Icon(Icons.arrow_forward),
-                variants: const [ButtonTone.filled],
+                variants: const [ButtonVariant.filled, ButtonColor.primary],
                 child: const Text('Continue'),
               ),
             ),
@@ -211,7 +215,7 @@ class RatingArea extends HookWidget {
                 style: textStyle.resolve(tokens, [
                   TextSize.labelSmall,
                   TextWeight.heavy,
-                  TextTone.muted,
+                  TextColor.muted,
                 ]),
               ),
               // const SizedBox(height: AppSpacing.sm),

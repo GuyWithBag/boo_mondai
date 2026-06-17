@@ -5,6 +5,7 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 import 'dart:developer' as developer;
+import 'dart:ui' as ui;
 import 'package:app_links/app_links.dart';
 import 'package:barrel_annotation/barrel_annotation.dart';
 import 'package:boo_mondai/core/hive/hive_registrar.g.dart' show HiveRegistrar;

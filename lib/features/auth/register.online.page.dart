@@ -12,7 +12,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         showGuestMergeDialog,
         AppSpacing,
         ErrorText,
-        ButtonTone,
+        ButtonVariant,
+        ButtonColor,
         Button,
         ButtonDepth,
         TextFieldSize,
@@ -131,7 +132,7 @@ class RegisterPage extends HookWidget {
                   ],
                   const SizedBox(height: AppSpacing.lg),
                   Button(
-                    variants: const [ButtonTone.filled],
+                    variants: const [ButtonVariant.filled, ButtonColor.primary],
                     onPressed: auth.isLoading ? null : signUp,
                     child: auth.isLoading
                         ? const SizedBox(
@@ -143,7 +144,11 @@ class RegisterPage extends HookWidget {
                   ),
                   const SizedBox(height: AppSpacing.md),
                   Button(
-                    variants: const [ButtonTone.filled, ButtonDepth.flat],
+                    variants: const [
+                      ButtonVariant.filled,
+                      ButtonColor.primary,
+                      ButtonDepth.flat,
+                    ],
                     onPressed: () => context.push('/login'),
                     child: const Text('Already have an account? Sign In'),
                   ),

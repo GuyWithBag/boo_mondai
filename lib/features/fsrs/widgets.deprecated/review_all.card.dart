@@ -3,10 +3,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         Button,
         ButtonSize,
-        ButtonTone,
         textStyle,
         TextSize,
-        TextTone,
+        TextColor,
         TextWeight;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

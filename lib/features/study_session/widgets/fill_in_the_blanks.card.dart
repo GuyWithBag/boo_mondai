@@ -6,7 +6,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         textStyle,
         TextSize,
         TextWeight,
-        TextTone,
+        TextColor,
         FillInTheBlankAnswerInput,
         MarkdownText,
         PhysicalCardSide;
@@ -76,7 +76,7 @@ class FillInTheBlanksCard extends HookWidget {
                 style: textStyle.resolve(tokens, [
                   TextSize.labelSmall,
                   TextWeight.heavy,
-                  TextTone.muted,
+                  TextColor.muted,
                 ]),
               ),
               SizedBox(height: 48.h),

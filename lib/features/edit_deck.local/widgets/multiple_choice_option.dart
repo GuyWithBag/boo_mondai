@@ -4,8 +4,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         MultipleChoiceOptionTone,
         AppTokens,
         multipleChoiceOptionStyle,
-        ButtonTone,
-        TextTone,
+        ButtonVariant,
+        ButtonColor,
+        TextColor,
         textStyle,
         TextSize,
         TextWeight,
@@ -65,12 +66,20 @@ class EditMultipleChoiceOption extends HookWidget {
       effectiveState,
       tone,
     ]);
-    final effectiveTone =
-        resolvedStyle.buttonTone ??
-        (correct ? ButtonTone.success : ButtonTone.ghost);
+    final effectiveButtonVariants =
+        resolvedStyle.buttonVariants ??
+        [
+          if (correct) ...[
+            ButtonVariant.soft,
+            ButtonColor.success,
+          ] else ...[
+            ButtonVariant.ghost,
+            ButtonColor.neutral,
+          ],
+        ];
     final effectiveSelected = resolvedStyle.selected ?? false;
     final effectiveOpacity = resolvedStyle.opacity ?? 1;
-    final effectiveTextTone = resolvedStyle.textTone ?? TextTone.baseline;
+    final effectiveTextTone = resolvedStyle.textTone ?? TextColor.baseline;
     final effectiveOnPressed =
         onPressed ?? onCorrectChanged ?? (!isEditable ? () {} : null);
     final optionText = isEditable
@@ -101,7 +110,7 @@ class EditMultipleChoiceOption extends HookWidget {
         child: Opacity(
           opacity: effectiveOpacity,
           child: Button(
-            variants: [ButtonDepth.flat, effectiveTone],
+            variants: [ButtonDepth.flat, ...effectiveButtonVariants],
             selected: effectiveSelected,
             mainAxisAlignment: MainAxisAlignment.start,
             onPressed: effectiveOnPressed,

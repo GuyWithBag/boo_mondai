@@ -10,7 +10,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         ProgressBar,
         ChangeSummaryChips,
         Button,
-        ButtonTone;
+        ButtonVariant,
+        ButtonColor;
 import 'package:flutter/material.dart'
     show
         SizedBox,
@@ -66,7 +67,7 @@ class SyncPage extends StatelessWidget {
     // ── "Already up to date" state ───────────────────────────────────────────
     if (isAlreadyUpToDate) {
       return Scaffold(
-        backgroundColor: tokens.colorPageBackground,
+        backgroundColor: tokens.colorScaffoldBackground,
         body: SafeArea(
           child: Center(
             child: Padding(
@@ -122,7 +123,7 @@ class SyncPage extends StatelessWidget {
 
     // ── Normal sync states (loading → reviewing → complete) ──────────────────
     return Scaffold(
-      backgroundColor: tokens.colorPageBackground,
+      backgroundColor: tokens.colorScaffoldBackground,
       body: SafeArea(
         child: Center(
           child: Padding(
@@ -183,7 +184,10 @@ class SyncPage extends StatelessWidget {
                         SizedBox(width: tokens.spaceLayoutGapSm.w),
                         Expanded(
                           child: Button(
-                            variants: const [ButtonTone.filled],
+                            variants: const [
+                              ButtonVariant.filled,
+                              ButtonColor.primary,
+                            ],
                             onPressed: onApply,
                             child: const Text('APPLY'),
                           ),

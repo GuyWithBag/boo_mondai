@@ -2,6 +2,6 @@
 
 // Other files
 export 'auth.controller.dart';
-export 'login.online.page.dart';
-export 'register.online.page.dart';
 export 'auth.service.dart';
+export 'register.online.page.dart';
+export 'login.online.page.dart';
