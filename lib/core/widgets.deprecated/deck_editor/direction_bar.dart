@@ -41,9 +41,9 @@ class DirectionBar extends StatelessWidget {
           const SizedBox(height: AppSpacing.xs),
           Text(
             'Choose how this card will be drillzed',
-            style: Theme.of(
-              context,
-            ).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: AppColors.colorTextSecondary,
+            ),
           ),
           const SizedBox(height: AppSpacing.md),
           SegmentedButton<CardType>(

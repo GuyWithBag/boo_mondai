@@ -9,7 +9,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         SurfaceShape,
         DeckTile,
         MetaLabel,
-        appTextStyle,
+        textStyle,
         TextSize,
         TextWeight,
         TextTone,
@@ -38,8 +38,9 @@ class DeckListingTile extends HookWidget {
         ? 'No description yet'
         : deck.shortDescription;
     final version = deck.version.isEmpty ? '1.0.0' : deck.version;
-    final backgroundImage =
-        backgroundImageProviderFromSource(_listingImageUrl(deck));
+    final backgroundImage = backgroundImageProviderFromSource(
+      _listingImageUrl(deck),
+    );
     final creatorName = deck.userProfile?.username ?? 'Unknown creator';
 
     useEffect(() {
@@ -80,14 +81,14 @@ class DeckListingTile extends HookWidget {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    _HeaderScrim(color: tokens.backgroundSurface),
+                    _HeaderScrim(color: tokens.colorSurfaceBackground),
                     Positioned(
-                      top: tokens.spacePanelGapMd,
-                      right: tokens.spacePanelGapLg,
+                      top: tokens.spaceLayoutGapMd,
+                      right: tokens.spaceLayoutGapLg,
                       child: Wrap(
                         alignment: WrapAlignment.end,
-                        spacing: tokens.spacePanelGapMd,
-                        runSpacing: tokens.spacePanelGapSm,
+                        spacing: tokens.spaceLayoutGapMd,
+                        runSpacing: tokens.spaceLayoutGapSm,
                         children: [
                           MetaLabel(
                             icon: Icons.download_outlined,
@@ -105,13 +106,13 @@ class DeckListingTile extends HookWidget {
                       ),
                     ),
                     Positioned(
-                      left: tokens.spacePanelGapLg,
-                      bottom: tokens.spacePanelGapMd,
+                      left: tokens.spaceLayoutGapLg,
+                      bottom: tokens.spaceLayoutGapMd,
                       child: DeckTile(deck: deck, width: 150),
                     ),
                     Positioned(
-                      right: tokens.spacePanelGapLg,
-                      bottom: tokens.spacePanelGapMd,
+                      right: tokens.spaceLayoutGapLg,
+                      bottom: tokens.spaceLayoutGapMd,
                       child: _CreatorBadge(
                         name: creatorName,
                         avatarUrl: deck.userProfile?.avatarUrl,
@@ -122,13 +123,13 @@ class DeckListingTile extends HookWidget {
               ),
             ),
             DecoratedBox(
-              decoration: BoxDecoration(color: tokens.softGray),
+              decoration: BoxDecoration(color: tokens.colorMuted),
               child: Padding(
                 padding: EdgeInsets.fromLTRB(
-                  tokens.spacePanelGapLg,
-                  tokens.spacePanelGapSm,
-                  tokens.spacePanelGapLg,
-                  tokens.spacePanelGapMd,
+                  tokens.spaceLayoutGapLg,
+                  tokens.spaceLayoutGapSm,
+                  tokens.spaceLayoutGapLg,
+                  tokens.spaceLayoutGapMd,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -142,13 +143,13 @@ class DeckListingTile extends HookWidget {
                             title,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: appTextStyle.resolve(tokens, const [
+                            style: textStyle.resolve(tokens, const [
                               TextSize.header,
                               TextWeight.heavy,
                             ]),
                           ),
                         ),
-                        SizedBox(width: tokens.spacePanelGapMd),
+                        SizedBox(width: tokens.spaceLayoutGapMd),
                         if (listing != null)
                           _FavoriteButton(
                             count: _formatCount(
@@ -163,24 +164,24 @@ class DeckListingTile extends HookWidget {
                           ),
                       ],
                     ),
-                    SizedBox(height: tokens.spacePanelGapSm),
+                    SizedBox(height: tokens.spaceLayoutGapSm),
                     Text(
                       description,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: appTextStyle.resolve(tokens, const [
+                      style: textStyle.resolve(tokens, const [
                         TextSize.label,
                         TextWeight.body,
                         TextTone.secondary,
                       ]),
                     ),
-                    SizedBox(height: tokens.spacePanelGapMd),
+                    SizedBox(height: tokens.spaceLayoutGapMd),
                     Row(
                       children: [
                         Expanded(
                           child: Wrap(
-                            spacing: tokens.spacePanelGapMd,
-                            runSpacing: tokens.spacePanelGapSm,
+                            spacing: tokens.spaceLayoutGapMd,
+                            runSpacing: tokens.spaceLayoutGapSm,
                             children: [
                               MetaLabel(
                                 icon: Icons.style_outlined,
@@ -200,7 +201,7 @@ class DeckListingTile extends HookWidget {
                               interactionsController.downvotesCount,
                             ),
                           ),
-                          SizedBox(width: tokens.spacePanelGapMd),
+                          SizedBox(width: tokens.spaceLayoutGapMd),
                           _InlineMetric(
                             icon: Icons.keyboard_arrow_up,
                             label: _formatCount(
@@ -211,10 +212,10 @@ class DeckListingTile extends HookWidget {
                       ],
                     ),
                     if (tags.isNotEmpty) ...[
-                      SizedBox(height: tokens.spacePanelGapMd),
+                      SizedBox(height: tokens.spaceLayoutGapMd),
                       Wrap(
-                        spacing: tokens.spacePanelGapSm,
-                        runSpacing: tokens.spacePanelGapSm,
+                        spacing: tokens.spaceLayoutGapSm,
+                        runSpacing: tokens.spaceLayoutGapSm,
                         children: [
                           for (final tag in tags) HeaderBadge(label: tag.name),
                         ],
@@ -345,7 +346,7 @@ class _CreatorBadge extends StatelessWidget {
           children: [
             Text(
               'By',
-              style: appTextStyle.resolve(tokens, const [
+              style: textStyle.resolve(tokens, const [
                 TextSize.labelSmall,
                 TextTone.secondary,
               ]),
@@ -354,18 +355,18 @@ class _CreatorBadge extends StatelessWidget {
               trimmedName,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: appTextStyle.resolve(tokens, const [
+              style: textStyle.resolve(tokens, const [
                 TextSize.label,
                 TextWeight.strong,
               ]),
             ),
           ],
         ),
-        SizedBox(width: tokens.spacePanelGapSm),
+        SizedBox(width: tokens.spaceLayoutGapSm),
         CircleAvatar(
           radius: 28,
-          backgroundColor: tokens.primarySoft,
-          foregroundColor: tokens.primary,
+          backgroundColor: tokens.colorPrimarySoft,
+          foregroundColor: tokens.colorPrimary,
           backgroundImage: hasAvatar ? NetworkImage(trimmedAvatarUrl) : null,
           child: hasAvatar ? null : const Icon(Icons.person_outline),
         ),
@@ -388,7 +389,7 @@ class _FavoriteButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final color = isSelected ? tokens.primary : tokens.textPrimary;
+    final color = isSelected ? tokens.colorPrimary : tokens.colorTextBaseline;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -398,14 +399,14 @@ class _FavoriteButton extends StatelessWidget {
           tooltip: isSelected ? 'Remove favorite' : 'Favorite',
           style: IconButton.styleFrom(
             foregroundColor: color,
-            disabledForegroundColor: tokens.textMuted,
+            disabledForegroundColor: tokens.colorTextMuted,
           ),
           onPressed: onPressed,
           icon: Icon(isSelected ? Icons.favorite : Icons.favorite_border),
         ),
         Text(
           count,
-          style: appTextStyle
+          style: textStyle
               .resolve(tokens, const [TextSize.label, TextWeight.strong])
               .copyWith(color: color),
         ),
@@ -427,13 +428,13 @@ class _InlineMetric extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, color: tokens.textPrimary),
-        SizedBox(width: tokens.spacePanelGapSm / 2),
+        Icon(icon, color: tokens.colorTextBaseline),
+        SizedBox(width: tokens.spaceLayoutGapSm / 2),
         Text(
           label,
-          style: appTextStyle
+          style: textStyle
               .resolve(tokens, const [TextSize.label, TextWeight.strong])
-              .copyWith(color: tokens.textPrimary),
+              .copyWith(color: tokens.colorTextBaseline),
         ),
       ],
     );
@@ -451,13 +452,13 @@ class _InlineMetric extends StatelessWidget {
 //     return Row(
 //       mainAxisSize: MainAxisSize.min,
 //       children: [
-//         Icon(icon, size: 16, color: AppColors.textSecondary),
+//         Icon(icon, size: 16, color: AppColors.colorTextSecondary),
 //         const SizedBox(width: AppSpacing.xs),
 //         Text(
 //           label,
 //           style: Theme.of(
 //             context,
-//           ).textTheme.labelMedium?.copyWith(color: AppColors.textSecondary),
+//           ).textTheme.labelMedium?.copyWith(color: AppColors.colorTextSecondary),
 //         ),
 //       ],
 //     );

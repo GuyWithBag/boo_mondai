@@ -3,8 +3,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         SurfaceShape,
         surfaceStyle,
         AppTokens,
-        SurfaceTone,
-        appTextStyle,
+        SurfaceColor,
+        textStyle,
         TextSize,
         TextWeight,
         TextTone;
@@ -23,7 +23,7 @@ class PanelHeader extends StatelessWidget {
 
     return Surface(
       style: surfaceStyle.resolve(tokens, const [
-        SurfaceTone.header,
+        SurfaceColor.header,
         SurfaceShape.sharp,
       ]),
       child: Row(
@@ -31,10 +31,9 @@ class PanelHeader extends StatelessWidget {
           Expanded(
             child: Text(
               title,
-              style: appTextStyle.resolve(tokens, [
+              style: textStyle.resolve(tokens, [
                 TextSize.labelLarge,
                 TextWeight.heavy,
-                TextTone.primary,
               ]),
             ),
           ),

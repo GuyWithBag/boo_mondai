@@ -53,7 +53,7 @@ class EditorSidebar extends StatelessWidget {
                   child: Text(
                     'Cards (${templates.length})', // <-- CHANGED
                     style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      color: AppColors.textSecondary,
+                      color: AppColors.colorTextSecondary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -81,7 +81,7 @@ class EditorSidebar extends StatelessWidget {
                     child: Text(
                       'No cards yet',
                       style: TextStyle(
-                        color: AppColors.textSecondary,
+                        color: AppColors.colorTextSecondary,
                         fontSize: 13,
                       ),
                     ),

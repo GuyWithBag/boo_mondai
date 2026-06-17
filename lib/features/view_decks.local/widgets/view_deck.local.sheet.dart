@@ -19,13 +19,13 @@ import 'package:boo_mondai/lib.barrel.dart'
         MetaLabel,
         SurfacePadding,
         SurfaceShape,
-        SurfaceTone,
+        SurfaceColor,
         TextSize,
         TextTone,
         TextWeight,
         ViewDecksLocalController,
         appChipStyle,
-        appTextStyle,
+        textStyle,
         surfaceStyle,
         useViewDeckLocalSheet;
 import 'package:flutter/material.dart';
@@ -75,7 +75,7 @@ class ViewDeckLocalSheet extends HookWidget {
         return Surface(
           style: surfaceStyle.resolve(tokens, const [
             SurfacePadding.none,
-            SurfaceTone.muted,
+            SurfaceColor.muted,
           ]),
           hasClipRRect: true,
           child: Scaffold(
@@ -222,9 +222,9 @@ class _Body extends StatelessWidget {
           ],
         ),
         Positioned(
-          left: tokens.spacePanelPadding,
-          right: tokens.spacePanelPadding,
-          top: tokens.spacePanelPadding,
+          left: tokens.spaceLayoutPadding,
+          right: tokens.spaceLayoutPadding,
+          top: tokens.spaceLayoutPadding,
           child: Row(
             children: [
               CollapsingHeaderItem(
@@ -245,7 +245,7 @@ class _Body extends StatelessWidget {
                 alignment: Alignment.topRight,
                 child: Button.icon(icon: Icons.edit, onPressed: onEditPressed),
               ),
-              SizedBox(width: tokens.spacePanelGapSm),
+              SizedBox(width: tokens.spaceLayoutGapSm),
               CollapsingHeaderItem(
                 scrollController: scrollController,
                 collapseDistance: headerHeight * 0.55,
@@ -261,12 +261,12 @@ class _Body extends StatelessWidget {
         ),
         Positioned(
           top: 110.h,
-          left: tokens.spacePanelPadding,
-          right: tokens.spacePanelPadding,
+          left: tokens.spaceLayoutPadding,
+          right: tokens.spaceLayoutPadding,
           child: Wrap(
             alignment: WrapAlignment.end,
-            spacing: tokens.spacePanelGapSm,
-            runSpacing: tokens.spacePanelGapSm,
+            spacing: tokens.spaceLayoutGapSm,
+            runSpacing: tokens.spaceLayoutGapSm,
             children: [
               if (deck.isPremade)
                 CollapsingHeaderItem(
@@ -361,12 +361,12 @@ class _BodySubSection extends StatelessWidget {
           Surface(
             style: surfaceStyle.resolve(tokens, const [
               SurfaceShape.topRounded,
-              SurfaceTone.muted,
+              SurfaceColor.muted,
               SurfaceBorder.top,
               SurfaceShadow.none,
             ]),
             child: Padding(
-              padding: EdgeInsets.all(tokens.spacePanelPadding),
+              padding: EdgeInsets.all(tokens.spaceLayoutPadding),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -388,14 +388,14 @@ class _BodySubSection extends StatelessWidget {
                       enabled: deck.isEditable,
                       placeholder: 'Deck title',
                       onSave: onTitleChanged,
-                      textStyle: appTextStyle.resolve(tokens, const [
+                      textStyle: textStyle.resolve(tokens, const [
                         TextSize.header,
                         TextWeight.heavy,
                       ]),
                     ),
                     metaLabels: Wrap(
-                      spacing: tokens.spacePanelGapMd,
-                      runSpacing: tokens.spacePanelGapSm,
+                      spacing: tokens.spaceLayoutGapMd,
+                      runSpacing: tokens.spaceLayoutGapSm,
                       children: [
                         MetaLabel(
                           icon: Icons.visibility_outlined,
@@ -414,10 +414,9 @@ class _BodySubSection extends StatelessWidget {
                       placeholder: 'Short description',
                       isMarkdown: true,
                       onSave: onShortDescriptionChanged,
-                      textStyle: appTextStyle.resolve(tokens, const [
+                      textStyle: textStyle.resolve(tokens, const [
                         TextSize.labelSmall,
                         TextWeight.body,
-                        TextTone.primary,
                       ]),
                     ),
                     longDescription: EditableTextValue(
@@ -428,10 +427,9 @@ class _BodySubSection extends StatelessWidget {
                       maxLines: null,
                       isMarkdown: true,
                       onSave: onLongDescriptionChanged,
-                      textStyle: appTextStyle.resolve(tokens, const [
+                      textStyle: textStyle.resolve(tokens, const [
                         TextSize.bodyLarge,
                         TextWeight.body,
-                        TextTone.primary,
                       ]),
                     ),
                     tags: tags,
@@ -447,10 +445,10 @@ class _BodySubSection extends StatelessWidget {
             ),
           ),
           Positioned(
-            left: tokens.spacePanelPadding,
+            left: tokens.spaceLayoutPadding,
             top:
-                -(deckWidth / tokens.cardAspectRatio) +
-                (tokens.radiusSurfaceLg - tokens.spacePanelPadding),
+                -(deckWidth / tokens.studyCardAspectRatio) +
+                (tokens.radiusSurfaceLg - tokens.spaceLayoutPadding),
             child: CollapsingHeaderItem(
               scrollController: scrollController,
               collapseDistance: collapseDistance,
@@ -459,8 +457,8 @@ class _BodySubSection extends StatelessWidget {
             ),
           ),
           Positioned(
-            right: tokens.spacePanelPadding,
-            top: -tokens.radiusSurfaceLg - tokens.spacePanelPadding,
+            right: tokens.spaceLayoutPadding,
+            top: -tokens.radiusSurfaceLg - tokens.spaceLayoutPadding,
             child: CollapsingHeaderItem(
               scrollController: scrollController,
               collapseDistance: collapseDistance,
@@ -474,13 +472,13 @@ class _BodySubSection extends StatelessWidget {
                     label: 'v${deck.version}.${deck.buildNumber}',
                     tooltip: 'Deck version and build number',
                   ),
-                  SizedBox(height: tokens.spacePanelGapSm),
+                  SizedBox(height: tokens.spaceLayoutGapSm),
                   MetaLabel(
                     icon: Icons.calendar_today_outlined,
                     label: _formatDate(deck.createdAt),
                     tooltip: 'Created ${_formatDate(deck.createdAt)}',
                   ),
-                  SizedBox(height: tokens.spacePanelGapSm),
+                  SizedBox(height: tokens.spaceLayoutGapSm),
                   MetaLabel(
                     icon: Icons.update_outlined,
                     label: _formatDate(deck.updatedAt),

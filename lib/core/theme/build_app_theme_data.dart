@@ -43,62 +43,62 @@ TextStyle _textStyle(
 TextTheme _textTheme(AppTokens tokens) {
   final displayStyle = _textStyle(
     tokens,
-    color: tokens.textPrimary,
-    size: tokens.textSizeCardFront,
+    color: tokens.colorTextBaseline,
+    size: tokens.studyCardTextSizeFront,
     weight: tokens.fontWeightTextHeavy,
     height: tokens.lineHeightTextDisplay,
   );
   final headlineStyle = _textStyle(
     tokens,
-    color: tokens.textPrimary,
+    color: tokens.colorTextBaseline,
     size: tokens.textSizeBodyLarge,
     weight: tokens.fontWeightTextHeavy,
     height: tokens.lineHeightFieldDisplay,
   );
   final titleStyle = _textStyle(
     tokens,
-    color: tokens.textPrimary,
+    color: tokens.colorTextBaseline,
     size: tokens.textSizeHeader,
     weight: tokens.fontWeightTextHeavy,
     height: tokens.lineHeightTextDisplay,
   );
   final bodyLargeStyle = _textStyle(
     tokens,
-    color: tokens.textPrimary,
+    color: tokens.colorTextBaseline,
     size: tokens.textSizeLabelLarge,
     weight: tokens.fontWeightTextBody,
     height: tokens.lineHeightTextBody,
   );
   final bodyStyle = _textStyle(
     tokens,
-    color: tokens.textPrimary,
+    color: tokens.colorTextBaseline,
     size: tokens.textSizeLabel,
     weight: tokens.fontWeightTextBody,
     height: tokens.lineHeightTextBody,
   );
   final labelStyle = _textStyle(
     tokens,
-    color: tokens.textPrimary,
+    color: tokens.colorTextBaseline,
     size: tokens.textSizeLabel,
     weight: tokens.fontWeightTextStrong,
-    height: tokens.lineHeightTactile,
+    height: tokens.lineHeightButton,
   );
   final labelSmallStyle = _textStyle(
     tokens,
-    color: tokens.textSecondary,
+    color: tokens.colorTextSecondary,
     size: tokens.textSizeLabelSmall,
     weight: tokens.fontWeightTextStrong,
-    height: tokens.lineHeightTactile,
+    height: tokens.lineHeightButton,
     letterSpacing: tokens.letterSpacingTextEyebrow,
   );
 
   return TextTheme(
     displayLarge: displayStyle,
     displayMedium: displayStyle.copyWith(
-      fontSize: tokens.textSizeCardBackFront,
+      fontSize: tokens.studyCardTextSizeBack,
     ),
     displaySmall: displayStyle.copyWith(
-      fontSize: tokens.textSizeCardBackContent,
+      fontSize: tokens.studyCardTextSizeBackContent,
     ),
     headlineLarge: headlineStyle,
     headlineMedium: headlineStyle.copyWith(fontSize: tokens.textSizeHeader),
@@ -109,7 +109,7 @@ TextTheme _textTheme(AppTokens tokens) {
     bodyLarge: bodyLargeStyle,
     bodyMedium: bodyStyle,
     bodySmall: bodyStyle.copyWith(
-      color: tokens.textSecondary,
+      color: tokens.colorTextSecondary,
       fontSize: tokens.textSizeLabelSmall,
     ),
     labelLarge: labelStyle,
@@ -121,22 +121,22 @@ TextTheme _textTheme(AppTokens tokens) {
 /// Builds `ThemeData` from typed app tokens for a given [brightness].
 ThemeData buildAppThemeData(AppTokens tokens, Brightness brightness) {
   final scheme = ColorScheme.fromSeed(
-    seedColor: tokens.primary,
+    seedColor: tokens.colorPrimary,
     brightness: brightness,
-    primary: tokens.primary,
-    surface: tokens.backgroundSurface,
-    error: tokens.actionError,
+    primary: tokens.colorPrimary,
+    surface: tokens.colorSurfaceBackground,
+    error: tokens.colorActionError,
   );
 
   return ThemeData(
     useMaterial3: true,
     brightness: brightness,
     colorScheme: scheme,
-    scaffoldBackgroundColor: tokens.backgroundPage,
+    scaffoldBackgroundColor: tokens.colorPageBackground,
     fontFamily: tokens.fontFamily,
     appBarTheme: AppBarTheme(
-      backgroundColor: tokens.backgroundSurface,
-      foregroundColor: tokens.textPrimary,
+      backgroundColor: tokens.colorSurfaceBackground,
+      foregroundColor: tokens.colorTextBaseline,
       elevation: 0,
       scrolledUnderElevation: 0,
       surfaceTintColor: Colors.transparent,
@@ -144,7 +144,7 @@ ThemeData buildAppThemeData(AppTokens tokens, Brightness brightness) {
       titleSpacing: 0,
       shape: Border(
         bottom: BorderSide(
-          color: tokens.borderNeutralSubtle,
+          color: tokens.colorBorderNeutralSubtle,
           width: tokens.borderWidthDefault,
         ),
       ),
@@ -154,48 +154,48 @@ ThemeData buildAppThemeData(AppTokens tokens, Brightness brightness) {
       labelPadding: EdgeInsets.zero,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7)),
       side: BorderSide(
-        color: tokens.borderNeutralSubtle,
+        color: tokens.colorBorderNeutralSubtle,
         width: tokens.borderWidthDefault,
       ),
-      backgroundColor: tokens.backgroundSurface,
-      selectedColor: tokens.primarySoft,
-      disabledColor: tokens.softGray,
+      backgroundColor: tokens.colorSurfaceBackground,
+      selectedColor: tokens.colorPrimarySoft,
+      disabledColor: tokens.colorMuted,
       surfaceTintColor: Colors.transparent,
       elevation: 0,
       pressElevation: 0,
       labelStyle: TextStyle(
-        color: tokens.textPrimary,
+        color: tokens.colorTextBaseline,
         fontSize: tokens.textSizeLabelSmall,
         fontWeight: tokens.fontWeightTextHeavy,
         letterSpacing: tokens.letterSpacingTextEyebrow,
       ),
       secondaryLabelStyle: TextStyle(
-        color: tokens.primary,
+        color: tokens.colorPrimary,
         fontSize: tokens.textSizeLabelSmall,
         fontWeight: tokens.fontWeightTextBody,
         letterSpacing: tokens.letterSpacingTextEyebrow,
       ),
       iconTheme: IconThemeData(
-        color: tokens.textPrimary,
+        color: tokens.colorTextBaseline,
         size: tokens.sizeIconMd,
       ),
-      checkmarkColor: tokens.primary,
-      deleteIconColor: tokens.textSecondary,
+      checkmarkColor: tokens.colorPrimary,
+      deleteIconColor: tokens.colorTextSecondary,
       showCheckmark: false,
     ),
     textTheme: _textTheme(tokens),
     dividerTheme: DividerThemeData(
-      color: tokens.borderNeutralSubtle,
+      color: tokens.colorBorderNeutralSubtle,
       thickness: tokens.borderWidthDefault,
     ),
     textSelectionTheme: TextSelectionThemeData(
-      selectionColor: tokens.primary.withValues(alpha: 0.22),
-      cursorColor: tokens.primary,
+      selectionColor: tokens.colorPrimary.withValues(alpha: 0.22),
+      cursorColor: tokens.colorPrimary,
     ),
     inputDecorationTheme: InputDecorationTheme(
       border: InputBorder.none,
       hintStyle: TextStyle(
-        color: tokens.textMuted.withValues(alpha: 0.65),
+        color: tokens.colorTextMuted.withValues(alpha: 0.65),
         fontWeight: FontWeight.w700,
       ),
     ),

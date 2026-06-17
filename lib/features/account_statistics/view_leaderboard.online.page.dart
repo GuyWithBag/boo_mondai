@@ -12,7 +12,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         LeaderboardTileWidget,
         SurfaceBorder,
         SurfaceShape,
-        SurfaceTone,
+        SurfaceColor,
         ViewLeaderboardController,
         surfaceStyle;
 import 'package:flutter/material.dart';
@@ -54,7 +54,7 @@ class ViewLeaderboardPage extends HookWidget {
                       padding: EdgeInsets.only(bottom: 16.h),
                       child: Surface(
                         style: surfaceStyle.resolve(tokens, const [
-                          SurfaceTone.surface,
+                          SurfaceColor.baseline,
                           SurfaceShape.rounded,
                           SurfaceBorder.none,
                         ]),
@@ -69,7 +69,7 @@ class ViewLeaderboardPage extends HookWidget {
                                     style: TextStyle(
                                       fontSize: 24.sp,
                                       fontWeight: tokens.fontWeightTextHeavy,
-                                      color: tokens.textPrimary,
+                                      color: tokens.colorTextBaseline,
                                     ),
                                   ),
                                   SizedBox(height: 8.h),
@@ -78,7 +78,7 @@ class ViewLeaderboardPage extends HookWidget {
                                     style: TextStyle(
                                       fontSize: tokens.textSizeLabel.sp,
                                       fontWeight: tokens.fontWeightTextStrong,
-                                      color: tokens.textSecondary,
+                                      color: tokens.colorTextSecondary,
                                     ),
                                   ),
                                 ],
@@ -87,7 +87,7 @@ class ViewLeaderboardPage extends HookWidget {
                             Icon(
                               Icons.workspace_premium_outlined,
                               size: 34.sp,
-                              color: tokens.textPrimary,
+                              color: tokens.colorTextBaseline,
                             ),
                           ],
                         ),

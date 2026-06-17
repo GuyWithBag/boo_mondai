@@ -49,7 +49,7 @@
 //                 'Accepted: ${card.acceptedIdentificationAnswers.join(', ')}',
 //                 style: Theme.of(
 //                   context,
-//                 ).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+//                 ).textTheme.bodySmall?.copyWith(color: AppColors.colorTextSecondary),
 //               ),
 //             ],
 //           ],

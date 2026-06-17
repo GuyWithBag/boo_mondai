@@ -78,24 +78,24 @@ class _SummaryChip extends StatelessWidget {
 ) {
   return switch (type) {
     ChangeType.added => (
-      foreground: tokens.actionSuccess,
-      background: tokens.actionSuccessBackground,
-      border: tokens.actionSuccessBorder,
+      foreground: tokens.colorActionSuccess,
+      background: tokens.colorActionSuccessBackground,
+      border: tokens.colorActionSuccessBorder,
     ),
     ChangeType.modified => (
-      foreground: tokens.ratingHardText,
-      background: tokens.ratingHardBackground,
-      border: tokens.ratingHardBorder,
+      foreground: tokens.colorRatingHardText,
+      background: tokens.colorRatingHardBackground,
+      border: tokens.colorRatingHardBorder,
     ),
     ChangeType.removed => (
-      foreground: tokens.ratingAgainText,
-      background: tokens.ratingAgainBackground,
-      border: tokens.ratingAgainBorder,
+      foreground: tokens.colorRatingAgainText,
+      background: tokens.colorRatingAgainBackground,
+      border: tokens.colorRatingAgainBorder,
     ),
     ChangeType.skipped => (
-      foreground: tokens.textSecondary,
-      background: tokens.backgroundSurface,
-      border: tokens.borderNeutralSubtle,
+      foreground: tokens.colorTextSecondary,
+      background: tokens.colorSurfaceBackground,
+      border: tokens.colorBorderNeutralSubtle,
     ),
   };
 }

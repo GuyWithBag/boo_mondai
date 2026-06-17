@@ -88,7 +88,7 @@ final buttonStyle = VariantStyle.button<AppTokens>(
       ),
     ),
   ),
-  defaultVariants: const [ButtonSize.md, ButtonTone.primary],
+  defaultVariants: const [ButtonSize.md, ButtonTone.colorPrimary],
   variants: {
     ButtonSize.sm: (_) => const ButtonStyle(
       padding: WidgetStatePropertyAll(
@@ -100,8 +100,8 @@ final buttonStyle = VariantStyle.button<AppTokens>(
         EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       ),
     ),
-    ButtonTone.primary: (tokens) => ButtonStyle(
-      backgroundColor: WidgetStatePropertyAll(tokens.primary),
+    ButtonTone.colorPrimary: (tokens) => ButtonStyle(
+      backgroundColor: WidgetStatePropertyAll(tokens.colorPrimary),
       foregroundColor: WidgetStatePropertyAll(tokens.onPrimary),
     ),
     ButtonTone.danger: (tokens) => ButtonStyle(
@@ -123,7 +123,7 @@ final buttonStyle = VariantStyle.buttonParts<AppTokens>(
       ),
     ),
   },
-  defaultVariants: const [ButtonSize.md, ButtonTone.primary],
+  defaultVariants: const [ButtonSize.md, ButtonTone.colorPrimary],
   variants: {
     ButtonSize.sm: (_) => {
       ButtonStylePart.padding(
@@ -135,8 +135,8 @@ final buttonStyle = VariantStyle.buttonParts<AppTokens>(
         const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       ),
     },
-    ButtonTone.primary: (tokens) => {
-      ButtonStylePart.backgroundColor(tokens.primary),
+    ButtonTone.colorPrimary: (tokens) => {
+      ButtonStylePart.backgroundColor(tokens.colorPrimary),
       ButtonStylePart.foregroundColor(tokens.onPrimary),
     },
     ButtonTone.danger: (tokens) => {
@@ -366,7 +366,7 @@ final controller = ThemeVariantsController<AppTokens>(
   lightThemeId: 'clean',
   darkThemeId: 'forest',
   transform: (theme) {
-    final primary = userSettings.primary ?? theme.tokens.primary;
+    final primary = userSettings.colorPrimary ?? theme.tokens.colorPrimary;
 
     return ThemeVariant<AppTokens>(
       themePresetId: theme.themePresetId,
@@ -407,11 +407,11 @@ Export only the theme catalog:
 final exportedThemes = controller.exportThemes(
   encodeThemeData: (themeData) => {
     'brightness': themeData.brightness.name,
-    'seed_color': themeData.colorScheme.primary.value,
+    'seed_color': themeData.colorScheme.colorPrimary.value,
     'use_material3': themeData.useMaterial3,
   },
   encodeTokens: (tokens) => {
-    'primary': tokens.primary.value,
+    'primary': tokens.colorPrimary.value,
     'on_primary': tokens.onPrimary.value,
     'danger': tokens.danger.value,
     'on_danger': tokens.onDanger.value,
@@ -544,8 +544,8 @@ final cardDecoration = VariantStyle.decorationParts<AppTokens>(
   },
   variants: {
     CardTone.highlighted: (tokens) => {
-      DecorationPart.color(tokens.primary.withValues(alpha: 0.08)),
-      DecorationPart.border(Border.all(color: tokens.primary)),
+      DecorationPart.color(tokens.colorPrimary.withValues(alpha: 0.08)),
+      DecorationPart.border(Border.all(color: tokens.colorPrimary)),
     },
   },
 );

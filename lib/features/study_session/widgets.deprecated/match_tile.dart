@@ -31,7 +31,7 @@ class MatchTile extends StatelessWidget {
     } else if (isSelected) {
       color = AppColors.primary;
     } else {
-      color = AppColors.textSecondary;
+      color = AppColors.colorTextSecondary;
     }
 
     return GestureDetector(

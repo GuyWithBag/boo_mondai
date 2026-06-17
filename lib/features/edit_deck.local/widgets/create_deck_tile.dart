@@ -13,7 +13,7 @@ class CreateDeckTile extends StatelessWidget {
     return SizedBox(
       width: 300,
       child: AspectRatio(
-        aspectRatio: tokens.cardAspectRatio,
+        aspectRatio: tokens.studyCardAspectRatio,
         child: Button.icon(
           tone: ButtonTone.dashed,
           icon: Icons.add,

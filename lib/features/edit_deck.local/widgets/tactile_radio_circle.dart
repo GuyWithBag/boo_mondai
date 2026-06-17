@@ -18,7 +18,9 @@ class TactileRadioCircle extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
-          color: correct ? tokens.actionSuccess : tokens.borderNeutralSubtle,
+          color: correct
+              ? tokens.colorActionSuccess
+              : tokens.colorBorderNeutralSubtle,
           width: 3,
         ),
       ),
@@ -28,7 +30,7 @@ class TactileRadioCircle extends StatelessWidget {
                 width: 10,
                 height: 10,
                 decoration: BoxDecoration(
-                  color: tokens.actionSuccess,
+                  color: tokens.colorActionSuccess,
                   shape: BoxShape.circle,
                 ),
               ),

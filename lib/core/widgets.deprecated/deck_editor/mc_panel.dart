@@ -51,7 +51,7 @@
 //               Text(
 //                 'ANSWER OPTIONS',
 //                 style: textTheme.labelMedium?.copyWith(
-//                   color: AppColors.textSecondary,
+//                   color: AppColors.colorTextSecondary,
 //                   fontWeight: FontWeight.w600,
 //                   letterSpacing: 0.4,
 //                 ),

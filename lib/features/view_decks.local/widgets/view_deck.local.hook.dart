@@ -118,11 +118,7 @@ ViewDeckLocalSheetState useViewDeckLocalSheet({
             : Icons.visibility_off_outlined,
       ),
       actions: [
-        const ModalAction<bool>(
-          value: false,
-          label: 'Cancel',
-          tone: ButtonTone.ghost,
-        ),
+        const ModalAction<bool>(value: false, label: 'Cancel'),
         ModalAction<bool>(
           value: true,
           label: actionLabel,
@@ -216,11 +212,7 @@ ViewDeckLocalSheetState useViewDeckLocalSheet({
       body: '"$title" and all its cards will be removed.',
       leading: const Icon(Icons.delete_outline),
       actions: [
-        const ModalAction<bool>(
-          value: false,
-          label: 'Cancel',
-          tone: ButtonTone.ghost,
-        ),
+        const ModalAction<bool>(value: false, label: 'Cancel'),
         const ModalAction<bool>(
           value: true,
           label: 'Delete',

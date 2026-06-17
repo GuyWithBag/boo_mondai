@@ -18,8 +18,8 @@ class EditDeckAppbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final horizontalPadding = tokens.spacePanelPadding;
-    final verticalPadding = tokens.spacePanelPaddingSm;
+    final horizontalPadding = tokens.spaceLayoutPadding;
+    final verticalPadding = tokens.spaceLayoutPadding;
 
     return SliverAppBar(
       leadingWidth: 100.w,
@@ -44,7 +44,7 @@ class EditDeckAppbar extends StatelessWidget {
               TextField(
                 controller: titleController,
                 style: TextStyle(
-                  color: tokens.textPrimary,
+                  color: tokens.colorTextBaseline,
                   fontSize: 24.sp,
                   fontWeight: FontWeight.w900,
                   height: 1,
@@ -64,7 +64,7 @@ class EditDeckAppbar extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Button(
-                tone: ButtonTone.filled,
+                variants: const [ButtonTone.filled],
                 onPressed: isSaving ? null : onSave,
                 child: isSaving
                     ? const SizedBox.square(

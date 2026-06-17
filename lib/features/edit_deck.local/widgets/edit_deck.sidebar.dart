@@ -66,9 +66,9 @@ class EditDeckSidebar extends StatelessWidget {
     return Container(
       width: 288.w,
       decoration: BoxDecoration(
-        color: tokens.backgroundSurface,
+        color: tokens.colorSurfaceBackground,
         border: Border(
-          right: BorderSide(color: tokens.borderNeutralSubtle, width: 2),
+          right: BorderSide(color: tokens.colorBorderNeutralSubtle, width: 2),
         ),
       ),
       child: Column(
@@ -89,9 +89,7 @@ class EditDeckSidebar extends StatelessWidget {
                         : () => onTemplateSelected(template.id),
                     leading: Icon(_iconFor(template)),
                     mainAxisAlignment: MainAxisAlignment.start,
-                    tone: template.id == activeTemplateId
-                        ? ButtonTone.ghost
-                        : ButtonTone.text,
+                    variants: const [ButtonTone.textGhostSelect],
                     child: Text(
                       _labelFor(template),
                       maxLines: 2,

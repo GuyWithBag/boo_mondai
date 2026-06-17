@@ -3,3 +3,4 @@
 // Other files
 export 'controller.dart';
 export 'cube.controller.dart';
+export 'selection.controller.dart';

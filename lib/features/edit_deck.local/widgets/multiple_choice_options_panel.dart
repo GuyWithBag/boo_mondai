@@ -22,7 +22,7 @@ class MultipleChoiceOptionsPanel extends StatelessWidget {
     final tokens = context.themeTokens<AppTokens>();
 
     return Surface(
-      style: surfaceStyle.resolve(tokens, const [SurfaceTone.surface]),
+      style: surfaceStyle.resolve(tokens, const [SurfaceColor.baseline]),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -71,7 +71,7 @@ class MultipleChoiceOptionsPanel extends StatelessWidget {
             const SizedBox(height: 20),
             Button(
               leading: const Icon(Icons.add),
-              tone: ButtonTone.dashed,
+              variants: const [ButtonTone.dashed],
               onPressed: onOptionAdd,
               child: const Text('Add Option'),
             ),

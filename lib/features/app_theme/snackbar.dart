@@ -31,7 +31,7 @@ class Snackbar extends StatelessWidget {
             children: [
               if (leading != null) ...[
                 leading!,
-                SizedBox(width: tokens.spacePanelGapSm),
+                SizedBox(width: tokens.spaceLayoutGapSm),
               ],
               Flexible(child: SelectableText(message)),
             ],

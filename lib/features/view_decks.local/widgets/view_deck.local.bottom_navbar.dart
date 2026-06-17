@@ -30,13 +30,12 @@ class ViewDeckLocalBottomNavbar extends StatelessWidget {
     return SizedBox(
       child: SafeArea(
         top: false,
-        minimum: EdgeInsets.all(tokens.spacePanelPadding),
+        minimum: EdgeInsets.all(tokens.spaceLayoutPadding),
         child: Row(
-          spacing: tokens.spacePanelGapMd,
+          spacing: tokens.spaceLayoutGapMd,
           children: [
             Expanded(
               child: Button(
-                tone: ButtonTone.ghost,
                 onPressed: () => context.push(
                   '/view-cards?deckId=${Uri.encodeQueryComponent(deckId)}',
                 ),
@@ -51,7 +50,7 @@ class ViewDeckLocalBottomNavbar extends StatelessWidget {
                     ? '$eligibleCards.length cards ready'
                     : 'Completed',
                 child: Button(
-                  tone: ButtonTone.filled,
+                  variants: const [ButtonTone.filled],
                   onPressed: canDrill
                       ? () => context.push('/drill/$deckId/session')
                       : null,

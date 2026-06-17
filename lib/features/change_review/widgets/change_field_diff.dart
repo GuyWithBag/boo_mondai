@@ -21,26 +21,26 @@ class ChangeFieldDiffView extends StatelessWidget {
     final after = diff.after?.toString();
 
     return Padding(
-      padding: EdgeInsets.only(bottom: tokens.spacePanelGapMd.h),
+      padding: EdgeInsets.only(bottom: tokens.spaceLayoutGapMd.h),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             diff.field,
             style: TextStyle(
-              color: tokens.textPrimary,
+              color: tokens.colorTextBaseline,
               fontFamily: tokens.fontFamily,
               fontSize: tokens.textSizeLabelLarge.sp,
               fontWeight: tokens.fontWeightTextStrong,
             ),
           ),
           SizedBox(height: 8.h),
-          Divider(color: tokens.borderNeutralSubtle, thickness: 1.5.h),
+          Divider(color: tokens.colorBorderNeutralSubtle, thickness: 1.5.h),
           if (before != null && before.isNotEmpty) ...[
             Text(
               before,
               style: TextStyle(
-                color: tokens.textMuted,
+                color: tokens.colorTextMuted,
                 fontFamily: tokens.fontFamily,
                 fontSize: tokens.textSizeLabel.sp,
                 decoration: type == ChangeType.modified
@@ -54,7 +54,7 @@ class ChangeFieldDiffView extends StatelessWidget {
             Text(
               after,
               style: TextStyle(
-                color: tokens.textPrimary,
+                color: tokens.colorTextBaseline,
                 fontFamily: tokens.fontFamily,
                 fontSize: tokens.textSizeLabel.sp,
                 fontWeight: tokens.fontWeightTextStrong,

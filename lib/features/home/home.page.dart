@@ -14,11 +14,13 @@ import 'package:boo_mondai/lib.barrel.dart'
         LocalDB,
         LeaderboardSection,
         ReadyToReviewCard,
-        StreaksCard;
+        StreaksCard,
+        AppTokens;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:theme_variants/theme_variants.dart';
 
 class HomePage extends HookWidget {
   const HomePage({super.key});
@@ -28,6 +30,7 @@ class HomePage extends HookWidget {
     final auth = context.watch<AuthController>();
     final reviewDashboard = context.watch<ViewReviewsController>();
     final leaderboard = context.watch<ViewLeaderboardController>();
+    final tokens = context.themeTokens<AppTokens>();
 
     useEffect(() {
       Future.microtask(() {
@@ -46,22 +49,23 @@ class HomePage extends HookWidget {
               leaderboard.fetchLeaderboard(),
             ]);
           },
-          child: ListView(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            children: [
-              ReadyToReviewCard(
-                dueCount: reviewDashboard.totalDue,
-                onStartSession: () => context.push('/review/session'),
-              ),
-              const SizedBox(height: AppSpacing.md),
-              StreaksCard(streak: LocalDB.streak.retrieve()),
-              const SizedBox(height: AppSpacing.md),
-              LeaderboardSection(
-                entries: leaderboard.entries,
-                isLoading: leaderboard.isLoading,
-                currentUserId: auth.currentProfile.id,
-              ),
-            ],
+          child: Padding(
+            padding: EdgeInsets.all(tokens.spaceLayoutPadding),
+            child: Column(
+              spacing: tokens.spaceLayoutGapMd,
+              children: [
+                ReadyToReviewCard(
+                  dueCount: reviewDashboard.totalDue,
+                  onStartSession: () => context.push('/review/session'),
+                ),
+                StreaksCard(streak: LocalDB.streak.getOrCreate()),
+                LeaderboardSection(
+                  entries: leaderboard.entries,
+                  isLoading: leaderboard.isLoading,
+                  currentUserId: auth.currentProfile.id,
+                ),
+              ],
+            ),
           ),
         ),
       ),

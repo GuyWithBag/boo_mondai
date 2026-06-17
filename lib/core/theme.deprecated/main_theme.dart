@@ -24,8 +24,8 @@ abstract final class AppTheme {
     ),
     scaffoldBackgroundColor: AppColors.background,
     textTheme: AppTypography.textTheme.apply(
-      bodyColor: AppColors.textPrimary,
-      displayColor: AppColors.textPrimary,
+      bodyColor: AppColors.colorTextBaseline,
+      displayColor: AppColors.colorTextBaseline,
     ),
     cardTheme: CardThemeData(
       shape: RoundedRectangleBorder(

@@ -69,7 +69,7 @@ class MatchMadnessInteraction extends HookWidget {
           'Match all pairs',
           style: Theme.of(
             context,
-          ).textTheme.labelSmall?.copyWith(color: AppColors.textSecondary),
+          ).textTheme.labelSmall?.copyWith(color: AppColors.colorTextSecondary),
         ),
         const SizedBox(height: AppSpacing.sm),
         ...pairs.map((pair) {
@@ -93,7 +93,7 @@ class MatchMadnessInteraction extends HookWidget {
                   isMatched ? Icons.link : Icons.link_off,
                   color: isMatched
                       ? AppColors.correct
-                      : AppColors.textSecondary.withValues(alpha: 0.3),
+                      : AppColors.colorTextSecondary.withValues(alpha: 0.3),
                   size: 18,
                 ),
                 const SizedBox(width: AppSpacing.sm),

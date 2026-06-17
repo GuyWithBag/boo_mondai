@@ -54,23 +54,18 @@ class _SearchFilterModal<TFilter extends SearchFilter> extends HookWidget {
 
     return Dialog(
       backgroundColor: Colors.transparent,
-      insetPadding: EdgeInsets.all(tokens.spacePanelGapLg),
+      insetPadding: EdgeInsets.all(tokens.spaceLayoutGapLg),
       child: Modal(
         tone: tone,
         leading: const Icon(Icons.tune),
         actions: [
           Button(
-            tone: ButtonTone.ghost,
             onPressed: () => Navigator.pop(context),
             child: const Text('Cancel'),
           ),
+          Button(onPressed: reset, child: const Text('Reset')),
           Button(
-            tone: ButtonTone.ghost,
-            onPressed: reset,
-            child: const Text('Reset'),
-          ),
-          Button(
-            tone: ButtonTone.filled,
+            variants: const [ButtonTone.filled],
             onPressed: () => Navigator.pop(context, filter.value),
             child: const Text('Apply'),
           ),
@@ -84,7 +79,7 @@ class _SearchFilterModal<TFilter extends SearchFilter> extends HookWidget {
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.titleMedium,
             ),
-            SizedBox(height: tokens.spacePanelGapLg),
+            SizedBox(height: tokens.spaceLayoutGapLg),
             ConstrainedBox(
               constraints: BoxConstraints(
                 maxHeight: MediaQuery.of(context).size.height * 0.6,
@@ -103,7 +98,7 @@ class _SearchFilterModal<TFilter extends SearchFilter> extends HookWidget {
                         ),
                       ),
                       if (index != fields.length - 1)
-                        SizedBox(height: tokens.spacePanelGapLg),
+                        SizedBox(height: tokens.spaceLayoutGapLg),
                     ],
                   ],
                 ),
@@ -133,7 +128,7 @@ class _SearchFilterFieldShell extends StatelessWidget {
           label.toUpperCase(),
           style: Theme.of(context).textTheme.labelSmall,
         ),
-        SizedBox(height: tokens.spacePanelGapSm),
+        SizedBox(height: tokens.spaceLayoutGapSm),
         child,
       ],
     );

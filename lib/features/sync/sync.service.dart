@@ -4,7 +4,6 @@
 
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        Services,
         SyncException,
         DTO,
         HiveLocalDB,
@@ -17,7 +16,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         ChangeSource,
         ChangeType,
         SyncPlanPayload,
-        SyncSummary;
+        SyncSummary,
+        AuthService;
 
 /// Compares two DateTimes at millisecond precision, ignoring sub-millisecond
 /// differences introduced by Supabase's microsecond storage vs Dart/Hive's
@@ -28,7 +28,7 @@ bool _isStrictlyAfterMs(DateTime a, DateTime b) {
 
 class SyncService {
   static void _ensureAuthenticated({required String userId}) {
-    if (!Services.auth.isAuthenticatedRemote || userId.trim().isEmpty) {
+    if (!AuthService.isAuthenticatedRemote || userId.trim().isEmpty) {
       throw const SyncException(
         'Sign in to sync your data.',
         code: 'SYNC_AUTH_REQUIRED',

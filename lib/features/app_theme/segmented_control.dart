@@ -32,7 +32,7 @@ class SegmentedControl<T> extends StatelessWidget {
       style: SurfaceStyle(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: tokens.softGray,
+          color: tokens.colorMuted,
           borderRadius: BorderRadius.circular(tokens.radiusSurface),
         ),
       ),

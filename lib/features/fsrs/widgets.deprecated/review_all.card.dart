@@ -4,7 +4,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         Button,
         ButtonSize,
         ButtonTone,
-        appTextStyle,
+        textStyle,
         TextSize,
         TextTone,
         TextWeight;
@@ -24,10 +24,10 @@ class ReviewAllCard extends StatelessWidget {
     final canReview = dueCount > 0;
 
     return Material(
-      color: tokens.backgroundSurface,
+      color: tokens.colorSurfaceBackground,
       shape: RoundedRectangleBorder(
         side: BorderSide(
-          color: tokens.borderNeutralSubtle,
+          color: tokens.colorBorderNeutralSubtle,
           width: tokens.borderWidthDefault.w,
         ),
         borderRadius: BorderRadius.circular(tokens.radiusSurfaceSm.r),
@@ -35,8 +35,8 @@ class ReviewAllCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: Padding(
         padding: EdgeInsets.symmetric(
-          horizontal: tokens.spacePanelPadding.r,
-          vertical: tokens.spacePanelPaddingSm.r,
+          horizontal: tokens.spaceLayoutPadding.r,
+          vertical: tokens.spaceLayoutPadding.r,
         ),
         child: Row(
           children: [
@@ -49,33 +49,31 @@ class ReviewAllCard extends StatelessWidget {
                     'You have $dueCount card${dueCount == 1 ? '' : 's'} Due',
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: appTextStyle.resolve(tokens, const [
+                    style: textStyle.resolve(tokens, const [
                       TextSize.header,
                       TextWeight.strong,
-                      TextTone.primary,
                     ]),
                   ),
-                  SizedBox(height: tokens.spacePanelGapSm.h),
+                  SizedBox(height: tokens.spaceLayoutGapSm.h),
                   Text(
                     '{Random Motivational Phrase}',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: appTextStyle.resolve(tokens, const [
+                    style: textStyle.resolve(tokens, const [
                       TextSize.label,
                       TextWeight.strong,
-                      TextTone.primary,
                     ]),
                   ),
                 ],
               ),
             ),
-            SizedBox(width: tokens.spacePanelGapLg.w),
+            SizedBox(width: tokens.spaceLayoutGapLg.w),
             Button(
               onPressed: canReview
                   ? () => context.push('/review/session')
                   : null,
-              tone: ButtonTone.ghost,
-              size: ButtonSize.lg,
+
+              variants: const [ButtonSize.lg],
               child: const Text('REVIEW ALL?'),
             ),
           ],

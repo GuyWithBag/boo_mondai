@@ -25,7 +25,7 @@ Future<void> showGuestMergeDialog({
       ModalAction<GuestMergeChoice>(
         value: GuestMergeChoice.merge,
         label: 'Merge into account',
-        tone: ButtonTone.filled,
+        tone: ButtonTone.error,
       ),
     ],
   );

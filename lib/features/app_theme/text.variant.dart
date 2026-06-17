@@ -3,23 +3,24 @@ import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
 import 'package:theme_variants/theme_variants.dart';
 
 enum TextSize {
+  headerLarge,
   header,
   labelLarge,
   label,
   labelSmall,
   bodyLarge,
   cardFront,
-  cardBackFront,
+  cardBack,
   cardBackContent,
 }
 
 enum TextWeight { body, strong, heavy }
 
-enum TextTone { primary, secondary, muted, brand }
+enum TextTone { baseline, secondary, muted, brand }
 
-final appTextStyle = VariantStyle.textParts<AppTokens>(
+final textStyle = VariantStyle.textParts<AppTokens>(
   base: (tokens) => {
-    TextStylePart.color(tokens.textPrimary),
+    TextStylePart.color(tokens.colorTextBaseline),
     TextStylePart.fontWeight(tokens.fontWeightTextBody),
   },
   defaultVariants: const [
@@ -28,6 +29,10 @@ final appTextStyle = VariantStyle.textParts<AppTokens>(
     TextTone.secondary,
   ],
   variants: {
+    TextSize.headerLarge: (tokens) => {
+      TextStylePart.fontSize(tokens.textSizeHeaderLarge.sp),
+      // TextStylePart.height(tokens.lineHeightTextDisplay),
+    },
     TextSize.header: (tokens) => {
       TextStylePart.fontSize(tokens.textSizeHeader.sp),
       TextStylePart.height(tokens.lineHeightTextDisplay),
@@ -49,15 +54,15 @@ final appTextStyle = VariantStyle.textParts<AppTokens>(
       TextStylePart.height(tokens.lineHeightFieldDisplay),
     },
     TextSize.cardFront: (tokens) => {
-      TextStylePart.fontSize(tokens.textSizeCardFront.sp),
+      TextStylePart.fontSize(tokens.studyCardTextSizeFront.sp),
       TextStylePart.height(tokens.lineHeightTextDisplay),
     },
-    TextSize.cardBackFront: (tokens) => {
-      TextStylePart.fontSize(tokens.textSizeCardBackFront.sp),
+    TextSize.cardBack: (tokens) => {
+      TextStylePart.fontSize(tokens.studyCardTextSizeBack.sp),
       TextStylePart.height(tokens.lineHeightTextTitle),
     },
     TextSize.cardBackContent: (tokens) => {
-      TextStylePart.fontSize(tokens.textSizeCardBackContent.sp),
+      TextStylePart.fontSize(tokens.studyCardTextSizeBackContent.sp),
       TextStylePart.height(tokens.lineHeightFieldDisplay),
     },
     TextWeight.body: (tokens) => {
@@ -69,9 +74,13 @@ final appTextStyle = VariantStyle.textParts<AppTokens>(
     TextWeight.heavy: (tokens) => {
       TextStylePart.fontWeight(tokens.fontWeightTextHeavy),
     },
-    TextTone.primary: (tokens) => {TextStylePart.color(tokens.textPrimary)},
-    TextTone.secondary: (tokens) => {TextStylePart.color(tokens.textSecondary)},
-    TextTone.muted: (tokens) => {TextStylePart.color(tokens.textMuted)},
-    TextTone.brand: (tokens) => {TextStylePart.color(tokens.primary)},
+    TextTone.baseline: (tokens) => {
+      TextStylePart.color(tokens.colorTextBaseline),
+    },
+    TextTone.secondary: (tokens) => {
+      TextStylePart.color(tokens.colorTextSecondary),
+    },
+    TextTone.muted: (tokens) => {TextStylePart.color(tokens.colorTextMuted)},
+    TextTone.brand: (tokens) => {TextStylePart.color(tokens.colorPrimary)},
   },
 );

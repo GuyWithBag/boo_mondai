@@ -4,7 +4,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         Button,
         ProgressBar,
-        appTextStyle,
+        textStyle,
         TextSize,
         TextWeight,
         TextTone;
@@ -29,10 +29,10 @@ class StudySessionAppbar extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
       decoration: BoxDecoration(
-        color: tokens.backgroundPage,
+        color: tokens.colorPageBackground,
         border: Border(
           bottom: BorderSide(
-            color: tokens.borderNeutralSubtle.withValues(alpha: 0.5),
+            color: tokens.colorBorderNeutralSubtle.withValues(alpha: 0.5),
           ),
         ),
       ),
@@ -46,7 +46,7 @@ class StudySessionAppbar extends StatelessWidget {
           SizedBox(width: 18.w),
           Text(
             '${controller.currentIndex} / ${controller.queue.length}',
-            style: appTextStyle.resolve(tokens, [
+            style: textStyle.resolve(tokens, [
               TextSize.labelSmall,
               TextWeight.heavy,
               TextTone.muted,

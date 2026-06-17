@@ -83,10 +83,10 @@ class DeckTile extends HookWidget {
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
     const stackedCardCount = 3;
-    final cardAspectRatio = tokens.cardAspectRatio;
-    final cardWidth = width ?? tokens.widthCard;
-    final cardHeight = cardWidth / cardAspectRatio;
-    final animationScale = cardWidth / tokens.widthCard;
+    final studyCardAspectRatio = tokens.studyCardAspectRatio;
+    final cardWidth = width ?? tokens.studyCardWidth;
+    final cardHeight = cardWidth / studyCardAspectRatio;
+    final animationScale = cardWidth / tokens.studyCardWidth;
     final coverImage = backgroundImageProviderFromSource(deck?.coverImageUrl);
     // final scale = 1.3;
     final cardControllers = useMemoized(
@@ -166,7 +166,7 @@ class DeckTile extends HookWidget {
         child: SizedBox(
           width: cardWidth,
           child: AspectRatio(
-            aspectRatio: cardAspectRatio,
+            aspectRatio: studyCardAspectRatio,
             child: Stack(
               clipBehavior: Clip.none,
               fit: StackFit.expand,
@@ -209,5 +209,4 @@ class DeckTile extends HookWidget {
       ),
     );
   }
-
 }

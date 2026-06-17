@@ -10,12 +10,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         Button,
         ButtonSize,
-        ButtonTone,
         LeaderboardEntry,
         LeaderboardTileWidget,
         SurfaceBorder,
         SurfaceShape,
-        SurfaceTone,
+        SurfaceColor,
         surfaceStyle;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -41,7 +40,7 @@ class LeaderboardSection extends StatelessWidget {
 
     return Surface(
       style: surfaceStyle.resolve(tokens, const [
-        SurfaceTone.surface,
+        SurfaceColor.baseline,
         SurfaceShape.rounded,
         SurfaceBorder.none,
       ]),
@@ -60,7 +59,7 @@ class LeaderboardSection extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 22.sp,
                         fontWeight: tokens.fontWeightTextHeavy,
-                        color: tokens.textPrimary,
+                        color: tokens.colorTextBaseline,
                       ),
                     ),
                     SizedBox(height: 8.h),
@@ -69,7 +68,7 @@ class LeaderboardSection extends StatelessWidget {
                       style: TextStyle(
                         fontSize: tokens.textSizeLabel.sp,
                         fontWeight: tokens.fontWeightTextStrong,
-                        color: tokens.textSecondary,
+                        color: tokens.colorTextSecondary,
                       ),
                     ),
                   ],
@@ -77,7 +76,7 @@ class LeaderboardSection extends StatelessWidget {
               ),
               Icon(
                 Icons.workspace_premium_outlined,
-                color: tokens.textPrimary,
+                color: tokens.colorTextBaseline,
                 size: 30.sp,
               ),
             ],
@@ -89,7 +88,7 @@ class LeaderboardSection extends StatelessWidget {
             Text(
               'No scores yet. Complete a drill to appear here.',
               style: TextStyle(
-                color: tokens.textSecondary,
+                color: tokens.colorTextSecondary,
                 fontWeight: tokens.fontWeightTextStrong,
               ),
             )
@@ -109,8 +108,8 @@ class LeaderboardSection extends StatelessWidget {
             width: double.infinity,
             child: Button(
               onPressed: () => context.push('/leaderboard'),
-              tone: ButtonTone.ghost,
-              size: ButtonSize.lg,
+
+              variants: const [ButtonSize.lg],
               child: const Text('SEE ALL RANKINGS'),
             ),
           ),

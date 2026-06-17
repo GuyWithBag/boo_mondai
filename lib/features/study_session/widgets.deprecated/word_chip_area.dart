@@ -36,7 +36,7 @@ class WordChipArea extends StatelessWidget {
           label,
           style: Theme.of(
             context,
-          ).textTheme.labelSmall?.copyWith(color: AppColors.textSecondary),
+          ).textTheme.labelSmall?.copyWith(color: AppColors.colorTextSecondary),
         ),
         const SizedBox(height: 4),
         ConstrainedBox(

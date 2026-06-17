@@ -3,7 +3,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         TextSize,
         surfaceStyle,
-        appTextStyle,
+        textStyle,
         TextWeight,
         TextTone,
         TextFieldSize,
@@ -44,13 +44,13 @@ class TextFieldCard extends StatelessWidget {
           children: [
             Text(
               title.toUpperCase(),
-              style: appTextStyle.resolve(tokens, [
+              style: textStyle.resolve(tokens, [
                 TextSize.labelSmall,
                 TextWeight.heavy,
                 TextTone.muted,
               ]),
             ),
-            SizedBox(height: tokens.spacePanelGapLg),
+            SizedBox(height: tokens.spaceLayoutGapLg),
             Expanded(
               child: VariantTextField(
                 controller: controller,
@@ -69,13 +69,13 @@ class TextFieldCard extends StatelessWidget {
             Column(
               children: [
                 Divider(),
-                SizedBox(height: tokens.spacePanelGapMd),
+                SizedBox(height: tokens.spaceLayoutGapMd),
               ],
             ),
             Row(
               children: [
                 Button.icon(onPressed: () {}, icon: Icons.image_outlined),
-                SizedBox(width: tokens.spacePanelGapSm),
+                SizedBox(width: tokens.spaceLayoutGapSm),
                 Button.icon(onPressed: () {}, icon: Icons.mic),
               ],
             ),

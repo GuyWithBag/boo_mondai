@@ -5,9 +5,10 @@
 // HOOKS: useEffect, useScrollController, useTextEditingController
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'dart:convert';
+
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        AuthController,
         Button,
         ChangeReviewController,
         ChangeReviewPlan,
@@ -20,16 +21,20 @@ import 'package:boo_mondai/lib.barrel.dart'
         DeckTileState,
         EmptyState,
         FilteredSearchBar,
+        ImportExportController,
         ListingStatesWrapper,
+        SnackbarTone,
         SyncButton,
         SyncPage,
         ViewDecksLocalController,
         showCreateDeckLocalSheet,
         showSnackbar,
-        useFilteredSearchBarController;
+        useFilteredSearchBarController,
+        AuthService;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:provider/provider.dart';
 
 class ViewDecksLocalPage extends HookWidget {
@@ -38,8 +43,8 @@ class ViewDecksLocalPage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<ViewDecksLocalController>();
-    final auth = context.watch<AuthController>();
     final reviewController = context.watch<ChangeReviewController>();
+    final importExport = useMemoized(() => ImportExportController());
 
     useEffect(() {
       controller.loadOnNextFrame();
@@ -64,6 +69,9 @@ class ViewDecksLocalPage extends HookWidget {
       return null;
     }, [controller.changePlan]);
 
+    useEffect(() => importExport.dispose, [importExport]);
+    useListenable(importExport);
+
     final searchController =
         useFilteredSearchBarController<Deck, DeckSearchFilter>(
           filterCodec: ViewDecksLocalController.deckSearchFilterCodec,
@@ -75,10 +83,87 @@ class ViewDecksLocalPage extends HookWidget {
     final hasSearchQuery = searchController.text.trim().isNotEmpty;
     final syncPlan = _currentSyncPlan(reviewController.plans);
 
+    Future<void> importDecksFromFile() async {
+      final result = await FilePicker.pickFiles(
+        dialogTitle: 'Import decks',
+        type: FileType.custom,
+        allowedExtensions: const ['json'],
+        withData: true,
+      );
+      if (result == null || result.files.isEmpty) return;
+      if (!context.mounted) return;
+
+      final file = result.files.single;
+      final bytes = file.bytes;
+      if (bytes == null) {
+        showSnackbar(
+          context: context,
+          message: 'Could not read the selected file.',
+          leading: const Icon(Icons.error_outline),
+          tone: SnackbarTone.error,
+        );
+        return;
+      }
+
+      final rawJson = utf8.decode(bytes);
+      final decoded = jsonDecode(rawJson);
+      var importedCount = 0;
+
+      if (decoded is Map<String, dynamic>) {
+        if (decoded.containsKey('decks')) {
+          final imported = await importExport.importDecksJson(rawJson: rawJson);
+          importedCount = imported.whereType<Deck>().length;
+        } else if (decoded.containsKey('deck')) {
+          final imported = await importExport.importDeckJson(rawJson: rawJson);
+          importedCount = imported == null ? 0 : 1;
+        } else {
+          showSnackbar(
+            context: context,
+            message: 'Unsupported import format.',
+            leading: const Icon(Icons.error_outline),
+            tone: SnackbarTone.error,
+          );
+          return;
+        }
+      } else if (decoded is List) {
+        final imported = await importExport.importDecksJson(rawJson: rawJson);
+        importedCount = imported.whereType<Deck>().length;
+      } else {
+        showSnackbar(
+          context: context,
+          message: 'Unsupported import format.',
+          leading: const Icon(Icons.error_outline),
+          tone: SnackbarTone.error,
+        );
+        return;
+      }
+
+      if (!context.mounted) return;
+      controller.load();
+
+      if (importExport.error != null) {
+        showSnackbar(
+          context: context,
+          message: 'Import failed: ${importExport.error}',
+          leading: const Icon(Icons.error_outline),
+          tone: SnackbarTone.error,
+        );
+        return;
+      }
+
+      showSnackbar(
+        context: context,
+        message: importedCount == 1
+            ? 'Imported 1 deck'
+            : 'Imported $importedCount decks',
+        leading: const Icon(Icons.file_download_done_outlined),
+      );
+    }
+
     // If there's an active sync plan, show SyncPage regardless of which
     // tab the user navigated to and back from — the plan survives in
     // ChangeReviewController which lives above the ShellRoute.
-    if (auth.service.isAuthenticatedRemote && syncPlan != null) {
+    if (AuthService.isAuthenticatedRemote && syncPlan != null) {
       return SyncPage(
         plan: syncPlan,
         onViewChanges: () {
@@ -113,8 +198,12 @@ class ViewDecksLocalPage extends HookWidget {
         actions: [
           SyncButton(
             isSyncing: controller.isSyncing,
-            isAuthenticated: auth.service.isAuthenticatedRemote,
+            isAuthenticated: AuthService.isAuthenticatedRemote,
             onSync: () => controller.sync(reviewController),
+          ),
+          Button.icon(
+            icon: Icons.file_open_outlined,
+            onPressed: importExport.isLoading ? null : importDecksFromFile,
           ),
           Button.icon(
             icon: Icons.layers_rounded,

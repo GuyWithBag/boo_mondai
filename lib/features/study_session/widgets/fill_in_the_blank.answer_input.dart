@@ -58,8 +58,8 @@ class FillInTheBlankAnswerInput extends StatelessWidget {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
             decoration: BoxDecoration(
-              color: tokens.actionSuccess.withValues(alpha: 0.12),
-              border: Border.all(color: tokens.actionSuccess),
+              color: tokens.colorActionSuccess.withValues(alpha: 0.12),
+              border: Border.all(color: tokens.colorActionSuccess),
               borderRadius: BorderRadius.circular(10.r),
             ),
             child: MarkdownText(data: correctAnswer),

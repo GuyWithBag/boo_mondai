@@ -17,9 +17,9 @@ enum TextFieldAlign { start, center }
 
 final appTextFieldStyle = VariantStyle.textFieldParts<AppTokens>(
   base: (tokens) => {
-    TextFieldStylePart.cursorColor(tokens.primary),
+    TextFieldStylePart.cursorColor(tokens.colorPrimary),
     TextFieldStylePart.text({
-      TextStylePart.color(tokens.textPrimary),
+      TextStylePart.color(tokens.colorTextBaseline),
       TextStylePart.fontWeight(tokens.fontWeightTextStrong),
     }),
     TextFieldStylePart.decoration({
@@ -76,13 +76,13 @@ final appTextFieldStyle = VariantStyle.textFieldParts<AppTokens>(
     TextFieldFrame.outline: (tokens) => {
       TextFieldStylePart.decoration({
         InputDecorationPart.filled(true),
-        InputDecorationPart.fillColor(tokens.backgroundPage),
+        InputDecorationPart.fillColor(tokens.colorPageBackground),
         InputDecorationPart.contentPadding(EdgeInsets.all(16.r)),
         InputDecorationPart.enabledBorder(
           OutlineInputBorder(
             borderRadius: BorderRadius.circular(tokens.radiusSurfaceSm.r),
             borderSide: BorderSide(
-              color: tokens.borderNeutralSubtle,
+              color: tokens.colorBorderNeutralSubtle,
               width: tokens.borderWidthDefault.w,
             ),
           ),
@@ -91,7 +91,7 @@ final appTextFieldStyle = VariantStyle.textFieldParts<AppTokens>(
           OutlineInputBorder(
             borderRadius: BorderRadius.circular(tokens.radiusSurfaceSm.r),
             borderSide: BorderSide(
-              color: tokens.primary,
+              color: tokens.colorPrimary,
               width: tokens.borderWidthDefault.w,
             ),
           ),
@@ -101,76 +101,85 @@ final appTextFieldStyle = VariantStyle.textFieldParts<AppTokens>(
     TextFieldFrame.underline: (tokens) => {
       TextFieldStylePart.decoration({
         InputDecorationPart.filled(true),
-        InputDecorationPart.fillColor(tokens.softGray),
+        InputDecorationPart.fillColor(tokens.colorMuted),
         // InputDecorationPart.contentPadding(
         //   EdgeInsets.symmetric(horizontal: 18.w, vertical: 12.h),
         // ),
         InputDecorationPart.enabledBorder(
           UnderlineInputBorder(
-            borderSide: BorderSide(color: tokens.primary, width: 4.w),
+            borderSide: BorderSide(color: tokens.colorPrimary, width: 4.w),
           ),
         ),
         InputDecorationPart.focusedBorder(
           UnderlineInputBorder(
-            borderSide: BorderSide(color: tokens.primary, width: 4.w),
+            borderSide: BorderSide(color: tokens.colorPrimary, width: 4.w),
           ),
         ),
       }),
     },
     TextFieldTone.neutral: (tokens) => {
-      TextFieldStylePart.text({TextStylePart.color(tokens.textPrimary)}),
+      TextFieldStylePart.text({TextStylePart.color(tokens.colorTextBaseline)}),
     },
     TextFieldTone.brand: (tokens) => {
-      TextFieldStylePart.cursorColor(tokens.primary),
-      TextFieldStylePart.text({TextStylePart.color(tokens.primary)}),
+      TextFieldStylePart.cursorColor(tokens.colorPrimary),
+      TextFieldStylePart.text({TextStylePart.color(tokens.colorPrimary)}),
     },
     TextFieldTone.success: (tokens) => {
-      TextFieldStylePart.text({TextStylePart.color(tokens.actionSuccess)}),
+      TextFieldStylePart.text({TextStylePart.color(tokens.colorActionSuccess)}),
       TextFieldStylePart.decoration({
         InputDecorationPart.fillColor(
-          tokens.actionSuccess.withValues(alpha: 0.12),
+          tokens.colorActionSuccess.withValues(alpha: 0.12),
         ),
         InputDecorationPart.enabledBorder(
           UnderlineInputBorder(
-            borderSide: BorderSide(color: tokens.actionSuccess, width: 4.w),
+            borderSide: BorderSide(
+              color: tokens.colorActionSuccess,
+              width: 4.w,
+            ),
             borderRadius: BorderRadius.circular(12.r),
           ),
         ),
         InputDecorationPart.focusedBorder(
           UnderlineInputBorder(
-            borderSide: BorderSide(color: tokens.actionSuccess, width: 4.w),
+            borderSide: BorderSide(
+              color: tokens.colorActionSuccess,
+              width: 4.w,
+            ),
             borderRadius: BorderRadius.circular(12.r),
           ),
         ),
         (theme) => theme.copyWith(
           disabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: tokens.actionSuccess, width: 4.w),
+            borderSide: BorderSide(
+              color: tokens.colorActionSuccess,
+              width: 4.w,
+            ),
             borderRadius: BorderRadius.circular(12.r),
           ),
         ),
       }),
     },
     TextFieldTone.error: (tokens) => {
-      TextFieldStylePart.text({TextStylePart.color(tokens.actionError)}),
+      TextFieldStylePart.text({TextStylePart.color(tokens.colorActionError)}),
       TextFieldStylePart.decoration({
         InputDecorationPart.fillColor(
-          tokens.actionError.withValues(alpha: 0.12),
+          tokens.colorActionError.withValues(alpha: 0.12),
         ),
         InputDecorationPart.enabledBorder(
           UnderlineInputBorder(
-            borderSide: BorderSide(color: tokens.actionError, width: 4.w),
+            borderSide: BorderSide(color: tokens.colorActionError, width: 4.w),
             borderRadius: BorderRadius.circular(12.r),
           ),
         ),
         InputDecorationPart.focusedBorder(
           UnderlineInputBorder(
-            borderSide: BorderSide(color: tokens.actionError, width: 4.w),
+            borderSide: BorderSide(color: tokens.colorActionError, width: 4.w),
             borderRadius: BorderRadius.circular(12.r),
           ),
         ),
         (theme) => theme.copyWith(
           disabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: tokens.actionError, width: 4.w),
+            borderSide: BorderSide(color: tokens.colorActionError, width: 4.w),
             borderRadius: BorderRadius.circular(12.r),
           ),
         ),

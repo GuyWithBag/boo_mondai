@@ -3,8 +3,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         useFillInTheBlanksEditor,
         AppTokens,
         surfaceStyle,
-        SurfaceTone,
-        appTextStyle,
+        SurfaceColor,
+        textStyle,
         TextSize,
         TextWeight,
         TextTone,
@@ -34,13 +34,13 @@ class FillInTheBlanksEditor extends HookWidget {
     );
 
     return Surface(
-      style: surfaceStyle.resolve(tokens, const [SurfaceTone.surface]),
+      style: surfaceStyle.resolve(tokens, const [SurfaceColor.baseline]),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'Sentence Builder'.toUpperCase(),
-            style: appTextStyle.resolve(tokens, [
+            style: textStyle.resolve(tokens, [
               TextSize.labelSmall,
               TextWeight.heavy,
               TextTone.muted,
@@ -49,7 +49,7 @@ class FillInTheBlanksEditor extends HookWidget {
           const SizedBox(height: 14),
           Text(
             'Type your full sentence below. Highlight the words you want the user to guess, and click "Create Blank".',
-            style: appTextStyle
+            style: textStyle
                 .resolve(tokens, [
                   TextSize.label,
                   TextWeight.body,
@@ -86,11 +86,11 @@ class FillInTheBlanksEditor extends HookWidget {
               editor.answers.isNotEmpty) ...[
             const SizedBox(height: 18),
             Surface(
-              style: surfaceStyle.resolve(tokens, const [SurfaceTone.muted]),
+              style: surfaceStyle.resolve(tokens, const [SurfaceColor.muted]),
               child: Text(
                 editor.previewSentence,
                 style: TextStyle(
-                  color: tokens.textPrimary,
+                  color: tokens.colorTextBaseline,
                   fontSize: 26,
                   fontWeight: FontWeight.w800,
                   height: 1.5,
@@ -101,17 +101,16 @@ class FillInTheBlanksEditor extends HookWidget {
           const SizedBox(height: 36),
           Text(
             'Hidden Segments'.toUpperCase(),
-            style: appTextStyle.resolve(tokens, [
+            style: textStyle.resolve(tokens, [
               TextSize.labelSmall,
               TextWeight.heavy,
-              TextTone.primary,
             ]),
           ),
           const SizedBox(height: 14),
           if (editor.answers.isEmpty)
             Text(
               'No blanks yet.',
-              style: appTextStyle.resolve(tokens, [
+              style: textStyle.resolve(tokens, [
                 TextSize.label,
                 TextWeight.body,
                 TextTone.secondary,
@@ -120,11 +119,11 @@ class FillInTheBlanksEditor extends HookWidget {
           else
             for (final entry in editor.answers.asMap().entries) ...[
               Surface(
-                style: surfaceStyle.resolve(tokens, const [SurfaceTone.muted]),
+                style: surfaceStyle.resolve(tokens, const [SurfaceColor.muted]),
                 child: Row(
                   children: [
                     Button(
-                      size: ButtonSize.lg,
+                      variants: const [ButtonSize.lg],
                       child: Text('${entry.key + 1}'),
                     ),
                     const SizedBox(width: 20),
@@ -134,7 +133,7 @@ class FillInTheBlanksEditor extends HookWidget {
                         children: [
                           Text(
                             'Correct Answer'.toUpperCase(),
-                            style: appTextStyle.resolve(tokens, [
+                            style: textStyle.resolve(tokens, [
                               TextSize.labelSmall,
                               TextWeight.heavy,
                               TextTone.muted,
@@ -144,7 +143,7 @@ class FillInTheBlanksEditor extends HookWidget {
                           Text(
                             entry.value,
                             style: TextStyle(
-                              color: tokens.textPrimary,
+                              color: tokens.colorTextBaseline,
                               fontSize: 24,
                               fontWeight: FontWeight.w900,
                             ),
@@ -154,7 +153,7 @@ class FillInTheBlanksEditor extends HookWidget {
                     ),
                     IconButton(
                       onPressed: () => editor.removeBlankAt(entry.key),
-                      icon: Icon(Icons.delete, color: tokens.actionError),
+                      icon: Icon(Icons.delete, color: tokens.colorActionError),
                     ),
                   ],
                 ),

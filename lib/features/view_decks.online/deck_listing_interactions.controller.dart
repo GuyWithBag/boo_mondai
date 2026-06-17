@@ -1,5 +1,10 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show Controller, DeckInteractionsRemoteDB, Deck, Services, LocalDB;
+    show
+        Controller,
+        DeckInteractionsRemoteDB,
+        Deck,
+        LocalDB,
+        AuthService;
 
 class DeckListingInteractionsController extends Controller {
   DeckListingInteractionsController({
@@ -22,7 +27,7 @@ class DeckListingInteractionsController extends Controller {
   bool isFavorite = false;
   bool isBusy = false;
 
-  bool get isAuthenticated => Services.auth.isAuthenticatedRemote;
+  bool get isAuthenticated => AuthService.isAuthenticatedRemote;
 
   Future<void> loadInteractionState() async {
     if (!isAuthenticated) return;

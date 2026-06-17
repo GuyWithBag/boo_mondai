@@ -24,8 +24,8 @@
 //   @override
 //   Widget build(BuildContext context) {
 //     final scheme = Theme.of(context).colorScheme;
-//     final bg = selected ? scheme.primary : scheme.surfaceContainerHighest;
-//     final fg = selected ? scheme.onPrimary : AppColors.textSecondary;
+//     final bg = selected ? scheme.colorPrimary : scheme.surfaceContainerHighest;
+//     final fg = selected ? scheme.onPrimary : AppColors.colorTextSecondary;
 //     return Tooltip(
 //       message: label,
 //       child: InkWell(

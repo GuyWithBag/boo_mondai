@@ -21,11 +21,11 @@ class StudySessionBottomNavBar extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.fromLTRB(24.w, 24.h, 24.w, 28.h),
       decoration: BoxDecoration(
-        color: tokens.backgroundSurface,
+        color: tokens.colorSurfaceBackground,
         borderRadius: BorderRadius.vertical(top: Radius.circular(40.r)),
         border: Border(
           top: BorderSide(
-            color: tokens.borderNeutralSubtle,
+            color: tokens.colorBorderNeutralSubtle,
             width: tokens.borderWidthDefault,
           ),
         ),

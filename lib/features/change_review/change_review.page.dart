@@ -27,11 +27,11 @@ class ChangeReviewPage extends StatelessWidget {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (context.canPop()) context.pop();
       });
-      return Scaffold(backgroundColor: tokens.backgroundPage);
+      return Scaffold(backgroundColor: tokens.colorPageBackground);
     }
 
     return Scaffold(
-      backgroundColor: tokens.backgroundPage,
+      backgroundColor: tokens.colorPageBackground,
       body: SafeArea(
         child: Column(
           children: [
@@ -39,7 +39,7 @@ class ChangeReviewPage extends StatelessWidget {
               child: CustomScrollView(
                 slivers: [
                   SliverPadding(
-                    padding: EdgeInsets.all(tokens.spacePanelPaddingSm.r),
+                    padding: EdgeInsets.all(tokens.spaceLayoutPadding.r),
                     sliver: SliverToBoxAdapter(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -47,13 +47,13 @@ class ChangeReviewPage extends StatelessWidget {
                           Icon(
                             Icons.sync_rounded,
                             size: 52.sp,
-                            color: tokens.textMuted,
+                            color: tokens.colorTextMuted,
                           ),
-                          SizedBox(height: tokens.spacePanelGapSm.h),
+                          SizedBox(height: tokens.spaceLayoutGapSm.h),
                           Text(
                             plan.title,
                             style: TextStyle(
-                              color: tokens.textPrimary,
+                              color: tokens.colorTextBaseline,
                               fontFamily: tokens.fontFamily,
                               fontSize: tokens.textSizeHeader.sp,
                               fontWeight: tokens.fontWeightTextHeavy,
@@ -63,13 +63,13 @@ class ChangeReviewPage extends StatelessWidget {
                           Text(
                             'Review changes before applying',
                             style: TextStyle(
-                              color: tokens.textSecondary,
+                              color: tokens.colorTextSecondary,
                               fontFamily: tokens.fontFamily,
                               fontSize: tokens.textSizeLabel.sp,
                               fontWeight: tokens.fontWeightTextStrong,
                             ),
                           ),
-                          SizedBox(height: tokens.spacePanelGapMd.h),
+                          SizedBox(height: tokens.spaceLayoutGapMd.h),
                           ChangeSummaryChips(plan: plan),
                         ],
                       ),
@@ -77,19 +77,19 @@ class ChangeReviewPage extends StatelessWidget {
                   ),
                   SliverPadding(
                     padding: EdgeInsets.symmetric(
-                      horizontal: tokens.spacePanelPaddingSm.r,
+                      horizontal: tokens.spaceLayoutPadding.r,
                     ),
                     sliver: SliverList.separated(
                       itemCount: plan.changes.length,
                       separatorBuilder: (_, _) =>
-                          SizedBox(height: tokens.spacePanelGapSm.h),
+                          SizedBox(height: tokens.spaceLayoutGapSm.h),
                       itemBuilder: (context, index) {
                         return ChangeReviewCard(change: plan.changes[index]);
                       },
                     ),
                   ),
                   SliverToBoxAdapter(
-                    child: SizedBox(height: tokens.spacePanelPadding.h),
+                    child: SizedBox(height: tokens.spaceLayoutPadding.h),
                   ),
                 ],
               ),

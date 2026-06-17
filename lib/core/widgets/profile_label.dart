@@ -44,7 +44,7 @@ class ProfileLabel extends StatelessWidget {
             Text(
               label,
               style: theme.textTheme.labelSmall?.copyWith(
-                color: AppColors.textSecondary,
+                color: AppColors.colorTextSecondary,
               ),
             ),
             Text(

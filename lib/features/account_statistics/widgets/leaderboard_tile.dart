@@ -13,7 +13,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         Streak,
         SurfaceBorder,
         SurfaceShape,
-        SurfaceTone,
+        SurfaceColor,
         surfaceStyle;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -38,8 +38,12 @@ class LeaderboardTileWidget extends HookWidget {
     final tokens = context.themeTokens<AppTokens>();
     final medal = _RankMedal.forRank(rank);
     final tileVariants = isCurrentUser
-        ? const [SurfaceShape.cardShape, SurfaceTone.primaryOutline]
-        : const [SurfaceTone.muted, SurfaceShape.cardShape, SurfaceBorder.none];
+        ? const [SurfaceShape.cardShape, SurfaceBorder.primary]
+        : const [
+            SurfaceColor.muted,
+            SurfaceShape.cardShape,
+            SurfaceBorder.none,
+          ];
 
     final streakFuture = useMemoized<Future<Streak?>>(
       () => RemoteDB.streak.selectOne(filters: {'user_id': entry.userId}),
@@ -73,14 +77,14 @@ class LeaderboardTileWidget extends HookWidget {
             SizedBox(width: 12.w),
             CircleAvatar(
               radius: 16.r,
-              backgroundColor: tokens.primarySoft,
+              backgroundColor: tokens.colorPrimarySoft,
               backgroundImage: profile?.avatarUrl == null
                   ? null
                   : NetworkImage(profile!.avatarUrl!),
               child: profile?.avatarUrl == null
                   ? Icon(
                       Icons.person_outline,
-                      color: tokens.primary,
+                      color: tokens.colorPrimary,
                       size: 20.sp,
                     )
                   : null,
@@ -98,7 +102,7 @@ class LeaderboardTileWidget extends HookWidget {
                     style: TextStyle(
                       fontSize: tokens.textSizeLabelLarge.sp,
                       fontWeight: tokens.fontWeightTextHeavy,
-                      color: tokens.textPrimary,
+                      color: tokens.colorTextBaseline,
                     ),
                   ),
                   SizedBox(height: 4.h),
@@ -109,7 +113,7 @@ class LeaderboardTileWidget extends HookWidget {
                     style: TextStyle(
                       fontSize: tokens.textSizeLabelSmall.sp,
                       fontWeight: tokens.fontWeightTextStrong,
-                      color: tokens.textSecondary,
+                      color: tokens.colorTextSecondary,
                     ),
                   ),
                 ],
@@ -121,7 +125,7 @@ class LeaderboardTileWidget extends HookWidget {
               style: TextStyle(
                 fontSize: tokens.textSizeLabelLarge.sp,
                 fontWeight: tokens.fontWeightTextHeavy,
-                color: tokens.textPrimary,
+                color: tokens.colorTextBaseline,
               ),
             ),
           ],

@@ -91,14 +91,14 @@
 //                 onPressed: hasSelection ? null : () => onTap(option),
 //                 style: FilledButton.styleFrom(
 //                   backgroundColor: bg ?? AppColors.surfaceVariant,
-//                   foregroundColor: AppColors.textPrimary,
+//                   foregroundColor: AppColors.colorTextBaseline,
 //                   disabledBackgroundColor: bg ?? AppColors.surfaceVariant,
 //                   disabledForegroundColor:
 //                       hasSelection && option.id == correctId
 //                       ? AppColors.correct
 //                       : hasSelection && isSelected
 //                       ? AppColors.incorrect
-//                       : AppColors.textSecondary,
+//                       : AppColors.colorTextSecondary,
 //                 ),
 //                 child: Text(option.optionText),
 //               ),

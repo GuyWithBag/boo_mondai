@@ -3,7 +3,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         MatchMadnessTemplate,
         StudySessionCardStageController,
         AppTokens,
-        appTextStyle,
+        textStyle,
         TextSize,
         TextWeight,
         TextTone,
@@ -77,7 +77,7 @@ class MatchingTypeCard extends HookWidget {
           Text(
             'Match the pairs'.toUpperCase(),
             textAlign: TextAlign.center,
-            style: appTextStyle.resolve(tokens, [
+            style: textStyle.resolve(tokens, [
               TextSize.labelSmall,
               TextWeight.heavy,
               TextTone.muted,

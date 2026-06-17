@@ -3,7 +3,8 @@
 // PURPOSE: Animated breakdown of drill performance by FSRS rating
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/lib.barrel.dart' show StudyRating, AppColors, AppSpacing;
+import 'package:boo_mondai/lib.barrel.dart'
+    show StudyRating, AppColors, AppSpacing;
 import 'package:flutter/material.dart';
 
 class ScoreReveal extends StatelessWidget {
@@ -101,7 +102,7 @@ class ScoreReveal extends StatelessWidget {
                   textAlign: TextAlign.right,
                   style: const TextStyle(
                     fontSize: 12,
-                    color: AppColors.textSecondary,
+                    color: AppColors.colorTextSecondary,
                   ),
                 ),
               ),

@@ -31,7 +31,7 @@ class DeckProfilesLabel extends StatelessWidget {
     final tokens = context.themeTokens<AppTokens>();
 
     return Row(
-      spacing: tokens.spacePanelGapMd.w,
+      spacing: tokens.spaceLayoutGapMd.w,
       children: [
         ProfileLabel(
           displayName: profileName,
@@ -39,7 +39,7 @@ class DeckProfilesLabel extends StatelessWidget {
           label: 'By',
         ),
         if (hasSourceProfile) ...[
-          SizedBox(width: tokens.spacePanelGapMd),
+          SizedBox(width: tokens.spaceLayoutGapMd),
           ProfileLabel(
             displayName: sourceProfileName!,
             avatarUrl: sourceProfileAvatarUrl,

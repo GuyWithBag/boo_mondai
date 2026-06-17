@@ -4,51 +4,46 @@
 
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        DecksRemoteDB,
-        CardTemplatesRemoteDB,
-        Deck,
         CardTemplate,
-        FlashcardTemplate,
-        IdentificationTemplate,
-        MultipleChoiceTemplate,
-        FillInTheBlanksTemplate,
-        MatchMadnessTemplate,
-        WordScrambleTemplate,
-        LocalDB,
-        uuid,
-        VisibilityState,
-        MultipleChoiceOption,
-        FillInTheBlankSegment,
-        MatchMadnessPair,
-        StudyCardService,
+        CardTemplatesRemoteDB,
         ChangeLog,
         ChangePlan,
         ChangeResult,
+        ChangeReviewController,
         ChangeReviewDiffService,
         ChangeReviewStatus,
-        ChangeReviewController,
         ChangeSource,
         ChangeType,
+        Deck,
         DeckDownloadPayload,
+        DecksRemoteDB,
         DownloadCheckpoint,
+        DownloadCheckpointLocalDB,
         DownloadCheckpointStatus,
-        DownloadCheckpointLocalDB;
+        FillInTheBlankSegment,
+        FillInTheBlanksTemplate,
+        FlashcardTemplate,
+        IdentificationTemplate,
+        LocalDB,
+        MatchMadnessPair,
+        MatchMadnessTemplate,
+        MultipleChoiceOption,
+        MultipleChoiceTemplate,
+        RemoteDB,
+        StudyCardService,
+        VisibilityState,
+        WordScrambleTemplate,
+        uuid;
 
 const _kPageSize = 20;
 
 class DeckDownloadsService {
-  DeckDownloadsService({
-    DecksRemoteDB? decksRemoteDB,
-    CardTemplatesRemoteDB? cardTemplatesRemoteDB,
-    DownloadCheckpointLocalDB? checkpointDB,
-  }) : _decksRemoteDB = decksRemoteDB ?? DecksRemoteDB(),
-       _cardTemplatesRemoteDB =
-           cardTemplatesRemoteDB ?? CardTemplatesRemoteDB(),
-       _checkpointDB = checkpointDB ?? LocalDB.downloadCheckpoint;
+  DeckDownloadsService();
 
-  final DecksRemoteDB _decksRemoteDB;
-  final CardTemplatesRemoteDB _cardTemplatesRemoteDB;
-  final DownloadCheckpointLocalDB _checkpointDB;
+  final DecksRemoteDB _decks = RemoteDB.deck;
+  final CardTemplatesRemoteDB _cardTemplates = RemoteDB.card;
+  final DownloadCheckpointLocalDB _downloadCheckpoints =
+      LocalDB.downloadCheckpoint;
 
   final Set<String> _pausedPlanIds = {};
 
@@ -73,8 +68,7 @@ class DeckDownloadsService {
     try {
       // 1. Fetch remote deck metadata
       reviewController.update(reviewPlan.id, progress: 0.05);
-      final remoteDeck =
-          await _decksRemoteDB.selectById(sourceDeck.id) ?? sourceDeck;
+      final remoteDeck = await _decks.selectById(sourceDeck.id) ?? sourceDeck;
 
       // 2. Check for an existing local copy
       final localDeck = _findExistingDownload(remoteDeck.id);
@@ -90,7 +84,7 @@ class DeckDownloadsService {
       }
 
       // 4. Load or create a checkpoint — existing is nullable, checkpoint is not
-      final existing = _checkpointDB.getByDeckId(remoteDeck.id);
+      final existing = _downloadCheckpoints.getByDeckId(remoteDeck.id);
       final alreadyFetchedIds =
           existing?.fetchedTemplateIds.toSet() ?? <String>{};
 
@@ -107,7 +101,7 @@ class DeckDownloadsService {
         createdAt: existing?.createdAt ?? DateTime.now(),
         updatedAt: DateTime.now(),
       );
-      await _checkpointDB.upsert(checkpoint);
+      await _downloadCheckpoints.upsert(checkpoint);
 
       // 5. Stream templates in pages
       final allFetchedTemplates = <CardTemplate>[];
@@ -122,7 +116,7 @@ class DeckDownloadsService {
       while (offset < totalCount) {
         // Check if paused between pages
         if (_pausedPlanIds.contains(reviewPlan.id)) {
-          await _checkpointDB.upsert(
+          await _downloadCheckpoints.upsert(
             checkpoint.copyWith(
               status: DownloadCheckpointStatus.paused,
               updatedAt: DateTime.now(),
@@ -138,7 +132,7 @@ class DeckDownloadsService {
           );
         }
 
-        final page = await _cardTemplatesRemoteDB.selectManyPaged(
+        final page = await _cardTemplates.selectManyPaged(
           deckId: remoteDeck.id,
           offset: offset,
           pageSize: _kPageSize,
@@ -157,7 +151,7 @@ class DeckDownloadsService {
           fetchedTemplateIds: alreadyFetchedIds.toList(),
           updatedAt: DateTime.now(),
         );
-        await _checkpointDB.upsert(checkpoint);
+        await _downloadCheckpoints.upsert(checkpoint);
 
         reviewController.update(
           reviewPlan.id,
@@ -203,7 +197,7 @@ class DeckDownloadsService {
       );
 
       // 7. Clean up checkpoint
-      await _checkpointDB.deleteByPk({'deck_id': remoteDeck.id});
+      await _downloadCheckpoints.deleteByPk({'deck_id': remoteDeck.id});
 
       final changes = _buildDownloadChanges(
         remoteDeck: remoteDeck,
@@ -247,11 +241,10 @@ class DeckDownloadsService {
   Future<ChangePlan<DeckDownloadPayload>> previewDeckDownload(
     Deck sourceDeck,
   ) async {
-    final remoteDeck =
-        await _decksRemoteDB.selectById(sourceDeck.id) ?? sourceDeck;
+    final remoteDeck = await _decks.selectById(sourceDeck.id) ?? sourceDeck;
     final localDeck = _findExistingDownload(remoteDeck.id);
 
-    final remoteTemplates = await _cardTemplatesRemoteDB.selectMany(
+    final remoteTemplates = await _cardTemplates.selectMany(
       filters: {'deck_id': remoteDeck.id},
       orderBy: 'sort_order',
       ascending: true,
@@ -279,8 +272,8 @@ class DeckDownloadsService {
   // ── Helpers ───────────────────────────────────────────────────────────────
 
   Future<int> _fetchTotalTemplateCount(String deckId) async {
-    final rows = await _cardTemplatesRemoteDB.client
-        .from(_cardTemplatesRemoteDB.tableName)
+    final rows = await _cardTemplates.client
+        .from(_cardTemplates.tableName)
         .select('id')
         .eq('deck_id', deckId);
     return rows.length;

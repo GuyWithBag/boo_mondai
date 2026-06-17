@@ -18,7 +18,7 @@ class UpcomingCount extends StatelessWidget {
       '$count more card${count == 1 ? '' : 's'} coming later',
       style: Theme.of(
         context,
-      ).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+      ).textTheme.bodySmall?.copyWith(color: AppColors.colorTextSecondary),
     );
   }
 }

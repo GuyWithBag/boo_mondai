@@ -41,7 +41,7 @@ class ScoreRow extends StatelessWidget {
               Text(
                 detail,
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: AppColors.textSecondary,
+                  color: AppColors.colorTextSecondary,
                 ),
               ),
             ],

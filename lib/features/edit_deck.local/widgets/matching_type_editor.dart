@@ -3,8 +3,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         MatchPairData,
         AppTokens,
         surfaceStyle,
-        SurfaceTone,
-        appTextStyle,
+        SurfaceColor,
+        textStyle,
         TextSize,
         TextWeight,
         TextTone,
@@ -34,13 +34,13 @@ class MatchingTypeEditor extends StatelessWidget {
     final tokens = context.themeTokens<AppTokens>();
 
     return Surface(
-      style: surfaceStyle.resolve(tokens, const [SurfaceTone.surface]),
+      style: surfaceStyle.resolve(tokens, const [SurfaceColor.baseline]),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
             'Matching Pairs'.toUpperCase(),
-            style: appTextStyle.resolve(tokens, [
+            style: textStyle.resolve(tokens, [
               TextSize.labelSmall,
               TextWeight.heavy,
               TextTone.muted,
@@ -53,7 +53,7 @@ class MatchingTypeEditor extends StatelessWidget {
               Expanded(
                 child: Text(
                   'TERM',
-                  style: appTextStyle.resolve(tokens, [
+                  style: textStyle.resolve(tokens, [
                     TextSize.labelSmall,
                     TextWeight.heavy,
                     TextTone.muted,
@@ -64,7 +64,7 @@ class MatchingTypeEditor extends StatelessWidget {
               Expanded(
                 child: Text(
                   'MATCH',
-                  style: appTextStyle.resolve(tokens, [
+                  style: textStyle.resolve(tokens, [
                     TextSize.labelSmall,
                     TextWeight.heavy,
                     TextTone.muted,
@@ -95,7 +95,7 @@ class MatchingTypeEditor extends StatelessWidget {
           const SizedBox(height: 28),
           Button(
             leading: const Icon(Icons.add),
-            tone: ButtonTone.dashed,
+            variants: const [ButtonTone.dashed],
             onPressed: onPairAdd,
             child: const Text('Add Pair'),
           ),

@@ -46,13 +46,13 @@
 //           overflow: TextOverflow.ellipsis,
 //           style: Theme.of(
 //             context,
-//           ).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
+//           ).textTheme.bodyMedium?.copyWith(color: AppColors.colorTextSecondary),
 //         ),
 //         trailing: Text(
 //           _formatDue(fsrsCard.due),
 //           style: Theme.of(
 //             context,
-//           ).textTheme.labelSmall?.copyWith(color: AppColors.textSecondary),
+//           ).textTheme.labelSmall?.copyWith(color: AppColors.colorTextSecondary),
 //         ),
 //       ),
 //     );

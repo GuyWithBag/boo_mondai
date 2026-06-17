@@ -55,7 +55,7 @@
 //     return InkWell(
 //       onTap: isActive ? null : onTap,
 //       child: Container(
-//         color: isActive ? scheme.primary.withValues(alpha: 0.08) : null,
+//         color: isActive ? scheme.colorPrimary.withValues(alpha: 0.08) : null,
 //         padding: const EdgeInsets.symmetric(
 //           horizontal: AppSpacing.md,
 //           vertical: AppSpacing.sm + 2,
@@ -65,14 +65,14 @@
 //             Icon(
 //               _getIcon(), // <-- Use the new icon helper
 //               size: 15,
-//               color: isActive ? scheme.primary : AppColors.textSecondary,
+//               color: isActive ? scheme.colorPrimary : AppColors.colorTextSecondary,
 //             ),
 //             const SizedBox(width: AppSpacing.sm),
 //             Expanded(
 //               child: Text(
 //                 _getPreviewText(), // <-- Use the new text helper
 //                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-//                   color: isActive ? scheme.primary : null,
+//                   color: isActive ? scheme.colorPrimary : null,
 //                   fontWeight: isActive ? FontWeight.w600 : null,
 //                 ),
 //                 maxLines: 2,

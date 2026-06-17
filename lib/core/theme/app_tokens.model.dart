@@ -28,22 +28,22 @@ textSizeLabelSmall
 textSizeBodyLarge
 fontWeightTextStrong
 lineHeightTextBody
-spacePanelGapLg
+spaceLayoutGapLg
 buttonShadowOffset
 radiusSurface
 borderWidthDefault
 
-Color tokens should describe use.
+Color tokens should describe use, prefixed with 'color'.
 
 Good:
-backgroundPage
-backgroundSurface
-textPrimary
-textSecondary
-textMuted
-borderNeutralSubtle
-actionSuccess
-actionError
+colorPageBackground
+colorSurfaceBackground
+colorTextBaseline
+colorTextSecondary
+colorTextMuted
+colorBorderNeutralSubtle
+colorActionSuccess
+colorActionError
 
 Avoid:
 gray100
@@ -54,27 +54,28 @@ red
 Use scale words only when the token is part of a real scale.
 
 Good:
-spacePanelGapSm
-spacePanelGapMd
-spacePanelGapLg
+spaceLayoutGapSm
+spaceLayoutGapMd
+spaceLayoutGapLg
 sizeIconMd
 sizeIconLg
 radiusSurfaceSm
 radiusSurface
 
 Avoid adding scale names if there is only one value:
-spacePanelGapDefault
+spaceLayoutGapDefault
 iconSizeDefault
 
 Component-specific values should stay with the component first.
-Promote them into AppTokens only when several components reuse the same idea.
+Promote them into AppTokens when several components reuse the same idea,
+or when they need to be configurable for custom themes.
 
 Good global token:
 borderWidthDefault
 
-Better kept local until reused:
-matchingTypeInputBorderWidth
-tactileButtonPressedYOffset
+Component-scoped:
+studyCardWidth
+studyCardAspectRatio
 */
 
 @MappableClass()
@@ -82,44 +83,49 @@ class AppTokens with AppTokensMappable {
   const AppTokens({
     required this.name,
     required this.fontFamily,
-    required this.primary,
-    required this.primaryDim,
-    required this.primaryBright,
-    required this.streak,
-    required this.streakDim,
-    required this.backgroundPage,
-    required this.backgroundSurface,
-    required this.borderNeutralSubtle,
-    required this.actionSuccess,
-    required this.actionSuccessBackground,
-    required this.actionSuccessBorder,
-    required this.actionError,
-    required this.actionErrorBackground,
-    required this.actionErrorBorder,
-    required this.textPrimary,
-    required this.textSecondary,
-    required this.textMuted,
-    required this.softGray,
-    required this.primarySoft,
-    required this.greenSoft,
-    required this.ratingAgainBackground,
-    required this.ratingAgainText,
-    required this.ratingAgainBorder,
-    required this.ratingAgainHoverBackground,
-    required this.ratingHardBackground,
-    required this.ratingHardText,
-    required this.ratingHardBorder,
-    required this.ratingHardHoverBackground,
-    required this.ratingGoodBackground,
-    required this.ratingGoodText,
-    required this.ratingGoodBorder,
-    required this.ratingGoodHoverBackground,
-    required this.ratingEasyBackground,
-    required this.ratingEasyText,
-    required this.ratingEasyBorder,
-    required this.ratingEasyHoverBackground,
+    required this.colorPrimary,
+    required this.colorPrimaryDim,
+    required this.colorPrimaryBright,
+    required this.colorPrimarySoft,
+    required this.colorStreak,
+    required this.colorStreakDim,
+    required this.colorPageBackground,
+    required this.colorSurfaceBackground,
+    required this.colorBorderNeutralSubtle,
+    required this.colorActionSuccess,
+    required this.colorActionSuccessBackground,
+    required this.colorActionSuccessBorder,
+    required this.colorActionError,
+    required this.colorActionErrorBackground,
+    required this.colorActionErrorBorder,
+    required this.colorTextBaseline,
+    required this.colorTextSecondary,
+    required this.colorTextMuted,
+    required this.colorMuted,
+    required this.colorRatingAgainBackground,
+    required this.colorRatingAgainText,
+    required this.colorRatingAgainBorder,
+    required this.colorRatingAgainHoverBackground,
+    required this.colorRatingHardBackground,
+    required this.colorRatingHardText,
+    required this.colorRatingHardBorder,
+    required this.colorRatingHardHoverBackground,
+    required this.colorRatingGoodBackground,
+    required this.colorRatingGoodText,
+    required this.colorRatingGoodBorder,
+    required this.colorRatingGoodHoverBackground,
+    required this.colorRatingEasyBackground,
+    required this.colorRatingEasyText,
+    required this.colorRatingEasyBorder,
+    required this.colorRatingEasyHoverBackground,
     required this.colorTransparent,
     required this.colorTextOnBrand,
+    required this.colorGoogle,
+    required this.colorGoogleDim,
+    required this.colorTextOnGoogle,
+    required this.colorMono,
+    required this.colorMonoDim,
+    required this.colorTextOnMono,
     required this.buttonShadowOffset,
     required this.modalShadowOffset,
     required this.fontWeightTextBody,
@@ -129,103 +135,152 @@ class AppTokens with AppTokensMappable {
     required this.lineHeightTextTitle,
     required this.lineHeightTextDisplay,
     required this.lineHeightFieldDisplay,
-    required this.lineHeightTactile,
+    required this.lineHeightButton,
     required this.letterSpacingTextEyebrow,
+    required this.radiusSurfaceLg,
     required this.radiusSurface,
     required this.radiusSurfaceSm,
     required this.borderWidthDefault,
-    required this.spacePanelPadding,
-    required this.spacePanelPaddingSm,
-    required this.spacePanelGapLg,
-    required this.spacePanelGapMd,
-    required this.spacePanelGapSm,
+    required this.spaceScaffoldPadding,
+    required this.spaceLayoutPadding,
+    required this.spaceLayoutGapLg,
+    required this.spaceLayoutGapMd,
+    required this.spaceLayoutGapSm,
+    required this.spaceScaffoldMaxWidth,
     required this.textSizeHeader,
     required this.textSizeLabelLarge,
     required this.textSizeLabel,
     required this.textSizeLabelSmall,
     required this.textSizeBodyLarge,
-    required this.textSizeCardFront,
-    required this.textSizeCardBackFront,
-    required this.textSizeCardBackContent,
     required this.sizeIconMd,
     required this.sizeIconLg,
-    required this.cardAspectRatio,
-    required this.widthCard,
-    required this.radiusCard,
-    required this.radiusSurfaceLg,
+    required this.studyCardWidth,
+    required this.studyCardAspectRatio,
+    required this.studyCardRadius,
+    required this.studyCardTextSizeFront,
+    required this.studyCardTextSizeBack,
+    required this.studyCardTextSizeBackContent,
+    required this.textSizeHeaderLarge,
   });
 
   final String name;
   final String fontFamily;
-  final Color primary;
-  final Color primaryDim;
-  final Color primaryBright;
-  final Color streak;
-  final Color streakDim;
-  final Color backgroundPage;
-  final Color backgroundSurface;
-  final Color borderNeutralSubtle;
-  final Color actionSuccess;
-  final Color actionSuccessBackground;
-  final Color actionSuccessBorder;
-  final Color actionError;
-  final Color actionErrorBackground;
-  final Color actionErrorBorder;
-  final Color textPrimary;
-  final Color textSecondary;
-  final Color textMuted;
-  final Color softGray;
-  final Color primarySoft;
-  final Color greenSoft;
-  final Color ratingAgainBackground;
-  final Color ratingAgainText;
-  final Color ratingAgainBorder;
-  final Color ratingAgainHoverBackground;
-  final Color ratingHardBackground;
-  final Color ratingHardText;
-  final Color ratingHardBorder;
-  final Color ratingHardHoverBackground;
-  final Color ratingGoodBackground;
-  final Color ratingGoodText;
-  final Color ratingGoodBorder;
-  final Color ratingGoodHoverBackground;
-  final Color ratingEasyBackground;
-  final Color ratingEasyText;
-  final Color ratingEasyBorder;
-  final Color ratingEasyHoverBackground;
+
+  // Primary
+  final Color colorPrimary;
+  final Color colorPrimaryDim;
+  final Color colorPrimaryBright;
+  final Color colorPrimarySoft;
+
+  // Streak
+  final Color colorStreak;
+  final Color colorStreakDim;
+
+  // Background
+  final Color colorPageBackground;
+  final Color colorSurfaceBackground;
+
+  // Border
+  final Color colorBorderNeutralSubtle;
+
+  // Action
+  final Color colorActionSuccess;
+  final Color colorActionSuccessBackground;
+  final Color colorActionSuccessBorder;
+  final Color colorActionError;
+  final Color colorActionErrorBackground;
+  final Color colorActionErrorBorder;
+
+  // Text
+  final Color colorTextBaseline;
+  final Color colorTextSecondary;
+  final Color colorTextMuted;
+
+  // Neutral
+  final Color colorMuted;
+
+  // Rating
+  final Color colorRatingAgainBackground;
+  final Color colorRatingAgainText;
+  final Color colorRatingAgainBorder;
+  final Color colorRatingAgainHoverBackground;
+  final Color colorRatingHardBackground;
+  final Color colorRatingHardText;
+  final Color colorRatingHardBorder;
+  final Color colorRatingHardHoverBackground;
+  final Color colorRatingGoodBackground;
+  final Color colorRatingGoodText;
+  final Color colorRatingGoodBorder;
+  final Color colorRatingGoodHoverBackground;
+  final Color colorRatingEasyBackground;
+  final Color colorRatingEasyText;
+  final Color colorRatingEasyBorder;
+  final Color colorRatingEasyHoverBackground;
+
+  // Utility
   final Color colorTransparent;
   final Color colorTextOnBrand;
+
+  // Auth providers
+  final Color colorGoogle;
+  final Color colorGoogleDim;
+  final Color colorTextOnGoogle;
+  final Color colorMono;
+  final Color colorMonoDim;
+  final Color colorTextOnMono;
+
+  // Shadow
   final double buttonShadowOffset;
   final double modalShadowOffset;
+
+  // Font weight
   final FontWeight fontWeightTextBody;
   final FontWeight fontWeightTextStrong;
   final FontWeight fontWeightTextHeavy;
+
+  // Line height
   final double lineHeightTextBody;
   final double lineHeightTextTitle;
   final double lineHeightTextDisplay;
   final double lineHeightFieldDisplay;
-  final double lineHeightTactile;
+  final double lineHeightButton;
+
+  // Letter spacing
   final double letterSpacingTextEyebrow;
+
+  // Radius
   final double radiusSurfaceLg;
   final double radiusSurface;
   final double radiusSurfaceSm;
+
+  // Border
   final double borderWidthDefault;
-  final double spacePanelPadding;
-  final double spacePanelPaddingSm;
-  final double spacePanelGapLg;
-  final double spacePanelGapMd;
-  final double spacePanelGapSm;
+
+  // Spacing
+  final double spaceScaffoldPadding;
+  final double spaceLayoutPadding;
+  final double spaceLayoutGapLg;
+  final double spaceLayoutGapMd;
+  final double spaceLayoutGapSm;
+  final double spaceScaffoldMaxWidth;
+
+  // Text size
+  final double textSizeHeaderLarge;
   final double textSizeHeader;
   final double textSizeLabelLarge;
   final double textSizeLabel;
   final double textSizeLabelSmall;
   final double textSizeBodyLarge;
-  final double textSizeCardFront;
-  final double textSizeCardBackFront;
-  final double textSizeCardBackContent;
+
+  // Icon size
   final double sizeIconMd;
   final double sizeIconLg;
-  final double cardAspectRatio;
-  final double widthCard;
-  final double radiusCard;
+
+  // Study card
+  final double studyCardWidth;
+  final double studyCardAspectRatio;
+  final double studyCardRadius;
+  final double studyCardTextSizeFront;
+  final double studyCardTextSizeBack;
+  final double studyCardTextSizeBackContent;
 }

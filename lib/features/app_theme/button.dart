@@ -16,12 +16,14 @@ class Button extends HookWidget {
     this.onPressed,
     this.leading,
     this.trailing,
-    this.tone = ButtonTone.ghost,
-    this.size = ButtonSize.md,
-    this.depth = ButtonDepth.elevated,
     this.selected = false,
     this.mainAxisAlignment = MainAxisAlignment.center,
     this.axis = Axis.horizontal,
+    this.variants = const [
+      ButtonTone.ghost,
+      ButtonSize.md,
+      ButtonDepth.elevated,
+    ],
     super.key,
   });
 
@@ -29,12 +31,10 @@ class Button extends HookWidget {
   final VoidCallback? onPressed;
   final Widget? leading;
   final Widget? trailing;
-  final ButtonTone tone;
-  final ButtonSize size;
-  final ButtonDepth depth;
   final bool selected;
   final MainAxisAlignment mainAxisAlignment;
   final Axis axis;
+  final List<Object> variants;
 
   static Button icon({
     VoidCallback? onPressed,
@@ -46,10 +46,8 @@ class Button extends HookWidget {
     return Button(
       onPressed: onPressed,
       leading: icon == null ? null : Icon(icon),
-      tone: tone,
-      size: ButtonSize.icon,
-      depth: depth,
       selected: selected,
+      variants: [tone, ButtonSize.icon, depth],
     );
   }
 
@@ -63,10 +61,8 @@ class Button extends HookWidget {
     return Button(
       onPressed: onPressed,
       leading: icon == null ? null : Icon(icon),
-      tone: tone,
-      size: ButtonSize.smallIcon,
-      depth: depth,
       selected: selected,
+      variants: [tone, ButtonSize.smallIcon, depth],
     );
   }
 
@@ -80,10 +76,9 @@ class Button extends HookWidget {
     return Button(
       onPressed: onPressed,
       leading: icon == null ? null : Icon(icon),
-      tone: tone,
-      size: ButtonSize.iconWithLabel,
       selected: selected,
       axis: Axis.vertical,
+      variants: [tone, ButtonSize.iconWithLabel],
       child: Text(
         label,
         maxLines: 2,
@@ -119,32 +114,12 @@ class Button extends HookWidget {
     useEffect(() {
       state.value = getState();
       return null;
-    }, [onPressed, selected, tone]);
-    final resolvedStyle = buttonStyle.resolve(tokens, <Object>[
-      tone,
-      size,
+    }, [onPressed, selected]);
+
+    final resolvedStyle = buttonStyle.resolve(tokens, [
+      ...variants,
       state.value,
-      depth,
     ]);
-
-    final pressedOffset = switch (depth) {
-      ButtonDepth.mechanical => 8.0,
-      ButtonDepth.elevated => 4.0,
-      ButtonDepth.flat => 0.0,
-    };
-
-    final contentStyle = resolvedStyle.copyWith(
-      transform: Matrix4.translationValues(
-        0,
-        depth != ButtonDepth.flat &&
-                state.value == ButtonState.pressed &&
-                !(state.value == ButtonState.disabled)
-            ? pressedOffset
-            : 0,
-        0,
-      ),
-      contentStyle: resolvedStyle.contentStyle,
-    );
 
     final contentChild = switch (axis) {
       Axis.horizontal => Row(
@@ -180,20 +155,20 @@ class Button extends HookWidget {
     };
 
     final content = Surface(
-      style: contentStyle,
+      style: resolvedStyle,
       duration: const Duration(milliseconds: 130),
       curve: Curves.easeOutCubic,
       child: contentChild,
     );
 
-    final paintedContent = tone == ButtonTone.dashed
+    final paintedContent = variants.contains(ButtonTone.dashed)
         ? SizedBox(
             width: double.infinity,
             child: CustomPaint(
               foregroundPainter: _DashedBorderPainter(
                 color: state.value == ButtonState.hovered
-                    ? tokens.primary
-                    : tokens.borderNeutralSubtle,
+                    ? tokens.colorPrimary
+                    : tokens.colorBorderNeutralSubtle,
                 radius: tokens.radiusSurfaceSm,
               ),
               child: content,

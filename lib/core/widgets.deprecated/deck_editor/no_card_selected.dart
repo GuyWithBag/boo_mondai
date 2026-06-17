@@ -26,21 +26,21 @@
 //           Icon(
 //             Icons.style_outlined,
 //             size: 64,
-//             color: AppColors.textSecondary.withValues(alpha: 0.4),
+//             color: AppColors.colorTextSecondary.withValues(alpha: 0.4),
 //           ),
 //           const SizedBox(height: AppSpacing.md),
 //           Text(
 //             'No card selected',
 //             style: Theme.of(
 //               context,
-//             ).textTheme.titleLarge?.copyWith(color: AppColors.textSecondary),
+//             ).textTheme.titleLarge?.copyWith(color: AppColors.colorTextSecondary),
 //           ),
 //           const SizedBox(height: AppSpacing.sm),
 //           Text(
 //             'Pick a card from the sidebar, or create a new one',
 //             style: Theme.of(
 //               context,
-//             ).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
+//             ).textTheme.bodyMedium?.copyWith(color: AppColors.colorTextSecondary),
 //           ),
 //           const SizedBox(height: AppSpacing.lg),
 //           FilledButton.icon(

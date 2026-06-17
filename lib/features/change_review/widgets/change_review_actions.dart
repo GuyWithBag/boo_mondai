@@ -22,9 +22,9 @@ class ChangeReviewActions extends StatelessWidget {
     final tokens = context.themeTokens<AppTokens>();
 
     return DecoratedBox(
-      decoration: BoxDecoration(color: tokens.backgroundPage),
+      decoration: BoxDecoration(color: tokens.colorPageBackground),
       child: Padding(
-        padding: EdgeInsets.all(tokens.spacePanelPaddingSm.r),
+        padding: EdgeInsets.all(tokens.spaceLayoutPadding.r),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -32,7 +32,7 @@ class ChangeReviewActions extends StatelessWidget {
               width: double.infinity,
               child: Button(onPressed: onBack, child: const Text('BACK')),
             ),
-            SizedBox(height: tokens.spacePanelGapSm.h),
+            SizedBox(height: tokens.spaceLayoutGapSm.h),
             Row(
               children: [
                 Expanded(
@@ -42,7 +42,7 @@ class ChangeReviewActions extends StatelessWidget {
                   ),
                 ),
                 if (showLooksGood) ...[
-                  SizedBox(width: tokens.spacePanelGapSm.w),
+                  SizedBox(width: tokens.spaceLayoutGapSm.w),
                   Expanded(
                     child: Button(
                       onPressed: onLooksGood,

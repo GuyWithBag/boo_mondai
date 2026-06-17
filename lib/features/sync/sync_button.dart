@@ -37,7 +37,7 @@ class SyncButton extends StatelessWidget {
       message: isAuthenticated ? 'Sync decks' : 'Sign in to sync',
       child: Button.icon(
         icon: Icons.sync_rounded,
-        tone: ButtonTone.ghost,
+
         onPressed: () {
           if (!isAuthenticated) {
             showSnackbar(

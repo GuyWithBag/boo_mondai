@@ -6,7 +6,7 @@ enum SectionEyebrowTone { muted, primary, brand }
 
 final sectionEyebrowStyle = VariantStyle.textParts<AppTokens>(
   base: (tokens) => {
-    TextStylePart.color(tokens.textMuted),
+    TextStylePart.color(tokens.colorTextMuted),
     TextStylePart.fontSize(tokens.textSizeLabelSmall.sp),
     TextStylePart.fontWeight(tokens.fontWeightTextHeavy),
     (style) => style.copyWith(letterSpacing: tokens.letterSpacingTextEyebrow),
@@ -14,11 +14,13 @@ final sectionEyebrowStyle = VariantStyle.textParts<AppTokens>(
   defaultVariants: const [SectionEyebrowTone.muted],
   variants: {
     SectionEyebrowTone.muted: (tokens) => {
-      TextStylePart.color(tokens.textMuted),
+      TextStylePart.color(tokens.colorTextMuted),
     },
     SectionEyebrowTone.primary: (tokens) => {
-      TextStylePart.color(tokens.textPrimary),
+      TextStylePart.color(tokens.colorTextBaseline),
     },
-    SectionEyebrowTone.brand: (tokens) => {TextStylePart.color(tokens.primary)},
+    SectionEyebrowTone.brand: (tokens) => {
+      TextStylePart.color(tokens.colorPrimary),
+    },
   },
 );

@@ -109,7 +109,7 @@ class EditableTextValue extends HookWidget {
               enabled: !isSaving.value,
               maxLines: maxLines,
               placeholder: placeholder,
-              textStyle: textStyle,
+              baseTextStyle: textStyle,
               textInputAction: maxLines == 1
                   ? TextInputAction.done
                   : TextInputAction.newline,
@@ -129,7 +129,7 @@ class EditableTextValue extends HookWidget {
               onSubmitted: maxLines == 1 ? (_) => save() : null,
               variants: fieldVariants,
             ),
-          SizedBox(height: tokens.spacePanelGapSm),
+          SizedBox(height: tokens.spaceLayoutGapSm),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
@@ -138,7 +138,7 @@ class EditableTextValue extends HookWidget {
                 depth: ButtonDepth.flat,
                 onPressed: isSaving.value ? null : cancel,
               ),
-              SizedBox(width: tokens.spacePanelGapSm),
+              SizedBox(width: tokens.spaceLayoutGapSm),
               Button.icon(
                 icon: Icons.check,
                 tone: ButtonTone.success,
@@ -156,11 +156,11 @@ class EditableTextValue extends HookWidget {
       children: [
         Expanded(
           child: isMarkdown && value.trim().isNotEmpty
-              ? MarkdownText(data: value, textStyle: textStyle)
+              ? MarkdownText(data: value, baseTextStyle: textStyle)
               : Text(value, style: textStyle),
         ),
         if (enabled) ...[
-          SizedBox(width: tokens.spacePanelGapSm),
+          SizedBox(width: tokens.spaceLayoutGapSm),
           Button.iconSmall(
             icon: Icons.edit_outlined,
             tone: ButtonTone.text,

@@ -5,7 +5,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         MultipleChoiceOption,
         ButtonTone,
-        appTextStyle,
+        textStyle,
         TextSize,
         TextWeight,
         TextTone,
@@ -54,7 +54,7 @@ class MultipleChoiceCard extends HookWidget {
               Text(
                 'Select Answer'.toUpperCase(),
                 textAlign: TextAlign.center,
-                style: appTextStyle.resolve(tokens, [
+                style: textStyle.resolve(tokens, [
                   TextSize.labelSmall,
                   TextWeight.heavy,
                   TextTone.muted,
@@ -71,8 +71,7 @@ class MultipleChoiceCard extends HookWidget {
                 SizedBox(
                   width: double.infinity,
                   child: Button(
-                    tone: _optionTone(entry.value),
-                    depth: ButtonDepth.flat,
+                    variants: [_optionTone(entry.value), ButtonDepth.flat],
                     selected:
                         !isRevealed && selectedOption.value == entry.value.id,
                     mainAxisAlignment: MainAxisAlignment.start,

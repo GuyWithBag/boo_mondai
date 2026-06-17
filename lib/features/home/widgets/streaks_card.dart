@@ -1,12 +1,6 @@
+import 'package:boo_mondai/features/app_theme/surface.variant.dart';
 import 'package:boo_mondai/lib.barrel.dart'
-    show
-        AppTokens,
-        Streak,
-        SurfaceBorder,
-        SurfaceShape,
-        SurfaceTone,
-        surfaceStyle,
-        SurfaceShadow;
+    show AppTokens, Streak, surfaceStyle;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -21,12 +15,7 @@ class StreaksCard extends StatelessWidget {
     final tokens = context.themeTokens<AppTokens>();
 
     return Surface(
-      style: surfaceStyle.resolve(tokens, const [
-        SurfaceTone.streak,
-        // SurfaceShadow.tactile,
-        // SurfaceShape.rounded,
-        // SurfaceBorder.none,
-      ]),
+      style: surfaceStyle.resolve(tokens, const [SurfaceTone.streak]),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

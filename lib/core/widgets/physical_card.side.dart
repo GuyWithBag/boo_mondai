@@ -1,11 +1,5 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show
-        SurfaceTone,
-        AppTokens,
-        surfaceStyle,
-        SurfaceShape,
-        SurfacePadding,
-        widthCard;
+    show AppTokens, surfaceStyle, SurfaceShape, widthCard;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -13,22 +7,23 @@ class PhysicalCardSide extends StatelessWidget {
   const PhysicalCardSide({
     super.key,
     required this.child,
-    this.tone = SurfaceTone.surface,
-    this.maxWidth = widthCard,
+    this.maxWidth,
+    this.surfaceStyleVariants = const [],
   });
 
   final Widget child;
-  final SurfaceTone tone;
-  final double maxWidth;
+  final List<Object> surfaceStyleVariants;
+  final double? maxWidth;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final radius = tokens.radiusCard * (maxWidth / tokens.widthCard);
+    final effectiveMaxWidth = maxWidth ?? tokens.studyCardWidth;
+    final radius =
+        tokens.studyCardRadius * (effectiveMaxWidth / tokens.studyCardWidth);
     final resolvedStyle = surfaceStyle.resolve(tokens, [
-      tone,
+      ...surfaceStyleVariants,
       SurfaceShape.cardShape,
-      SurfacePadding.none,
     ]);
     final style = resolvedStyle.copyWith(
       decoration: resolvedStyle.decoration.copyWith(
@@ -38,7 +33,7 @@ class PhysicalCardSide extends StatelessWidget {
     );
 
     return ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: maxWidth),
+      constraints: BoxConstraints(maxWidth: effectiveMaxWidth),
       child: Surface(style: style, child: child),
     );
   }

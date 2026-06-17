@@ -43,7 +43,7 @@ class ScoringInfoDialog extends StatelessWidget {
             'Rankings are sorted by drill score. Keep drillzing and reviewing '
             'every day to climb higher!',
             style: theme.textTheme.bodySmall?.copyWith(
-              color: AppColors.textSecondary,
+              color: AppColors.colorTextSecondary,
             ),
           ),
         ],

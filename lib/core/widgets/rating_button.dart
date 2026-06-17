@@ -53,7 +53,7 @@ class RatingButton extends StatelessWidget {
         message: 'Press $shortcut',
         child: Button(
           onPressed: onTap,
-          tone: tone,
+          variants: [tone],
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [

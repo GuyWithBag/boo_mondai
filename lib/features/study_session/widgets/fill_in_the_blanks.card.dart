@@ -3,7 +3,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         FillInTheBlanksTemplate,
         StudySessionCardStageController,
         AppTokens,
-        appTextStyle,
+        textStyle,
         TextSize,
         TextWeight,
         TextTone,
@@ -73,7 +73,7 @@ class FillInTheBlanksCard extends HookWidget {
               Text(
                 'Fill in the blank'.toUpperCase(),
                 textAlign: TextAlign.center,
-                style: appTextStyle.resolve(tokens, [
+                style: textStyle.resolve(tokens, [
                   TextSize.labelSmall,
                   TextWeight.heavy,
                   TextTone.muted,
@@ -89,13 +89,9 @@ class FillInTheBlanksCard extends HookWidget {
                   children: [
                     Text(
                       entry.value.prefix,
-                      style: appTextStyle.resolve(
+                      style: textStyle.resolve(
                         context.themeTokens<AppTokens>(),
-                        [
-                          TextSize.bodyLarge,
-                          TextWeight.heavy,
-                          TextTone.primary,
-                        ],
+                        [TextSize.bodyLarge, TextWeight.heavy],
                       ),
                     ),
                     isRevealed
@@ -110,13 +106,9 @@ class FillInTheBlanksCard extends HookWidget {
                           ),
                     Text(
                       entry.value.suffix,
-                      style: appTextStyle.resolve(
+                      style: textStyle.resolve(
                         context.themeTokens<AppTokens>(),
-                        [
-                          TextSize.bodyLarge,
-                          TextWeight.heavy,
-                          TextTone.primary,
-                        ],
+                        [TextSize.bodyLarge, TextWeight.heavy],
                       ),
                     ),
                   ],
@@ -144,8 +136,8 @@ class _PreviewAnswer extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
       decoration: BoxDecoration(
-        color: tokens.actionSuccess.withValues(alpha: 0.12),
-        border: Border.all(color: tokens.actionSuccess),
+        color: tokens.colorActionSuccess.withValues(alpha: 0.12),
+        border: Border.all(color: tokens.colorActionSuccess),
         borderRadius: BorderRadius.circular(10.r),
       ),
       child: MarkdownText(data: label),

@@ -31,7 +31,7 @@ class InputCard extends StatelessWidget {
           Text(
             label,
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
-              color: AppColors.textSecondary,
+              color: AppColors.colorTextSecondary,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.4,
             ),

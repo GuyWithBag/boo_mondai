@@ -9,7 +9,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         DeckTile,
         DeckReviewStats,
         ProgressBar,
-        appTextStyle,
+        textStyle,
         TextSize,
         TextTone,
         TextWeight;
@@ -50,15 +50,15 @@ class ReviewDeckTile extends StatelessWidget {
               const _DeckCoverPlaceholder()
             else
               DeckTile(deck: deck, width: 108.w),
-            SizedBox(width: tokens.spacePanelGapMd.w),
+            SizedBox(width: tokens.spaceLayoutGapMd.w),
             Expanded(
               child: _ReviewDeckDetails(stats: stats, completion: completion),
             ),
-            SizedBox(width: tokens.spacePanelGapMd.w),
+            SizedBox(width: tokens.spaceLayoutGapMd.w),
             Button.icon(
               onPressed: () {},
               icon: Icons.visibility_outlined,
-              tone: ButtonTone.ghost,
+
               depth: ButtonDepth.flat,
             ),
           ],
@@ -87,15 +87,13 @@ class _ReviewDeckDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final titleStyle = appTextStyle.resolve(tokens, const [
+    final titleStyle = textStyle.resolve(tokens, const [
       TextSize.header,
       TextWeight.heavy,
-      TextTone.primary,
     ]);
-    final labelStyle = appTextStyle.resolve(tokens, const [
+    final labelStyle = textStyle.resolve(tokens, const [
       TextSize.label,
       TextWeight.strong,
-      TextTone.primary,
     ]);
 
     final historicalStats = _StatsCluster(
@@ -122,7 +120,7 @@ class _ReviewDeckDetails extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           style: labelStyle,
         ),
-        SizedBox(height: tokens.spacePanelGapSm.h),
+        SizedBox(height: tokens.spaceLayoutGapSm.h),
         ConstrainedBox(
           constraints: BoxConstraints(maxWidth: 120.w),
           child: ProgressBar(value: completion),
@@ -144,11 +142,11 @@ class _ReviewDeckDetails extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: titleStyle,
               ),
-              SizedBox(height: tokens.spacePanelGapSm.h),
+              SizedBox(height: tokens.spaceLayoutGapSm.h),
               historicalStats,
-              SizedBox(height: tokens.spacePanelGapMd.h),
+              SizedBox(height: tokens.spaceLayoutGapMd.h),
               completionPanel,
-              SizedBox(height: tokens.spacePanelGapSm.h),
+              SizedBox(height: tokens.spaceLayoutGapSm.h),
               dueStats,
             ],
           );
@@ -168,16 +166,16 @@ class _ReviewDeckDetails extends StatelessWidget {
                     style: titleStyle,
                   ),
                 ),
-                SizedBox(width: tokens.spacePanelGapMd.w),
+                SizedBox(width: tokens.spaceLayoutGapMd.w),
                 Flexible(child: historicalStats),
               ],
             ),
-            SizedBox(height: tokens.spacePanelGapMd.h),
+            SizedBox(height: tokens.spaceLayoutGapMd.h),
             Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Expanded(child: completionPanel),
-                SizedBox(width: tokens.spacePanelGapMd.w),
+                SizedBox(width: tokens.spaceLayoutGapMd.w),
                 Flexible(child: dueStats),
               ],
             ),
@@ -196,10 +194,9 @@ class _StatsCluster extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final labelStyle = appTextStyle.resolve(tokens, const [
+    final labelStyle = textStyle.resolve(tokens, const [
       TextSize.label,
       TextWeight.strong,
-      TextTone.primary,
     ]);
 
     return LayoutBuilder(
@@ -269,7 +266,7 @@ class _DeckCoverPlaceholder extends StatelessWidget {
     final tokens = context.themeTokens<AppTokens>();
 
     return CustomPaint(
-      painter: _DeckCoverPlaceholderPainter(color: tokens.textPrimary),
+      painter: _DeckCoverPlaceholderPainter(color: tokens.colorTextBaseline),
       child: SizedBox(width: 108.w, height: 152.h),
     );
   }

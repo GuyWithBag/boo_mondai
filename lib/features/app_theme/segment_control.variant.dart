@@ -23,7 +23,7 @@ final segmentControlOptionStyle = VariantStyle.surfaceParts<AppTokens>(
       ),
     }),
     SurfaceStylePart.text({
-      TextStylePart.color(tokens.textSecondary),
+      TextStylePart.color(tokens.colorTextSecondary),
       TextStylePart.fontSize(tokens.textSizeLabel.sp),
       TextStylePart.fontWeight(tokens.fontWeightTextStrong),
     }),
@@ -33,19 +33,19 @@ final segmentControlOptionStyle = VariantStyle.surfaceParts<AppTokens>(
     SegmentControlOptionState.idle: (_) => const {},
     SegmentControlOptionState.selected: (tokens) => {
       SurfaceStylePart.decoration({
-        DecorationPart.color(tokens.backgroundSurface),
+        DecorationPart.color(tokens.colorSurfaceBackground),
         DecorationPart.border(
           Border.all(
-            color: tokens.borderNeutralSubtle,
+            color: tokens.colorBorderNeutralSubtle,
             width: tokens.borderWidthDefault.w,
           ),
         ),
       }),
-      SurfaceStylePart.text({TextStylePart.color(tokens.textPrimary)}),
+      SurfaceStylePart.text({TextStylePart.color(tokens.colorTextBaseline)}),
     },
     SegmentControlOptionState.disabled: (tokens) => {
       SurfaceStylePart.opacity(0.5),
-      SurfaceStylePart.text({TextStylePart.color(tokens.textMuted)}),
+      SurfaceStylePart.text({TextStylePart.color(tokens.colorTextMuted)}),
     },
   },
 );

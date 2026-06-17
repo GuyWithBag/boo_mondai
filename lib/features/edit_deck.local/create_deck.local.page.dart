@@ -24,11 +24,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         SectionEyebrowTone,
         SegmentOption,
         SegmentedControl,
-        appTextStyle,
+        textStyle,
         TextSize,
         TextWeight,
         TextTone,
-        SurfaceTone;
+        SurfaceColor;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -55,7 +55,7 @@ class CreateDeckPage extends StatelessWidget {
     final tokens = context.themeTokens<AppTokens>();
 
     return Scaffold(
-      backgroundColor: tokens.backgroundPage,
+      backgroundColor: tokens.colorPageBackground,
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
@@ -191,7 +191,7 @@ class CreateDeckSheet extends HookWidget {
                       : null,
                 ),
                 Padding(
-                  padding: EdgeInsets.all(tokens.spacePanelPadding),
+                  padding: EdgeInsets.all(tokens.spaceLayoutPadding),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -204,13 +204,13 @@ class CreateDeckSheet extends HookWidget {
                             ? 'Title is required'
                             : null,
                       ),
-                      SizedBox(height: tokens.spacePanelGapLg),
+                      SizedBox(height: tokens.spaceLayoutGapLg),
                       _TextFieldPanel(
                         title: 'Short Description',
                         placeholder: 'A one-line summary for this deck',
                         controller: shortDescController,
                       ),
-                      SizedBox(height: tokens.spacePanelGapLg),
+                      SizedBox(height: tokens.spaceLayoutGapLg),
                       _TextFieldPanel(
                         title: 'Long Description',
                         placeholder:
@@ -218,33 +218,33 @@ class CreateDeckSheet extends HookWidget {
                         controller: longDescController,
                         maxLines: 6,
                       ),
-                      SizedBox(height: tokens.spacePanelGapLg),
+                      SizedBox(height: tokens.spaceLayoutGapLg),
                       _TextFieldPanel(
                         title: 'Cover Image URL',
                         placeholder: 'https://...',
                         controller: coverImageController,
                         keyboardType: TextInputType.url,
                       ),
-                      SizedBox(height: tokens.spacePanelGapLg),
+                      SizedBox(height: tokens.spaceLayoutGapLg),
                       _TextFieldPanel(
                         title: 'Version',
                         placeholder: '1.0.0',
                         controller: versionController,
                         tone: TextFieldTone.brand,
                       ),
-                      SizedBox(height: tokens.spacePanelGapLg),
+                      SizedBox(height: tokens.spaceLayoutGapLg),
                       _VisibilityPanel(
                         value: visibilityState.value,
                         onChanged: (value) => visibilityState.value = value,
                       ),
-                      SizedBox(height: tokens.spacePanelGapLg),
+                      SizedBox(height: tokens.spaceLayoutGapLg),
                       _PublishPanel(
                         value: isPublished.value,
                         onChanged: (value) => isPublished.value = value,
                       ),
-                      SizedBox(height: tokens.spacePanelGapLg),
+                      SizedBox(height: tokens.spaceLayoutGapLg),
                       Button(
-                        tone: ButtonTone.filled,
+                        variants: const [ButtonTone.filled],
                         leading: Icon(isEdit ? Icons.save : Icons.add),
                         onPressed: handleSave,
                         child: Text(isEdit ? 'Save Deck' : 'Create Deck'),
@@ -293,7 +293,7 @@ class _TextFieldPanel extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SectionEyebrow(title, tone: SectionEyebrowTone.primary),
-        SizedBox(height: tokens.spacePanelGapMd),
+        SizedBox(height: tokens.spaceLayoutGapMd),
         TextFormField(
           controller: controller,
           validator: validator,
@@ -324,7 +324,7 @@ class _VisibilityPanel extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SectionEyebrow('Visibility', tone: SectionEyebrowTone.primary),
-        SizedBox(height: tokens.spacePanelGapMd.h),
+        SizedBox(height: tokens.spaceLayoutGapMd.h),
         SegmentedControl<VisibilityState>(
           value: value,
           onChanged: onChanged,
@@ -334,10 +334,10 @@ class _VisibilityPanel extends StatelessWidget {
             SegmentOption(value: VisibilityState.public, label: 'Public'),
           ],
         ),
-        SizedBox(height: tokens.spacePanelGapMd.h),
+        SizedBox(height: tokens.spaceLayoutGapMd.h),
         Text(
           _visibilityHint(value),
-          style: appTextStyle.resolve(tokens, const [
+          style: textStyle.resolve(tokens, const [
             TextSize.label,
             TextWeight.body,
             TextTone.secondary,
@@ -359,28 +359,27 @@ class _PublishPanel extends StatelessWidget {
     final tokens = context.themeTokens<AppTokens>();
 
     return Surface(
-      style: surfaceStyle.resolve(tokens, const [SurfaceTone.muted]),
+      style: surfaceStyle.resolve(tokens, const [SurfaceColor.muted]),
       child: SwitchListTile(
         contentPadding: EdgeInsets.symmetric(
-          horizontal: tokens.spacePanelGapMd,
-          vertical: tokens.spacePanelGapSm,
+          horizontal: tokens.spaceLayoutGapMd,
+          vertical: tokens.spaceLayoutGapSm,
         ),
         value: value,
         onChanged: onChanged,
         secondary: Icon(value ? Icons.public : Icons.lock_outline),
         title: Text(
           'Publish to browser',
-          style: appTextStyle.resolve(tokens, const [
+          style: textStyle.resolve(tokens, const [
             TextSize.labelLarge,
             TextWeight.heavy,
-            TextTone.primary,
           ]),
         ),
         subtitle: Text(
           value
               ? 'This deck can be published on the next sync.'
               : 'This deck stays local/private until published.',
-          style: appTextStyle.resolve(tokens, const [
+          style: textStyle.resolve(tokens, const [
             TextSize.label,
             TextWeight.body,
             TextTone.secondary,

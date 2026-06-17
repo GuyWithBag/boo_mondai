@@ -49,7 +49,7 @@ class FlashcardFrontSide extends StatelessWidget {
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Button(
-                  tone: ButtonTone.text,
+                  variants: const [ButtonTone.text],
                   leading: const Icon(Icons.touch_app),
                   onPressed: onReveal,
                   child: const Text('Tap to reveal'),

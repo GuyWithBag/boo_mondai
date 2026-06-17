@@ -1852,13 +1852,7 @@ class UserSettingsAdapter extends TypeAdapter<UserSettings> {
     return UserSettings(
       id: fields[6] as String,
       userId: fields[0] as String,
-      themeModeName: fields[1] as String,
-      lightThemePresetId: fields[2] as String,
-      darkThemePresetId: fields[3] as String,
-      themeOverride: fields[4] as ThemeOverride?,
-      customThemePresets: fields[5] == null
-          ? const []
-          : (fields[5] as List).cast<CustomThemePreset>(),
+      preferences: (fields[9] as Map).cast<String, dynamic>(),
       createdAt: fields[7] as DateTime,
       updatedAt: fields[8] as DateTime,
     );
@@ -1867,25 +1861,17 @@ class UserSettingsAdapter extends TypeAdapter<UserSettings> {
   @override
   void write(BinaryWriter writer, UserSettings obj) {
     writer
-      ..writeByte(9)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.userId)
-      ..writeByte(1)
-      ..write(obj.themeModeName)
-      ..writeByte(2)
-      ..write(obj.lightThemePresetId)
-      ..writeByte(3)
-      ..write(obj.darkThemePresetId)
-      ..writeByte(4)
-      ..write(obj.themeOverride)
-      ..writeByte(5)
-      ..write(obj.customThemePresets)
       ..writeByte(6)
       ..write(obj.id)
       ..writeByte(7)
       ..write(obj.createdAt)
       ..writeByte(8)
-      ..write(obj.updatedAt);
+      ..write(obj.updatedAt)
+      ..writeByte(9)
+      ..write(obj.preferences);
   }
 
   @override

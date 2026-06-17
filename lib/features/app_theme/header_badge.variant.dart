@@ -13,14 +13,14 @@ final headerBadgeStyle = VariantStyle.chipParts<AppTokens>(
     ),
     ChipPart.side(
       BorderSide(
-        color: tokens.primaryBright,
+        color: tokens.colorPrimaryBright,
         width: tokens.borderWidthDefault.w,
       ),
     ),
-    ChipPart.backgroundColor(tokens.primarySoft),
+    ChipPart.backgroundColor(tokens.colorPrimarySoft),
     ChipPart.labelStyle(
       TextStyle(
-        color: tokens.primary,
+        color: tokens.colorPrimary,
         fontSize: tokens.textSizeLabelSmall.sp,
         fontWeight: tokens.fontWeightTextHeavy,
         letterSpacing: tokens.letterSpacingTextEyebrow,
@@ -31,16 +31,16 @@ final headerBadgeStyle = VariantStyle.chipParts<AppTokens>(
   defaultVariants: const [HeaderBadgeTone.brand],
   variants: {
     HeaderBadgeTone.brand: (tokens) => {
-      ChipPart.backgroundColor(tokens.primarySoft),
+      ChipPart.backgroundColor(tokens.colorPrimarySoft),
       ChipPart.side(
         BorderSide(
-          color: tokens.primaryBright,
+          color: tokens.colorPrimaryBright,
           width: tokens.borderWidthDefault.w,
         ),
       ),
       ChipPart.labelStyle(
         TextStyle(
-          color: tokens.primary,
+          color: tokens.colorPrimary,
           fontSize: tokens.textSizeLabelSmall.sp,
           fontWeight: tokens.fontWeightTextHeavy,
           letterSpacing: tokens.letterSpacingTextEyebrow,
@@ -48,16 +48,16 @@ final headerBadgeStyle = VariantStyle.chipParts<AppTokens>(
       ),
     },
     HeaderBadgeTone.neutral: (tokens) => {
-      ChipPart.backgroundColor(tokens.softGray),
+      ChipPart.backgroundColor(tokens.colorMuted),
       ChipPart.side(
         BorderSide(
-          color: tokens.borderNeutralSubtle,
+          color: tokens.colorBorderNeutralSubtle,
           width: tokens.borderWidthDefault.w,
         ),
       ),
       ChipPart.labelStyle(
         TextStyle(
-          color: tokens.textSecondary,
+          color: tokens.colorTextSecondary,
           fontSize: tokens.textSizeLabelSmall.sp,
           fontWeight: tokens.fontWeightTextHeavy,
           letterSpacing: tokens.letterSpacingTextEyebrow,
@@ -65,16 +65,18 @@ final headerBadgeStyle = VariantStyle.chipParts<AppTokens>(
       ),
     },
     HeaderBadgeTone.success: (tokens) => {
-      ChipPart.backgroundColor(tokens.actionSuccess.withValues(alpha: 0.12)),
+      ChipPart.backgroundColor(
+        tokens.colorActionSuccess.withValues(alpha: 0.12),
+      ),
       ChipPart.side(
         BorderSide(
-          color: tokens.actionSuccess,
+          color: tokens.colorActionSuccess,
           width: tokens.borderWidthDefault.w,
         ),
       ),
       ChipPart.labelStyle(
         TextStyle(
-          color: tokens.actionSuccess,
+          color: tokens.colorActionSuccess,
           fontSize: tokens.textSizeLabelSmall.sp,
           fontWeight: tokens.fontWeightTextHeavy,
           letterSpacing: tokens.letterSpacingTextEyebrow,
@@ -82,16 +84,16 @@ final headerBadgeStyle = VariantStyle.chipParts<AppTokens>(
       ),
     },
     HeaderBadgeTone.error: (tokens) => {
-      ChipPart.backgroundColor(tokens.actionError.withValues(alpha: 0.12)),
+      ChipPart.backgroundColor(tokens.colorActionError.withValues(alpha: 0.12)),
       ChipPart.side(
         BorderSide(
-          color: tokens.actionError,
+          color: tokens.colorActionError,
           width: tokens.borderWidthDefault.w,
         ),
       ),
       ChipPart.labelStyle(
         TextStyle(
-          color: tokens.actionError,
+          color: tokens.colorActionError,
           fontSize: tokens.textSizeLabelSmall.sp,
           fontWeight: tokens.fontWeightTextHeavy,
           letterSpacing: tokens.letterSpacingTextEyebrow,

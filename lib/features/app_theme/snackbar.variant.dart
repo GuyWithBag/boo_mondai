@@ -20,37 +20,37 @@ final appSnackbarStyle = VariantStyle.surfaceParts<AppTokens>(
   base: (tokens) => {
     SurfaceStylePart.padding(
       EdgeInsets.symmetric(
-        horizontal: tokens.spacePanelGapMd.w,
-        vertical: tokens.spacePanelGapSm.h,
+        horizontal: tokens.spaceLayoutGapMd.w,
+        vertical: tokens.spaceLayoutGapSm.h,
       ),
     ),
     SurfaceStylePart.decoration({
-      DecorationPart.color(tokens.backgroundSurface),
+      DecorationPart.color(tokens.colorSurfaceBackground),
       DecorationPart.borderRadius(
         BorderRadius.circular(tokens.radiusSurfaceSm.r),
       ),
       DecorationPart.border(
         Border.all(
-          color: tokens.borderNeutralSubtle,
+          color: tokens.colorBorderNeutralSubtle,
           width: tokens.borderWidthDefault.w,
         ),
       ),
       DecorationPart.boxShadow([
         BoxShadow(
-          color: tokens.borderNeutralSubtle.withValues(alpha: 0.55),
+          color: tokens.colorBorderNeutralSubtle.withValues(alpha: 0.55),
           offset: Offset(0, tokens.modalShadowOffset.h),
         ),
       ]),
     }),
     SurfaceStylePart.content({
       ContentStylePart.text({
-        TextStylePart.color(tokens.textPrimary),
+        TextStylePart.color(tokens.colorTextBaseline),
         TextStylePart.fontSize(tokens.textSizeLabel.sp),
         TextStylePart.fontWeight(tokens.fontWeightTextStrong),
         TextStylePart.height(tokens.lineHeightTextBody),
       }),
       ContentStylePart.icon({
-        IconThemePart.color(tokens.textPrimary),
+        IconThemePart.color(tokens.colorTextBaseline),
         IconThemePart.size(tokens.sizeIconMd.sp),
       }),
     }),
@@ -59,13 +59,16 @@ final appSnackbarStyle = VariantStyle.surfaceParts<AppTokens>(
   variants: {
     SnackbarTone.primary: (tokens) => {
       SurfaceStylePart.decoration({
-        DecorationPart.color(tokens.primary),
+        DecorationPart.color(tokens.colorPrimary),
         DecorationPart.border(
-          Border.all(color: tokens.primary, width: tokens.borderWidthDefault.w),
+          Border.all(
+            color: tokens.colorPrimary,
+            width: tokens.borderWidthDefault.w,
+          ),
         ),
         DecorationPart.boxShadow([
           BoxShadow(
-            color: tokens.primaryDim.withValues(alpha: 0.45),
+            color: tokens.colorPrimaryDim.withValues(alpha: 0.45),
             offset: Offset(0, tokens.modalShadowOffset.h),
           ),
         ]),
@@ -77,76 +80,79 @@ final appSnackbarStyle = VariantStyle.surfaceParts<AppTokens>(
     },
     SnackbarTone.surface: (tokens) => {
       SurfaceStylePart.decoration({
-        DecorationPart.color(tokens.backgroundSurface),
+        DecorationPart.color(tokens.colorSurfaceBackground),
         DecorationPart.border(
           Border.all(
-            color: tokens.borderNeutralSubtle,
+            color: tokens.colorBorderNeutralSubtle,
             width: tokens.borderWidthDefault.w,
           ),
         ),
         DecorationPart.boxShadow([
           BoxShadow(
-            color: tokens.borderNeutralSubtle,
+            color: tokens.colorBorderNeutralSubtle,
             offset: Offset(0, tokens.modalShadowOffset.h),
           ),
         ]),
       }),
       SurfaceStylePart.content({
-        ContentStylePart.text({TextStylePart.color(tokens.textPrimary)}),
-        ContentStylePart.icon({IconThemePart.color(tokens.textPrimary)}),
+        ContentStylePart.text({TextStylePart.color(tokens.colorTextBaseline)}),
+        ContentStylePart.icon({IconThemePart.color(tokens.colorTextBaseline)}),
       }),
     },
     SnackbarTone.success: (tokens) => {
       SurfaceStylePart.decoration({
-        DecorationPart.color(tokens.actionSuccessBackground),
+        DecorationPart.color(tokens.colorActionSuccessBackground),
         DecorationPart.border(
           Border.all(
-            color: tokens.actionSuccessBorder,
+            color: tokens.colorActionSuccessBorder,
             width: tokens.borderWidthDefault.w,
           ),
         ),
         DecorationPart.boxShadow([
           BoxShadow(
-            color: tokens.actionSuccessBorder,
+            color: tokens.colorActionSuccessBorder,
             offset: Offset(0, tokens.modalShadowOffset.h),
           ),
         ]),
       }),
       SurfaceStylePart.content({
-        ContentStylePart.text({TextStylePart.color(tokens.actionSuccess)}),
-        ContentStylePart.icon({IconThemePart.color(tokens.actionSuccess)}),
+        ContentStylePart.text({TextStylePart.color(tokens.colorActionSuccess)}),
+        ContentStylePart.icon({IconThemePart.color(tokens.colorActionSuccess)}),
       }),
     },
     SnackbarTone.error: (tokens) => {
       SurfaceStylePart.decoration({
-        DecorationPart.color(tokens.actionErrorBackground),
+        DecorationPart.color(tokens.colorActionErrorBackground),
         DecorationPart.border(
           Border.all(
-            color: tokens.actionErrorBorder,
+            color: tokens.colorActionErrorBorder,
             width: tokens.borderWidthDefault.w,
           ),
         ),
         DecorationPart.boxShadow([
           BoxShadow(
-            color: tokens.actionErrorBorder,
+            color: tokens.colorActionErrorBorder,
             offset: Offset(0, tokens.modalShadowOffset.h),
           ),
         ]),
       }),
       SurfaceStylePart.content({
-        ContentStylePart.text({TextStylePart.color(tokens.actionError)}),
-        ContentStylePart.icon({IconThemePart.color(tokens.actionError)}),
+        ContentStylePart.text({TextStylePart.color(tokens.colorActionError)}),
+        ContentStylePart.icon({IconThemePart.color(tokens.colorActionError)}),
       }),
     },
     SnackbarTone.streak: (tokens) => {
       SurfaceStylePart.decoration({
-        DecorationPart.color(tokens.streak),
+        DecorationPart.color(tokens.colorStreak),
         DecorationPart.border(
-          Border.all(color: tokens.streak, width: tokens.borderWidthDefault.w),
+          Border.all(
+            color: tokens.colorStreak,
+            width: tokens.borderWidthDefault.w,
+          ),
         ),
         DecorationPart.boxShadow([
           BoxShadow(
-            color: tokens.streakDim.withValues(alpha: 0.45),
+            color: tokens.colorStreakDim.withValues(alpha: 0.45),
             offset: Offset(0, tokens.modalShadowOffset.h),
           ),
         ]),
@@ -158,78 +164,94 @@ final appSnackbarStyle = VariantStyle.surfaceParts<AppTokens>(
     },
     SnackbarTone.dashed: (tokens) => {
       SurfaceStylePart.decoration({
-        DecorationPart.color(tokens.softGray),
+        DecorationPart.color(tokens.colorMuted),
         DecorationPart.border(
           Border.all(
-            color: tokens.borderNeutralSubtle,
+            color: tokens.colorBorderNeutralSubtle,
             width: tokens.borderWidthDefault.w,
           ),
         ),
         DecorationPart.boxShadow(const []),
       }),
       SurfaceStylePart.content({
-        ContentStylePart.text({TextStylePart.color(tokens.textMuted)}),
-        ContentStylePart.icon({IconThemePart.color(tokens.textMuted)}),
+        ContentStylePart.text({TextStylePart.color(tokens.colorTextMuted)}),
+        ContentStylePart.icon({IconThemePart.color(tokens.colorTextMuted)}),
       }),
     },
     SnackbarTone.again: (tokens) => {
       SurfaceStylePart.decoration({
-        DecorationPart.color(tokens.ratingAgainBackground),
+        DecorationPart.color(tokens.colorRatingAgainBackground),
         DecorationPart.border(
           Border.all(
-            color: tokens.ratingAgainBorder,
+            color: tokens.colorRatingAgainBorder,
             width: tokens.borderWidthDefault.w,
           ),
         ),
       }),
       SurfaceStylePart.content({
-        ContentStylePart.text({TextStylePart.color(tokens.ratingAgainText)}),
-        ContentStylePart.icon({IconThemePart.color(tokens.ratingAgainText)}),
+        ContentStylePart.text({
+          TextStylePart.color(tokens.colorRatingAgainText),
+        }),
+        ContentStylePart.icon({
+          IconThemePart.color(tokens.colorRatingAgainText),
+        }),
       }),
     },
     SnackbarTone.hard: (tokens) => {
       SurfaceStylePart.decoration({
-        DecorationPart.color(tokens.ratingHardBackground),
+        DecorationPart.color(tokens.colorRatingHardBackground),
         DecorationPart.border(
           Border.all(
-            color: tokens.ratingHardBorder,
+            color: tokens.colorRatingHardBorder,
             width: tokens.borderWidthDefault.w,
           ),
         ),
       }),
       SurfaceStylePart.content({
-        ContentStylePart.text({TextStylePart.color(tokens.ratingHardText)}),
-        ContentStylePart.icon({IconThemePart.color(tokens.ratingHardText)}),
+        ContentStylePart.text({
+          TextStylePart.color(tokens.colorRatingHardText),
+        }),
+        ContentStylePart.icon({
+          IconThemePart.color(tokens.colorRatingHardText),
+        }),
       }),
     },
     SnackbarTone.good: (tokens) => {
       SurfaceStylePart.decoration({
-        DecorationPart.color(tokens.ratingGoodBackground),
+        DecorationPart.color(tokens.colorRatingGoodBackground),
         DecorationPart.border(
           Border.all(
-            color: tokens.ratingGoodBorder,
+            color: tokens.colorRatingGoodBorder,
             width: tokens.borderWidthDefault.w,
           ),
         ),
       }),
       SurfaceStylePart.content({
-        ContentStylePart.text({TextStylePart.color(tokens.ratingGoodText)}),
-        ContentStylePart.icon({IconThemePart.color(tokens.ratingGoodText)}),
+        ContentStylePart.text({
+          TextStylePart.color(tokens.colorRatingGoodText),
+        }),
+        ContentStylePart.icon({
+          IconThemePart.color(tokens.colorRatingGoodText),
+        }),
       }),
     },
     SnackbarTone.easy: (tokens) => {
       SurfaceStylePart.decoration({
-        DecorationPart.color(tokens.ratingEasyBackground),
+        DecorationPart.color(tokens.colorRatingEasyBackground),
         DecorationPart.border(
           Border.all(
-            color: tokens.ratingEasyBorder,
+            color: tokens.colorRatingEasyBorder,
             width: tokens.borderWidthDefault.w,
           ),
         ),
       }),
       SurfaceStylePart.content({
-        ContentStylePart.text({TextStylePart.color(tokens.ratingEasyText)}),
-        ContentStylePart.icon({IconThemePart.color(tokens.ratingEasyText)}),
+        ContentStylePart.text({
+          TextStylePart.color(tokens.colorRatingEasyText),
+        }),
+        ContentStylePart.icon({
+          IconThemePart.color(tokens.colorRatingEasyText),
+        }),
       }),
     },
   },

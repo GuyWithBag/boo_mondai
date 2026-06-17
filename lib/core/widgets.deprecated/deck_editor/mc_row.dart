@@ -75,7 +75,7 @@
 //                   border: Border.all(
 //                     color: option.isCorrect
 //                         ? AppColors.correct
-//                         : AppColors.textSecondary.withValues(alpha: 0.4),
+//                         : AppColors.colorTextSecondary.withValues(alpha: 0.4),
 //                     width: 2,
 //                   ),
 //                 ),
@@ -122,7 +122,7 @@
 //               icon: const Icon(Icons.close, size: 18),
 //               onPressed: onRemove,
 //               tooltip: 'Remove option',
-//               color: AppColors.textSecondary,
+//               color: AppColors.colorTextSecondary,
 //               visualDensity: VisualDensity.compact,
 //             )
 //           else

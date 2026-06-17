@@ -17,8 +17,8 @@ abstract final class AppColors {
   static const surface = Color(0xFFFFFFFF);
   static const surfaceVariant = Color(0xFFF0F2F5);
   static const error = Color(0xFFE53935);
-  static const textPrimary = Color(0xFF212121);
-  static const textSecondary = Color(0xFF757575);
+  static const colorTextBaseline = Color(0xFF212121);
+  static const colorTextSecondary = Color(0xFF757575);
 
   // ── Dark theme ──────────────────────────────
   static const primaryDark = Color(0xFF7986CB);

@@ -156,9 +156,9 @@ class FilteredSearchBar<TObject, TFilter extends SearchFilter>
               constraints: BoxConstraints(maxHeight: maxDropdownHeight),
               child: DecoratedBox(
                 decoration: BoxDecoration(
-                  color: tokens.backgroundSurface,
+                  color: tokens.colorSurfaceBackground,
                   borderRadius: BorderRadius.circular(tokens.radiusSurfaceSm),
-                  border: Border.all(color: tokens.borderNeutralSubtle),
+                  border: Border.all(color: tokens.colorBorderNeutralSubtle),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.12),
@@ -305,16 +305,16 @@ class FilteredSearchBar<TObject, TFilter extends SearchFilter>
                 )
               : const Icon(Icons.search),
           prefixIconColor: searchController.hasText
-              ? tokens.textPrimary
-              : tokens.textMuted,
+              ? tokens.colorTextBaseline
+              : tokens.colorTextMuted,
           suffixIcon: filterEnabled
               ? IconButton(
                   tooltip: 'Filter search',
                   icon: Icon(
                     Icons.tune,
                     color: searchController.hasDirectiveText
-                        ? tokens.primary
-                        : tokens.textPrimary,
+                        ? tokens.colorPrimary
+                        : tokens.colorTextBaseline,
                   ),
                   onPressed: openFilters,
                 )

@@ -179,8 +179,8 @@ class SearchFilterSliderEditor extends StatelessWidget {
         Text(label),
         SliderTheme(
           data: SliderTheme.of(context).copyWith(
-            activeTrackColor: tokens.primary,
-            thumbColor: tokens.primary,
+            activeTrackColor: tokens.colorPrimary,
+            thumbColor: tokens.colorPrimary,
           ),
           child: Slider(
             min: min,

@@ -4,16 +4,16 @@ import 'package:boo_mondai/lib.barrel.dart'
         CubeController,
         Deck,
         AppTokens,
-        appTextStyle,
+        textStyle,
         TextSize,
         TextWeight,
         SurfaceBorder,
         surfaceStyle,
         SurfaceShape,
         SurfacePadding,
-        SurfaceTone,
+        SurfaceColor,
         Cube,
-        widthCard;
+        studyCardWidth;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -24,26 +24,30 @@ class PhysicalDeck extends StatelessWidget {
     required this.controller,
     this.hasTags = false,
     this.showInfoCover = true,
-    this.textScaleBaseWidth = widthCard,
+    this.textScaleBaseWidth,
   });
 
   final Deck? deck;
   final CubeController controller;
   final bool hasTags;
   final bool showInfoCover;
-  final double textScaleBaseWidth;
+  final double? textScaleBaseWidth;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final textScale = (controller.width / textScaleBaseWidth).clamp(0.6, 1.4);
-    final titleStyle = appTextStyle
+    final effectiveTextScaleBaseWidth = tokens.studyCardWidth;
+    final textScale = (controller.width / effectiveTextScaleBaseWidth).clamp(
+      0.6,
+      1.4,
+    );
+    final titleStyle = textStyle
         .resolve(tokens, const [TextSize.labelLarge, TextWeight.heavy])
         .scaledBy(textScale);
-    final tagStyle = appTextStyle
+    final tagStyle = textStyle
         .resolve(tokens, const [TextSize.labelSmall, TextWeight.heavy])
         .scaledBy(textScale);
-    final descriptionStyle = appTextStyle
+    final descriptionStyle = textStyle
         .resolve(tokens, const [TextSize.labelSmall, TextWeight.body])
         .scaledBy(textScale);
     final coverImage = backgroundImageProviderFromSource(deck?.coverImageUrl);
@@ -85,7 +89,7 @@ class PhysicalDeck extends StatelessWidget {
                     bottom: -controller.height * 0.08,
                     child: Surface(
                       style: surfaceStyle.resolve(tokens, const [
-                        SurfaceTone.muted,
+                        SurfaceColor.muted,
                         SurfaceShape.sharp,
                         SurfacePadding.text,
                       ]),
@@ -129,7 +133,9 @@ class PhysicalDeck extends StatelessWidget {
                               ],
                             ),
                           ],
-                          if ((deck?.shortDescription ?? '').trim().isNotEmpty) ...[
+                          if ((deck?.shortDescription ?? '')
+                              .trim()
+                              .isNotEmpty) ...[
                             SizedBox(height: controller.height * 0.025),
                             Text(
                               deck!.shortDescription,

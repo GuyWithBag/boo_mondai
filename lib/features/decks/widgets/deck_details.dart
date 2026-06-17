@@ -35,17 +35,17 @@ class DeckDetails extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         title,
-        SizedBox(height: tokens.spacePanelGapSm),
+        SizedBox(height: tokens.spaceLayoutGapSm),
         if (metaLabels != null) ...[
           metaLabels!,
-          SizedBox(height: tokens.spacePanelGapMd),
+          SizedBox(height: tokens.spaceLayoutGapMd),
         ],
         shortDescription,
-        SizedBox(height: tokens.spacePanelGapSm),
+        SizedBox(height: tokens.spaceLayoutGapSm),
         longDescription,
-        SizedBox(height: tokens.spacePanelGapLg),
+        SizedBox(height: tokens.spaceLayoutGapLg),
         const SectionEyebrow('Tags'),
-        SizedBox(height: tokens.spacePanelGapMd),
+        SizedBox(height: tokens.spaceLayoutGapMd),
         ChipInput(
           values: tags,
           onChanged: onTagsChanged ?? (_) {},

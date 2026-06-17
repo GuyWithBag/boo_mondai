@@ -32,7 +32,7 @@ class Sidebar extends StatelessWidget {
         decoration: BoxDecoration(
           border: BorderDirectional(
             end: BorderSide(
-              color: tokens.borderNeutralSubtle,
+              color: tokens.colorBorderNeutralSubtle,
               width: tokens.borderWidthDefault,
             ),
           ),
@@ -45,7 +45,7 @@ class Sidebar extends StatelessWidget {
           child: ListView.separated(
             itemCount: pages.length,
             separatorBuilder: (_, _) =>
-                SizedBox(height: tokens.spacePanelGapSm),
+                SizedBox(height: tokens.spaceLayoutGapSm),
             itemBuilder: (context, index) {
               final page = pages[index];
               final isSelected = index == currentPageIndex;
@@ -56,9 +56,8 @@ class Sidebar extends StatelessWidget {
                       ? page.selectedIcon!
                       : page.icon!,
                 ),
-                tone: ButtonTone.textGhostSelect,
                 selected: isSelected,
-                depth: ButtonDepth.flat,
+                variants: const [ButtonTone.textGhostSelect],
                 mainAxisAlignment: MainAxisAlignment.start,
                 onPressed: () => context.go(pages[index].url),
                 child: Text(page.name),

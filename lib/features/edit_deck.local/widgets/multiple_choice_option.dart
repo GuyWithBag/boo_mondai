@@ -6,7 +6,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         multipleChoiceOptionStyle,
         ButtonTone,
         TextTone,
-        appTextStyle,
+        textStyle,
         TextSize,
         TextWeight,
         ButtonDepth,
@@ -70,7 +70,7 @@ class EditMultipleChoiceOption extends HookWidget {
         (correct ? ButtonTone.success : ButtonTone.ghost);
     final effectiveSelected = resolvedStyle.selected ?? false;
     final effectiveOpacity = resolvedStyle.opacity ?? 1;
-    final effectiveTextTone = resolvedStyle.textTone ?? TextTone.primary;
+    final effectiveTextTone = resolvedStyle.textTone ?? TextTone.baseline;
     final effectiveOnPressed =
         onPressed ?? onCorrectChanged ?? (!isEditable ? () {} : null);
     final optionText = isEditable
@@ -78,7 +78,7 @@ class EditMultipleChoiceOption extends HookWidget {
             controller: controller,
             onChanged: onTextChanged,
             style: TextStyle(
-              color: tokens.textPrimary,
+              color: tokens.colorTextBaseline,
               fontSize: 20,
               fontWeight: FontWeight.w800,
             ),
@@ -86,7 +86,7 @@ class EditMultipleChoiceOption extends HookWidget {
           )
         : Text(
             value,
-            style: appTextStyle.resolve(tokens, [
+            style: textStyle.resolve(tokens, [
               TextSize.labelLarge,
               TextWeight.heavy,
               effectiveTextTone,
@@ -101,15 +101,14 @@ class EditMultipleChoiceOption extends HookWidget {
         child: Opacity(
           opacity: effectiveOpacity,
           child: Button(
-            tone: effectiveTone,
-            depth: ButtonDepth.flat,
+            variants: [ButtonDepth.flat, effectiveTone],
             selected: effectiveSelected,
             mainAxisAlignment: MainAxisAlignment.start,
             onPressed: effectiveOnPressed,
             leading: showRadio ? TactileRadioCircle(correct: correct) : null,
             trailing: isEditable
                 ? IconButton(
-                    color: tokens.textMuted,
+                    color: tokens.colorTextMuted,
                     onPressed: canRemove ? onRemove : null,
                     icon: const Icon(Icons.delete),
                   )

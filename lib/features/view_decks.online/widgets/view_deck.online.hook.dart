@@ -10,8 +10,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         DeckVoteReviewComment,
         DeckVoteReviewsService,
         LocalDB,
-        Services,
-        ViewDecksOnlineController;
+        ViewDecksOnlineController,
+        AuthService;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
@@ -224,28 +224,28 @@ ViewDeckOnlineSheetState useViewDeckOnlineSheet({
   }
 
   bool canInteract(String message) {
-    if (Services.auth.isAuthenticatedRemote) return true;
+    if (AuthService.isAuthenticatedRemote) return true;
 
     discussionError.value = Exception(message);
     return false;
   }
 
   bool canEditComment(DeckComment comment) {
-    if (!Services.auth.isAuthenticatedRemote || comment.isDeleted) return false;
+    if (!AuthService.isAuthenticatedRemote || comment.isDeleted) return false;
 
     final profile = LocalDB.profile.getOrCreate();
     return profile.id == comment.userId;
   }
 
   bool canEditReview(DeckVoteReview review) {
-    if (!Services.auth.isAuthenticatedRemote || review.isDeleted) return false;
+    if (!AuthService.isAuthenticatedRemote || review.isDeleted) return false;
 
     final profile = LocalDB.profile.getOrCreate();
     return profile.id == review.userId;
   }
 
   bool canEditReviewComment(DeckVoteReviewComment comment) {
-    if (!Services.auth.isAuthenticatedRemote || comment.isDeleted) return false;
+    if (!AuthService.isAuthenticatedRemote || comment.isDeleted) return false;
 
     final profile = LocalDB.profile.getOrCreate();
     return profile.id == comment.userId;

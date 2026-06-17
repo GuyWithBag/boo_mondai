@@ -56,7 +56,7 @@ class SliverAppBar extends material.StatelessWidget {
       leading: const BackButton(),
       title: title,
       actions: actions,
-      backgroundColor: tokens.backgroundSurface,
+      backgroundColor: tokens.colorSurfaceBackground,
       surfaceTintColor: material.Colors.transparent,
       forceMaterialTransparency: forceMaterialTransparency,
       flexibleSpace: hasFlexibleContent

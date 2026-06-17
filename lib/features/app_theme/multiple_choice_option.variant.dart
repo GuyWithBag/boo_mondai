@@ -35,7 +35,6 @@ final multipleChoiceOptionStyle =
         buttonTone: ButtonTone.ghost,
         selected: false,
         opacity: 1,
-        textTone: TextTone.primary,
       ),
       merge: (base, variant) => base.merge(variant),
       defaultVariants: const [
@@ -62,13 +61,8 @@ final multipleChoiceOptionStyle =
         MultipleChoiceOptionTone.neutral: (_) =>
             const MultipleChoiceOptionStyle(buttonTone: ButtonTone.ghost),
         MultipleChoiceOptionTone.success: (_) =>
-            const MultipleChoiceOptionStyle(
-              buttonTone: ButtonTone.success,
-              textTone: TextTone.primary,
-            ),
-        MultipleChoiceOptionTone.error: (_) => const MultipleChoiceOptionStyle(
-          buttonTone: ButtonTone.error,
-          textTone: TextTone.primary,
-        ),
+            const MultipleChoiceOptionStyle(buttonTone: ButtonTone.success),
+        MultipleChoiceOptionTone.error: (_) =>
+            const MultipleChoiceOptionStyle(buttonTone: ButtonTone.error),
       },
     );

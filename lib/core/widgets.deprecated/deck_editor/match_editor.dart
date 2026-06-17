@@ -61,7 +61,7 @@
 //         const SizedBox(height: AppSpacing.sm),
 //         Text(
 //           'Each term will be matched to its corresponding answer during the game.',
-//           style: textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+//           style: textTheme.bodySmall?.copyWith(color: AppColors.colorTextSecondary),
 //         ),
 //         const SizedBox(height: AppSpacing.md),
 

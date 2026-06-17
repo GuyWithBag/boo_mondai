@@ -21,7 +21,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         ViewDrillResultPage,
         PlaceholderAppPage,
         AnswerSurveyPage,
-        ChangeReviewPage;
+        ChangeReviewPage,
+        SettingsPage;
 import 'package:boo_mondai/features/view_cards/view_cards.page.dart'
     show ViewCardsPage;
 import 'package:flutter/material.dart';
@@ -198,7 +199,7 @@ class Pages {
     name: 'Settings',
     builder:
         (context, {pathParameters = const {}, queryParameters = const {}}) =>
-            const PlaceholderAppPage(title: 'Settings'),
+            const SettingsPage(),
   );
 
   static final notifications = AppPage(

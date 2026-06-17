@@ -72,7 +72,7 @@ class ViewCardTile extends HookWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           AspectRatio(
-            aspectRatio: tokens.cardAspectRatio,
+            aspectRatio: tokens.studyCardAspectRatio,
             child: _ScaledCardText(
               width: width,
               child: _buildPreview(
@@ -86,7 +86,7 @@ class ViewCardTile extends HookWidget {
             ),
           ),
           if (labels.isNotEmpty) ...[
-            SizedBox(height: tokens.spacePanelGapSm),
+            SizedBox(height: tokens.spaceLayoutGapSm),
             Wrap(
               alignment: WrapAlignment.center,
               spacing: 8,
@@ -136,14 +136,14 @@ class ViewCardsReversibleGroup extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(tokens.spacePanelPadding),
+      padding: EdgeInsets.all(tokens.spaceLayoutPadding),
       decoration: BoxDecoration(
-        color: tokens.softGray,
+        color: tokens.colorMuted,
         borderRadius: BorderRadius.circular(tokens.radiusSurfaceSm),
       ),
       child: Wrap(
-        spacing: tokens.spacePanelGapLg,
-        runSpacing: tokens.spacePanelGapLg,
+        spacing: tokens.spaceLayoutGapLg,
+        runSpacing: tokens.spaceLayoutGapLg,
         alignment: WrapAlignment.center,
         children: [
           if (template != null) ...[
@@ -235,7 +235,7 @@ class _FlashcardPreview extends HookWidget {
     final tokens = context.themeTokens<AppTokens>();
     final controller = useCubeController(
       width: width,
-      height: width / tokens.cardAspectRatio,
+      height: width / tokens.studyCardAspectRatio,
       depth: 10,
       perspective: 0.001,
     );
@@ -267,7 +267,7 @@ class _FlashcardPreview extends HookWidget {
             message: 'Flip card',
             child: Button.iconSmall(
               icon: Icons.flip,
-              tone: ButtonTone.ghost,
+
               depth: ButtonDepth.flat,
               onPressed: () => controller.flip(),
             ),
@@ -353,7 +353,7 @@ class _ScaledCardText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final scale = (width / tokens.widthCard).clamp(0.8, 1.15).toDouble();
+    final scale = (width / tokens.studyCardWidth).clamp(0.8, 1.15).toDouble();
 
     return MediaQuery(
       data: MediaQuery.of(

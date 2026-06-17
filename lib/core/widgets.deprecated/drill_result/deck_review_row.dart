@@ -43,7 +43,7 @@ class DeckReviewRow extends StatelessWidget {
             message: 'These cards were moved to FSRS review',
             child: HeaderBadge(
               label: '$reviewLater later',
-              // color: AppColors.textSecondary,
+              // color: AppColors.colorTextSecondary,
             ),
           ),
       ],

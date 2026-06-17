@@ -24,7 +24,7 @@ class CardTypeSelector extends StatelessWidget {
     ];
 
     return Surface(
-      style: surfaceStyle.resolve(tokens, const [SurfaceTone.surface]),
+      style: surfaceStyle.resolve(tokens, const [SurfaceColor.baseline]),
       child: Wrap(
         spacing: 18,
         runSpacing: 18,
@@ -38,18 +38,14 @@ class CardTypeSelector extends StatelessWidget {
               children: [
                 Text(
                   'Study Direction',
-                  style: appTextStyle
-                      .resolve(tokens, [
-                        TextSize.labelLarge,
-                        TextWeight.heavy,
-                        TextTone.primary,
-                      ])
+                  style: textStyle
+                      .resolve(tokens, [TextSize.labelLarge, TextWeight.heavy])
                       .copyWith(fontSize: 18),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   hint,
-                  style: appTextStyle.resolve(tokens, [
+                  style: textStyle.resolve(tokens, [
                     TextSize.label,
                     TextWeight.body,
                     TextTone.secondary,

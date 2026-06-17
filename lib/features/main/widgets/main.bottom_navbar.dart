@@ -23,7 +23,7 @@ class BottomNavbar extends StatelessWidget {
       decoration: BoxDecoration(
         border: BorderDirectional(
           top: BorderSide(
-            color: tokens.borderNeutralSubtle,
+            color: tokens.colorBorderNeutralSubtle,
             width: tokens.borderWidthDefault,
           ),
         ),

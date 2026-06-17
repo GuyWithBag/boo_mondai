@@ -647,26 +647,18 @@ types:
         index: 7
   UserSettings:
     typeId: 34
-    nextIndex: 9
+    nextIndex: 10
     fields:
       userId:
         index: 0
-      themeModeName:
-        index: 1
-      lightThemePresetId:
-        index: 2
-      darkThemePresetId:
-        index: 3
-      themeOverride:
-        index: 4
-      customThemePresets:
-        index: 5
       id:
         index: 6
       createdAt:
         index: 7
       updatedAt:
         index: 8
+      preferences:
+        index: 9
   DownloadCheckpoint:
     typeId: 35
     nextIndex: 7

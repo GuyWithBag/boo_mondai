@@ -32,7 +32,7 @@ class EmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 56.r, color: AppColors.textSecondary),
+            Icon(icon, size: 56.r, color: AppColors.colorTextSecondary),
             SizedBox(height: AppSpacing.md.h),
             Text(
               title,

@@ -251,7 +251,7 @@ class EditDeckPage extends HookWidget {
                                           Text(
                                             'No card selected',
                                             style: TextStyle(
-                                              color: tokens.textPrimary,
+                                              color: tokens.colorTextBaseline,
                                               fontSize: 24,
                                               fontWeight: FontWeight.w900,
                                             ),

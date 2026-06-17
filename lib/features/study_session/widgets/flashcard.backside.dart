@@ -3,9 +3,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         FlashcardTemplate,
         StudyCard,
         AppTokens,
-        SurfaceTone,
         PhysicalCardSide,
-        MarkdownText;
+        MarkdownText,
+        SurfaceBorder;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -28,7 +28,7 @@ class FlashcardBackSide extends StatelessWidget {
 
     return PhysicalCardSide(
       maxWidth: maxWidth,
-      tone: SurfaceTone.primaryOutline,
+      surfaceStyleVariants: const [SurfaceBorder.primary],
       child: Center(
         child: Column(
           key: const ValueKey('flashcard-back'),
@@ -42,7 +42,7 @@ class FlashcardBackSide extends StatelessWidget {
               width: 64.w,
               height: 4.h,
               decoration: BoxDecoration(
-                color: tokens.borderNeutralSubtle,
+                color: tokens.colorBorderNeutralSubtle,
                 borderRadius: BorderRadius.circular(999),
               ),
             ),

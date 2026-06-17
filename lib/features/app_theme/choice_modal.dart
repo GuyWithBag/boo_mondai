@@ -4,7 +4,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppModalTone,
         AppTokens,
         Button,
-        appTextStyle,
+        textStyle,
         TextSize,
         TextWeight,
         TextTone,
@@ -46,14 +46,14 @@ class ChoiceModal<T> extends StatelessWidget {
 
     return Dialog(
       backgroundColor: Colors.transparent,
-      insetPadding: EdgeInsets.all(tokens.spacePanelGapLg),
+      insetPadding: EdgeInsets.all(tokens.spaceLayoutGapLg),
       child: Modal(
         tone: tone,
         leading: leading,
         actions: [
           for (final action in actions)
             Button(
-              tone: action.tone,
+              variants: [action.tone],
               onPressed: () => Navigator.pop(context, action.value),
               child: Text(action.label),
             ),
@@ -65,16 +65,16 @@ class ChoiceModal<T> extends StatelessWidget {
             Text(
               title,
               textAlign: TextAlign.center,
-              style: appTextStyle.resolve(tokens, const [
+              style: textStyle.resolve(tokens, const [
                 TextSize.header,
                 TextWeight.heavy,
               ]),
             ),
-            SizedBox(height: tokens.spacePanelGapSm),
+            SizedBox(height: tokens.spaceLayoutGapSm),
             Text(
               body,
               textAlign: TextAlign.center,
-              style: appTextStyle.resolve(tokens, const [
+              style: textStyle.resolve(tokens, const [
                 TextSize.label,
                 TextWeight.body,
                 TextTone.secondary,

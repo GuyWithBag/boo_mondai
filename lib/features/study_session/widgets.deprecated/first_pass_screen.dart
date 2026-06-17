@@ -47,7 +47,7 @@ class FirstPassScreen extends StatelessWidget {
                   '$incorrectCount card${incorrectCount == 1 ? '' : 's'} '
                   'you missed until you get them right.',
                   style: theme.textTheme.bodyLarge?.copyWith(
-                    color: AppColors.textSecondary,
+                    color: AppColors.colorTextSecondary,
                   ),
                   textAlign: TextAlign.center,
                 ),

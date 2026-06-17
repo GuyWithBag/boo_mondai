@@ -18,21 +18,21 @@ enum AppModalTone {
 
 final appModalStyle = VariantStyle.surfaceParts<AppTokens>(
   base: (tokens) => {
-    SurfaceStylePart.padding(EdgeInsets.all(tokens.spacePanelPadding.r)),
+    SurfaceStylePart.padding(EdgeInsets.all(tokens.spaceLayoutPadding.r)),
     SurfaceStylePart.decoration({
-      DecorationPart.color(tokens.backgroundSurface),
+      DecorationPart.color(tokens.colorSurfaceBackground),
       DecorationPart.borderRadius(
         BorderRadius.circular(tokens.radiusSurface.r),
       ),
       DecorationPart.border(
         Border.all(
-          color: tokens.borderNeutralSubtle,
+          color: tokens.colorBorderNeutralSubtle,
           width: tokens.borderWidthDefault.w,
         ),
       ),
       DecorationPart.boxShadow([
         BoxShadow(
-          color: tokens.borderNeutralSubtle.withValues(alpha: 0.55),
+          color: tokens.colorBorderNeutralSubtle.withValues(alpha: 0.55),
           offset: Offset(0, tokens.modalShadowOffset.h),
         ),
       ]),
@@ -42,13 +42,16 @@ final appModalStyle = VariantStyle.surfaceParts<AppTokens>(
   variants: {
     AppModalTone.primary: (tokens) => {
       SurfaceStylePart.decoration({
-        DecorationPart.color(tokens.primary),
+        DecorationPart.color(tokens.colorPrimary),
         DecorationPart.border(
-          Border.all(color: tokens.primary, width: tokens.borderWidthDefault.w),
+          Border.all(
+            color: tokens.colorPrimary,
+            width: tokens.borderWidthDefault.w,
+          ),
         ),
         DecorationPart.boxShadow([
           BoxShadow(
-            color: tokens.primaryDim.withValues(alpha: 0.45),
+            color: tokens.colorPrimaryDim.withValues(alpha: 0.45),
             offset: Offset(0, tokens.modalShadowOffset.h),
           ),
         ]),
@@ -56,16 +59,16 @@ final appModalStyle = VariantStyle.surfaceParts<AppTokens>(
     },
     AppModalTone.surface: (tokens) => {
       SurfaceStylePart.decoration({
-        DecorationPart.color(tokens.backgroundSurface),
+        DecorationPart.color(tokens.colorSurfaceBackground),
         DecorationPart.border(
           Border.all(
-            color: tokens.borderNeutralSubtle,
+            color: tokens.colorBorderNeutralSubtle,
             width: tokens.borderWidthDefault.w,
           ),
         ),
         DecorationPart.boxShadow([
           BoxShadow(
-            color: tokens.borderNeutralSubtle,
+            color: tokens.colorBorderNeutralSubtle,
             offset: Offset(0, tokens.modalShadowOffset.h),
           ),
         ]),
@@ -73,16 +76,16 @@ final appModalStyle = VariantStyle.surfaceParts<AppTokens>(
     },
     AppModalTone.success: (tokens) => {
       SurfaceStylePart.decoration({
-        DecorationPart.color(tokens.actionSuccessBackground),
+        DecorationPart.color(tokens.colorActionSuccessBackground),
         DecorationPart.border(
           Border.all(
-            color: tokens.actionSuccessBorder,
+            color: tokens.colorActionSuccessBorder,
             width: tokens.borderWidthDefault.w,
           ),
         ),
         DecorationPart.boxShadow([
           BoxShadow(
-            color: tokens.actionSuccessBorder,
+            color: tokens.colorActionSuccessBorder,
             offset: Offset(0, tokens.modalShadowOffset.h),
           ),
         ]),
@@ -90,16 +93,16 @@ final appModalStyle = VariantStyle.surfaceParts<AppTokens>(
     },
     AppModalTone.error: (tokens) => {
       SurfaceStylePart.decoration({
-        DecorationPart.color(tokens.actionErrorBackground),
+        DecorationPart.color(tokens.colorActionErrorBackground),
         DecorationPart.border(
           Border.all(
-            color: tokens.actionErrorBorder,
+            color: tokens.colorActionErrorBorder,
             width: tokens.borderWidthDefault.w,
           ),
         ),
         DecorationPart.boxShadow([
           BoxShadow(
-            color: tokens.actionErrorBorder,
+            color: tokens.colorActionErrorBorder,
             offset: Offset(0, tokens.modalShadowOffset.h),
           ),
         ]),
@@ -107,13 +110,16 @@ final appModalStyle = VariantStyle.surfaceParts<AppTokens>(
     },
     AppModalTone.streak: (tokens) => {
       SurfaceStylePart.decoration({
-        DecorationPart.color(tokens.streak),
+        DecorationPart.color(tokens.colorStreak),
         DecorationPart.border(
-          Border.all(color: tokens.streak, width: tokens.borderWidthDefault.w),
+          Border.all(
+            color: tokens.colorStreak,
+            width: tokens.borderWidthDefault.w,
+          ),
         ),
         DecorationPart.boxShadow([
           BoxShadow(
-            color: tokens.streakDim.withValues(alpha: 0.45),
+            color: tokens.colorStreakDim.withValues(alpha: 0.45),
             offset: Offset(0, tokens.modalShadowOffset.h),
           ),
         ]),
@@ -121,10 +127,10 @@ final appModalStyle = VariantStyle.surfaceParts<AppTokens>(
     },
     AppModalTone.dashed: (tokens) => {
       SurfaceStylePart.decoration({
-        DecorationPart.color(tokens.softGray),
+        DecorationPart.color(tokens.colorMuted),
         DecorationPart.border(
           Border.all(
-            color: tokens.borderNeutralSubtle,
+            color: tokens.colorBorderNeutralSubtle,
             width: tokens.borderWidthDefault.w,
           ),
         ),
@@ -134,10 +140,10 @@ final appModalStyle = VariantStyle.surfaceParts<AppTokens>(
 
     AppModalTone.again: (tokens) => {
       SurfaceStylePart.decoration({
-        DecorationPart.color(tokens.ratingAgainBackground),
+        DecorationPart.color(tokens.colorRatingAgainBackground),
         DecorationPart.border(
           Border.all(
-            color: tokens.ratingAgainBorder,
+            color: tokens.colorRatingAgainBorder,
             width: tokens.borderWidthDefault.w,
           ),
         ),
@@ -145,10 +151,10 @@ final appModalStyle = VariantStyle.surfaceParts<AppTokens>(
     },
     AppModalTone.hard: (tokens) => {
       SurfaceStylePart.decoration({
-        DecorationPart.color(tokens.ratingHardBackground),
+        DecorationPart.color(tokens.colorRatingHardBackground),
         DecorationPart.border(
           Border.all(
-            color: tokens.ratingHardBorder,
+            color: tokens.colorRatingHardBorder,
             width: tokens.borderWidthDefault.w,
           ),
         ),
@@ -156,10 +162,10 @@ final appModalStyle = VariantStyle.surfaceParts<AppTokens>(
     },
     AppModalTone.good: (tokens) => {
       SurfaceStylePart.decoration({
-        DecorationPart.color(tokens.ratingGoodBackground),
+        DecorationPart.color(tokens.colorRatingGoodBackground),
         DecorationPart.border(
           Border.all(
-            color: tokens.ratingGoodBorder,
+            color: tokens.colorRatingGoodBorder,
             width: tokens.borderWidthDefault.w,
           ),
         ),
@@ -167,10 +173,10 @@ final appModalStyle = VariantStyle.surfaceParts<AppTokens>(
     },
     AppModalTone.easy: (tokens) => {
       SurfaceStylePart.decoration({
-        DecorationPart.color(tokens.ratingEasyBackground),
+        DecorationPart.color(tokens.colorRatingEasyBackground),
         DecorationPart.border(
           Border.all(
-            color: tokens.ratingEasyBorder,
+            color: tokens.colorRatingEasyBorder,
             width: tokens.borderWidthDefault.w,
           ),
         ),

@@ -26,21 +26,21 @@ class MatchPair extends StatelessWidget {
 
     return Row(
       children: [
-        Icon(Icons.drag_indicator, color: tokens.textMuted),
+        Icon(Icons.drag_indicator, color: tokens.colorTextMuted),
         const SizedBox(width: 12),
         Expanded(
           child: MatchingTypeInput(value: term, onChanged: onTermChanged),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 14),
-          child: Icon(Icons.compare_arrows, color: tokens.textMuted),
+          child: Icon(Icons.compare_arrows, color: tokens.colorTextMuted),
         ),
         Expanded(
           child: MatchingTypeInput(value: match, onChanged: onMatchChanged),
         ),
         IconButton(
           onPressed: canRemove ? onRemove : null,
-          icon: Icon(Icons.delete, color: tokens.textMuted),
+          icon: Icon(Icons.delete, color: tokens.colorTextMuted),
         ),
       ],
     );

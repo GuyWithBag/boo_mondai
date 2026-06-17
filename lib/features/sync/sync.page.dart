@@ -66,11 +66,11 @@ class SyncPage extends StatelessWidget {
     // ── "Already up to date" state ───────────────────────────────────────────
     if (isAlreadyUpToDate) {
       return Scaffold(
-        backgroundColor: tokens.backgroundPage,
+        backgroundColor: tokens.colorPageBackground,
         body: SafeArea(
           child: Center(
             child: Padding(
-              padding: EdgeInsets.all(tokens.spacePanelPadding.r),
+              padding: EdgeInsets.all(tokens.spaceLayoutPadding.r),
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 560),
                 child: Column(
@@ -79,31 +79,31 @@ class SyncPage extends StatelessWidget {
                     Icon(
                       Icons.check_circle_outline_rounded,
                       size: 76,
-                      color: tokens.textMuted,
+                      color: tokens.colorTextMuted,
                     ),
-                    SizedBox(height: tokens.spacePanelGapMd.h),
+                    SizedBox(height: tokens.spaceLayoutGapMd.h),
                     Text(
                       'Everything is already up to date',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: tokens.textPrimary,
+                        color: tokens.colorTextBaseline,
                         fontFamily: tokens.fontFamily,
                         fontSize: tokens.textSizeHeader.sp,
                         fontWeight: tokens.fontWeightTextStrong,
                       ),
                     ),
-                    SizedBox(height: tokens.spacePanelGapSm.h),
+                    SizedBox(height: tokens.spaceLayoutGapSm.h),
                     Text(
                       'No changes to apply.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: tokens.textSecondary,
+                        color: tokens.colorTextSecondary,
                         fontFamily: tokens.fontFamily,
                         fontSize: tokens.textSizeLabelLarge.sp,
                         fontWeight: tokens.fontWeightTextStrong,
                       ),
                     ),
-                    SizedBox(height: tokens.spacePanelGapLg.h),
+                    SizedBox(height: tokens.spaceLayoutGapLg.h),
                     SizedBox(
                       width: double.infinity,
                       child: Button(
@@ -122,29 +122,33 @@ class SyncPage extends StatelessWidget {
 
     // ── Normal sync states (loading → reviewing → complete) ──────────────────
     return Scaffold(
-      backgroundColor: tokens.backgroundPage,
+      backgroundColor: tokens.colorPageBackground,
       body: SafeArea(
         child: Center(
           child: Padding(
-            padding: EdgeInsets.all(tokens.spacePanelPadding.r),
+            padding: EdgeInsets.all(tokens.spaceLayoutPadding.r),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 560),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.sync_rounded, size: 76, color: tokens.textMuted),
-                  SizedBox(height: tokens.spacePanelGapMd.h),
+                  Icon(
+                    Icons.sync_rounded,
+                    size: 76,
+                    color: tokens.colorTextMuted,
+                  ),
+                  SizedBox(height: tokens.spaceLayoutGapMd.h),
                   Text(
                     isComplete ? 'Sync Complete!' : 'Syncing',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: tokens.textPrimary,
+                      color: tokens.colorTextBaseline,
                       fontFamily: tokens.fontFamily,
                       fontSize: tokens.textSizeHeader.sp,
                       fontWeight: tokens.fontWeightTextStrong,
                     ),
                   ),
-                  SizedBox(height: tokens.spacePanelGapSm.h),
+                  SizedBox(height: tokens.spaceLayoutGapSm.h),
                   Text(
                     isComplete
                         ? isReviewing
@@ -153,20 +157,20 @@ class SyncPage extends StatelessWidget {
                         : '${(progress * 100).round()}%',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: tokens.textSecondary,
+                      color: tokens.colorTextSecondary,
                       fontFamily: tokens.fontFamily,
                       fontSize: tokens.textSizeLabelLarge.sp,
                       fontWeight: tokens.fontWeightTextStrong,
                     ),
                   ),
                   if (!isComplete) ...[
-                    SizedBox(height: tokens.spacePanelGapMd.h),
+                    SizedBox(height: tokens.spaceLayoutGapMd.h),
                     ProgressBar(value: progress),
                   ] else ...[
-                    SizedBox(height: tokens.spacePanelGapMd.h),
+                    SizedBox(height: tokens.spaceLayoutGapMd.h),
                     ChangeSummaryChips(plan: plan),
                   ],
-                  SizedBox(height: tokens.spacePanelGapLg.h),
+                  SizedBox(height: tokens.spaceLayoutGapLg.h),
                   if (isComplete) ...[
                     Row(
                       children: [
@@ -176,17 +180,17 @@ class SyncPage extends StatelessWidget {
                             child: const Text('VIEW CHANGES'),
                           ),
                         ),
-                        SizedBox(width: tokens.spacePanelGapSm.w),
+                        SizedBox(width: tokens.spaceLayoutGapSm.w),
                         Expanded(
                           child: Button(
-                            tone: ButtonTone.filled,
+                            variants: const [ButtonTone.filled],
                             onPressed: onApply,
                             child: const Text('APPLY'),
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(height: tokens.spacePanelGapSm.h),
+                    SizedBox(height: tokens.spaceLayoutGapSm.h),
                     SizedBox(
                       width: double.infinity,
                       child: Button(

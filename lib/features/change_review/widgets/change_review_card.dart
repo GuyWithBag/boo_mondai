@@ -21,15 +21,15 @@ class ChangeReviewCard extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: tokens.backgroundSurface,
+        color: tokens.colorSurfaceBackground,
         borderRadius: BorderRadius.circular(tokens.radiusSurfaceSm.r),
         border: Border.all(
-          color: tokens.borderNeutralSubtle,
+          color: tokens.colorBorderNeutralSubtle,
           width: tokens.borderWidthDefault.w,
         ),
       ),
       child: Padding(
-        padding: EdgeInsets.all(tokens.spacePanelPaddingSm.r),
+        padding: EdgeInsets.all(tokens.spaceLayoutPadding.r),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -55,7 +55,7 @@ class ChangeReviewCard extends StatelessWidget {
                       Text(
                         change.title,
                         style: TextStyle(
-                          color: tokens.textPrimary,
+                          color: tokens.colorTextBaseline,
                           fontFamily: tokens.fontFamily,
                           fontSize: tokens.textSizeLabelLarge.sp,
                           fontWeight: tokens.fontWeightTextStrong,
@@ -66,7 +66,7 @@ class ChangeReviewCard extends StatelessWidget {
                         Text(
                           change.subtitle!,
                           style: TextStyle(
-                            color: tokens.textSecondary,
+                            color: tokens.colorTextSecondary,
                             fontFamily: tokens.fontFamily,
                             fontSize: tokens.textSizeLabel.sp,
                           ),
@@ -78,7 +78,7 @@ class ChangeReviewCard extends StatelessWidget {
               ],
             ),
             if (change.fields.isNotEmpty) ...[
-              SizedBox(height: tokens.spacePanelGapMd.h),
+              SizedBox(height: tokens.spaceLayoutGapMd.h),
               for (final field in change.fields)
                 ChangeFieldDiffView(diff: field, type: change.type),
             ],
@@ -91,9 +91,9 @@ class ChangeReviewCard extends StatelessWidget {
 
 Color _foreground(AppTokens tokens, ChangeType type) {
   return switch (type) {
-    ChangeType.added => tokens.actionSuccess,
-    ChangeType.modified => tokens.ratingHardText,
-    ChangeType.removed => tokens.ratingAgainText,
-    ChangeType.skipped => tokens.textSecondary,
+    ChangeType.added => tokens.colorActionSuccess,
+    ChangeType.modified => tokens.colorRatingHardText,
+    ChangeType.removed => tokens.colorRatingAgainText,
+    ChangeType.skipped => tokens.colorTextSecondary,
   };
 }

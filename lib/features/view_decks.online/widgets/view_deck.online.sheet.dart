@@ -13,7 +13,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         SectionEyebrow,
         SurfacePadding,
         SurfaceShape,
-        SurfaceTone,
+        SurfaceColor,
         TextSize,
         TextTone,
         TextWeight,
@@ -22,7 +22,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         MarkdownTextMode,
         ViewDeckOnlineSheetState,
         ViewDecksOnlineController,
-        appTextStyle,
+        textStyle,
         surfaceStyle,
         useViewDeckOnlineSheet,
         ChangeReviewController;
@@ -101,7 +101,7 @@ class ViewDeckOnlineSheet extends HookWidget {
         return Surface(
           style: surfaceStyle.resolve(tokens, const [
             SurfacePadding.none,
-            SurfaceTone.muted,
+            SurfaceColor.muted,
           ]),
           hasClipRRect: true,
           child: _Body(
@@ -152,22 +152,22 @@ class _Body extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _HeroCarousel(imageUrls: sheet.carouselImageUrls),
-                  SizedBox(height: tokens.spacePanelGapMd),
+                  SizedBox(height: tokens.spaceLayoutGapMd),
                   Padding(
                     padding: EdgeInsets.symmetric(
-                      horizontal: tokens.spacePanelPadding,
+                      horizontal: tokens.spaceLayoutPadding,
                     ),
                     child: _InteractionSummary(sheet: sheet),
                   ),
-                  SizedBox(height: tokens.spacePanelGapMd),
+                  SizedBox(height: tokens.spaceLayoutGapMd),
                   Surface(
                     style: surfaceStyle.resolve(tokens, const [
                       SurfaceShape.topRounded,
-                      SurfaceTone.muted,
+                      SurfaceColor.muted,
                       SurfacePadding.none,
                     ]),
                     child: Padding(
-                      padding: EdgeInsets.all(tokens.spacePanelPadding),
+                      padding: EdgeInsets.all(tokens.spaceLayoutPadding),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -176,8 +176,8 @@ class _Body extends StatelessWidget {
                             children: [
                               Expanded(
                                 child: Wrap(
-                                  spacing: tokens.spacePanelGapMd,
-                                  runSpacing: tokens.spacePanelGapSm,
+                                  spacing: tokens.spaceLayoutGapMd,
+                                  runSpacing: tokens.spaceLayoutGapSm,
                                   children: [
                                     ProfileLabel(
                                       label: 'By',
@@ -209,9 +209,9 @@ class _Body extends StatelessWidget {
                               ),
                             ],
                           ),
-                          SizedBox(height: tokens.spacePanelGapMd),
+                          SizedBox(height: tokens.spaceLayoutGapMd),
                           _InteractionSummary(sheet: sheet),
-                          SizedBox(height: tokens.spacePanelGapLg),
+                          SizedBox(height: tokens.spaceLayoutGapLg),
                           Center(
                             child: DeckTile(
                               deck: deck,
@@ -219,20 +219,20 @@ class _Body extends StatelessWidget {
                               width: 190,
                             ),
                           ),
-                          SizedBox(height: tokens.spacePanelGapLg),
+                          SizedBox(height: tokens.spaceLayoutGapLg),
                           DeckDetails(
                             title: EditableTextValue(
                               value: sheet.title,
                               enabled: false,
                               onSave: (_) async {},
-                              textStyle: appTextStyle.resolve(tokens, const [
+                              textStyle: textStyle.resolve(tokens, const [
                                 TextSize.header,
                                 TextWeight.heavy,
                               ]),
                             ),
                             metaLabels: Wrap(
-                              spacing: tokens.spacePanelGapMd,
-                              runSpacing: tokens.spacePanelGapSm,
+                              spacing: tokens.spaceLayoutGapMd,
+                              runSpacing: tokens.spaceLayoutGapSm,
                               children: [
                                 MetaLabel(
                                   icon: Icons.style_outlined,
@@ -258,10 +258,9 @@ class _Body extends StatelessWidget {
                               value: sheet.shortDescription,
                               enabled: false,
                               onSave: (_) async {},
-                              textStyle: appTextStyle.resolve(tokens, const [
+                              textStyle: textStyle.resolve(tokens, const [
                                 TextSize.label,
                                 TextWeight.strong,
-                                TextTone.primary,
                               ]),
                             ),
                             longDescription: EditableTextValue(
@@ -270,10 +269,9 @@ class _Body extends StatelessWidget {
                               isMarkdown: true,
                               markdownMode: MarkdownTextMode.preview,
                               onSave: (_) async {},
-                              textStyle: appTextStyle.resolve(tokens, const [
+                              textStyle: textStyle.resolve(tokens, const [
                                 TextSize.bodyLarge,
                                 TextWeight.body,
-                                TextTone.primary,
                               ]),
                             ),
                             tags: deck.tags
@@ -286,16 +284,16 @@ class _Body extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(height: tokens.spacePanelGapLg),
+                  SizedBox(height: tokens.spaceLayoutGapLg),
                   Padding(
                     padding: EdgeInsets.symmetric(
-                      horizontal: tokens.spacePanelPadding,
+                      horizontal: tokens.spaceLayoutPadding,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SectionEyebrow('Featured Cards'),
-                        SizedBox(height: tokens.spacePanelGapLg),
+                        SizedBox(height: tokens.spaceLayoutGapLg),
                         _DiscussionSection(sheet: sheet),
                       ],
                     ),
@@ -306,9 +304,9 @@ class _Body extends StatelessWidget {
           ],
         ),
         Positioned(
-          left: tokens.spacePanelPadding,
-          right: tokens.spacePanelPadding,
-          top: tokens.spacePanelPadding,
+          left: tokens.spaceLayoutPadding,
+          right: tokens.spaceLayoutPadding,
+          top: tokens.spaceLayoutPadding,
           child: Row(
             children: [
               Button.icon(
@@ -351,10 +349,10 @@ class _HeroCarousel extends StatelessWidget {
       width: double.infinity,
       child: Padding(
         padding: EdgeInsets.only(
-          left: tokens.spacePanelPadding,
-          right: tokens.spacePanelPadding,
-          top: tokens.spacePanelPadding * 3.5,
-          bottom: tokens.spacePanelPadding,
+          left: tokens.spaceLayoutPadding,
+          right: tokens.spaceLayoutPadding,
+          top: tokens.spaceLayoutPadding * 3.5,
+          bottom: tokens.spaceLayoutPadding,
         ),
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -394,11 +392,11 @@ class _NetworkImageTile extends StatelessWidget {
       fit: BoxFit.cover,
       errorBuilder: (context, _, _) {
         return ColoredBox(
-          color: tokens.backgroundSurface,
+          color: tokens.colorSurfaceBackground,
           child: Icon(
             Icons.image_not_supported_outlined,
             size: 44,
-            color: tokens.textMuted,
+            color: tokens.colorTextMuted,
           ),
         );
       },
@@ -416,8 +414,8 @@ class _InteractionSummary extends StatelessWidget {
     final tokens = context.themeTokens<AppTokens>();
 
     return Wrap(
-      spacing: tokens.spacePanelGapSm,
-      runSpacing: tokens.spacePanelGapSm,
+      spacing: tokens.spaceLayoutGapSm,
+      runSpacing: tokens.spaceLayoutGapSm,
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         _InteractionButton(
@@ -478,12 +476,12 @@ class _DiscussionSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SectionEyebrow('Reviews'),
-        SizedBox(height: tokens.spacePanelGapMd),
+        SizedBox(height: tokens.spaceLayoutGapMd),
         _ReviewComposer(
           isSubmitting: sheet.isSubmittingReview,
           onSubmitted: sheet.onReviewSubmitted,
         ),
-        SizedBox(height: tokens.spacePanelGapLg),
+        SizedBox(height: tokens.spaceLayoutGapLg),
         if (sheet.isLoadingDiscussion)
           const Center(child: CircularProgressIndicator())
         else if (sheet.reviewItems.isEmpty)
@@ -499,14 +497,14 @@ class _DiscussionSection extends StatelessWidget {
               isSubmitting:
                   sheet.isSubmittingReview || sheet.isSubmittingReviewComment,
             ),
-        SizedBox(height: tokens.spacePanelGapLg),
+        SizedBox(height: tokens.spaceLayoutGapLg),
         SectionEyebrow('Comments'),
-        SizedBox(height: tokens.spacePanelGapMd),
+        SizedBox(height: tokens.spaceLayoutGapMd),
         _CommentComposer(
           isSubmitting: sheet.isSubmittingComment,
           onSubmitted: sheet.onCommentSubmitted,
         ),
-        SizedBox(height: tokens.spacePanelGapLg),
+        SizedBox(height: tokens.spaceLayoutGapLg),
         if (sheet.isLoadingDiscussion)
           const SizedBox.shrink()
         else if (sheet.commentItems.isEmpty)
@@ -709,9 +707,11 @@ class _InteractionButton extends StatelessWidget {
       avatar: Icon(icon, size: 18),
       label: Text(label),
       onPressed: onPressed,
-      backgroundColor: selected ? tokens.primary.withValues(alpha: 0.14) : null,
+      backgroundColor: selected
+          ? tokens.colorPrimary.withValues(alpha: 0.14)
+          : null,
       side: BorderSide(
-        color: selected ? tokens.primary : tokens.borderNeutralSubtle,
+        color: selected ? tokens.colorPrimary : tokens.colorBorderNeutralSubtle,
       ),
     );
   }
@@ -728,7 +728,7 @@ class _EmptyDiscussionText extends StatelessWidget {
 
     return Text(
       label,
-      style: appTextStyle.resolve(tokens, const [
+      style: textStyle.resolve(tokens, const [
         TextSize.label,
         TextTone.secondary,
       ]),

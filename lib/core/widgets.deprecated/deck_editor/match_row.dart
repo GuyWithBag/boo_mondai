@@ -148,7 +148,7 @@
 //               icon: const Icon(Icons.close, size: 18),
 //               onPressed: onRemove,
 //               tooltip: 'Remove pair',
-//               color: AppColors.textSecondary,
+//               color: AppColors.colorTextSecondary,
 //               visualDensity: VisualDensity.compact,
 //             )
 //           else

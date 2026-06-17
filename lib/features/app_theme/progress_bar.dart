@@ -20,13 +20,13 @@ class ProgressBar extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            ColoredBox(color: tokens.softGray),
+            ColoredBox(color: tokens.colorMuted),
             FractionallySizedBox(
               alignment: Alignment.centerLeft,
               widthFactor: clampedValue,
               child: DecoratedBox(
                 decoration: BoxDecoration(
-                  color: tokens.primary,
+                  color: tokens.colorPrimary,
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Align(
