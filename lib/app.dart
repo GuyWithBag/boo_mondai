@@ -22,12 +22,12 @@ bool _scaleScreenUtilForSmallAndMediumWidth() {
 
 class BooMondaiApp extends HookWidget {
   final AuthController authController;
-  final UserSettings initialUserSettings;
+  final SettingsController settingsController;
 
   const BooMondaiApp({
     super.key,
     required this.authController,
-    required this.initialUserSettings,
+    required this.settingsController,
   });
 
   @override
@@ -36,15 +36,15 @@ class BooMondaiApp extends HookWidget {
       authController,
     ]);
     final controller = useMemoized(
-      () => UserSettingsThemeBridge.createController(initialUserSettings),
-      [initialUserSettings],
+      () => UserSettingsThemeBridge.createController(settingsController),
+      [settingsController],
     );
     useListenable(controller);
 
     return ThemeVariantsProvider<AppTokens>(
       controller: controller,
       child: ScreenUtilInit(
-        designSize: Breakpoints.mobile,
+        designSize: Breakpoints.baseMobileSize,
         minTextAdapt: true,
         splitScreenMode: true,
         enableScaleWH: _scaleScreenUtilForSmallAndMediumWidth,

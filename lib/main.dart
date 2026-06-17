@@ -4,9 +4,7 @@
 // PROVIDERS: all
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 import 'dart:developer' as developer;
-
 import 'package:app_links/app_links.dart';
 import 'package:barrel_annotation/barrel_annotation.dart';
 import 'package:boo_mondai/core/hive/hive_registrar.g.dart' show HiveRegistrar;
@@ -17,7 +15,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         RemoteDB,
         LocalDB,
         Services,
-        NotificationService,
         AuthController,
         DrillSessionController,
         ViewReviewsController,
@@ -27,7 +24,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         ViewLeaderboardController,
         StreakController,
         ResearchController,
-        UserSettingsService,
+        SettingsController,
+        NotificationsController,
+        ImportExportController,
         BooMondaiApp;
 import 'package:flutter/material.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
@@ -44,11 +43,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 )
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   // ── Hive ────────────────────────────────────────────
   await Hive.initFlutter('boo_mondai');
   Hive.registerAdapters();
-
   // ── Supabase ────────────────────────────────────────
   await Supabase.initialize(
     url: Env.supabaseUrl,
@@ -57,28 +54,28 @@ Future<void> main() async {
   await RemoteDB.init();
   await LocalDB.init();
   Services.init();
-
-  // ── Other services ──────────────────────────────────
-  final notificationService = NotificationService();
-  await notificationService.init();
-
+  // ── Settings (must come before notifications) ───────
+  final settingsController = SettingsController();
+  await settingsController.init();
+  // ── Notifications ────────────────────────────────────
+  final notificationsController = NotificationsController(settingsController);
+  await notificationsController.init();
   // ── Restore session ─────────────────────────────────
   final authController = AuthController();
   await authController.restoreSession();
-  final initialUserSettings =
-      await UserSettingsService.getOrCreateForCurrentProfile();
-
-  // This is what catches the link on Linux when the OS tries
-  // to open the app via the .desktop file
+  // ── Deep links ──────────────────────────────────────
   final appLinks = AppLinks();
   appLinks.uriLinkStream.listen((uri) {
     developer.log('Received deep link: $uri');
   });
-
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: authController),
+        ChangeNotifierProvider.value(value: settingsController),
+        ChangeNotifierProvider.value(value: notificationsController),
+        ChangeNotifierProvider(create: (_) => ChangeReviewController()),
+        ChangeNotifierProvider(create: (_) => ImportExportController()),
         ChangeNotifierProvider(create: (_) => DrillSessionController()),
         ChangeNotifierProvider(create: (_) => ViewReviewsController()),
         ChangeNotifierProvider(create: (_) => ReviewSessionController()),
@@ -87,11 +84,10 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => ViewLeaderboardController()),
         ChangeNotifierProvider(create: (_) => StreakController()),
         ChangeNotifierProvider(create: (_) => ResearchController()),
-        ChangeNotifierProvider(create: (_) => ChangeReviewController()),
       ],
       child: BooMondaiApp(
         authController: authController,
-        initialUserSettings: initialUserSettings,
+        settingsController: settingsController,
       ),
     ),
   );

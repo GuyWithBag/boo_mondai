@@ -6,7 +6,13 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart'
-    show AuthController, ErrorPage, RouteException, Pages, MainScaffold;
+    show
+        AuthController,
+        ErrorPage,
+        RouteException,
+        Pages,
+        MainScaffold,
+        AuthService;
 import 'package:go_router/go_router.dart';
 
 GoRouter createRouter(AuthController authController) {
@@ -35,7 +41,7 @@ GoRouter createRouter(AuthController authController) {
       final isAnonymous = !auth.currentProfile.isAnonymous;
       final loc = state.matchedLocation;
 
-      if (auth.service.isAuthenticatedRemote &&
+      if (AuthService.isAuthenticatedRemote &&
           !auth.hasPendingGuestMerge &&
           (loc == Pages.login.url || loc == Pages.register.url)) {
         return Pages.home.url;

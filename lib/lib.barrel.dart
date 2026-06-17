@@ -5,6 +5,6 @@ export 'core/core.barrel.dart';
 export 'features/features.barrel.dart';
 // Other files
 export 'app.dart';
-export 'env.dart';
 export 'routes.dart';
+export 'env.dart';
 export 'main.dart';
