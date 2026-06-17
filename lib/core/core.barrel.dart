@@ -13,5 +13,6 @@ export 'theme.deprecated/theme.deprecated.barrel.dart';
 export 'theme/theme.barrel.dart';
 export 'widgets.deprecated/widgets.deprecated.barrel.dart';
 export 'widgets/widgets.barrel.dart';
+export 'helpers/helpers.barrel.dart';
 // Other files
 export 'services.dart';
