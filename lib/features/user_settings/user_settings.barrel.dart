@@ -3,8 +3,7 @@
 // Barrel files
 export 'models/models.barrel.dart';
 // Other files
-export 'user_settings.remote.db.dart';
-export 'user_settings_theme_bridge.dart';
 export 'user_settings.controller.dart';
 export 'user_settings.local.db.dart';
 export 'user_settings.service.dart';
+export 'user_settings_theme_bridge.dart';

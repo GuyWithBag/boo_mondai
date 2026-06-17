@@ -338,27 +338,27 @@ Use `AppTokens`.
 
 Page:
 
-- background: `tokens.backgroundPage`
-- cards: `tokens.backgroundSurface`
-- borders/dividers: `tokens.borderNeutralSubtle`
-- main text: `tokens.textPrimary`
-- secondary text: `tokens.textSecondary`
-- muted previous values: `tokens.textMuted`
+- background: `tokens.colorPageBackground`
+- cards: `tokens.colorSurfaceBackground`
+- borders/dividers: `tokens.colorBorderNeutralSubtle`
+- main text: `tokens.colorTextBaseline`
+- secondary text: `tokens.colorTextSecondary`
+- muted previous values: `tokens.colorTextMuted`
 
 Change color mapping:
 
 - `ChangeType.added`: success tokens
-  - `tokens.actionSuccess`
-  - `tokens.actionSuccessBackground`
-  - `tokens.actionSuccessBorder`
+  - `tokens.colorActionSuccess`
+  - `tokens.colorActionSuccessBackground`
+  - `tokens.colorActionSuccessBorder`
 - `ChangeType.modified`: hard-rating tokens
-  - `tokens.ratingHardText`
-  - `tokens.ratingHardBackground`
-  - `tokens.ratingHardBorder`
+  - `tokens.colorRatingHardText`
+  - `tokens.colorRatingHardBackground`
+  - `tokens.colorRatingHardBorder`
 - `ChangeType.removed`: again-rating tokens
-  - `tokens.ratingAgainText`
-  - `tokens.ratingAgainBackground`
-  - `tokens.ratingAgainBorder`
+  - `tokens.colorRatingAgainText`
+  - `tokens.colorRatingAgainBackground`
+  - `tokens.colorRatingAgainBorder`
 
 Skipped changes can use neutral text/border tokens.
 

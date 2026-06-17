@@ -17,7 +17,7 @@ class ThemeOverride with ThemeOverrideMappable {
     this.extraTokens = const {},
   });
 
-  /// Optional ARGB color value overriding `tokens.primary`.
+  /// Optional ARGB color value overriding `tokens.colorPrimary`.
   final int? primaryColorValue;
 
   /// Optional font family override.
