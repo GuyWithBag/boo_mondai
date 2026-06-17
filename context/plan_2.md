@@ -338,7 +338,7 @@ Use `AppTokens`.
 
 Page:
 
-- background: `tokens.colorPageBackground`
+- background: `tokens.colorScaffoldBackground`
 - cards: `tokens.colorSurfaceBackground`
 - borders/dividers: `tokens.colorBorderNeutralSubtle`
 - main text: `tokens.colorTextBaseline`
