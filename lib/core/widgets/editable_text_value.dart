@@ -157,9 +157,7 @@ class EditableTextValue extends HookWidget {
     return Row(
       spacing: tokens.spaceLayoutGapSm,
       crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: TextAlignMainAxisAlignmentHelper.fromTextAlign(
-        textAlign,
-      ),
+      mainAxisAlignment: TextHelper.textAlignToMainAxisalignment(textAlign),
       children: [
         isMarkdown && value.trim().isNotEmpty
             ? MarkdownText(data: value, baseTextStyle: textStyle)
