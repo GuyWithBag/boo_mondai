@@ -22,9 +22,6 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
 
   static String _$name(AppTokens v) => v.name;
   static const Field<AppTokens, String> _f$name = Field('name', _$name);
-  static String _$fontFamily(AppTokens v) => v.fontFamily;
-  static const Field<AppTokens, String> _f$fontFamily =
-      Field('fontFamily', _$fontFamily, key: r'font_family');
   static Color _$colorPrimary(AppTokens v) => v.colorPrimary;
   static const Field<AppTokens, Color> _f$colorPrimary =
       Field('colorPrimary', _$colorPrimary, key: r'color_primary');
@@ -44,10 +41,11 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
   static Color _$colorStreakDim(AppTokens v) => v.colorStreakDim;
   static const Field<AppTokens, Color> _f$colorStreakDim =
       Field('colorStreakDim', _$colorStreakDim, key: r'color_streak_dim');
-  static Color _$colorPageBackground(AppTokens v) => v.colorPageBackground;
-  static const Field<AppTokens, Color> _f$colorPageBackground = Field(
-      'colorPageBackground', _$colorPageBackground,
-      key: r'color_page_background');
+  static Color _$colorScaffoldBackground(AppTokens v) =>
+      v.colorScaffoldBackground;
+  static const Field<AppTokens, Color> _f$colorScaffoldBackground = Field(
+      'colorScaffoldBackground', _$colorScaffoldBackground,
+      key: r'color_scaffold_background');
   static Color _$colorSurfaceBackground(AppTokens v) =>
       v.colorSurfaceBackground;
   static const Field<AppTokens, Color> _f$colorSurfaceBackground = Field(
@@ -173,13 +171,6 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
   static const Field<AppTokens, Color> _f$colorRatingEasyHoverBackground =
       Field('colorRatingEasyHoverBackground', _$colorRatingEasyHoverBackground,
           key: r'color_rating_easy_hover_background');
-  static Color _$colorTransparent(AppTokens v) => v.colorTransparent;
-  static const Field<AppTokens, Color> _f$colorTransparent =
-      Field('colorTransparent', _$colorTransparent, key: r'color_transparent');
-  static Color _$colorTextOnBrand(AppTokens v) => v.colorTextOnBrand;
-  static const Field<AppTokens, Color> _f$colorTextOnBrand = Field(
-      'colorTextOnBrand', _$colorTextOnBrand,
-      key: r'color_text_on_brand');
   static Color _$colorGoogle(AppTokens v) => v.colorGoogle;
   static const Field<AppTokens, Color> _f$colorGoogle =
       Field('colorGoogle', _$colorGoogle, key: r'color_google');
@@ -199,153 +190,178 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
   static Color _$colorTextOnMono(AppTokens v) => v.colorTextOnMono;
   static const Field<AppTokens, Color> _f$colorTextOnMono =
       Field('colorTextOnMono', _$colorTextOnMono, key: r'color_text_on_mono');
+  static String _$fontFamily(AppTokens v) => v.fontFamily;
+  static const Field<AppTokens, String> _f$fontFamily = Field(
+      'fontFamily', _$fontFamily,
+      key: r'font_family', mode: FieldMode.member);
+  static Color _$colorTransparent(AppTokens v) => v.colorTransparent;
+  static const Field<AppTokens, Color> _f$colorTransparent = Field(
+      'colorTransparent', _$colorTransparent,
+      key: r'color_transparent', mode: FieldMode.member);
+  static Color _$colorTextOnBrand(AppTokens v) => v.colorTextOnBrand;
+  static const Field<AppTokens, Color> _f$colorTextOnBrand = Field(
+      'colorTextOnBrand', _$colorTextOnBrand,
+      key: r'color_text_on_brand', mode: FieldMode.member);
   static double _$buttonShadowOffset(AppTokens v) => v.buttonShadowOffset;
   static const Field<AppTokens, double> _f$buttonShadowOffset = Field(
       'buttonShadowOffset', _$buttonShadowOffset,
-      key: r'button_shadow_offset');
+      key: r'button_shadow_offset', mode: FieldMode.member);
   static double _$modalShadowOffset(AppTokens v) => v.modalShadowOffset;
   static const Field<AppTokens, double> _f$modalShadowOffset = Field(
       'modalShadowOffset', _$modalShadowOffset,
-      key: r'modal_shadow_offset');
+      key: r'modal_shadow_offset', mode: FieldMode.member);
   static FontWeight _$fontWeightTextBody(AppTokens v) => v.fontWeightTextBody;
   static const Field<AppTokens, FontWeight> _f$fontWeightTextBody = Field(
       'fontWeightTextBody', _$fontWeightTextBody,
-      key: r'font_weight_text_body');
+      key: r'font_weight_text_body', mode: FieldMode.member);
   static FontWeight _$fontWeightTextStrong(AppTokens v) =>
       v.fontWeightTextStrong;
   static const Field<AppTokens, FontWeight> _f$fontWeightTextStrong = Field(
       'fontWeightTextStrong', _$fontWeightTextStrong,
-      key: r'font_weight_text_strong');
+      key: r'font_weight_text_strong', mode: FieldMode.member);
   static FontWeight _$fontWeightTextHeavy(AppTokens v) => v.fontWeightTextHeavy;
   static const Field<AppTokens, FontWeight> _f$fontWeightTextHeavy = Field(
       'fontWeightTextHeavy', _$fontWeightTextHeavy,
-      key: r'font_weight_text_heavy');
+      key: r'font_weight_text_heavy', mode: FieldMode.member);
   static double _$lineHeightTextBody(AppTokens v) => v.lineHeightTextBody;
   static const Field<AppTokens, double> _f$lineHeightTextBody = Field(
       'lineHeightTextBody', _$lineHeightTextBody,
-      key: r'line_height_text_body');
+      key: r'line_height_text_body', mode: FieldMode.member);
   static double _$lineHeightTextTitle(AppTokens v) => v.lineHeightTextTitle;
   static const Field<AppTokens, double> _f$lineHeightTextTitle = Field(
       'lineHeightTextTitle', _$lineHeightTextTitle,
-      key: r'line_height_text_title');
+      key: r'line_height_text_title', mode: FieldMode.member);
   static double _$lineHeightTextDisplay(AppTokens v) => v.lineHeightTextDisplay;
   static const Field<AppTokens, double> _f$lineHeightTextDisplay = Field(
       'lineHeightTextDisplay', _$lineHeightTextDisplay,
-      key: r'line_height_text_display');
+      key: r'line_height_text_display', mode: FieldMode.member);
   static double _$lineHeightFieldDisplay(AppTokens v) =>
       v.lineHeightFieldDisplay;
   static const Field<AppTokens, double> _f$lineHeightFieldDisplay = Field(
       'lineHeightFieldDisplay', _$lineHeightFieldDisplay,
-      key: r'line_height_field_display');
+      key: r'line_height_field_display', mode: FieldMode.member);
   static double _$lineHeightButton(AppTokens v) => v.lineHeightButton;
-  static const Field<AppTokens, double> _f$lineHeightButton =
-      Field('lineHeightButton', _$lineHeightButton, key: r'line_height_button');
+  static const Field<AppTokens, double> _f$lineHeightButton = Field(
+      'lineHeightButton', _$lineHeightButton,
+      key: r'line_height_button', mode: FieldMode.member);
   static double _$letterSpacingTextEyebrow(AppTokens v) =>
       v.letterSpacingTextEyebrow;
   static const Field<AppTokens, double> _f$letterSpacingTextEyebrow = Field(
       'letterSpacingTextEyebrow', _$letterSpacingTextEyebrow,
-      key: r'letter_spacing_text_eyebrow');
-  static double _$radiusSurfaceLg(AppTokens v) => v.radiusSurfaceLg;
-  static const Field<AppTokens, double> _f$radiusSurfaceLg =
-      Field('radiusSurfaceLg', _$radiusSurfaceLg, key: r'radius_surface_lg');
-  static double _$radiusSurface(AppTokens v) => v.radiusSurface;
-  static const Field<AppTokens, double> _f$radiusSurface =
-      Field('radiusSurface', _$radiusSurface, key: r'radius_surface');
-  static double _$radiusSurfaceSm(AppTokens v) => v.radiusSurfaceSm;
-  static const Field<AppTokens, double> _f$radiusSurfaceSm =
-      Field('radiusSurfaceSm', _$radiusSurfaceSm, key: r'radius_surface_sm');
+      key: r'letter_spacing_text_eyebrow', mode: FieldMode.member);
   static double _$borderWidthDefault(AppTokens v) => v.borderWidthDefault;
   static const Field<AppTokens, double> _f$borderWidthDefault = Field(
       'borderWidthDefault', _$borderWidthDefault,
-      key: r'border_width_default');
+      key: r'border_width_default', mode: FieldMode.member);
   static double _$spaceScaffoldPadding(AppTokens v) => v.spaceScaffoldPadding;
   static const Field<AppTokens, double> _f$spaceScaffoldPadding = Field(
       'spaceScaffoldPadding', _$spaceScaffoldPadding,
-      key: r'space_scaffold_padding');
+      key: r'space_scaffold_padding', mode: FieldMode.member);
   static double _$spaceLayoutPadding(AppTokens v) => v.spaceLayoutPadding;
   static const Field<AppTokens, double> _f$spaceLayoutPadding = Field(
       'spaceLayoutPadding', _$spaceLayoutPadding,
-      key: r'space_layout_padding');
+      key: r'space_layout_padding', mode: FieldMode.member);
   static double _$spaceLayoutGapLg(AppTokens v) => v.spaceLayoutGapLg;
   static const Field<AppTokens, double> _f$spaceLayoutGapLg = Field(
       'spaceLayoutGapLg', _$spaceLayoutGapLg,
-      key: r'space_layout_gap_lg');
+      key: r'space_layout_gap_lg', mode: FieldMode.member);
   static double _$spaceLayoutGapMd(AppTokens v) => v.spaceLayoutGapMd;
   static const Field<AppTokens, double> _f$spaceLayoutGapMd = Field(
       'spaceLayoutGapMd', _$spaceLayoutGapMd,
-      key: r'space_layout_gap_md');
+      key: r'space_layout_gap_md', mode: FieldMode.member);
   static double _$spaceLayoutGapSm(AppTokens v) => v.spaceLayoutGapSm;
   static const Field<AppTokens, double> _f$spaceLayoutGapSm = Field(
       'spaceLayoutGapSm', _$spaceLayoutGapSm,
-      key: r'space_layout_gap_sm');
+      key: r'space_layout_gap_sm', mode: FieldMode.member);
   static double _$spaceScaffoldMaxWidth(AppTokens v) => v.spaceScaffoldMaxWidth;
   static const Field<AppTokens, double> _f$spaceScaffoldMaxWidth = Field(
       'spaceScaffoldMaxWidth', _$spaceScaffoldMaxWidth,
-      key: r'space_scaffold_max_width');
+      key: r'space_scaffold_max_width', mode: FieldMode.member);
+  static double _$radiusSurfaceLg(AppTokens v) => v.radiusSurfaceLg;
+  static const Field<AppTokens, double> _f$radiusSurfaceLg = Field(
+      'radiusSurfaceLg', _$radiusSurfaceLg,
+      key: r'radius_surface_lg', mode: FieldMode.member);
+  static double _$radiusSurface(AppTokens v) => v.radiusSurface;
+  static const Field<AppTokens, double> _f$radiusSurface = Field(
+      'radiusSurface', _$radiusSurface,
+      key: r'radius_surface', mode: FieldMode.member);
+  static double _$radiusSurfaceSm(AppTokens v) => v.radiusSurfaceSm;
+  static const Field<AppTokens, double> _f$radiusSurfaceSm = Field(
+      'radiusSurfaceSm', _$radiusSurfaceSm,
+      key: r'radius_surface_sm', mode: FieldMode.member);
+  static double _$textSizeHeaderLarge(AppTokens v) => v.textSizeHeaderLarge;
+  static const Field<AppTokens, double> _f$textSizeHeaderLarge = Field(
+      'textSizeHeaderLarge', _$textSizeHeaderLarge,
+      key: r'text_size_header_large', mode: FieldMode.member);
   static double _$textSizeHeader(AppTokens v) => v.textSizeHeader;
-  static const Field<AppTokens, double> _f$textSizeHeader =
-      Field('textSizeHeader', _$textSizeHeader, key: r'text_size_header');
+  static const Field<AppTokens, double> _f$textSizeHeader = Field(
+      'textSizeHeader', _$textSizeHeader,
+      key: r'text_size_header', mode: FieldMode.member);
+  static double _$textSizeHeader2(AppTokens v) => v.textSizeHeader2;
+  static const Field<AppTokens, double> _f$textSizeHeader2 = Field(
+      'textSizeHeader2', _$textSizeHeader2,
+      key: r'text_size_header2', mode: FieldMode.member);
   static double _$textSizeLabelLarge(AppTokens v) => v.textSizeLabelLarge;
   static const Field<AppTokens, double> _f$textSizeLabelLarge = Field(
       'textSizeLabelLarge', _$textSizeLabelLarge,
-      key: r'text_size_label_large');
+      key: r'text_size_label_large', mode: FieldMode.member);
   static double _$textSizeLabel(AppTokens v) => v.textSizeLabel;
-  static const Field<AppTokens, double> _f$textSizeLabel =
-      Field('textSizeLabel', _$textSizeLabel, key: r'text_size_label');
+  static const Field<AppTokens, double> _f$textSizeLabel = Field(
+      'textSizeLabel', _$textSizeLabel,
+      key: r'text_size_label', mode: FieldMode.member);
   static double _$textSizeLabelSmall(AppTokens v) => v.textSizeLabelSmall;
   static const Field<AppTokens, double> _f$textSizeLabelSmall = Field(
       'textSizeLabelSmall', _$textSizeLabelSmall,
-      key: r'text_size_label_small');
+      key: r'text_size_label_small', mode: FieldMode.member);
   static double _$textSizeBodyLarge(AppTokens v) => v.textSizeBodyLarge;
   static const Field<AppTokens, double> _f$textSizeBodyLarge = Field(
       'textSizeBodyLarge', _$textSizeBodyLarge,
-      key: r'text_size_body_large');
+      key: r'text_size_body_large', mode: FieldMode.member);
   static double _$sizeIconMd(AppTokens v) => v.sizeIconMd;
-  static const Field<AppTokens, double> _f$sizeIconMd =
-      Field('sizeIconMd', _$sizeIconMd, key: r'size_icon_md');
+  static const Field<AppTokens, double> _f$sizeIconMd = Field(
+      'sizeIconMd', _$sizeIconMd,
+      key: r'size_icon_md', mode: FieldMode.member);
   static double _$sizeIconLg(AppTokens v) => v.sizeIconLg;
-  static const Field<AppTokens, double> _f$sizeIconLg =
-      Field('sizeIconLg', _$sizeIconLg, key: r'size_icon_lg');
-  static double _$studyCardWidth(AppTokens v) => v.studyCardWidth;
-  static const Field<AppTokens, double> _f$studyCardWidth =
-      Field('studyCardWidth', _$studyCardWidth, key: r'study_card_width');
+  static const Field<AppTokens, double> _f$sizeIconLg = Field(
+      'sizeIconLg', _$sizeIconLg,
+      key: r'size_icon_lg', mode: FieldMode.member);
   static double _$studyCardAspectRatio(AppTokens v) => v.studyCardAspectRatio;
   static const Field<AppTokens, double> _f$studyCardAspectRatio = Field(
       'studyCardAspectRatio', _$studyCardAspectRatio,
-      key: r'study_card_aspect_ratio');
+      key: r'study_card_aspect_ratio', mode: FieldMode.member);
+  static double _$studyCardWidth(AppTokens v) => v.studyCardWidth;
+  static const Field<AppTokens, double> _f$studyCardWidth = Field(
+      'studyCardWidth', _$studyCardWidth,
+      key: r'study_card_width', mode: FieldMode.member);
   static double _$studyCardRadius(AppTokens v) => v.studyCardRadius;
-  static const Field<AppTokens, double> _f$studyCardRadius =
-      Field('studyCardRadius', _$studyCardRadius, key: r'study_card_radius');
+  static const Field<AppTokens, double> _f$studyCardRadius = Field(
+      'studyCardRadius', _$studyCardRadius,
+      key: r'study_card_radius', mode: FieldMode.member);
   static double _$studyCardTextSizeFront(AppTokens v) =>
       v.studyCardTextSizeFront;
   static const Field<AppTokens, double> _f$studyCardTextSizeFront = Field(
       'studyCardTextSizeFront', _$studyCardTextSizeFront,
-      key: r'study_card_text_size_front');
+      key: r'study_card_text_size_front', mode: FieldMode.member);
   static double _$studyCardTextSizeBack(AppTokens v) => v.studyCardTextSizeBack;
   static const Field<AppTokens, double> _f$studyCardTextSizeBack = Field(
       'studyCardTextSizeBack', _$studyCardTextSizeBack,
-      key: r'study_card_text_size_back');
+      key: r'study_card_text_size_back', mode: FieldMode.member);
   static double _$studyCardTextSizeBackContent(AppTokens v) =>
       v.studyCardTextSizeBackContent;
   static const Field<AppTokens, double> _f$studyCardTextSizeBackContent = Field(
       'studyCardTextSizeBackContent', _$studyCardTextSizeBackContent,
-      key: r'study_card_text_size_back_content');
-  static double _$textSizeHeaderLarge(AppTokens v) => v.textSizeHeaderLarge;
-  static const Field<AppTokens, double> _f$textSizeHeaderLarge = Field(
-      'textSizeHeaderLarge', _$textSizeHeaderLarge,
-      key: r'text_size_header_large');
+      key: r'study_card_text_size_back_content', mode: FieldMode.member);
 
   @override
   final MappableFields<AppTokens> fields = const {
     #name: _f$name,
-    #fontFamily: _f$fontFamily,
     #colorPrimary: _f$colorPrimary,
     #colorPrimaryDim: _f$colorPrimaryDim,
     #colorPrimaryBright: _f$colorPrimaryBright,
     #colorPrimarySoft: _f$colorPrimarySoft,
     #colorStreak: _f$colorStreak,
     #colorStreakDim: _f$colorStreakDim,
-    #colorPageBackground: _f$colorPageBackground,
+    #colorScaffoldBackground: _f$colorScaffoldBackground,
     #colorSurfaceBackground: _f$colorSurfaceBackground,
     #colorBorderNeutralSubtle: _f$colorBorderNeutralSubtle,
     #colorActionSuccess: _f$colorActionSuccess,
@@ -374,14 +390,15 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
     #colorRatingEasyText: _f$colorRatingEasyText,
     #colorRatingEasyBorder: _f$colorRatingEasyBorder,
     #colorRatingEasyHoverBackground: _f$colorRatingEasyHoverBackground,
-    #colorTransparent: _f$colorTransparent,
-    #colorTextOnBrand: _f$colorTextOnBrand,
     #colorGoogle: _f$colorGoogle,
     #colorGoogleDim: _f$colorGoogleDim,
     #colorTextOnGoogle: _f$colorTextOnGoogle,
     #colorMono: _f$colorMono,
     #colorMonoDim: _f$colorMonoDim,
     #colorTextOnMono: _f$colorTextOnMono,
+    #fontFamily: _f$fontFamily,
+    #colorTransparent: _f$colorTransparent,
+    #colorTextOnBrand: _f$colorTextOnBrand,
     #buttonShadowOffset: _f$buttonShadowOffset,
     #modalShadowOffset: _f$modalShadowOffset,
     #fontWeightTextBody: _f$fontWeightTextBody,
@@ -393,9 +410,6 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
     #lineHeightFieldDisplay: _f$lineHeightFieldDisplay,
     #lineHeightButton: _f$lineHeightButton,
     #letterSpacingTextEyebrow: _f$letterSpacingTextEyebrow,
-    #radiusSurfaceLg: _f$radiusSurfaceLg,
-    #radiusSurface: _f$radiusSurface,
-    #radiusSurfaceSm: _f$radiusSurfaceSm,
     #borderWidthDefault: _f$borderWidthDefault,
     #spaceScaffoldPadding: _f$spaceScaffoldPadding,
     #spaceLayoutPadding: _f$spaceLayoutPadding,
@@ -403,33 +417,36 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
     #spaceLayoutGapMd: _f$spaceLayoutGapMd,
     #spaceLayoutGapSm: _f$spaceLayoutGapSm,
     #spaceScaffoldMaxWidth: _f$spaceScaffoldMaxWidth,
+    #radiusSurfaceLg: _f$radiusSurfaceLg,
+    #radiusSurface: _f$radiusSurface,
+    #radiusSurfaceSm: _f$radiusSurfaceSm,
+    #textSizeHeaderLarge: _f$textSizeHeaderLarge,
     #textSizeHeader: _f$textSizeHeader,
+    #textSizeHeader2: _f$textSizeHeader2,
     #textSizeLabelLarge: _f$textSizeLabelLarge,
     #textSizeLabel: _f$textSizeLabel,
     #textSizeLabelSmall: _f$textSizeLabelSmall,
     #textSizeBodyLarge: _f$textSizeBodyLarge,
     #sizeIconMd: _f$sizeIconMd,
     #sizeIconLg: _f$sizeIconLg,
-    #studyCardWidth: _f$studyCardWidth,
     #studyCardAspectRatio: _f$studyCardAspectRatio,
+    #studyCardWidth: _f$studyCardWidth,
     #studyCardRadius: _f$studyCardRadius,
     #studyCardTextSizeFront: _f$studyCardTextSizeFront,
     #studyCardTextSizeBack: _f$studyCardTextSizeBack,
     #studyCardTextSizeBackContent: _f$studyCardTextSizeBackContent,
-    #textSizeHeaderLarge: _f$textSizeHeaderLarge,
   };
 
   static AppTokens _instantiate(DecodingData data) {
     return AppTokens(
         name: data.dec(_f$name),
-        fontFamily: data.dec(_f$fontFamily),
         colorPrimary: data.dec(_f$colorPrimary),
         colorPrimaryDim: data.dec(_f$colorPrimaryDim),
         colorPrimaryBright: data.dec(_f$colorPrimaryBright),
         colorPrimarySoft: data.dec(_f$colorPrimarySoft),
         colorStreak: data.dec(_f$colorStreak),
         colorStreakDim: data.dec(_f$colorStreakDim),
-        colorPageBackground: data.dec(_f$colorPageBackground),
+        colorScaffoldBackground: data.dec(_f$colorScaffoldBackground),
         colorSurfaceBackground: data.dec(_f$colorSurfaceBackground),
         colorBorderNeutralSubtle: data.dec(_f$colorBorderNeutralSubtle),
         colorActionSuccess: data.dec(_f$colorActionSuccess),
@@ -462,49 +479,12 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
         colorRatingEasyBorder: data.dec(_f$colorRatingEasyBorder),
         colorRatingEasyHoverBackground:
             data.dec(_f$colorRatingEasyHoverBackground),
-        colorTransparent: data.dec(_f$colorTransparent),
-        colorTextOnBrand: data.dec(_f$colorTextOnBrand),
         colorGoogle: data.dec(_f$colorGoogle),
         colorGoogleDim: data.dec(_f$colorGoogleDim),
         colorTextOnGoogle: data.dec(_f$colorTextOnGoogle),
         colorMono: data.dec(_f$colorMono),
         colorMonoDim: data.dec(_f$colorMonoDim),
-        colorTextOnMono: data.dec(_f$colorTextOnMono),
-        buttonShadowOffset: data.dec(_f$buttonShadowOffset),
-        modalShadowOffset: data.dec(_f$modalShadowOffset),
-        fontWeightTextBody: data.dec(_f$fontWeightTextBody),
-        fontWeightTextStrong: data.dec(_f$fontWeightTextStrong),
-        fontWeightTextHeavy: data.dec(_f$fontWeightTextHeavy),
-        lineHeightTextBody: data.dec(_f$lineHeightTextBody),
-        lineHeightTextTitle: data.dec(_f$lineHeightTextTitle),
-        lineHeightTextDisplay: data.dec(_f$lineHeightTextDisplay),
-        lineHeightFieldDisplay: data.dec(_f$lineHeightFieldDisplay),
-        lineHeightButton: data.dec(_f$lineHeightButton),
-        letterSpacingTextEyebrow: data.dec(_f$letterSpacingTextEyebrow),
-        radiusSurfaceLg: data.dec(_f$radiusSurfaceLg),
-        radiusSurface: data.dec(_f$radiusSurface),
-        radiusSurfaceSm: data.dec(_f$radiusSurfaceSm),
-        borderWidthDefault: data.dec(_f$borderWidthDefault),
-        spaceScaffoldPadding: data.dec(_f$spaceScaffoldPadding),
-        spaceLayoutPadding: data.dec(_f$spaceLayoutPadding),
-        spaceLayoutGapLg: data.dec(_f$spaceLayoutGapLg),
-        spaceLayoutGapMd: data.dec(_f$spaceLayoutGapMd),
-        spaceLayoutGapSm: data.dec(_f$spaceLayoutGapSm),
-        spaceScaffoldMaxWidth: data.dec(_f$spaceScaffoldMaxWidth),
-        textSizeHeader: data.dec(_f$textSizeHeader),
-        textSizeLabelLarge: data.dec(_f$textSizeLabelLarge),
-        textSizeLabel: data.dec(_f$textSizeLabel),
-        textSizeLabelSmall: data.dec(_f$textSizeLabelSmall),
-        textSizeBodyLarge: data.dec(_f$textSizeBodyLarge),
-        sizeIconMd: data.dec(_f$sizeIconMd),
-        sizeIconLg: data.dec(_f$sizeIconLg),
-        studyCardWidth: data.dec(_f$studyCardWidth),
-        studyCardAspectRatio: data.dec(_f$studyCardAspectRatio),
-        studyCardRadius: data.dec(_f$studyCardRadius),
-        studyCardTextSizeFront: data.dec(_f$studyCardTextSizeFront),
-        studyCardTextSizeBack: data.dec(_f$studyCardTextSizeBack),
-        studyCardTextSizeBackContent: data.dec(_f$studyCardTextSizeBackContent),
-        textSizeHeaderLarge: data.dec(_f$textSizeHeaderLarge));
+        colorTextOnMono: data.dec(_f$colorTextOnMono));
   }
 
   @override
@@ -560,14 +540,13 @@ abstract class AppTokensCopyWith<$R, $In extends AppTokens, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   $R call(
       {String? name,
-      String? fontFamily,
       Color? colorPrimary,
       Color? colorPrimaryDim,
       Color? colorPrimaryBright,
       Color? colorPrimarySoft,
       Color? colorStreak,
       Color? colorStreakDim,
-      Color? colorPageBackground,
+      Color? colorScaffoldBackground,
       Color? colorSurfaceBackground,
       Color? colorBorderNeutralSubtle,
       Color? colorActionSuccess,
@@ -596,49 +575,12 @@ abstract class AppTokensCopyWith<$R, $In extends AppTokens, $Out>
       Color? colorRatingEasyText,
       Color? colorRatingEasyBorder,
       Color? colorRatingEasyHoverBackground,
-      Color? colorTransparent,
-      Color? colorTextOnBrand,
       Color? colorGoogle,
       Color? colorGoogleDim,
       Color? colorTextOnGoogle,
       Color? colorMono,
       Color? colorMonoDim,
-      Color? colorTextOnMono,
-      double? buttonShadowOffset,
-      double? modalShadowOffset,
-      FontWeight? fontWeightTextBody,
-      FontWeight? fontWeightTextStrong,
-      FontWeight? fontWeightTextHeavy,
-      double? lineHeightTextBody,
-      double? lineHeightTextTitle,
-      double? lineHeightTextDisplay,
-      double? lineHeightFieldDisplay,
-      double? lineHeightButton,
-      double? letterSpacingTextEyebrow,
-      double? radiusSurfaceLg,
-      double? radiusSurface,
-      double? radiusSurfaceSm,
-      double? borderWidthDefault,
-      double? spaceScaffoldPadding,
-      double? spaceLayoutPadding,
-      double? spaceLayoutGapLg,
-      double? spaceLayoutGapMd,
-      double? spaceLayoutGapSm,
-      double? spaceScaffoldMaxWidth,
-      double? textSizeHeader,
-      double? textSizeLabelLarge,
-      double? textSizeLabel,
-      double? textSizeLabelSmall,
-      double? textSizeBodyLarge,
-      double? sizeIconMd,
-      double? sizeIconLg,
-      double? studyCardWidth,
-      double? studyCardAspectRatio,
-      double? studyCardRadius,
-      double? studyCardTextSizeFront,
-      double? studyCardTextSizeBack,
-      double? studyCardTextSizeBackContent,
-      double? textSizeHeaderLarge});
+      Color? colorTextOnMono});
   AppTokensCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -653,14 +595,13 @@ class _AppTokensCopyWithImpl<$R, $Out>
   @override
   $R call(
           {String? name,
-          String? fontFamily,
           Color? colorPrimary,
           Color? colorPrimaryDim,
           Color? colorPrimaryBright,
           Color? colorPrimarySoft,
           Color? colorStreak,
           Color? colorStreakDim,
-          Color? colorPageBackground,
+          Color? colorScaffoldBackground,
           Color? colorSurfaceBackground,
           Color? colorBorderNeutralSubtle,
           Color? colorActionSuccess,
@@ -689,60 +630,22 @@ class _AppTokensCopyWithImpl<$R, $Out>
           Color? colorRatingEasyText,
           Color? colorRatingEasyBorder,
           Color? colorRatingEasyHoverBackground,
-          Color? colorTransparent,
-          Color? colorTextOnBrand,
           Color? colorGoogle,
           Color? colorGoogleDim,
           Color? colorTextOnGoogle,
           Color? colorMono,
           Color? colorMonoDim,
-          Color? colorTextOnMono,
-          double? buttonShadowOffset,
-          double? modalShadowOffset,
-          FontWeight? fontWeightTextBody,
-          FontWeight? fontWeightTextStrong,
-          FontWeight? fontWeightTextHeavy,
-          double? lineHeightTextBody,
-          double? lineHeightTextTitle,
-          double? lineHeightTextDisplay,
-          double? lineHeightFieldDisplay,
-          double? lineHeightButton,
-          double? letterSpacingTextEyebrow,
-          double? radiusSurfaceLg,
-          double? radiusSurface,
-          double? radiusSurfaceSm,
-          double? borderWidthDefault,
-          double? spaceScaffoldPadding,
-          double? spaceLayoutPadding,
-          double? spaceLayoutGapLg,
-          double? spaceLayoutGapMd,
-          double? spaceLayoutGapSm,
-          double? spaceScaffoldMaxWidth,
-          double? textSizeHeader,
-          double? textSizeLabelLarge,
-          double? textSizeLabel,
-          double? textSizeLabelSmall,
-          double? textSizeBodyLarge,
-          double? sizeIconMd,
-          double? sizeIconLg,
-          double? studyCardWidth,
-          double? studyCardAspectRatio,
-          double? studyCardRadius,
-          double? studyCardTextSizeFront,
-          double? studyCardTextSizeBack,
-          double? studyCardTextSizeBackContent,
-          double? textSizeHeaderLarge}) =>
+          Color? colorTextOnMono}) =>
       $apply(FieldCopyWithData({
         if (name != null) #name: name,
-        if (fontFamily != null) #fontFamily: fontFamily,
         if (colorPrimary != null) #colorPrimary: colorPrimary,
         if (colorPrimaryDim != null) #colorPrimaryDim: colorPrimaryDim,
         if (colorPrimaryBright != null) #colorPrimaryBright: colorPrimaryBright,
         if (colorPrimarySoft != null) #colorPrimarySoft: colorPrimarySoft,
         if (colorStreak != null) #colorStreak: colorStreak,
         if (colorStreakDim != null) #colorStreakDim: colorStreakDim,
-        if (colorPageBackground != null)
-          #colorPageBackground: colorPageBackground,
+        if (colorScaffoldBackground != null)
+          #colorScaffoldBackground: colorScaffoldBackground,
         if (colorSurfaceBackground != null)
           #colorSurfaceBackground: colorSurfaceBackground,
         if (colorBorderNeutralSubtle != null)
@@ -793,67 +696,16 @@ class _AppTokensCopyWithImpl<$R, $Out>
           #colorRatingEasyBorder: colorRatingEasyBorder,
         if (colorRatingEasyHoverBackground != null)
           #colorRatingEasyHoverBackground: colorRatingEasyHoverBackground,
-        if (colorTransparent != null) #colorTransparent: colorTransparent,
-        if (colorTextOnBrand != null) #colorTextOnBrand: colorTextOnBrand,
         if (colorGoogle != null) #colorGoogle: colorGoogle,
         if (colorGoogleDim != null) #colorGoogleDim: colorGoogleDim,
         if (colorTextOnGoogle != null) #colorTextOnGoogle: colorTextOnGoogle,
         if (colorMono != null) #colorMono: colorMono,
         if (colorMonoDim != null) #colorMonoDim: colorMonoDim,
-        if (colorTextOnMono != null) #colorTextOnMono: colorTextOnMono,
-        if (buttonShadowOffset != null) #buttonShadowOffset: buttonShadowOffset,
-        if (modalShadowOffset != null) #modalShadowOffset: modalShadowOffset,
-        if (fontWeightTextBody != null) #fontWeightTextBody: fontWeightTextBody,
-        if (fontWeightTextStrong != null)
-          #fontWeightTextStrong: fontWeightTextStrong,
-        if (fontWeightTextHeavy != null)
-          #fontWeightTextHeavy: fontWeightTextHeavy,
-        if (lineHeightTextBody != null) #lineHeightTextBody: lineHeightTextBody,
-        if (lineHeightTextTitle != null)
-          #lineHeightTextTitle: lineHeightTextTitle,
-        if (lineHeightTextDisplay != null)
-          #lineHeightTextDisplay: lineHeightTextDisplay,
-        if (lineHeightFieldDisplay != null)
-          #lineHeightFieldDisplay: lineHeightFieldDisplay,
-        if (lineHeightButton != null) #lineHeightButton: lineHeightButton,
-        if (letterSpacingTextEyebrow != null)
-          #letterSpacingTextEyebrow: letterSpacingTextEyebrow,
-        if (radiusSurfaceLg != null) #radiusSurfaceLg: radiusSurfaceLg,
-        if (radiusSurface != null) #radiusSurface: radiusSurface,
-        if (radiusSurfaceSm != null) #radiusSurfaceSm: radiusSurfaceSm,
-        if (borderWidthDefault != null) #borderWidthDefault: borderWidthDefault,
-        if (spaceScaffoldPadding != null)
-          #spaceScaffoldPadding: spaceScaffoldPadding,
-        if (spaceLayoutPadding != null) #spaceLayoutPadding: spaceLayoutPadding,
-        if (spaceLayoutGapLg != null) #spaceLayoutGapLg: spaceLayoutGapLg,
-        if (spaceLayoutGapMd != null) #spaceLayoutGapMd: spaceLayoutGapMd,
-        if (spaceLayoutGapSm != null) #spaceLayoutGapSm: spaceLayoutGapSm,
-        if (spaceScaffoldMaxWidth != null)
-          #spaceScaffoldMaxWidth: spaceScaffoldMaxWidth,
-        if (textSizeHeader != null) #textSizeHeader: textSizeHeader,
-        if (textSizeLabelLarge != null) #textSizeLabelLarge: textSizeLabelLarge,
-        if (textSizeLabel != null) #textSizeLabel: textSizeLabel,
-        if (textSizeLabelSmall != null) #textSizeLabelSmall: textSizeLabelSmall,
-        if (textSizeBodyLarge != null) #textSizeBodyLarge: textSizeBodyLarge,
-        if (sizeIconMd != null) #sizeIconMd: sizeIconMd,
-        if (sizeIconLg != null) #sizeIconLg: sizeIconLg,
-        if (studyCardWidth != null) #studyCardWidth: studyCardWidth,
-        if (studyCardAspectRatio != null)
-          #studyCardAspectRatio: studyCardAspectRatio,
-        if (studyCardRadius != null) #studyCardRadius: studyCardRadius,
-        if (studyCardTextSizeFront != null)
-          #studyCardTextSizeFront: studyCardTextSizeFront,
-        if (studyCardTextSizeBack != null)
-          #studyCardTextSizeBack: studyCardTextSizeBack,
-        if (studyCardTextSizeBackContent != null)
-          #studyCardTextSizeBackContent: studyCardTextSizeBackContent,
-        if (textSizeHeaderLarge != null)
-          #textSizeHeaderLarge: textSizeHeaderLarge
+        if (colorTextOnMono != null) #colorTextOnMono: colorTextOnMono
       }));
   @override
   AppTokens $make(CopyWithData data) => AppTokens(
       name: data.get(#name, or: $value.name),
-      fontFamily: data.get(#fontFamily, or: $value.fontFamily),
       colorPrimary: data.get(#colorPrimary, or: $value.colorPrimary),
       colorPrimaryDim: data.get(#colorPrimaryDim, or: $value.colorPrimaryDim),
       colorPrimaryBright:
@@ -862,8 +714,8 @@ class _AppTokensCopyWithImpl<$R, $Out>
           data.get(#colorPrimarySoft, or: $value.colorPrimarySoft),
       colorStreak: data.get(#colorStreak, or: $value.colorStreak),
       colorStreakDim: data.get(#colorStreakDim, or: $value.colorStreakDim),
-      colorPageBackground:
-          data.get(#colorPageBackground, or: $value.colorPageBackground),
+      colorScaffoldBackground: data.get(#colorScaffoldBackground,
+          or: $value.colorScaffoldBackground),
       colorSurfaceBackground:
           data.get(#colorSurfaceBackground, or: $value.colorSurfaceBackground),
       colorBorderNeutralSubtle: data.get(#colorBorderNeutralSubtle,
@@ -892,8 +744,7 @@ class _AppTokensCopyWithImpl<$R, $Out>
           data.get(#colorRatingAgainText, or: $value.colorRatingAgainText),
       colorRatingAgainBorder:
           data.get(#colorRatingAgainBorder, or: $value.colorRatingAgainBorder),
-      colorRatingAgainHoverBackground: data.get(
-          #colorRatingAgainHoverBackground,
+      colorRatingAgainHoverBackground: data.get(#colorRatingAgainHoverBackground,
           or: $value.colorRatingAgainHoverBackground),
       colorRatingHardBackground: data.get(#colorRatingHardBackground,
           or: $value.colorRatingHardBackground),
@@ -912,49 +763,12 @@ class _AppTokensCopyWithImpl<$R, $Out>
       colorRatingEasyText: data.get(#colorRatingEasyText, or: $value.colorRatingEasyText),
       colorRatingEasyBorder: data.get(#colorRatingEasyBorder, or: $value.colorRatingEasyBorder),
       colorRatingEasyHoverBackground: data.get(#colorRatingEasyHoverBackground, or: $value.colorRatingEasyHoverBackground),
-      colorTransparent: data.get(#colorTransparent, or: $value.colorTransparent),
-      colorTextOnBrand: data.get(#colorTextOnBrand, or: $value.colorTextOnBrand),
       colorGoogle: data.get(#colorGoogle, or: $value.colorGoogle),
       colorGoogleDim: data.get(#colorGoogleDim, or: $value.colorGoogleDim),
       colorTextOnGoogle: data.get(#colorTextOnGoogle, or: $value.colorTextOnGoogle),
       colorMono: data.get(#colorMono, or: $value.colorMono),
       colorMonoDim: data.get(#colorMonoDim, or: $value.colorMonoDim),
-      colorTextOnMono: data.get(#colorTextOnMono, or: $value.colorTextOnMono),
-      buttonShadowOffset: data.get(#buttonShadowOffset, or: $value.buttonShadowOffset),
-      modalShadowOffset: data.get(#modalShadowOffset, or: $value.modalShadowOffset),
-      fontWeightTextBody: data.get(#fontWeightTextBody, or: $value.fontWeightTextBody),
-      fontWeightTextStrong: data.get(#fontWeightTextStrong, or: $value.fontWeightTextStrong),
-      fontWeightTextHeavy: data.get(#fontWeightTextHeavy, or: $value.fontWeightTextHeavy),
-      lineHeightTextBody: data.get(#lineHeightTextBody, or: $value.lineHeightTextBody),
-      lineHeightTextTitle: data.get(#lineHeightTextTitle, or: $value.lineHeightTextTitle),
-      lineHeightTextDisplay: data.get(#lineHeightTextDisplay, or: $value.lineHeightTextDisplay),
-      lineHeightFieldDisplay: data.get(#lineHeightFieldDisplay, or: $value.lineHeightFieldDisplay),
-      lineHeightButton: data.get(#lineHeightButton, or: $value.lineHeightButton),
-      letterSpacingTextEyebrow: data.get(#letterSpacingTextEyebrow, or: $value.letterSpacingTextEyebrow),
-      radiusSurfaceLg: data.get(#radiusSurfaceLg, or: $value.radiusSurfaceLg),
-      radiusSurface: data.get(#radiusSurface, or: $value.radiusSurface),
-      radiusSurfaceSm: data.get(#radiusSurfaceSm, or: $value.radiusSurfaceSm),
-      borderWidthDefault: data.get(#borderWidthDefault, or: $value.borderWidthDefault),
-      spaceScaffoldPadding: data.get(#spaceScaffoldPadding, or: $value.spaceScaffoldPadding),
-      spaceLayoutPadding: data.get(#spaceLayoutPadding, or: $value.spaceLayoutPadding),
-      spaceLayoutGapLg: data.get(#spaceLayoutGapLg, or: $value.spaceLayoutGapLg),
-      spaceLayoutGapMd: data.get(#spaceLayoutGapMd, or: $value.spaceLayoutGapMd),
-      spaceLayoutGapSm: data.get(#spaceLayoutGapSm, or: $value.spaceLayoutGapSm),
-      spaceScaffoldMaxWidth: data.get(#spaceScaffoldMaxWidth, or: $value.spaceScaffoldMaxWidth),
-      textSizeHeader: data.get(#textSizeHeader, or: $value.textSizeHeader),
-      textSizeLabelLarge: data.get(#textSizeLabelLarge, or: $value.textSizeLabelLarge),
-      textSizeLabel: data.get(#textSizeLabel, or: $value.textSizeLabel),
-      textSizeLabelSmall: data.get(#textSizeLabelSmall, or: $value.textSizeLabelSmall),
-      textSizeBodyLarge: data.get(#textSizeBodyLarge, or: $value.textSizeBodyLarge),
-      sizeIconMd: data.get(#sizeIconMd, or: $value.sizeIconMd),
-      sizeIconLg: data.get(#sizeIconLg, or: $value.sizeIconLg),
-      studyCardWidth: data.get(#studyCardWidth, or: $value.studyCardWidth),
-      studyCardAspectRatio: data.get(#studyCardAspectRatio, or: $value.studyCardAspectRatio),
-      studyCardRadius: data.get(#studyCardRadius, or: $value.studyCardRadius),
-      studyCardTextSizeFront: data.get(#studyCardTextSizeFront, or: $value.studyCardTextSizeFront),
-      studyCardTextSizeBack: data.get(#studyCardTextSizeBack, or: $value.studyCardTextSizeBack),
-      studyCardTextSizeBackContent: data.get(#studyCardTextSizeBackContent, or: $value.studyCardTextSizeBackContent),
-      textSizeHeaderLarge: data.get(#textSizeHeaderLarge, or: $value.textSizeHeaderLarge));
+      colorTextOnMono: data.get(#colorTextOnMono, or: $value.colorTextOnMono));
 
   @override
   AppTokensCopyWith<$R2, AppTokens, $Out2> $chain<$R2, $Out2>(
