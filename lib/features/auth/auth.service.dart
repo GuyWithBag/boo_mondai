@@ -20,21 +20,25 @@ typedef AuthServiceResponse = ({
 });
 
 class AuthService {
-  final SupabaseClient _client = Supabase.instance.client;
+  static SupabaseClient get _client => Supabase.instance.client;
 
-  Session? get currentSession => _client.auth.currentSession;
-  User? get currentUser => _client.auth.currentUser;
-  bool get isAuthenticatedRemote => _client.auth.currentUser != null;
-  bool get isAuthenticatedLocal =>
+  static Session? get currentSession => _client.auth.currentSession;
+  static User? get currentUser => _client.auth.currentUser;
+  static bool get isAuthenticatedRemote => _client.auth.currentUser != null;
+  static bool get isAuthenticatedLocal =>
       LocalDB.profile.getOrCreate().isAnonymous == false;
-  bool get isAuthenticatedEither =>
+  static bool get isAuthenticatedEither =>
       isAuthenticatedRemote || isAuthenticatedLocal;
-  bool get isAuthenticatedBoth => isAuthenticatedRemote && isAuthenticatedLocal;
+  static bool get isAuthenticatedBoth =>
+      isAuthenticatedRemote && isAuthenticatedLocal;
 
   // ── Auth Guard ─────────────────────────────────────────────
 
   /// Internal helper to catch Auth errors and log them.
-  Future<T> _guard<T>(Future<T> Function() fn, {required String action}) async {
+  static Future<T> _guard<T>(
+    Future<T> Function() fn, {
+    required String action,
+  }) async {
     try {
       return await fn();
     } on AuthException catch (e) {
@@ -100,7 +104,7 @@ class AuthService {
     }
   }
 
-  bool _isNetworkTransportError(Object e) {
+  static bool _isNetworkTransportError(Object e) {
     final typeName = e.runtimeType.toString();
     final message = e.toString();
     return typeName == 'ClientException' ||
@@ -111,7 +115,7 @@ class AuthService {
 
   // ── Logic ──────────────────────────────────────────────────
 
-  Future<Profile?> restoreSession() async {
+  static Future<Profile?> restoreSession() async {
     // This uses RemoteDB, which is already guarded, so no extra try-catch needed here.
     final user = currentUser;
     if (user == null) return null;
@@ -127,7 +131,10 @@ class AuthService {
     return profileData;
   }
 
-  Future<AuthServiceResponse> signIn(String email, String password) async {
+  static Future<AuthServiceResponse> signIn(
+    String email,
+    String password,
+  ) async {
     final guestProfileId = LocalDB.profile.getOrCreate().id;
 
     // Wrap the actual auth call in the guard
@@ -164,7 +171,7 @@ class AuthService {
     );
   }
 
-  Future<AuthServiceResponse> signInWithGoogle() async {
+  static Future<AuthServiceResponse> signInWithGoogle() async {
     final guestProfileId = LocalDB.profile.getOrCreate().id;
 
     // Check if the app is running natively on mobile (iOS/Android)
@@ -232,7 +239,7 @@ class AuthService {
     }
   }
 
-  Future<AuthServiceResponse> signUp(
+  static Future<AuthServiceResponse> signUp(
     String email,
     String password,
     String username,
@@ -259,14 +266,14 @@ class AuthService {
   }
 
   /// Clears out the session and local profile.
-  Future<void> signOut() async {
+  static Future<void> signOut() async {
     await _client.auth.signOut();
     await LocalDB.profile.clear();
     LocalDB.profile.getOrCreate();
   }
 
   /// Executes the migration or deletion of guest data based on user choice.
-  Future<void> executeMergeDecision(
+  static Future<void> executeMergeDecision(
     bool merge,
     String guestUserId,
     Profile remoteProfile,
@@ -283,7 +290,7 @@ class AuthService {
   }
 
   // You can stick this in your AuthService or directly in your UI for testing
-  Future<void> manualDevLogin(String urlFromBrowser) async {
+  static Future<void> manualDevLogin(String urlFromBrowser) async {
     try {
       final uri = Uri.parse(urlFromBrowser);
       // This forces Supabase to process the URL as if it came from a deep link!
@@ -294,7 +301,7 @@ class AuthService {
     }
   }
 
-  Future<AuthResponse> _nativeMobileGoogleSignIn() async {
+  static Future<AuthResponse> _nativeMobileGoogleSignIn() async {
     /// TODO: update the Web client ID with your own.
     ///
     /// Web Client ID that you registered with Google Cloud.
@@ -335,7 +342,7 @@ class AuthService {
   }
 
   /// Extracted logic to keep DB sync and Guest Merging DRY
-  Future<AuthServiceResponse> _processSuccessfulSignIn(
+  static Future<AuthServiceResponse> _processSuccessfulSignIn(
     User user,
     String guestProfileId,
   ) async {
@@ -360,7 +367,7 @@ class AuthService {
     );
   }
 
-  String _createFallbackUsername(User user) {
+  static String _createFallbackUsername(User user) {
     final fallbackUsername =
         user.userMetadata?['full_name'] ??
         user.email?.split('@').first ??
@@ -369,7 +376,7 @@ class AuthService {
   }
 
   /// Will create a new profile with the same local ID but new information based on the sign-up form.
-  Future<Profile> _upsertNewRemoteProfile(
+  static Future<Profile> _upsertNewRemoteProfile(
     String newUserId,
     String newUsername,
   ) async {

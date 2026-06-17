@@ -10,12 +10,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         AuthServiceResponse,
         Profile,
         RemoteDB,
-        Services,
         LocalDB;
 
 class AuthController extends Controller {
-  AuthService get service => Services.auth;
-
   /// Holds the result of the latest auth action to drive UI logic (like merges)
   AuthServiceResponse? authServiceResponse;
 
@@ -23,7 +20,7 @@ class AuthController extends Controller {
 
   Profile get currentProfile => LocalDB.profile.getOrCreate();
 
-  String? get currentEmail => service.currentUser?.email;
+  String? get currentEmail => AuthService.currentUser?.email;
 
   /// Drives the UI prompt for merging guest data based on the latest auth response.
   bool get hasPendingGuestMerge => authServiceResponse?.needsMerge ?? false;
@@ -33,7 +30,7 @@ class AuthController extends Controller {
   Future<void> restoreSession() async {
     setLoading(true);
     try {
-      await service.restoreSession();
+      await AuthService.restoreSession();
     } on Exception catch (e) {
       setError(e);
     } finally {
@@ -44,7 +41,7 @@ class AuthController extends Controller {
   Future<void> signIn(String email, String password) async {
     setLoading(true);
     try {
-      authServiceResponse = await service.signIn(email, password);
+      authServiceResponse = await AuthService.signIn(email, password);
     } on Exception catch (e) {
       setError(e);
     } finally {
@@ -55,7 +52,7 @@ class AuthController extends Controller {
   Future<void> signInWithGoogle() async {
     setLoading(true);
     try {
-      authServiceResponse = await service.signInWithGoogle();
+      authServiceResponse = await AuthService.signInWithGoogle();
     } on Exception catch (e) {
       setError(e);
     } finally {
@@ -66,7 +63,7 @@ class AuthController extends Controller {
   Future<void> signUp(String email, String password, String username) async {
     setLoading(true);
     try {
-      authServiceResponse = await service.signUp(email, password, username);
+      authServiceResponse = await AuthService.signUp(email, password, username);
     } on Exception catch (e) {
       setError(e); // Removed the debug junk!
     } finally {
@@ -82,7 +79,7 @@ class AuthController extends Controller {
 
     setLoading(true);
     try {
-      await service.executeMergeDecision(merge, guestId, remoteProfile);
+      await AuthService.executeMergeDecision(merge, guestId, remoteProfile);
     } on Exception catch (e) {
       setError(e);
     } finally {
@@ -94,7 +91,7 @@ class AuthController extends Controller {
   Future<void> signOut() async {
     setLoading(true);
     try {
-      await service.signOut();
+      await AuthService.signOut();
       authServiceResponse = null; // Reset auth state on sign out
     } on Exception catch (e) {
       setError(e);
@@ -113,7 +110,7 @@ class AuthController extends Controller {
       updatedAt: DateTime.now(),
     );
     await LocalDB.profile.upsert(updated);
-    if (service.isAuthenticatedRemote) {
+    if (AuthService.isAuthenticatedRemote) {
       await RemoteDB.profile.upsert(updated);
     }
     notifyListeners();
@@ -122,7 +119,7 @@ class AuthController extends Controller {
   Future<void> manualDevSignIn(String url) async {
     setLoading(true);
     try {
-      await service.manualDevLogin(url);
+      await AuthService.manualDevLogin(url);
     } catch (e) {
       setError(e as Exception);
     } finally {

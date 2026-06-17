@@ -131,7 +131,7 @@ class RegisterPage extends HookWidget {
                   ],
                   const SizedBox(height: AppSpacing.lg),
                   Button(
-                    tone: ButtonTone.filled,
+                    variants: const [ButtonTone.filled],
                     onPressed: auth.isLoading ? null : signUp,
                     child: auth.isLoading
                         ? const SizedBox(
@@ -143,8 +143,7 @@ class RegisterPage extends HookWidget {
                   ),
                   const SizedBox(height: AppSpacing.md),
                   Button(
-                    tone: ButtonTone.text,
-                    depth: ButtonDepth.flat,
+                    variants: const [ButtonTone.filled, ButtonDepth.flat],
                     onPressed: () => context.push('/login'),
                     child: const Text('Already have an account? Sign In'),
                   ),

@@ -116,7 +116,7 @@ class LoginPage extends HookWidget {
                   ],
                   const SizedBox(height: AppSpacing.lg),
                   Button(
-                    tone: ButtonTone.filled,
+                    variants: const [ButtonTone.filled],
                     onPressed: auth.isLoading ? null : performSignIn,
                     child: auth.isLoading
                         ? const LoadingIndicator()
@@ -124,8 +124,7 @@ class LoginPage extends HookWidget {
                   ),
                   const SizedBox(height: AppSpacing.md),
                   Button(
-                    tone: ButtonTone.text,
-                    depth: ButtonDepth.flat,
+                    variants: const [ButtonTone.filled, ButtonDepth.flat],
                     onPressed: navigateToRegister,
                     child: const Text("Don't have an account? Sign Up"),
                   ),

@@ -2,3 +2,9 @@
 
 // Other files
 export 'profile_avatar.dart';
+export 'dark_mode_toggle.card.dart';
+export 'auth.card.dart';
+export 'sign_out.modal.dart';
+export 'google_sign_in.button.dart';
+export 'apple_sign_in.button.dart';
+export 'profile.card.dart';
