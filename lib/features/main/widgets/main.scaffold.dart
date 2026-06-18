@@ -1,6 +1,6 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/widgets/main_scaffold.dart
-// PURPOSE: Connects routing and state to the generic ResponsiveScaffold
+// PURPOSE: Connects routing and state to the generic PageScaffold
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart';
@@ -22,12 +22,17 @@ class MainScaffold extends StatelessWidget {
     final auth = context.watch<AuthController>();
     final hideNavigation = auth.currentProfile.role == 'group_b_participant';
 
-    return ResponsiveScaffold(
+    return PageScaffold(
+      body: child,
       hideNavigation: hideNavigation,
+      hideBottomNavigationBarOnScroll: true,
       sidebar: Sidebar(currentPageIndex: currentIndex),
-      bottomNavbar: BottomNavbar(currentPageIndex: currentIndex),
-
-      child: child,
+      bottomNavigationBar: BottomNavbar(currentPageIndex: currentIndex),
+      padding: EdgeInsets.zero,
+      scrollable: false,
+      safeArea: false,
+      center: false,
+      constrainWidth: false,
     );
   }
 }

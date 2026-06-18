@@ -5,7 +5,7 @@
 
 import 'package:boo_mondai/features/app_theme/app_theme.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, surfaceStyle, ButtonVariant, ButtonColor, Button, Pages;
+    show AppTokens, surfaceStyle, ButtonColor, Button, Pages;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart' show GoRouterHelper;
 import 'package:theme_variants/theme_variants.dart';
@@ -47,7 +47,7 @@ class BottomNavbar extends StatelessWidget {
                       : page.icon,
                   label: page.name,
                   variant: ButtonVariant.text,
-                  color: ButtonColor.neutral,
+                  color: ButtonColor.baseline,
                   selected: isSelected,
                   onPressed: () => context.go(pages[index].url),
                 ),

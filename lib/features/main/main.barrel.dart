@@ -2,3 +2,5 @@
 
 // Barrel files
 export 'widgets/widgets.barrel.dart';
+// Other files
+export 'main.controller.dart';
