@@ -8,6 +8,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextWeight,
         TextColor,
         PhysicalCardSide,
+        ScaleHelper,
         Button;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -19,19 +20,38 @@ class MatchingTypeCard extends HookWidget {
     super.key,
     required this.template,
     required this.interactionsController,
+    this.maxWidth,
   }) : previewRevealed = false;
 
-  const MatchingTypeCard.preview({super.key, required this.template})
-    : interactionsController = null,
-      previewRevealed = true;
+  const MatchingTypeCard.preview({
+    super.key,
+    required this.template,
+    this.maxWidth,
+  }) : interactionsController = null,
+       previewRevealed = true;
 
   final MatchMadnessTemplate template;
   final StudySessionCardStageController? interactionsController;
   final bool previewRevealed;
+  final double? maxWidth;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
+    final contentScale = ScaleHelper.factor(
+      current: maxWidth ?? tokens.studyCardWidth,
+      base: tokens.studyCardWidth,
+      min: 0.6,
+      max: 1.4,
+    );
+    final eyebrowStyle = ScaleHelper.textStyle(
+      textStyle.resolve(tokens, const [
+        TextSize.labelSmall,
+        TextWeight.heavy,
+        TextColor.muted,
+      ]),
+      contentScale,
+    );
     final terms = template.pairs.map((pair) => pair.term).toList();
     final matches = template.pairs.map((pair) => pair.match).toList();
     final selectedMatch = useState<String?>(null);
@@ -71,17 +91,14 @@ class MatchingTypeCard extends HookWidget {
     }
 
     return PhysicalCardSide(
+      maxWidth: maxWidth,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
             'Match the pairs'.toUpperCase(),
             textAlign: TextAlign.center,
-            style: textStyle.resolve(tokens, [
-              TextSize.labelSmall,
-              TextWeight.heavy,
-              TextColor.muted,
-            ]),
+            style: eyebrowStyle,
           ),
           SizedBox(height: 40.h),
           Row(

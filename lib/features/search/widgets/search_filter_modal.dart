@@ -3,7 +3,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppModalTone,
         AppTokens,
         Button,
-        ButtonVariant,
         ButtonColor,
         Modal,
         SearchFilter,
@@ -58,7 +57,6 @@ class _SearchFilterModal<TFilter extends SearchFilter> extends HookWidget {
       insetPadding: EdgeInsets.all(tokens.spaceLayoutGapLg),
       child: Modal(
         tone: tone,
-        leading: const Icon(Icons.tune),
         actions: [
           Button(
             onPressed: () => Navigator.pop(context),
@@ -66,46 +64,45 @@ class _SearchFilterModal<TFilter extends SearchFilter> extends HookWidget {
           ),
           Button(onPressed: reset, child: const Text('Reset')),
           Button(
-            variants: const [ButtonVariant.filled, ButtonColor.primary],
+            variants: const [ButtonColor.primary],
             onPressed: () => Navigator.pop(context, filter.value),
             child: const Text('Apply'),
           ),
         ],
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Search Filters',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            SizedBox(height: tokens.spaceLayoutGapLg),
-            ConstrainedBox(
-              constraints: BoxConstraints(
-                maxHeight: MediaQuery.of(context).size.height * 0.6,
+        child: Flexible(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Search Filters',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleMedium,
               ),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    for (var index = 0; index < fields.length; index++) ...[
-                      _SearchFilterFieldShell(
-                        label: fields[index].label,
-                        child: fields[index].buildEditor(
-                          context,
-                          filter.value,
-                          (nextFilter) => filter.value = nextFilter,
+              SizedBox(height: tokens.spaceLayoutGapLg),
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      for (var index = 0; index < fields.length; index++) ...[
+                        _SearchFilterFieldShell(
+                          label: fields[index].label,
+                          child: fields[index].buildEditor(
+                            context,
+                            filter.value,
+                            (nextFilter) => filter.value = nextFilter,
+                          ),
                         ),
-                      ),
-                      if (index != fields.length - 1)
-                        SizedBox(height: tokens.spaceLayoutGapLg),
+                        if (index != fields.length - 1)
+                          SizedBox(height: tokens.spaceLayoutGapLg),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

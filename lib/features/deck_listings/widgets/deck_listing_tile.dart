@@ -60,7 +60,7 @@ class DeckListingTile extends HookWidget {
     }, [interactionsController.error]);
 
     final tile = ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 580, minWidth: 320),
+      constraints: const BoxConstraints(maxWidth: 580),
       child: Surface(
         style: surfaceStyle.resolve(tokens, const [
           SurfacePadding.none,

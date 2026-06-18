@@ -2,9 +2,6 @@
 // PATH: lib/pages/view_deck.local.page.dart
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/core/widgets/widgets.barrel.dart';
-import 'package:boo_mondai/features/app_theme/surface.variant.dart';
-import 'package:boo_mondai/features/view_decks.local/widgets/view_deck.local.bottom_navbar.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
@@ -16,19 +13,58 @@ import 'package:boo_mondai/lib.barrel.dart'
         DeckProfilesLabel,
         DeckTile,
         HeaderBadge,
+        MainController,
         MetaLabel,
         SurfacePadding,
         SurfaceShape,
         SurfaceColor,
         TextSize,
-        TextColor,
         TextWeight,
         ViewDecksLocalController,
         appChipStyle,
         textStyle,
         surfaceStyle,
-        useViewDeckLocalSheet;
-import 'package:flutter/material.dart';
+        useViewDeckLocalSheet,
+        PageScaffold,
+        CollapsingHeaderItem,
+        ViewDeckLocalBottomNavbar,
+        BackgroundImageSurface,
+        SurfaceBorder,
+        SurfaceShadow,
+        AppBar,
+        EditableTextValue;
+import 'package:flutter/material.dart'
+    show
+        BuildContext,
+        showModalBottomSheet,
+        Widget,
+        StatelessWidget,
+        ScrollController,
+        ValueChanged,
+        VoidCallback,
+        Chip,
+        Colors,
+        Clip,
+        EdgeInsets,
+        DraggableScrollableSheet,
+        Positioned,
+        SizedBox,
+        Column,
+        Stack,
+        SliverToBoxAdapter,
+        CustomScrollView,
+        Alignment,
+        Icons,
+        WrapAlignment,
+        Icon,
+        Text,
+        ChoiceChip,
+        ChipTheme,
+        Wrap,
+        CrossAxisAlignment,
+        MainAxisAlignment,
+        Row,
+        Padding;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -36,24 +72,21 @@ import 'package:provider/provider.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 Future<void> showViewDeckLocalSheet(BuildContext context, Deck deck) {
-  return showModalBottomSheet<void>(
-    context: context,
-    isScrollControlled: true,
-    useSafeArea: true,
-    backgroundColor: Colors.transparent,
-    builder: (_) => ViewDeckLocalSheet(deck: deck),
+  return context.read<MainController>().runWithBottomNavbarHidden(
+    () => showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => ViewDeckLocalSheet(deck: deck),
+    ),
   );
 }
 
 class ViewDeckLocalSheet extends HookWidget {
-  const ViewDeckLocalSheet({
-    super.key,
-    required this.deck,
-    this.showCloseButton = true,
-  });
+  const ViewDeckLocalSheet({super.key, required this.deck});
 
   final Deck deck;
-  final bool showCloseButton;
 
   @override
   Widget build(BuildContext context) {
@@ -68,21 +101,21 @@ class ViewDeckLocalSheet extends HookWidget {
 
     return DraggableScrollableSheet(
       expand: false,
-      initialChildSize: showCloseButton ? 0.9 : 1,
-      minChildSize: showCloseButton ? 0.5 : 1,
+      initialChildSize: 1,
+      minChildSize: 0.4,
       maxChildSize: 1,
       builder: (context, scrollController) {
         return Surface(
-          style: surfaceStyle.resolve(tokens, const [
-            SurfacePadding.none,
-            SurfaceColor.muted,
-          ]),
-          hasClipRRect: true,
-          child: Scaffold(
+          style: surfaceStyle
+              .resolve(tokens, const [SurfacePadding.none, SurfaceColor.muted])
+              .copyWith(clipBehavior: Clip.antiAlias),
+          child: PageScaffold(
             backgroundColor: Colors.transparent,
-            bottomNavigationBar: ViewDeckLocalBottomNavbar(
-              deckId: sheetDeck.id,
-            ),
+            bottomNavigationBar: ViewDeckLocalBottomNavbar(deck: sheetDeck),
+            scrollable: false,
+            center: false,
+            constrainWidth: false,
+            padding: EdgeInsets.zero,
             body: _Body(
               scrollController: scrollController,
               deck: sheetDeck,
@@ -94,7 +127,6 @@ class ViewDeckLocalSheet extends HookWidget {
               visibilityLabel: sheet.visibilityLabel,
               shortDescription: sheet.shortDescription,
               longDescription: sheet.longDescription,
-              showCloseButton: showCloseButton,
               isSavingPublishState: sheet.isSavingPublishState,
               onPublishedChanged: sheet.onPublishedChanged,
               onTitleChanged: sheet.onTitleChanged,
@@ -132,7 +164,6 @@ class _Body extends StatelessWidget {
     required this.visibilityLabel,
     required this.shortDescription,
     required this.longDescription,
-    required this.showCloseButton,
     required this.isSavingPublishState,
     required this.onPublishedChanged,
     required this.onTitleChanged,
@@ -154,7 +185,6 @@ class _Body extends StatelessWidget {
   final String visibilityLabel;
   final String shortDescription;
   final String longDescription;
-  final bool showCloseButton;
   final bool isSavingPublishState;
   final ValueChanged<bool> onPublishedChanged;
   final Future<void> Function(String value) onTitleChanged;
@@ -222,64 +252,30 @@ class _Body extends StatelessWidget {
           ],
         ),
         Positioned(
-          left: tokens.spaceLayoutPadding,
-          right: tokens.spaceLayoutPadding,
-          top: tokens.spaceLayoutPadding,
-          child: Row(
-            children: [
-              CollapsingHeaderItem(
-                scrollController: scrollController,
-                collapseDistance: headerHeight * 0.55,
-                alignment: Alignment.topLeft,
-                child: showCloseButton
-                    ? Button.icon(icon: Icons.close, onPressed: onBackPressed)
-                    : Button.icon(
-                        icon: Icons.arrow_back,
-                        onPressed: onBackPressed,
-                      ),
-              ),
-              const Spacer(),
-              CollapsingHeaderItem(
-                scrollController: scrollController,
-                collapseDistance: headerHeight * 0.55,
-                alignment: Alignment.topRight,
-                child: Button.icon(icon: Icons.edit, onPressed: onEditPressed),
-              ),
-              SizedBox(width: tokens.spaceLayoutGapSm),
-              CollapsingHeaderItem(
-                scrollController: scrollController,
-                collapseDistance: headerHeight * 0.55,
-                alignment: Alignment.topRight,
-                child: Button.icon(
-                  icon: Icons.delete_outline,
-                  color: ButtonColor.error,
-                  onPressed: onDeletePressed,
-                ),
+          left: 0,
+          right: 0,
+          top: 0,
+          child: AppBar(
+            backgroundColor: Colors.transparent,
+            onPop: onBackPressed,
+            collapsible: true,
+            scrollController: scrollController,
+            collapseDistance: headerHeight * 0.55,
+            actions: [
+              Button.icon(icon: Icons.edit, onPressed: onEditPressed),
+              Button.icon(
+                icon: Icons.delete_outline,
+                color: ButtonColor.error,
+                onPressed: onDeletePressed,
               ),
             ],
-          ),
-        ),
-        Positioned(
-          top: 110.h,
-          left: tokens.spaceLayoutPadding,
-          right: tokens.spaceLayoutPadding,
-          child: Wrap(
-            alignment: WrapAlignment.end,
-            spacing: tokens.spaceLayoutGapSm,
-            runSpacing: tokens.spaceLayoutGapSm,
-            children: [
-              if (deck.isPremade)
-                CollapsingHeaderItem(
-                  scrollController: scrollController,
-                  collapseDistance: headerHeight * 0.55,
-                  alignment: Alignment.topRight,
-                  child: const HeaderBadge(label: 'Premade'),
-                ),
-              CollapsingHeaderItem(
-                scrollController: scrollController,
-                collapseDistance: headerHeight * 0.55,
-                alignment: Alignment.topRight,
-                child: ChipTheme(
+            bottom: Wrap(
+              alignment: WrapAlignment.end,
+              spacing: tokens.spaceLayoutGapSm,
+              runSpacing: tokens.spaceLayoutGapSm,
+              children: [
+                if (deck.isPremade) const HeaderBadge(label: 'Premade'),
+                ChipTheme(
                   data: publishChipStyle,
                   child: ChoiceChip(
                     avatar: Icon(
@@ -294,15 +290,9 @@ class _Body extends StatelessWidget {
                         : onPublishedChanged,
                   ),
                 ),
-              ),
-              if (!deck.isEditable)
-                CollapsingHeaderItem(
-                  scrollController: scrollController,
-                  collapseDistance: headerHeight * 0.55,
-                  alignment: Alignment.topRight,
-                  child: const Chip(label: Text('Locked')),
-                ),
-            ],
+                if (!deck.isEditable) const Chip(label: Text('Locked')),
+              ],
+            ),
           ),
         ),
       ],
@@ -352,7 +342,7 @@ class _BodySubSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tags = deck.tags.map((tag) => tag.name).toList(growable: false);
-
+    final tokens = context.themeTokens<AppTokens>();
     return SizedBox(
       width: double.infinity,
       child: Stack(
@@ -364,9 +354,10 @@ class _BodySubSection extends StatelessWidget {
               SurfaceColor.muted,
               SurfaceBorder.top,
               SurfaceShadow.none,
+              SurfacePadding.none,
             ]),
             child: Padding(
-              padding: EdgeInsets.all(tokens.spaceLayoutPadding),
+              padding: EdgeInsets.all(tokens.spaceScaffoldPadding),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -469,7 +460,7 @@ class _BodySubSection extends StatelessWidget {
                 children: [
                   MetaLabel(
                     icon: Icons.new_releases_outlined,
-                    label: 'v${deck.version}.${deck.buildNumber}',
+                    label: 'v${deck.version}+${deck.buildNumber}',
                     tooltip: 'Deck version and build number',
                   ),
                   SizedBox(height: tokens.spaceLayoutGapSm),

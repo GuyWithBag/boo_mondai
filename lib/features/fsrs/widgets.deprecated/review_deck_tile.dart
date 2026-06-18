@@ -3,7 +3,7 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
         Button,
-        ButtonDepth,
+        ButtonVariant,
         Deck,
         DeckTile,
         DeckReviewStats,
@@ -57,8 +57,7 @@ class ReviewDeckTile extends StatelessWidget {
             Button.icon(
               onPressed: () {},
               icon: Icons.visibility_outlined,
-
-              depth: ButtonDepth.flat,
+              variant: ButtonVariant.flat,
             ),
           ],
         ),

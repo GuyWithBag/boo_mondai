@@ -4,15 +4,15 @@ import 'package:boo_mondai/lib.barrel.dart'
         StudySessionCardStageController,
         AppTokens,
         MultipleChoiceOption,
-        ButtonVariant,
         ButtonColor,
         textStyle,
         TextSize,
         TextWeight,
         TextColor,
-        ButtonDepth,
+        ButtonVariant,
         Button,
         PhysicalCardSide,
+        ScaleHelper,
         MarkdownText;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -24,19 +24,38 @@ class MultipleChoiceCard extends HookWidget {
     super.key,
     required this.template,
     required this.interactionsController,
+    this.maxWidth,
   }) : previewRevealed = false;
 
-  const MultipleChoiceCard.preview({super.key, required this.template})
-    : interactionsController = null,
-      previewRevealed = true;
+  const MultipleChoiceCard.preview({
+    super.key,
+    required this.template,
+    this.maxWidth,
+  }) : interactionsController = null,
+       previewRevealed = true;
 
   final MultipleChoiceTemplate template;
   final StudySessionCardStageController? interactionsController;
   final bool previewRevealed;
+  final double? maxWidth;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
+    final contentScale = ScaleHelper.factor(
+      current: maxWidth ?? tokens.studyCardWidth,
+      base: tokens.studyCardWidth,
+      min: 0.6,
+      max: 1.4,
+    );
+    final eyebrowStyle = ScaleHelper.textStyle(
+      textStyle.resolve(tokens, const [
+        TextSize.labelSmall,
+        TextWeight.heavy,
+        TextColor.muted,
+      ]),
+      contentScale,
+    );
     final selectedOption = useState<String?>(null);
     final isRevealed =
         previewRevealed || interactionsController?.isRevealed == true;
@@ -47,6 +66,7 @@ class MultipleChoiceCard extends HookWidget {
     }, [template.id, interactionsController]);
 
     return PhysicalCardSide(
+      maxWidth: maxWidth,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -55,11 +75,7 @@ class MultipleChoiceCard extends HookWidget {
               Text(
                 'Select Answer'.toUpperCase(),
                 textAlign: TextAlign.center,
-                style: textStyle.resolve(tokens, [
-                  TextSize.labelSmall,
-                  TextWeight.heavy,
-                  TextColor.muted,
-                ]),
+                style: eyebrowStyle,
               ),
               SizedBox(height: 28.h),
               MarkdownText(data: template.questionPrompt),
@@ -74,7 +90,7 @@ class MultipleChoiceCard extends HookWidget {
                   child: Button(
                     variants: [
                       ..._optionVariants(entry.value),
-                      ButtonDepth.flat,
+                      ButtonVariant.flat,
                     ],
                     selected:
                         !isRevealed && selectedOption.value == entry.value.id,
@@ -107,12 +123,12 @@ class MultipleChoiceCard extends HookWidget {
     final isRevealed =
         previewRevealed || interactionsController?.isRevealed == true;
     if (isRevealed && isCorrect) {
-      return [ButtonVariant.soft, ButtonColor.success];
+      return [ButtonColor.success];
     }
     if (isRevealed && isSelected) {
-      return [ButtonVariant.soft, ButtonColor.error];
+      return [ButtonColor.error];
     }
-    return [ButtonVariant.ghost, ButtonColor.neutral];
+    return [ButtonColor.baseline];
   }
 
   String _optionLabel(MultipleChoiceOption option, int index) {

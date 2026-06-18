@@ -4,13 +4,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         MultipleChoiceOptionTone,
         AppTokens,
         multipleChoiceOptionStyle,
-        ButtonVariant,
         ButtonColor,
         TextColor,
         textStyle,
         TextSize,
         TextWeight,
-        ButtonDepth,
+        ButtonVariant,
         TactileRadioCircle,
         Button;
 import 'package:flutter/material.dart';
@@ -66,15 +65,14 @@ class EditMultipleChoiceOption extends HookWidget {
       effectiveState,
       tone,
     ]);
-    final effectiveButtonVariants =
-        resolvedStyle.buttonVariants ??
+    final effectiveButtonStyleVariants =
+        resolvedStyle.buttonStyleVariants ??
         [
           if (correct) ...[
-            ButtonVariant.soft,
             ButtonColor.success,
           ] else ...[
-            ButtonVariant.ghost,
-            ButtonColor.neutral,
+            ButtonColor.baseline,
+            ButtonColor.baseline,
           ],
         ];
     final effectiveSelected = resolvedStyle.selected ?? false;
@@ -110,7 +108,7 @@ class EditMultipleChoiceOption extends HookWidget {
         child: Opacity(
           opacity: effectiveOpacity,
           child: Button(
-            variants: [ButtonDepth.flat, ...effectiveButtonVariants],
+            variants: [ButtonVariant.flat, ...effectiveButtonStyleVariants],
             selected: effectiveSelected,
             mainAxisAlignment: MainAxisAlignment.start,
             onPressed: effectiveOnPressed,

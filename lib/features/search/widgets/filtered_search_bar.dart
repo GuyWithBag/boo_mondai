@@ -11,11 +11,13 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextFieldSize,
         TextFieldTone,
         appTextFieldStyle,
-        useFilteredSearchBarController;
+        useFilteredSearchBarController,
+        Button;
 import 'package:flutter/material.dart'
     show
         BuildContext,
         Widget,
+        Expanded,
         ValueChanged,
         VoidCallback,
         OverlayEntry,
@@ -44,6 +46,7 @@ import 'package:flutter/material.dart'
         IconButton,
         InputDecoration,
         TextField,
+        Row,
         WidgetsBinding,
         CompositedTransformTarget;
 import 'package:flutter_hooks/flutter_hooks.dart'
@@ -285,42 +288,39 @@ class FilteredSearchBar<TObject, TFilter extends SearchFilter>
 
     return CompositedTransformTarget(
       link: layerLink,
-      child: TextField(
-        controller: searchController.textController,
-        focusNode: searchController.focusNode,
-        enabled: enabled,
-        autofocus: autofocus,
-        onChanged: onChanged,
-        onSubmitted: onSubmitted,
-        textInputAction: TextInputAction.search,
-        cursorColor: style.cursorColor,
-        style: style.textStyle,
-        decoration: InputDecoration(
-          hintText: placeholder,
-          prefixIcon: searchController.hasText
-              ? IconButton(
-                  tooltip: 'Clear search',
-                  icon: const Icon(Icons.close),
-                  onPressed: clearValue,
-                )
-              : const Icon(Icons.search),
-          prefixIconColor: searchController.hasText
-              ? tokens.colorTextBaseline
-              : tokens.colorTextMuted,
-          suffixIcon: filterEnabled
-              ? IconButton(
-                  tooltip: 'Filter search',
-                  icon: Icon(
-                    Icons.tune,
-                    color: searchController.hasDirectiveText
-                        ? tokens.colorPrimary
-                        : tokens.colorTextBaseline,
-                  ),
-                  onPressed: openFilters,
-                )
-              : null,
-        ).applyDefaults(style.decorationTheme),
-        onTap: searchController.updateDropdownState,
+      child: Row(
+        spacing: tokens.spaceLayoutGapMd,
+        children: [
+          Expanded(
+            child: TextField(
+              controller: searchController.textController,
+              focusNode: searchController.focusNode,
+              enabled: enabled,
+              autofocus: autofocus,
+              onChanged: onChanged,
+              onSubmitted: onSubmitted,
+              textInputAction: TextInputAction.search,
+              cursorColor: style.cursorColor,
+              style: style.textStyle,
+              decoration: InputDecoration(
+                hintText: placeholder,
+                prefixIcon: searchController.hasText
+                    ? IconButton(
+                        tooltip: 'Clear search',
+                        icon: const Icon(Icons.close),
+                        onPressed: clearValue,
+                      )
+                    : const Icon(Icons.search),
+                prefixIconColor: searchController.hasText
+                    ? tokens.colorTextBaseline
+                    : tokens.colorTextMuted,
+              ).applyDefaults(style.decorationTheme),
+              onTap: searchController.updateDropdownState,
+            ),
+          ),
+          if (filterEnabled)
+            Button.icon(icon: Icons.tune, onPressed: openFilters),
+        ],
       ),
     );
   }

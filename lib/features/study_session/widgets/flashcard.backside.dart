@@ -5,7 +5,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         PhysicalCardSide,
         MarkdownText,
-        SurfaceBorder;
+        SurfaceColor;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -28,7 +28,7 @@ class FlashcardBackSide extends StatelessWidget {
 
     return PhysicalCardSide(
       maxWidth: maxWidth,
-      surfaceStyleVariants: const [SurfaceBorder.primary],
+      surfaceStyleVariants: const [SurfaceColor.primarySoft],
       child: Center(
         child: Column(
           key: const ValueKey('flashcard-back'),

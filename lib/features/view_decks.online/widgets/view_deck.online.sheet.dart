@@ -15,11 +15,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         SurfaceShape,
         SurfaceColor,
         TextSize,
-        TextColor,
         TextWeight,
         DeckDetails,
         ProfileLabel,
         MarkdownTextMode,
+        MainController,
         ViewDeckOnlineSheetState,
         ViewDecksOnlineController,
         textStyle,
@@ -35,14 +35,16 @@ import 'package:theme_variants/theme_variants.dart';
 Future<void> showViewDeckOnlineSheet(BuildContext context, Deck deck) {
   final controller = context.read<ViewDecksOnlineController>();
 
-  return showModalBottomSheet<void>(
-    context: context,
-    isScrollControlled: true,
-    useSafeArea: true,
-    backgroundColor: Colors.transparent,
-    builder: (_) => ChangeNotifierProvider<ViewDecksOnlineController>.value(
-      value: controller,
-      child: ViewDeckOnlineSheet(deck: deck),
+  return context.read<MainController>().runWithBottomNavbarHidden(
+    () => showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => ChangeNotifierProvider<ViewDecksOnlineController>.value(
+        value: controller,
+        child: ViewDeckOnlineSheet(deck: deck),
+      ),
     ),
   );
 }

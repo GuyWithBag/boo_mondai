@@ -9,6 +9,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextColor,
         FillInTheBlankAnswerInput,
         MarkdownText,
+        ScaleHelper,
         PhysicalCardSide;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -20,15 +21,20 @@ class FillInTheBlanksCard extends HookWidget {
     super.key,
     required this.template,
     required this.interactionsController,
+    this.maxWidth,
   }) : previewRevealed = false;
 
-  const FillInTheBlanksCard.preview({super.key, required this.template})
-    : interactionsController = null,
-      previewRevealed = true;
+  const FillInTheBlanksCard.preview({
+    super.key,
+    required this.template,
+    this.maxWidth,
+  }) : interactionsController = null,
+       previewRevealed = true;
 
   final FillInTheBlanksTemplate template;
   final StudySessionCardStageController? interactionsController;
   final bool previewRevealed;
+  final double? maxWidth;
 
   bool _isCorrect(int index, List<String> blankInputs) {
     final answer = index < blankInputs.length ? blankInputs[index] : '';
@@ -38,6 +44,24 @@ class FillInTheBlanksCard extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
+    final contentScale = ScaleHelper.factor(
+      current: maxWidth ?? tokens.studyCardWidth,
+      base: tokens.studyCardWidth,
+      min: 0.6,
+      max: 1.4,
+    );
+    final eyebrowStyle = ScaleHelper.textStyle(
+      textStyle.resolve(tokens, const [
+        TextSize.labelSmall,
+        TextWeight.heavy,
+        TextColor.muted,
+      ]),
+      contentScale,
+    );
+    final blankTextStyle = ScaleHelper.textStyle(
+      textStyle.resolve(tokens, const [TextSize.bodyLarge, TextWeight.heavy]),
+      contentScale,
+    );
     final blankInputs = useState<List<String>>(
       List.filled(template.segments.length, ''),
     );
@@ -64,6 +88,7 @@ class FillInTheBlanksCard extends HookWidget {
     }
 
     return PhysicalCardSide(
+      maxWidth: maxWidth,
       child: SingleChildScrollView(
         child: ConstrainedBox(
           constraints: BoxConstraints(minHeight: 480.h),
@@ -73,11 +98,7 @@ class FillInTheBlanksCard extends HookWidget {
               Text(
                 'Fill in the blank'.toUpperCase(),
                 textAlign: TextAlign.center,
-                style: textStyle.resolve(tokens, [
-                  TextSize.labelSmall,
-                  TextWeight.heavy,
-                  TextColor.muted,
-                ]),
+                style: eyebrowStyle,
               ),
               SizedBox(height: 48.h),
               for (final entry in template.segments.asMap().entries) ...[
@@ -87,30 +108,22 @@ class FillInTheBlanksCard extends HookWidget {
                   spacing: 12.w,
                   runSpacing: 16.h,
                   children: [
-                    Text(
-                      entry.value.prefix,
-                      style: textStyle.resolve(
-                        context.themeTokens<AppTokens>(),
-                        [TextSize.bodyLarge, TextWeight.heavy],
-                      ),
-                    ),
+                    Text(entry.value.prefix, style: blankTextStyle),
                     isRevealed
-                        ? _PreviewAnswer(label: entry.value.correctAnswer)
+                        ? _PreviewAnswer(
+                            label: entry.value.correctAnswer,
+                            scale: contentScale,
+                          )
                         : FillInTheBlankAnswerInput(
                             revealed:
                                 interactionsController?.isRevealed ?? false,
                             correct: _isCorrect(entry.key, blankInputs.value),
                             correctAnswer: entry.value.correctAnswer,
+                            scale: contentScale,
                             onChanged: (value) =>
                                 updateBlankInput(entry.key, value),
                           ),
-                    Text(
-                      entry.value.suffix,
-                      style: textStyle.resolve(
-                        context.themeTokens<AppTokens>(),
-                        [TextSize.bodyLarge, TextWeight.heavy],
-                      ),
-                    ),
+                    Text(entry.value.suffix, style: blankTextStyle),
                   ],
                 ),
                 if (entry.key != template.segments.length - 1)
@@ -125,9 +138,10 @@ class FillInTheBlanksCard extends HookWidget {
 }
 
 class _PreviewAnswer extends StatelessWidget {
-  const _PreviewAnswer({required this.label});
+  const _PreviewAnswer({required this.label, required this.scale});
 
   final String label;
+  final double scale;
 
   @override
   Widget build(BuildContext context) {
@@ -138,7 +152,7 @@ class _PreviewAnswer extends StatelessWidget {
       decoration: BoxDecoration(
         color: tokens.colorActionSuccess.withValues(alpha: 0.12),
         border: Border.all(color: tokens.colorActionSuccess),
-        borderRadius: BorderRadius.circular(10.r),
+        borderRadius: BorderRadius.circular(10.r * scale),
       ),
       child: MarkdownText(data: label),
     );

@@ -17,7 +17,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         SurfacePadding,
         Button,
         PanelHeader,
-        ButtonVariant,
         ButtonColor,
         appTextFieldStyle,
         TextFieldSize,
@@ -29,7 +28,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextSize,
         TextWeight,
         TextColor,
-        SurfaceColor;
+        SurfaceColor,
+        PageScaffold;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -53,18 +53,10 @@ class CreateDeckPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
-
-    return Scaffold(
-      backgroundColor: tokens.colorScaffoldBackground,
-      body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 760),
-            child: CreateDeckSheet(deckId: deckId, showCloseButton: false),
-          ),
-        ),
-      ),
+    return PageScaffold(
+      maxWidth: 760,
+      scrollable: false,
+      body: CreateDeckSheet(deckId: deckId, showCloseButton: false),
     );
   }
 }
@@ -246,7 +238,7 @@ class CreateDeckSheet extends HookWidget {
                       SizedBox(height: tokens.spaceLayoutGapLg),
                       Button(
                         variants: const [
-                          ButtonVariant.filled,
+                          ButtonColor.primary,
                           ButtonColor.primary,
                         ],
                         leading: Icon(isEdit ? Icons.save : Icons.add),

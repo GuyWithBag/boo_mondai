@@ -13,8 +13,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         StudySessionService,
         Button,
-        ButtonVariant,
-        ButtonColor,
+                ButtonColor,
         textStyle,
         TextSize,
         TextWeight,
@@ -132,7 +131,7 @@ class RatingArea extends HookWidget {
                           : null,
                       leading: const Icon(Icons.check),
                       variants: const [
-                        ButtonVariant.filled,
+                        ButtonColor.primary,
                         ButtonColor.primary,
                       ],
                       child: const Text('Submit'),
@@ -162,7 +161,7 @@ class RatingArea extends HookWidget {
               child: Button(
                 onPressed: onContinue,
                 leading: const Icon(Icons.arrow_forward),
-                variants: const [ButtonVariant.filled, ButtonColor.primary],
+                variants: const [ButtonColor.primary],
                 child: const Text('Continue'),
               ),
             ),

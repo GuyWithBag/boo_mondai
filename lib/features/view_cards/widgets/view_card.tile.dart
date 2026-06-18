@@ -2,7 +2,7 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
         Button,
-        ButtonDepth,
+        ButtonVariant,
         CardTemplate,
         ChipTone,
         FillInTheBlanksCard,
@@ -209,9 +209,18 @@ Widget _buildPreview(
               side: side,
               width: width,
             ),
-    MultipleChoiceTemplate t => MultipleChoiceCard.preview(template: t),
-    FillInTheBlanksTemplate t => FillInTheBlanksCard.preview(template: t),
-    MatchMadnessTemplate t => MatchingTypeCard.preview(template: t),
+    MultipleChoiceTemplate t => MultipleChoiceCard.preview(
+      template: t,
+      maxWidth: width,
+    ),
+    FillInTheBlanksTemplate t => FillInTheBlanksCard.preview(
+      template: t,
+      maxWidth: width,
+    ),
+    MatchMadnessTemplate t => MatchingTypeCard.preview(
+      template: t,
+      maxWidth: width,
+    ),
     IdentificationTemplate t => _PromptPreview(prompt: t.promptText),
     WordScrambleTemplate t => _PromptPreview(prompt: t.sentenceToScramble),
     _ => _UnknownTemplatePreview(label: template.runtimeType.toString()),
@@ -266,8 +275,7 @@ class _FlashcardPreview extends HookWidget {
             message: 'Flip card',
             child: Button.iconSmall(
               icon: Icons.flip,
-
-              depth: ButtonDepth.flat,
+              variant: ButtonVariant.flat,
               onPressed: () => controller.flip(),
             ),
           ),

@@ -17,6 +17,7 @@ class FillInTheBlankAnswerInput extends StatelessWidget {
     required this.correct,
     required this.correctAnswer,
     required this.onChanged,
+    this.scale = 1,
     super.key,
   });
 
@@ -24,6 +25,7 @@ class FillInTheBlankAnswerInput extends StatelessWidget {
   final bool correct;
   final String correctAnswer;
   final ValueChanged<String> onChanged;
+  final double scale;
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +62,7 @@ class FillInTheBlankAnswerInput extends StatelessWidget {
             decoration: BoxDecoration(
               color: tokens.colorActionSuccess.withValues(alpha: 0.12),
               border: Border.all(color: tokens.colorActionSuccess),
-              borderRadius: BorderRadius.circular(10.r),
+              borderRadius: BorderRadius.circular(10.r * scale),
             ),
             child: MarkdownText(data: correctAnswer),
           ),

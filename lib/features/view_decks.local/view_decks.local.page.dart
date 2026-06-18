@@ -30,8 +30,24 @@ import 'package:boo_mondai/lib.barrel.dart'
         showCreateDeckLocalSheet,
         showSnackbar,
         useFilteredSearchBarController,
-        AuthService;
-import 'package:flutter/material.dart';
+        AuthService,
+        AppBar,
+        PageScaffold;
+import 'package:flutter/material.dart'
+    show
+        BuildContext,
+        Widget,
+        Icon,
+        Text,
+        SizedBox,
+        StatelessWidget,
+        VoidCallback,
+        WidgetsBinding,
+        Icons,
+        CrossAxisAlignment,
+        Column,
+        ElevatedButton,
+        LayoutBuilder;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:file_picker/file_picker.dart';
@@ -192,9 +208,9 @@ class ViewDecksLocalPage extends HookWidget {
       onSubmitted: (_) => controller.submitSearch(context, visibleDecks),
     );
 
-    return Scaffold(
+    return PageScaffold(
       appBar: AppBar(
-        title: const Text('My Decks'),
+        title: 'My Decks',
         actions: [
           SyncButton(
             isSyncing: controller.isSyncing,
@@ -211,26 +227,21 @@ class ViewDecksLocalPage extends HookWidget {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            searchBar,
-            const SizedBox(height: 24),
-            Expanded(
-              child: _DeckListBody(
-                error: controller.error,
-                isLoading: controller.isLoading,
-                onRetry: controller.load,
-                onDeleteDeck: controller.deleteDeck,
-                onPressed: controller.goToDeck,
-                decks: visibleDecks,
-                hasSearchQuery: hasSearchQuery,
-              ),
-            ),
-          ],
-        ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          searchBar,
+          const SizedBox(height: 24),
+          _DeckListBody(
+            error: controller.error,
+            isLoading: controller.isLoading,
+            onRetry: controller.load,
+            onDeleteDeck: controller.deleteDeck,
+            onPressed: controller.goToDeck,
+            decks: visibleDecks,
+            hasSearchQuery: hasSearchQuery,
+          ),
+        ],
       ),
     );
   }
@@ -272,37 +283,52 @@ class _DeckListBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListingStatesWrapper<Deck>.wrap(
-      isLoading: isLoading,
-      exception: error,
-      items: decks,
-      onRetry: onRetry,
-      skeletonTile: DeckTile(deck: null),
-      emptyState: hasSearchQuery
-          ? const EmptyState(
-              icon: Icons.search_off,
-              title: 'No decks found',
-              message: 'Try another search or remove filters',
-            )
-          : EmptyState(
-              icon: Icons.layers,
-              title: 'No decks yet',
-              message: 'Create your first deck to get started',
-              action: ElevatedButton(
-                child: Text('Create Deck'),
-                onPressed: () => showCreateDeckLocalSheet(context),
-              ),
-            ),
-      spacing: 16,
-      leadingItem: CreateDeckTile(
-        onPressed: () => showCreateDeckLocalSheet(context),
-      ),
-      itemBuilder: (_, _, deck) {
-        return DeckTile(
-          deck: deck,
-          state: DeckTileState.defaultView,
-          onPressed: () {
-            onPressed(context, deck);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const spacing = 16.0;
+        final availableWidth = constraints.maxWidth.isFinite
+            ? constraints.maxWidth
+            : 616.0;
+        final tileWidth = ((availableWidth - spacing) / 2)
+            .clamp(0.0, availableWidth)
+            .toDouble();
+
+        return ListingStatesWrapper<Deck>.wrap(
+          isLoading: isLoading,
+          exception: error,
+          items: decks,
+          onRetry: onRetry,
+          skeletonTile: DeckTile(deck: null, width: tileWidth),
+          emptyState: hasSearchQuery
+              ? const EmptyState(
+                  icon: Icons.search_off,
+                  title: 'No decks found',
+                  message: 'Try another search or remove filters',
+                )
+              : EmptyState(
+                  icon: Icons.layers,
+                  title: 'No decks yet',
+                  message: 'Create your first deck to get started',
+                  action: ElevatedButton(
+                    child: Text('Create Deck'),
+                    onPressed: () => showCreateDeckLocalSheet(context),
+                  ),
+                ),
+          spacing: spacing,
+          runSpacing: spacing,
+          leadingItem: CreateDeckTile(
+            width: tileWidth,
+            onPressed: () => showCreateDeckLocalSheet(context),
+          ),
+          itemBuilder: (_, _, deck) {
+            return DeckTile(
+              deck: deck,
+              width: tileWidth,
+              state: DeckTileState.defaultView,
+              onPressed: () {
+                onPressed(context, deck);
+              },
+            );
           },
         );
       },

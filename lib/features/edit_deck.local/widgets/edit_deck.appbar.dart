@@ -1,9 +1,28 @@
-import 'package:flutter/material.dart' hide SliverAppBar;
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:boo_mondai/lib.barrel.dart';
+import 'package:boo_mondai/lib.barrel.dart'
+    show AppBar, AppTokens, Button, ButtonColor, HeaderBadge, MetaLabel;
+import 'package:flutter/material.dart'
+    show
+        TextEditingController,
+        StatelessWidget,
+        PreferredSizeWidget,
+        Size,
+        Widget,
+        BuildContext,
+        InputDecoration,
+        SizedBox,
+        Text,
+        CrossAxisAlignment,
+        MainAxisAlignment,
+        Icons,
+        FontWeight,
+        TextField,
+        TextStyle,
+        Column,
+        CircularProgressIndicator,
+        Row;
 import 'package:theme_variants/theme_variants.dart';
 
-class EditDeckAppbar extends StatelessWidget {
+class EditDeckAppbar extends StatelessWidget implements PreferredSizeWidget {
   const EditDeckAppbar({
     required this.titleController,
     required this.onSave,
@@ -15,69 +34,58 @@ class EditDeckAppbar extends StatelessWidget {
   final Future<void> Function() onSave;
   final bool isSaving;
 
+  static const _toolbarHeight = 88.0;
+
+  @override
+  Size get preferredSize => const Size.fromHeight(_toolbarHeight);
+
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final horizontalPadding = tokens.spaceLayoutPadding;
-    final verticalPadding = tokens.spaceLayoutPadding;
 
-    return SliverAppBar(
-      leadingWidth: 100.w,
-      title: SizedBox(
-        height: 88,
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: verticalPadding),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Wrap(
-                spacing: 8.w,
-                runSpacing: 8.h,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  const HeaderBadge(label: 'Draft Deck'),
-                  const MetaLabel(icon: Icons.lock, label: 'Private'),
-                ],
-              ),
-              SizedBox(height: 4.h),
-              TextField(
-                controller: titleController,
-                style: TextStyle(
-                  color: tokens.colorTextBaseline,
-                  fontSize: 24.sp,
-                  fontWeight: FontWeight.w900,
-                  height: 1,
-                ),
-                decoration: const InputDecoration.collapsed(
-                  hintText: 'Deck Title...',
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+    return AppBar(
+      // subSection: Row(
+      //   mainAxisAlignment: MainAxisAlignment.end,
+      //   children: [
+      //     Button(
+      //       variants: const [ButtonColor.primary],
+      //       onPressed: isSaving ? null : onSave,
+      //       child: isSaving
+      //           ? const SizedBox.square(
+      //               dimension: 18,
+      //               child: CircularProgressIndicator(strokeWidth: 2),
+      //             )
+      //           : const Text('Save'),
+      //     ),
+      //   ],
+      // ),
       actions: [
-        Padding(
-          padding: EdgeInsets.symmetric(vertical: verticalPadding),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
+        Button.icon(
+          color: ButtonColor.primary,
+          onPressed: isSaving ? null : onSave,
+          icon: Icons.save,
+        ),
+      ],
+      child: Column(
+        // spacing: tokens.spaceLayoutGapSm,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            spacing: tokens.spaceLayoutGapSm,
             children: [
-              Button(
-                variants: const [ButtonVariant.filled, ButtonColor.primary],
-                onPressed: isSaving ? null : onSave,
-                child: isSaving
-                    ? const SizedBox.square(
-                        dimension: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Text('Save'),
-              ),
+              const HeaderBadge(label: 'Draft Deck'),
+              const MetaLabel(icon: Icons.lock, label: 'Private'),
             ],
           ),
-        ),
-        SizedBox(width: horizontalPadding),
-      ],
+          TextField(
+            controller: titleController,
+            decoration: const InputDecoration.collapsed(
+              hintText: 'Deck Title...',
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
