@@ -342,7 +342,7 @@ Page:
 - cards: `tokens.colorSurfaceBackground`
 - borders/dividers: `tokens.colorBorderNeutralSubtle`
 - main text: `tokens.colorTextBaseline`
-- secondary text: `tokens.colorTextSecondary`
+- secondary text: `tokens.colorTextMuted`
 - muted previous values: `tokens.colorTextMuted`
 
 Change color mapping:
