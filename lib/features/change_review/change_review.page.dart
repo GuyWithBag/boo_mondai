@@ -63,7 +63,7 @@ class ChangeReviewPage extends StatelessWidget {
                           Text(
                             'Review changes before applying',
                             style: TextStyle(
-                              color: tokens.colorTextSecondary,
+                              color: tokens.colorTextMuted,
                               fontFamily: tokens.fontFamily,
                               fontSize: tokens.textSizeLabel.sp,
                               fontWeight: tokens.fontWeightTextStrong,

@@ -86,8 +86,8 @@ class DarkModeToggleCard extends HookWidget {
       SurfaceColor.baseline,
       SurfaceBorder.none,
       SurfacePadding.none,
-      SurfaceShape.roundedSm,
-      SurfaceShadow.normal,
+      SurfaceShape.rounded,
+      SurfaceShadow.baseline,
     ]);
     final height = 120.h;
     final style = baseStyle.copyWith(

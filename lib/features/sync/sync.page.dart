@@ -10,7 +10,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         ProgressBar,
         ChangeSummaryChips,
         Button,
-        ButtonVariant,
         ButtonColor;
 import 'package:flutter/material.dart'
     show
@@ -98,7 +97,7 @@ class SyncPage extends StatelessWidget {
                       'No changes to apply.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: tokens.colorTextSecondary,
+                        color: tokens.colorTextMuted,
                         fontFamily: tokens.fontFamily,
                         fontSize: tokens.textSizeLabelLarge.sp,
                         fontWeight: tokens.fontWeightTextStrong,
@@ -158,7 +157,7 @@ class SyncPage extends StatelessWidget {
                         : '${(progress * 100).round()}%',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: tokens.colorTextSecondary,
+                      color: tokens.colorTextMuted,
                       fontFamily: tokens.fontFamily,
                       fontSize: tokens.textSizeLabelLarge.sp,
                       fontWeight: tokens.fontWeightTextStrong,
@@ -185,7 +184,7 @@ class SyncPage extends StatelessWidget {
                         Expanded(
                           child: Button(
                             variants: const [
-                              ButtonVariant.filled,
+                              ButtonColor.primary,
                               ButtonColor.primary,
                             ],
                             onPressed: onApply,

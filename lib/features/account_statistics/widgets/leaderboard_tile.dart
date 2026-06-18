@@ -38,7 +38,7 @@ class LeaderboardTileWidget extends HookWidget {
     final tokens = context.themeTokens<AppTokens>();
     final medal = _RankMedal.forRank(rank);
     final tileVariants = isCurrentUser
-        ? const [SurfaceShape.cardShape, SurfaceBorder.primary]
+        ? const [SurfaceShape.cardShape, SurfaceColor.primarySoft]
         : const [
             SurfaceColor.muted,
             SurfaceShape.cardShape,
@@ -113,7 +113,7 @@ class LeaderboardTileWidget extends HookWidget {
                     style: TextStyle(
                       fontSize: tokens.textSizeLabelSmall.sp,
                       fontWeight: tokens.fontWeightTextStrong,
-                      color: tokens.colorTextSecondary,
+                      color: tokens.colorTextMuted,
                     ),
                   ),
                 ],

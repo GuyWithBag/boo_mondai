@@ -5,8 +5,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         AuthController,
         Button,
-        ButtonVariant,
-        ButtonColor,
+                ButtonColor,
         Modal,
         AppModalTone,
         textStyle,
@@ -50,7 +49,7 @@ class GoogleSignInButton extends StatelessWidget {
     final auth = context.read<AuthController>();
 
     return Button(
-      variants: const [ButtonVariant.filled, ButtonColor.google],
+      variants: const [ButtonColor.google],
       leading: Icon(Icons.g_mobiledata),
       child: Text('CONTINUE WITH GOOGLE'),
       onPressed: () async {
@@ -97,7 +96,7 @@ class _DevManualLoginDialog extends HookWidget {
             child: const Text('Cancel'),
           ),
           Button(
-            variants: const [ButtonVariant.filled, ButtonColor.primary],
+            variants: const [ButtonColor.primary],
             onPressed: () => Navigator.of(context).pop(controller.text),
             child: const Text('Submit Code'),
           ),

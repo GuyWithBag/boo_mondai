@@ -3,14 +3,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         AuthController,
         AppTokens,
         AppModalTone,
-        ButtonVariant,
         ButtonColor,
         Button,
         LocalDB,
         textStyle,
         TextSize,
         TextWeight,
-        TextColor,
         Modal;
 import 'package:flutter/material.dart'
     show
@@ -63,7 +61,7 @@ class SignOutDialog extends StatelessWidget {
             child: const Text('Keep data'),
           ),
           Button(
-            variants: const [ButtonVariant.soft, ButtonColor.error],
+            variants: const [ButtonColor.error],
             onPressed: () async {
               Navigator.of(context).pop();
               await auth.signOut();

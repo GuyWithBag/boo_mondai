@@ -15,7 +15,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         SurfaceBorder,
         SurfaceShape,
         SurfaceColor,
-        surfaceStyle;
+        surfaceStyle,
+        SurfaceShadow;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -40,9 +41,9 @@ class LeaderboardSection extends StatelessWidget {
 
     return Surface(
       style: surfaceStyle.resolve(tokens, const [
-        SurfaceColor.baseline,
-        SurfaceShape.rounded,
+        SurfaceShape.roundedSm,
         SurfaceBorder.none,
+        SurfaceShadow.none,
       ]),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -68,7 +69,7 @@ class LeaderboardSection extends StatelessWidget {
                       style: TextStyle(
                         fontSize: tokens.textSizeLabel.sp,
                         fontWeight: tokens.fontWeightTextStrong,
-                        color: tokens.colorTextSecondary,
+                        color: tokens.colorTextMuted,
                       ),
                     ),
                   ],
@@ -88,7 +89,7 @@ class LeaderboardSection extends StatelessWidget {
             Text(
               'No scores yet. Complete a drill to appear here.',
               style: TextStyle(
-                color: tokens.colorTextSecondary,
+                color: tokens.colorTextMuted,
                 fontWeight: tokens.fontWeightTextStrong,
               ),
             )

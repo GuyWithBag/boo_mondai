@@ -93,7 +93,7 @@ class _SummaryChip extends StatelessWidget {
       border: tokens.colorRatingAgainBorder,
     ),
     ChangeType.skipped => (
-      foreground: tokens.colorTextSecondary,
+      foreground: tokens.colorTextMuted,
       background: tokens.colorSurfaceBackground,
       border: tokens.colorBorderNeutralSubtle,
     ),

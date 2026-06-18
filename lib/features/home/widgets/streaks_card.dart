@@ -15,7 +15,7 @@ class StreaksCard extends StatelessWidget {
     final tokens = context.themeTokens<AppTokens>();
 
     return Surface(
-      style: surfaceStyle.resolve(tokens, const [SurfaceTone.streak]),
+      style: surfaceStyle.resolve(tokens, const [SurfaceColor.streak]),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

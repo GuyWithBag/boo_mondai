@@ -78,7 +78,7 @@ class ViewLeaderboardPage extends HookWidget {
                                     style: TextStyle(
                                       fontSize: tokens.textSizeLabel.sp,
                                       fontWeight: tokens.fontWeightTextStrong,
-                                      color: tokens.colorTextSecondary,
+                                      color: tokens.colorTextMuted,
                                     ),
                                   ),
                                 ],

@@ -1,20 +1,17 @@
 import 'package:boo_mondai/core/theme/app_tokens.model.dart';
 import 'package:boo_mondai/features/app_theme/app_theme.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
-    show AuthController, EditableTextValue, AppSpacing, ProfileAvatar;
+    show AuthController, EditableTextValue, ProfileAvatar;
 import 'package:flutter/material.dart'
     show
-        StatelessWidget,
-        Widget,
         BuildContext,
-        CrossAxisAlignment,
-        MainAxisSize,
         Column,
-        Expanded,
-        Row,
         Icons,
+        MainAxisSize,
+        StatelessWidget,
         TextAlign,
-        SizedBox;
+        Widget,
+        CrossAxisAlignment;
 import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
 import 'package:provider/provider.dart' show WatchContext;
 import 'package:theme_variants/theme_variants.dart'
@@ -37,8 +34,10 @@ class ProfileCard extends StatelessWidget {
       style: surfaceStyle.resolve(tokens, const [
         SurfaceBorder.none,
         SurfaceShape.roundedSm,
+        SurfaceShadow.none,
       ]),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
         spacing: tokens.spaceLayoutGapSm.h,
         children: [
@@ -47,22 +46,30 @@ class ProfileCard extends StatelessWidget {
             avatarUrl: profile.avatarUrl,
             radius: 66,
           ),
-          EditableTextValue(
-            value: displayName,
-            editingValue: profile.displayName,
-            placeholder: 'Display name',
-            textStyle: textStyle.resolve(tokens, const [TextSize.headerLarge]),
-            onSave: auth.updateDisplayName,
-            textAlign: TextAlign.center,
-          ),
-          MetaLabel(label: '@${profile.username}'),
-          if (!profile.isAnonymous && email != null) ...[
-            // Text(email, style: textStyle.resolve(tokens, const [])),
-            MetaLabel(label: email),
-          ],
-          MetaLabel(
-            label: 'Joined at ${_formatShortDate(profile.createdAt)}',
-            icon: Icons.calendar_month,
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            spacing: tokens.spaceLayoutGapXsm,
+            children: [
+              EditableTextValue(
+                value: displayName,
+                editingValue: profile.displayName,
+                placeholder: 'Display name',
+                textStyle: textStyle.resolve(tokens, const [
+                  TextSize.headerLarge,
+                ]),
+                onSave: auth.updateDisplayName,
+                textAlign: TextAlign.center,
+              ),
+              MetaLabel(label: '@${profile.username}'),
+              if (!profile.isAnonymous && email != null) ...[
+                // Text(email, style: textStyle.resolve(tokens, const [])),
+                MetaLabel(label: email),
+              ],
+              MetaLabel(
+                label: 'Joined at ${_formatShortDate(profile.createdAt)}',
+                icon: Icons.calendar_month,
+              ),
+            ],
           ),
         ],
       ),

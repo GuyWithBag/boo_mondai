@@ -1,5 +1,5 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show Button, ButtonVariant, ButtonColor;
+    show Button, ButtonColor;
 import 'package:flutter/material.dart'
     show StatelessWidget, Widget, BuildContext, Icons, Icon, Text;
 
@@ -9,7 +9,7 @@ class AppleSignInButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Button(
-      variants: const [ButtonVariant.filled, ButtonColor.mono],
+      variants: const [ButtonColor.mono],
       leading: Icon(Icons.apple),
       onPressed: null,
       child: Text('CONTINUE WITH APPLE'),

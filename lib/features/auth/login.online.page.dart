@@ -7,10 +7,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         LoadingIndicator,
         AppSpacing,
         ErrorText,
-        ButtonVariant,
         ButtonColor,
         Button,
-        ButtonDepth,
+        ButtonVariant,
         TextFieldSize,
         TextFieldFrame,
         TextFieldTone,
@@ -117,7 +116,7 @@ class LoginPage extends HookWidget {
                   ],
                   const SizedBox(height: AppSpacing.lg),
                   Button(
-                    variants: const [ButtonVariant.filled, ButtonColor.primary],
+                    variants: const [ButtonColor.primary],
                     onPressed: auth.isLoading ? null : performSignIn,
                     child: auth.isLoading
                         ? const LoadingIndicator()
@@ -126,9 +125,9 @@ class LoginPage extends HookWidget {
                   const SizedBox(height: AppSpacing.md),
                   Button(
                     variants: const [
-                      ButtonVariant.filled,
                       ButtonColor.primary,
-                      ButtonDepth.flat,
+                      ButtonColor.primary,
+                      ButtonVariant.flat,
                     ],
                     onPressed: navigateToRegister,
                     child: const Text("Don't have an account? Sign Up"),

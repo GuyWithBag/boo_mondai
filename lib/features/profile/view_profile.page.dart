@@ -5,10 +5,17 @@
 // HOOKS: dev auth dialog only
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/features/profile/widgets/auth.card.dart';
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, Button, Pages, DarkModeToggleCard, ProfileCard;
+    show
+        AppTokens,
+        Button,
+        Pages,
+        DarkModeToggleCard,
+        ProfileCard,
+        PageScaffold,
+        AuthCard;
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
 import 'package:go_router/go_router.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -20,42 +27,29 @@ class ViewAccountPage extends StatelessWidget {
     final tokens = context.themeTokens<AppTokens>();
     final pages = Pages.appDetails;
 
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: SafeArea(
-          child: Center(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                maxWidth: tokens.spaceScaffoldMaxWidth,
-              ),
-              child: Padding(
-                padding: EdgeInsets.all(tokens.spaceLayoutPadding),
-                child: Column(
-                  spacing: tokens.spaceLayoutGapMd,
-                  children: [
-                    const ProfileCard(),
-                    const DarkModeToggleCard(),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      spacing: tokens.spaceLayoutGapMd,
-                      children: [
-                        for (final page in pages) ...[
-                          Button(
-                            onPressed: () => context.push(page.url),
-                            leading: Icon(page.icon),
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            child: Text(page.name),
-                          ),
-                        ],
-                      ],
-                    ),
-                    const AuthCard(),
-                  ],
+    return PageScaffold(
+      body: Column(
+        spacing: tokens.spaceLayoutGapMd,
+        children: [
+          const ProfileCard(),
+          const DarkModeToggleCard(),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            spacing: tokens.spaceLayoutGapMd,
+            children: [
+              for (final page in pages) ...[
+                Button(
+                  onPressed: () => context.push(page.url),
+                  leading: Icon(page.icon),
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  child: Text(page.name),
                 ),
-              ),
-            ),
+              ],
+            ],
           ),
-        ),
+          SizedBox(height: tokens.spaceLayoutGapXsm.h),
+          const AuthCard(),
+        ],
       ),
     );
   }

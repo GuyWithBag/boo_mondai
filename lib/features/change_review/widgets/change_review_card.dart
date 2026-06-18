@@ -66,7 +66,7 @@ class ChangeReviewCard extends StatelessWidget {
                         Text(
                           change.subtitle!,
                           style: TextStyle(
-                            color: tokens.colorTextSecondary,
+                            color: tokens.colorTextMuted,
                             fontFamily: tokens.fontFamily,
                             fontSize: tokens.textSizeLabel.sp,
                           ),
@@ -94,6 +94,6 @@ Color _foreground(AppTokens tokens, ChangeType type) {
     ChangeType.added => tokens.colorActionSuccess,
     ChangeType.modified => tokens.colorRatingHardText,
     ChangeType.removed => tokens.colorRatingAgainText,
-    ChangeType.skipped => tokens.colorTextSecondary,
+    ChangeType.skipped => tokens.colorTextMuted,
   };
 }

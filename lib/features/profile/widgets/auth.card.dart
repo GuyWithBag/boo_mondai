@@ -1,11 +1,9 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        AppSpacing,
         AppTokens,
         AppleSignInButton,
         AuthService,
         Button,
-        ButtonVariant,
         ButtonColor,
         GoogleSignInButton,
         LabeledDivider,
@@ -46,6 +44,7 @@ class AuthCard extends StatelessWidget {
 
     if (AuthService.isAuthenticatedEither) {
       return Column(
+        spacing: tokens.spaceLayoutGapMd,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           if (profile.role != 'researcher') ...[
@@ -54,13 +53,12 @@ class AuthCard extends StatelessWidget {
               leading: const Icon(Icons.vpn_key_outlined),
               child: const Text('ENTER RESEARCH CODE'),
             ),
-            const SizedBox(height: AppSpacing.sm),
           ],
           Button(
-            variants: const [ButtonVariant.soft, ButtonColor.error],
+            variants: const [ButtonColor.error],
             onPressed: () => showSignOutDialog(context),
             leading: const Icon(Icons.logout),
-            child: const Text('SIGN OUT'),
+            child: const Text('Sign Out'),
           ),
         ],
       );
@@ -94,14 +92,14 @@ class AuthCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Button(
-                  variants: const [ButtonVariant.soft, ButtonColor.hard],
+                  variants: const [ButtonColor.hard],
                   onPressed: () => context.push(Pages.login.url),
                   child: const Text('LOG IN'),
                 ),
               ),
               Expanded(
                 child: Button(
-                  variants: const [ButtonVariant.filled, ButtonColor.primary],
+                  variants: const [ButtonColor.primary],
                   onPressed: () => context.push(Pages.register.url),
                   child: const Text('REGISTER'),
                 ),

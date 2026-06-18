@@ -1,12 +1,5 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show
-        AppTokens,
-        Button,
-        ButtonSize,
-        ButtonVariant,
-        ButtonColor,
-        SurfaceTone,
-        surfaceStyle;
+    show AppTokens, Button, ButtonSize, ButtonColor, SurfaceColor, surfaceStyle;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -27,7 +20,7 @@ class ReadyToReviewCard extends StatelessWidget {
     final canStart = dueCount > 0;
 
     return Surface(
-      style: surfaceStyle.resolve(tokens, const [SurfaceTone.primarySoft]),
+      style: surfaceStyle.resolve(tokens, const [SurfaceColor.primarySoft]),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -55,11 +48,7 @@ class ReadyToReviewCard extends StatelessWidget {
             alignment: Alignment.centerLeft,
             child: Button(
               onPressed: canStart ? onStartSession : null,
-              variants: const [
-                ButtonVariant.filled,
-                ButtonColor.primary,
-                ButtonSize.lg,
-              ],
+              variants: const [ButtonColor.primary, ButtonSize.lg],
               child: const Text('START SESSION'),
             ),
           ),
