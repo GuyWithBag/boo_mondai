@@ -10,4 +10,18 @@ abstract final class TextHelper {
       TextAlign.justify => MainAxisAlignment.spaceBetween,
     };
   }
+
+  static String defaultText(String? value, String fallback) {
+    final trimmed = value?.trim();
+    if (trimmed == null || trimmed.isEmpty) return fallback;
+
+    return trimmed;
+  }
+
+  static String? nonEmptyOrNull(String? value) {
+    final trimmed = value?.trim();
+    if (trimmed == null || trimmed.isEmpty) return null;
+
+    return trimmed;
+  }
 }

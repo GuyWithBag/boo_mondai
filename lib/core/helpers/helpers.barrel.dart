@@ -3,3 +3,5 @@
 // Other files
 export 'text_helper.dart';
 export 'scale_helper.dart';
+export 'date_helper.dart';
+export 'number_helper.dart';
