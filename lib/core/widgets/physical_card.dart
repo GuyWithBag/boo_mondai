@@ -30,10 +30,6 @@ class PhysicalCard extends HookWidget {
       controller: controller,
       front: front,
       back: back,
-      // right: const SizedBox.expand(),
-      // left: const SizedBox.expand(),
-      // top: const SizedBox.expand(),
-      // bottom: const SizedBox.expand(),
       depth: controller.depth == 0 ? 10 : controller.depth,
     );
 

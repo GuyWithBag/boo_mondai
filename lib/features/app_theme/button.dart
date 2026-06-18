@@ -1,9 +1,8 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         ButtonSize,
-        ButtonDepth,
-        ButtonColor,
         ButtonVariant,
+        ButtonColor,
         ButtonState,
         AppTokens,
         buttonStyle;
@@ -21,10 +20,9 @@ class Button extends HookWidget {
     this.mainAxisAlignment = MainAxisAlignment.center,
     this.axis = Axis.horizontal,
     this.variants = const [
-      ButtonVariant.ghost,
-      ButtonColor.neutral,
+      ButtonColor.baseline,
       ButtonSize.md,
-      ButtonDepth.elevated,
+      ButtonVariant.elevated,
     ],
     super.key,
   });
@@ -41,32 +39,30 @@ class Button extends HookWidget {
   static Button icon({
     VoidCallback? onPressed,
     IconData? icon,
-    ButtonVariant variant = ButtonVariant.ghost,
-    ButtonColor color = ButtonColor.neutral,
-    ButtonDepth depth = ButtonDepth.elevated,
+    ButtonColor color = ButtonColor.baseline,
+    ButtonVariant variant = ButtonVariant.elevated,
     bool selected = false,
   }) {
     return Button(
       onPressed: onPressed,
       leading: icon == null ? null : Icon(icon),
       selected: selected,
-      variants: [variant, color, ButtonSize.icon, depth],
+      variants: [color, ButtonSize.icon, variant],
     );
   }
 
   static Button iconSmall({
     VoidCallback? onPressed,
     IconData? icon,
+    ButtonColor color = ButtonColor.muted,
     ButtonVariant variant = ButtonVariant.text,
-    ButtonColor color = ButtonColor.neutral,
-    ButtonDepth depth = ButtonDepth.flat,
     bool selected = false,
   }) {
     return Button(
       onPressed: onPressed,
       leading: icon == null ? null : Icon(icon),
       selected: selected,
-      variants: [variant, color, ButtonSize.smallIcon, depth],
+      variants: [color, ButtonSize.smallIcon, variant],
     );
   }
 
@@ -74,8 +70,8 @@ class Button extends HookWidget {
     VoidCallback? onPressed,
     IconData? icon,
     required String label,
-    ButtonVariant variant = ButtonVariant.ghost,
-    ButtonColor color = ButtonColor.neutral,
+    ButtonColor color = ButtonColor.baseline,
+    ButtonVariant variant = ButtonVariant.elevated,
     bool selected = false,
   }) {
     return Button(
@@ -83,7 +79,7 @@ class Button extends HookWidget {
       leading: icon == null ? null : Icon(icon),
       selected: selected,
       axis: Axis.vertical,
-      variants: [variant, color, ButtonSize.iconWithLabel],
+      variants: [color, ButtonSize.iconWithLabel, variant],
       child: Text(
         label,
         maxLines: 2,

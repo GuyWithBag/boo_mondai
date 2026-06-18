@@ -7,8 +7,7 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         StudySessionController,
         StudyRating,
-        ButtonVariant,
-        ButtonColor,
+                ButtonColor,
         Button;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -58,7 +57,7 @@ class RatingButton extends StatelessWidget {
         message: 'Press $shortcut',
         child: Button(
           onPressed: onTap,
-          variants: [ButtonVariant.soft, color],
+          variants: [color],
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [

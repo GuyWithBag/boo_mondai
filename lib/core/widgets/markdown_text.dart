@@ -55,7 +55,7 @@ MarkdownStyleSheet _markdownStyleSheet(AppTokens tokens, TextStyle body) {
     h5: strong,
     h5Padding: EdgeInsets.zero,
     h6: body.copyWith(
-      color: tokens.colorTextSecondary,
+      color: tokens.colorTextMuted,
       fontSize: bodyFontSize == null ? null : bodyFontSize * 0.9,
       fontWeight: tokens.fontWeightTextStrong,
     ),
@@ -63,7 +63,7 @@ MarkdownStyleSheet _markdownStyleSheet(AppTokens tokens, TextStyle body) {
     em: body.copyWith(fontStyle: FontStyle.italic),
     strong: strong,
     del: body.copyWith(decoration: TextDecoration.lineThrough),
-    blockquote: body.copyWith(color: tokens.colorTextSecondary),
+    blockquote: body.copyWith(color: tokens.colorTextMuted),
     img: body,
     checkbox: body.copyWith(color: tokens.colorPrimary),
     blockSpacing: tokens.spaceLayoutGapMd,
@@ -204,7 +204,11 @@ class MarkdownText extends HookWidget {
     }
 
     return switch (mode) {
-      MarkdownTextMode.raw => SelectableText(data, style: resolvedTextStyle),
+      MarkdownTextMode.raw => SelectableText(
+        data,
+        style: resolvedTextStyle,
+        maxLines: maxLines,
+      ),
       MarkdownTextMode.preview => MarkdownBody(
         data: data,
         selectable: selectable,

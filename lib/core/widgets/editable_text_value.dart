@@ -3,7 +3,7 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
         Button,
-        ButtonDepth,
+        ButtonVariant,
         ButtonColor,
         MarkdownText,
         MarkdownTextMode,
@@ -138,14 +138,14 @@ class EditableTextValue extends HookWidget {
             children: [
               Button.icon(
                 icon: Icons.close,
-                depth: ButtonDepth.flat,
+                variant: ButtonVariant.flat,
                 onPressed: isSaving.value ? null : cancel,
               ),
               SizedBox(width: tokens.spaceLayoutGapSm),
               Button.icon(
                 icon: Icons.check,
                 color: ButtonColor.success,
-                depth: ButtonDepth.flat,
+                variant: ButtonVariant.flat,
                 onPressed: isSaving.value ? null : save,
               ),
             ],
@@ -154,14 +154,26 @@ class EditableTextValue extends HookWidget {
       );
     }
 
+    final valueWidget = isMarkdown && value.trim().isNotEmpty
+        ? MarkdownText(
+            data: value,
+            baseTextStyle: textStyle,
+            maxLines: maxLines,
+          )
+        : Text(
+            value,
+            style: textStyle,
+            textAlign: textAlign,
+            maxLines: maxLines,
+            overflow: maxLines == null ? null : TextOverflow.ellipsis,
+          );
+
     return Row(
       spacing: tokens.spaceLayoutGapSm,
-      crossAxisAlignment: CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: TextHelper.textAlignToMainAxisalignment(textAlign),
       children: [
-        isMarkdown && value.trim().isNotEmpty
-            ? MarkdownText(data: value, baseTextStyle: textStyle)
-            : Text(value, style: textStyle, textAlign: textAlign),
+        Flexible(child: valueWidget),
         if (enabled) ...[Button.iconSmall(icon: Icons.edit, onPressed: edit)],
       ],
     );

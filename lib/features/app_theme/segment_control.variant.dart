@@ -23,7 +23,7 @@ final segmentControlOptionStyle = VariantStyle.surfaceParts<AppTokens>(
       ),
     }),
     SurfaceStylePart.text({
-      TextStylePart.color(tokens.colorTextSecondary),
+      TextStylePart.color(tokens.colorTextMuted),
       TextStylePart.fontSize(tokens.textSizeLabel.sp),
       TextStylePart.fontWeight(tokens.fontWeightTextStrong),
     }),

@@ -21,7 +21,6 @@ final AppTokens defaultDark = AppTokens(
   colorActionErrorBackground: Color(0xff450a0a),
   colorActionErrorBorder: Color(0xff7f1d1d),
   colorTextBaseline: Color(0xfff3f4f6),
-  colorTextSecondary: Color(0xffd1d5db),
   colorTextMuted: Color(0xff9ca3af),
   colorMuted: Color(0xff1f2937),
   colorRatingAgainBackground: Color(0xff450a0a),

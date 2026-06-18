@@ -85,7 +85,7 @@ TextTheme _textTheme(AppTokens tokens) {
   );
   final labelSmallStyle = _textStyle(
     tokens,
-    color: tokens.colorTextSecondary,
+    color: tokens.colorTextMuted,
     size: tokens.textSizeLabelSmall,
     weight: tokens.fontWeightTextStrong,
     height: tokens.lineHeightButton,
@@ -109,7 +109,7 @@ TextTheme _textTheme(AppTokens tokens) {
     bodyLarge: bodyLargeStyle,
     bodyMedium: bodyStyle,
     bodySmall: bodyStyle.copyWith(
-      color: tokens.colorTextSecondary,
+      color: tokens.colorTextMuted,
       fontSize: tokens.textSizeLabelSmall,
     ),
     labelLarge: labelStyle,
@@ -180,7 +180,7 @@ ThemeData buildAppThemeData(AppTokens tokens, Brightness brightness) {
         size: tokens.sizeIconMd,
       ),
       checkmarkColor: tokens.colorPrimary,
-      deleteIconColor: tokens.colorTextSecondary,
+      deleteIconColor: tokens.colorTextMuted,
       showCheckmark: false,
     ),
     textTheme: _textTheme(tokens),

@@ -134,11 +134,11 @@ final appChipStyle = VariantStyle.chipParts<AppTokens>(
     ChipTone.text: (tokens) => {
       ChipPart.selectedColor(tokens.colorTransparent),
       ChipPart.secondaryLabelStyle(
-        _chipLabelStyle(tokens, tokens.colorTextSecondary),
+        _chipLabelStyle(tokens, tokens.colorTextMuted),
       ),
       ChipPart.backgroundColor(tokens.colorTransparent),
       ChipPart.side(BorderSide(color: tokens.colorTransparent, width: 0)),
-      ChipPart.labelStyle(_chipLabelStyle(tokens, tokens.colorTextSecondary)),
+      ChipPart.labelStyle(_chipLabelStyle(tokens, tokens.colorTextMuted)),
     },
     ChipTone.again: (tokens) => {
       ChipPart.selectedColor(tokens.colorRatingAgainBackground),

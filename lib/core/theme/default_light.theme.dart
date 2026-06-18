@@ -21,7 +21,6 @@ final AppTokens defaultLight = AppTokens(
   colorActionErrorBackground: Color(0xfffef2f2),
   colorActionErrorBorder: Color(0xfffecaca),
   colorTextBaseline: Color(0xff111827),
-  colorTextSecondary: Color(0xff6b7280),
   colorTextMuted: Color(0xff9ca3af),
   colorMuted: Color(0xfff3f4f6),
   colorRatingAgainBackground: Color(0xfffef2f2),

@@ -27,7 +27,7 @@ final textStyle = VariantStyle.textParts<AppTokens>(
   defaultVariants: const [
     TextSize.labelSmall,
     TextWeight.body,
-    TextColor.muted,
+    TextColor.baseline,
   ],
   variants: {
     TextSize.headerLarge: (tokens) => {

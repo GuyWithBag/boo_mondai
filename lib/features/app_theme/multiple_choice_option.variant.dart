@@ -1,5 +1,5 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, ButtonVariant, ButtonColor, TextColor;
+    show AppTokens, ButtonColor, TextColor;
 import 'package:theme_variants/theme_variants.dart';
 
 enum MultipleChoiceOptionState { idle, hovered, selected, faded, disabled }
@@ -8,20 +8,20 @@ enum MultipleChoiceOptionTone { neutral, success, error }
 
 class MultipleChoiceOptionStyle {
   const MultipleChoiceOptionStyle({
-    this.buttonVariants,
+    this.buttonStyleVariants,
     this.selected,
     this.opacity,
     this.textTone,
   });
 
-  final List<Object>? buttonVariants;
+  final List<Object>? buttonStyleVariants;
   final bool? selected;
   final double? opacity;
   final TextColor? textTone;
 
   MultipleChoiceOptionStyle merge(MultipleChoiceOptionStyle other) {
     return MultipleChoiceOptionStyle(
-      buttonVariants: other.buttonVariants ?? buttonVariants,
+      buttonStyleVariants: other.buttonStyleVariants ?? buttonStyleVariants,
       selected: other.selected ?? selected,
       opacity: other.opacity ?? opacity,
       textTone: other.textTone ?? textTone,
@@ -32,7 +32,7 @@ class MultipleChoiceOptionStyle {
 final multipleChoiceOptionStyle =
     VariantStyle<AppTokens, MultipleChoiceOptionStyle>(
       base: (_) => const MultipleChoiceOptionStyle(
-        buttonVariants: [ButtonVariant.ghost, ButtonColor.neutral],
+        buttonStyleVariants: [ButtonColor.baseline],
         selected: false,
         opacity: 1,
       ),
@@ -60,14 +60,14 @@ final multipleChoiceOptionStyle =
             const MultipleChoiceOptionStyle(opacity: 0.5),
         MultipleChoiceOptionTone.neutral: (_) =>
             const MultipleChoiceOptionStyle(
-              buttonVariants: [ButtonVariant.ghost, ButtonColor.neutral],
+              buttonStyleVariants: [ButtonColor.baseline],
             ),
         MultipleChoiceOptionTone.success: (_) =>
             const MultipleChoiceOptionStyle(
-              buttonVariants: [ButtonVariant.soft, ButtonColor.success],
+              buttonStyleVariants: [ButtonColor.success],
             ),
         MultipleChoiceOptionTone.error: (_) => const MultipleChoiceOptionStyle(
-          buttonVariants: [ButtonVariant.soft, ButtonColor.error],
+          buttonStyleVariants: [ButtonColor.error],
         ),
       },
     );

@@ -1,5 +1,5 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show Button, ButtonColor, ButtonDepth, ButtonVariant;
+    show Button, ButtonColor, ButtonVariant;
 import 'package:flutter/material.dart';
 
 class FloatingActionButton extends StatelessWidget {
@@ -17,9 +17,8 @@ class FloatingActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Button.icon(
-      variant: ButtonVariant.filled,
       color: ButtonColor.primary,
-      depth: ButtonDepth.mechanical,
+      variant: ButtonVariant.elevated,
       onPressed: onPressed,
       icon: icon,
     );

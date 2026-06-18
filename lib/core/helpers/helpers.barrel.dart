@@ -2,3 +2,4 @@
 
 // Other files
 export 'text_helper.dart';
+export 'scale_helper.dart';

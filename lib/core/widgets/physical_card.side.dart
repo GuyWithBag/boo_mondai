@@ -1,5 +1,5 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, surfaceStyle, SurfaceShape, widthCard;
+    show AppTokens, ScaleHelper, surfaceStyle, SurfaceShape;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -19,8 +19,11 @@ class PhysicalCardSide extends StatelessWidget {
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
     final effectiveMaxWidth = maxWidth ?? tokens.studyCardWidth;
-    final radius =
-        tokens.studyCardRadius * (effectiveMaxWidth / tokens.studyCardWidth);
+    final radius = ScaleHelper.radius(
+      radius: tokens.studyCardRadius,
+      current: effectiveMaxWidth,
+      base: tokens.studyCardWidth,
+    );
     final resolvedStyle = surfaceStyle.resolve(tokens, [
       ...surfaceStyleVariants,
       SurfaceShape.cardShape,

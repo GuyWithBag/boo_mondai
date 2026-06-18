@@ -98,7 +98,6 @@ class AppTokens with AppTokensMappable {
     required this.colorActionErrorBackground,
     required this.colorActionErrorBorder,
     required this.colorTextBaseline,
-    required this.colorTextSecondary,
     required this.colorTextMuted,
     required this.colorMuted,
     required this.colorRatingAgainBackground,
@@ -155,7 +154,6 @@ class AppTokens with AppTokensMappable {
 
   // Text
   final Color colorTextBaseline;
-  final Color colorTextSecondary;
   final Color colorTextMuted;
 
   // Neutral
@@ -207,11 +205,14 @@ class AppTokens with AppTokensMappable {
 
   final double borderWidthDefault = 2;
 
-  final double spaceScaffoldPadding = 28;
+  final double spaceScaffoldPadding = 20;
+  final double spaceScaffoldPaddingMobileY = 28;
+
   final double spaceLayoutPadding = 20;
   final double spaceLayoutGapLg = 24;
   final double spaceLayoutGapMd = 18;
   final double spaceLayoutGapSm = 8;
+  final double spaceLayoutGapXsm = 4;
   final double spaceScaffoldMaxWidth = 800;
 
   final double radiusSurfaceLg = 60;

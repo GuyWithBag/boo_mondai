@@ -57,7 +57,7 @@ final headerBadgeStyle = VariantStyle.chipParts<AppTokens>(
       ),
       ChipPart.labelStyle(
         TextStyle(
-          color: tokens.colorTextSecondary,
+          color: tokens.colorTextMuted,
           fontSize: tokens.textSizeLabelSmall.sp,
           fontWeight: tokens.fontWeightTextHeavy,
           letterSpacing: tokens.letterSpacingTextEyebrow,

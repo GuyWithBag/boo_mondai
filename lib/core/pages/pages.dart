@@ -9,7 +9,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         ViewDecksLocalPage,
         ViewReviewsPage,
         ViewAccountPage,
-        VariantShowcasePage,
         LoginPage,
         RegisterPage,
         CreateDeckPage,
@@ -46,7 +45,7 @@ class Pages {
   static final decksOnline = AppPage(
     url: '/decks-online',
     icon: Icons.public_outlined,
-    name: 'Decks Online',
+    name: 'Browse',
     builder:
         (context, {pathParameters = const {}, queryParameters = const {}}) =>
             const ViewDecksOnlinePage(),
@@ -55,7 +54,7 @@ class Pages {
   static final decksLocal = AppPage(
     url: '/decks-local',
     icon: Icons.library_books_outlined,
-    name: 'Decks Local',
+    name: 'Decks',
     builder:
         (context, {pathParameters = const {}, queryParameters = const {}}) =>
             const ViewDecksLocalPage(),
@@ -77,15 +76,6 @@ class Pages {
     builder:
         (context, {pathParameters = const {}, queryParameters = const {}}) =>
             const ViewAccountPage(),
-  );
-
-  static final variants = AppPage(
-    url: '/variants',
-    icon: Icons.palette_outlined,
-    name: 'Variants',
-    builder:
-        (context, {pathParameters = const {}, queryParameters = const {}}) =>
-            const VariantShowcasePage(),
   );
 
   static final login = AppPage(
@@ -262,7 +252,6 @@ class Pages {
     decksLocal,
     reviews,
     account,
-    variants,
   ];
   static final auth = <AppPage>[login, register];
   static final appDetails = <AppPage>[

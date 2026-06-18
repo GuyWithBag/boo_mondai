@@ -87,10 +87,6 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
   static const Field<AppTokens, Color> _f$colorTextBaseline = Field(
       'colorTextBaseline', _$colorTextBaseline,
       key: r'color_text_baseline');
-  static Color _$colorTextSecondary(AppTokens v) => v.colorTextSecondary;
-  static const Field<AppTokens, Color> _f$colorTextSecondary = Field(
-      'colorTextSecondary', _$colorTextSecondary,
-      key: r'color_text_secondary');
   static Color _$colorTextMuted(AppTokens v) => v.colorTextMuted;
   static const Field<AppTokens, Color> _f$colorTextMuted =
       Field('colorTextMuted', _$colorTextMuted, key: r'color_text_muted');
@@ -257,6 +253,11 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
   static const Field<AppTokens, double> _f$spaceScaffoldPadding = Field(
       'spaceScaffoldPadding', _$spaceScaffoldPadding,
       key: r'space_scaffold_padding', mode: FieldMode.member);
+  static double _$spaceScaffoldPaddingMobileY(AppTokens v) =>
+      v.spaceScaffoldPaddingMobileY;
+  static const Field<AppTokens, double> _f$spaceScaffoldPaddingMobileY = Field(
+      'spaceScaffoldPaddingMobileY', _$spaceScaffoldPaddingMobileY,
+      key: r'space_scaffold_padding_mobile_y', mode: FieldMode.member);
   static double _$spaceLayoutPadding(AppTokens v) => v.spaceLayoutPadding;
   static const Field<AppTokens, double> _f$spaceLayoutPadding = Field(
       'spaceLayoutPadding', _$spaceLayoutPadding,
@@ -273,6 +274,10 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
   static const Field<AppTokens, double> _f$spaceLayoutGapSm = Field(
       'spaceLayoutGapSm', _$spaceLayoutGapSm,
       key: r'space_layout_gap_sm', mode: FieldMode.member);
+  static double _$spaceLayoutGapXsm(AppTokens v) => v.spaceLayoutGapXsm;
+  static const Field<AppTokens, double> _f$spaceLayoutGapXsm = Field(
+      'spaceLayoutGapXsm', _$spaceLayoutGapXsm,
+      key: r'space_layout_gap_xsm', mode: FieldMode.member);
   static double _$spaceScaffoldMaxWidth(AppTokens v) => v.spaceScaffoldMaxWidth;
   static const Field<AppTokens, double> _f$spaceScaffoldMaxWidth = Field(
       'spaceScaffoldMaxWidth', _$spaceScaffoldMaxWidth,
@@ -371,7 +376,6 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
     #colorActionErrorBackground: _f$colorActionErrorBackground,
     #colorActionErrorBorder: _f$colorActionErrorBorder,
     #colorTextBaseline: _f$colorTextBaseline,
-    #colorTextSecondary: _f$colorTextSecondary,
     #colorTextMuted: _f$colorTextMuted,
     #colorMuted: _f$colorMuted,
     #colorRatingAgainBackground: _f$colorRatingAgainBackground,
@@ -412,10 +416,12 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
     #letterSpacingTextEyebrow: _f$letterSpacingTextEyebrow,
     #borderWidthDefault: _f$borderWidthDefault,
     #spaceScaffoldPadding: _f$spaceScaffoldPadding,
+    #spaceScaffoldPaddingMobileY: _f$spaceScaffoldPaddingMobileY,
     #spaceLayoutPadding: _f$spaceLayoutPadding,
     #spaceLayoutGapLg: _f$spaceLayoutGapLg,
     #spaceLayoutGapMd: _f$spaceLayoutGapMd,
     #spaceLayoutGapSm: _f$spaceLayoutGapSm,
+    #spaceLayoutGapXsm: _f$spaceLayoutGapXsm,
     #spaceScaffoldMaxWidth: _f$spaceScaffoldMaxWidth,
     #radiusSurfaceLg: _f$radiusSurfaceLg,
     #radiusSurface: _f$radiusSurface,
@@ -456,7 +462,6 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
         colorActionErrorBackground: data.dec(_f$colorActionErrorBackground),
         colorActionErrorBorder: data.dec(_f$colorActionErrorBorder),
         colorTextBaseline: data.dec(_f$colorTextBaseline),
-        colorTextSecondary: data.dec(_f$colorTextSecondary),
         colorTextMuted: data.dec(_f$colorTextMuted),
         colorMuted: data.dec(_f$colorMuted),
         colorRatingAgainBackground: data.dec(_f$colorRatingAgainBackground),
@@ -556,7 +561,6 @@ abstract class AppTokensCopyWith<$R, $In extends AppTokens, $Out>
       Color? colorActionErrorBackground,
       Color? colorActionErrorBorder,
       Color? colorTextBaseline,
-      Color? colorTextSecondary,
       Color? colorTextMuted,
       Color? colorMuted,
       Color? colorRatingAgainBackground,
@@ -611,7 +615,6 @@ class _AppTokensCopyWithImpl<$R, $Out>
           Color? colorActionErrorBackground,
           Color? colorActionErrorBorder,
           Color? colorTextBaseline,
-          Color? colorTextSecondary,
           Color? colorTextMuted,
           Color? colorMuted,
           Color? colorRatingAgainBackground,
@@ -661,7 +664,6 @@ class _AppTokensCopyWithImpl<$R, $Out>
         if (colorActionErrorBorder != null)
           #colorActionErrorBorder: colorActionErrorBorder,
         if (colorTextBaseline != null) #colorTextBaseline: colorTextBaseline,
-        if (colorTextSecondary != null) #colorTextSecondary: colorTextSecondary,
         if (colorTextMuted != null) #colorTextMuted: colorTextMuted,
         if (colorMuted != null) #colorMuted: colorMuted,
         if (colorRatingAgainBackground != null)
@@ -734,8 +736,6 @@ class _AppTokensCopyWithImpl<$R, $Out>
           data.get(#colorActionErrorBorder, or: $value.colorActionErrorBorder),
       colorTextBaseline:
           data.get(#colorTextBaseline, or: $value.colorTextBaseline),
-      colorTextSecondary:
-          data.get(#colorTextSecondary, or: $value.colorTextSecondary),
       colorTextMuted: data.get(#colorTextMuted, or: $value.colorTextMuted),
       colorMuted: data.get(#colorMuted, or: $value.colorMuted),
       colorRatingAgainBackground: data.get(#colorRatingAgainBackground,
@@ -756,7 +756,8 @@ class _AppTokensCopyWithImpl<$R, $Out>
           or: $value.colorRatingHardHoverBackground),
       colorRatingGoodBackground: data.get(#colorRatingGoodBackground,
           or: $value.colorRatingGoodBackground),
-      colorRatingGoodText: data.get(#colorRatingGoodText, or: $value.colorRatingGoodText),
+      colorRatingGoodText:
+          data.get(#colorRatingGoodText, or: $value.colorRatingGoodText),
       colorRatingGoodBorder: data.get(#colorRatingGoodBorder, or: $value.colorRatingGoodBorder),
       colorRatingGoodHoverBackground: data.get(#colorRatingGoodHoverBackground, or: $value.colorRatingGoodHoverBackground),
       colorRatingEasyBackground: data.get(#colorRatingEasyBackground, or: $value.colorRatingEasyBackground),

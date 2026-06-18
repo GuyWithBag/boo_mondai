@@ -1162,10 +1162,10 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "983e172f1fb9eb742ce87c8fadace90694612cea"
+      resolved-ref: ae9c7c1bec81b76b348783e4e97c2a6b3765834d
       url: "https://github.com/GuyWithBag/theme_variants.git"
     source: git
-    version: "0.2.4"
+    version: "0.2.6"
   timezone:
     dependency: "direct main"
     description:

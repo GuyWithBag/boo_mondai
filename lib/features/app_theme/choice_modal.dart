@@ -1,6 +1,5 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        ButtonVariant,
         ButtonColor,
         AppModalTone,
         AppTokens,
@@ -16,13 +15,11 @@ class ModalAction<T> {
   const ModalAction({
     required this.value,
     required this.label,
-    this.variant = ButtonVariant.ghost,
-    this.color = ButtonColor.neutral,
+    this.color = ButtonColor.baseline,
   });
 
   final T value;
   final String label;
-  final ButtonVariant variant;
   final ButtonColor color;
 }
 
@@ -55,7 +52,7 @@ class ChoiceModal<T> extends StatelessWidget {
         actions: [
           for (final action in actions)
             Button(
-              variants: [action.variant, action.color],
+              variants: [action.color],
               onPressed: () => Navigator.pop(context, action.value),
               child: Text(action.label),
             ),

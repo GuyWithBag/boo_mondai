@@ -1,5 +1,5 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, SurfaceShape, surfaceStyle;
+    show AppTokens, SurfaceShape, surfaceStyle, SurfaceBorder;
 import 'package:flutter/material.dart'
     show
         Alignment,
@@ -63,7 +63,11 @@ class BackgroundImageSurface extends StatelessWidget {
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
     final resolvedStyle =
-        style ?? surfaceStyle.resolve(tokens, const [SurfaceShape.sharp]);
+        style ??
+        surfaceStyle.resolve(tokens, const [
+          SurfaceShape.sharp,
+          SurfaceBorder.none,
+        ]);
     final childPadding = resolvedStyle.padding ?? EdgeInsets.zero;
     final finalStyle = resolvedStyle.copyWith(
       padding: EdgeInsets.zero,

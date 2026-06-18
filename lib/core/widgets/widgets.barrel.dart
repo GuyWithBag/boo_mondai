@@ -17,6 +17,6 @@ export 'collapsing_header_item.dart';
 export 'markdown_text.dart';
 export 'placeholder_app_page.dart';
 export 'selection_tile_frame.dart';
-export 'rating_button.dart';
 export 'editable_text_value.dart';
 export 'selection_action_bar.dart';
+export 'rating_button.dart';
