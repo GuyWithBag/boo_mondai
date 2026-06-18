@@ -5,3 +5,4 @@ export 'models/models.barrel.dart';
 // Other files
 export 'deck_vote_reviews.remote.db.dart';
 export 'deck_vote_reviews.service.dart';
+export 'deck_vote_reviews.controller.dart';
