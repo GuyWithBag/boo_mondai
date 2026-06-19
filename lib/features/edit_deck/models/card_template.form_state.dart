@@ -12,7 +12,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         defaultMatchPairs;
 import 'package:flutter/material.dart';
 
-class DeckCardFormState {
+class CardTemplateFormState {
   final ValueNotifier<QuestionType> questionType;
   final ValueNotifier<CardType> cardType;
   final TextEditingController frontController;
@@ -23,7 +23,7 @@ class DeckCardFormState {
   final TextEditingController fillInTheBlankAnswersController;
   final ValueNotifier<List<MatchPairData>> matchPairs;
 
-  DeckCardFormState({
+  CardTemplateFormState({
     required this.questionType,
     required this.cardType,
     required this.frontController,
@@ -35,11 +35,11 @@ class DeckCardFormState {
     required this.matchPairs,
   });
 
-  factory DeckCardFormState.empty({
+  factory CardTemplateFormState.empty({
     QuestionType questionType = QuestionType.flashcard,
     CardType cardType = CardType.normal,
   }) {
-    return DeckCardFormState(
+    return CardTemplateFormState(
       questionType: ValueNotifier(questionType),
       cardType: ValueNotifier(cardType),
       frontController: TextEditingController(),

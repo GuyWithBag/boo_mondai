@@ -5,11 +5,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         EditDeckEditorController,
         ErrorText,
         FillInTheBlanksEditor,
-        FlashcardEditor,
-        FormatSelector,
         MatchingTypeEditor,
-        MultipleChoiceEditor,
-        QuestionType;
+        QuestionType,
+        FlashcardEditor,
+        MultipleChoiceEditor;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -28,11 +27,6 @@ class EditDeckEditorBody extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          FormatSelector(
-            selectedIndex: editor.selectedFormatIndex,
-            onChanged: editor.setFormatIndex,
-          ),
-          const SizedBox(height: 24),
           switch (editor.questionType) {
             QuestionType.flashcard => FlashcardEditor(
               formState: editor.formState,

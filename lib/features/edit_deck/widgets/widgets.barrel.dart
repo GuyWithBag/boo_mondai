@@ -2,17 +2,13 @@
 
 // Other files
 export 'direction_selector.dart';
-export 'fill_in_the_blanks.editor.dart';
-export 'flashcard_editor.dart';
 export 'format_selector.dart';
-export 'matching_type_input.dart';
-export 'matching_type_pair.dart';
-export 'multiple_choice_editor.dart';
-export 'responsive_two_column.dart';
 export 'multiple_choice_options_panel.dart';
 export 'edit_deck.sidebar.dart';
 export 'create_deck_tile.dart';
-export 'matching_type_editor.dart';
 export 'edit_deck.appbar.dart';
 export 'multiple_choice_option.dart';
-export 'edit_deck.editor_body.dart';
+export 'fill_in_the_blank.chip.dart';
+export 'matching_type.pair.dart';
+export 'matching_type.input.dart';
+export 'edit_deck.bottom_navbar.dart';

@@ -1,7 +1,7 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         CardType,
-        DeckCardFormState,
+        CardTemplateFormState,
         EditDeckController,
         EditDeckQuestionTypeHelper,
         QuestionType;
@@ -21,7 +21,7 @@ class EditDeckEditorController {
   final TextEditingController titleController;
   final QuestionType questionType;
 
-  DeckCardFormState get formState => deckController.formState;
+  CardTemplateFormState get formState => deckController.formState;
   String? get activeTemplateId => deckController.activeTemplateId;
   bool get hasActiveTemplate => activeTemplateId != null;
   bool get isSaving => deckController.isLoading;

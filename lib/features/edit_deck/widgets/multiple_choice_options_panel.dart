@@ -28,27 +28,24 @@ class MultipleChoiceOptionsPanel extends StatelessWidget {
               ),
             ],
           ),
-          Expanded(
-            child: ListView(
-              children: [
-                for (final option in options.asMap().entries) ...[
-                  EditMultipleChoiceOption(
-                    value: option.value.text,
-                    correct: option.value.isCorrect,
-                    showRadio: true,
-                    canRemove: options.length > 2,
-                    onCorrectChanged: () =>
-                        controller.selectCorrectOption(option.key),
-                    onTextChanged: (value) =>
-                        controller.updateOptionText(option.key, value),
-                    onRemove: () => controller.removeOption(option.key),
-                  ),
-                  const SizedBox(height: 14),
-                ],
+          Column(
+            children: [
+              for (final option in options.asMap().entries) ...[
+                EditMultipleChoiceOption(
+                  value: option.value.text,
+                  correct: option.value.isCorrect,
+                  showRadio: true,
+                  canRemove: options.length > 2,
+                  onCorrectChanged: () =>
+                      controller.selectCorrectOption(option.key),
+                  onTextChanged: (value) =>
+                      controller.updateOptionText(option.key, value),
+                  onRemove: () => controller.removeOption(option.key),
+                ),
+                const SizedBox(height: 14),
               ],
-            ),
+            ],
           ),
-          SizedBox(height: tokens.spaceLayoutGapSm),
           Button(
             leading: const Icon(Icons.add),
             variants: const [ButtonVariant.dashed, ButtonColor.dashed],

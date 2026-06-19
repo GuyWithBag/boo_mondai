@@ -1,5 +1,5 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show DeckCardFormState, MatchPairData, MatchPairHelper;
+    show CardTemplateFormState, MatchPairData, MatchPairHelper;
 import 'package:flutter_hooks/flutter_hooks.dart';
 
 class MatchingTypeEditorController {
@@ -8,7 +8,7 @@ class MatchingTypeEditorController {
     required this.pairs,
   });
 
-  final DeckCardFormState formState;
+  final CardTemplateFormState formState;
   final List<MatchPairData> pairs;
 
   void addPair() {
@@ -41,7 +41,7 @@ class MatchingTypeEditorController {
 }
 
 MatchingTypeEditorController useMatchingTypeEditor(
-  DeckCardFormState formState,
+  CardTemplateFormState formState,
 ) {
   final pairs = useValueListenable(formState.matchPairs);
 

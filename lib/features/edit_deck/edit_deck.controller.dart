@@ -8,7 +8,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         Controller,
         CardTemplate,
         Deck,
-        DeckCardFormState,
+        CardTemplateFormState,
         FlashcardTemplate,
         IdentificationTemplate,
         MultipleChoiceTemplate,
@@ -31,19 +31,18 @@ import 'package:boo_mondai/lib.barrel.dart'
 
 class EditDeckController extends Controller {
   EditDeckController({required String deckId, String? initialTemplateId}) {
+    _pendingInitialTemplateId = initialTemplateId;
     loadDeck(deckId);
-    if (initialTemplateId != null) {
-      selectTemplate(initialTemplateId);
-    }
   }
 
   Deck? _deck;
   List<CardTemplate> _templates = []; // Replaced _cards
   bool _isDirty = false;
+  String? _pendingInitialTemplateId;
 
   // Editor State
   String? _activeTemplateId; // Replaced _activeCardId
-  final DeckCardFormState formState = DeckCardFormState.empty();
+  final CardTemplateFormState formState = CardTemplateFormState.empty();
 
   // ── Getters ───────────────────────────────────────
 
@@ -73,6 +72,17 @@ class EditDeckController extends Controller {
     try {
       _deck = LocalDB.deck.selectByPk({'id': deckId});
       _templates = LocalDB.cardTemplate.getByDeckId(deckId);
+
+      final pendingInitialTemplateId = _pendingInitialTemplateId;
+      final initialTemplate = _templates.where((template) {
+        return template.id == pendingInitialTemplateId;
+      }).firstOrNull;
+      final templateToSelect = initialTemplate ?? _templates.firstOrNull;
+
+      _pendingInitialTemplateId = null;
+      if (templateToSelect != null) {
+        selectTemplate(templateToSelect.id);
+      }
     } on Exception catch (e) {
       setError(e);
     } finally {

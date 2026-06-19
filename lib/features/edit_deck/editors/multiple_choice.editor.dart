@@ -1,23 +1,26 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        DeckCardFormState,
+        CardTemplateFormState,
         TextFieldCard,
         MultipleChoiceOptionsPanel,
-        useMultipleChoiceEditor;
+        useMultipleChoiceEditor,
+        AppTokens;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'responsive_two_column.dart';
+import 'package:theme_variants/theme_variants.dart';
 
 class MultipleChoiceEditor extends HookWidget {
   const MultipleChoiceEditor({required this.formState, super.key});
 
-  final DeckCardFormState formState;
+  final CardTemplateFormState formState;
 
   @override
   Widget build(BuildContext context) {
     final editor = useMultipleChoiceEditor(formState);
+    final tokens = context.themeTokens<AppTokens>();
 
-    return ResponsiveTwoColumn(
+    return Column(
+      spacing: tokens.spaceLayoutGapMd,
       children: [
         TextFieldCard(
           title: 'Front (Prompt)',

@@ -1,4 +1,5 @@
-import 'package:boo_mondai/lib.barrel.dart' show CardType, DeckCardFormState;
+import 'package:boo_mondai/lib.barrel.dart'
+    show CardType, CardTemplateFormState;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
@@ -8,7 +9,7 @@ class FlashcardEditorController {
     required this.cardType,
   });
 
-  final DeckCardFormState formState;
+  final CardTemplateFormState formState;
   final CardType cardType;
 
   TextEditingController get frontController => formState.frontController;
@@ -27,7 +28,7 @@ class FlashcardEditorController {
   }
 }
 
-FlashcardEditorController useFlashcardEditor(DeckCardFormState formState) {
+FlashcardEditorController useFlashcardEditor(CardTemplateFormState formState) {
   final cardType = useValueListenable(formState.cardType);
 
   return FlashcardEditorController(formState: formState, cardType: cardType);

@@ -1,6 +1,6 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        DeckCardFormState,
+        CardTemplateFormState,
         MultipleChoiceOptionData,
         MultipleChoiceOptionHelper;
 import 'package:flutter/material.dart';
@@ -12,7 +12,7 @@ class MultipleChoiceEditorController {
     required this.options,
   });
 
-  final DeckCardFormState formState;
+  final CardTemplateFormState formState;
   final List<MultipleChoiceOptionData> options;
 
   TextEditingController get promptController => formState.frontController;
@@ -50,7 +50,7 @@ class MultipleChoiceEditorController {
 }
 
 MultipleChoiceEditorController useMultipleChoiceEditor(
-  DeckCardFormState formState,
+  CardTemplateFormState formState,
 ) {
   final options = useValueListenable(formState.multipleChoiceOptions);
 
