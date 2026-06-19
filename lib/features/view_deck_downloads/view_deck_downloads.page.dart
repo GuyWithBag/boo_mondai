@@ -4,8 +4,7 @@
 
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        ChangeReviewController,
-        ChangeReviewStatus,
+        ChangeTrackerController,
         DownloadsTile,
         EmptyState,
         ViewDeckDownloadsAppbar,
@@ -20,7 +19,7 @@ class ViewDeckDownloadsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => ViewDeckDownloadsController(
-        reviewController: context.read<ChangeReviewController>(),
+        reviewController: context.read<ChangeTrackerController>(),
       ),
       child: const _ViewDeckDownloadsView(),
     );
@@ -47,12 +46,12 @@ class _ViewDeckDownloadsView extends StatelessWidget {
           : ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                if (controller.activePlans.isNotEmpty) ...[
-                  for (final plan in controller.activePlans)
+                if (controller.activeEntries.isNotEmpty) ...[
+                  for (final plan in controller.activeEntries)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 16),
                       child: DownloadsTile(
-                        plan: plan,
+                        entry: plan,
                         progress: controller.progressForPlan(plan),
                         onPause: () => controller.pauseDownload(plan.id),
                         onResume: () => controller.resumeDownload(plan.id),
@@ -72,7 +71,7 @@ class _ViewDeckDownloadsView extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(bottom: 16),
                       child: DownloadsTile(
-                        plan: plan,
+                        entry: plan,
                         progress: 1.0,
                         localDeck: controller.localDeckForPlan(plan),
                         onDismiss: () => controller.dismissCompleted(plan.id),

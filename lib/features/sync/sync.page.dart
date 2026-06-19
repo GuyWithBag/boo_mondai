@@ -4,11 +4,11 @@
 
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        ChangeReviewPlan,
+        ChangeTrackerEntry,
         AppTokens,
-        ChangeReviewStatus,
+        ChangeTrackerStatus,
         ProgressBar,
-        ChangeSummaryChips,
+        ChangeTrackerSummaryChips,
         Button,
         ButtonColor;
 import 'package:flutter/material.dart'
@@ -40,13 +40,13 @@ import 'package:theme_variants/theme_variants.dart' show ThemeVariantsContext;
 class SyncPage extends StatelessWidget {
   const SyncPage({
     super.key,
-    required this.plan,
+    required this.entry,
     required this.onViewChanges,
     required this.onApply,
     required this.onDiscard,
   });
 
-  final ChangeReviewPlan plan;
+  final ChangeTrackerEntry entry;
   final VoidCallback onViewChanges;
   final VoidCallback onApply;
   final VoidCallback onDiscard;
@@ -54,13 +54,14 @@ class SyncPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final progress = (plan.progress ?? 0).clamp(0.0, 1.0);
+    final progress = (entry.progress ?? 0).clamp(0.0, 1.0);
 
-    final isAlreadyUpToDate = plan.status == ChangeReviewStatus.alreadyUpToDate;
-    final isReviewing = plan.status == ChangeReviewStatus.reviewing;
+    final isAlreadyUpToDate =
+        entry.status == ChangeTrackerStatus.alreadyUpToDate;
+    final isReviewing = entry.status == ChangeTrackerStatus.reviewing;
     final isComplete =
-        plan.status == ChangeReviewStatus.completed ||
-        plan.status == ChangeReviewStatus.results ||
+        entry.status == ChangeTrackerStatus.completed ||
+        entry.status == ChangeTrackerStatus.results ||
         isReviewing;
 
     // ── "Already up to date" state ───────────────────────────────────────────
@@ -168,7 +169,7 @@ class SyncPage extends StatelessWidget {
                     ProgressBar(value: progress),
                   ] else ...[
                     SizedBox(height: tokens.spaceLayoutGapMd.h),
-                    ChangeSummaryChips(plan: plan),
+                    ChangeTrackerSummaryChips(entry: entry),
                   ],
                   SizedBox(height: tokens.spaceLayoutGapLg.h),
                   if (isComplete) ...[

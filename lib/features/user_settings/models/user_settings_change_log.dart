@@ -2,9 +2,9 @@
 // enum UserSettingsChangeType { created, updated, skipped }
 
 // /// One user settings change entry for UI summaries and telemetry.
-// class UserSettingsChangeLog {
+// class UserSettingsChangeRecord {
 //   /// Creates a user settings change log row.
-//   const UserSettingsChangeLog({
+//   const UserSettingsChangeRecord({
 //     required this.type,
 //     required this.entityType,
 //     required this.entityId,
@@ -63,7 +63,7 @@
 //   final T value;
 
 //   /// Human-readable change logs.
-//   final List<UserSettingsChangeLog> changeLogs;
+//   final List<UserSettingsChangeRecord> changeLogs;
 
 //   /// Non-fatal failures encountered while applying the operation.
 //   final List<String> failures;

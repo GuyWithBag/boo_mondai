@@ -8,11 +8,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         DTO,
         HiveLocalDB,
         SupabaseRemoteDB,
-        ChangeLog,
-        ChangePlan,
+        ChangeRecord,
+        ChangePreview,
         ChangeResult,
-        ChangeReviewStatus,
-        ChangeReviewController,
+        ChangeTrackerStatus,
+        ChangeTrackerController,
         ChangeSource,
         ChangeType,
         SyncPlanPayload,
@@ -85,21 +85,21 @@ class SyncService {
     }
   }
 
-  /// Builds a sync preview and registers its apply step with the ChangeReviewController.
-  static Future<ChangePlan<SyncPlanPayload<T>>> sync<T extends DTO>({
+  /// Builds a sync preview and registers its apply step with the ChangeTrackerController.
+  static Future<ChangePreview<SyncPlanPayload<T>>> sync<T extends DTO>({
     required HiveLocalDB<T> localDb,
     required SupabaseRemoteDB<T> remoteDb,
     required String userId,
-    required ChangeReviewController reviewController,
+    required ChangeTrackerController reviewController,
     bool Function(T item)? localWhere,
   }) async {
-    late final ChangePlan<SyncPlanPayload<T>> syncPlan;
+    late final ChangePreview<SyncPlanPayload<T>> syncPlan;
 
     // 1. Force the _SyncPage loading screen to appear immediately
-    final reviewPlan = reviewController.start(
+    final entry = reviewController.start(
       source: ChangeSource.sync,
       title: 'Sync',
-      status: ChangeReviewStatus.previewing,
+      status: ChangeTrackerStatus.previewing,
       progress: 0.1,
       onApply: () async {
         // This captures the 'syncPlan' variable once it's populated below
@@ -126,13 +126,13 @@ class SyncService {
       // 3. IF NO SYNC NEEDED: Bail out instantly to the new status
       if (!isSyncNeeded) {
         reviewController.update(
-          reviewPlan.id,
-          status: ChangeReviewStatus.alreadyUpToDate,
+          entry.id,
+          status: ChangeTrackerStatus.alreadyUpToDate,
           progress: 1.0,
         );
 
         // Initialize the late variable to an empty state
-        syncPlan = ChangePlan(
+        syncPlan = ChangePreview(
           payload: SyncPlanPayload<T>(
             tableName: remoteDb.tableName,
             pullItems: const [],
@@ -145,7 +145,7 @@ class SyncService {
       }
 
       // 4. IF SYNC NEEDED: Do the heavy lifting (download and diff)
-      reviewController.update(reviewPlan.id, progress: 0.4);
+      reviewController.update(entry.id, progress: 0.4);
       syncPlan = await previewSync(
         localDb: localDb,
         remoteDb: remoteDb,
@@ -156,8 +156,8 @@ class SyncService {
       // 5. Double check (just in case previewSync found no actionable changes)
       if (syncPlan.changes.isEmpty) {
         reviewController.update(
-          reviewPlan.id,
-          status: ChangeReviewStatus.alreadyUpToDate,
+          entry.id,
+          status: ChangeTrackerStatus.alreadyUpToDate,
           progress: 1.0,
         );
         return syncPlan;
@@ -165,15 +165,15 @@ class SyncService {
 
       // 6. We have confirmed changes! Move to reviewing so the user can Apply.
       reviewController.update(
-        reviewPlan.id,
-        status: ChangeReviewStatus.reviewing,
+        entry.id,
+        status: ChangeTrackerStatus.reviewing,
         progress: 1.0,
         changes: syncPlan.changes,
       );
 
       return syncPlan;
     } catch (e) {
-      reviewController.fail(reviewPlan.id, e);
+      reviewController.fail(entry.id, e);
 
       if (e is SyncException) rethrow;
       throw SyncException(
@@ -184,7 +184,7 @@ class SyncService {
   }
 
   /// Previews pull/push decisions without mutating local or remote data.
-  static Future<ChangePlan<SyncPlanPayload<T>>> previewSync<T extends DTO>({
+  static Future<ChangePreview<SyncPlanPayload<T>>> previewSync<T extends DTO>({
     required HiveLocalDB<T> localDb,
     required SupabaseRemoteDB<T> remoteDb,
     required String userId,
@@ -192,7 +192,7 @@ class SyncService {
   }) async {
     try {
       _ensureAuthenticated(userId: userId);
-      final changes = <ChangeLog>[];
+      final changes = <ChangeRecord>[];
       final pullItems = <T>[];
       final pushItems = <T>[];
       var skipped = 0;
@@ -209,7 +209,7 @@ class SyncService {
         if (local == null) {
           pullItems.add(remote);
           changes.add(
-            ChangeLog(
+            ChangeRecord(
               type: ChangeType.added,
               source: ChangeSource.sync,
               entityType: remoteDb.tableName,
@@ -225,7 +225,7 @@ class SyncService {
         if (_isStrictlyAfterMs(remote.updatedAt, local.updatedAt)) {
           pullItems.add(remote);
           changes.add(
-            ChangeLog(
+            ChangeRecord(
               type: ChangeType.modified,
               source: ChangeSource.sync,
               entityType: remoteDb.tableName,
@@ -247,7 +247,7 @@ class SyncService {
         if (remote == null) {
           pushItems.add(local);
           changes.add(
-            ChangeLog(
+            ChangeRecord(
               type: ChangeType.added,
               source: ChangeSource.sync,
               entityType: remoteDb.tableName,
@@ -263,7 +263,7 @@ class SyncService {
         if (_isStrictlyAfterMs(local.updatedAt, remote.updatedAt)) {
           pushItems.add(local);
           changes.add(
-            ChangeLog(
+            ChangeRecord(
               type: ChangeType.modified,
               source: ChangeSource.sync,
               entityType: remoteDb.tableName,
@@ -278,7 +278,7 @@ class SyncService {
         }
       }
 
-      return ChangePlan(
+      return ChangePreview(
         payload: SyncPlanPayload<T>(
           tableName: remoteDb.tableName,
           pullItems: pullItems,
@@ -297,7 +297,7 @@ class SyncService {
 
   /// Applies a previously previewed sync plan.
   static Future<ChangeResult<SyncSummary>> applySync<T extends DTO>({
-    required ChangePlan<SyncPlanPayload<T>> plan,
+    required ChangePreview<SyncPlanPayload<T>> plan,
     required HiveLocalDB<T> localDb,
     required SupabaseRemoteDB<T> remoteDb,
   }) async {

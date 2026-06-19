@@ -3,3 +3,4 @@
 // Other files
 export 'import_export_backup.dto.dart';
 export 'import_export_result.dart';
+export 'import_export_file_status.dart';

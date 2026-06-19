@@ -4,18 +4,18 @@
 
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        ChangeReviewPlan,
-        ChangeReviewStatus,
+        ChangeTrackerEntry,
+        ChangeTrackerStatus,
         Button,
         Deck,
-        showViewDeckLocalSheet;
+        showViewDeckSingleSheet;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart' show Surface;
 
 class DownloadsTile extends StatelessWidget {
   const DownloadsTile({
     super.key,
-    required this.plan,
+    required this.entry,
     required this.progress,
     this.localDeck,
     this.onPause,
@@ -24,7 +24,7 @@ class DownloadsTile extends StatelessWidget {
     this.onDismiss,
   });
 
-  final ChangeReviewPlan plan;
+  final ChangeTrackerEntry entry;
   final double progress;
   final Deck? localDeck;
   final VoidCallback? onPause;
@@ -33,12 +33,12 @@ class DownloadsTile extends StatelessWidget {
   final VoidCallback? onDismiss;
 
   String get _statusLabel {
-    return switch (plan.status) {
-      ChangeReviewStatus.previewing => 'Fetching deck info...',
-      ChangeReviewStatus.applying => _applyingLabel,
-      ChangeReviewStatus.paused => 'Paused — ${_percentLabel}',
-      ChangeReviewStatus.completed => _completedLabel,
-      ChangeReviewStatus.failed => 'Download failed.',
+    return switch (entry.status) {
+      ChangeTrackerStatus.previewing => 'Fetching deck info...',
+      ChangeTrackerStatus.applying => _applyingLabel,
+      ChangeTrackerStatus.paused => 'Paused — $_percentLabel',
+      ChangeTrackerStatus.completed => _completedLabel,
+      ChangeTrackerStatus.failed => 'Download failed.',
       _ => 'Canceled.',
     };
   }
@@ -53,20 +53,20 @@ class DownloadsTile extends StatelessWidget {
   String get _percentLabel => '${(progress * 100).round()}%';
 
   String get _completedLabel {
-    final cardCount = plan.changes
+    final cardCount = entry.changes
         .where((c) => c.entityType == 'card_template')
         .length;
     return 'Downloaded $cardCount card${cardCount == 1 ? '' : 's'}.';
   }
 
   bool get _isActive =>
-      plan.status == ChangeReviewStatus.previewing ||
-      plan.status == ChangeReviewStatus.applying ||
-      plan.status == ChangeReviewStatus.paused;
+      entry.status == ChangeTrackerStatus.previewing ||
+      entry.status == ChangeTrackerStatus.applying ||
+      entry.status == ChangeTrackerStatus.paused;
 
-  bool get _isPaused => plan.status == ChangeReviewStatus.paused;
-  bool get _isCompleted => plan.status == ChangeReviewStatus.completed;
-  bool get _isFailed => plan.status == ChangeReviewStatus.failed;
+  bool get _isPaused => entry.status == ChangeTrackerStatus.paused;
+  bool get _isCompleted => entry.status == ChangeTrackerStatus.completed;
+  bool get _isFailed => entry.status == ChangeTrackerStatus.failed;
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +81,7 @@ class DownloadsTile extends StatelessWidget {
               height: 64,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
-                color: Theme.of(context).colorScheme.surfaceVariant,
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
               ),
               child: const Icon(Icons.layers_rounded),
             ),
@@ -93,7 +93,7 @@ class DownloadsTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    plan.title,
+                    entry.title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.titleSmall,
@@ -127,7 +127,7 @@ class DownloadsTile extends StatelessWidget {
               ),
             ] else if (_isCompleted && localDeck != null) ...[
               Button(
-                onPressed: () => showViewDeckLocalSheet(context, localDeck!),
+                onPressed: () => showViewDeckSingleSheet(context, localDeck!),
                 child: const Text('VIEW DECK'),
               ),
               Button.icon(

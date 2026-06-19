@@ -19,13 +19,13 @@ import/export are all producers of one shared change-review model.
 
 ## Naming Decision
 
-There is no longer a need for `SyncChangeLog`.
+There is no longer a need for `SyncChangeRecord`.
 
 Delete:
 
 - `lib/features/sync/models/sync_change_log.dart`
 - `lib/features/sync/models/sync_change_type.dart`
-- `ImportExportChangeLog`
+- `ImportExportChangeRecord`
 - `ImportExportChangeType`
 
 Replace them with a generic change-review model, probably under:
@@ -36,14 +36,14 @@ lib/features/change_review/
 
 Use names like:
 
-- `ChangeLog`
+- `ChangeRecord`
 - `ChangeType`
 - `ChangeReviewPlan`
 - `ChangeReviewItem`
 - `ChangeFieldDiff`
 
-`SyncChangeLog` is too narrow because downloads and import/export need the same
-representation. `ImportExportChangeLog` is also too narrow because it is only a
+`SyncChangeRecord` is too narrow because downloads and import/export need the same
+representation. `ImportExportChangeRecord` is also too narrow because it is only a
 message log and does not carry enough structured before/after data for the new
 UI.
 
@@ -99,8 +99,8 @@ class ChangeFieldDiff {
   final Object? after;
 }
 
-class ChangeLog {
-  const ChangeLog({
+class ChangeRecord {
+  const ChangeRecord({
     required this.type,
     required this.source,
     required this.entityType,
@@ -138,7 +138,7 @@ class ChangeReviewPlan {
   final ChangeSource source;
   final String title;
   final ChangeReviewStatus status;
-  final List<ChangeLog> changes;
+  final List<ChangeRecord> changes;
   final double? progress;
   final String? errorMessage;
 
@@ -161,7 +161,7 @@ Responsibilities:
 - hold active and completed `ChangeReviewPlan`s in memory
 - update status and progress
 - attach structured changes
-- expose `activePlans`, `plans`, and `planById`
+- expose `activeEntries`, `entries`, and `entryById`
 - notify pages when status/progress/changes update
 
 This replaces sync-specific operation state. The sync feature can still start a
@@ -179,11 +179,11 @@ Current files to change:
 
 Changes:
 
-1. Remove `SyncChangeLog` and `SyncChangeType`.
-2. Make `SyncResult.changes` use `List<ChangeLog>`.
+1. Remove `SyncChangeRecord` and `SyncChangeType`.
+2. Make `SyncResult.changes` use `List<ChangeRecord>`.
 3. Make `SyncOperation` either disappear or become a thin wrapper around
    `ChangeReviewPlan`.
-4. Change `SyncService.pull` and `SyncService.push` to emit `ChangeLog`.
+4. Change `SyncService.pull` and `SyncService.push` to emit `ChangeRecord`.
 5. Use `ChangeType.added` for remote/local records that did not exist.
 6. Use `ChangeType.modified` for newer records replacing older records.
 7. Use `ChangeType.skipped` only for records intentionally ignored.
@@ -210,7 +210,7 @@ Current files to change:
 
 Changes:
 
-1. Replace `List<SyncChangeLog>` with `List<ChangeLog>`.
+1. Replace `List<SyncChangeRecord>` with `List<ChangeRecord>`.
 2. Map download changes to `ChangeSource.deckDownload`.
 3. Emit `ChangeType.added` for a new local deck and copied card templates.
 4. Emit `ChangeType.modified` when the published deck/card is newer.
@@ -249,11 +249,11 @@ model instead of adapting around it.
 
 Changes:
 
-1. Delete `ImportExportChangeLog` and `ImportExportChangeType`.
+1. Delete `ImportExportChangeRecord` and `ImportExportChangeType`.
 2. Rename the file or move shared pieces into `change_review`.
 3. Change `ImportExportResult<T>` and `ImportExportBatchResult<T>` to use
-   `List<ChangeLog> changes`.
-4. Replace controller state `latestChangeLogs` with `latestChanges`.
+   `List<ChangeRecord> changes`.
+4. Replace controller state `latestChangeRecords` with `latestChanges`.
 5. Update backup JSON from old message logs to serialized generic change logs.
 6. For card import preview, emit structured changes before applying decisions.
 7. For deck import/update, emit deck field diffs and card template changes.
@@ -389,10 +389,10 @@ Skipped changes can use neutral text/border tokens.
 ## Implementation Order
 
 1. Create `change_review` models and store.
-2. Remove `SyncChangeLog` and `ImportExportChangeLog`.
-3. Convert sync result models to generic `ChangeLog`.
-4. Convert deck download plans/results to generic `ChangeLog`.
-5. Convert import/export result and batch result to generic `ChangeLog`.
+2. Remove `SyncChangeRecord` and `ImportExportChangeRecord`.
+3. Convert sync result models to generic `ChangeRecord`.
+4. Convert deck download entries/results to generic `ChangeRecord`.
+5. Convert import/export result and batch result to generic `ChangeRecord`.
 6. Add `ChangeReviewDiffService` for deck/template/tag diffs.
 7. Build the three UI states from the design images.
 8. Add `/change-review/:planId` route.
@@ -409,9 +409,9 @@ Skipped changes can use neutral text/border tokens.
 
 ## Acceptance Criteria
 
-- No `SyncChangeLog` remains.
-- No `ImportExportChangeLog` remains.
-- Sync, deck downloads, and import/export all produce `List<ChangeLog>`.
+- No `SyncChangeRecord` remains.
+- No `ImportExportChangeRecord` remains.
+- Sync, deck downloads, and import/export all produce `List<ChangeRecord>`.
 - The change review page can render added, modified, and removed counts.
 - Added uses success colors.
 - Modified uses hard colors.

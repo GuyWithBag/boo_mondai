@@ -12,12 +12,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         FlashcardTemplate,
         IdentificationTemplate,
         ImportCardMatchCandidate,
-        ChangePlan,
+        ChangePreview,
         ImportCardsPayload,
         ImportExportBackup,
         ChangeBatchResult,
-        ChangeLog,
-        ChangeReviewDiffService,
+        ChangeRecord,
+        ChangeComparer,
         ChangeSource,
         ChangeType,
         ChangeResult,
@@ -48,7 +48,7 @@ class ImportExportService {
     final templates = LocalDB.cardTemplate.getByDeckId(deckId);
     final payload = _buildDeckPayload(deck: deck, templates: templates);
     final logs = [
-      ChangeLog(
+      ChangeRecord(
         type: ChangeType.added,
         source: ChangeSource.importExport,
         entityType: 'deck',
@@ -75,7 +75,7 @@ class ImportExportService {
   ) async {
     final values = <Map<String, dynamic>>[];
     final failures = <String>[];
-    final logs = <ChangeLog>[];
+    final logs = <ChangeRecord>[];
 
     for (final deckId in deckIds) {
       try {
@@ -115,7 +115,7 @@ class ImportExportService {
     };
 
     final logs = [
-      ChangeLog(
+      ChangeRecord(
         type: ChangeType.added,
         source: ChangeSource.importExport,
         entityType: 'card_templates',
@@ -149,11 +149,11 @@ class ImportExportService {
     final incomingDeck = DeckMapper.fromMap(deckMap);
     final incomingTemplateMaps = _extractTemplateMaps(payload);
     final incomingTemplates = _decodeTemplates(incomingTemplateMaps);
-    final logs = <ChangeLog>[];
+    final logs = <ChangeRecord>[];
 
     if (mode == DeckImportMode.skip) {
       logs.add(
-        ChangeLog(
+        ChangeRecord(
           type: ChangeType.skipped,
           source: ChangeSource.importExport,
           entityType: 'deck',
@@ -197,7 +197,7 @@ class ImportExportService {
       );
 
       logs.add(
-        ChangeLog(
+        ChangeRecord(
           type: ChangeType.modified,
           source: ChangeSource.importExport,
           entityType: 'deck',
@@ -206,7 +206,7 @@ class ImportExportService {
           subtitle: '${copiedTemplates.length} imported cards',
           before: target,
           after: updatedDeck,
-          fields: ChangeReviewDiffService.diffDecks(target, updatedDeck),
+          fields: ChangeComparer.decks(target, updatedDeck),
         ),
       );
 
@@ -248,7 +248,7 @@ class ImportExportService {
     );
 
     logs.add(
-      ChangeLog(
+      ChangeRecord(
         type: ChangeType.added,
         source: ChangeSource.importExport,
         entityType: 'deck',
@@ -292,7 +292,7 @@ class ImportExportService {
   }) async {
     final values = <Deck?>[];
     final failures = <String>[];
-    final logs = <ChangeLog>[];
+    final logs = <ChangeRecord>[];
 
     for (var i = 0; i < payloads.length; i++) {
       try {
@@ -340,7 +340,7 @@ class ImportExportService {
   }
 
   /// Previews card import and detects likely update candidates.
-  static Future<ChangePlan<ImportCardsPayload>> previewCardImport({
+  static Future<ChangePreview<ImportCardsPayload>> previewCardImport({
     required String deckId,
     required List<Map<String, dynamic>> incomingTemplateMaps,
     CardSimilarityConfig similarity = const CardSimilarityConfig(),
@@ -348,7 +348,7 @@ class ImportExportService {
     final incoming = _decodeTemplates(incomingTemplateMaps);
     final existing = LocalDB.cardTemplate.getByDeckId(deckId);
     final candidates = <ImportCardMatchCandidate>[];
-    final changes = <ChangeLog>[];
+    final changes = <ChangeRecord>[];
 
     for (final template in incoming) {
       final incomingPreview = _templatePreview(template);
@@ -388,26 +388,26 @@ class ImportExportService {
           (template) => template.id == existingTemplateId,
         );
         changes.add(
-          ChangeLog(
+          ChangeRecord(
             type: ChangeType.modified,
             source: ChangeSource.importExport,
             entityType: 'card_template',
             entityId: local.id,
-            title: ChangeReviewDiffService.templateTitle(local),
+            title: ChangeComparer.templateTitle(local),
             subtitle: 'Likely imported card update',
             before: local,
             after: template,
-            fields: ChangeReviewDiffService.diffTemplates(local, template),
+            fields: ChangeComparer.templates(local, template),
           ),
         );
       } else {
         changes.add(
-          ChangeLog(
+          ChangeRecord(
             type: ChangeType.added,
             source: ChangeSource.importExport,
             entityType: 'card_template',
             entityId: template.id,
-            title: ChangeReviewDiffService.templateTitle(template),
+            title: ChangeComparer.templateTitle(template),
             subtitle: 'Imported card will be added',
             after: template,
           ),
@@ -415,7 +415,7 @@ class ImportExportService {
       }
     }
 
-    return ChangePlan<ImportCardsPayload>(
+    return ChangePreview<ImportCardsPayload>(
       payload: ImportCardsPayload(
         deckId: deckId,
         incomingTemplates: incomingTemplateMaps,
@@ -426,7 +426,7 @@ class ImportExportService {
   }
 
   /// JSON helper for [previewCardImport].
-  static Future<ChangePlan<ImportCardsPayload>> previewCardImportJson({
+  static Future<ChangePreview<ImportCardsPayload>> previewCardImportJson({
     required String deckId,
     required String rawJson,
     CardSimilarityConfig similarity = const CardSimilarityConfig(),
@@ -456,10 +456,10 @@ class ImportExportService {
 
   /// Applies card import decisions and returns detailed change logs.
   static Future<ChangeResult<List<CardTemplate>>> applyCardImportPlan({
-    required ChangePlan<ImportCardsPayload> plan,
+    required ChangePreview<ImportCardsPayload> plan,
     required List<CardImportDecision> decisions,
   }) async {
-    final logs = <ChangeLog>[];
+    final logs = <ChangeRecord>[];
     final payload = plan.payload;
     final incoming = _decodeTemplates(payload.incomingTemplates);
     final decisionByIncomingId = {
@@ -471,12 +471,12 @@ class ImportExportService {
       final decision = decisionByIncomingId[template.id];
       if (decision?.action == CardImportAction.skip) {
         logs.add(
-          ChangeLog(
+          ChangeRecord(
             type: ChangeType.skipped,
             source: ChangeSource.importExport,
             entityType: 'card_template',
             entityId: template.id,
-            title: ChangeReviewDiffService.templateTitle(template),
+            title: ChangeComparer.templateTitle(template),
             subtitle: 'Skipped imported card',
             after: template,
           ),
@@ -491,7 +491,7 @@ class ImportExportService {
         });
         if (existing == null) {
           logs.add(
-            ChangeLog(
+            ChangeRecord(
               type: ChangeType.skipped,
               source: ChangeSource.importExport,
               entityType: 'card_template',
@@ -512,16 +512,16 @@ class ImportExportService {
         await LocalDB.cardTemplate.upsert(updated);
         written.add(updated);
         logs.add(
-          ChangeLog(
+          ChangeRecord(
             type: ChangeType.modified,
             source: ChangeSource.importExport,
             entityType: 'card_template',
             entityId: existing.id,
-            title: ChangeReviewDiffService.templateTitle(updated),
+            title: ChangeComparer.templateTitle(updated),
             subtitle: 'Updated imported card',
             before: existing,
             after: updated,
-            fields: ChangeReviewDiffService.diffTemplates(existing, updated),
+            fields: ChangeComparer.templates(existing, updated),
           ),
         );
         continue;
@@ -536,12 +536,12 @@ class ImportExportService {
       await LocalDB.cardTemplate.upsert(created);
       written.add(created);
       logs.add(
-        ChangeLog(
+        ChangeRecord(
           type: ChangeType.added,
           source: ChangeSource.importExport,
           entityType: 'card_template',
           entityId: created.id,
-          title: ChangeReviewDiffService.templateTitle(created),
+          title: ChangeComparer.templateTitle(created),
           subtitle: 'Imported new card',
           after: created,
         ),
@@ -832,7 +832,7 @@ class ImportExportService {
     required String? entityId,
     required String title,
     required Map<String, dynamic> payload,
-    required List<ChangeLog> logs,
+    required List<ChangeRecord> logs,
   }) async {
     final backup = ImportExportBackup(
       id: uuid.v7(),

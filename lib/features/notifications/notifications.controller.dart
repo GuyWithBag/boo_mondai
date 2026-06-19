@@ -11,7 +11,7 @@ import 'package:boo_mondai/lib.barrel.dart'
 /// Reads [SettingsController] to know what to schedule, delegates all
 /// plugin calls to [NotificationsService].
 ///
-/// **Provider placement:** above the router, alongside [ChangeReviewController]
+/// **Provider placement:** above the router, alongside [ChangeTrackerController]
 /// and [SettingsController].
 ///
 /// **Wiring [SettingsController]:**

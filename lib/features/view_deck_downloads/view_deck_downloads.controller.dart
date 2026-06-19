@@ -5,13 +5,12 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         Controller,
-        ChangeReviewController,
-        ChangeReviewPlan,
-        ChangeReviewStatus,
+        ChangeTrackerController,
+        ChangeTrackerEntry,
+        ChangeTrackerStatus,
         ChangeSource,
         DeckDownloadsService,
         DownloadCheckpointLocalDB,
-        DownloadCheckpointStatus,
         LocalDB,
         Deck;
 
@@ -26,16 +25,16 @@ class ViewDeckDownloadsController extends Controller {
     _autoResumeInterruptedDownloads();
   }
 
-  final ChangeReviewController reviewController;
+  final ChangeTrackerController reviewController;
   final DeckDownloadsService _downloadsService;
   final DownloadCheckpointLocalDB _checkpointDB;
 
-  List<ChangeReviewPlan> _activePlans = [];
-  List<ChangeReviewPlan> _completedPlans = [];
+  List<ChangeTrackerEntry> _activeEntries = [];
+  List<ChangeTrackerEntry> _completedPlans = [];
 
-  List<ChangeReviewPlan> get activePlans => _activePlans;
-  List<ChangeReviewPlan> get completedPlans => _completedPlans;
-  bool get isEmpty => _activePlans.isEmpty && _completedPlans.isEmpty;
+  List<ChangeTrackerEntry> get activeEntries => _activeEntries;
+  List<ChangeTrackerEntry> get completedPlans => _completedPlans;
+  bool get isEmpty => _activeEntries.isEmpty && _completedPlans.isEmpty;
 
   // ── Auto-resume ───────────────────────────────────────────────────────────
 
@@ -62,14 +61,14 @@ class ViewDeckDownloadsController extends Controller {
       final plan = reviewController.start(
         source: ChangeSource.deckDownload,
         title: checkpoint.deckTitle,
-        status: ChangeReviewStatus.applying,
+        status: ChangeTrackerStatus.applying,
         progress: checkpoint.progress,
       );
 
       _downloadsService.downloadDeck(
         localDeck,
         reviewController,
-        resumePlanId: plan.id,
+        resumeEntryId: plan.id,
       );
     }
   }
@@ -77,32 +76,32 @@ class ViewDeckDownloadsController extends Controller {
   // ── Plan list ─────────────────────────────────────────────────────────────
 
   void _onReviewChanged() {
-    final all = reviewController.plans
+    final all = reviewController.entries
         .where((p) => p.source == ChangeSource.deckDownload)
         .toList();
 
-    _activePlans = all.where((p) => _isActive(p.status)).toList();
+    _activeEntries = all.where((p) => _isActive(p.status)).toList();
     _completedPlans = all
-        .where((p) => p.status == ChangeReviewStatus.completed)
+        .where((p) => p.status == ChangeTrackerStatus.completed)
         .toList();
     notifyListeners();
   }
 
-  static bool _isActive(ChangeReviewStatus status) =>
-      status == ChangeReviewStatus.previewing ||
-      status == ChangeReviewStatus.applying ||
-      status == ChangeReviewStatus.paused ||
-      status == ChangeReviewStatus.reviewing;
+  static bool _isActive(ChangeTrackerStatus status) =>
+      status == ChangeTrackerStatus.previewing ||
+      status == ChangeTrackerStatus.applying ||
+      status == ChangeTrackerStatus.paused ||
+      status == ChangeTrackerStatus.reviewing;
 
   // ── Actions ───────────────────────────────────────────────────────────────
 
-  void pauseDownload(String planId) {
-    _downloadsService.pauseDownload(planId);
-    reviewController.pause(planId);
+  void pauseDownload(String entryId) {
+    _downloadsService.pauseDownload(entryId);
+    reviewController.pause(entryId);
   }
 
-  void resumeDownload(String planId) {
-    final plan = reviewController.planById(planId);
+  void resumeDownload(String entryId) {
+    final plan = reviewController.entryById(entryId);
     if (plan == null) return;
 
     // Find the source deck via checkpoint
@@ -117,14 +116,14 @@ class ViewDeckDownloadsController extends Controller {
         .firstOrNull;
     if (localDeck == null) return;
 
-    reviewController.resume(planId);
-    _downloadsService.resumeDownload(localDeck, reviewController, planId);
+    reviewController.resume(entryId);
+    _downloadsService.resumeDownload(localDeck, reviewController, entryId);
   }
 
-  void cancelDownload(String planId) {
-    _downloadsService.pauseDownload(planId); // stop the loop first
-    reviewController.cancel(planId);
-    reviewController.remove(planId);
+  void cancelDownload(String entryId) {
+    _downloadsService.pauseDownload(entryId); // stop the loop first
+    reviewController.cancel(entryId);
+    reviewController.remove(entryId);
 
     // Clean up checkpoint
     final checkpoint =
@@ -135,13 +134,13 @@ class ViewDeckDownloadsController extends Controller {
     }
   }
 
-  void dismissCompleted(String planId) {
-    reviewController.remove(planId);
+  void dismissCompleted(String entryId) {
+    reviewController.remove(entryId);
   }
 
   /// Returns the local deck for a completed plan, found via sourceDeckId.
-  Deck? localDeckForPlan(ChangeReviewPlan plan) {
-    final deckChange = plan.changes
+  Deck? localDeckForPlan(ChangeTrackerEntry entry) {
+    final deckChange = entry.changes
         .where((c) => c.entityType == 'deck')
         .firstOrNull;
     final remoteId = deckChange?.remoteId;
@@ -152,9 +151,9 @@ class ViewDeckDownloadsController extends Controller {
   }
 
   /// Progress for a plan, falling back to checkpoint if plan has none yet.
-  double progressForPlan(ChangeReviewPlan plan) {
-    if ((plan.progress ?? 0) > 0) return plan.progress!;
-    final deckChange = plan.changes
+  double progressForPlan(ChangeTrackerEntry entry) {
+    if ((entry.progress ?? 0) > 0) return entry.progress!;
+    final deckChange = entry.changes
         .where((c) => c.entityType == 'deck')
         .firstOrNull;
     final remoteId = deckChange?.remoteId;

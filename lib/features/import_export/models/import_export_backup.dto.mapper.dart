@@ -55,7 +55,7 @@ class ImportExportBackupMapper extends ClassMapperBase<ImportExportBackup> {
   static const Field<ImportExportBackup, String> _f$changeLogsJson = Field(
     'changeLogsJson',
     _$changeLogsJson,
-    key: r'change_logs_json',
+    key: r'change_records_json',
   );
   static DateTime _$createdAt(ImportExportBackup v) => v.createdAt;
   static const Field<ImportExportBackup, DateTime> _f$createdAt = Field(

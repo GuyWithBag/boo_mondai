@@ -215,7 +215,7 @@ lib/features/import_export/
   import_export_plan.md
   models/
     import_export_backup.dto.dart
-    import_export_change_log.dart
+    import_export_change_record.dart
     import_export_options.dart
     import_export_payload.dart
     import_export_plan.dart

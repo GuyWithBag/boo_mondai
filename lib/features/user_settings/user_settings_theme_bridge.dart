@@ -99,9 +99,9 @@
 //       radiusSurface: radiusScale == null
 //           ? null
 //           : theme.tokens.radiusSurface * radiusScale,
-//       radiusSurfaceSm: radiusScale == null
+//       radiusSurfaceXsm: radiusScale == null
 //           ? null
-//           : theme.tokens.radiusSurfaceSm * radiusScale,
+//           : theme.tokens.radiusSurfaceXsm * radiusScale,
 //       spacePanelPadding: spacingScale == null
 //           ? null
 //           : theme.tokens.spaceLayoutPadding * spacingScale,

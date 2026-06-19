@@ -10,7 +10,7 @@
 //         ThemeOverrideMapper,
 //         UserSettings,
 //         CustomThemePresetMapper,
-//         UserSettingsChangeLog,
+//         UserSettingsChangeRecord,
 //         UserSettingsChangeType,
 //         UserSettingsExportOptions,
 //         UserSettingsImportMode,
@@ -177,7 +177,7 @@
 //     return UserSettingsOperationResult(
 //       value: payload,
 //       changeLogs: [
-//         UserSettingsChangeLog(
+//         UserSettingsChangeRecord(
 //           type: UserSettingsChangeType.created,
 //           entityType: 'user_settings',
 //           entityId: settings.id,
@@ -207,7 +207,7 @@
 //     UserSettingsImportMode mode = UserSettingsImportMode.mergeCurrent,
 //   }) async {
 //     final current = await getOrCreateForUser(userId);
-//     final logs = <UserSettingsChangeLog>[];
+//     final logs = <UserSettingsChangeRecord>[];
 //     final failures = <String>[];
 //     final now = DateTime.now();
 
@@ -229,7 +229,7 @@
 //             rawThemeMode == 'dark')) {
 //       themeModeName = rawThemeMode;
 //       logs.add(
-//         UserSettingsChangeLog(
+//         UserSettingsChangeRecord(
 //           type: UserSettingsChangeType.updated,
 //           entityType: 'user_settings',
 //           entityId: current.id,
@@ -242,7 +242,7 @@
 //     if (rawLightPreset is String && rawLightPreset.trim().isNotEmpty) {
 //       lightThemePresetId = rawLightPreset.trim();
 //       logs.add(
-//         UserSettingsChangeLog(
+//         UserSettingsChangeRecord(
 //           type: UserSettingsChangeType.updated,
 //           entityType: 'user_settings',
 //           entityId: current.id,
@@ -255,7 +255,7 @@
 //     if (rawDarkPreset is String && rawDarkPreset.trim().isNotEmpty) {
 //       darkThemePresetId = rawDarkPreset.trim();
 //       logs.add(
-//         UserSettingsChangeLog(
+//         UserSettingsChangeRecord(
 //           type: UserSettingsChangeType.updated,
 //           entityType: 'user_settings',
 //           entityId: current.id,
@@ -268,7 +268,7 @@
 //     if (rawOverride is Map<String, dynamic>) {
 //       themeOverride = ThemeOverrideMapper.fromMap(rawOverride);
 //       logs.add(
-//         UserSettingsChangeLog(
+//         UserSettingsChangeRecord(
 //           type: UserSettingsChangeType.updated,
 //           entityType: 'theme_override',
 //           entityId: current.id,
@@ -280,7 +280,7 @@
 //         Map<String, dynamic>.from(rawOverride),
 //       );
 //       logs.add(
-//         UserSettingsChangeLog(
+//         UserSettingsChangeRecord(
 //           type: UserSettingsChangeType.updated,
 //           entityType: 'theme_override',
 //           entityId: current.id,
@@ -320,7 +320,7 @@
 //       }
 
 //       logs.add(
-//         UserSettingsChangeLog(
+//         UserSettingsChangeRecord(
 //           type: UserSettingsChangeType.updated,
 //           entityType: 'custom_theme_preset',
 //           entityId: current.id,

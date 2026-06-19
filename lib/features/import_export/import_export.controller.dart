@@ -7,15 +7,39 @@ import 'package:boo_mondai/lib.barrel.dart'
         Controller,
         Deck,
         DeckImportMode,
-        ChangePlan,
+        ChangePreview,
         ImportCardsPayload,
-        ChangeLog,
+        ChangeRecord,
         ImportExportService;
+import 'package:file_picker/file_picker.dart';
+
+enum ImportFileStatus {
+  canceled,
+  imported,
+  unreadableFile,
+  unsupportedFormat,
+  failed,
+}
+
+class ImportFileResult<T> {
+  const ImportFileResult({
+    required this.status,
+    this.items = const [],
+    this.error,
+  });
+
+  final ImportFileStatus status;
+  final List<T> items;
+  final Exception? error;
+
+  bool get didImport => status == ImportFileStatus.imported;
+  int get importedCount => items.length;
+}
 
 /// UI-facing state holder for import/export workflows.
 class ImportExportController extends Controller {
-  ChangePlan<ImportCardsPayload>? currentPlan;
-  List<ChangeLog> latestChanges = const [];
+  ChangePreview<ImportCardsPayload>? currentPlan;
+  List<ChangeRecord> latestChanges = const [];
   List<String> latestFailures = const [];
 
   /// Exports one deck and stores change logs.
@@ -135,6 +159,74 @@ class ImportExportController extends Controller {
     }
   }
 
+  Future<ImportFileResult<Deck>> importDecksFromFile() async {
+    final result = await FilePicker.pickFiles(
+      dialogTitle: 'Import decks',
+      type: FileType.custom,
+      allowedExtensions: const ['json'],
+      withData: true,
+    );
+    if (result == null || result.files.isEmpty) {
+      return const ImportFileResult(status: ImportFileStatus.canceled);
+    }
+
+    final bytes = result.files.single.bytes;
+    if (bytes == null) {
+      return const ImportFileResult(status: ImportFileStatus.unreadableFile);
+    }
+
+    try {
+      final rawJson = utf8.decode(bytes);
+      final decoded = jsonDecode(rawJson);
+      final imported = await _importDecodedDecksJson(
+        rawJson: rawJson,
+        decoded: decoded,
+      );
+
+      final currentError = error;
+      if (currentError != null) {
+        return ImportFileResult(
+          status: ImportFileStatus.failed,
+          error: currentError,
+        );
+      }
+
+      return ImportFileResult(
+        status: ImportFileStatus.imported,
+        items: imported,
+      );
+    } on FormatException catch (e) {
+      return ImportFileResult(
+        status: ImportFileStatus.unsupportedFormat,
+        error: e,
+      );
+    } on Exception catch (e) {
+      return ImportFileResult(status: ImportFileStatus.failed, error: e);
+    }
+  }
+
+  Future<List<Deck>> _importDecodedDecksJson({
+    required String rawJson,
+    required Object? decoded,
+  }) async {
+    if (decoded is Map<String, dynamic>) {
+      if (decoded.containsKey('decks')) {
+        final imported = await importDecksJson(rawJson: rawJson);
+        return imported.whereType<Deck>().toList(growable: false);
+      }
+
+      if (decoded.containsKey('deck')) {
+        final imported = await importDeckJson(rawJson: rawJson);
+        return imported == null ? const [] : [imported];
+      }
+    } else if (decoded is List) {
+      final imported = await importDecksJson(rawJson: rawJson);
+      return imported.whereType<Deck>().toList(growable: false);
+    }
+
+    throw const FormatException('Unsupported import format.');
+  }
+
   /// Exports cards from one deck.
   Future<Map<String, dynamic>?> exportCards({
     required String deckId,
@@ -158,7 +250,7 @@ class ImportExportController extends Controller {
   }
 
   /// Builds a similarity plan for importing cards into one deck.
-  Future<ChangePlan<ImportCardsPayload>?> previewCardImport({
+  Future<ChangePreview<ImportCardsPayload>?> previewCardImport({
     required String deckId,
     required List<Map<String, dynamic>> incomingTemplateMaps,
     CardSimilarityConfig similarity = const CardSimilarityConfig(),
@@ -183,7 +275,7 @@ class ImportExportController extends Controller {
   }
 
   /// Builds a similarity plan from raw JSON.
-  Future<ChangePlan<ImportCardsPayload>?> previewCardImportJson({
+  Future<ChangePreview<ImportCardsPayload>?> previewCardImportJson({
     required String deckId,
     required String rawJson,
     CardSimilarityConfig similarity = const CardSimilarityConfig(),

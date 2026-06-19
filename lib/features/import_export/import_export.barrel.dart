@@ -5,5 +5,5 @@ export 'models/models.barrel.dart';
 export 'widgets/widgets.barrel.dart';
 // Other files
 export 'import_export.local.db.dart';
-export 'import_export.service.dart';
 export 'import_export.controller.dart';
+export 'import_export.service.dart';

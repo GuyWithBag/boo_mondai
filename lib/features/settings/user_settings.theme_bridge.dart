@@ -131,9 +131,9 @@ class UserSettingsThemeBridge {
       colorPrimary: hasPrimary ? Color(override.primaryColorValue!) : null,
       //   fontFamily: hasFont ? override.fontFamily!.trim() : null,
       //   radiusSurface: radiusScale == null ? null : t.radiusSurface * radiusScale,
-      //   radiusSurfaceSm: radiusScale == null
+      //   radiusSurfaceXsm: radiusScale == null
       //       ? null
-      //       : t.radiusSurfaceSm * radiusScale,
+      //       : t.radiusSurfaceXsm * radiusScale,
       //   spaceScaffoldPadding: spacingScale == null
       //       ? null
       //       : t.spaceScaffoldPadding * spacingScale,

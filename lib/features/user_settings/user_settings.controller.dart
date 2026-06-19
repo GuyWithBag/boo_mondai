@@ -4,7 +4,7 @@
 //         CustomThemePreset,
 //         ThemeOverride,
 //         UserSettings,
-//         UserSettingsChangeLog,
+//         UserSettingsChangeRecord,
 //         UserSettingsExportOptions,
 //         UserSettingsImportMode,
 //         UserSettingsService;
@@ -13,7 +13,7 @@
 // /// UI-facing state holder for profile-scoped user settings workflows.
 // class UserSettingsController extends Controller {
 //   UserSettings? settings;
-//   List<UserSettingsChangeLog> latestChangeLogs = const [];
+//   List<UserSettingsChangeRecord> latestChangeRecords = const [];
 //   List<String> latestFailures = const [];
 
 //   /// Loads settings for the active local profile.
@@ -21,7 +21,7 @@
 //     setLoading(true);
 //     try {
 //       settings = await UserSettingsService.getOrCreateForCurrentProfile();
-//       latestChangeLogs = const [];
+//       latestChangeRecords = const [];
 //       latestFailures = const [];
 //     } on Exception catch (e) {
 //       setError(e);
@@ -136,7 +136,7 @@
 //         userId: current.userId,
 //         options: options,
 //       );
-//       latestChangeLogs = result.changeLogs;
+//       latestChangeRecords = result.changeLogs;
 //       latestFailures = result.failures;
 //       return result.value;
 //     } on Exception catch (e) {
@@ -159,7 +159,7 @@
 //         userId: current.userId,
 //         options: options,
 //       );
-//       latestChangeLogs = result.changeLogs;
+//       latestChangeRecords = result.changeLogs;
 //       latestFailures = result.failures;
 //       return result.value;
 //     } on Exception catch (e) {
@@ -185,7 +185,7 @@
 //         mode: mode,
 //       );
 //       settings = result.value;
-//       latestChangeLogs = result.changeLogs;
+//       latestChangeRecords = result.changeLogs;
 //       latestFailures = result.failures;
 //     } on Exception catch (e) {
 //       setError(e);
@@ -209,7 +209,7 @@
 //         mode: mode,
 //       );
 //       settings = result.value;
-//       latestChangeLogs = result.changeLogs;
+//       latestChangeRecords = result.changeLogs;
 //       latestFailures = result.failures;
 //     } on Exception catch (e) {
 //       setError(e);

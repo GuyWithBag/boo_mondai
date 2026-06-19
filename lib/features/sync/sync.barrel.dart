@@ -5,6 +5,7 @@ export 'widgets/widgets.barrel.dart';
 export 'models/models.barrel.dart';
 // Other files
 export 'guest_migration.service.dart';
-export 'sync.service.dart';
 export 'sync_button.dart';
+export 'sync.service.dart';
 export 'sync.page.dart';
+export 'sync.controller.dart';

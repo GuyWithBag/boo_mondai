@@ -1,10 +1,10 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/widgets/main_scaffold.dart
-// PURPOSE: Connects routing and state to the generic PageScaffold
+// PURPOSE: Connects routing and state to the generic Scaffold
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Scaffold;
 import 'package:provider/provider.dart';
 
 class MainScaffold extends StatelessWidget {
@@ -22,7 +22,7 @@ class MainScaffold extends StatelessWidget {
     final auth = context.watch<AuthController>();
     final hideNavigation = auth.currentProfile.role == 'group_b_participant';
 
-    return PageScaffold(
+    return Scaffold(
       body: child,
       hideNavigation: hideNavigation,
       hideBottomNavigationBarOnScroll: true,
