@@ -1,4 +1,4 @@
-import 'package:boo_mondai/core/helpers/text_helper.dart';
+import 'package:boo_mondai/core/helpers/text.helper.dart';
 import 'package:boo_mondai/features/decks/models/deck.dto.dart';
 
 abstract final class ViewDeckListingSingleHelper {

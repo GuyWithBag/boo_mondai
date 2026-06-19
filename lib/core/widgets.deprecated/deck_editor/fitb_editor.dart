@@ -6,7 +6,8 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart'
-    show InputCard, FitbPreview, AppSpacing, splitFillInTheBlankAnswers;
+    show InputCard, FitbPreview, AppSpacing;
+import 'package:boo_mondai/core/helpers/text.helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
@@ -63,7 +64,7 @@ class FitbEditor extends HookWidget {
             validator: (value) {
               if (value == null || value.trim().isEmpty) return 'Required';
 
-              final answers = splitFillInTheBlankAnswers(value);
+              final answers = TextHelper.splitCommaSeparated(value);
               if (answers.isEmpty) return 'Required';
 
               final sentence = sentenceController.text.trim().toLowerCase();

@@ -9,8 +9,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextFieldSize,
         TextFieldFrame,
         TextFieldTone,
-        Button,
-        VariantTextField;
+        MarkdownText,
+        MarkdownTextMode,
+        Button;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -52,13 +53,15 @@ class TextFieldCard extends StatelessWidget {
             ),
             SizedBox(height: tokens.spaceLayoutGapLg),
             Expanded(
-              child: VariantTextField(
+              child: MarkdownText(
+                data: controller?.text ?? '',
                 controller: controller,
                 onChanged: onChanged,
                 maxLines: null,
                 expands: true,
                 textAlignVertical: TextAlignVertical.top,
                 placeholder: placeholder,
+                mode: MarkdownTextMode.input,
                 variants: const [
                   TextFieldSize.bodyLarge,
                   TextFieldFrame.none,

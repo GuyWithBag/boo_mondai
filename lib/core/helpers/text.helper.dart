@@ -24,4 +24,12 @@ abstract final class TextHelper {
 
     return trimmed;
   }
+
+  static List<String> splitCommaSeparated(String value) {
+    return value
+        .split(',')
+        .map((entry) => entry.trim())
+        .where((entry) => entry.isNotEmpty)
+        .toList();
+  }
 }
