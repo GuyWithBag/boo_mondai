@@ -4,4 +4,4 @@
 export 'models/models.barrel.dart';
 // Other files
 export 'view_reviews.controller.dart';
-export 'view_reviews.local.page.dart';
+export 'view_reviews.page.dart';

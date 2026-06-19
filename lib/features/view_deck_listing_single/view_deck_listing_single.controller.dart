@@ -1,6 +1,6 @@
-import 'package:boo_mondai/features/change_review/change_review_controller.dart';
 import 'package:boo_mondai/features/deck_comments/deck_comments.controller.dart';
 import 'package:boo_mondai/features/deck_vote_reviews/deck_vote_reviews.controller.dart';
+import 'package:boo_mondai/features/change_tracker/change_tracker.controller.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         Deck,
@@ -99,7 +99,7 @@ ViewDeckListingSingleController useViewDeckListingSingleSheet({
   required String deckId,
   required Deck initialDeck,
   required ViewDeckListingsController controller,
-  required ChangeReviewController changeReviewController,
+  required ChangeTrackerController changeReviewController,
 }) {
   useListenable(controller);
 

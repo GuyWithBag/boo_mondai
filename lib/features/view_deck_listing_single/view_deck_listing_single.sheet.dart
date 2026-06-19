@@ -19,36 +19,76 @@ import 'package:boo_mondai/lib.barrel.dart'
         DeckDetails,
         ProfileLabel,
         MarkdownTextMode,
-        MainController,
         ViewDeckListingsController,
         textStyle,
         surfaceStyle,
         useViewDeckListingSingleSheet,
-        ChangeReviewController,
-        ViewDeckListingSingleController;
-import 'package:boo_mondai/core/helpers/date_helper.dart';
-import 'package:boo_mondai/core/helpers/number_helper.dart';
-import 'package:boo_mondai/features/view_deck_listing_single/helpers/view_deck_listing_single.helper.dart';
-import 'package:flutter/material.dart';
+        ChangeTrackerController,
+        ViewDeckListingSingleController,
+        showBottomSheet,
+        ViewDeckListingSingleHelper,
+        DateHelper,
+        NumberHelper;
+import 'package:flutter/material.dart'
+    show
+        BuildContext,
+        Widget,
+        StatelessWidget,
+        ScrollController,
+        VoidCallback,
+        Spacer,
+        Center,
+        SizedBox,
+        Text,
+        TextEditingController,
+        OutlineInputBorder,
+        IconData,
+        WidgetsBinding,
+        ScaffoldMessenger,
+        SnackBar,
+        DraggableScrollableSheet,
+        CrossAxisAlignment,
+        EdgeInsets,
+        Padding,
+        Icons,
+        Wrap,
+        Expanded,
+        Row,
+        Column,
+        SliverToBoxAdapter,
+        CustomScrollView,
+        Positioned,
+        Stack,
+        MediaQuery,
+        BorderRadius,
+        RoundedRectangleBorder,
+        ClipRRect,
+        CarouselView,
+        LayoutBuilder,
+        Image,
+        BoxFit,
+        Icon,
+        ColoredBox,
+        WrapCrossAlignment,
+        CircularProgressIndicator,
+        ButtonSegment,
+        SegmentedButton,
+        FilledButton,
+        TextInputAction,
+        InputDecoration,
+        TextField,
+        BorderSide,
+        ActionChip;
+
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 Future<void> showViewDeckListingSingleSheet(BuildContext context, Deck deck) {
-  final controller = context.read<ViewDeckListingsController>();
-
-  return context.read<MainController>().runWithBottomNavbarHidden(
-    () => showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => ChangeNotifierProvider<ViewDeckListingsController>.value(
-        value: controller,
-        child: ViewDeckListingSingleSheet(deck: deck),
-      ),
-    ),
+  return showBottomSheet(
+    context: context,
+    builder: (_) => ViewDeckListingSingleSheet(deck: deck),
   );
 }
 
@@ -66,7 +106,7 @@ class ViewDeckListingSingleSheet extends HookWidget {
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
     final controller = context.read<ViewDeckListingsController>();
-    final changeReviewController = context.read<ChangeReviewController>();
+    final changeReviewController = context.read<ChangeTrackerController>();
     final sheet = useViewDeckListingSingleSheet(
       deckId: deck.id,
       initialDeck: deck,
