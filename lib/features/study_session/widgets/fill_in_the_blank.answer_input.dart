@@ -6,8 +6,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextFieldSize,
         TextFieldState,
         TextFieldTone,
-        VariantTextField;
-import 'package:flutter/material.dart';
+        TextField;
+import 'package:flutter/material.dart' hide TextField;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -44,7 +44,7 @@ class FillInTheBlankAnswerInput extends StatelessWidget {
       children: [
         SizedBox(
           width: 260.w,
-          child: VariantTextField(
+          child: TextField(
             enabled: !revealed,
             onChanged: onChanged,
             variants: [
