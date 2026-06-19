@@ -13,7 +13,7 @@ final segmentControlOptionStyle = VariantStyle.surfaceParts<AppTokens>(
     SurfaceStylePart.decoration({
       DecorationPart.color(tokens.colorTransparent),
       DecorationPart.borderRadius(
-        BorderRadius.circular(tokens.radiusSurfaceSm.r),
+        BorderRadius.circular(tokens.radiusSurfaceXsm.r),
       ),
       DecorationPart.border(
         Border.all(

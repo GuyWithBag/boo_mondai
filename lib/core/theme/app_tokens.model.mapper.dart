@@ -262,6 +262,10 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
   static const Field<AppTokens, double> _f$spaceLayoutPadding = Field(
       'spaceLayoutPadding', _$spaceLayoutPadding,
       key: r'space_layout_padding', mode: FieldMode.member);
+  static double _$spaceLayoutPaddingXsm(AppTokens v) => v.spaceLayoutPaddingXsm;
+  static const Field<AppTokens, double> _f$spaceLayoutPaddingXsm = Field(
+      'spaceLayoutPaddingXsm', _$spaceLayoutPaddingXsm,
+      key: r'space_layout_padding_xsm', mode: FieldMode.member);
   static double _$spaceLayoutGapLg(AppTokens v) => v.spaceLayoutGapLg;
   static const Field<AppTokens, double> _f$spaceLayoutGapLg = Field(
       'spaceLayoutGapLg', _$spaceLayoutGapLg,
@@ -294,6 +298,10 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
   static const Field<AppTokens, double> _f$radiusSurfaceSm = Field(
       'radiusSurfaceSm', _$radiusSurfaceSm,
       key: r'radius_surface_sm', mode: FieldMode.member);
+  static double _$radiusSurfaceXsm(AppTokens v) => v.radiusSurfaceXsm;
+  static const Field<AppTokens, double> _f$radiusSurfaceXsm = Field(
+      'radiusSurfaceXsm', _$radiusSurfaceXsm,
+      key: r'radius_surface_xsm', mode: FieldMode.member);
   static double _$textSizeHeaderLarge(AppTokens v) => v.textSizeHeaderLarge;
   static const Field<AppTokens, double> _f$textSizeHeaderLarge = Field(
       'textSizeHeaderLarge', _$textSizeHeaderLarge,
@@ -418,6 +426,7 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
     #spaceScaffoldPadding: _f$spaceScaffoldPadding,
     #spaceScaffoldPaddingMobileY: _f$spaceScaffoldPaddingMobileY,
     #spaceLayoutPadding: _f$spaceLayoutPadding,
+    #spaceLayoutPaddingXsm: _f$spaceLayoutPaddingXsm,
     #spaceLayoutGapLg: _f$spaceLayoutGapLg,
     #spaceLayoutGapMd: _f$spaceLayoutGapMd,
     #spaceLayoutGapSm: _f$spaceLayoutGapSm,
@@ -426,6 +435,7 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
     #radiusSurfaceLg: _f$radiusSurfaceLg,
     #radiusSurface: _f$radiusSurface,
     #radiusSurfaceSm: _f$radiusSurfaceSm,
+    #radiusSurfaceXsm: _f$radiusSurfaceXsm,
     #textSizeHeaderLarge: _f$textSizeHeaderLarge,
     #textSizeHeader: _f$textSizeHeader,
     #textSizeHeader2: _f$textSizeHeader2,

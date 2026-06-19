@@ -170,14 +170,14 @@ class Button extends HookWidget {
                 color: state.value == ButtonState.hovered
                     ? tokens.colorPrimary
                     : tokens.colorBorderNeutralSubtle,
-                radius: tokens.radiusSurfaceSm,
+                radius: tokens.radiusSurfaceXsm,
               ),
               child: content,
             ),
           )
         : content;
 
-    return MouseRegion(
+    final button = MouseRegion(
       cursor: state.value == ButtonState.disabled
           ? SystemMouseCursors.forbidden
           : SystemMouseCursors.click,
@@ -203,6 +203,13 @@ class Button extends HookWidget {
               },
         child: paintedContent,
       ),
+    );
+
+    return Padding(
+      padding: variants.contains(ButtonVariant.elevated)
+          ? EdgeInsets.only(top: tokens.buttonShadowOffset)
+          : EdgeInsets.zero,
+      child: button,
     );
   }
 }

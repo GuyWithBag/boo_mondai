@@ -46,10 +46,11 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
   base: (tokens) => {
     SurfaceStylePart.decoration({
       DecorationPart.borderRadius(
-        BorderRadius.circular(tokens.radiusSurfaceSm.r),
+        BorderRadius.circular(tokens.radiusSurfaceXsm.r),
       ),
       DecorationPart.borderParts({
         BorderPart.width(tokens.borderWidthDefault.w),
+        BorderPart.style(BorderStyle.solid),
       }),
       DecorationPart.boxShadowParts({
         BoxShadowPart.offset(Offset(0, tokens.buttonShadowOffset.h)),
@@ -258,7 +259,10 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
           BoxShadowPart.offset(Offset.zero),
           BoxShadowPart.blurRadius(0),
         }),
-        DecorationPart.borderParts({BorderPart.width(0)}),
+        DecorationPart.borderParts({
+          BorderPart.width(0),
+          BorderPart.style(BorderStyle.none),
+        }),
       }),
     },
   },

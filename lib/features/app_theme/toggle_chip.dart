@@ -1,5 +1,4 @@
-import 'package:boo_mondai/lib.barrel.dart'
-    show ChipTone, AppTokens, appChipStyle;
+import 'package:boo_mondai/lib.barrel.dart' show ChipTone, AppTokens, chipStyle;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -27,7 +26,7 @@ class ToggleChip extends StatelessWidget {
     final tone = selected ? selectedTone : unselectedTone;
 
     return ChipTheme(
-      data: appChipStyle.resolve(tokens, [tone]),
+      data: chipStyle.resolve(tokens, [tone]),
       child: ActionChip(
         label: Text(label),
         onPressed: onChanged == null || isBusy

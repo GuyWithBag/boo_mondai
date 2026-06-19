@@ -26,7 +26,7 @@ TextStyle _chipLabelStyle(AppTokens tokens, Color color) {
   );
 }
 
-final appChipStyle = VariantStyle.chipParts<AppTokens>(
+final chipStyle = VariantStyle.chipParts<AppTokens>(
   base: (tokens) => {
     ChipPart.padding(EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h)),
     ChipPart.shape(

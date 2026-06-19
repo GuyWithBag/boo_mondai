@@ -59,7 +59,7 @@ spaceLayoutGapMd
 spaceLayoutGapLg
 sizeIconMd
 sizeIconLg
-radiusSurfaceSm
+radiusSurfaceXsm
 radiusSurface
 
 Avoid adding scale names if there is only one value:
@@ -209,6 +209,7 @@ class AppTokens with AppTokensMappable {
   final double spaceScaffoldPaddingMobileY = 28;
 
   final double spaceLayoutPadding = 20;
+  final double spaceLayoutPaddingXsm = 10;
   final double spaceLayoutGapLg = 24;
   final double spaceLayoutGapMd = 18;
   final double spaceLayoutGapSm = 8;
@@ -217,7 +218,8 @@ class AppTokens with AppTokensMappable {
 
   final double radiusSurfaceLg = 60;
   final double radiusSurface = 40;
-  final double radiusSurfaceSm = 16;
+  final double radiusSurfaceSm = 26;
+  final double radiusSurfaceXsm = 16;
 
   final double textSizeHeaderLarge = 36;
   final double textSizeHeader = 24;

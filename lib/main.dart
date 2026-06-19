@@ -9,7 +9,7 @@ import 'package:app_links/app_links.dart';
 import 'package:barrel_annotation/barrel_annotation.dart';
 import 'package:boo_mondai/core/hive/hive_registrar.g.dart' show HiveRegistrar;
 import 'package:boo_mondai/env.dart' show Env;
-import 'package:boo_mondai/features/change_review/change_review.barrel.dart';
+import 'package:boo_mondai/features/change_tracker/change_tracker.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         RemoteDB,
@@ -20,7 +20,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         ViewReviewsController,
         ReviewSessionController,
         ViewDecksLocalController,
-        ViewDecksOnlineController,
+        ViewDeckListingsController,
         ViewLeaderboardController,
         StreakController,
         ResearchController,
@@ -75,13 +75,13 @@ Future<void> main() async {
         ChangeNotifierProvider.value(value: authController),
         ChangeNotifierProvider.value(value: settingsController),
         ChangeNotifierProvider.value(value: notificationsController),
-        ChangeNotifierProvider(create: (_) => ChangeReviewController()),
+        ChangeNotifierProvider(create: (_) => ChangeTrackerController()),
         ChangeNotifierProvider(create: (_) => ImportExportController()),
         ChangeNotifierProvider(create: (_) => DrillSessionController()),
         ChangeNotifierProvider(create: (_) => ViewReviewsController()),
         ChangeNotifierProvider(create: (_) => ReviewSessionController()),
         ChangeNotifierProvider(create: (_) => ViewDecksLocalController()),
-        ChangeNotifierProvider(create: (_) => ViewDecksOnlineController()),
+        ChangeNotifierProvider(create: (_) => ViewDeckListingsController()),
         ChangeNotifierProvider(create: (_) => ViewLeaderboardController()),
         ChangeNotifierProvider(create: (_) => StreakController()),
         ChangeNotifierProvider(create: (_) => ResearchController()),

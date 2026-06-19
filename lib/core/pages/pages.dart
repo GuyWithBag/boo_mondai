@@ -5,7 +5,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         AuthController,
         EnterResearchCodePage,
         HomePage,
-        ViewDecksOnlinePage,
+        ViewDeckListingsPage,
         ViewDecksLocalPage,
         ViewReviewsPage,
         ViewAccountPage,
@@ -20,7 +20,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         ViewDrillResultPage,
         PlaceholderAppPage,
         AnswerSurveyPage,
-        ChangeReviewPage,
+        ChangeTrackerPage,
         SettingsPage;
 import 'package:boo_mondai/features/view_cards/view_cards.page.dart'
     show ViewCardsPage;
@@ -48,7 +48,7 @@ class Pages {
     name: 'Browse',
     builder:
         (context, {pathParameters = const {}, queryParameters = const {}}) =>
-            const ViewDecksOnlinePage(),
+            const ViewDeckListingsPage(),
   );
 
   static final decksLocal = AppPage(
@@ -160,11 +160,11 @@ class Pages {
   );
 
   static final changeReview = AppPage(
-    url: '/change-review/:planId',
+    url: '/change-review/:entryId',
     name: 'Change Review',
     builder:
         (context, {pathParameters = const {}, queryParameters = const {}}) =>
-            ChangeReviewPage(planId: pathParameters['planId']!),
+            ChangeTrackerPage(entryId: pathParameters['entryId']!),
   );
 
   static final research = AppPage(

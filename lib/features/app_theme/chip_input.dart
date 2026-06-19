@@ -5,7 +5,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         ChipTone,
         TextFieldSize,
-        appChipStyle,
+        chipStyle,
         appTextFieldStyle,
         useChipInputController;
 import 'package:flutter/material.dart';
@@ -57,7 +57,7 @@ class ChipInput extends HookWidget {
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
     final textFieldStyle = appTextFieldStyle.resolve(tokens, textFieldVariants);
-    final chipTheme = appChipStyle.resolve(tokens, [chipTone]);
+    final chipTheme = chipStyle.resolve(tokens, [chipTone]);
     Widget readOnlyChipBuilder(String value) {
       return Padding(
         padding: EdgeInsetsDirectional.only(end: 6.w, bottom: 3.h),

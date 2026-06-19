@@ -3,7 +3,9 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         Button,
         CollapsingHeaderItem,
+        SurfaceBorder,
         SurfaceColor,
+        SurfacePadding,
         SurfaceShape,
         TextSize,
         TextWeight,
@@ -19,7 +21,7 @@ class AppBar extends StatelessWidget implements PreferredSizeWidget {
     this.title,
     this.actions = const [],
     this.bottom,
-    this.backgroundColor,
+    this.transparentBackground = false,
     this.padding,
     this.actionsSpacing,
     this.automaticallyImplyPopButton = true,
@@ -40,7 +42,7 @@ class AppBar extends StatelessWidget implements PreferredSizeWidget {
   final List<Widget> actions;
   final Widget? bottom;
   final Widget? subSection;
-  final Color? backgroundColor;
+  final bool transparentBackground;
   final EdgeInsetsGeometry? padding;
   final double? actionsSpacing;
   final bool automaticallyImplyPopButton;
@@ -86,14 +88,16 @@ class AppBar extends StatelessWidget implements PreferredSizeWidget {
     );
     return SizedBox(
       child: SafeArea(
+        bottom: false,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Surface(
-              style: surfaceStyle.resolve(tokens, const [
+              style: surfaceStyle.resolve(tokens, [
                 SurfaceShape.sharp,
-                SurfaceColor.invisible,
+                SurfaceBorder.bottom,
+                if (transparentBackground) SurfaceColor.invisible,
               ]),
               child: Column(
                 children: [

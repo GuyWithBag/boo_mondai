@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
 import 'package:theme_variants/theme_variants.dart';
 
-enum AppModalTone {
+enum ModalTone {
   primary,
   surface,
   success,
@@ -16,7 +16,7 @@ enum AppModalTone {
   easy,
 }
 
-final appModalStyle = VariantStyle.surfaceParts<AppTokens>(
+final modalStyle = VariantStyle.surfaceParts<AppTokens>(
   base: (tokens) => {
     SurfaceStylePart.padding(EdgeInsets.all(tokens.spaceLayoutPadding.r)),
     SurfaceStylePart.decoration({
@@ -38,9 +38,9 @@ final appModalStyle = VariantStyle.surfaceParts<AppTokens>(
       ]),
     }),
   },
-  defaultVariants: const [AppModalTone.surface],
+  defaultVariants: const [ModalTone.surface],
   variants: {
-    AppModalTone.primary: (tokens) => {
+    ModalTone.primary: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.colorPrimary),
         DecorationPart.border(
@@ -57,7 +57,7 @@ final appModalStyle = VariantStyle.surfaceParts<AppTokens>(
         ]),
       }),
     },
-    AppModalTone.surface: (tokens) => {
+    ModalTone.surface: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.colorSurfaceBackground),
         DecorationPart.border(
@@ -74,7 +74,7 @@ final appModalStyle = VariantStyle.surfaceParts<AppTokens>(
         ]),
       }),
     },
-    AppModalTone.success: (tokens) => {
+    ModalTone.success: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.colorActionSuccessBackground),
         DecorationPart.border(
@@ -91,7 +91,7 @@ final appModalStyle = VariantStyle.surfaceParts<AppTokens>(
         ]),
       }),
     },
-    AppModalTone.error: (tokens) => {
+    ModalTone.error: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.colorActionErrorBackground),
         DecorationPart.border(
@@ -108,7 +108,7 @@ final appModalStyle = VariantStyle.surfaceParts<AppTokens>(
         ]),
       }),
     },
-    AppModalTone.streak: (tokens) => {
+    ModalTone.streak: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.colorStreak),
         DecorationPart.border(
@@ -125,7 +125,7 @@ final appModalStyle = VariantStyle.surfaceParts<AppTokens>(
         ]),
       }),
     },
-    AppModalTone.dashed: (tokens) => {
+    ModalTone.dashed: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.colorMuted),
         DecorationPart.border(
@@ -138,7 +138,7 @@ final appModalStyle = VariantStyle.surfaceParts<AppTokens>(
       }),
     },
 
-    AppModalTone.again: (tokens) => {
+    ModalTone.again: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.colorRatingAgainBackground),
         DecorationPart.border(
@@ -149,7 +149,7 @@ final appModalStyle = VariantStyle.surfaceParts<AppTokens>(
         ),
       }),
     },
-    AppModalTone.hard: (tokens) => {
+    ModalTone.hard: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.colorRatingHardBackground),
         DecorationPart.border(
@@ -160,7 +160,7 @@ final appModalStyle = VariantStyle.surfaceParts<AppTokens>(
         ),
       }),
     },
-    AppModalTone.good: (tokens) => {
+    ModalTone.good: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.colorRatingGoodBackground),
         DecorationPart.border(
@@ -171,7 +171,7 @@ final appModalStyle = VariantStyle.surfaceParts<AppTokens>(
         ),
       }),
     },
-    AppModalTone.easy: (tokens) => {
+    ModalTone.easy: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.colorRatingEasyBackground),
         DecorationPart.border(

@@ -1,6 +1,17 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, SegmentControlOptionState, segmentControlOptionStyle;
+    show
+        AppTokens,
+        SegmentControlOptionState,
+        SurfaceBorder,
+        SurfaceColor,
+        SurfacePadding,
+        SurfaceShadow,
+        SurfaceShape,
+        segmentControlOptionStyle,
+        useSelectionController,
+        surfaceStyle;
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 class SegmentOption<T> {
@@ -10,7 +21,7 @@ class SegmentOption<T> {
   final String label;
 }
 
-class SegmentedControl<T> extends StatelessWidget {
+class SegmentedControl<T> extends HookWidget {
   const SegmentedControl({
     required this.options,
     required this.value,
@@ -27,27 +38,39 @@ class SegmentedControl<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
+    final selection = useSelectionController<T>(
+      selectedValues: [value],
+      onSelectionChanged: (selected) {
+        if (selected.isEmpty) return;
+        onChanged(selected.first);
+      },
+    );
 
     return Surface(
-      style: SurfaceStyle(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: tokens.colorMuted,
-          borderRadius: BorderRadius.circular(tokens.radiusSurface),
-        ),
-      ),
+      style: surfaceStyle
+          .resolve(tokens, const [
+            SurfaceColor.muted,
+            SurfaceBorder.none,
+            SurfaceShadow.none,
+            SurfacePadding.xsm,
+            SurfaceShape.roundedSm,
+          ])
+          .copyWith(padding: EdgeInsets.all(10)),
 
-      child: Wrap(
-        spacing: 8,
-        children: [
-          for (final option in options)
-            _SegmentedControlOption<T>(
-              option: option,
-              selected: option.value == value,
-              enabled: enabled,
-              onTap: () => onChanged(option.value),
-            ),
-        ],
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          spacing: tokens.spaceLayoutGapSm,
+          children: [
+            for (final option in options)
+              _SegmentedControlOption<T>(
+                option: option,
+                selected: selection.isSelected(option.value),
+                enabled: enabled,
+                onTap: () => selection.select(option.value),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -79,7 +102,7 @@ class _SegmentedControlOption<T> extends StatelessWidget {
     return InkWell(
       borderRadius:
           style.decoration.borderRadius as BorderRadius? ??
-          BorderRadius.circular(tokens.radiusSurfaceSm),
+          BorderRadius.circular(tokens.radiusSurfaceXsm),
       onTap: enabled ? onTap : null,
       child: Surface(style: style, child: Text(option.label)),
     );

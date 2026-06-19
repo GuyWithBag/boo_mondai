@@ -13,9 +13,17 @@ enum SurfaceColor {
   invisible,
 }
 
-enum SurfaceShape { rounded, roundedSm, cardShape, sharp, topRounded }
+enum SurfaceShape {
+  rounded,
+  roundedSm,
+  roundedXsm,
+  cardShape,
+  sharp,
+  topRounded,
+  circle,
+}
 
-enum SurfacePadding { baseline, text, none }
+enum SurfacePadding { baseline, text, none, xsm }
 
 enum SurfaceBorder { baseline, sidebar, none, top, bottom }
 
@@ -78,6 +86,7 @@ final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
       SurfaceStylePart.decoration({
         DecorationPart.borderParts({
           BorderPart.width(tokens.borderWidthDefault.w),
+          BorderPart.style(BorderStyle.solid),
         }),
       }),
     },
@@ -85,20 +94,29 @@ final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
       SurfaceStylePart.decoration({
         DecorationPart.borderParts({
           BorderPart.width(0),
-          BorderPart.right({BorderSidePart.width(tokens.borderWidthDefault.w)}),
+          BorderPart.right({
+            BorderSidePart.width(tokens.borderWidthDefault.w),
+            BorderSidePart.style(BorderStyle.solid),
+          }),
         }),
       }),
     },
     SurfaceBorder.none: (_) => {
       SurfaceStylePart.decoration({
-        DecorationPart.borderParts({BorderPart.width(0)}),
+        DecorationPart.borderParts({
+          BorderPart.width(0),
+          BorderPart.style(BorderStyle.none),
+        }),
       }),
     },
     SurfaceBorder.top: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.borderParts({
           BorderPart.width(0),
-          BorderPart.top({BorderSidePart.width(tokens.borderWidthDefault.w)}),
+          BorderPart.top({
+            BorderSidePart.width(tokens.borderWidthDefault.w),
+            BorderSidePart.style(BorderStyle.solid),
+          }),
         }),
       }),
     },
@@ -108,6 +126,7 @@ final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
           BorderPart.width(0),
           BorderPart.bottom({
             BorderSidePart.width(tokens.borderWidthDefault.w),
+            BorderSidePart.style(BorderStyle.solid),
           }),
         }),
       }),
@@ -126,11 +145,23 @@ final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
         ),
       }),
     },
+    SurfaceShape.roundedXsm: (tokens) => {
+      SurfaceStylePart.decoration({
+        DecorationPart.borderRadius(
+          BorderRadius.circular(tokens.radiusSurfaceXsm.r),
+        ),
+      }),
+    },
     SurfaceShape.cardShape: (tokens) => {
       SurfaceStylePart.decoration({
         DecorationPart.borderRadius(
           BorderRadiusGeometry.circular(tokens.studyCardRadius.r),
         ),
+      }),
+    },
+    SurfaceShape.circle: (tokens) => {
+      SurfaceStylePart.decoration({
+        DecorationPart.borderRadius(BorderRadiusGeometry.circular(999)),
       }),
     },
     SurfaceShape.topRounded: (tokens) => {
@@ -149,6 +180,9 @@ final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
     },
     SurfacePadding.baseline: (tokens) => {
       SurfaceStylePart.padding(EdgeInsets.all(tokens.spaceLayoutPadding)),
+    },
+    SurfacePadding.xsm: (tokens) => {
+      SurfaceStylePart.padding(EdgeInsets.all(tokens.spaceLayoutPaddingXsm)),
     },
     SurfacePadding.none: (_) => {SurfaceStylePart.padding(EdgeInsets.all(0))},
     SurfacePadding.text: (_) => {
