@@ -5,6 +5,8 @@ export 'filters/filters.barrel.dart';
 export 'widgets/widgets.barrel.dart';
 export 'models/models.barrel.dart';
 export 'results/results.barrel.dart';
+export 'sort_fields/sort_fields.barrel.dart';
+export 'filter_codecs/filter_codecs.barrel.dart';
 // Other files
 export 'search_text_parser.dart';
 export 'search_directive_property.dart';

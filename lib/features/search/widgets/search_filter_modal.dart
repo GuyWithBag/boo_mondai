@@ -36,24 +36,19 @@ Future<TFilter?> showSearchFilterModal<TFilter extends SearchFilter>({
     context: context,
     barrierDismissible: true,
     title: 'Search Filters',
+    tone: tone,
     child: _SearchFilterBody<TFilter>(
       codec: codec,
       currentFilter: currentFilter,
-      tone: tone,
     ),
   );
 }
 
 class _SearchFilterBody<TFilter extends SearchFilter> extends HookWidget {
-  const _SearchFilterBody({
-    required this.codec,
-    required this.currentFilter,
-    required this.tone,
-  });
+  const _SearchFilterBody({required this.codec, required this.currentFilter});
 
   final SearchFilterCodec<TFilter> codec;
   final TFilter currentFilter;
-  final ModalTone tone;
 
   @override
   Widget build(BuildContext context) {

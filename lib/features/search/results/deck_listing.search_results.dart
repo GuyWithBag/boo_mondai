@@ -1,8 +1,10 @@
-import 'package:boo_mondai/features/deck_listings/models/deck_listing.dto.dart';
-import 'package:boo_mondai/features/search/filters/deck_listing.search_filter.dart';
-import 'package:boo_mondai/features/search/models/deck_listing.search_sort_field.dart';
-import 'package:boo_mondai/features/search/models/search_sort_direction.dart';
-import 'package:boo_mondai/features/search/results/search_results.dart';
+import 'package:boo_mondai/lib.barrel.dart'
+    show
+        DeckListingSearchFilter,
+        DeckListing,
+        SearchResults,
+        DeckListingSearchSortField,
+        SearchSortDirection;
 import 'package:fuzzywuzzy/fuzzywuzzy.dart';
 
 final class DeckListingSearchResults

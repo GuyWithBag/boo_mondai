@@ -4,8 +4,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         CardTemplateSearchSortField,
         SearchDirectiveProperty,
         SearchFilter,
-        SearchSortDirection;
-import 'package:boo_mondai/features/search/filters/search_filter_directive.dart';
+        SearchSortDirection,
+        SearchFilterDirective;
 
 abstract final class CardTemplateSearchFilterDirective {
   static const deck = SearchFilterDirective(

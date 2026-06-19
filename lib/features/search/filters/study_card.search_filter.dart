@@ -1,7 +1,6 @@
 import 'package:boo_mondai/features/search/search_text_parser.dart';
 import 'package:boo_mondai/lib.barrel.dart'
-    show SearchDirectiveProperty, SearchFilter;
-import 'package:boo_mondai/features/search/filters/search_filter_directive.dart';
+    show SearchDirectiveProperty, SearchFilter, SearchFilterDirective;
 
 abstract final class StudyCardSearchFilterDirective {
   static const deck = SearchFilterDirective(

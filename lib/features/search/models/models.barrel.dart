@@ -2,9 +2,7 @@
 
 // Other files
 export 'search_sort_direction.dart';
-export 'deck.search_sort_field.dart';
-export 'deck_listing.search_sort_field.dart';
-export 'card_template.search_sort_field.dart';
 export 'search_filter.dart';
 export 'search_scope.dart';
 export 'search_filter_codec.dart';
+export 'search_filter_directive.dart';

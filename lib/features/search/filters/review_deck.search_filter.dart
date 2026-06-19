@@ -1,7 +1,10 @@
 import 'package:boo_mondai/features/search/search_text_parser.dart';
 import 'package:boo_mondai/lib.barrel.dart'
-    show DueFilterThreshold, SearchDirectiveProperty, SearchFilter;
-import 'package:boo_mondai/features/search/filters/search_filter_directive.dart';
+    show
+        DueFilterThreshold,
+        SearchDirectiveProperty,
+        SearchFilter,
+        SearchFilterDirective;
 
 abstract final class ReviewDeckSearchFilterDirective {
   static const due = SearchFilterDirective(

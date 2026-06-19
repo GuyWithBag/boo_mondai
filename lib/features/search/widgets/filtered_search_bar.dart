@@ -10,7 +10,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextFieldFrame,
         TextFieldSize,
         TextFieldTone,
-        appTextFieldStyle,
+        textFieldStyle,
         useFilteredSearchBarController,
         Button;
 import 'package:flutter/material.dart'
@@ -276,7 +276,7 @@ class FilteredSearchBar<TObject, TFilter extends SearchFilter>
       onCleared?.call();
     }
 
-    final style = appTextFieldStyle.resolve(tokens, const [
+    final style = textFieldStyle.resolve(tokens, const [
       TextFieldSize.normal,
       TextFieldFrame.outline,
       TextFieldTone.neutral,

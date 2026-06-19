@@ -1,8 +1,10 @@
-import 'package:boo_mondai/features/cards/models/card_template.dto.dart';
-import 'package:boo_mondai/features/search/filters/card_template.search_filter.dart';
-import 'package:boo_mondai/features/search/models/card_template.search_sort_field.dart';
-import 'package:boo_mondai/features/search/models/search_sort_direction.dart';
-import 'package:boo_mondai/features/search/results/search_results.dart';
+import 'package:boo_mondai/lib.barrel.dart'
+    show
+        CardTemplate,
+        CardTemplateSearchFilter,
+        SearchResults,
+        CardTemplateSearchSortField,
+        SearchSortDirection;
 import 'package:fuzzywuzzy/fuzzywuzzy.dart';
 
 final class CardTemplateSearchResults
