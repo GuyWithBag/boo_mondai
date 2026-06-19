@@ -6,7 +6,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         ChipTone,
         TextFieldSize,
         chipStyle,
-        appTextFieldStyle,
+        textFieldStyle,
         useChipInputController;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -56,7 +56,10 @@ class ChipInput extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final textFieldStyle = appTextFieldStyle.resolve(tokens, textFieldVariants);
+    final resolvedTextFieldStyle = textFieldStyle.resolve(
+      tokens,
+      textFieldVariants,
+    );
     final chipTheme = chipStyle.resolve(tokens, [chipTone]);
     Widget readOnlyChipBuilder(String value) {
       return Padding(
@@ -225,18 +228,18 @@ class ChipInput extends HookWidget {
               minLines: 1,
               maxLines: null,
               textInputAction: TextInputAction.done,
-              cursorColor: textFieldStyle.cursorColor,
-              style: textFieldStyle.textStyle,
-              decoration: InputDecoration(
-                hintText: placeholder,
-              ).applyDefaults(textFieldStyle.decorationTheme),
+              style: resolvedTextFieldStyle.textStyle,
+              decoration: InputDecoration(hintText: placeholder),
             )
           : Wrap(
               spacing: 0,
               runSpacing: 0,
               children: [
                 if (values.isEmpty)
-                  Text(placeholder ?? '', style: textFieldStyle.textStyle)
+                  Text(
+                    placeholder ?? '',
+                    style: resolvedTextFieldStyle.textStyle,
+                  )
                 else
                   for (final value in values) readOnlyChipBuilder(value),
               ],

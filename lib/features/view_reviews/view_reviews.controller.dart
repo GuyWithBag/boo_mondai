@@ -9,13 +9,13 @@ import 'package:boo_mondai/lib.barrel.dart'
         DeckReviewStats,
         DeckHistoricalStats,
         LocalDB,
-        Services;
-import 'package:boo_mondai/features/decks/models/visibility_state.dto.dart';
-import 'package:boo_mondai/features/search/filters/review_deck.search_filter.dart';
-import 'package:boo_mondai/features/search/filters/review_deck.search_filter_codec.dart';
-import 'package:boo_mondai/features/search/results/review_deck.search_results.dart';
-import 'package:boo_mondai/features/study_session/models/due_filter_threshold.dart';
-import 'package:boo_mondai/features/view_reviews/models/review_deck_entry.dart';
+        Services,
+        ReviewDeckSearchResults,
+        ReviewDeckEntry,
+        ReviewDeckSearchFilter,
+        DueFilterThreshold,
+        ReviewDeckSearchFilterCodec,
+        VisibilityState;
 
 class ViewReviewsController extends Controller {
   static const reviewSearchFilterCodec = ReviewDeckSearchFilterCodec();

@@ -2,6 +2,7 @@
 
 // Barrel files
 export 'models/models.barrel.dart';
+export 'controllers/controllers.barrel.dart';
 // Other files
 export 'back_button.dart';
 export 'chip.variant.dart';
@@ -24,9 +25,7 @@ export 'text.variant.dart';
 export 'text_field.variant.dart';
 export 'text_field_card.dart';
 export 'toggle_chip.dart';
-export 'variant_text_field.dart';
 export 'chip_input.dart';
-export 'chip_input.hook.dart';
 export 'snackbar.dart';
 export 'labeled_divider.dart';
 export 'button.variant.dart';
@@ -36,3 +35,5 @@ export 'app_bar.dart';
 export 'scaffold.dart';
 export 'modal.dart';
 export 'show_bottom_sheet.dart';
+export 'text_field.dart';
+export 'chip_input.controller.dart';

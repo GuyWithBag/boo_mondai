@@ -90,7 +90,7 @@ class ViewDecksLocalPage extends HookWidget {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!context.mounted) return;
         showSnackbar(
-          context: context,
+          context,
           message: 'Sync failed: $err',
           leading: const Icon(Icons.sync_problem_outlined),
           duration: const Duration(seconds: 3),
@@ -107,7 +107,7 @@ class ViewDecksLocalPage extends HookWidget {
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!context.mounted) return;
-        showSnackbar(context: context, message: 'Everything is up to date!');
+        showSnackbar(context, message: 'Everything is up to date!');
         syncController.clearChangePreview();
       });
 
@@ -133,7 +133,7 @@ class ViewDecksLocalPage extends HookWidget {
       if (result.didImport) controller.load();
 
       showSnackbar(
-        context: context,
+        context,
         message: ViewDecksHelper.importMessage(result),
         leading: Icon(
           ViewDecksHelper.isImportFailure(result)

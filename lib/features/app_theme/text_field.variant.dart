@@ -15,7 +15,7 @@ enum TextFieldAlign { start, center }
 
 // enum TextFieldShape { rounded, sharp }
 
-final appTextFieldStyle = VariantStyle.textFieldParts<AppTokens>(
+final textFieldStyle = VariantStyle.textFieldParts<AppTokens>(
   base: (tokens) => {
     TextFieldStylePart.cursorColor(tokens.colorPrimary),
     TextFieldStylePart.text({

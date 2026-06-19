@@ -41,7 +41,7 @@ class SyncButton extends StatelessWidget {
         onPressed: () {
           if (!isAuthenticated) {
             showSnackbar(
-              context: context,
+              context,
               message: 'Sign in to sync your decks.',
               leading: const Icon(Icons.lock_outline),
               tone: SnackbarTone.dashed,

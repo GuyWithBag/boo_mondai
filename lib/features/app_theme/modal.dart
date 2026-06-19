@@ -69,66 +69,69 @@ class Modal<T> extends StatelessWidget {
     return Center(
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: maxWidth),
-        child: Surface(
-          style: modalStyle.resolve(tokens, [tone]),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (leading != null) ...[
-                IconTheme.merge(
-                  data: IconThemeData(size: tokens.sizeIconLg),
-                  child: leading!,
-                ),
-                SizedBox(height: tokens.spaceLayoutGapLg),
-              ],
-              if (title != null)
-                Text(
-                  title!,
-                  textAlign: TextAlign.center,
-                  style: textStyle.resolve(tokens, const [
-                    TextSize.header,
-                    TextWeight.heavy,
-                  ]),
-                ),
-              if (subtitle != null) ...[
-                SizedBox(height: tokens.spaceLayoutGapSm),
-                Text(
-                  subtitle!,
-                  textAlign: TextAlign.center,
-                  style: textStyle.resolve(tokens, const [
-                    TextSize.label,
-                    TextWeight.body,
-                  ]),
-                ),
-              ],
-              if (child != null) ...[
-                SizedBox(height: tokens.spaceLayoutGapSm),
-                child!,
-              ],
-              if (hasActions) ...[
-                SizedBox(height: tokens.spaceLayoutGapLg),
-                Wrap(
-                  alignment: WrapAlignment.end,
-                  spacing: tokens.spaceLayoutGapSm,
-                  runSpacing: tokens.spaceLayoutGapSm,
-                  children: [
-                    ...actions.map(
-                      (action) => Button(
-                        variants: [action.color],
-                        onPressed: () {
-                          action.onPressed?.call();
-                          Navigator.pop(context, action.value);
-                        },
-                        child: Text(action.label),
+        child: Material(
+          type: MaterialType.transparency,
+          child: Surface(
+            style: modalStyle.resolve(tokens, [tone]),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (leading != null) ...[
+                  IconTheme.merge(
+                    data: IconThemeData(size: tokens.sizeIconLg),
+                    child: leading!,
+                  ),
+                  SizedBox(height: tokens.spaceLayoutGapLg),
+                ],
+                if (title != null)
+                  Text(
+                    title!,
+                    textAlign: TextAlign.center,
+                    style: textStyle.resolve(tokens, const [
+                      TextSize.header,
+                      TextWeight.heavy,
+                    ]),
+                  ),
+                if (subtitle != null) ...[
+                  SizedBox(height: tokens.spaceLayoutGapSm),
+                  Text(
+                    subtitle!,
+                    textAlign: TextAlign.center,
+                    style: textStyle.resolve(tokens, const [
+                      TextSize.label,
+                      TextWeight.body,
+                    ]),
+                  ),
+                ],
+                if (child != null) ...[
+                  SizedBox(height: tokens.spaceLayoutGapSm),
+                  child!,
+                ],
+                if (hasActions) ...[
+                  SizedBox(height: tokens.spaceLayoutGapLg),
+                  Wrap(
+                    alignment: WrapAlignment.end,
+                    spacing: tokens.spaceLayoutGapSm,
+                    runSpacing: tokens.spaceLayoutGapSm,
+                    children: [
+                      ...actions.map(
+                        (action) => Button(
+                          variants: [action.color],
+                          onPressed: () {
+                            action.onPressed?.call();
+                            Navigator.pop(context, action.value);
+                          },
+                          child: Text(action.label),
+                        ),
                       ),
-                    ),
-                    ...?actionsCustom,
-                  ],
-                ),
+                      ...?actionsCustom,
+                    ],
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ),

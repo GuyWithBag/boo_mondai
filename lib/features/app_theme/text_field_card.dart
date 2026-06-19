@@ -19,6 +19,7 @@ class TextFieldCard extends StatelessWidget {
   const TextFieldCard({
     required this.title,
     required this.placeholder,
+    this.hasAttachments = true,
     this.controller,
     this.onChanged,
     this.minHeight,
@@ -30,6 +31,7 @@ class TextFieldCard extends StatelessWidget {
   final TextEditingController? controller;
   final ValueChanged<String>? onChanged;
   final double? minHeight;
+  final bool hasAttachments;
 
   @override
   Widget build(BuildContext context) {
@@ -75,13 +77,14 @@ class TextFieldCard extends StatelessWidget {
                 SizedBox(height: tokens.spaceLayoutGapMd),
               ],
             ),
-            Row(
-              children: [
-                Button.icon(onPressed: () {}, icon: Icons.image_outlined),
-                SizedBox(width: tokens.spaceLayoutGapSm),
-                Button.icon(onPressed: () {}, icon: Icons.mic),
-              ],
-            ),
+            if (hasAttachments)
+              Row(
+                children: [
+                  Button.icon(onPressed: () {}, icon: Icons.image_outlined),
+                  SizedBox(width: tokens.spaceLayoutGapSm),
+                  Button.icon(onPressed: () {}, icon: Icons.mic),
+                ],
+              ),
           ],
         ),
       ),

@@ -42,8 +42,8 @@ class Snackbar extends StatelessWidget {
   }
 }
 
-void showSnackbar({
-  required BuildContext context,
+void showSnackbar(
+  BuildContext context, {
   required String message,
   Widget? leading,
   SnackbarTone tone = SnackbarTone.surface,

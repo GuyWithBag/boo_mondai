@@ -18,8 +18,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextFieldSize,
         TextFieldFrame,
         TextFieldTone,
-        VariantTextField;
-import 'package:flutter/material.dart' hide BackButton;
+        TextField;
+import 'package:flutter/material.dart' hide BackButton, TextField;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -191,7 +191,7 @@ class _RegisterField extends StatelessWidget {
       children: [
         Text(label),
         const SizedBox(height: AppSpacing.xs),
-        VariantTextField(
+        TextField(
           controller: controller,
           focusNode: focusNode,
           placeholder: placeholder,

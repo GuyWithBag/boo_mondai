@@ -58,6 +58,7 @@ class Scaffold extends HookWidget {
     this.maxWidth,
     this.padding,
     this.hideNavigation = false,
+    this.hideAppBarOnScroll = false,
     this.hideBottomNavigationBarOnScroll = false,
     this.scrollable = true,
     this.safeArea = true,
@@ -77,6 +78,7 @@ class Scaffold extends HookWidget {
   final double? maxWidth;
   final EdgeInsetsGeometry? padding;
   final bool hideNavigation;
+  final bool hideAppBarOnScroll;
   final bool hideBottomNavigationBarOnScroll;
   final bool scrollable;
   final bool safeArea;
@@ -90,6 +92,7 @@ class Scaffold extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final isFloatingSidebarOpen = useState(floatingSidebarInitiallyOpen);
+    final isAppBarVisible = useState(true);
     final tokens = context.themeTokens<AppTokens>();
     final effectiveMaxWidth = maxWidth ?? tokens.spaceScaffoldMaxWidth;
     final effectivePadding =
@@ -150,7 +153,9 @@ class Scaffold extends HookWidget {
           floatingActionButton: effectiveFloatingActionButton,
           bottomNavigationBar: bottomNavigationBar != null
               ? _AnimatedBottomNavbar(
-                  isVisible: mainController.isBottomNavbarVisible,
+                  isVisible:
+                      !hideBottomNavigationBarOnScroll ||
+                      mainController.isBottomNavbarVisible,
                   child: bottomNavigationBar!,
                 )
               : null,
@@ -158,12 +163,20 @@ class Scaffold extends HookWidget {
           body: SafeArea(
             child: Column(
               children: [
-                appBar ?? SizedBox.shrink(),
+                if (appBar != null)
+                  _AnimatedAppBar(
+                    isVisible: isAppBarVisible.value,
+                    child: appBar!,
+                  ),
                 Expanded(
-                  child: _autoHideBottomNavbarWrapper(
+                  child: _autoHideNavigationWrapper(
                     controller: mainController,
+                    onShowAppBar: () => isAppBarVisible.value = true,
+                    onHideAppBar: () => isAppBarVisible.value = false,
                     child: scaffoldBody,
-                    disabled: !hideBottomNavigationBarOnScroll,
+                    hideAppBarOnScroll: hideAppBarOnScroll,
+                    hideBottomNavigationBarOnScroll:
+                        hideBottomNavigationBarOnScroll,
                   ),
                 ),
               ],
@@ -175,20 +188,35 @@ class Scaffold extends HookWidget {
   }
 }
 
-Widget _autoHideBottomNavbarWrapper({
+Widget _autoHideNavigationWrapper({
   required Widget child,
-  required bool disabled,
+  required bool hideAppBarOnScroll,
+  required bool hideBottomNavigationBarOnScroll,
   required MainController controller,
+  required VoidCallback onShowAppBar,
+  required VoidCallback onHideAppBar,
 }) {
   return NotificationListener<UserScrollNotification>(
     onNotification: (notification) {
-      if (disabled) return false;
+      if (!hideAppBarOnScroll && !hideBottomNavigationBarOnScroll) {
+        return false;
+      }
 
       switch (notification.direction) {
         case ScrollDirection.reverse:
-          controller.hideBottomNavbar();
+          if (hideAppBarOnScroll) {
+            onHideAppBar();
+          }
+          if (hideBottomNavigationBarOnScroll) {
+            controller.hideBottomNavbar();
+          }
         case ScrollDirection.forward:
-          controller.showBottomNavbar();
+          if (hideAppBarOnScroll) {
+            onShowAppBar();
+          }
+          if (hideBottomNavigationBarOnScroll) {
+            controller.showBottomNavbar();
+          }
         case ScrollDirection.idle:
           break;
       }
@@ -197,6 +225,47 @@ Widget _autoHideBottomNavbarWrapper({
     },
     child: child,
   );
+}
+
+class _AnimatedAppBar extends StatelessWidget {
+  const _AnimatedAppBar({required this.isVisible, required this.child});
+
+  static const _duration = Duration(milliseconds: 180);
+
+  final bool isVisible;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedSwitcher(
+      duration: _duration,
+      reverseDuration: _duration,
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Curves.easeInCubic,
+      transitionBuilder: (child, animation) {
+        final curved = CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeOutCubic,
+          reverseCurve: Curves.easeInCubic,
+        );
+
+        return SizeTransition(
+          sizeFactor: curved,
+          alignment: Alignment.bottomCenter,
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0, -1),
+              end: Offset.zero,
+            ).animate(curved),
+            child: child,
+          ),
+        );
+      },
+      child: isVisible
+          ? KeyedSubtree(key: const ValueKey('shown'), child: child)
+          : const SizedBox.shrink(key: ValueKey('hidden')),
+    );
+  }
 }
 
 Widget _withSidebar({
