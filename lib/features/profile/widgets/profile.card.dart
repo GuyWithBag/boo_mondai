@@ -33,7 +33,7 @@ class ProfileCard extends StatelessWidget {
     return Surface(
       style: surfaceStyle.resolve(tokens, const [
         SurfaceBorder.none,
-        SurfaceShape.roundedSm,
+        SurfaceShape.roundedXsm,
         SurfaceShadow.none,
       ]),
       child: Column(

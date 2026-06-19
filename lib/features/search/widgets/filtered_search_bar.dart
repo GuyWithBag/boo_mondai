@@ -160,7 +160,7 @@ class FilteredSearchBar<TObject, TFilter extends SearchFilter>
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   color: tokens.colorSurfaceBackground,
-                  borderRadius: BorderRadius.circular(tokens.radiusSurfaceSm),
+                  borderRadius: BorderRadius.circular(tokens.radiusSurfaceXsm),
                   border: Border.all(color: tokens.colorBorderNeutralSubtle),
                   boxShadow: [
                     BoxShadow(
@@ -171,7 +171,7 @@ class FilteredSearchBar<TObject, TFilter extends SearchFilter>
                   ],
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(tokens.radiusSurfaceSm),
+                  borderRadius: BorderRadius.circular(tokens.radiusSurfaceXsm),
                   child: ListView.builder(
                     padding: EdgeInsets.zero,
                     shrinkWrap: true,

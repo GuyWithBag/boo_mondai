@@ -1,13 +1,28 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        AppModalTone,
+        ModalTone,
         AppTokens,
         Button,
         ButtonColor,
-        Modal,
         SearchFilter,
-        SearchFilterCodec;
-import 'package:flutter/material.dart';
+        SearchFilterCodec,
+        showModal;
+import 'package:flutter/material.dart'
+    show
+        BuildContext,
+        Navigator,
+        Theme,
+        Widget,
+        Text,
+        SizedBox,
+        Column,
+        CrossAxisAlignment,
+        MainAxisSize,
+        SingleChildScrollView,
+        Flexible,
+        StatelessWidget,
+        MainAxisAlignment,
+        Row;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -15,12 +30,13 @@ Future<TFilter?> showSearchFilterModal<TFilter extends SearchFilter>({
   required BuildContext context,
   required SearchFilterCodec<TFilter> codec,
   required TFilter currentFilter,
-  AppModalTone tone = AppModalTone.surface,
+  ModalTone tone = ModalTone.surface,
 }) {
-  return showDialog<TFilter>(
+  return showModal<TFilter>(
     context: context,
     barrierDismissible: true,
-    builder: (_) => _SearchFilterModal<TFilter>(
+    title: 'Search Filters',
+    child: _SearchFilterBody<TFilter>(
       codec: codec,
       currentFilter: currentFilter,
       tone: tone,
@@ -28,8 +44,8 @@ Future<TFilter?> showSearchFilterModal<TFilter extends SearchFilter>({
   );
 }
 
-class _SearchFilterModal<TFilter extends SearchFilter> extends HookWidget {
-  const _SearchFilterModal({
+class _SearchFilterBody<TFilter extends SearchFilter> extends HookWidget {
+  const _SearchFilterBody({
     required this.codec,
     required this.currentFilter,
     required this.tone,
@@ -37,74 +53,64 @@ class _SearchFilterModal<TFilter extends SearchFilter> extends HookWidget {
 
   final SearchFilterCodec<TFilter> codec;
   final TFilter currentFilter;
-  final AppModalTone tone;
+  final ModalTone tone;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
     final filter = useState<TFilter>(currentFilter);
     final fields = [...codec.modalFields]
-      ..sort(
-        (left, right) => left.directive.order.compareTo(right.directive.order),
-      );
+      ..sort((l, r) => l.directive.order.compareTo(r.directive.order));
 
-    void reset() {
-      filter.value = currentFilter;
-    }
-
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      insetPadding: EdgeInsets.all(tokens.spaceLayoutGapLg),
-      child: Modal(
-        tone: tone,
-        actions: [
-          Button(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          Button(onPressed: reset, child: const Text('Reset')),
-          Button(
-            variants: const [ButtonColor.primary],
-            onPressed: () => Navigator.pop(context, filter.value),
-            child: const Text('Apply'),
-          ),
-        ],
-        child: Flexible(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Search Filters',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              SizedBox(height: tokens.spaceLayoutGapLg),
-              Flexible(
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      for (var index = 0; index < fields.length; index++) ...[
-                        _SearchFilterFieldShell(
-                          label: fields[index].label,
-                          child: fields[index].buildEditor(
-                            context,
-                            filter.value,
-                            (nextFilter) => filter.value = nextFilter,
-                          ),
-                        ),
-                        if (index != fields.length - 1)
-                          SizedBox(height: tokens.spaceLayoutGapLg),
-                      ],
-                    ],
+    // Rebuild with actions wired to current filter state
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Flexible(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (var i = 0; i < fields.length; i++) ...[
+                  _SearchFilterFieldShell(
+                    label: fields[i].label,
+                    child: fields[i].buildEditor(
+                      context,
+                      filter.value,
+                      (next) => filter.value = next,
+                    ),
                   ),
-                ),
-              ),
-            ],
+                  if (i != fields.length - 1)
+                    SizedBox(height: tokens.spaceLayoutGapLg),
+                ],
+              ],
+            ),
           ),
         ),
-      ),
+        SizedBox(height: tokens.spaceLayoutGapLg),
+        // Actions inline since they need access to filter state
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Button(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            SizedBox(width: tokens.spaceLayoutGapSm),
+            Button(
+              onPressed: () => filter.value = currentFilter,
+              child: const Text('Reset'),
+            ),
+            SizedBox(width: tokens.spaceLayoutGapSm),
+            Button(
+              variants: const [ButtonColor.primary],
+              onPressed: () => Navigator.pop(context, filter.value),
+              child: const Text('Apply'),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
@@ -118,7 +124,6 @@ class _SearchFilterFieldShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [

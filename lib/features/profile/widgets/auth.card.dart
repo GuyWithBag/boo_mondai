@@ -67,7 +67,7 @@ class AuthCard extends StatelessWidget {
     return Surface(
       style: surfaceStyle.resolve(tokens, const [
         SurfaceBorder.none,
-        SurfaceShape.roundedSm,
+        SurfaceShape.roundedXsm,
       ]),
       child: Column(
         spacing: tokens.spaceLayoutGapMd,

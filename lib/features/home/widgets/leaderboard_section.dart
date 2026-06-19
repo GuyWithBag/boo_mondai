@@ -41,7 +41,7 @@ class LeaderboardSection extends StatelessWidget {
 
     return Surface(
       style: surfaceStyle.resolve(tokens, const [
-        SurfaceShape.roundedSm,
+        SurfaceShape.roundedXsm,
         SurfaceBorder.none,
         SurfaceShadow.none,
       ]),

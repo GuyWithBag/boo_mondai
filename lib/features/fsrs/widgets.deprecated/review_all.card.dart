@@ -29,7 +29,7 @@ class ReviewAllCard extends StatelessWidget {
           color: tokens.colorBorderNeutralSubtle,
           width: tokens.borderWidthDefault.w,
         ),
-        borderRadius: BorderRadius.circular(tokens.radiusSurfaceSm.r),
+        borderRadius: BorderRadius.circular(tokens.radiusSurfaceXsm.r),
       ),
       clipBehavior: Clip.antiAlias,
       child: Padding(

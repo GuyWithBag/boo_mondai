@@ -20,7 +20,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         StudyCard,
         WordScrambleTemplate,
         MatchingTypeCard,
-        appChipStyle,
+        chipStyle,
         useCubeController;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -93,7 +93,7 @@ class ViewCardTile extends HookWidget {
               children: [
                 for (final label in labels.take(3))
                   ChipTheme(
-                    data: appChipStyle.resolve(tokens, const [ChipTone.ghost]),
+                    data: chipStyle.resolve(tokens, const [ChipTone.ghost]),
                     child: Chip(
                       label: Text(label),
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -138,7 +138,7 @@ class ViewCardsReversibleGroup extends StatelessWidget {
       padding: EdgeInsets.all(tokens.spaceLayoutPadding),
       decoration: BoxDecoration(
         color: tokens.colorMuted,
-        borderRadius: BorderRadius.circular(tokens.radiusSurfaceSm),
+        borderRadius: BorderRadius.circular(tokens.radiusSurfaceXsm),
       ),
       child: Wrap(
         spacing: tokens.spaceLayoutGapLg,

@@ -12,9 +12,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         Pages,
         DarkModeToggleCard,
         ProfileCard,
-        PageScaffold,
+        Scaffold,
         AuthCard;
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Scaffold;
 import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
 import 'package:go_router/go_router.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -27,9 +27,9 @@ class ViewAccountPage extends StatelessWidget {
     final tokens = context.themeTokens<AppTokens>();
     final pages = Pages.appDetails;
 
-    return PageScaffold(
+    return Scaffold(
       body: Column(
-        spacing: tokens.spaceLayoutGapMd,
+        spacing: tokens.spaceLayoutGapSm,
         children: [
           const ProfileCard(),
           const DarkModeToggleCard(),
