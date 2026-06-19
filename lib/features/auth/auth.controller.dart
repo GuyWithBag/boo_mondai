@@ -8,9 +8,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         Controller,
         AuthService,
         AuthServiceResponse,
+        ImageHelper,
         Profile,
         RemoteDB,
         LocalDB;
+import 'package:file_picker/file_picker.dart' show PlatformFile;
 
 class AuthController extends Controller {
   /// Holds the result of the latest auth action to drive UI logic (like merges)
@@ -113,6 +115,19 @@ class AuthController extends Controller {
     if (AuthService.isAuthenticatedRemote) {
       await RemoteDB.profile.upsert(updated);
     }
+    notifyListeners();
+  }
+
+  Future<void> updateAvatarImage(PlatformFile file) async {
+    final imageSource = ImageHelper.sourceFromPickedFile(file);
+    if (imageSource == null) return;
+
+    final profile = currentProfile;
+    if (profile.avatarUrl == imageSource) return;
+
+    await LocalDB.profile.upsert(
+      profile.copyWith(avatarUrl: imageSource, updatedAt: DateTime.now()),
+    );
     notifyListeners();
   }
 

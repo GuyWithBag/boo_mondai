@@ -1,9 +1,11 @@
 import 'package:boo_mondai/core/database/localdbs.dart';
+import 'package:boo_mondai/core/helpers/image.helper.dart' show ImageHelper;
 import 'package:boo_mondai/features/decks/models/deck.dto.dart';
 import 'package:boo_mondai/features/decks/models/visibility_state.dto.dart';
 import 'package:boo_mondai/features/profile/models/cached_profile.dart';
 import 'package:boo_mondai/features/profile/models/profile.dto.dart';
 import 'package:boo_mondai/features/tags/models/tag.dto.dart';
+import 'package:file_picker/file_picker.dart' show PlatformFile;
 
 abstract final class ViewDeckSingleHelper {
   static String title(Deck deck) {
@@ -122,6 +124,25 @@ abstract final class ViewDeckSingleHelper {
     ).copyWith(updatedAt: DateTime.now());
 
     await LocalDB.deck.upsert(updatedDeck);
+    return true;
+  }
+
+  static Future<bool> updateCoverImage({
+    required Deck deck,
+    required PlatformFile file,
+  }) async {
+    if (!deck.isEditable) {
+      return false;
+    }
+
+    final imageSource = ImageHelper.sourceFromPickedFile(file);
+    if (imageSource == null || imageSource == deck.coverImageUrl) {
+      return false;
+    }
+
+    await LocalDB.deck.upsert(
+      deck.copyWith(coverImageUrl: imageSource, updatedAt: DateTime.now()),
+    );
     return true;
   }
 

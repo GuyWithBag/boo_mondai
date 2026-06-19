@@ -7,6 +7,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         ViewDecksLocalController,
         showModal,
         ViewDeckSingleHelper;
+import 'package:file_picker/file_picker.dart' show PlatformFile;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
@@ -20,6 +21,7 @@ class ViewDeckSingleSheetController {
     required this.onShortDescriptionChanged,
     required this.onLongDescriptionChanged,
     required this.onTagsChanged,
+    required this.onCoverImagePicked,
     required this.onDeletePressed,
   });
 
@@ -30,6 +32,7 @@ class ViewDeckSingleSheetController {
   final Future<void> Function(String value) onShortDescriptionChanged;
   final Future<void> Function(String value) onLongDescriptionChanged;
   final ValueChanged<List<String>> onTagsChanged;
+  final Future<void> Function(PlatformFile file) onCoverImagePicked;
   final VoidCallback onDeletePressed;
 }
 
@@ -136,6 +139,16 @@ ViewDeckSingleSheetController useViewDeckSingleSheet({
     }
   }
 
+  Future<void> setCoverImage(PlatformFile file) async {
+    final updated = await ViewDeckSingleHelper.updateCoverImage(
+      deck: deck,
+      file: file,
+    );
+    if (updated) {
+      controller.load();
+    }
+  }
+
   Future<void> deleteDeckDialog() async {
     final confirmed = await showModal<bool>(
       context: context,
@@ -169,6 +182,7 @@ ViewDeckSingleSheetController useViewDeckSingleSheet({
     onShortDescriptionChanged: setShortDescription,
     onLongDescriptionChanged: setLongDescription,
     onTagsChanged: setTags,
+    onCoverImagePicked: setCoverImage,
     onDeletePressed: deleteDeckDialog,
   );
 }

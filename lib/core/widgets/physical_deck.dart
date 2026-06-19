@@ -1,9 +1,11 @@
 import 'package:boo_mondai/core/widgets/background_image_surface.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
+        BackgroundImagePicked,
         CubeController,
         Deck,
         AppTokens,
+        ImageHelper,
         textStyle,
         TextSize,
         TextWeight,
@@ -25,6 +27,7 @@ class PhysicalDeck extends StatelessWidget {
     this.hasTags = false,
     this.showInfoCover = true,
     this.textScaleBaseWidth,
+    this.onCoverImagePicked,
   });
 
   final Deck? deck;
@@ -32,6 +35,7 @@ class PhysicalDeck extends StatelessWidget {
   final bool hasTags;
   final bool showInfoCover;
   final double? textScaleBaseWidth;
+  final BackgroundImagePicked? onCoverImagePicked;
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +60,7 @@ class PhysicalDeck extends StatelessWidget {
       textStyle.resolve(tokens, const [TextSize.labelSmall, TextWeight.body]),
       textScale,
     );
-    final coverImage = backgroundImageProviderFromSource(deck?.coverImageUrl);
+    final coverImage = ImageHelper.providerFromSource(deck?.coverImageUrl);
     final visibleTags = deck?.tags.take(8).toList() ?? const [];
 
     return Cube(
@@ -81,6 +85,7 @@ class PhysicalDeck extends StatelessWidget {
         builder: (context, constraints) {
           return BackgroundImageSurface(
             image: coverImage,
+            onImagePicked: onCoverImagePicked,
             clipBehavior: Clip.none,
             style: surfaceStyle.resolve(tokens, const [
               SurfaceShape.sharp,

@@ -1,11 +1,14 @@
+import 'dart:async' show FutureOr;
+
 import 'package:boo_mondai/lib.barrel.dart'
     show AppTokens, SurfaceShape, surfaceStyle, SurfaceBorder;
+import 'package:file_picker/file_picker.dart'
+    show FilePicker, FileType, PlatformFile;
 import 'package:flutter/material.dart'
     show
         Alignment,
         AlignmentGeometry,
         BoxFit,
-        AssetImage,
         BuildContext,
         Center,
         Clip,
@@ -16,25 +19,29 @@ import 'package:flutter/material.dart'
         Icons,
         Image,
         ImageProvider,
-        NetworkImage,
+        GestureDetector,
+        HitTestBehavior,
         Padding,
         Positioned,
+        SizedBox,
         Stack,
         StackFit,
         StatelessWidget,
         Widget;
 import 'package:theme_variants/theme_variants.dart';
 
-ImageProvider? backgroundImageProviderFromSource(String? source) {
-  final value = source?.trim();
-  if (value == null || value.isEmpty) return null;
+typedef BackgroundImagePicked = FutureOr<void> Function(PlatformFile file);
 
-  final uri = Uri.tryParse(value);
-  if (uri != null && (uri.scheme == 'http' || uri.scheme == 'https')) {
-    return NetworkImage(value);
-  }
+Future<PlatformFile?> pickBackgroundImageFile() async {
+  final result = await FilePicker.pickFiles(
+    type: FileType.image,
+    allowMultiple: false,
+    withData: true,
+  );
+  final files = result?.files;
+  if (files == null || files.isEmpty) return null;
 
-  return AssetImage(value);
+  return files.first;
 }
 
 class BackgroundImageSurface extends StatelessWidget {
@@ -48,6 +55,7 @@ class BackgroundImageSurface extends StatelessWidget {
     this.clipBehavior = Clip.antiAlias,
     this.missingImageIcon = Icons.image_not_supported_outlined,
     this.missingImageIconSize = 40,
+    this.onImagePicked,
   });
 
   final ImageProvider? image;
@@ -56,8 +64,9 @@ class BackgroundImageSurface extends StatelessWidget {
   final BoxFit fit;
   final AlignmentGeometry imageAlignment;
   final Clip clipBehavior;
-  final IconData missingImageIcon;
+  final IconData? missingImageIcon;
   final double missingImageIconSize;
+  final BackgroundImagePicked? onImagePicked;
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +83,7 @@ class BackgroundImageSurface extends StatelessWidget {
       clipBehavior: resolvedStyle.clipBehavior ?? clipBehavior,
     );
 
-    return Surface(
+    final surface = Surface(
       style: finalStyle,
       child: Stack(
         fit: StackFit.expand,
@@ -87,7 +96,9 @@ class BackgroundImageSurface extends StatelessWidget {
             Center(
               child: IconTheme(
                 data: finalStyle.iconTheme,
-                child: Icon(missingImageIcon, size: missingImageIconSize),
+                child: missingImageIcon == null
+                    ? const SizedBox.shrink()
+                    : Icon(missingImageIcon, size: missingImageIconSize),
               ),
             ),
           if (child != null)
@@ -97,5 +108,22 @@ class BackgroundImageSurface extends StatelessWidget {
         ],
       ),
     );
+
+    if (onImagePicked == null) {
+      return surface;
+    }
+
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: _pickImage,
+      child: surface,
+    );
+  }
+
+  Future<void> _pickImage() async {
+    final file = await pickBackgroundImageFile();
+    if (file == null) return;
+
+    await onImagePicked?.call(file);
   }
 }

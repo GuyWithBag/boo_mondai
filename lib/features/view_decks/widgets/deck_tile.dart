@@ -8,8 +8,12 @@
 import 'package:boo_mondai/core/widgets/background_image_surface.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
+        BackgroundImagePicked,
+        Button,
+        ButtonColor,
         Deck,
         AppTokens,
+        ImageHelper,
         CubeController,
         useCubeController,
         PhysicalCardSide,
@@ -59,6 +63,9 @@ class DeckTile extends HookWidget {
   /// Shows deck tags on the default tile's front cover.
   final bool hasTags;
 
+  final bool isImageEditable;
+  final BackgroundImagePicked? onImagePicked;
+
   final double? width;
 
   const DeckTile({
@@ -76,6 +83,8 @@ class DeckTile extends HookWidget {
     this.onHover,
     this.state = DeckTileState.defaultView,
     this.hasTags = false,
+    this.isImageEditable = false,
+    this.onImagePicked,
     this.width,
   });
 
@@ -87,7 +96,8 @@ class DeckTile extends HookWidget {
     final cardWidth = width ?? tokens.studyCardWidth;
     final cardHeight = cardWidth / studyCardAspectRatio;
     final animationScale = cardWidth / tokens.studyCardWidth;
-    final coverImage = backgroundImageProviderFromSource(deck?.coverImageUrl);
+    final coverImage = ImageHelper.providerFromSource(deck?.coverImageUrl);
+    final effectiveOnImagePicked = isImageEditable ? onImagePicked : null;
     // final scale = 1.3;
     final cardControllers = useMemoized(
       () => List.generate(
@@ -181,10 +191,23 @@ class DeckTile extends HookWidget {
                 ],
                 DeckTileState.bare => [
                   PhysicalDeck(
+                    deck: deck,
                     controller: physicalDeckController,
                     showInfoCover: false,
+                    onCoverImagePicked: effectiveOnImagePicked,
                     textScaleBaseWidth: cardWidth,
                   ),
+                  if (effectiveOnImagePicked != null)
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: Button.iconSmall(
+                        icon: Icons.edit,
+                        color: ButtonColor.primary,
+                        onPressed: () =>
+                            _pickAndApplyImage(effectiveOnImagePicked),
+                      ),
+                    ),
                 ],
                 DeckTileState.spread => [
                   for (final controller in cardControllers)
@@ -192,7 +215,10 @@ class DeckTile extends HookWidget {
                       controller: controller,
                       front: PhysicalCardSide(
                         maxWidth: cardWidth,
-                        child: BackgroundImageSurface(image: coverImage),
+                        child: BackgroundImageSurface(
+                          image: coverImage,
+                          onImagePicked: effectiveOnImagePicked,
+                        ),
                       ),
                     ),
                   PhysicalDeck(
@@ -208,5 +234,12 @@ class DeckTile extends HookWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _pickAndApplyImage(BackgroundImagePicked onImagePicked) async {
+    final file = await pickBackgroundImageFile();
+    if (file == null) return;
+
+    await onImagePicked(file);
   }
 }

@@ -13,7 +13,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextSize,
         TextWeight,
         TextColor,
-        HeaderBadge;
+        HeaderBadge,
+        ImageHelper;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -38,7 +39,7 @@ class DeckListingTile extends HookWidget {
         ? 'No description yet'
         : deck.shortDescription;
     final version = deck.version.isEmpty ? '1.0.0' : deck.version;
-    final backgroundImage = backgroundImageProviderFromSource(
+    final backgroundImage = ImageHelper.providerFromSource(
       _listingImageUrl(deck),
     );
     final creatorName = deck.userProfile?.username ?? 'Unknown creator';

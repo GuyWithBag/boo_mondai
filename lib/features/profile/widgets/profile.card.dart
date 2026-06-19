@@ -45,6 +45,7 @@ class ProfileCard extends StatelessWidget {
             displayName: displayName,
             avatarUrl: profile.avatarUrl,
             radius: 66,
+            onImagePicked: auth.updateAvatarImage,
           ),
           Column(
             mainAxisSize: MainAxisSize.min,

@@ -13,8 +13,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         DeckProfilesLabel,
         DeckTile,
         HeaderBadge,
-        MainController,
         MetaLabel,
+        DeckTileState,
         SurfacePadding,
         SurfaceShape,
         SurfaceColor,
@@ -36,11 +36,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         EditableTextValue,
         ViewDeckSingleHelper,
         DateHelper,
+        ImageHelper,
         showBottomSheet;
 import 'package:flutter/material.dart'
     show
         BuildContext,
-        showModalBottomSheet,
         Widget,
         StatelessWidget,
         ScrollController,
@@ -174,7 +174,12 @@ class _Body extends StatelessWidget {
                     right: 0,
                     top: 0,
                     height: headerHeight + tokens.radiusSurfaceLg,
-                    child: BackgroundImageSurface(),
+                    child: BackgroundImageSurface(
+                      image: ImageHelper.providerFromSource(deck.coverImageUrl),
+                      onImagePicked: deck.isEditable
+                          ? controller.onCoverImagePicked
+                          : null,
+                    ),
                   ),
                   Column(
                     children: [
@@ -364,7 +369,13 @@ class _BodySubSection extends StatelessWidget {
               scrollController: scrollController,
               collapseDistance: collapseDistance,
               alignment: Alignment.bottomLeft,
-              child: DeckTile(deck: deck, width: deckWidth),
+              child: DeckTile(
+                deck: deck,
+                width: deckWidth,
+                state: DeckTileState.bare,
+                isImageEditable: deck.isEditable,
+                onImagePicked: controller.onCoverImagePicked,
+              ),
             ),
           ),
           Positioned(
