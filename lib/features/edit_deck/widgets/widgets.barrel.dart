@@ -2,7 +2,6 @@
 
 // Other files
 export 'direction_selector.dart';
-export 'format_selector.dart';
 export 'multiple_choice_options_panel.dart';
 export 'edit_deck.sidebar.dart';
 export 'create_deck_tile.dart';
@@ -10,5 +9,4 @@ export 'edit_deck.appbar.dart';
 export 'multiple_choice_option.dart';
 export 'fill_in_the_blank.chip.dart';
 export 'matching_type.pair.dart';
-export 'matching_type.input.dart';
 export 'edit_deck.bottom_navbar.dart';

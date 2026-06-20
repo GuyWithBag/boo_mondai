@@ -11,7 +11,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         Scaffold,
         showSnackbar,
         useEditDeckController,
-        useEditDeckEditor,
         Button,
         ButtonColor;
 import 'package:flutter/material.dart' hide Scaffold;
@@ -33,38 +32,67 @@ class EditDeckPage extends HookWidget {
       deckId: deckId,
       initialTemplateId: initialTemplateId,
     );
-    final editor = useEditDeckEditor(controller);
+    final formKey = useMemoized(GlobalKey<FormState>.new);
+    final titleController = useTextEditingController();
+
+    useEffect(() {
+      final deckTitle = controller.deck?.title;
+      if (deckTitle != null && titleController.text.isEmpty) {
+        titleController.text = deckTitle;
+      }
+      return null;
+    }, [controller.deck?.id, controller.deck?.title]);
+
+    useEffect(() {
+      controller.ensureVisibleQuestionType();
+      return null;
+    }, [controller.questionType]);
+
+    bool validate() => formKey.currentState?.validate() ?? true;
+
+    void addTemplate() {
+      if (!validate()) return;
+      controller.addTemplate();
+    }
+
+    void selectTemplate(String templateId) {
+      if (!validate()) return;
+      controller.selectTemplate(templateId);
+    }
 
     return Scaffold(
       appBar: EditDeckAppbar(
-        titleController: editor.titleController,
+        titleController: titleController,
         onSave: () async {
-          await editor.saveDeck();
+          if (!validate()) return;
+
+          await controller.saveDeck(title: titleController.text);
           if (!context.mounted) return;
           showSnackbar(context, message: 'Deck Saved');
         },
-        isSaving: editor.isSaving,
+        isSaving: controller.isLoading,
       ),
       floatingActionButton: Button.icon(
         color: ButtonColor.primary,
-        onPressed: editor.addTemplate,
+        onPressed: addTemplate,
         icon: Icons.add,
       ),
       sidebar: EditDeckSidebar(
-        activeTemplateId: editor.activeTemplateId,
-        onAdd: editor.addTemplate,
-        onTemplateSelected: editor.selectTemplate,
+        activeTemplateId: controller.activeTemplateId,
+        onAdd: addTemplate,
+        onTemplateSelected: selectTemplate,
         templates: controller.templates,
       ),
-      bottomNavigationBar: editor.hasActiveTemplate
-          ? EditDeckBottomNavbar(editor: editor)
+      bottomNavigationBar: controller.hasActiveTemplate
+          ? EditDeckBottomNavbar(editor: controller)
           : null,
       haveSidebarOpenButton: true,
       hideAppBarOnScroll: true,
+      hideFloatingActionButtonOnScroll: true,
       floatingSidebar: true,
       body: Form(
-        key: editor.formKey,
-        child: EditDeckEditorBody(editor: editor),
+        key: formKey,
+        child: EditDeckEditorBody(editor: controller),
       ),
     );
   }

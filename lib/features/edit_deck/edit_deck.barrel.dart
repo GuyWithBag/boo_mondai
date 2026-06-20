@@ -8,5 +8,4 @@ export 'helpers/helpers.barrel.dart';
 export 'editors/editors.barrel.dart';
 // Other files
 export 'edit_deck.controller.dart';
-export 'create_deck.local.page.dart';
 export 'edit_deck.page.dart';

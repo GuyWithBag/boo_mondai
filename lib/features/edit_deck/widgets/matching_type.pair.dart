@@ -1,4 +1,12 @@
-import 'package:boo_mondai/lib.barrel.dart' show AppTokens, MatchingTypeInput;
+import 'package:boo_mondai/lib.barrel.dart'
+    show
+        AppTokens,
+        MatchingTypeInput,
+        MarkdownText,
+        MarkdownTextMode,
+        TextFieldSize,
+        TextFieldFrame,
+        TextFieldTone;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -25,22 +33,36 @@ class MatchPair extends StatelessWidget {
     final tokens = context.themeTokens<AppTokens>();
 
     return Row(
+      spacing: tokens.spaceLayoutGapSm,
       children: [
-        Icon(Icons.drag_indicator, color: tokens.colorTextMuted),
-        const SizedBox(width: 12),
         Expanded(
-          child: MatchingTypeInput(value: term, onChanged: onTermChanged),
+          child: MarkdownText(
+            data: term,
+            onChanged: onTermChanged,
+            mode: MarkdownTextMode.input,
+            variants: const [
+              TextFieldSize.labelLarge,
+              TextFieldFrame.outline,
+              TextFieldTone.neutral,
+            ],
+          ),
         ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          child: Icon(Icons.compare_arrows, color: tokens.colorTextMuted),
-        ),
+        Icon(Icons.compare_arrows, color: tokens.colorTextMuted),
         Expanded(
-          child: MatchingTypeInput(value: match, onChanged: onMatchChanged),
+          child: MarkdownText(
+            data: match,
+            onChanged: onMatchChanged,
+            mode: MarkdownTextMode.input,
+            variants: const [
+              TextFieldSize.labelLarge,
+              TextFieldFrame.outline,
+              TextFieldTone.neutral,
+            ],
+          ),
         ),
         IconButton(
           onPressed: canRemove ? onRemove : null,
-          icon: Icon(Icons.delete, color: tokens.colorTextMuted),
+          icon: Icon(Icons.delete_rounded, color: tokens.colorTextMuted),
         ),
       ],
     );

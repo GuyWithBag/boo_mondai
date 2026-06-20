@@ -2,7 +2,7 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
         Button,
-        EditDeckEditorController,
+        EditDeckController,
         ErrorText,
         FillInTheBlanksEditor,
         MatchingTypeEditor,
@@ -15,7 +15,7 @@ import 'package:theme_variants/theme_variants.dart';
 class EditDeckEditorBody extends StatelessWidget {
   const EditDeckEditorBody({required this.editor, super.key});
 
-  final EditDeckEditorController editor;
+  final EditDeckController editor;
 
   @override
   Widget build(BuildContext context) {

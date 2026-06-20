@@ -22,6 +22,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         uuid,
         CardType,
         QuestionType,
+        EditDeckQuestionTypeHelper,
         StudyCardService,
         MultipleChoiceOptionData,
         defaultMultipleChoiceOptions,
@@ -50,6 +51,32 @@ class EditDeckController extends Controller {
   List<CardTemplate> get templates => List.unmodifiable(_templates);
   bool get isDirty => _isDirty;
   String? get activeTemplateId => _activeTemplateId;
+  bool get hasActiveTemplate => _activeTemplateId != null;
+  QuestionType get questionType => formState.questionType.value;
+  int get selectedFormatIndex =>
+      EditDeckQuestionTypeHelper.selectedFormatIndex(questionType);
+
+  void setFormatIndex(int index) {
+    setQuestionType(EditDeckQuestionTypeHelper.questionTypeAt(index));
+  }
+
+  void setQuestionType(QuestionType value) {
+    formState.questionType.value = value;
+    formState.cardType.value =
+        EditDeckQuestionTypeHelper.cardTypeForQuestionType(
+          value,
+          formState.cardType.value,
+        );
+    notifyListeners();
+  }
+
+  void ensureVisibleQuestionType() {
+    if (EditDeckQuestionTypeHelper.isVisible(questionType)) return;
+
+    formState.questionType.value = QuestionType.flashcard;
+    formState.cardType.value = CardType.normal;
+    notifyListeners();
+  }
 
   void updateDeckTitle(String title) {
     final deck = _deck;
@@ -128,20 +155,13 @@ class EditDeckController extends Controller {
     }
   }
 
-  /// Creates a blank flashcard, adds it to the list, and automatically selects it.
-  void addBlankTemplate() {
+  /// Creates a blank template for the currently selected question type,
+  /// adds it to the list, and automatically selects it.
+  void addTemplate() {
     if (_deck == null) return;
 
-    // Default to a basic FlashcardTemplate when adding new
-    final newTemplate = FlashcardTemplate(
-      id: uuid.v7(),
-      updatedAt: DateTime.now(),
-      deckId: _deck!.id,
-      sortOrder: _templates.length,
-      createdAt: DateTime.now(),
-      frontText: '',
-      backText: '',
-    );
+    final newTemplate = _createTemplateForCurrentQuestionType();
+    if (newTemplate == null) return;
 
     _templates = [..._templates, newTemplate];
     _isDirty = true;
@@ -153,9 +173,12 @@ class EditDeckController extends Controller {
   // PATH: lib/controllers/deck_editor_page_controller.dart
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  Future<void> saveDeck() async {
+  Future<void> saveDeck({String? title}) async {
     if (_deck == null) return;
 
+    if (title != null) {
+      updateDeckTitle(title);
+    }
     saveActiveTemplateToDraft();
 
     setLoading(true);
@@ -409,5 +432,91 @@ class EditDeckController extends Controller {
         displayOrder: i,
       ),
     );
+  }
+
+  CardTemplate? _createTemplateForCurrentQuestionType() {
+    final deck = _deck;
+    if (deck == null) return null;
+
+    final now = DateTime.now();
+    final id = uuid.v7();
+    final sortOrder = _templates.length;
+
+    return switch (formState.questionType.value) {
+      QuestionType.flashcard => FlashcardTemplate(
+        id: id,
+        deckId: deck.id,
+        sortOrder: sortOrder,
+        createdAt: now,
+        updatedAt: now,
+        frontText: '',
+        backText: '',
+        cardType: formState.cardType.value,
+      ),
+      QuestionType.multipleChoice => MultipleChoiceTemplate(
+        id: id,
+        deckId: deck.id,
+        sortOrder: sortOrder,
+        createdAt: now,
+        updatedAt: now,
+        questionPrompt: '',
+        options: [
+          for (
+            var index = 0;
+            index < defaultMultipleChoiceOptions.length;
+            index++
+          )
+            MultipleChoiceOption(
+              id: uuid.v7(),
+              templateId: id,
+              optionText: defaultMultipleChoiceOptions[index].text,
+              isCorrect: defaultMultipleChoiceOptions[index].isCorrect,
+              displayOrder: index,
+            ),
+        ],
+      ),
+      QuestionType.fillInTheBlanks => FillInTheBlanksTemplate(
+        id: id,
+        deckId: deck.id,
+        sortOrder: sortOrder,
+        createdAt: now,
+        updatedAt: now,
+        segments: const [],
+      ),
+      QuestionType.matchMadness => MatchMadnessTemplate(
+        id: id,
+        deckId: deck.id,
+        sortOrder: sortOrder,
+        createdAt: now,
+        updatedAt: now,
+        pairs: [
+          for (var index = 0; index < defaultMatchPairs.length; index++)
+            MatchMadnessPair(
+              id: uuid.v7(),
+              templateId: id,
+              term: defaultMatchPairs[index].term,
+              match: defaultMatchPairs[index].match,
+              displayOrder: index,
+            ),
+        ],
+      ),
+      QuestionType.identification => IdentificationTemplate(
+        id: id,
+        deckId: deck.id,
+        sortOrder: sortOrder,
+        createdAt: now,
+        updatedAt: now,
+        promptText: '',
+        acceptedAnswers: '',
+      ),
+      QuestionType.wordScramble => WordScrambleTemplate(
+        id: id,
+        deckId: deck.id,
+        sortOrder: sortOrder,
+        createdAt: now,
+        updatedAt: now,
+        sentenceToScramble: '',
+      ),
+    };
   }
 }
