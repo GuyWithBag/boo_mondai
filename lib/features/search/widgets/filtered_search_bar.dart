@@ -57,6 +57,8 @@ import 'package:theme_variants/theme_variants.dart' show ThemeVariantsContext;
 typedef SearchResultBuilder<TObject> =
     Widget Function(BuildContext context, TObject result, int index);
 
+typedef SearchResultLabelBuilder<TObject> = String Function(TObject result);
+
 typedef SearchFilterModalBuilder<TFilter extends SearchFilter> =
     Future<TFilter?> Function(BuildContext context, TFilter currentFilter);
 
@@ -73,6 +75,7 @@ class FilteredSearchBar<TObject, TFilter extends SearchFilter>
     this.enabled,
     this.autofocus = false,
     this.resultBuilder,
+    this.resultLabelBuilder,
     this.onResultSelected,
     this.onChanged,
     this.onSubmitted,
@@ -95,6 +98,7 @@ class FilteredSearchBar<TObject, TFilter extends SearchFilter>
   final bool? enabled;
   final bool autofocus;
   final SearchResultBuilder<TObject>? resultBuilder;
+  final SearchResultLabelBuilder<TObject>? resultLabelBuilder;
   final ValueChanged<TObject>? onResultSelected;
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onSubmitted;
@@ -183,6 +187,7 @@ class FilteredSearchBar<TObject, TFilter extends SearchFilter>
                           context,
                           result,
                           index,
+                          label: resultLabelBuilder?.call(result),
                           onTap: () => selectResult(result),
                         );
                       }

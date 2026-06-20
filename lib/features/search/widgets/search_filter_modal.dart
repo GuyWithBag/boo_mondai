@@ -15,11 +15,13 @@ import 'package:flutter/material.dart'
         Widget,
         Text,
         SizedBox,
+        ConstrainedBox,
+        BoxConstraints,
         Column,
         CrossAxisAlignment,
         MainAxisSize,
+        MediaQuery,
         SingleChildScrollView,
-        Flexible,
         StatelessWidget,
         MainAxisAlignment,
         Row;
@@ -56,13 +58,15 @@ class _SearchFilterBody<TFilter extends SearchFilter> extends HookWidget {
     final filter = useState<TFilter>(currentFilter);
     final fields = [...codec.modalFields]
       ..sort((l, r) => l.directive.order.compareTo(r.directive.order));
+    final maxContentHeight = MediaQuery.sizeOf(context).height * 0.68;
 
     // Rebuild with actions wired to current filter state
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Flexible(
+        ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: maxContentHeight),
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,

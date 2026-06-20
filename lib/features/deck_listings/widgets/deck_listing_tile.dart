@@ -28,9 +28,10 @@ class DeckListingTile extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final listing = deck.listing;
+    final interactionsEnabled = listing != null && deck.isPublished;
     final interactionsController = useDeckListingInteractionsController(
       deck,
-      enabled: listing != null,
+      enabled: interactionsEnabled,
     );
     final AppTokens tokens = context.themeTokens<AppTokens>();
     final tags = deck.tags.take(8).toList();
@@ -91,6 +92,8 @@ class DeckListingTile extends HookWidget {
                         spacing: tokens.spaceLayoutGapMd,
                         runSpacing: tokens.spaceLayoutGapSm,
                         children: [
+                          if (!deck.isPublished)
+                            const HeaderBadge(label: 'Unpublished'),
                           MetaLabel(
                             icon: Icons.download_outlined,
                             label: _formatCount(listing?.downloadsCount ?? 0),
@@ -157,7 +160,9 @@ class DeckListingTile extends HookWidget {
                               interactionsController.favoritesCount,
                             ),
                             isSelected: interactionsController.isFavorite,
-                            onPressed: interactionsController.isBusy
+                            onPressed:
+                                interactionsController.isBusy ||
+                                    !interactionsEnabled
                                 ? null
                                 : () {
                                     interactionsController.toggleFavorite();

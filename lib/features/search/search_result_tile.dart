@@ -20,12 +20,13 @@ class SearchResultTile extends StatelessWidget {
     BuildContext context,
     TObject result,
     int index, {
+    String? label,
     VoidCallback? onTap,
   }) {
     return SearchResultTile(
       onTap: onTap,
       title: Text(
-        result.toString(),
+        label ?? result.toString(),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),

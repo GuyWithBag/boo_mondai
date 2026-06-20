@@ -1,10 +1,13 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
+        AppBar,
         Button,
         ButtonColor,
         Deck,
         DeckCommentWidget,
+        DeckListingSheetMode,
+        DeckListingTile,
         DeckTile,
         DeckTileState,
         ErrorState,
@@ -19,6 +22,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         DeckDetails,
         ProfileLabel,
         MarkdownTextMode,
+        Scaffold,
         ViewDeckListingsController,
         textStyle,
         surfaceStyle,
@@ -36,7 +40,6 @@ import 'package:flutter/material.dart'
         StatelessWidget,
         ScrollController,
         VoidCallback,
-        Spacer,
         Center,
         SizedBox,
         Text,
@@ -62,6 +65,7 @@ import 'package:flutter/material.dart'
         MediaQuery,
         BorderRadius,
         RoundedRectangleBorder,
+        Colors,
         ClipRRect,
         CarouselView,
         LayoutBuilder,
@@ -85,10 +89,20 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-Future<void> showViewDeckListingSingleSheet(BuildContext context, Deck deck) {
+Future<void> showViewDeckListingSingleSheet(
+  BuildContext context,
+  Deck deck, {
+  DeckListingSheetMode initialMode = DeckListingSheetMode.preview,
+}) {
   return showBottomSheet(
     context: context,
-    builder: (_) => ViewDeckListingSingleSheet(deck: deck),
+    builder: (_) {
+      final controller = ViewDeckListingsController()..decks = [deck];
+      return ChangeNotifierProvider<ViewDeckListingsController>.value(
+        value: controller,
+        child: ViewDeckListingSingleSheet(deck: deck, initialMode: initialMode),
+      );
+    },
   );
 }
 
@@ -96,10 +110,12 @@ class ViewDeckListingSingleSheet extends HookWidget {
   const ViewDeckListingSingleSheet({
     super.key,
     required this.deck,
+    this.initialMode = DeckListingSheetMode.preview,
     this.showCloseButton = true,
   });
 
   final Deck deck;
+  final DeckListingSheetMode initialMode;
   final bool showCloseButton;
 
   @override
@@ -110,6 +126,7 @@ class ViewDeckListingSingleSheet extends HookWidget {
     final sheet = useViewDeckListingSingleSheet(
       deckId: deck.id,
       initialDeck: deck,
+      initialMode: initialMode,
       controller: controller,
       changeReviewController: changeReviewController,
     );
@@ -149,17 +166,23 @@ class ViewDeckListingSingleSheet extends HookWidget {
             SurfaceColor.muted,
           ]),
           hasClipRRect: true,
-          child: _Body(
-            scrollController: scrollController,
-            controller: sheet,
-            showCloseButton: showCloseButton,
-            onBackPressed: () {
-              if (context.canPop()) {
-                context.pop();
-                return;
-              }
-              context.go('/');
-            },
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            scrollable: false,
+            center: false,
+            constrainWidth: false,
+            padding: EdgeInsets.zero,
+            body: _Body(
+              scrollController: scrollController,
+              controller: sheet,
+              onBackPressed: () {
+                if (context.canPop()) {
+                  context.pop();
+                  return;
+                }
+                context.go('/');
+              },
+            ),
           ),
         );
       },
@@ -171,13 +194,11 @@ class _Body extends StatelessWidget {
   const _Body({
     required this.scrollController,
     required this.controller,
-    required this.showCloseButton,
     required this.onBackPressed,
   });
 
   final ScrollController scrollController;
   final ViewDeckListingSingleController controller;
-  final bool showCloseButton;
   final VoidCallback onBackPressed;
 
   @override
@@ -275,109 +296,123 @@ class _Body extends StatelessWidget {
                             ),
                           ),
                           SizedBox(height: tokens.spaceLayoutGapLg),
-                          DeckDetails(
-                            title: EditableTextValue(
-                              value: ViewDeckListingSingleHelper.title(deck),
-                              enabled: false,
-                              onSave: (_) async {},
-                              textStyle: textStyle.resolve(tokens, const [
-                                TextSize.header,
-                                TextWeight.heavy,
-                              ]),
-                            ),
-                            metaLabels: Wrap(
-                              spacing: tokens.spaceLayoutGapMd,
-                              runSpacing: tokens.spaceLayoutGapSm,
-                              children: [
-                                MetaLabel(
-                                  icon: Icons.style_outlined,
-                                  label: '${deck.cardCount} cards',
-                                ),
-                                MetaLabel(
-                                  icon: Icons.new_releases_outlined,
-                                  label: 'v${deck.version}+${deck.buildNumber}',
-                                ),
-                                MetaLabel(
-                                  icon: Icons.visibility_outlined,
-                                  label:
-                                      ViewDeckListingSingleHelper.visibilityLabel(
-                                        deck,
-                                      ),
-                                ),
-                                MetaLabel(
-                                  icon: Icons.update_outlined,
-                                  label: DateHelper.ddMmYy(deck.updatedAt),
-                                  tooltip:
-                                      'Updated ${DateHelper.ddMmYy(deck.updatedAt)}',
-                                ),
-                              ],
-                            ),
-                            shortDescription: EditableTextValue(
-                              value:
-                                  ViewDeckListingSingleHelper.shortDescription(
-                                    deck,
+                          if (controller.canEdit) ...[
+                            _ListingModeControls(controller: controller),
+                            SizedBox(height: tokens.spaceLayoutGapLg),
+                          ],
+                          if (controller.mode == DeckListingSheetMode.preview)
+                            Center(child: DeckListingTile(deck: deck))
+                          else
+                            DeckDetails(
+                              title: EditableTextValue(
+                                value: ViewDeckListingSingleHelper.title(deck),
+                                enabled: controller.canEdit,
+                                onSave: controller.onTitleChanged,
+                                textStyle: textStyle.resolve(tokens, const [
+                                  TextSize.header,
+                                  TextWeight.heavy,
+                                ]),
+                              ),
+                              metaLabels: Wrap(
+                                spacing: tokens.spaceLayoutGapMd,
+                                runSpacing: tokens.spaceLayoutGapSm,
+                                children: [
+                                  MetaLabel(
+                                    icon: Icons.style_outlined,
+                                    label: '${deck.cardCount} cards',
                                   ),
-                              enabled: false,
-                              onSave: (_) async {},
-                              textStyle: textStyle.resolve(tokens, const [
-                                TextSize.label,
-                                TextWeight.strong,
-                              ]),
-                            ),
-                            longDescription: EditableTextValue(
-                              value:
-                                  ViewDeckListingSingleHelper.longDescription(
-                                    deck,
+                                  MetaLabel(
+                                    icon: Icons.new_releases_outlined,
+                                    label:
+                                        'v${deck.version}+${deck.buildNumber}',
                                   ),
-                              enabled: false,
-                              isMarkdown: true,
-                              markdownMode: MarkdownTextMode.preview,
-                              onSave: (_) async {},
-                              textStyle: textStyle.resolve(tokens, const [
-                                TextSize.bodyLarge,
-                                TextWeight.body,
-                              ]),
+                                  MetaLabel(
+                                    icon: Icons.visibility_outlined,
+                                    label:
+                                        ViewDeckListingSingleHelper.visibilityLabel(
+                                          deck,
+                                        ),
+                                  ),
+                                  MetaLabel(
+                                    icon: Icons.update_outlined,
+                                    label: DateHelper.ddMmYy(deck.updatedAt),
+                                    tooltip:
+                                        'Updated ${DateHelper.ddMmYy(deck.updatedAt)}',
+                                  ),
+                                ],
+                              ),
+                              shortDescription: EditableTextValue(
+                                value:
+                                    ViewDeckListingSingleHelper.shortDescription(
+                                      deck,
+                                    ),
+                                enabled: controller.canEdit,
+                                onSave: controller.onShortDescriptionChanged,
+                                textStyle: textStyle.resolve(tokens, const [
+                                  TextSize.label,
+                                  TextWeight.strong,
+                                ]),
+                              ),
+                              longDescription: EditableTextValue(
+                                value:
+                                    ViewDeckListingSingleHelper.longDescription(
+                                      deck,
+                                    ),
+                                enabled: controller.canEdit,
+                                isMarkdown: true,
+                                markdownMode: MarkdownTextMode.preview,
+                                onSave: controller.onLongDescriptionChanged,
+                                textStyle: textStyle.resolve(tokens, const [
+                                  TextSize.bodyLarge,
+                                  TextWeight.body,
+                                ]),
+                              ),
+                              tags: deck.tags
+                                  .map((tag) => tag.name)
+                                  .toList(growable: false),
+                              tagsEnabled: false,
+                              tagsPlaceholder: 'No tags yet',
                             ),
-                            tags: deck.tags
-                                .map((tag) => tag.name)
-                                .toList(growable: false),
-                            tagsEnabled: false,
-                            tagsPlaceholder: 'No tags yet',
-                          ),
                         ],
                       ),
                     ),
                   ),
-                  SizedBox(height: tokens.spaceLayoutGapLg),
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: tokens.spaceLayoutPadding,
+                  if (deck.isPublished) ...[
+                    SizedBox(height: tokens.spaceLayoutGapLg),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: tokens.spaceLayoutPadding,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SectionEyebrow('Featured Cards'),
+                          SizedBox(height: tokens.spaceLayoutGapLg),
+                          _DiscussionSection(sheet: controller),
+                        ],
+                      ),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SectionEyebrow('Featured Cards'),
-                        SizedBox(height: tokens.spaceLayoutGapLg),
-                        _DiscussionSection(sheet: controller),
-                      ],
-                    ),
-                  ),
+                  ],
                 ],
               ),
             ),
           ],
         ),
         Positioned(
-          left: tokens.spaceLayoutPadding,
-          right: tokens.spaceLayoutPadding,
           top: tokens.spaceLayoutPadding,
-          child: Row(
-            children: [
-              Button.icon(
-                icon: showCloseButton ? Icons.close : Icons.arrow_back,
-                onPressed: onBackPressed,
-              ),
-              const Spacer(),
+          left: 0,
+          right: 0,
+          child: AppBar(
+            transparentBackground: true,
+            onPop: onBackPressed,
+            actions: [
+              if (controller.canPublish) ...[
+                Button.icon(
+                  icon: Icons.public_outlined,
+                  color: ButtonColor.success,
+                  onPressed: controller.onPublishPressed,
+                ),
+              ],
               Button.icon(
                 icon: controller.isDownloading
                     ? Icons.sync
@@ -395,6 +430,34 @@ class _Body extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _ListingModeControls extends StatelessWidget {
+  const _ListingModeControls({required this.controller});
+
+  final ViewDeckListingSingleController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return SegmentedButton<DeckListingSheetMode>(
+      segments: const [
+        ButtonSegment(
+          value: DeckListingSheetMode.editor,
+          icon: Icon(Icons.edit_outlined),
+          label: Text('Editor'),
+        ),
+        ButtonSegment(
+          value: DeckListingSheetMode.preview,
+          icon: Icon(Icons.visibility_outlined),
+          label: Text('Preview'),
+        ),
+      ],
+      selected: {controller.mode},
+      onSelectionChanged: (selected) {
+        controller.onModeChanged(selected.first);
+      },
     );
   }
 }

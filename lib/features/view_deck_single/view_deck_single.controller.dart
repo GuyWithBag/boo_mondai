@@ -2,9 +2,12 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         ButtonColor,
         Deck,
+        DeckListing,
+        DeckListingSheetMode,
         LocalDB,
         ModalAction,
         ViewDecksLocalController,
+        showViewDeckListingSingleSheet,
         showModal,
         ViewDeckSingleHelper;
 import 'package:file_picker/file_picker.dart' show PlatformFile;
@@ -49,6 +52,45 @@ ViewDeckSingleSheetController useViewDeckSingleSheet({
 
   Future<void> setPublished(bool isPublished) async {
     if (isSavingPublishState.value || deck.isPublished == isPublished) {
+      return;
+    }
+
+    if (isPublished) {
+      final confirmed = await showModal<bool>(
+        context: context,
+        title: 'Create deck listing?',
+        subtitle:
+            'This will create a listing of this deck to publish online. You will have to publish it in the listing.',
+        leading: const Icon(Icons.public_outlined),
+        actions: [
+          const ModalAction<bool>(value: false, label: 'Cancel'),
+          const ModalAction<bool>(
+            value: true,
+            label: 'Create Listing',
+            color: ButtonColor.primary,
+          ),
+        ],
+      );
+      if (confirmed != true) return;
+
+      final now = DateTime.now();
+      final listing = DeckListing(
+        deckId: deck.id,
+        createdAt: now,
+        updatedAt: now,
+      );
+      final listingDeck = deck.copyWith(listing: listing, updatedAt: now);
+      await LocalDB.deck.upsert(listingDeck);
+      await LocalDB.deckListing.upsert(listing);
+      controller.load();
+
+      if (context.mounted) {
+        await showViewDeckListingSingleSheet(
+          context,
+          listingDeck,
+          initialMode: DeckListingSheetMode.editor,
+        );
+      }
       return;
     }
 

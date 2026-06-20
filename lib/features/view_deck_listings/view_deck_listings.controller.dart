@@ -23,6 +23,21 @@ class ViewDeckListingsController extends Controller {
 
   bool isDownloadingDeck(String deckId) => downloadingDeckId == deckId;
 
+  void replaceDeck(Deck deck) {
+    decks = [
+      for (final current in decks)
+        if (current.id == deck.id) deck else current,
+    ];
+
+    if (!decks.any((current) => current.id == deck.id)) {
+      decks = [deck, ...decks];
+    }
+
+    const deckSearchResults = DeckSearchResults();
+    availableTags = deckSearchResults.availableTags(decks);
+    notifyListeners();
+  }
+
   Future<void> loadPublicDecks() async {
     setLoading(true);
     try {

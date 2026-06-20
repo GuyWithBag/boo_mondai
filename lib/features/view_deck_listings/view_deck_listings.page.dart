@@ -73,6 +73,7 @@ class _ViewDeckListingsView extends HookWidget {
             searchResults: const DeckSearchResults(),
             items: controller.decks,
             placeholder: 'Search public decks',
+            resultLabelBuilder: (deck) => deck.title,
           ),
           ListingStatesWrapper<Deck>.list(
             isLoading: controller.isLoading,

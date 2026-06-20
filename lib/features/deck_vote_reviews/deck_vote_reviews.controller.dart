@@ -57,6 +57,7 @@ DeckVoteReviewsController useDeckVoteReviewsController({
   required Deck deck,
   required int? currentVoteValue,
   Future<void> Function()? onReviewChanged,
+  bool enabled = true,
 }) {
   final reviews = useState(const <DeckVoteReview>[]);
   final reviewComments = useState(
@@ -89,9 +90,11 @@ DeckVoteReviewsController useDeckVoteReviewsController({
       }
     }
 
-    loadReviews();
+    if (enabled) {
+      loadReviews();
+    }
     return null;
-  }, [deck.id]);
+  }, [deck.id, enabled]);
 
   final reviewByItemId = {
     for (final review in reviews.value) review.id: review,

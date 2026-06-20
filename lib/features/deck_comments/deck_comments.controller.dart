@@ -41,7 +41,10 @@ class DeckCommentsController {
   int get count => comments.length;
 }
 
-DeckCommentsController useDeckCommentsController({required Deck deck}) {
+DeckCommentsController useDeckCommentsController({
+  required Deck deck,
+  bool enabled = true,
+}) {
   final comments = useState(const <DeckComment>[]);
   final isLoading = useState(false);
   final isSubmitting = useState(false);
@@ -61,9 +64,11 @@ DeckCommentsController useDeckCommentsController({required Deck deck}) {
       }
     }
 
-    loadComments();
+    if (enabled) {
+      loadComments();
+    }
     return null;
-  }, [deck.id]);
+  }, [deck.id, enabled]);
 
   final commentByItemId = {
     for (final comment in comments.value) comment.id: comment,

@@ -95,7 +95,7 @@ class BackgroundImageSurface extends StatelessWidget {
           else
             Center(
               child: IconTheme(
-                data: finalStyle.iconTheme,
+                data: finalStyle.iconTheme.copyWith(color: tokens.colorMuted),
                 child: missingImageIcon == null
                     ? const SizedBox.shrink()
                     : Icon(missingImageIcon, size: missingImageIconSize),

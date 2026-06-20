@@ -2,6 +2,9 @@ import 'dart:convert';
 
 import 'package:file_picker/file_picker.dart' show PlatformFile;
 import 'package:flutter/material.dart';
+import 'package:boo_mondai/core/helpers/image_file_provider_stub.dart'
+    if (dart.library.io) 'package:boo_mondai/core/helpers/image_file_provider_io.dart'
+    show imageProviderFromFilePath;
 
 abstract final class ImageHelper {
   static ImageProvider? providerFromSource(String? source) {
@@ -16,16 +19,24 @@ abstract final class ImageHelper {
     final dataImage = _memoryImageFromDataUri(value);
     if (dataImage != null) return dataImage;
 
+    final fileImage = imageProviderFromFilePath(value);
+    if (fileImage != null) return fileImage;
+
     return AssetImage(value);
   }
 
   static String? sourceFromPickedFile(PlatformFile file) {
     final bytes = file.bytes;
-    if (bytes == null || bytes.isEmpty) {
+    if (bytes != null && bytes.isNotEmpty) {
+      return 'data:${_mimeTypeForExtension(file.extension)};base64,${base64Encode(bytes)}';
+    }
+
+    final path = file.path?.trim();
+    if (path == null || path.isEmpty) {
       return null;
     }
 
-    return 'data:${_mimeTypeForExtension(file.extension)};base64,${base64Encode(bytes)}';
+    return path;
   }
 
   static MemoryImage? _memoryImageFromDataUri(String value) {

@@ -26,7 +26,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         SyncPage,
         ViewDecksHelper,
         ViewDecksLocalController,
-        showCreateDeckLocalSheet,
         showSnackbar,
         useFilteredSearchBarController,
         useSyncController,
@@ -174,6 +173,7 @@ class ViewDecksLocalPage extends HookWidget {
       searchResults: ViewDecksLocalController.deckSearchResults,
       items: controller.decks,
       placeholder: 'Search decks',
+      resultLabelBuilder: (deck) => deck.title,
       onResultSelected: (deck) => controller.goToDeck(context, deck),
       onSubmitted: (_) => controller.submitSearch(context, visibleDecks),
     );
@@ -207,6 +207,7 @@ class ViewDecksLocalPage extends HookWidget {
             isLoading: controller.isLoading,
             onRetry: controller.load,
             onPressed: controller.goToDeck,
+            onCreate: () => controller.createDeck(context),
             decks: visibleDecks,
             hasSearchQuery: hasSearchQuery,
           ),
@@ -225,6 +226,7 @@ class _DeckListBody extends StatelessWidget {
     required this.decks,
     required this.onRetry,
     required this.onPressed,
+    required this.onCreate,
     required this.hasSearchQuery,
   });
 
@@ -233,6 +235,7 @@ class _DeckListBody extends StatelessWidget {
   final List<Deck> decks;
   final VoidCallback onRetry;
   final Function(BuildContext context, Deck deck) onPressed;
+  final VoidCallback onCreate;
   final bool hasSearchQuery;
 
   @override
@@ -264,16 +267,13 @@ class _DeckListBody extends StatelessWidget {
                   title: 'No decks yet',
                   message: 'Create your first deck to get started',
                   action: ElevatedButton(
+                    onPressed: onCreate,
                     child: Text('Create Deck'),
-                    onPressed: () => showCreateDeckLocalSheet(context),
                   ),
                 ),
           spacing: spacing,
           runSpacing: spacing,
-          leadingItem: CreateDeckTile(
-            width: tileWidth,
-            onPressed: () => showCreateDeckLocalSheet(context),
-          ),
+          leadingItem: CreateDeckTile(width: tileWidth, onPressed: onCreate),
           itemBuilder: (_, _, deck) {
             return DeckTile(
               deck: deck,

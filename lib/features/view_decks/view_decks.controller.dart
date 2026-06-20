@@ -13,6 +13,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         Deck,
         DeckSearchFilterCodec,
         DeckSearchResults,
+        FsrsCard,
         showViewDeckSingleSheet;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -74,10 +75,51 @@ class ViewDecksLocalController extends Controller {
     goToDeck(context, visibleDecks.single);
   }
 
+  Future<void> createDeck(BuildContext context) async {
+    setLoading(true);
+    setError(null);
+    try {
+      final deck = Deck.createNow(
+        userId: LocalDB.profile.getOrCreate().id,
+        title: 'Untitled Deck',
+        isPublished: false,
+      );
+
+      await _deckDB.upsert(deck);
+      load();
+
+      if (context.mounted) {
+        showViewDeckSingleSheet(context, deck);
+      }
+    } on Exception catch (e) {
+      setError(e);
+      setLoading(false);
+      notifyListeners();
+    }
+  }
+
   Future<void> deleteDeck(String id) async {
     setLoading(true);
     setError(null);
     try {
+      final studyCards = LocalDB.studyCard.getByDeckId(id);
+      final studyCardIds = studyCards.map((card) => card.id).toSet();
+      final fsrsCards = LocalDB.fsrsCard.selectMany(
+        where: (card) => studyCardIds.contains(card.studyCardId),
+      );
+      final fsrsCardIds = fsrsCards.map((card) => card.id).toSet();
+      final reviewLogs = LocalDB.reviewLog.selectMany(
+        where: (log) => fsrsCardIds.contains(log.fsrsCardId),
+      );
+
+      await LocalDB.reviewLog.deleteManyByPk([
+        for (final log in reviewLogs) {'id': log.id},
+      ]);
+      await LocalDB.fsrsCard.deleteManyByPk([
+        for (final FsrsCard card in fsrsCards) {'id': card.id},
+      ]);
+      await LocalDB.studyCard.deleteByDeckId(id);
+      await LocalDB.cardTemplate.deleteByDeckId(id);
       await _deckDB.deleteByPk({'id': id});
       load();
     } on Exception catch (e) {
