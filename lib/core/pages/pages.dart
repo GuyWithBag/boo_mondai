@@ -11,7 +11,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         ViewAccountPage,
         LoginPage,
         RegisterPage,
-        CreateDeckPage,
         StudySessionPage,
         ResearcherDashboardPage,
         ViewLeaderboardPage,
@@ -92,14 +91,6 @@ class Pages {
     builder:
         (context, {pathParameters = const {}, queryParameters = const {}}) =>
             const RegisterPage(),
-  );
-
-  static final createDeck = AppPage(
-    url: '/decks-local/create',
-    name: 'Create Deck',
-    builder:
-        (context, {pathParameters = const {}, queryParameters = const {}}) =>
-            const CreateDeckPage(),
   );
 
   static final editDeck = AppPage(
@@ -261,7 +252,6 @@ class Pages {
     termsOfService,
   ];
   static final nonShell = <AppPage>[
-    createDeck,
     editDeck,
     viewCards,
     drillSession,

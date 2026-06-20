@@ -1,6 +1,6 @@
 import 'package:boo_mondai/features/app_theme/surface.variant.dart';
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, Streak, surfaceStyle;
+    show AppTokens, Streak, TextSize, TextWeight, surfaceStyle, textStyle;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -17,29 +17,25 @@ class StreaksCard extends StatelessWidget {
     return Surface(
       style: surfaceStyle.resolve(tokens, const [SurfaceColor.streak]),
       child: Row(
+        spacing: tokens.spaceLayoutGapMd,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.local_fire_department_outlined, size: 34.sp),
-          SizedBox(width: 18.w),
+          Icon(Icons.local_fire_department_outlined, size: 45.sp),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
+            spacing: tokens.spaceLayoutGapSm,
             children: [
               Text(
                 '${streak?.currentStreak ?? 0}',
-                style: TextStyle(
-                  fontSize: 24.sp,
-                  fontWeight: tokens.fontWeightTextHeavy,
-                  height: 1,
-                ),
+                style: textStyle.resolve(tokens, const [
+                  TextSize.header2,
+                  TextWeight.heavy,
+                ]),
               ),
-              SizedBox(height: 6.h),
               Text(
                 'Day Streak',
-                style: TextStyle(
-                  fontSize: tokens.textSizeLabel.sp,
-                  fontWeight: tokens.fontWeightTextStrong,
-                ),
+                style: textStyle.resolve(tokens, const [TextSize.label]),
               ),
             ],
           ),

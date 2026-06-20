@@ -4,6 +4,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         DrillSessionsRemoteDB,
         ProfilesRemoteDB,
         DecksRemoteDB,
+        DeckListingsRemoteDB,
         DeckInteractionsRemoteDB,
         DeckCommentsRemoteDB,
         DeckCommentEditLogsRemoteDB,
@@ -24,6 +25,7 @@ class RemoteDB {
   // ── Remote Data Sources ──────────────────────────
   static late final ProfilesRemoteDB profile;
   static late final DecksRemoteDB deck;
+  static late final DeckListingsRemoteDB deckListing;
   static late final DeckInteractionsRemoteDB deckInteractions;
   static late final DeckCommentsRemoteDB deckComment;
   static late final DeckCommentEditLogsRemoteDB deckCommentEditLog;
@@ -46,6 +48,7 @@ class RemoteDB {
   static Future<void> init() async {
     profile = ProfilesRemoteDB();
     deck = DecksRemoteDB();
+    deckListing = DeckListingsRemoteDB();
     deckInteractions = DeckInteractionsRemoteDB();
     deckComment = DeckCommentsRemoteDB();
     deckCommentEditLog = DeckCommentEditLogsRemoteDB();

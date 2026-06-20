@@ -37,6 +37,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 @BarrelConfig(
   exclude: [
     'lib/core/hive/hive.barrel.dart',
+    'lib/core/helpers/image_file_provider_io.dart',
+    'lib/core/helpers/image_file_provider_stub.dart',
     'lib/**/**/*.mapper.dart',
     'lib/**/*.mapper.dart',
     'lib/*.mapper.dart',

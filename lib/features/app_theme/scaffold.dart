@@ -15,6 +15,7 @@ import 'package:flutter/material.dart'
         SizedBox,
         EdgeInsets,
         Padding,
+        ClipRect,
         BoxConstraints,
         ConstrainedBox,
         Center,
@@ -22,11 +23,13 @@ import 'package:flutter/material.dart'
         Expanded,
         Column,
         LayoutBuilder,
+        MediaQuery,
         NotificationListener,
         Row,
         Positioned,
         Curves,
         AnimatedSlide,
+        AnimatedOpacity,
         IgnorePointer,
         Stack,
         MainAxisSize,
@@ -60,6 +63,9 @@ class Scaffold extends HookWidget {
     this.hideNavigation = false,
     this.hideAppBarOnScroll = false,
     this.hideBottomNavigationBarOnScroll = false,
+    this.hideFloatingActionButtonOnScroll = false,
+    this.onlyShowFloatingActionButtonsWhenTyping = false,
+    this.hideFloatingActionButtonsWhenTyping = false,
     this.scrollable = true,
     this.safeArea = true,
     this.center = true,
@@ -68,7 +74,12 @@ class Scaffold extends HookWidget {
     this.floatingSidebar = false,
     this.floatingSidebarInitiallyOpen = false,
     this.haveSidebarOpenButton = false,
-  });
+  }) : assert(
+         !onlyShowFloatingActionButtonsWhenTyping ||
+             !hideFloatingActionButtonsWhenTyping,
+         'onlyShowFloatingActionButtonsWhenTyping and '
+         'hideFloatingActionButtonsWhenTyping cannot both be true.',
+       );
 
   final Widget body;
   final Widget? appBar;
@@ -80,6 +91,9 @@ class Scaffold extends HookWidget {
   final bool hideNavigation;
   final bool hideAppBarOnScroll;
   final bool hideBottomNavigationBarOnScroll;
+  final bool hideFloatingActionButtonOnScroll;
+  final bool onlyShowFloatingActionButtonsWhenTyping;
+  final bool hideFloatingActionButtonsWhenTyping;
   final bool scrollable;
   final bool safeArea;
   final bool center;
@@ -93,6 +107,8 @@ class Scaffold extends HookWidget {
   Widget build(BuildContext context) {
     final isFloatingSidebarOpen = useState(floatingSidebarInitiallyOpen);
     final isAppBarVisible = useState(true);
+    final isFloatingActionButtonVisible = useState(true);
+    final isTyping = MediaQuery.viewInsetsOf(context).bottom > 0;
     final tokens = context.themeTokens<AppTokens>();
     final effectiveMaxWidth = maxWidth ?? tokens.spaceScaffoldMaxWidth;
     final effectivePadding =
@@ -138,7 +154,7 @@ class Scaffold extends HookWidget {
           floatingSidebar: useFloatingSidebar,
           isFloatingSidebarOpen: isFloatingSidebarOpen.value,
         );
-        final effectiveFloatingActionButton = _floatingActionButtonRow(
+        final floatingActionButtonRow = _floatingActionButtonRow(
           floatingActionButton: floatingActionButton,
           showSidebarOpenButton:
               canShowSidebar && useFloatingSidebar && haveSidebarOpenButton,
@@ -147,6 +163,43 @@ class Scaffold extends HookWidget {
             isFloatingSidebarOpen.value = !isFloatingSidebarOpen.value;
           },
           tokens: tokens,
+        );
+        final effectiveFloatingActionButton = floatingActionButtonRow == null
+            ? null
+            : _AnimatedFloatingActionButton(
+                isVisible:
+                    !hideFloatingActionButtonOnScroll ||
+                    isFloatingActionButtonVisible.value,
+                onlyShowWhenTyping: onlyShowFloatingActionButtonsWhenTyping,
+                hideWhenTyping: hideFloatingActionButtonsWhenTyping,
+                isTyping: isTyping,
+                child: floatingActionButtonRow,
+              );
+
+        final body = Column(
+          children: [
+            if (appBar != null)
+              _AnimatedAppBar(isVisible: isAppBarVisible.value, child: appBar!),
+            Expanded(
+              child: _autoHideNavigationWrapper(
+                controller: mainController,
+                onShowAppBar: () => isAppBarVisible.value = true,
+                onHideAppBar: () => isAppBarVisible.value = false,
+                onShowFloatingActionButton: () {
+                  isFloatingActionButtonVisible.value = true;
+                },
+                onHideFloatingActionButton: () {
+                  isFloatingActionButtonVisible.value = false;
+                },
+                child: scaffoldBody,
+                hideAppBarOnScroll: hideAppBarOnScroll,
+                hideBottomNavigationBarOnScroll:
+                    hideBottomNavigationBarOnScroll,
+                hideFloatingActionButtonOnScroll:
+                    hideFloatingActionButtonOnScroll,
+              ),
+            ),
+          ],
         );
 
         return material.Scaffold(
@@ -160,28 +213,7 @@ class Scaffold extends HookWidget {
                 )
               : null,
           backgroundColor: backgroundColor ?? tokens.colorScaffoldBackground,
-          body: SafeArea(
-            child: Column(
-              children: [
-                if (appBar != null)
-                  _AnimatedAppBar(
-                    isVisible: isAppBarVisible.value,
-                    child: appBar!,
-                  ),
-                Expanded(
-                  child: _autoHideNavigationWrapper(
-                    controller: mainController,
-                    onShowAppBar: () => isAppBarVisible.value = true,
-                    onHideAppBar: () => isAppBarVisible.value = false,
-                    child: scaffoldBody,
-                    hideAppBarOnScroll: hideAppBarOnScroll,
-                    hideBottomNavigationBarOnScroll:
-                        hideBottomNavigationBarOnScroll,
-                  ),
-                ),
-              ],
-            ),
-          ),
+          body: safeArea ? SafeArea(child: body) : body,
         );
       },
     );
@@ -192,13 +224,18 @@ Widget _autoHideNavigationWrapper({
   required Widget child,
   required bool hideAppBarOnScroll,
   required bool hideBottomNavigationBarOnScroll,
+  required bool hideFloatingActionButtonOnScroll,
   required MainController controller,
   required VoidCallback onShowAppBar,
   required VoidCallback onHideAppBar,
+  required VoidCallback onShowFloatingActionButton,
+  required VoidCallback onHideFloatingActionButton,
 }) {
   return NotificationListener<UserScrollNotification>(
     onNotification: (notification) {
-      if (!hideAppBarOnScroll && !hideBottomNavigationBarOnScroll) {
+      if (!hideAppBarOnScroll &&
+          !hideBottomNavigationBarOnScroll &&
+          !hideFloatingActionButtonOnScroll) {
         return false;
       }
 
@@ -210,12 +247,18 @@ Widget _autoHideNavigationWrapper({
           if (hideBottomNavigationBarOnScroll) {
             controller.hideBottomNavbar();
           }
+          if (hideFloatingActionButtonOnScroll) {
+            onHideFloatingActionButton();
+          }
         case ScrollDirection.forward:
           if (hideAppBarOnScroll) {
             onShowAppBar();
           }
           if (hideBottomNavigationBarOnScroll) {
             controller.showBottomNavbar();
+          }
+          if (hideFloatingActionButtonOnScroll) {
+            onShowFloatingActionButton();
           }
         case ScrollDirection.idle:
           break;
@@ -229,6 +272,75 @@ Widget _autoHideNavigationWrapper({
 
 class _AnimatedAppBar extends StatelessWidget {
   const _AnimatedAppBar({required this.isVisible, required this.child});
+
+  static const _duration = Duration(milliseconds: 180);
+
+  final bool isVisible;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRect(
+      child: IgnorePointer(
+        ignoring: !isVisible,
+        child: AnimatedOpacity(
+          duration: _duration,
+          curve: Curves.easeOutCubic,
+          opacity: isVisible ? 1 : 0,
+          child: AnimatedSlide(
+            duration: _duration,
+            curve: Curves.easeOutCubic,
+            offset: isVisible ? Offset.zero : const Offset(0, -1),
+            child: child,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AnimatedFloatingActionButton extends StatelessWidget {
+  const _AnimatedFloatingActionButton({
+    required this.isVisible,
+    required this.onlyShowWhenTyping,
+    required this.hideWhenTyping,
+    required this.isTyping,
+    required this.child,
+  });
+
+  static const _duration = Duration(milliseconds: 180);
+
+  final bool isVisible;
+  final bool onlyShowWhenTyping;
+  final bool hideWhenTyping;
+  final bool isTyping;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final typingVisible =
+        (!onlyShowWhenTyping || isTyping) && (!hideWhenTyping || !isTyping);
+    final effectiveVisible = isVisible && typingVisible;
+
+    return IgnorePointer(
+      ignoring: !effectiveVisible,
+      child: AnimatedOpacity(
+        duration: _duration,
+        curve: Curves.easeOutCubic,
+        opacity: effectiveVisible ? 1 : 0,
+        child: AnimatedSlide(
+          duration: _duration,
+          curve: Curves.easeOutCubic,
+          offset: effectiveVisible ? Offset.zero : const Offset(0, 1),
+          child: child,
+        ),
+      ),
+    );
+  }
+}
+
+class _AnimatedBottomNavbar extends StatelessWidget {
+  const _AnimatedBottomNavbar({required this.isVisible, required this.child});
 
   static const _duration = Duration(milliseconds: 180);
 
@@ -251,10 +363,10 @@ class _AnimatedAppBar extends StatelessWidget {
 
         return SizeTransition(
           sizeFactor: curved,
-          alignment: Alignment.bottomCenter,
+          alignment: Alignment.topCenter,
           child: SlideTransition(
             position: Tween<Offset>(
-              begin: const Offset(0, -1),
+              begin: const Offset(0, 1),
               end: Offset.zero,
             ).animate(curved),
             child: child,
@@ -333,45 +445,4 @@ Widget? _floatingActionButtonRow({
         ),
     ],
   );
-}
-
-class _AnimatedBottomNavbar extends StatelessWidget {
-  const _AnimatedBottomNavbar({required this.isVisible, required this.child});
-
-  static const _duration = Duration(milliseconds: 180);
-
-  final bool isVisible;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedSwitcher(
-      duration: _duration,
-      reverseDuration: _duration,
-      switchInCurve: Curves.easeOutCubic,
-      switchOutCurve: Curves.easeInCubic,
-      transitionBuilder: (child, animation) {
-        final curved = CurvedAnimation(
-          parent: animation,
-          curve: Curves.easeOutCubic,
-          reverseCurve: Curves.easeInCubic,
-        );
-
-        return SizeTransition(
-          sizeFactor: curved,
-          alignment: Alignment.topCenter,
-          child: SlideTransition(
-            position: Tween<Offset>(
-              begin: const Offset(0, 1),
-              end: Offset.zero,
-            ).animate(curved),
-            child: child,
-          ),
-        );
-      },
-      child: isVisible
-          ? KeyedSubtree(key: const ValueKey('shown'), child: child)
-          : const SizedBox.shrink(key: ValueKey('hidden')),
-    );
-  }
 }
