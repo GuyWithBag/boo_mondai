@@ -189,6 +189,18 @@ class AppTokens with AppTokensMappable {
   final Color colorMonoDim;
   final Color colorTextOnMono;
 
+  // Button padding
+  final double buttonPaddingHorizontalSm = 8;
+  final double buttonPaddingVerticalSm = 12;
+  final double buttonPaddingHorizontalMd = 24;
+  final double buttonPaddingVerticalMd = 16;
+  final double buttonPaddingHorizontalLg = 32;
+  final double buttonPaddingVerticalLg = 18;
+  final double buttonPaddingHorizontalIconWithLabel = 4;
+  final double buttonPaddingVerticalIconWithLabel = 6;
+  final double buttonPaddingHorizontalExtendedFab = 24;
+  final double buttonPaddingVerticalExtendedFab = 0;
+
   final double buttonShadowOffset = 8;
   final double modalShadowOffset = 10;
 
@@ -201,7 +213,7 @@ class AppTokens with AppTokensMappable {
   final double lineHeightTextDisplay = 1.05;
   final double lineHeightFieldDisplay = 1.15;
   final double lineHeightButton = 1.1;
-  final double letterSpacingTextEyebrow = 1.6;
+  final double letterSpacingTextEyebrow = 1.8;
 
   final double borderWidthDefault = 2;
 
@@ -209,6 +221,7 @@ class AppTokens with AppTokensMappable {
   final double spaceScaffoldPaddingMobileY = 28;
 
   final double spaceLayoutPadding = 20;
+  final double spaceLayoutPaddingSm = 15;
   final double spaceLayoutPaddingXsm = 10;
   final double spaceLayoutGapLg = 24;
   final double spaceLayoutGapMd = 18;

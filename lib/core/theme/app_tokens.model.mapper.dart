@@ -198,6 +198,64 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
   static const Field<AppTokens, Color> _f$colorTextOnBrand = Field(
       'colorTextOnBrand', _$colorTextOnBrand,
       key: r'color_text_on_brand', mode: FieldMode.member);
+  static double _$buttonPaddingHorizontalSm(AppTokens v) =>
+      v.buttonPaddingHorizontalSm;
+  static const Field<AppTokens, double> _f$buttonPaddingHorizontalSm = Field(
+      'buttonPaddingHorizontalSm', _$buttonPaddingHorizontalSm,
+      key: r'button_padding_horizontal_sm', mode: FieldMode.member);
+  static double _$buttonPaddingVerticalSm(AppTokens v) =>
+      v.buttonPaddingVerticalSm;
+  static const Field<AppTokens, double> _f$buttonPaddingVerticalSm = Field(
+      'buttonPaddingVerticalSm', _$buttonPaddingVerticalSm,
+      key: r'button_padding_vertical_sm', mode: FieldMode.member);
+  static double _$buttonPaddingHorizontalMd(AppTokens v) =>
+      v.buttonPaddingHorizontalMd;
+  static const Field<AppTokens, double> _f$buttonPaddingHorizontalMd = Field(
+      'buttonPaddingHorizontalMd', _$buttonPaddingHorizontalMd,
+      key: r'button_padding_horizontal_md', mode: FieldMode.member);
+  static double _$buttonPaddingVerticalMd(AppTokens v) =>
+      v.buttonPaddingVerticalMd;
+  static const Field<AppTokens, double> _f$buttonPaddingVerticalMd = Field(
+      'buttonPaddingVerticalMd', _$buttonPaddingVerticalMd,
+      key: r'button_padding_vertical_md', mode: FieldMode.member);
+  static double _$buttonPaddingHorizontalLg(AppTokens v) =>
+      v.buttonPaddingHorizontalLg;
+  static const Field<AppTokens, double> _f$buttonPaddingHorizontalLg = Field(
+      'buttonPaddingHorizontalLg', _$buttonPaddingHorizontalLg,
+      key: r'button_padding_horizontal_lg', mode: FieldMode.member);
+  static double _$buttonPaddingVerticalLg(AppTokens v) =>
+      v.buttonPaddingVerticalLg;
+  static const Field<AppTokens, double> _f$buttonPaddingVerticalLg = Field(
+      'buttonPaddingVerticalLg', _$buttonPaddingVerticalLg,
+      key: r'button_padding_vertical_lg', mode: FieldMode.member);
+  static double _$buttonPaddingHorizontalIconWithLabel(AppTokens v) =>
+      v.buttonPaddingHorizontalIconWithLabel;
+  static const Field<AppTokens, double>
+      _f$buttonPaddingHorizontalIconWithLabel = Field(
+          'buttonPaddingHorizontalIconWithLabel',
+          _$buttonPaddingHorizontalIconWithLabel,
+          key: r'button_padding_horizontal_icon_with_label',
+          mode: FieldMode.member);
+  static double _$buttonPaddingVerticalIconWithLabel(AppTokens v) =>
+      v.buttonPaddingVerticalIconWithLabel;
+  static const Field<AppTokens, double> _f$buttonPaddingVerticalIconWithLabel =
+      Field('buttonPaddingVerticalIconWithLabel',
+          _$buttonPaddingVerticalIconWithLabel,
+          key: r'button_padding_vertical_icon_with_label',
+          mode: FieldMode.member);
+  static double _$buttonPaddingHorizontalExtendedFab(AppTokens v) =>
+      v.buttonPaddingHorizontalExtendedFab;
+  static const Field<AppTokens, double> _f$buttonPaddingHorizontalExtendedFab =
+      Field('buttonPaddingHorizontalExtendedFab',
+          _$buttonPaddingHorizontalExtendedFab,
+          key: r'button_padding_horizontal_extended_fab',
+          mode: FieldMode.member);
+  static double _$buttonPaddingVerticalExtendedFab(AppTokens v) =>
+      v.buttonPaddingVerticalExtendedFab;
+  static const Field<AppTokens, double> _f$buttonPaddingVerticalExtendedFab =
+      Field('buttonPaddingVerticalExtendedFab',
+          _$buttonPaddingVerticalExtendedFab,
+          key: r'button_padding_vertical_extended_fab', mode: FieldMode.member);
   static double _$buttonShadowOffset(AppTokens v) => v.buttonShadowOffset;
   static const Field<AppTokens, double> _f$buttonShadowOffset = Field(
       'buttonShadowOffset', _$buttonShadowOffset,
@@ -262,6 +320,10 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
   static const Field<AppTokens, double> _f$spaceLayoutPadding = Field(
       'spaceLayoutPadding', _$spaceLayoutPadding,
       key: r'space_layout_padding', mode: FieldMode.member);
+  static double _$spaceLayoutPaddingSm(AppTokens v) => v.spaceLayoutPaddingSm;
+  static const Field<AppTokens, double> _f$spaceLayoutPaddingSm = Field(
+      'spaceLayoutPaddingSm', _$spaceLayoutPaddingSm,
+      key: r'space_layout_padding_sm', mode: FieldMode.member);
   static double _$spaceLayoutPaddingXsm(AppTokens v) => v.spaceLayoutPaddingXsm;
   static const Field<AppTokens, double> _f$spaceLayoutPaddingXsm = Field(
       'spaceLayoutPaddingXsm', _$spaceLayoutPaddingXsm,
@@ -411,6 +473,17 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
     #fontFamily: _f$fontFamily,
     #colorTransparent: _f$colorTransparent,
     #colorTextOnBrand: _f$colorTextOnBrand,
+    #buttonPaddingHorizontalSm: _f$buttonPaddingHorizontalSm,
+    #buttonPaddingVerticalSm: _f$buttonPaddingVerticalSm,
+    #buttonPaddingHorizontalMd: _f$buttonPaddingHorizontalMd,
+    #buttonPaddingVerticalMd: _f$buttonPaddingVerticalMd,
+    #buttonPaddingHorizontalLg: _f$buttonPaddingHorizontalLg,
+    #buttonPaddingVerticalLg: _f$buttonPaddingVerticalLg,
+    #buttonPaddingHorizontalIconWithLabel:
+        _f$buttonPaddingHorizontalIconWithLabel,
+    #buttonPaddingVerticalIconWithLabel: _f$buttonPaddingVerticalIconWithLabel,
+    #buttonPaddingHorizontalExtendedFab: _f$buttonPaddingHorizontalExtendedFab,
+    #buttonPaddingVerticalExtendedFab: _f$buttonPaddingVerticalExtendedFab,
     #buttonShadowOffset: _f$buttonShadowOffset,
     #modalShadowOffset: _f$modalShadowOffset,
     #fontWeightTextBody: _f$fontWeightTextBody,
@@ -426,6 +499,7 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
     #spaceScaffoldPadding: _f$spaceScaffoldPadding,
     #spaceScaffoldPaddingMobileY: _f$spaceScaffoldPaddingMobileY,
     #spaceLayoutPadding: _f$spaceLayoutPadding,
+    #spaceLayoutPaddingSm: _f$spaceLayoutPaddingSm,
     #spaceLayoutPaddingXsm: _f$spaceLayoutPaddingXsm,
     #spaceLayoutGapLg: _f$spaceLayoutGapLg,
     #spaceLayoutGapMd: _f$spaceLayoutGapMd,

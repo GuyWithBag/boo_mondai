@@ -10,11 +10,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         Button,
         ButtonSize,
+        ButtonPadding,
         LeaderboardEntry,
         LeaderboardTileWidget,
         SurfaceBorder,
         SurfaceShape,
-        SurfaceColor,
         surfaceStyle,
         SurfaceShadow;
 import 'package:flutter/material.dart';
@@ -110,7 +110,7 @@ class LeaderboardSection extends StatelessWidget {
             child: Button(
               onPressed: () => context.push('/leaderboard'),
 
-              variants: const [ButtonSize.lg],
+              variants: const [ButtonSize.lg, ButtonPadding.lg],
               child: const Text('SEE ALL RANKINGS'),
             ),
           ),

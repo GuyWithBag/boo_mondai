@@ -7,13 +7,42 @@ enum TextFieldSize { labelLarge, bodyLarge, normal }
 
 enum TextFieldFrame { none, outline, underline }
 
-enum TextFieldTone { neutral, brand, success, error }
+enum TextFieldColor { baseline, brand, success, error, transparentBg }
 
 enum TextFieldState { idle, incorrect }
 
 enum TextFieldAlign { start, center }
 
-// enum TextFieldShape { rounded, sharp }
+Set<StylePart<TextFieldStyle>> textFieldPalette({
+  required Color textColor,
+  required Color cursorColor,
+  required Color borderColor,
+  Color? fillColor,
+}) {
+  return {
+    TextFieldStylePart.cursorColor(cursorColor),
+    TextFieldStylePart.text({TextStylePart.color(textColor)}),
+    if (fillColor != null)
+      TextFieldStylePart.decoration({InputDecorationPart.fillColor(fillColor)}),
+    TextFieldStylePart.decoration({
+      InputDecorationPart.enabledBorderParts({
+        InputBorderPart.borderSideParts({BorderSidePart.color(borderColor)}),
+      }),
+      InputDecorationPart.focusedBorderParts({
+        InputBorderPart.borderSideParts({BorderSidePart.color(borderColor)}),
+      }),
+      InputDecorationPart.disabledBorderParts({
+        InputBorderPart.borderSideParts({BorderSidePart.color(borderColor)}),
+      }),
+      InputDecorationPart.errorBorderParts({
+        InputBorderPart.borderSideParts({BorderSidePart.color(borderColor)}),
+      }),
+      InputDecorationPart.focusedErrorBorderParts({
+        InputBorderPart.borderSideParts({BorderSidePart.color(borderColor)}),
+      }),
+    }),
+  };
+}
 
 final textFieldStyle = VariantStyle.textFieldParts<AppTokens>(
   base: (tokens) => {
@@ -33,17 +62,15 @@ final textFieldStyle = VariantStyle.textFieldParts<AppTokens>(
   defaultVariants: const [
     TextFieldSize.normal,
     TextFieldFrame.none,
-    TextFieldTone.neutral,
+    TextFieldColor.baseline,
     TextFieldState.idle,
     TextFieldAlign.start,
-    // TextFieldShape.rounded
   ],
   variants: {
-    // TextFieldShape.rounded: (tokens) => {},
-    TextFieldAlign.start: (tokens) => {
+    TextFieldAlign.start: (_) => {
       TextFieldStylePart.textAlign(TextAlign.start),
     },
-    TextFieldAlign.center: (tokens) => {
+    TextFieldAlign.center: (_) => {
       TextFieldStylePart.textAlign(TextAlign.center),
     },
     TextFieldSize.labelLarge: (tokens) => {
@@ -70,6 +97,9 @@ final textFieldStyle = VariantStyle.textFieldParts<AppTokens>(
         InputDecorationPart.border(InputBorder.none),
         InputDecorationPart.enabledBorder(InputBorder.none),
         InputDecorationPart.focusedBorder(InputBorder.none),
+        InputDecorationPart.disabledBorder(InputBorder.none),
+        InputDecorationPart.errorBorder(InputBorder.none),
+        InputDecorationPart.focusedErrorBorder(InputBorder.none),
         InputDecorationPart.contentPadding(EdgeInsets.zero),
       }),
     },
@@ -78,113 +108,55 @@ final textFieldStyle = VariantStyle.textFieldParts<AppTokens>(
         InputDecorationPart.filled(true),
         InputDecorationPart.fillColor(tokens.colorScaffoldBackground),
         InputDecorationPart.contentPadding(EdgeInsets.all(16.r)),
-        InputDecorationPart.enabledBorder(
-          OutlineInputBorder(
-            borderRadius: BorderRadius.circular(tokens.radiusSurfaceXsm.r),
-            borderSide: BorderSide(
-              color: tokens.colorBorderNeutralSubtle,
-              width: tokens.borderWidthDefault.w,
-            ),
+        InputDecorationPart.borderParts({
+          InputBorderPart.borderRadius(
+            BorderRadius.circular(tokens.radiusSurfaceXsm.r),
           ),
-        ),
-        InputDecorationPart.focusedBorder(
-          OutlineInputBorder(
-            borderRadius: BorderRadius.circular(tokens.radiusSurfaceXsm.r),
-            borderSide: BorderSide(
-              color: tokens.colorPrimary,
-              width: tokens.borderWidthDefault.w,
-            ),
-          ),
-        ),
+          InputBorderPart.borderSideParts({
+            BorderSidePart.width(tokens.borderWidthDefault.w),
+          }),
+        }),
       }),
     },
     TextFieldFrame.underline: (tokens) => {
       TextFieldStylePart.decoration({
-        InputDecorationPart.filled(true),
-        InputDecorationPart.fillColor(tokens.colorMuted),
-        // InputDecorationPart.contentPadding(
-        //   EdgeInsets.symmetric(horizontal: 18.w, vertical: 12.h),
-        // ),
-        InputDecorationPart.enabledBorder(
-          UnderlineInputBorder(
-            borderSide: BorderSide(color: tokens.colorPrimary, width: 4.w),
-          ),
+        InputDecorationPart.contentPadding(
+          EdgeInsets.symmetric(horizontal: 18.w, vertical: 12.h),
         ),
-        InputDecorationPart.focusedBorder(
-          UnderlineInputBorder(
-            borderSide: BorderSide(color: tokens.colorPrimary, width: 4.w),
-          ),
-        ),
+        InputDecorationPart.borderParts({
+          InputBorderPart.borderRadius(BorderRadius.circular(12.r)),
+          InputBorderPart.borderSideParts({BorderSidePart.width(4.w)}),
+        }),
       }),
     },
-    TextFieldTone.neutral: (tokens) => {
-      TextFieldStylePart.text({TextStylePart.color(tokens.colorTextBaseline)}),
-    },
-    TextFieldTone.brand: (tokens) => {
-      TextFieldStylePart.cursorColor(tokens.colorPrimary),
-      TextFieldStylePart.text({TextStylePart.color(tokens.colorPrimary)}),
-    },
-    TextFieldTone.success: (tokens) => {
-      TextFieldStylePart.text({TextStylePart.color(tokens.colorActionSuccess)}),
-      TextFieldStylePart.decoration({
-        InputDecorationPart.fillColor(
-          tokens.colorActionSuccess.withValues(alpha: 0.12),
-        ),
-        InputDecorationPart.enabledBorder(
-          UnderlineInputBorder(
-            borderSide: BorderSide(
-              color: tokens.colorActionSuccess,
-              width: 4.w,
-            ),
-            borderRadius: BorderRadius.circular(12.r),
-          ),
-        ),
-        InputDecorationPart.focusedBorder(
-          UnderlineInputBorder(
-            borderSide: BorderSide(
-              color: tokens.colorActionSuccess,
-              width: 4.w,
-            ),
-            borderRadius: BorderRadius.circular(12.r),
-          ),
-        ),
-        (theme) => theme.copyWith(
-          disabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(
-              color: tokens.colorActionSuccess,
-              width: 4.w,
-            ),
-            borderRadius: BorderRadius.circular(12.r),
-          ),
-        ),
-      }),
-    },
-    TextFieldTone.error: (tokens) => {
-      TextFieldStylePart.text({TextStylePart.color(tokens.colorActionError)}),
-      TextFieldStylePart.decoration({
-        InputDecorationPart.fillColor(
-          tokens.colorActionError.withValues(alpha: 0.12),
-        ),
-        InputDecorationPart.enabledBorder(
-          UnderlineInputBorder(
-            borderSide: BorderSide(color: tokens.colorActionError, width: 4.w),
-            borderRadius: BorderRadius.circular(12.r),
-          ),
-        ),
-        InputDecorationPart.focusedBorder(
-          UnderlineInputBorder(
-            borderSide: BorderSide(color: tokens.colorActionError, width: 4.w),
-            borderRadius: BorderRadius.circular(12.r),
-          ),
-        ),
-        (theme) => theme.copyWith(
-          disabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: tokens.colorActionError, width: 4.w),
-            borderRadius: BorderRadius.circular(12.r),
-          ),
-        ),
-      }),
-    },
+    TextFieldColor.baseline: (tokens) => textFieldPalette(
+      textColor: tokens.colorTextBaseline,
+      cursorColor: tokens.colorTextBaseline,
+      borderColor: tokens.colorTextBaseline,
+    ),
+    TextFieldColor.transparentBg: (tokens) => textFieldPalette(
+      textColor: tokens.colorTextBaseline,
+      cursorColor: tokens.colorTextBaseline,
+      borderColor: tokens.colorTextBaseline,
+      fillColor: Colors.transparent,
+    ),
+    TextFieldColor.brand: (tokens) => textFieldPalette(
+      textColor: tokens.colorPrimary,
+      cursorColor: tokens.colorPrimary,
+      borderColor: tokens.colorPrimary,
+    ),
+    TextFieldColor.success: (tokens) => textFieldPalette(
+      textColor: tokens.colorActionSuccess,
+      cursorColor: tokens.colorActionSuccess,
+      fillColor: tokens.colorActionSuccess.withValues(alpha: 0.12),
+      borderColor: tokens.colorActionSuccess,
+    ),
+    TextFieldColor.error: (tokens) => textFieldPalette(
+      textColor: tokens.colorActionError,
+      cursorColor: tokens.colorActionError,
+      fillColor: tokens.colorActionError.withValues(alpha: 0.12),
+      borderColor: tokens.colorActionError,
+    ),
     TextFieldState.idle: (_) => const <StylePart<TextFieldStyle>>{},
     TextFieldState.incorrect: (_) => {
       TextFieldStylePart.text({

@@ -8,17 +8,19 @@ class SectionEyebrow extends StatelessWidget {
     this.label, {
     this.tone = SectionEyebrowTone.muted,
     super.key,
+    this.isUpperCase = true,
   });
 
   final String label;
   final SectionEyebrowTone tone;
+  final bool isUpperCase;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
 
     return Text(
-      label.toUpperCase(),
+      isUpperCase ? label.toUpperCase() : label,
       style: sectionEyebrowStyle.resolve(tokens, [tone]),
     );
   }

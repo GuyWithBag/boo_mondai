@@ -3,9 +3,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         Button,
         ButtonSize,
+        ButtonPadding,
         textStyle,
         TextSize,
-        TextColor,
         TextWeight;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -72,7 +72,7 @@ class ReviewAllCard extends StatelessWidget {
                   ? () => context.push('/review/session')
                   : null,
 
-              variants: const [ButtonSize.lg],
+              variants: const [ButtonSize.lg, ButtonPadding.lg],
               child: const Text('REVIEW ALL?'),
             ),
           ],

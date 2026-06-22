@@ -1,6 +1,7 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         ButtonSize,
+        ButtonPadding,
         ButtonVariant,
         ButtonColor,
         ButtonState,
@@ -19,11 +20,7 @@ class Button extends HookWidget {
     this.selected = false,
     this.mainAxisAlignment = MainAxisAlignment.center,
     this.axis = Axis.horizontal,
-    this.variants = const [
-      ButtonColor.baseline,
-      ButtonSize.md,
-      ButtonVariant.elevated,
-    ],
+    this.variants = const [],
     super.key,
   });
 
@@ -47,7 +44,7 @@ class Button extends HookWidget {
       onPressed: onPressed,
       leading: icon == null ? null : Icon(icon),
       selected: selected,
-      variants: [color, ButtonSize.icon, variant],
+      variants: [color, ButtonSize.icon, ButtonPadding.none, variant],
     );
   }
 
@@ -62,7 +59,7 @@ class Button extends HookWidget {
       onPressed: onPressed,
       leading: icon == null ? null : Icon(icon),
       selected: selected,
-      variants: [color, ButtonSize.smallIcon, variant],
+      variants: [color, ButtonSize.smallIcon, ButtonPadding.none, variant],
     );
   }
 
@@ -79,7 +76,12 @@ class Button extends HookWidget {
       leading: icon == null ? null : Icon(icon),
       selected: selected,
       axis: Axis.vertical,
-      variants: [color, ButtonSize.iconWithLabel, variant],
+      variants: [
+        color,
+        ButtonSize.iconWithLabel,
+        ButtonPadding.iconWithLabel,
+        variant,
+      ],
       child: Text(
         label,
         maxLines: 2,

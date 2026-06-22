@@ -19,15 +19,15 @@ import 'package:theme_variants/theme_variants.dart';
 ///
 /// ```dart
 /// TextField(
-///   variants: [TextFieldSize.normal, TextFieldFrame.outline, TextFieldTone.neutral],
+///   variants: [TextFieldSize.normal, TextFieldFrame.outline, TextFieldColor.neutral],
 ///   controller: _controller,
 ///   placeholder: 'Search…',
 /// )
 /// ```
 class TextField extends StatelessWidget {
   const TextField({
-    required this.variants,
     super.key,
+    this.variants = const [],
     this.groupId = EditableText,
     this.controller,
     this.focusNode,
@@ -101,6 +101,7 @@ class TextField extends StatelessWidget {
     this.spellCheckConfiguration,
     this.magnifierConfiguration,
     this.hintLocales,
+    this.placeholderTextStyle,
   }) : assert(obscuringCharacter.length == 1),
        assert(maxLines == null || maxLines > 0),
        assert(minLines == null || minLines > 0),
@@ -157,6 +158,9 @@ class TextField extends StatelessWidget {
 
   /// See [material.TextField.textCapitalization].
   final TextCapitalization textCapitalization;
+
+  /// See [material.TextField.style].
+  final TextStyle? placeholderTextStyle;
 
   /// See [material.TextField.style].
   final TextStyle? style;
@@ -352,6 +356,7 @@ class TextField extends StatelessWidget {
 
     final baseDecoration = material.InputDecoration(
       hintText: placeholder,
+      hintStyle: placeholderTextStyle,
     ).applyDefaults(tokenStyle.decorationTheme);
 
     final effectiveDecoration = decorationOverride != null
@@ -360,6 +365,7 @@ class TextField extends StatelessWidget {
 
     return material.TextField(
       groupId: groupId,
+
       controller: controller,
       focusNode: focusNode,
       undoController: undoController,

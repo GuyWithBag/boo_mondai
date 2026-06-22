@@ -6,10 +6,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         SurfaceColor,
         textStyle,
         TextSize,
-        TextWeight,
-        TextColor;
-import 'package:flutter/material.dart';
-import 'package:theme_variants/theme_variants.dart';
+        TextWeight;
+import 'package:flutter/material.dart'
+    show StatelessWidget, Widget, BuildContext, Text, Expanded, Row;
+import 'package:theme_variants/theme_variants.dart'
+    show ThemeVariantsContext, Surface;
 
 class PanelHeader extends StatelessWidget {
   const PanelHeader({required this.title, this.trailing, super.key});

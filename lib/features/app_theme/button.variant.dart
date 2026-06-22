@@ -25,6 +25,8 @@ enum ButtonColor {
   dashed,
 }
 
+enum ButtonPadding { none, sm, md, lg, iconWithLabel, extendedFab }
+
 Set<StylePart<SurfaceStyle>> _buttonPalette({
   required Color background,
   required Color border,
@@ -67,6 +69,7 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
     ButtonSize.md,
     ButtonState.idle,
     ButtonVariant.elevated,
+    ButtonPadding.md,
   ],
   variants: {
     ButtonColor.primary: (tokens) => _buttonPalette(
@@ -155,44 +158,30 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
       foreground: tokens.colorTextMuted,
     ),
     ButtonSize.sm: (tokens) => {
-      SurfaceStylePart.padding(
-        const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-      ),
       SurfaceStylePart.text({TextStylePart.fontSize(tokens.textSizeLabel.sp)}),
       SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconMd.sp)}),
     },
     ButtonSize.md: (tokens) => {
-      SurfaceStylePart.padding(
-        const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      ),
       SurfaceStylePart.text({TextStylePart.fontSize(tokens.textSizeLabel.sp)}),
       SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconMd.sp)}),
     },
     ButtonSize.lg: (tokens) => {
-      SurfaceStylePart.padding(
-        const EdgeInsets.symmetric(horizontal: 32, vertical: 18),
-      ),
       SurfaceStylePart.text({TextStylePart.fontSize(tokens.textSizeLabel.sp)}),
       SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconLg.sp)}),
     },
     ButtonSize.icon: (tokens) => {
-      SurfaceStylePart.padding(EdgeInsets.zero),
       SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconLg.sp)}),
       SurfaceStylePart.text({TextStylePart.fontSize(tokens.textSizeLabel.sp)}),
       SurfaceStylePart.height(48.h),
       SurfaceStylePart.width(48.w),
     },
     ButtonSize.smallIcon: (tokens) => {
-      SurfaceStylePart.padding(EdgeInsets.zero),
       SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconMd.sp)}),
       SurfaceStylePart.text({TextStylePart.fontSize(tokens.textSizeLabel.sp)}),
       SurfaceStylePart.height(tokens.sizeIconMd.h),
       SurfaceStylePart.width(tokens.sizeIconMd.w),
     },
     ButtonSize.iconWithLabel: (tokens) => {
-      SurfaceStylePart.padding(
-        const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
-      ),
       SurfaceStylePart.constraints(const BoxConstraints(minWidth: 48)),
       SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconLg.sp)}),
       SurfaceStylePart.text({
@@ -200,19 +189,58 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
       }),
     },
     ButtonSize.fab: (tokens) => {
-      SurfaceStylePart.padding(EdgeInsets.zero),
       SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconLg.sp)}),
       SurfaceStylePart.height(64.h),
       SurfaceStylePart.width(64.w),
     },
     ButtonSize.extendedFab: (tokens) => {
-      SurfaceStylePart.padding(const EdgeInsets.symmetric(horizontal: 24)),
       SurfaceStylePart.text({
         TextStylePart.fontSize(tokens.textSizeLabel.sp),
         TextStylePart.fontWeight(tokens.fontWeightTextHeavy),
       }),
       SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconMd.sp)}),
       SurfaceStylePart.height(64.h),
+    },
+    ButtonPadding.none: (_) => {SurfaceStylePart.padding(EdgeInsets.zero)},
+    ButtonPadding.sm: (tokens) => {
+      SurfaceStylePart.padding(
+        EdgeInsets.symmetric(
+          horizontal: tokens.buttonPaddingHorizontalSm.w,
+          vertical: tokens.buttonPaddingVerticalSm.h,
+        ),
+      ),
+    },
+    ButtonPadding.md: (tokens) => {
+      SurfaceStylePart.padding(
+        EdgeInsets.symmetric(
+          horizontal: tokens.buttonPaddingHorizontalMd.w,
+          vertical: tokens.buttonPaddingVerticalMd.h,
+        ),
+      ),
+    },
+    ButtonPadding.lg: (tokens) => {
+      SurfaceStylePart.padding(
+        EdgeInsets.symmetric(
+          horizontal: tokens.buttonPaddingHorizontalLg.w,
+          vertical: tokens.buttonPaddingVerticalLg.h,
+        ),
+      ),
+    },
+    ButtonPadding.iconWithLabel: (tokens) => {
+      SurfaceStylePart.padding(
+        EdgeInsets.symmetric(
+          horizontal: tokens.buttonPaddingHorizontalIconWithLabel.w,
+          vertical: tokens.buttonPaddingVerticalIconWithLabel.h,
+        ),
+      ),
+    },
+    ButtonPadding.extendedFab: (tokens) => {
+      SurfaceStylePart.padding(
+        EdgeInsets.symmetric(
+          horizontal: tokens.buttonPaddingHorizontalExtendedFab.w,
+          vertical: tokens.buttonPaddingVerticalExtendedFab.h,
+        ),
+      ),
     },
     ButtonState.idle: (_) => const <StylePart<SurfaceStyle>>{},
     ButtonState.hovered: (_) => const <StylePart<SurfaceStyle>>{},

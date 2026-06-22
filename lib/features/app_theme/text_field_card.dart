@@ -8,7 +8,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextColor,
         TextFieldSize,
         TextFieldFrame,
-        TextFieldTone,
+        TextFieldColor,
         MarkdownText,
         MarkdownTextMode,
         Button;
@@ -64,11 +64,7 @@ class TextFieldCard extends StatelessWidget {
                 textAlignVertical: TextAlignVertical.top,
                 placeholder: placeholder,
                 mode: MarkdownTextMode.input,
-                variants: const [
-                  TextFieldSize.bodyLarge,
-                  TextFieldFrame.none,
-                  TextFieldTone.neutral,
-                ],
+                variants: const [TextFieldSize.bodyLarge, TextFieldFrame.none],
               ),
             ),
             Column(

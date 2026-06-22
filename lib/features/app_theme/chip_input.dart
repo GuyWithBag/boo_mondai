@@ -1,7 +1,7 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         TextFieldFrame,
-        TextFieldTone,
+        TextFieldColor,
         AppTokens,
         ChipTone,
         TextFieldSize,
@@ -22,7 +22,7 @@ class ChipInput extends HookWidget {
     this.onChipPressed,
     this.onChipDeleted,
     this.placeholder,
-    this.isEnabled = true,
+    this.isEditable = true,
     this.separatorPattern,
     this.allowDuplicates = false,
     this.createChipOnSubmit = true,
@@ -30,7 +30,6 @@ class ChipInput extends HookWidget {
     this.textFieldVariants = const [
       TextFieldSize.normal,
       TextFieldFrame.outline,
-      TextFieldTone.neutral,
     ],
     this.normalizer,
     this.focusNode,
@@ -43,7 +42,7 @@ class ChipInput extends HookWidget {
   final ValueChanged<String>? onChipPressed;
   final ValueChanged<String>? onChipDeleted;
   final String? placeholder;
-  final bool isEnabled;
+  final bool isEditable;
   final Pattern? separatorPattern;
   final bool allowDuplicates;
   final bool createChipOnSubmit;
@@ -78,10 +77,10 @@ class ChipInput extends HookWidget {
         padding: EdgeInsetsDirectional.only(end: 6.w, bottom: 3.h),
         child: InputChip(
           label: Text(value),
-          onPressed: isEnabled && onChipPressed != null
+          onPressed: isEditable && onChipPressed != null
               ? () => onChipPressed!(value)
               : null,
-          onDeleted: isEnabled ? () => removeValue(value) : null,
+          onDeleted: isEditable ? () => removeValue(value) : null,
         ),
       );
     }
@@ -218,7 +217,7 @@ class ChipInput extends HookWidget {
 
     return ChipTheme(
       data: chipTheme,
-      child: isEnabled
+      child: isEditable
           ? TextField(
               controller: chipController,
               focusNode: effectiveFocusNode,
