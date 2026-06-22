@@ -40,7 +40,7 @@ class DeckListingTile extends HookWidget {
         ? 'No description yet'
         : deck.shortDescription;
     final version = deck.version.isEmpty ? '1.0.0' : deck.version;
-    final backgroundImage = ImageHelper.providerFromSource(
+    final backgroundImage = ImageHelper.getImageProviderFromSource(
       _listingImageUrl(deck),
     );
     final creatorName = deck.userProfile?.username ?? 'Unknown creator';

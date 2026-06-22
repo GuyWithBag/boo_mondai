@@ -37,7 +37,7 @@ class ProfileAvatar extends StatelessWidget {
     final initials = name.isNotEmpty ? name[0].toUpperCase() : '?';
     final imageUrl = avatarUrl?.trim();
     final hasImage = imageUrl != null && imageUrl.isNotEmpty;
-    final image = ImageHelper.providerFromSource(imageUrl);
+    final image = ImageHelper.getImageProviderFromSource(imageUrl);
 
     return Stack(
       clipBehavior: Clip.none,

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 abstract final class TextHelper {
-  static MainAxisAlignment textAlignToMainAxisalignment(TextAlign? textAlign) {
+  static MainAxisAlignment getMainAxisAlignmentForTextAlign(
+    TextAlign? textAlign,
+  ) {
     if (textAlign == null) return MainAxisAlignment.start;
     return switch (textAlign) {
       TextAlign.center => MainAxisAlignment.center,
@@ -11,21 +13,21 @@ abstract final class TextHelper {
     };
   }
 
-  static String defaultText(String? value, String fallback) {
+  static String getTrimmedTextOrFallback(String? value, String fallback) {
     final trimmed = value?.trim();
     if (trimmed == null || trimmed.isEmpty) return fallback;
 
     return trimmed;
   }
 
-  static String? nonEmptyOrNull(String? value) {
+  static String? getTrimmedTextOrNull(String? value) {
     final trimmed = value?.trim();
     if (trimmed == null || trimmed.isEmpty) return null;
 
     return trimmed;
   }
 
-  static List<String> splitCommaSeparated(String value) {
+  static List<String> getTrimmedCommaSeparatedValues(String value) {
     return value
         .split(',')
         .map((entry) => entry.trim())

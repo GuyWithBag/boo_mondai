@@ -7,7 +7,7 @@ import 'package:boo_mondai/core/helpers/image_file_provider_stub.dart'
     show imageProviderFromFilePath;
 
 abstract final class ImageHelper {
-  static ImageProvider? providerFromSource(String? source) {
+  static ImageProvider? getImageProviderFromSource(String? source) {
     final value = source?.trim();
     if (value == null || value.isEmpty) return null;
 
@@ -25,7 +25,7 @@ abstract final class ImageHelper {
     return AssetImage(value);
   }
 
-  static String? sourceFromPickedFile(PlatformFile file) {
+  static String? getImageSourceFromPickedFile(PlatformFile file) {
     final bytes = file.bytes;
     if (bytes != null && bytes.isNotEmpty) {
       return 'data:${_mimeTypeForExtension(file.extension)};base64,${base64Encode(bytes)}';

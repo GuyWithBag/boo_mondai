@@ -16,12 +16,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         MultipleChoiceCard,
         MultipleChoiceTemplate,
         PhysicalCard,
+        PhysicalCardController,
         PhysicalCardSide,
         StudyCard,
         WordScrambleTemplate,
         MatchingTypeCard,
-        chipStyle,
-        useCubeController;
+        chipStyle;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -240,18 +240,16 @@ class _FlashcardPreview extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
-    final controller = useCubeController(
-      width: width,
-      height: width / tokens.studyCardAspectRatio,
-      depth: 10,
-      perspective: 0.001,
+    final controller = useMemoized(
+      () => PhysicalCardController(context, width: width, perspective: 0.001),
+      [width],
     );
 
     useEffect(() {
       controller.showBack(studyCard.isReversed, animated: false);
       return null;
     }, [controller, studyCard.isReversed]);
+    useEffect(() => controller.dispose, [controller]);
 
     return Stack(
       children: [

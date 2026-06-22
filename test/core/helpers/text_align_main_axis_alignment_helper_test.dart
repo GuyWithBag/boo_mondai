@@ -6,36 +6,36 @@ void main() {
   group('TextHelper', () {
     test('maps center to center', () {
       expect(
-        TextHelper.textAlignToMainAxisalignment(TextAlign.center),
+        TextHelper.getMainAxisAlignmentForTextAlign(TextAlign.center),
         MainAxisAlignment.center,
       );
     });
 
     test('maps left and start to start', () {
       expect(
-        TextHelper.textAlignToMainAxisalignment(TextAlign.left),
+        TextHelper.getMainAxisAlignmentForTextAlign(TextAlign.left),
         MainAxisAlignment.start,
       );
       expect(
-        TextHelper.textAlignToMainAxisalignment(TextAlign.start),
+        TextHelper.getMainAxisAlignmentForTextAlign(TextAlign.start),
         MainAxisAlignment.start,
       );
     });
 
     test('maps right and end to end', () {
       expect(
-        TextHelper.textAlignToMainAxisalignment(TextAlign.right),
+        TextHelper.getMainAxisAlignmentForTextAlign(TextAlign.right),
         MainAxisAlignment.end,
       );
       expect(
-        TextHelper.textAlignToMainAxisalignment(TextAlign.end),
+        TextHelper.getMainAxisAlignmentForTextAlign(TextAlign.end),
         MainAxisAlignment.end,
       );
     });
 
     test('maps justify to spaceBetween', () {
       expect(
-        TextHelper.textAlignToMainAxisalignment(TextAlign.justify),
+        TextHelper.getMainAxisAlignmentForTextAlign(TextAlign.justify),
         MainAxisAlignment.spaceBetween,
       );
     });

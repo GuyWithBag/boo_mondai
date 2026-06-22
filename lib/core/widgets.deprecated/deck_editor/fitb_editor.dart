@@ -64,7 +64,7 @@ class FitbEditor extends HookWidget {
             validator: (value) {
               if (value == null || value.trim().isEmpty) return 'Required';
 
-              final answers = TextHelper.splitCommaSeparated(value);
+              final answers = TextHelper.getTrimmedCommaSeparatedValues(value);
               if (answers.isEmpty) return 'Required';
 
               final sentence = sentenceController.text.trim().toLowerCase();

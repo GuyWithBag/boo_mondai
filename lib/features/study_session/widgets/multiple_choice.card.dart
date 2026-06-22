@@ -16,7 +16,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         MarkdownText;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 class MultipleChoiceCard extends HookWidget {
@@ -42,13 +41,13 @@ class MultipleChoiceCard extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final contentScale = ScaleHelper.factor(
+    final contentScale = ScaleHelper.getClampedSizeRatio(
       current: maxWidth ?? tokens.studyCardWidth,
       base: tokens.studyCardWidth,
       min: 0.6,
       max: 1.4,
     );
-    final eyebrowStyle = ScaleHelper.textStyle(
+    final eyebrowStyle = ScaleHelper.getTextStyleWithScaledFontSize(
       textStyle.resolve(tokens, const [
         TextSize.labelSmall,
         TextWeight.heavy,
@@ -68,20 +67,20 @@ class MultipleChoiceCard extends HookWidget {
     return PhysicalCardSide(
       maxWidth: maxWidth,
       child: Column(
+        spacing: tokens.spaceLayoutGapMd,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Column(
+            spacing: tokens.spaceLayoutGapMd,
             children: [
               Text(
                 'Select Answer'.toUpperCase(),
                 textAlign: TextAlign.center,
                 style: eyebrowStyle,
               ),
-              SizedBox(height: 28.h),
               MarkdownText(data: template.questionPrompt),
             ],
           ),
-          SizedBox(height: 32.h),
           Column(
             children: [
               for (final entry in template.options.asMap().entries) ...[
@@ -107,8 +106,6 @@ class MultipleChoiceCard extends HookWidget {
                     ),
                   ),
                 ),
-                if (entry.key != template.options.length - 1)
-                  SizedBox(height: 14.h),
               ],
             ],
           ),

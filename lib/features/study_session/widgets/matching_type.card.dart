@@ -38,13 +38,13 @@ class MatchingTypeCard extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final contentScale = ScaleHelper.factor(
+    final contentScale = ScaleHelper.getClampedSizeRatio(
       current: maxWidth ?? tokens.studyCardWidth,
       base: tokens.studyCardWidth,
       min: 0.6,
       max: 1.4,
     );
-    final eyebrowStyle = ScaleHelper.textStyle(
+    final eyebrowStyle = ScaleHelper.getTextStyleWithScaledFontSize(
       textStyle.resolve(tokens, const [
         TextSize.labelSmall,
         TextWeight.heavy,
@@ -93,6 +93,7 @@ class MatchingTypeCard extends HookWidget {
     return PhysicalCardSide(
       maxWidth: maxWidth,
       child: Column(
+        spacing: tokens.spaceLayoutGapMd,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
@@ -100,8 +101,9 @@ class MatchingTypeCard extends HookWidget {
             textAlign: TextAlign.center,
             style: eyebrowStyle,
           ),
-          SizedBox(height: 40.h),
+
           Row(
+            spacing: tokens.spaceLayoutGapSm,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
@@ -113,7 +115,6 @@ class MatchingTypeCard extends HookWidget {
                   onItemPressed: handleMatchTap,
                 ),
               ),
-              SizedBox(width: 18.w),
               Expanded(
                 child: _MatchColumn(
                   items: matches,

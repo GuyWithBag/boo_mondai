@@ -119,7 +119,7 @@ class AuthController extends Controller {
   }
 
   Future<void> updateAvatarImage(PlatformFile file) async {
-    final imageSource = ImageHelper.sourceFromPickedFile(file);
+    final imageSource = ImageHelper.getImageSourceFromPickedFile(file);
     if (imageSource == null) return;
 
     final profile = currentProfile;

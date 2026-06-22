@@ -42,25 +42,27 @@ class PhysicalDeck extends StatelessWidget {
     final tokens = context.themeTokens<AppTokens>();
     final effectiveTextScaleBaseWidth =
         textScaleBaseWidth ?? tokens.studyCardWidth;
-    final textScale = ScaleHelper.factor(
+    final textScale = ScaleHelper.getClampedSizeRatio(
       current: controller.width,
       base: effectiveTextScaleBaseWidth,
       min: 0.6,
       max: 1.4,
     );
-    final titleStyle = ScaleHelper.textStyle(
+    final titleStyle = ScaleHelper.getTextStyleWithScaledFontSize(
       textStyle.resolve(tokens, const [TextSize.labelLarge, TextWeight.strong]),
       textScale,
     );
-    final tagStyle = ScaleHelper.textStyle(
+    final tagStyle = ScaleHelper.getTextStyleWithScaledFontSize(
       textStyle.resolve(tokens, const [TextSize.labelSmall, TextWeight.strong]),
       textScale,
     );
-    final descriptionStyle = ScaleHelper.textStyle(
+    final descriptionStyle = ScaleHelper.getTextStyleWithScaledFontSize(
       textStyle.resolve(tokens, const [TextSize.labelSmall, TextWeight.body]),
       textScale,
     );
-    final coverImage = ImageHelper.providerFromSource(deck?.coverImageUrl);
+    final coverImage = ImageHelper.getImageProviderFromSource(
+      deck?.coverImageUrl,
+    );
     final visibleTags = deck?.tags.take(8).toList() ?? const [];
 
     return Cube(

@@ -1,38 +1,33 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        AppTokens,
         AppBar,
+        AppTokens,
         Button,
         ButtonColor,
+        ChangeTrackerController,
+        DateHelper,
         Deck,
-        DeckCommentWidget,
+        DeckDetails,
         DeckListingSheetMode,
-        DeckListingTile,
+        DeckProfilesLabel,
         DeckTile,
         DeckTileState,
         ErrorState,
-        EditableTextValue,
         MetaLabel,
-        SectionEyebrow,
+        Scaffold,
+        SurfaceColor,
         SurfacePadding,
         SurfaceShape,
-        SurfaceColor,
-        TextSize,
-        TextWeight,
-        DeckDetails,
-        ProfileLabel,
-        MarkdownTextMode,
-        Scaffold,
-        ViewDeckListingsController,
-        textStyle,
-        surfaceStyle,
-        useViewDeckListingSingleSheet,
-        ChangeTrackerController,
         ViewDeckListingSingleController,
+        ViewDeckListingsController,
         showBottomSheet,
-        ViewDeckListingSingleHelper,
-        DateHelper,
-        NumberHelper;
+        surfaceStyle,
+        useViewDeckListingSingleController,
+        ViewDeckSingleHelper,
+        ChipTone,
+        SurfaceBorder,
+        SurfaceShadow,
+        DiscussionSection;
 import 'package:flutter/material.dart'
     show
         BuildContext,
@@ -43,51 +38,32 @@ import 'package:flutter/material.dart'
         Center,
         SizedBox,
         Text,
-        TextEditingController,
-        OutlineInputBorder,
-        IconData,
         WidgetsBinding,
         ScaffoldMessenger,
         SnackBar,
         DraggableScrollableSheet,
         CrossAxisAlignment,
         EdgeInsets,
-        Padding,
         Icons,
-        Wrap,
-        Expanded,
         Row,
         Column,
         SliverToBoxAdapter,
         CustomScrollView,
         Positioned,
         Stack,
-        MediaQuery,
-        BorderRadius,
-        RoundedRectangleBorder,
         Colors,
-        ClipRRect,
         CarouselView,
-        LayoutBuilder,
-        Image,
-        BoxFit,
-        Icon,
-        ColoredBox,
-        WrapCrossAlignment,
-        CircularProgressIndicator,
-        ButtonSegment,
-        SegmentedButton,
-        FilledButton,
-        TextInputAction,
-        InputDecoration,
-        TextField,
-        BorderSide,
-        ActionChip;
+        MainAxisAlignment,
+        Clip,
+        Axis;
+import 'package:flutter_hooks/flutter_hooks.dart' show HookWidget, useEffect;
 
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
-import 'package:theme_variants/theme_variants.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
+import 'package:go_router/go_router.dart' show GoRouterHelper;
+import 'package:provider/provider.dart'
+    show ChangeNotifierProvider, ReadContext;
+import 'package:theme_variants/theme_variants.dart'
+    show ThemeVariantsContext, Surface;
 
 Future<void> showViewDeckListingSingleSheet(
   BuildContext context,
@@ -111,19 +87,17 @@ class ViewDeckListingSingleSheet extends HookWidget {
     super.key,
     required this.deck,
     this.initialMode = DeckListingSheetMode.preview,
-    this.showCloseButton = true,
   });
 
   final Deck deck;
   final DeckListingSheetMode initialMode;
-  final bool showCloseButton;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
     final controller = context.read<ViewDeckListingsController>();
     final changeReviewController = context.read<ChangeTrackerController>();
-    final sheet = useViewDeckListingSingleSheet(
+    final sheet = useViewDeckListingSingleController(
       deckId: deck.id,
       initialDeck: deck,
       initialMode: initialMode,
@@ -156,16 +130,14 @@ class ViewDeckListingSingleSheet extends HookWidget {
 
     return DraggableScrollableSheet(
       expand: false,
-      initialChildSize: showCloseButton ? 0.92 : 1,
-      minChildSize: showCloseButton ? 0.55 : 1,
+      initialChildSize: 1,
+      minChildSize: 0.4,
       maxChildSize: 1,
       builder: (context, scrollController) {
         return Surface(
-          style: surfaceStyle.resolve(tokens, const [
-            SurfacePadding.none,
-            SurfaceColor.muted,
-          ]),
-          hasClipRRect: true,
+          style: surfaceStyle
+              .resolve(tokens, const [SurfacePadding.none])
+              .copyWith(clipBehavior: Clip.antiAlias),
           child: Scaffold(
             backgroundColor: Colors.transparent,
             scrollable: false,
@@ -173,6 +145,7 @@ class ViewDeckListingSingleSheet extends HookWidget {
             constrainWidth: false,
             padding: EdgeInsets.zero,
             body: _Body(
+              initialMode: initialMode,
               scrollController: scrollController,
               controller: sheet,
               onBackPressed: () {
@@ -195,16 +168,21 @@ class _Body extends StatelessWidget {
     required this.scrollController,
     required this.controller,
     required this.onBackPressed,
+    required this.initialMode,
   });
 
   final ScrollController scrollController;
   final ViewDeckListingSingleController controller;
   final VoidCallback onBackPressed;
+  final DeckListingSheetMode initialMode;
 
   @override
   Widget build(BuildContext context) {
     final deck = controller.deck!;
     final tokens = context.themeTokens<AppTokens>();
+    final headerHeight = 350.h.clamp(300.0, 390.0).toDouble();
+    final tags = deck.tags.map((tag) => tag.name).toList(growable: false);
+    final isEditing = initialMode == DeckListingSheetMode.editor;
 
     return Stack(
       children: [
@@ -213,186 +191,147 @@ class _Body extends StatelessWidget {
           slivers: [
             SliverToBoxAdapter(
               child: Column(
+                spacing: tokens.spaceLayoutGapMd,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _HeroCarousel(
-                    imageUrls: ViewDeckListingSingleHelper.carouselImageUrls(
-                      deck,
+                  SizedBox(
+                    height: headerHeight,
+                    child: CarouselView.weighted(
+                      scrollDirection: Axis.horizontal,
+                      flexWeights: const <int>[1],
+                      children: List<Widget>.generate(10, (int index) {
+                        return Center(child: Text('Item $index'));
+                      }),
                     ),
                   ),
-                  SizedBox(height: tokens.spaceLayoutGapMd),
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: tokens.spaceLayoutPadding,
-                    ),
-                    child: _InteractionSummary(controller: controller),
-                  ),
-                  SizedBox(height: tokens.spaceLayoutGapMd),
                   Surface(
                     style: surfaceStyle.resolve(tokens, const [
                       SurfaceShape.topRounded,
                       SurfaceColor.muted,
-                      SurfacePadding.none,
+                      SurfaceBorder.top,
+                      SurfaceShadow.none,
+                      SurfacePadding.scaffold,
                     ]),
-                    child: Padding(
-                      padding: EdgeInsets.all(tokens.spaceLayoutPadding),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Wrap(
-                                  spacing: tokens.spaceLayoutGapMd,
-                                  runSpacing: tokens.spaceLayoutGapSm,
-                                  children: [
-                                    ProfileLabel(
-                                      label: 'By',
-                                      displayName:
-                                          ViewDeckListingSingleHelper.profileName(
-                                            deck,
-                                          ),
-                                      avatarUrl:
-                                          ViewDeckListingSingleHelper.profileAvatarUrl(
-                                            deck,
-                                          ),
-                                    ),
-                                    MetaLabel(
-                                      icon: Icons.calendar_today_outlined,
-                                      label: DateHelper.ddMmYy(deck.createdAt),
-                                      tooltip:
-                                          'Created ${DateHelper.ddMmYy(deck.createdAt)}',
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              _InteractionButton(
-                                icon: controller.isFavorite
-                                    ? Icons.favorite
-                                    : Icons.favorite_border,
-                                label: NumberHelper.compactCount(
-                                  controller.favoritesCount,
-                                ),
-                                selected: controller.isFavorite,
-                                onPressed:
-                                    controller.isBusy ||
-                                        controller.onFavoritePressed == null
-                                    ? null
-                                    : () {
-                                        controller.onFavoritePressed!();
-                                      },
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: tokens.spaceLayoutGapMd),
-                          _InteractionSummary(controller: controller),
-                          SizedBox(height: tokens.spaceLayoutGapLg),
-                          Center(
-                            child: DeckTile(
-                              deck: deck,
-                              state: DeckTileState.spread,
-                              width: 190,
-                            ),
-                          ),
-                          SizedBox(height: tokens.spaceLayoutGapLg),
-                          if (controller.canEdit) ...[
-                            _ListingModeControls(controller: controller),
-                            SizedBox(height: tokens.spaceLayoutGapLg),
-                          ],
-                          if (controller.mode == DeckListingSheetMode.preview)
-                            Center(child: DeckListingTile(deck: deck))
-                          else
-                            DeckDetails(
-                              title: EditableTextValue(
-                                value: ViewDeckListingSingleHelper.title(deck),
-                                enabled: controller.canEdit,
-                                onSave: controller.onTitleChanged,
-                                textStyle: textStyle.resolve(tokens, const [
-                                  TextSize.header,
-                                  TextWeight.heavy,
-                                ]),
-                              ),
-                              metaLabels: Wrap(
-                                spacing: tokens.spaceLayoutGapMd,
-                                runSpacing: tokens.spaceLayoutGapSm,
-                                children: [
-                                  MetaLabel(
-                                    icon: Icons.style_outlined,
-                                    label: '${deck.cardCount} cards',
+                    child: Column(
+                      spacing: tokens.spaceLayoutGapMd,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          spacing: tokens.spaceLayoutGapSm,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            DeckProfilesLabel(
+                              profileName: deck.userProfile!.username,
+                              profileAvatarUrl: deck.userProfile!.avatarUrl,
+                              sourceProfileAvatarUrl:
+                                  ViewDeckSingleHelper.sourceProfileAvatarUrl(
+                                    deck,
                                   ),
+                              sourceProfileName:
+                                  ViewDeckSingleHelper.sourceProfileName(deck),
+                            ),
+                            Row(
+                              spacing: tokens.spaceLayoutGapSm,
+                              children: [
+                                Button.icon(icon: Icons.arrow_upward),
+                                Button.icon(icon: Icons.arrow_downward),
+                                Button.icon(icon: Icons.monitor_heart),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            MetaLabel(label: '', icon: Icons.download),
+                            MetaLabel(label: '', icon: Icons.arrow_upward),
+                            MetaLabel(label: '', icon: Icons.arrow_downward),
+                            MetaLabel(label: '', icon: Icons.favorite),
+                          ],
+                        ),
+                        Center(
+                          child: DeckTile(
+                            deck: deck,
+                            state: DeckTileState.spread,
+                            width: 190,
+                          ),
+                        ),
+                        DeckDetails(
+                          title: ViewDeckSingleHelper.title(deck),
+                          shortDescription:
+                              ViewDeckSingleHelper.shortDescription(deck),
+                          longDescription: ViewDeckSingleHelper.longDescription(
+                            deck,
+                          ),
+                          isEditable: isEditing,
+                          tags: tags,
+                          areTagsEditable: deck.isEditable,
+                          tagsPlaceholder: deck.isEditable
+                              ? 'Add tags'
+                              : 'No tags yet',
+                          tagsTone: ChipTone.ghost,
+                          onTitleChanged: controller.updateTitle,
+                          onShortDescriptionChanged:
+                              controller.updateShortDescription,
+                          onLongDescriptionChanged:
+                              controller.updateLongDescription,
+                          metaLabels: Column(
+                            spacing: tokens.spaceLayoutGapSm,
+                            children: [
+                              Row(
+                                spacing: tokens.spaceLayoutGapSm,
+                                children: [
                                   MetaLabel(
                                     icon: Icons.new_releases_outlined,
                                     label:
                                         'v${deck.version}+${deck.buildNumber}',
+                                    tooltip: 'Deck version and build number',
                                   ),
                                   MetaLabel(
-                                    icon: Icons.visibility_outlined,
-                                    label:
-                                        ViewDeckListingSingleHelper.visibilityLabel(
-                                          deck,
-                                        ),
-                                  ),
-                                  MetaLabel(
-                                    icon: Icons.update_outlined,
-                                    label: DateHelper.ddMmYy(deck.updatedAt),
-                                    tooltip:
-                                        'Updated ${DateHelper.ddMmYy(deck.updatedAt)}',
+                                    icon: Icons.style_outlined,
+                                    label: '${deck.cardCount} cards',
                                   ),
                                 ],
                               ),
-                              shortDescription: EditableTextValue(
-                                value:
-                                    ViewDeckListingSingleHelper.shortDescription(
-                                      deck,
+                              Row(
+                                spacing: tokens.spaceLayoutGapSm,
+                                children: [
+                                  MetaLabel(
+                                    icon: Icons.calendar_today_outlined,
+                                    label: DateHelper.formatDateYyyyMmDd(
+                                      deck.createdAt,
                                     ),
-                                enabled: controller.canEdit,
-                                onSave: controller.onShortDescriptionChanged,
-                                textStyle: textStyle.resolve(tokens, const [
-                                  TextSize.label,
-                                  TextWeight.strong,
-                                ]),
-                              ),
-                              longDescription: EditableTextValue(
-                                value:
-                                    ViewDeckListingSingleHelper.longDescription(
-                                      deck,
+                                    tooltip:
+                                        'Created ${DateHelper.formatDateYyyyMmDd(deck.createdAt)}',
+                                  ),
+                                  MetaLabel(
+                                    icon: Icons.update_outlined,
+                                    label: DateHelper.formatDateYyyyMmDd(
+                                      deck.updatedAt,
                                     ),
-                                enabled: controller.canEdit,
-                                isMarkdown: true,
-                                markdownMode: MarkdownTextMode.preview,
-                                onSave: controller.onLongDescriptionChanged,
-                                textStyle: textStyle.resolve(tokens, const [
-                                  TextSize.bodyLarge,
-                                  TextWeight.body,
-                                ]),
+                                    tooltip:
+                                        'Updated ${DateHelper.formatDateYyyyMmDd(deck.updatedAt)}',
+                                  ),
+                                  MetaLabel(
+                                    icon: Icons.update_outlined,
+                                    label: DateHelper.formatDateYyyyMmDd(
+                                      deck.updatedAt,
+                                    ),
+                                    tooltip:
+                                        'Published ${DateHelper.formatDateYyyyMmDd(deck.updatedAt)}',
+                                  ),
+                                ],
                               ),
-                              tags: deck.tags
-                                  .map((tag) => tag.name)
-                                  .toList(growable: false),
-                              tagsEnabled: false,
-                              tagsPlaceholder: 'No tags yet',
-                            ),
+                            ],
+                          ),
+                        ),
+                        // SectionEyebrow('Featured Cards'),
+                        if (deck.isPublished) ...[
+                          DiscussionSection(sheet: controller),
                         ],
-                      ),
+                      ],
                     ),
                   ),
-                  if (deck.isPublished) ...[
-                    SizedBox(height: tokens.spaceLayoutGapLg),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: tokens.spaceLayoutPadding,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SectionEyebrow('Featured Cards'),
-                          SizedBox(height: tokens.spaceLayoutGapLg),
-                          _DiscussionSection(sheet: controller),
-                        ],
-                      ),
-                    ),
-                  ],
                 ],
               ),
             ),
@@ -410,7 +349,7 @@ class _Body extends StatelessWidget {
                 Button.icon(
                   icon: Icons.public_outlined,
                   color: ButtonColor.success,
-                  onPressed: controller.onPublishPressed,
+                  onPressed: controller.publishDraft,
                 ),
               ],
               Button.icon(
@@ -422,446 +361,12 @@ class _Body extends StatelessWidget {
                     controller.isDownloading ||
                         controller.onDownloadPressed == null
                     ? null
-                    : () {
-                        controller.onDownloadPressed!();
-                      },
+                    : controller.onDownloadPressed,
               ),
             ],
           ),
         ),
       ],
-    );
-  }
-}
-
-class _ListingModeControls extends StatelessWidget {
-  const _ListingModeControls({required this.controller});
-
-  final ViewDeckListingSingleController controller;
-
-  @override
-  Widget build(BuildContext context) {
-    return SegmentedButton<DeckListingSheetMode>(
-      segments: const [
-        ButtonSegment(
-          value: DeckListingSheetMode.editor,
-          icon: Icon(Icons.edit_outlined),
-          label: Text('Editor'),
-        ),
-        ButtonSegment(
-          value: DeckListingSheetMode.preview,
-          icon: Icon(Icons.visibility_outlined),
-          label: Text('Preview'),
-        ),
-      ],
-      selected: {controller.mode},
-      onSelectionChanged: (selected) {
-        controller.onModeChanged(selected.first);
-      },
-    );
-  }
-}
-
-class _HeroCarousel extends StatelessWidget {
-  const _HeroCarousel({required this.imageUrls});
-
-  final List<String> imageUrls;
-
-  @override
-  Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
-    final height = MediaQuery.sizeOf(context).height * 0.34;
-
-    return SizedBox(
-      height: height.clamp(260.0, 380.0),
-      width: double.infinity,
-      child: Padding(
-        padding: EdgeInsets.only(
-          left: tokens.spaceLayoutPadding,
-          right: tokens.spaceLayoutPadding,
-          top: tokens.spaceLayoutPadding * 3.5,
-          bottom: tokens.spaceLayoutPadding,
-        ),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return CarouselView(
-              itemExtent: constraints.maxWidth * 0.82,
-              shrinkExtent: 64,
-              itemSnapping: true,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(tokens.radiusSurface),
-              ),
-              children: [
-                for (final imageUrl in imageUrls)
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(tokens.radiusSurface),
-                    child: _NetworkImageTile(imageUrl: imageUrl),
-                  ),
-              ],
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
-
-class _NetworkImageTile extends StatelessWidget {
-  const _NetworkImageTile({required this.imageUrl});
-
-  final String imageUrl;
-
-  @override
-  Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
-
-    return Image.network(
-      imageUrl,
-      fit: BoxFit.cover,
-      errorBuilder: (context, _, _) {
-        return ColoredBox(
-          color: tokens.colorSurfaceBackground,
-          child: Icon(
-            Icons.image_not_supported_outlined,
-            size: 44,
-            color: tokens.colorTextMuted,
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _InteractionSummary extends StatelessWidget {
-  const _InteractionSummary({required this.controller});
-
-  final ViewDeckListingSingleController controller;
-
-  @override
-  Widget build(BuildContext context) {
-    final deck = controller.deck!;
-    final tokens = context.themeTokens<AppTokens>();
-
-    return Wrap(
-      spacing: tokens.spaceLayoutGapSm,
-      runSpacing: tokens.spaceLayoutGapSm,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      children: [
-        _InteractionButton(
-          icon: controller.voteValue == 1
-              ? Icons.arrow_circle_up
-              : Icons.arrow_circle_up_outlined,
-          label: NumberHelper.compactCount(controller.upvotesCount),
-          selected: controller.voteValue == 1,
-          onPressed: controller.isBusy || controller.onUpvotePressed == null
-              ? null
-              : () {
-                  controller.onUpvotePressed!();
-                },
-        ),
-        _InteractionButton(
-          icon: controller.voteValue == -1
-              ? Icons.arrow_circle_down
-              : Icons.arrow_circle_down_outlined,
-          label: NumberHelper.compactCount(controller.downvotesCount),
-          selected: controller.voteValue == -1,
-          onPressed: controller.isBusy || controller.onDownvotePressed == null
-              ? null
-              : () {
-                  controller.onDownvotePressed!();
-                },
-        ),
-        MetaLabel(
-          icon: Icons.cloud_download_outlined,
-          label: NumberHelper.compactCount(
-            ViewDeckListingSingleHelper.downloadsCount(deck),
-          ),
-        ),
-        MetaLabel(
-          icon: Icons.call_split_outlined,
-          label: NumberHelper.compactCount(
-            ViewDeckListingSingleHelper.forksCount(deck),
-          ),
-        ),
-        MetaLabel(
-          icon: Icons.rate_review_outlined,
-          label: NumberHelper.compactCount(controller.reviewsCount),
-        ),
-        MetaLabel(
-          icon: Icons.chat_bubble_outline,
-          label: NumberHelper.compactCount(controller.commentsCount),
-        ),
-      ],
-    );
-  }
-}
-
-class _DiscussionSection extends StatelessWidget {
-  const _DiscussionSection({required this.sheet});
-
-  final ViewDeckListingSingleController sheet;
-
-  @override
-  Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SectionEyebrow('Reviews'),
-        SizedBox(height: tokens.spaceLayoutGapMd),
-        _ReviewComposer(
-          isSubmitting: sheet.isSubmittingReview,
-          onSubmitted: sheet.onReviewSubmitted,
-        ),
-        SizedBox(height: tokens.spaceLayoutGapLg),
-        if (sheet.isLoadingDiscussion)
-          const Center(child: CircularProgressIndicator())
-        else if (sheet.reviewItems.isEmpty)
-          _EmptyDiscussionText(label: 'No reviews yet.')
-        else
-          for (final review in sheet.reviewItems)
-            DeckCommentWidget(
-              item: review,
-              repliesFor: sheet.reviewRepliesFor,
-              onReply: sheet.onReviewReply,
-              onEdit: sheet.onReviewEdit,
-              canEdit: sheet.canEditReviewItem,
-              isSubmitting:
-                  sheet.isSubmittingReview || sheet.isSubmittingReviewComment,
-            ),
-        SizedBox(height: tokens.spaceLayoutGapLg),
-        SectionEyebrow('Comments'),
-        SizedBox(height: tokens.spaceLayoutGapMd),
-        _CommentComposer(
-          isSubmitting: sheet.isSubmittingComment,
-          onSubmitted: sheet.onCommentSubmitted,
-        ),
-        SizedBox(height: tokens.spaceLayoutGapLg),
-        if (sheet.isLoadingDiscussion)
-          const SizedBox.shrink()
-        else if (sheet.commentItems.isEmpty)
-          _EmptyDiscussionText(label: 'No comments yet.')
-        else
-          for (final comment in sheet.commentItems)
-            DeckCommentWidget(
-              item: comment,
-              repliesFor: sheet.commentRepliesFor,
-              onReply: sheet.onCommentSubmitted,
-              onEdit: sheet.onCommentEdit,
-              canEdit: sheet.canEditCommentItem,
-              isSubmitting: sheet.isSubmittingComment,
-            ),
-      ],
-    );
-  }
-}
-
-class _ReviewComposer extends HookWidget {
-  const _ReviewComposer({
-    required this.isSubmitting,
-    required this.onSubmitted,
-  });
-
-  final bool isSubmitting;
-  final Future<bool> Function({
-    required int voteValue,
-    required String title,
-    required String body,
-  })
-  onSubmitted;
-
-  @override
-  Widget build(BuildContext context) {
-    final titleController = useTextEditingController();
-    final bodyController = useTextEditingController();
-    final voteValue = useState(1);
-
-    return Column(
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: _DiscussionInput(
-                controller: titleController,
-                hintText: 'Review title',
-                minLines: 1,
-                maxLines: 1,
-              ),
-            ),
-            const SizedBox(width: 8),
-            SegmentedButton<int>(
-              segments: const [
-                ButtonSegment(
-                  value: 1,
-                  icon: Icon(Icons.thumb_up_alt_outlined),
-                ),
-                ButtonSegment(
-                  value: -1,
-                  icon: Icon(Icons.thumb_down_alt_outlined),
-                ),
-              ],
-              selected: {voteValue.value},
-              onSelectionChanged: isSubmitting
-                  ? null
-                  : (values) {
-                      voteValue.value = values.first;
-                    },
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        _DiscussionInput(
-          controller: bodyController,
-          hintText: 'Input',
-          minLines: 4,
-        ),
-        const SizedBox(height: 8),
-        SizedBox(
-          width: double.infinity,
-          child: FilledButton(
-            onPressed: isSubmitting
-                ? null
-                : () async {
-                    final posted = await onSubmitted(
-                      voteValue: voteValue.value,
-                      title: titleController.text,
-                      body: bodyController.text,
-                    );
-                    if (!posted) return;
-
-                    titleController.clear();
-                    bodyController.clear();
-                  },
-            child: isSubmitting
-                ? const SizedBox.square(
-                    dimension: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Text('Post Review'),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _CommentComposer extends HookWidget {
-  const _CommentComposer({
-    required this.isSubmitting,
-    required this.onSubmitted,
-  });
-
-  final bool isSubmitting;
-  final Future<bool> Function(String body, {String? parentCommentId})
-  onSubmitted;
-
-  @override
-  Widget build(BuildContext context) {
-    final bodyController = useTextEditingController();
-
-    return Column(
-      children: [
-        _DiscussionInput(
-          controller: bodyController,
-          hintText: 'Input',
-          minLines: 4,
-        ),
-        const SizedBox(height: 8),
-        SizedBox(
-          width: double.infinity,
-          child: FilledButton(
-            onPressed: isSubmitting
-                ? null
-                : () async {
-                    final posted = await onSubmitted(bodyController.text);
-                    if (posted) bodyController.clear();
-                  },
-            child: isSubmitting
-                ? const SizedBox.square(
-                    dimension: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Text('Post Comment'),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _DiscussionInput extends StatelessWidget {
-  const _DiscussionInput({
-    required this.controller,
-    required this.hintText,
-    required this.minLines,
-    this.maxLines = 6,
-  });
-
-  final TextEditingController controller;
-  final String hintText;
-  final int minLines;
-  final int maxLines;
-
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      minLines: minLines,
-      maxLines: maxLines,
-      textInputAction: TextInputAction.newline,
-      decoration: InputDecoration(
-        hintText: hintText,
-        alignLabelWithHint: true,
-        border: const OutlineInputBorder(),
-      ),
-    );
-  }
-}
-
-class _InteractionButton extends StatelessWidget {
-  const _InteractionButton({
-    required this.icon,
-    required this.label,
-    required this.selected,
-    required this.onPressed,
-  });
-
-  final IconData icon;
-  final String label;
-  final bool selected;
-  final VoidCallback? onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
-
-    return ActionChip(
-      avatar: Icon(icon, size: 18),
-      label: Text(label),
-      onPressed: onPressed,
-      backgroundColor: selected
-          ? tokens.colorPrimary.withValues(alpha: 0.14)
-          : null,
-      side: BorderSide(
-        color: selected ? tokens.colorPrimary : tokens.colorBorderNeutralSubtle,
-      ),
-    );
-  }
-}
-
-class _EmptyDiscussionText extends StatelessWidget {
-  const _EmptyDiscussionText({required this.label});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
-
-    return Text(
-      label,
-      style: textStyle.resolve(tokens, const [TextSize.label]),
     );
   }
 }

@@ -19,7 +19,7 @@ class PhysicalCardSide extends StatelessWidget {
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
     final effectiveMaxWidth = maxWidth ?? tokens.studyCardWidth;
-    final radius = ScaleHelper.radius(
+    final radius = ScaleHelper.getScaledRadiusFromBase(
       radius: tokens.studyCardRadius,
       current: effectiveMaxWidth,
       base: tokens.studyCardWidth,

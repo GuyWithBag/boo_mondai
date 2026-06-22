@@ -1,5 +1,5 @@
 abstract final class DateHelper {
-  static String yyyyMmDd(DateTime value) {
+  static String formatDateYyyyMmDd(DateTime value) {
     final local = value.toLocal();
     final year = local.year.toString().padLeft(4, '0');
     final month = local.month.toString().padLeft(2, '0');
@@ -7,7 +7,7 @@ abstract final class DateHelper {
     return '$year-$month-$day';
   }
 
-  static String ddMmYy(DateTime value) {
+  static String formatDateDdMmYy(DateTime value) {
     final local = value.toLocal();
     final day = local.day.toString().padLeft(2, '0');
     final month = local.month.toString().padLeft(2, '0');

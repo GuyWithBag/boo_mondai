@@ -44,13 +44,13 @@ class FillInTheBlanksCard extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final contentScale = ScaleHelper.factor(
+    final contentScale = ScaleHelper.getClampedSizeRatio(
       current: maxWidth ?? tokens.studyCardWidth,
       base: tokens.studyCardWidth,
       min: 0.6,
       max: 1.4,
     );
-    final eyebrowStyle = ScaleHelper.textStyle(
+    final eyebrowStyle = ScaleHelper.getTextStyleWithScaledFontSize(
       textStyle.resolve(tokens, const [
         TextSize.labelSmall,
         TextWeight.heavy,
@@ -58,7 +58,7 @@ class FillInTheBlanksCard extends HookWidget {
       ]),
       contentScale,
     );
-    final blankTextStyle = ScaleHelper.textStyle(
+    final blankTextStyle = ScaleHelper.getTextStyleWithScaledFontSize(
       textStyle.resolve(tokens, const [TextSize.bodyLarge, TextWeight.heavy]),
       contentScale,
     );
@@ -126,8 +126,6 @@ class FillInTheBlanksCard extends HookWidget {
                     Text(entry.value.suffix, style: blankTextStyle),
                   ],
                 ),
-                if (entry.key != template.segments.length - 1)
-                  SizedBox(height: 24.h),
               ],
             ],
           ),

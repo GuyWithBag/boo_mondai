@@ -14,9 +14,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         Deck,
         AppTokens,
         ImageHelper,
-        CubeController,
+        ScaleHelper,
         useCubeController,
         PhysicalCardSide,
+        PhysicalCardController,
         PhysicalCard,
         PhysicalDeck;
 import 'package:flutter/material.dart';
@@ -94,23 +95,23 @@ class DeckTile extends HookWidget {
     const stackedCardCount = 3;
     final studyCardAspectRatio = tokens.studyCardAspectRatio;
     final cardWidth = width ?? tokens.studyCardWidth;
-    final cardHeight = cardWidth / studyCardAspectRatio;
+    final cardHeight = ScaleHelper.getSizeFromWidthAndAspectRatio(
+      width: cardWidth,
+      aspectRatio: studyCardAspectRatio,
+    ).height;
     final animationScale = cardWidth / tokens.studyCardWidth;
-    final coverImage = ImageHelper.providerFromSource(deck?.coverImageUrl);
+    final coverImage = ImageHelper.getImageProviderFromSource(
+      deck?.coverImageUrl,
+    );
     final effectiveOnImagePicked = isImageEditable ? onImagePicked : null;
     // final scale = 1.3;
     final cardControllers = useMemoized(
       () => List.generate(
         stackedCardCount,
-        (_) => CubeController(
-          depth: 0,
-          perspective: 0,
-          height: cardHeight,
-          width: cardWidth,
-          // scale: scale,
-        ),
+        (_) =>
+            PhysicalCardController(context, width: cardWidth, perspective: 0),
       ),
-      [cardHeight, cardWidth],
+      [cardWidth],
     );
     useEffect(() {
       return () {

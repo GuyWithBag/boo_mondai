@@ -386,7 +386,7 @@ class EditDeckController extends Controller {
 
   List<FillInTheBlankSegment> _buildSegments(String templateId) {
     final sentence = formState.fillInTheBlankSentenceController.text.trim();
-    final answers = TextHelper.splitCommaSeparated(
+    final answers = TextHelper.getTrimmedCommaSeparatedValues(
       formState.fillInTheBlankAnswersController.text,
     );
     if (sentence.isEmpty || answers.isEmpty) return [];

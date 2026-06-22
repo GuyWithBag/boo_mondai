@@ -1,6 +1,4 @@
-import 'package:boo_mondai/core/controllers/cube.controller.dart'
-    show CubeController;
-import 'package:boo_mondai/lib.barrel.dart' show Cube;
+import 'package:boo_mondai/lib.barrel.dart' show Cube, PhysicalCardController;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
@@ -15,7 +13,7 @@ class PhysicalCard extends HookWidget {
     this.animateChanges = true,
   });
 
-  final CubeController controller;
+  final PhysicalCardController controller;
   final Widget front;
   final Widget? back;
   final bool tapToFlip;
@@ -27,7 +25,7 @@ class PhysicalCard extends HookWidget {
     useListenable(controller);
 
     final cube = Cube(
-      controller: controller,
+      controller: controller.controller,
       front: front,
       back: back,
       depth: controller.depth == 0 ? 10 : controller.depth,

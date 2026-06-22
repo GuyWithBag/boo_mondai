@@ -28,7 +28,9 @@ FillInTheBlanksEditorState useFillInTheBlanksEditor({
   useListenable(answersController);
 
   final sentence = sentenceController.text;
-  final answers = TextHelper.splitCommaSeparated(answersController.text);
+  final answers = TextHelper.getTrimmedCommaSeparatedValues(
+    answersController.text,
+  );
   final selectedText = _selectedSentenceText(sentenceController);
 
   void writeAnswers(List<String> updatedAnswers) {

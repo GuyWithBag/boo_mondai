@@ -77,7 +77,7 @@ void main() {
 
   group('TextHelper', () {
     test('splits comma separated text', () {
-      expect(TextHelper.splitCommaSeparated('one, two, ,three'), [
+      expect(TextHelper.getTrimmedCommaSeparatedValues('one, two, ,three'), [
         'one',
         'two',
         'three',

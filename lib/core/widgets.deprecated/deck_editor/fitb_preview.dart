@@ -27,7 +27,7 @@ class FitbPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeColorScheme = Theme.of(context).colorScheme;
-    final answers = TextHelper.splitCommaSeparated(answersRaw);
+    final answers = TextHelper.getTrimmedCommaSeparatedValues(answersRaw);
     final trimmedSentence = sentence.trim();
     final lowerSentence = trimmedSentence.toLowerCase();
 

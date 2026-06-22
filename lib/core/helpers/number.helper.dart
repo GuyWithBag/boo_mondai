@@ -1,5 +1,5 @@
 abstract final class NumberHelper {
-  static String compactCount(int value) {
+  static String formatCompactCount(int value) {
     if (value >= 1000000) {
       return '${(value / 1000000).toStringAsFixed(1)}m';
     }

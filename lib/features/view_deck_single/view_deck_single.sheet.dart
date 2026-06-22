@@ -1,7 +1,3 @@
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// PATH: lib/pages/view_deck.local.page.dart
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
@@ -18,12 +14,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         SurfacePadding,
         SurfaceShape,
         SurfaceColor,
-        TextSize,
-        TextWeight,
         ViewDecksLocalController,
         ViewDeckSingleSheetController,
         chipStyle,
-        textStyle,
         surfaceStyle,
         useViewDeckSingleSheet,
         Scaffold,
@@ -33,7 +26,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         SurfaceBorder,
         SurfaceShadow,
         AppBar,
-        EditableTextValue,
         ViewDeckSingleHelper,
         DateHelper,
         ImageHelper,
@@ -66,13 +58,13 @@ import 'package:flutter/material.dart'
         Wrap,
         CrossAxisAlignment,
         MainAxisAlignment,
-        Row,
-        Padding;
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
-import 'package:theme_variants/theme_variants.dart';
+        Row;
+import 'package:flutter_hooks/flutter_hooks.dart' show HookWidget;
+import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
+import 'package:go_router/go_router.dart' show GoRouterHelper;
+import 'package:provider/provider.dart' show ReadContext;
+import 'package:theme_variants/theme_variants.dart'
+    show Surface, ThemeVariantsContext;
 
 Future<void> showViewDeckSingleSheet(BuildContext context, Deck deck) {
   return showBottomSheet(
@@ -175,9 +167,11 @@ class _Body extends StatelessWidget {
                     top: 0,
                     height: headerHeight + tokens.radiusSurfaceLg,
                     child: BackgroundImageSurface(
-                      image: ImageHelper.providerFromSource(deck.coverImageUrl),
+                      image: ImageHelper.getImageProviderFromSource(
+                        deck.coverImageUrl,
+                      ),
                       onImagePicked: deck.isEditable
-                          ? controller.onCoverImagePicked
+                          ? controller.updateCoverImage
                           : null,
                     ),
                   ),
@@ -212,7 +206,7 @@ class _Body extends StatelessWidget {
               Button.icon(
                 icon: Icons.delete_outline,
                 color: ButtonColor.error,
-                onPressed: controller.onDeletePressed,
+                onPressed: controller.deleteDeck,
               ),
             ],
             bottom: Wrap(
@@ -233,7 +227,7 @@ class _Body extends StatelessWidget {
                     selected: deck.isPublished,
                     onSelected: controller.isSavingPublishState
                         ? null
-                        : controller.onPublishedChanged,
+                        : controller.setPublished,
                   ),
                 ),
                 if (!deck.isEditable) const Chip(label: Text('Locked')),
@@ -264,6 +258,7 @@ class _BodySubSection extends StatelessWidget {
     final deck = controller.deck;
     final tags = deck.tags.map((tag) => tag.name).toList(growable: false);
     final tokens = context.themeTokens<AppTokens>();
+
     return SizedBox(
       width: double.infinity,
       child: Stack(
@@ -275,89 +270,55 @@ class _BodySubSection extends StatelessWidget {
               SurfaceColor.muted,
               SurfaceBorder.top,
               SurfaceShadow.none,
-              SurfacePadding.none,
+              SurfacePadding.scaffold,
             ]),
-            child: Padding(
-              padding: EdgeInsets.all(tokens.spaceScaffoldPadding),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    DeckProfilesLabel(
+                      profileName: ViewDeckSingleHelper.profileName(deck),
+                      profileAvatarUrl: ViewDeckSingleHelper.profileAvatarUrl(
+                        deck,
+                      ),
+                      sourceProfileName: ViewDeckSingleHelper.sourceProfileName(
+                        deck,
+                      ),
+                      sourceProfileAvatarUrl:
+                          ViewDeckSingleHelper.sourceProfileAvatarUrl(deck),
+                    ),
+                  ],
+                ),
+                DeckDetails(
+                  title: ViewDeckSingleHelper.title(deck),
+                  shortDescription: ViewDeckSingleHelper.shortDescription(deck),
+                  longDescription: ViewDeckSingleHelper.longDescription(deck),
+                  onTitleChanged: controller.updateTitle,
+                  onShortDescriptionChanged: controller.updateShortDescription,
+                  onLongDescriptionChanged: controller.updateLongDescription,
+                  tags: tags,
+                  onTagsChanged: controller.updateTags,
+                  areTagsEditable: deck.isEditable,
+                  tagsPlaceholder: deck.isEditable ? 'Add tags' : 'No tags yet',
+                  tagsTone: ChipTone.ghost,
+                  metaLabels: Wrap(
+                    spacing: tokens.spaceLayoutGapMd,
+                    runSpacing: tokens.spaceLayoutGapSm,
                     children: [
-                      DeckProfilesLabel(
-                        profileName: ViewDeckSingleHelper.profileName(deck),
-                        profileAvatarUrl: ViewDeckSingleHelper.profileAvatarUrl(
-                          deck,
-                        ),
-                        sourceProfileName:
-                            ViewDeckSingleHelper.sourceProfileName(deck),
-                        sourceProfileAvatarUrl:
-                            ViewDeckSingleHelper.sourceProfileAvatarUrl(deck),
+                      MetaLabel(
+                        icon: Icons.visibility_outlined,
+                        label: ViewDeckSingleHelper.visibilityLabel(deck),
+                      ),
+                      MetaLabel(
+                        icon: Icons.style_outlined,
+                        label: '${deck.cardCount} cards',
                       ),
                     ],
                   ),
-                  DeckDetails(
-                    title: EditableTextValue(
-                      value: ViewDeckSingleHelper.title(deck),
-                      editingValue: deck.title,
-                      enabled: deck.isEditable,
-                      placeholder: 'Deck title',
-                      onSave: controller.onTitleChanged,
-                      textStyle: textStyle.resolve(tokens, const [
-                        TextSize.header,
-                        TextWeight.heavy,
-                      ]),
-                    ),
-                    metaLabels: Wrap(
-                      spacing: tokens.spaceLayoutGapMd,
-                      runSpacing: tokens.spaceLayoutGapSm,
-                      children: [
-                        MetaLabel(
-                          icon: Icons.visibility_outlined,
-                          label: ViewDeckSingleHelper.visibilityLabel(deck),
-                        ),
-                        MetaLabel(
-                          icon: Icons.style_outlined,
-                          label: '${deck.cardCount} cards',
-                        ),
-                      ],
-                    ),
-                    shortDescription: EditableTextValue(
-                      value: ViewDeckSingleHelper.shortDescription(deck),
-                      editingValue: deck.shortDescription,
-                      enabled: deck.isEditable,
-                      placeholder: 'Short description',
-                      isMarkdown: true,
-                      onSave: controller.onShortDescriptionChanged,
-                      textStyle: textStyle.resolve(tokens, const [
-                        TextSize.labelSmall,
-                        TextWeight.body,
-                      ]),
-                    ),
-                    longDescription: EditableTextValue(
-                      value: ViewDeckSingleHelper.longDescription(deck),
-                      editingValue: deck.longDescription,
-                      enabled: deck.isEditable,
-                      placeholder: 'Long description',
-                      maxLines: null,
-                      isMarkdown: true,
-                      onSave: controller.onLongDescriptionChanged,
-                      textStyle: textStyle.resolve(tokens, const [
-                        TextSize.bodyLarge,
-                        TextWeight.body,
-                      ]),
-                    ),
-                    tags: tags,
-                    onTagsChanged: controller.onTagsChanged,
-                    tagsEnabled: deck.isEditable,
-                    tagsPlaceholder: deck.isEditable
-                        ? 'Add tags'
-                        : 'No tags yet',
-                    tagsTone: ChipTone.ghost,
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
           Positioned(
@@ -374,7 +335,7 @@ class _BodySubSection extends StatelessWidget {
                 width: deckWidth,
                 state: DeckTileState.bare,
                 isImageEditable: deck.isEditable,
-                onImagePicked: controller.onCoverImagePicked,
+                onImagePicked: controller.updateCoverImage,
               ),
             ),
           ),
@@ -386,6 +347,7 @@ class _BodySubSection extends StatelessWidget {
               collapseDistance: collapseDistance,
               alignment: Alignment.bottomLeft,
               child: Column(
+                spacing: tokens.spaceLayoutGapSm,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -394,17 +356,17 @@ class _BodySubSection extends StatelessWidget {
                     label: 'v${deck.version}+${deck.buildNumber}',
                     tooltip: 'Deck version and build number',
                   ),
-                  SizedBox(height: tokens.spaceLayoutGapSm),
                   MetaLabel(
                     icon: Icons.calendar_today_outlined,
-                    label: DateHelper.yyyyMmDd(deck.createdAt),
-                    tooltip: 'Created ${DateHelper.yyyyMmDd(deck.createdAt)}',
+                    label: DateHelper.formatDateYyyyMmDd(deck.createdAt),
+                    tooltip:
+                        'Created ${DateHelper.formatDateYyyyMmDd(deck.createdAt)}',
                   ),
-                  SizedBox(height: tokens.spaceLayoutGapSm),
                   MetaLabel(
                     icon: Icons.update_outlined,
-                    label: DateHelper.yyyyMmDd(deck.updatedAt),
-                    tooltip: 'Updated ${DateHelper.yyyyMmDd(deck.updatedAt)}',
+                    label: DateHelper.formatDateYyyyMmDd(deck.updatedAt),
+                    tooltip:
+                        'Updated ${DateHelper.formatDateYyyyMmDd(deck.updatedAt)}',
                   ),
                 ],
               ),

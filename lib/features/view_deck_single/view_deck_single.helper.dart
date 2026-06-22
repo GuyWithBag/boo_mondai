@@ -135,7 +135,7 @@ abstract final class ViewDeckSingleHelper {
       return false;
     }
 
-    final imageSource = ImageHelper.sourceFromPickedFile(file);
+    final imageSource = ImageHelper.getImageSourceFromPickedFile(file);
     if (imageSource == null || imageSource == deck.coverImageUrl) {
       return false;
     }

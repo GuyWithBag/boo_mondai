@@ -9,7 +9,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         MarkdownTextMode,
         TextField,
         TextFieldFrame,
-        TextFieldTone,
         TextFieldSize;
 import 'package:flutter/material.dart'
     show
@@ -32,34 +31,28 @@ import 'package:flutter/material.dart'
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-typedef EditableTextValueSave = Future<void> Function(String value);
-
 class EditableTextValue extends HookWidget {
   const EditableTextValue({
     required this.value,
     required this.onSave,
-    this.editingValue,
     this.enabled = true,
     this.placeholder,
     this.textStyle,
     this.maxLines = 1,
     this.isMarkdown = false,
     this.markdownMode = MarkdownTextMode.input,
-    this.fieldVariants = const [
-      TextFieldSize.normal,
-      TextFieldFrame.underline,
-      TextFieldTone.neutral,
-    ],
+    this.fieldVariants = const [TextFieldSize.normal, TextFieldFrame.underline],
     super.key,
     this.textAlign,
+    this.placeholderTextStyle,
   });
 
   final String value;
-  final String? editingValue;
-  final EditableTextValueSave onSave;
+  final Future<void> Function(String value)? onSave;
   final bool enabled;
   final String? placeholder;
   final TextStyle? textStyle;
+  final TextStyle? placeholderTextStyle;
   final int? maxLines;
   final bool isMarkdown;
   final MarkdownTextMode markdownMode;
@@ -71,24 +64,26 @@ class EditableTextValue extends HookWidget {
     final tokens = context.themeTokens<AppTokens>();
     final isEditing = useState(false);
     final isSaving = useState(false);
-    final controller = useTextEditingController(text: editingValue ?? value);
-    final markdownValue = useState(editingValue ?? value);
+    final controller = useTextEditingController(text: value);
+    final markdownValue = useState(value);
     final focusNode = useFocusNode();
 
     useEffect(() {
       if (!isEditing.value) {
-        controller.text = editingValue ?? value;
-        markdownValue.value = editingValue ?? value;
+        controller.text = value;
+        markdownValue.value = value;
       }
       return null;
-    }, [editingValue, value, isEditing.value]);
+    }, [value, isEditing.value]);
 
     Future<void> save() async {
       if (isSaving.value) return;
 
       isSaving.value = true;
       try {
-        await onSave(isMarkdown ? markdownValue.value : controller.text);
+        if (onSave != null) {
+          await onSave!(isMarkdown ? markdownValue.value : controller.text);
+        }
         isEditing.value = false;
       } finally {
         isSaving.value = false;
@@ -96,14 +91,14 @@ class EditableTextValue extends HookWidget {
     }
 
     void cancel() {
-      controller.text = editingValue ?? value;
-      markdownValue.value = editingValue ?? value;
+      controller.text = value;
+      markdownValue.value = value;
       isEditing.value = false;
     }
 
     void edit() {
-      controller.text = editingValue ?? value;
-      markdownValue.value = editingValue ?? value;
+      controller.text = value;
+      markdownValue.value = value;
       isEditing.value = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         focusNode.requestFocus();
@@ -129,6 +124,7 @@ class EditableTextValue extends HookWidget {
               enabled: !isSaving.value,
               maxLines: maxLines,
               placeholder: placeholder,
+
               baseTextStyle: textStyle,
               textInputAction: maxLines == 1
                   ? TextInputAction.done
@@ -143,7 +139,6 @@ class EditableTextValue extends HookWidget {
               maxLines: maxLines,
               placeholder: placeholder,
               style: textStyle,
-
               textInputAction: maxLines == 1
                   ? TextInputAction.done
                   : TextInputAction.newline,
@@ -189,7 +184,7 @@ class EditableTextValue extends HookWidget {
     return Row(
       spacing: tokens.spaceLayoutGapSm,
       crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: TextHelper.textAlignToMainAxisalignment(textAlign),
+      mainAxisAlignment: TextHelper.getMainAxisAlignmentForTextAlign(textAlign),
       children: [
         Flexible(child: valueWidget),
         if (enabled) ...[Button.iconSmall(icon: Icons.edit, onPressed: edit)],

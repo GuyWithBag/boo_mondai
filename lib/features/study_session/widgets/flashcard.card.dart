@@ -4,9 +4,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         StudyCard,
         StudySessionCardStageController,
         StudySessionController,
-        useCubeController,
         FlashcardFrontSide,
         FlashcardBackSide,
+        PhysicalCardController,
         PhysicalCard;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -27,11 +27,9 @@ class FlashcardCard extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final physicalCardController = useCubeController(
-      width: 460,
-      height: 644,
-      depth: 10,
-      perspective: 0.001,
+    final physicalCardController = useMemoized(
+      () => PhysicalCardController(context, width: 460),
+      const [],
     );
 
     useEffect(() {
@@ -40,7 +38,9 @@ class FlashcardCard extends HookWidget {
         animated: true,
       );
       return null;
-    }, [interactionsController.isRevealed]);
+    }, [physicalCardController, interactionsController.isRevealed]);
+
+    useEffect(() => physicalCardController.dispose, [physicalCardController]);
 
     return PhysicalCard(
       controller: physicalCardController,

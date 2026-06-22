@@ -3,18 +3,18 @@ import 'package:boo_mondai/features/decks/models/deck.dto.dart';
 
 abstract final class ViewDeckListingSingleHelper {
   static String title(Deck deck) {
-    return TextHelper.defaultText(deck.title, 'Untitled deck');
+    return TextHelper.getTrimmedTextOrFallback(deck.title, 'Untitled deck');
   }
 
   static String shortDescription(Deck deck) {
-    return TextHelper.defaultText(
+    return TextHelper.getTrimmedTextOrFallback(
       deck.shortDescription,
       'No short description yet.',
     );
   }
 
   static String longDescription(Deck deck) {
-    return TextHelper.defaultText(
+    return TextHelper.getTrimmedTextOrFallback(
       deck.longDescription,
       'No long description yet.',
     );
@@ -34,11 +34,14 @@ abstract final class ViewDeckListingSingleHelper {
   }
 
   static String profileName(Deck deck) {
-    return TextHelper.defaultText(deck.userProfile?.username, 'Unknown author');
+    return TextHelper.getTrimmedTextOrFallback(
+      deck.userProfile?.username,
+      'Unknown author',
+    );
   }
 
   static String? profileAvatarUrl(Deck deck) {
-    return TextHelper.nonEmptyOrNull(deck.userProfile?.avatarUrl);
+    return TextHelper.getTrimmedTextOrNull(deck.userProfile?.avatarUrl);
   }
 
   static String visibilityLabel(Deck deck) {
