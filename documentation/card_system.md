@@ -58,6 +58,17 @@ erDiagram
     text audio_url
   }
 
+  card_template_attachments {
+    uuid id PK
+    uuid template_id FK
+    text kind
+    text storage_path
+    text public_url
+    text mime_type
+    text alt_text
+    timestamptz created_at
+  }
+
   multiple_choice_options {
     uuid id PK
     uuid template_id FK

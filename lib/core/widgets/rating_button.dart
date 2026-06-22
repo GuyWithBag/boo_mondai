@@ -7,10 +7,14 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         StudySessionController,
         StudyRating,
-                ButtonColor,
-        Button;
+        ButtonColor,
+        Button,
+        AppTokens,
+        ButtonPadding,
+        textStyle,
+        TextSize;
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:theme_variants/theme_variants.dart';
 
 class RatingButton extends StatelessWidget {
   final StudyRating type;
@@ -52,20 +56,28 @@ class RatingButton extends StatelessWidget {
         color = ButtonColor.easy;
     }
 
+    final tokens = context.themeTokens<AppTokens>();
+
     return Expanded(
       child: Tooltip(
         message: 'Press $shortcut',
         child: Button(
           onPressed: onTap,
-          variants: [color],
+          variants: [color, ButtonPadding.sm],
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            spacing: tokens.spaceLayoutGapXsm,
             children: [
               Text(label.toUpperCase(), textAlign: TextAlign.center),
-              SizedBox(height: 4.h),
               Opacity(
                 opacity: 0.7,
-                child: Text(reviewTime, textAlign: TextAlign.center),
+                child: Text(
+                  reviewTime,
+                  textAlign: TextAlign.center,
+                  style: textStyle.resolve(tokens, const [
+                    TextSize.labelSmall,
+                  ]).copyWith(),
+                ),
               ),
             ],
           ),

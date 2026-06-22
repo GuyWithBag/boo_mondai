@@ -1,0 +1,1 @@
+enum DiscussionType { comment, review }

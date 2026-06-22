@@ -38,4 +38,4 @@ class StudyCardsRemoteDB extends SupabaseRemoteDB<StudyCard> {
 }
 
 const _studyCardWithRelationsSelect =
-    '*, deck:decks(*), template:card_templates(*, tags(*), options:multiple_choice_options(*), segments:fill_in_the_blank_segments(*), pairs:match_madness_pairs(*)), personal_tags:tags(*)';
+    '*, deck:decks(*), template:card_templates(*, tags(*), options:multiple_choice_options(*), segments:fill_in_the_blank_segments(*), pairs:match_madness_pairs(*), attachments:card_template_attachments(*)), personal_tags:tags(*)';

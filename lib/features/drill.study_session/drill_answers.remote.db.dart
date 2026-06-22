@@ -35,4 +35,4 @@ class DrillAnswersRemoteDB extends SupabaseRemoteDB<DrillAnswer> {
 }
 
 const _drillAnswerWithRelationsSelect =
-    '*, session:drill_sessions(*, deck:decks(*), user_profile:profiles!drill_sessions_user_id_fkey(id, username, avatar_url, created_at)), card_template:card_templates(*, tags(*), options:multiple_choice_options(*), segments:fill_in_the_blank_segments(*), pairs:match_madness_pairs(*))';
+    '*, session:drill_sessions(*, deck:decks(*), user_profile:profiles!drill_sessions_user_id_fkey(id, username, avatar_url, created_at)), card_template:card_templates(*, tags(*), options:multiple_choice_options(*), segments:fill_in_the_blank_segments(*), pairs:match_madness_pairs(*), attachments:card_template_attachments(*))';

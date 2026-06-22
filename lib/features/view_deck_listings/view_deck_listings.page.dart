@@ -29,6 +29,7 @@ import 'package:flutter/material.dart'
         CrossAxisAlignment,
         Icons,
         Center,
+        Expanded,
         Column;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
@@ -64,6 +65,7 @@ class _ViewDeckListingsView extends HookWidget {
     final tokens = context.themeTokens<AppTokens>();
     return Scaffold(
       appBar: AppBar(title: 'Browse Decks'),
+      scrollable: false,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -75,33 +77,35 @@ class _ViewDeckListingsView extends HookWidget {
             placeholder: 'Search public decks',
             resultLabelBuilder: (deck) => deck.title,
           ),
-          ListingStatesWrapper<Deck>.list(
-            isLoading: controller.isLoading,
-            exception: controller.error,
-            items: visibleDecks,
-            emptyState: hasSearchQuery
-                ? const EmptyState(
-                    icon: Icons.search_off,
-                    title: 'No decks found',
-                    message: 'Try a different query or remove filters.',
-                  )
-                : const EmptyState(
-                    icon: Icons.public,
-                    title: 'No public decks yet',
-                    message: 'Published community decks will appear here.',
+          Expanded(
+            child: ListingStatesWrapper<Deck>.list(
+              isLoading: controller.isLoading,
+              exception: controller.error,
+              items: visibleDecks,
+              emptyState: hasSearchQuery
+                  ? const EmptyState(
+                      icon: Icons.search_off,
+                      title: 'No decks found',
+                      message: 'Try a different query or remove filters.',
+                    )
+                  : const EmptyState(
+                      icon: Icons.public,
+                      title: 'No public decks yet',
+                      message: 'Published community decks will appear here.',
+                    ),
+              onRetry: controller.loadPublicDecks,
+              skeletonTile: Center(child: DeckListingTile(deck: _skeletonDeck)),
+              separatorHeight: tokens.spaceLayoutGapMd,
+              itemBuilder: (context, _, deck) {
+                return Center(
+                  child: DeckListingTile(
+                    deck: deck,
+                    onPressed: () =>
+                        showViewDeckListingSingleSheet(context, deck),
                   ),
-            onRetry: controller.loadPublicDecks,
-            skeletonTile: Center(child: DeckListingTile(deck: _skeletonDeck)),
-            separatorHeight: tokens.spaceLayoutGapMd,
-            itemBuilder: (context, _, deck) {
-              return Center(
-                child: DeckListingTile(
-                  deck: deck,
-                  onPressed: () =>
-                      showViewDeckListingSingleSheet(context, deck),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ],
       ),

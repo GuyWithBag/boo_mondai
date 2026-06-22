@@ -260,6 +260,9 @@ class FillInTheBlanksTemplateAdapter
       updatedAt: fields[3] as DateTime,
       sourceTemplateId: fields[6] as String?,
       tags: fields[7] == null ? const [] : (fields[7] as List).cast<Tag>(),
+      attachments: fields[8] == null
+          ? const []
+          : (fields[8] as List).cast<CardMediaAttachment>(),
       segments: (fields[0] as List).cast<FillInTheBlankSegment>(),
     );
   }
@@ -267,7 +270,7 @@ class FillInTheBlanksTemplateAdapter
   @override
   void write(BinaryWriter writer, FillInTheBlanksTemplate obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.segments)
       ..writeByte(1)
@@ -283,7 +286,9 @@ class FillInTheBlanksTemplateAdapter
       ..writeByte(6)
       ..write(obj.sourceTemplateId)
       ..writeByte(7)
-      ..write(obj.tags);
+      ..write(obj.tags)
+      ..writeByte(8)
+      ..write(obj.attachments);
   }
 
   @override
@@ -316,6 +321,9 @@ class MultipleChoiceTemplateAdapter
       updatedAt: fields[6] as DateTime,
       sourceTemplateId: fields[9] as String?,
       tags: fields[10] == null ? const [] : (fields[10] as List).cast<Tag>(),
+      attachments: fields[11] == null
+          ? const []
+          : (fields[11] as List).cast<CardMediaAttachment>(),
       questionPrompt: fields[0] as String,
       options: (fields[1] as List).cast<MultipleChoiceOption>(),
       imageUrl: fields[2] as String?,
@@ -326,7 +334,7 @@ class MultipleChoiceTemplateAdapter
   @override
   void write(BinaryWriter writer, MultipleChoiceTemplate obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(12)
       ..writeByte(0)
       ..write(obj.questionPrompt)
       ..writeByte(1)
@@ -348,7 +356,9 @@ class MultipleChoiceTemplateAdapter
       ..writeByte(9)
       ..write(obj.sourceTemplateId)
       ..writeByte(10)
-      ..write(obj.tags);
+      ..write(obj.tags)
+      ..writeByte(11)
+      ..write(obj.attachments);
   }
 
   @override
@@ -380,6 +390,9 @@ class FlashcardTemplateAdapter extends TypeAdapter<FlashcardTemplate> {
       updatedAt: fields[9] as DateTime,
       sourceTemplateId: fields[12] as String?,
       tags: fields[13] == null ? const [] : (fields[13] as List).cast<Tag>(),
+      attachments: fields[14] == null
+          ? const []
+          : (fields[14] as List).cast<CardMediaAttachment>(),
       frontText: fields[0] as String,
       backText: fields[1] as String,
       frontImageUrl: fields[2] as String?,
@@ -393,7 +406,7 @@ class FlashcardTemplateAdapter extends TypeAdapter<FlashcardTemplate> {
   @override
   void write(BinaryWriter writer, FlashcardTemplate obj) {
     writer
-      ..writeByte(14)
+      ..writeByte(15)
       ..writeByte(0)
       ..write(obj.frontText)
       ..writeByte(1)
@@ -421,7 +434,9 @@ class FlashcardTemplateAdapter extends TypeAdapter<FlashcardTemplate> {
       ..writeByte(12)
       ..write(obj.sourceTemplateId)
       ..writeByte(13)
-      ..write(obj.tags);
+      ..write(obj.tags)
+      ..writeByte(14)
+      ..write(obj.attachments);
   }
 
   @override
@@ -453,6 +468,9 @@ class MatchMadnessTemplateAdapter extends TypeAdapter<MatchMadnessTemplate> {
       updatedAt: fields[3] as DateTime,
       sourceTemplateId: fields[6] as String?,
       tags: fields[7] == null ? const [] : (fields[7] as List).cast<Tag>(),
+      attachments: fields[8] == null
+          ? const []
+          : (fields[8] as List).cast<CardMediaAttachment>(),
       pairs: (fields[0] as List).cast<MatchMadnessPair>(),
     );
   }
@@ -460,7 +478,7 @@ class MatchMadnessTemplateAdapter extends TypeAdapter<MatchMadnessTemplate> {
   @override
   void write(BinaryWriter writer, MatchMadnessTemplate obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.pairs)
       ..writeByte(1)
@@ -476,7 +494,9 @@ class MatchMadnessTemplateAdapter extends TypeAdapter<MatchMadnessTemplate> {
       ..writeByte(6)
       ..write(obj.sourceTemplateId)
       ..writeByte(7)
-      ..write(obj.tags);
+      ..write(obj.tags)
+      ..writeByte(8)
+      ..write(obj.attachments);
   }
 
   @override
@@ -509,6 +529,9 @@ class IdentificationTemplateAdapter
       updatedAt: fields[6] as DateTime,
       sourceTemplateId: fields[9] as String?,
       tags: fields[10] == null ? const [] : (fields[10] as List).cast<Tag>(),
+      attachments: fields[11] == null
+          ? const []
+          : (fields[11] as List).cast<CardMediaAttachment>(),
       promptText: fields[0] as String,
       acceptedAnswers: fields[1] as String,
       imageUrl: fields[2] as String?,
@@ -519,7 +542,7 @@ class IdentificationTemplateAdapter
   @override
   void write(BinaryWriter writer, IdentificationTemplate obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(12)
       ..writeByte(0)
       ..write(obj.promptText)
       ..writeByte(1)
@@ -541,7 +564,9 @@ class IdentificationTemplateAdapter
       ..writeByte(9)
       ..write(obj.sourceTemplateId)
       ..writeByte(10)
-      ..write(obj.tags);
+      ..write(obj.tags)
+      ..writeByte(11)
+      ..write(obj.attachments);
   }
 
   @override
@@ -676,6 +701,9 @@ class WordScrambleTemplateAdapter extends TypeAdapter<WordScrambleTemplate> {
       updatedAt: fields[5] as DateTime,
       sourceTemplateId: fields[8] as String?,
       tags: fields[9] == null ? const [] : (fields[9] as List).cast<Tag>(),
+      attachments: fields[10] == null
+          ? const []
+          : (fields[10] as List).cast<CardMediaAttachment>(),
       sentenceToScramble: fields[0] as String,
       imageUrl: fields[1] as String?,
       audioUrl: fields[2] as String?,
@@ -685,7 +713,7 @@ class WordScrambleTemplateAdapter extends TypeAdapter<WordScrambleTemplate> {
   @override
   void write(BinaryWriter writer, WordScrambleTemplate obj) {
     writer
-      ..writeByte(10)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.sentenceToScramble)
       ..writeByte(1)
@@ -705,7 +733,9 @@ class WordScrambleTemplateAdapter extends TypeAdapter<WordScrambleTemplate> {
       ..writeByte(8)
       ..write(obj.sourceTemplateId)
       ..writeByte(9)
-      ..write(obj.tags);
+      ..write(obj.tags)
+      ..writeByte(10)
+      ..write(obj.attachments);
   }
 
   @override
@@ -1971,6 +2001,98 @@ class DownloadCheckpointStatusAdapter
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is DownloadCheckpointStatusAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class CardMediaAttachmentAdapter extends TypeAdapter<CardMediaAttachment> {
+  @override
+  final typeId = 37;
+
+  @override
+  CardMediaAttachment read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return CardMediaAttachment(
+      id: fields[0] as String,
+      templateId: fields[1] as String,
+      kind: fields[2] as CardMediaKind,
+      storagePath: fields[3] as String,
+      publicUrl: fields[4] as String?,
+      mimeType: fields[5] as String?,
+      altText: fields[6] as String?,
+      createdAt: fields[7] as DateTime,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, CardMediaAttachment obj) {
+    writer
+      ..writeByte(8)
+      ..writeByte(0)
+      ..write(obj.id)
+      ..writeByte(1)
+      ..write(obj.templateId)
+      ..writeByte(2)
+      ..write(obj.kind)
+      ..writeByte(3)
+      ..write(obj.storagePath)
+      ..writeByte(4)
+      ..write(obj.publicUrl)
+      ..writeByte(5)
+      ..write(obj.mimeType)
+      ..writeByte(6)
+      ..write(obj.altText)
+      ..writeByte(7)
+      ..write(obj.createdAt);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CardMediaAttachmentAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class CardMediaKindAdapter extends TypeAdapter<CardMediaKind> {
+  @override
+  final typeId = 38;
+
+  @override
+  CardMediaKind read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return CardMediaKind.image;
+      case 1:
+        return CardMediaKind.audio;
+      default:
+        return CardMediaKind.image;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, CardMediaKind obj) {
+    switch (obj) {
+      case CardMediaKind.image:
+        writer.writeByte(0);
+      case CardMediaKind.audio:
+        writer.writeByte(1);
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CardMediaKindAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

@@ -1,3 +1,4 @@
+import 'package:boo_mondai/features/cards/models/card_media_attachment.dto.dart';
 import 'package:boo_mondai/features/cards/models/card_template.dto.dart';
 import 'package:boo_mondai/features/cards/models/card_type.dto.dart';
 import 'package:boo_mondai/features/tags/models/tag.dto.dart';
@@ -28,6 +29,7 @@ class FlashcardTemplate extends CardTemplate with FlashcardTemplateMappable {
     required super.updatedAt,
     super.sourceTemplateId,
     super.tags,
+    super.attachments,
     required this.frontText,
     required this.backText,
     this.frontImageUrl,

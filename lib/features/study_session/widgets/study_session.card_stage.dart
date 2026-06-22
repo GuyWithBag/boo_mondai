@@ -13,7 +13,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         MatchingTypeCard;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class StudySessionCardStage extends HookWidget {
   const StudySessionCardStage({
@@ -70,9 +69,6 @@ class StudySessionCardStage extends HookWidget {
       ),
     };
 
-    return SingleChildScrollView(
-      padding: EdgeInsets.fromLTRB(20.w, 42.h, 20.w, 42.h),
-      child: Center(child: child),
-    );
+    return Center(child: child);
   }
 }

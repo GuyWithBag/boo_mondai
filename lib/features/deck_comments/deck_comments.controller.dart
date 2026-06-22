@@ -1,44 +1,162 @@
-import 'package:boo_mondai/core/database/localdbs.dart';
-import 'package:boo_mondai/features/auth/auth.service.dart';
-import 'package:boo_mondai/features/deck_comments/deck_comment.widget.dart';
-import 'package:boo_mondai/features/deck_comments/deck_comments.service.dart';
-import 'package:boo_mondai/features/deck_comments/models/deck_comment.dto.dart';
-import 'package:boo_mondai/features/decks/models/deck.dto.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:boo_mondai/lib.barrel.dart'
+    show
+        DiscussionItem,
+        DeckComment,
+        Deck,
+        DeckCommentsService,
+        AuthService,
+        LocalDB;
+import 'package:flutter/foundation.dart' show ValueNotifier;
+import 'package:flutter_hooks/flutter_hooks.dart' show useState, useEffect;
 
 class DeckCommentsController {
-  const DeckCommentsController({
-    required this.comments,
-    required this.isLoading,
-    required this.isSubmitting,
-    required this.items,
-    required this.repliesFor,
-    required this.canEditItem,
-    required this.addComment,
-    required this.updateCommentItem,
-    required this.error,
-    required this.clearError,
-  });
+  DeckCommentsController({
+    required this.deck,
+    required ValueNotifier<List<DeckComment>> comments,
+    required ValueNotifier<bool> isLoading,
+    required ValueNotifier<bool> isSubmitting,
+    required ValueNotifier<Exception?> error,
+  }) : _comments = comments,
+       _isLoading = isLoading,
+       _isSubmitting = isSubmitting,
+       _error = error;
 
-  final List<DeckComment> comments;
-  final bool isLoading;
-  final bool isSubmitting;
-  final List<DeckCommentItem> items;
-  final List<DeckCommentItem> Function(String itemId) repliesFor;
-  final bool Function(DeckCommentItem item) canEditItem;
-  final Future<bool> Function(String body, {String? parentCommentId})
-  addComment;
-  final Future<bool> Function(
-    DeckCommentItem item,
-    String body, {
-    String? title,
-  })
-  updateCommentItem;
-  final Exception? error;
-  final VoidCallback clearError;
+  final Deck deck;
+
+  final ValueNotifier<List<DeckComment>> _comments;
+  final ValueNotifier<bool> _isLoading;
+  final ValueNotifier<bool> _isSubmitting;
+  final ValueNotifier<Exception?> _error;
+
+  // ─── Read-only state ────────────────────────────────────────────────────
+
+  List<DeckComment> get comments => _comments.value;
+  bool get isLoading => _isLoading.value;
+  bool get isSubmitting => _isSubmitting.value;
+  Exception? get error => _error.value;
 
   int get count => comments.length;
+
+  List<DiscussionItem> get items => comments
+      .where((comment) => comment.parentCommentId == null)
+      .map(DiscussionItem.fromDeckComment)
+      .toList(growable: false);
+
+  void clearError() {
+    _error.value = null;
+  }
+
+  // ─── Derived lookups ────────────────────────────────────────────────────
+
+  Map<String, DeckComment> get _commentByItemId => {
+    for (final comment in comments) comment.id: comment,
+  };
+
+  List<DiscussionItem> repliesFor(String itemId) {
+    return comments
+        .where((comment) => comment.parentCommentId == itemId)
+        .map(DiscussionItem.fromDeckComment)
+        .toList(growable: false);
+  }
+
+  // ─── Permissions ────────────────────────────────────────────────────────
+
+  bool _canInteract(String message) {
+    if (AuthService.isAuthenticatedRemote) return true;
+
+    _error.value = Exception(message);
+    return false;
+  }
+
+  bool canEditComment(DeckComment comment) {
+    if (!AuthService.isAuthenticatedRemote || comment.isDeleted) return false;
+
+    final profile = LocalDB.profile.getOrCreate();
+    return profile.id == comment.userId;
+  }
+
+  bool canEditItem(DiscussionItem item) {
+    final comment = _commentByItemId[item.id];
+    return comment != null && canEditComment(comment);
+  }
+
+  // ─── Loading ────────────────────────────────────────────────────────────
+
+  Future<void> loadComments() async {
+    _isLoading.value = true;
+    _error.value = null;
+
+    try {
+      await _reloadComments();
+    } on Exception catch (e) {
+      _error.value = e;
+    } finally {
+      _isLoading.value = false;
+    }
+  }
+
+  Future<void> _reloadComments() async {
+    _comments.value = await DeckCommentsService.getByDeck(deck.id);
+  }
+
+  // ─── Mutations ──────────────────────────────────────────────────────────
+
+  Future<bool> addComment(String body, {String? parentCommentId}) async {
+    final trimmedBody = body.trim();
+    if (trimmedBody.isEmpty) return false;
+    if (!_canInteract('Sign in to comment on decks.')) return false;
+
+    _isSubmitting.value = true;
+    _error.value = null;
+
+    try {
+      final profile = LocalDB.profile.getOrCreate();
+      await DeckCommentsService.addComment(
+        deckId: deck.id,
+        userId: profile.id,
+        body: trimmedBody,
+        parentCommentId: parentCommentId,
+      );
+      await _reloadComments();
+      return true;
+    } on Exception catch (e) {
+      _error.value = e;
+      return false;
+    } finally {
+      _isSubmitting.value = false;
+    }
+  }
+
+  Future<bool> updateCommentItem(
+    DiscussionItem item,
+    String body, {
+    String? title,
+  }) async {
+    final trimmedBody = body.trim();
+    final comment = _commentByItemId[item.id];
+    if (comment == null || trimmedBody.isEmpty) return false;
+    if (!canEditComment(comment)) {
+      _error.value = Exception('You can only edit your own comments.');
+      return false;
+    }
+
+    _isSubmitting.value = true;
+    _error.value = null;
+
+    try {
+      await DeckCommentsService.updateComment(
+        commentId: comment.id,
+        body: trimmedBody,
+      );
+      await _reloadComments();
+      return true;
+    } on Exception catch (e) {
+      _error.value = e;
+      return false;
+    } finally {
+      _isSubmitting.value = false;
+    }
+  }
 }
 
 DeckCommentsController useDeckCommentsController({
@@ -50,130 +168,20 @@ DeckCommentsController useDeckCommentsController({
   final isSubmitting = useState(false);
   final error = useState<Exception?>(null);
 
+  final controller = DeckCommentsController(
+    deck: deck,
+    comments: comments,
+    isLoading: isLoading,
+    isSubmitting: isSubmitting,
+    error: error,
+  );
+
   useEffect(() {
-    Future<void> loadComments() async {
-      isLoading.value = true;
-      error.value = null;
-
-      try {
-        comments.value = await DeckCommentsService.getByDeck(deck.id);
-      } on Exception catch (e) {
-        error.value = e;
-      } finally {
-        isLoading.value = false;
-      }
-    }
-
     if (enabled) {
-      loadComments();
+      controller.loadComments();
     }
     return null;
   }, [deck.id, enabled]);
 
-  final commentByItemId = {
-    for (final comment in comments.value) comment.id: comment,
-  };
-
-  Future<void> reloadComments() async {
-    comments.value = await DeckCommentsService.getByDeck(deck.id);
-  }
-
-  bool canInteract(String message) {
-    if (AuthService.isAuthenticatedRemote) return true;
-
-    error.value = Exception(message);
-    return false;
-  }
-
-  bool canEditComment(DeckComment comment) {
-    if (!AuthService.isAuthenticatedRemote || comment.isDeleted) return false;
-
-    final profile = LocalDB.profile.getOrCreate();
-    return profile.id == comment.userId;
-  }
-
-  List<DeckCommentItem> repliesFor(String itemId) {
-    return comments.value
-        .where((comment) => comment.parentCommentId == itemId)
-        .map(DeckCommentItem.fromDeckComment)
-        .toList(growable: false);
-  }
-
-  Future<bool> addComment(String body, {String? parentCommentId}) async {
-    final trimmedBody = body.trim();
-    if (trimmedBody.isEmpty) return false;
-    if (!canInteract('Sign in to comment on decks.')) return false;
-
-    isSubmitting.value = true;
-    error.value = null;
-
-    try {
-      final profile = LocalDB.profile.getOrCreate();
-      await DeckCommentsService.addComment(
-        deckId: deck.id,
-        userId: profile.id,
-        body: trimmedBody,
-        parentCommentId: parentCommentId,
-      );
-      await reloadComments();
-      return true;
-    } on Exception catch (e) {
-      error.value = e;
-      return false;
-    } finally {
-      isSubmitting.value = false;
-    }
-  }
-
-  Future<bool> updateCommentItem(
-    DeckCommentItem item,
-    String body, {
-    String? title,
-  }) async {
-    final trimmedBody = body.trim();
-    final comment = commentByItemId[item.id];
-    if (comment == null || trimmedBody.isEmpty) return false;
-    if (!canEditComment(comment)) {
-      error.value = Exception('You can only edit your own comments.');
-      return false;
-    }
-
-    isSubmitting.value = true;
-    error.value = null;
-
-    try {
-      await DeckCommentsService.updateComment(
-        commentId: comment.id,
-        body: trimmedBody,
-      );
-      await reloadComments();
-      return true;
-    } on Exception catch (e) {
-      error.value = e;
-      return false;
-    } finally {
-      isSubmitting.value = false;
-    }
-  }
-
-  return DeckCommentsController(
-    comments: comments.value,
-    isLoading: isLoading.value,
-    isSubmitting: isSubmitting.value,
-    items: comments.value
-        .where((comment) => comment.parentCommentId == null)
-        .map(DeckCommentItem.fromDeckComment)
-        .toList(growable: false),
-    repliesFor: repliesFor,
-    canEditItem: (item) {
-      final comment = commentByItemId[item.id];
-      return comment != null && canEditComment(comment);
-    },
-    addComment: addComment,
-    updateCommentItem: updateCommentItem,
-    error: error.value,
-    clearError: () {
-      error.value = null;
-    },
-  );
+  return controller;
 }

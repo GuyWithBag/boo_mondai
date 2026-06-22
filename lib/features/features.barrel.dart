@@ -35,3 +35,4 @@ export 'edit_deck/edit_deck.barrel.dart';
 export 'change_tracker/change_tracker.barrel.dart';
 export 'leaderboard/leaderboard.barrel.dart';
 export 'streak/streak.barrel.dart';
+export 'view_discussion/view_discussion.barrel.dart';

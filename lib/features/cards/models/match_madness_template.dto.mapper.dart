@@ -16,6 +16,7 @@ class MatchMadnessTemplateMapper
       MapperContainer.globals.use(_instance = MatchMadnessTemplateMapper._());
       CardTemplateMapper.ensureInitialized().addSubMapper(_instance!);
       TagMapper.ensureInitialized();
+      CardMediaAttachmentMapper.ensureInitialized();
       MatchMadnessPairMapper.ensureInitialized();
     }
     return _instance!;
@@ -65,6 +66,15 @@ class MatchMadnessTemplateMapper
     opt: true,
     def: const [],
   );
+  static List<CardMediaAttachment> _$attachments(MatchMadnessTemplate v) =>
+      v.attachments;
+  static const Field<MatchMadnessTemplate, List<CardMediaAttachment>>
+  _f$attachments = Field(
+    'attachments',
+    _$attachments,
+    opt: true,
+    def: const [],
+  );
   static List<MatchMadnessPair> _$pairs(MatchMadnessTemplate v) => v.pairs;
   static const Field<MatchMadnessTemplate, List<MatchMadnessPair>> _f$pairs =
       Field('pairs', _$pairs);
@@ -78,6 +88,7 @@ class MatchMadnessTemplateMapper
     #updatedAt: _f$updatedAt,
     #sourceTemplateId: _f$sourceTemplateId,
     #tags: _f$tags,
+    #attachments: _f$attachments,
     #pairs: _f$pairs,
   };
 
@@ -98,6 +109,7 @@ class MatchMadnessTemplateMapper
       updatedAt: data.dec(_f$updatedAt),
       sourceTemplateId: data.dec(_f$sourceTemplateId),
       tags: data.dec(_f$tags),
+      attachments: data.dec(_f$attachments),
       pairs: data.dec(_f$pairs),
     );
   }
@@ -174,6 +186,13 @@ abstract class MatchMadnessTemplateCopyWith<
     implements CardTemplateCopyWith<$R, $In, $Out> {
   @override
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags;
+  @override
+  ListCopyWith<
+    $R,
+    CardMediaAttachment,
+    CardMediaAttachmentCopyWith<$R, CardMediaAttachment, CardMediaAttachment>
+  >
+  get attachments;
   ListCopyWith<
     $R,
     MatchMadnessPair,
@@ -189,6 +208,7 @@ abstract class MatchMadnessTemplateCopyWith<
     DateTime? updatedAt,
     String? sourceTemplateId,
     List<Tag>? tags,
+    List<CardMediaAttachment>? attachments,
     List<MatchMadnessPair>? pairs,
   });
   MatchMadnessTemplateCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
@@ -213,6 +233,17 @@ class _MatchMadnessTemplateCopyWithImpl<$R, $Out>
   @override
   ListCopyWith<
     $R,
+    CardMediaAttachment,
+    CardMediaAttachmentCopyWith<$R, CardMediaAttachment, CardMediaAttachment>
+  >
+  get attachments => ListCopyWith(
+    $value.attachments,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(attachments: v),
+  );
+  @override
+  ListCopyWith<
+    $R,
     MatchMadnessPair,
     MatchMadnessPairCopyWith<$R, MatchMadnessPair, MatchMadnessPair>
   >
@@ -230,6 +261,7 @@ class _MatchMadnessTemplateCopyWithImpl<$R, $Out>
     DateTime? updatedAt,
     Object? sourceTemplateId = $none,
     List<Tag>? tags,
+    List<CardMediaAttachment>? attachments,
     List<MatchMadnessPair>? pairs,
   }) => $apply(
     FieldCopyWithData({
@@ -240,6 +272,7 @@ class _MatchMadnessTemplateCopyWithImpl<$R, $Out>
       if (updatedAt != null) #updatedAt: updatedAt,
       if (sourceTemplateId != $none) #sourceTemplateId: sourceTemplateId,
       if (tags != null) #tags: tags,
+      if (attachments != null) #attachments: attachments,
       if (pairs != null) #pairs: pairs,
     }),
   );
@@ -252,6 +285,7 @@ class _MatchMadnessTemplateCopyWithImpl<$R, $Out>
     updatedAt: data.get(#updatedAt, or: $value.updatedAt),
     sourceTemplateId: data.get(#sourceTemplateId, or: $value.sourceTemplateId),
     tags: data.get(#tags, or: $value.tags),
+    attachments: data.get(#attachments, or: $value.attachments),
     pairs: data.get(#pairs, or: $value.pairs),
   );
 

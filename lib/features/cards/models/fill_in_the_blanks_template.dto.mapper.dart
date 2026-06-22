@@ -18,6 +18,7 @@ class FillInTheBlanksTemplateMapper
       );
       CardTemplateMapper.ensureInitialized().addSubMapper(_instance!);
       TagMapper.ensureInitialized();
+      CardMediaAttachmentMapper.ensureInitialized();
       FillInTheBlankSegmentMapper.ensureInitialized();
     }
     return _instance!;
@@ -68,6 +69,15 @@ class FillInTheBlanksTemplateMapper
     opt: true,
     def: const [],
   );
+  static List<CardMediaAttachment> _$attachments(FillInTheBlanksTemplate v) =>
+      v.attachments;
+  static const Field<FillInTheBlanksTemplate, List<CardMediaAttachment>>
+  _f$attachments = Field(
+    'attachments',
+    _$attachments,
+    opt: true,
+    def: const [],
+  );
   static List<FillInTheBlankSegment> _$segments(FillInTheBlanksTemplate v) =>
       v.segments;
   static const Field<FillInTheBlanksTemplate, List<FillInTheBlankSegment>>
@@ -82,6 +92,7 @@ class FillInTheBlanksTemplateMapper
     #updatedAt: _f$updatedAt,
     #sourceTemplateId: _f$sourceTemplateId,
     #tags: _f$tags,
+    #attachments: _f$attachments,
     #segments: _f$segments,
   };
 
@@ -102,6 +113,7 @@ class FillInTheBlanksTemplateMapper
       updatedAt: data.dec(_f$updatedAt),
       sourceTemplateId: data.dec(_f$sourceTemplateId),
       tags: data.dec(_f$tags),
+      attachments: data.dec(_f$attachments),
       segments: data.dec(_f$segments),
     );
   }
@@ -178,6 +190,13 @@ abstract class FillInTheBlanksTemplateCopyWith<
     implements CardTemplateCopyWith<$R, $In, $Out> {
   @override
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags;
+  @override
+  ListCopyWith<
+    $R,
+    CardMediaAttachment,
+    CardMediaAttachmentCopyWith<$R, CardMediaAttachment, CardMediaAttachment>
+  >
+  get attachments;
   ListCopyWith<
     $R,
     FillInTheBlankSegment,
@@ -197,6 +216,7 @@ abstract class FillInTheBlanksTemplateCopyWith<
     DateTime? updatedAt,
     String? sourceTemplateId,
     List<Tag>? tags,
+    List<CardMediaAttachment>? attachments,
     List<FillInTheBlankSegment>? segments,
   });
   FillInTheBlanksTemplateCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
@@ -222,6 +242,17 @@ class _FillInTheBlanksTemplateCopyWithImpl<$R, $Out>
   @override
   ListCopyWith<
     $R,
+    CardMediaAttachment,
+    CardMediaAttachmentCopyWith<$R, CardMediaAttachment, CardMediaAttachment>
+  >
+  get attachments => ListCopyWith(
+    $value.attachments,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(attachments: v),
+  );
+  @override
+  ListCopyWith<
+    $R,
     FillInTheBlankSegment,
     FillInTheBlankSegmentCopyWith<
       $R,
@@ -243,6 +274,7 @@ class _FillInTheBlanksTemplateCopyWithImpl<$R, $Out>
     DateTime? updatedAt,
     Object? sourceTemplateId = $none,
     List<Tag>? tags,
+    List<CardMediaAttachment>? attachments,
     List<FillInTheBlankSegment>? segments,
   }) => $apply(
     FieldCopyWithData({
@@ -253,6 +285,7 @@ class _FillInTheBlanksTemplateCopyWithImpl<$R, $Out>
       if (updatedAt != null) #updatedAt: updatedAt,
       if (sourceTemplateId != $none) #sourceTemplateId: sourceTemplateId,
       if (tags != null) #tags: tags,
+      if (attachments != null) #attachments: attachments,
       if (segments != null) #segments: segments,
     }),
   );
@@ -265,6 +298,7 @@ class _FillInTheBlanksTemplateCopyWithImpl<$R, $Out>
     updatedAt: data.get(#updatedAt, or: $value.updatedAt),
     sourceTemplateId: data.get(#sourceTemplateId, or: $value.sourceTemplateId),
     tags: data.get(#tags, or: $value.tags),
+    attachments: data.get(#attachments, or: $value.attachments),
     segments: data.get(#segments, or: $value.segments),
   );
 

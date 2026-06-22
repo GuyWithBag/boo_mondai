@@ -31,6 +31,7 @@ class CardTemplatesRemoteDB extends SupabaseRemoteDB<CardTemplate> {
     'options',
     'segments',
     'pairs',
+    'attachments',
   };
 
   /// Fetches a single page of templates for [deckId], ordered by sort_order.
@@ -52,4 +53,4 @@ class CardTemplatesRemoteDB extends SupabaseRemoteDB<CardTemplate> {
 }
 
 const _cardTemplateWithRelationsSelect =
-    '*, tags(*), options:multiple_choice_options(*), segments:fill_in_the_blank_segments(*), pairs:match_madness_pairs!match_madness_pairs_template_id_fkey(*)';
+    '*, tags(*), options:multiple_choice_options(*), segments:fill_in_the_blank_segments(*), pairs:match_madness_pairs!match_madness_pairs_template_id_fkey(*), attachments:card_template_attachments(*)';

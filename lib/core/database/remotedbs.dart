@@ -1,6 +1,7 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         CardTemplatesRemoteDB,
+        CardMediaAttachmentsRemoteDB,
         DrillSessionsRemoteDB,
         ProfilesRemoteDB,
         DecksRemoteDB,
@@ -36,6 +37,7 @@ class RemoteDB {
   deckVoteReviewCommentEditLog;
   static late final UserSettingsRemoteDB userSettings;
   static late final CardTemplatesRemoteDB card;
+  static late final CardMediaAttachmentsRemoteDB cardMediaAttachment;
   static late final DrillSessionsRemoteDB drill;
   static late final ReviewSessionsRemoteDB reviewSession;
   static late final DrillAnswersRemoteDB drillAnswer;
@@ -58,6 +60,7 @@ class RemoteDB {
     deckVoteReviewCommentEditLog = DeckVoteReviewCommentEditLogsRemoteDB();
     userSettings = UserSettingsRemoteDB();
     card = CardTemplatesRemoteDB();
+    cardMediaAttachment = CardMediaAttachmentsRemoteDB();
     drill = DrillSessionsRemoteDB();
     reviewSession = ReviewSessionsRemoteDB();
     drillAnswer = DrillAnswersRemoteDB();

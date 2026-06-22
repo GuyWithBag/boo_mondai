@@ -1,3 +1,4 @@
+import 'package:boo_mondai/features/cards/models/card_media_attachment.dto.dart';
 import 'package:boo_mondai/features/cards/models/card_template.dto.dart';
 import 'package:boo_mondai/features/cards/models/fill_in_the_blank_segment.dto.dart';
 import 'package:boo_mondai/features/tags/models/tag.dto.dart';
@@ -18,6 +19,7 @@ class FillInTheBlanksTemplate extends CardTemplate
     required super.updatedAt,
     super.sourceTemplateId,
     super.tags,
+    super.attachments,
     required this.segments,
   });
 

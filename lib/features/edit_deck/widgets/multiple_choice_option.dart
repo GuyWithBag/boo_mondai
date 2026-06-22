@@ -11,7 +11,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         MarkdownTextMode,
         TextFieldFrame,
         TextFieldSize,
-        TextFieldTone,
+        TextFieldColor,
         surfaceStyle,
         textStyle,
         TextSize,
@@ -98,11 +98,7 @@ class EditMultipleChoiceOption extends HookWidget {
               fontSize: 20,
               fontWeight: FontWeight.w800,
             ),
-            variants: const [
-              TextFieldSize.labelLarge,
-              TextFieldFrame.none,
-              TextFieldTone.neutral,
-            ],
+            variants: const [TextFieldSize.labelLarge, TextFieldFrame.none],
           )
         : Text(
             value,

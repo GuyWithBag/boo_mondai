@@ -13,7 +13,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextField,
         TextFieldSize,
         TextFieldFrame,
-        TextFieldTone,
+        TextFieldColor,
         Button,
         BlankChip;
 import 'package:flutter/material.dart' hide TextField;
@@ -98,11 +98,7 @@ class FillInTheBlanksEditor extends HookWidget {
           // Uses the span controller directly — chips appear inline where
           // the selection was made.
           TextField(
-            variants: const [
-              TextFieldSize.normal,
-              TextFieldFrame.outline,
-              TextFieldTone.neutral,
-            ],
+            variants: const [TextFieldSize.normal, TextFieldFrame.outline],
             controller: spanController,
             style: resolvedTextStyle,
             placeholder: 'Type the full sentence…',

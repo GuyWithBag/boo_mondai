@@ -6,7 +6,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         SegmentedControl,
         TextFieldFrame,
         TextFieldSize,
-        TextFieldTone,
+        TextFieldColor,
         TextField,
         textFieldStyle,
         SearchFilter,
@@ -67,15 +67,10 @@ class SearchFilterTextEditor extends HookWidget {
       onChanged: onChanged,
       placeholder: placeholder,
       keyboardType: keyboardType,
-      variants: const [
-        TextFieldSize.normal,
-        TextFieldFrame.outline,
-        TextFieldTone.neutral,
-      ],
+      variants: const [TextFieldSize.normal, TextFieldFrame.outline],
       style: textFieldStyle.resolve(tokens, const [
         TextFieldSize.normal,
         TextFieldFrame.outline,
-        TextFieldTone.neutral,
       ]).textStyle,
     );
   }

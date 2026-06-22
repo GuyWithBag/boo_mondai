@@ -53,7 +53,6 @@ class ProfileCard extends StatelessWidget {
             children: [
               EditableTextValue(
                 value: displayName,
-                editingValue: profile.displayName,
                 placeholder: 'Display name',
                 textStyle: textStyle.resolve(tokens, const [
                   TextSize.headerLarge,

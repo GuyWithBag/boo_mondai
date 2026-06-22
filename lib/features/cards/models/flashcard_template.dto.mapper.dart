@@ -15,6 +15,7 @@ class FlashcardTemplateMapper extends SubClassMapperBase<FlashcardTemplate> {
       MapperContainer.globals.use(_instance = FlashcardTemplateMapper._());
       CardTemplateMapper.ensureInitialized().addSubMapper(_instance!);
       TagMapper.ensureInitialized();
+      CardMediaAttachmentMapper.ensureInitialized();
       CardTypeMapper.ensureInitialized();
     }
     return _instance!;
@@ -60,6 +61,15 @@ class FlashcardTemplateMapper extends SubClassMapperBase<FlashcardTemplate> {
   static const Field<FlashcardTemplate, List<Tag>> _f$tags = Field(
     'tags',
     _$tags,
+    opt: true,
+    def: const [],
+  );
+  static List<CardMediaAttachment> _$attachments(FlashcardTemplate v) =>
+      v.attachments;
+  static const Field<FlashcardTemplate, List<CardMediaAttachment>>
+  _f$attachments = Field(
+    'attachments',
+    _$attachments,
     opt: true,
     def: const [],
   );
@@ -121,6 +131,7 @@ class FlashcardTemplateMapper extends SubClassMapperBase<FlashcardTemplate> {
     #updatedAt: _f$updatedAt,
     #sourceTemplateId: _f$sourceTemplateId,
     #tags: _f$tags,
+    #attachments: _f$attachments,
     #frontText: _f$frontText,
     #backText: _f$backText,
     #frontImageUrl: _f$frontImageUrl,
@@ -147,6 +158,7 @@ class FlashcardTemplateMapper extends SubClassMapperBase<FlashcardTemplate> {
       updatedAt: data.dec(_f$updatedAt),
       sourceTemplateId: data.dec(_f$sourceTemplateId),
       tags: data.dec(_f$tags),
+      attachments: data.dec(_f$attachments),
       frontText: data.dec(_f$frontText),
       backText: data.dec(_f$backText),
       frontImageUrl: data.dec(_f$frontImageUrl),
@@ -231,6 +243,13 @@ abstract class FlashcardTemplateCopyWith<
   @override
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags;
   @override
+  ListCopyWith<
+    $R,
+    CardMediaAttachment,
+    CardMediaAttachmentCopyWith<$R, CardMediaAttachment, CardMediaAttachment>
+  >
+  get attachments;
+  @override
   $R call({
     String? id,
     String? deckId,
@@ -239,6 +258,7 @@ abstract class FlashcardTemplateCopyWith<
     DateTime? updatedAt,
     String? sourceTemplateId,
     List<Tag>? tags,
+    List<CardMediaAttachment>? attachments,
     String? frontText,
     String? backText,
     String? frontImageUrl,
@@ -267,6 +287,17 @@ class _FlashcardTemplateCopyWithImpl<$R, $Out>
     (v) => call(tags: v),
   );
   @override
+  ListCopyWith<
+    $R,
+    CardMediaAttachment,
+    CardMediaAttachmentCopyWith<$R, CardMediaAttachment, CardMediaAttachment>
+  >
+  get attachments => ListCopyWith(
+    $value.attachments,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(attachments: v),
+  );
+  @override
   $R call({
     String? id,
     String? deckId,
@@ -275,6 +306,7 @@ class _FlashcardTemplateCopyWithImpl<$R, $Out>
     DateTime? updatedAt,
     Object? sourceTemplateId = $none,
     List<Tag>? tags,
+    List<CardMediaAttachment>? attachments,
     String? frontText,
     String? backText,
     Object? frontImageUrl = $none,
@@ -291,6 +323,7 @@ class _FlashcardTemplateCopyWithImpl<$R, $Out>
       if (updatedAt != null) #updatedAt: updatedAt,
       if (sourceTemplateId != $none) #sourceTemplateId: sourceTemplateId,
       if (tags != null) #tags: tags,
+      if (attachments != null) #attachments: attachments,
       if (frontText != null) #frontText: frontText,
       if (backText != null) #backText: backText,
       if (frontImageUrl != $none) #frontImageUrl: frontImageUrl,
@@ -309,6 +342,7 @@ class _FlashcardTemplateCopyWithImpl<$R, $Out>
     updatedAt: data.get(#updatedAt, or: $value.updatedAt),
     sourceTemplateId: data.get(#sourceTemplateId, or: $value.sourceTemplateId),
     tags: data.get(#tags, or: $value.tags),
+    attachments: data.get(#attachments, or: $value.attachments),
     frontText: data.get(#frontText, or: $value.frontText),
     backText: data.get(#backText, or: $value.backText),
     frontImageUrl: data.get(#frontImageUrl, or: $value.frontImageUrl),

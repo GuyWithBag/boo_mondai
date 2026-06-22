@@ -6,7 +6,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         MarkdownTextMode,
         TextFieldSize,
         TextFieldFrame,
-        TextFieldTone;
+        TextFieldColor;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -40,11 +40,7 @@ class MatchPair extends StatelessWidget {
             data: term,
             onChanged: onTermChanged,
             mode: MarkdownTextMode.input,
-            variants: const [
-              TextFieldSize.labelLarge,
-              TextFieldFrame.outline,
-              TextFieldTone.neutral,
-            ],
+            variants: const [TextFieldSize.labelLarge, TextFieldFrame.outline],
           ),
         ),
         Icon(Icons.compare_arrows, color: tokens.colorTextMuted),
@@ -53,11 +49,7 @@ class MatchPair extends StatelessWidget {
             data: match,
             onChanged: onMatchChanged,
             mode: MarkdownTextMode.input,
-            variants: const [
-              TextFieldSize.labelLarge,
-              TextFieldFrame.outline,
-              TextFieldTone.neutral,
-            ],
+            variants: const [TextFieldSize.labelLarge, TextFieldFrame.outline],
           ),
         ),
         IconButton(

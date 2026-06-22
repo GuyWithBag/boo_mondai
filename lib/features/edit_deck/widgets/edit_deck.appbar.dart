@@ -10,7 +10,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         MetaLabel,
         TextFieldFrame,
         TextFieldSize,
-        TextFieldTone;
+        TextFieldColor;
 import 'package:flutter/material.dart'
     show
         TextEditingController,
@@ -87,11 +87,7 @@ class EditDeckAppbar extends StatelessWidget implements PreferredSizeWidget {
             controller: titleController,
             placeholder: 'Deck Title...',
             mode: MarkdownTextMode.input,
-            variants: const [
-              TextFieldSize.labelLarge,
-              TextFieldFrame.none,
-              TextFieldTone.neutral,
-            ],
+            variants: const [TextFieldSize.labelLarge, TextFieldFrame.none],
           ),
         ],
       ),

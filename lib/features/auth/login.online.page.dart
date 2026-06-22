@@ -12,7 +12,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         ButtonVariant,
         TextFieldSize,
         TextFieldFrame,
-        TextFieldTone,
+        TextFieldColor,
         TextField;
 import 'package:flutter/material.dart' hide BackButton, TextField;
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -182,11 +182,7 @@ class _AuthField extends StatelessWidget {
           textInputAction: textInputAction,
           obscureText: obscureText,
           onSubmitted: onSubmitted,
-          variants: const [
-            TextFieldSize.normal,
-            TextFieldFrame.outline,
-            TextFieldTone.neutral,
-          ],
+          variants: const [TextFieldSize.normal, TextFieldFrame.outline],
         ),
         if (error != null) ...[
           const SizedBox(height: AppSpacing.xs),

@@ -16,48 +16,29 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 
 class ViewDeckSingleSheetController {
-  const ViewDeckSingleSheetController({
+  ViewDeckSingleSheetController({
     required this.deck,
     required this.isSavingPublishState,
-    required this.onPublishedChanged,
-    required this.onTitleChanged,
-    required this.onShortDescriptionChanged,
-    required this.onLongDescriptionChanged,
-    required this.onTagsChanged,
-    required this.onCoverImagePicked,
-    required this.onDeletePressed,
-  });
+    required BuildContext context,
+    required ViewDecksLocalController parentController,
+    required ValueNotifier<bool> isSavingPublishStateNotifier,
+  })  : _context = context,
+        _parentController = parentController,
+        _isSavingPublishStateNotifier = isSavingPublishStateNotifier;
 
   final Deck deck;
   final bool isSavingPublishState;
-  final ValueChanged<bool> onPublishedChanged;
-  final Future<void> Function(String value) onTitleChanged;
-  final Future<void> Function(String value) onShortDescriptionChanged;
-  final Future<void> Function(String value) onLongDescriptionChanged;
-  final ValueChanged<List<String>> onTagsChanged;
-  final Future<void> Function(PlatformFile file) onCoverImagePicked;
-  final VoidCallback onDeletePressed;
-}
 
-ViewDeckSingleSheetController useViewDeckSingleSheet({
-  required BuildContext context,
-  required Deck initialDeck,
-  required ViewDecksLocalController controller,
-}) {
-  final deckListenable = useMemoized(() => LocalDB.deck.box.listenable());
-  useListenable(deckListenable);
-
-  final deck = LocalDB.deck.selectByPk({'id': initialDeck.id}) ?? initialDeck;
-  final isSavingPublishState = useState(false);
+  final BuildContext _context;
+  final ViewDecksLocalController _parentController;
+  final ValueNotifier<bool> _isSavingPublishStateNotifier;
 
   Future<void> setPublished(bool isPublished) async {
-    if (isSavingPublishState.value || deck.isPublished == isPublished) {
-      return;
-    }
+    if (isSavingPublishState || deck.isPublished == isPublished) return;
 
     if (isPublished) {
       final confirmed = await showModal<bool>(
-        context: context,
+        context: _context,
         title: 'Create deck listing?',
         subtitle:
             'This will create a listing of this deck to publish online. You will have to publish it in the listing.',
@@ -82,11 +63,11 @@ ViewDeckSingleSheetController useViewDeckSingleSheet({
       final listingDeck = deck.copyWith(listing: listing, updatedAt: now);
       await LocalDB.deck.upsert(listingDeck);
       await LocalDB.deckListing.upsert(listing);
-      controller.load();
+      _parentController.load();
 
-      if (context.mounted) {
+      if (_context.mounted) {
         await showViewDeckListingSingleSheet(
-          context,
+          _context,
           listingDeck,
           initialMode: DeckListingSheetMode.editor,
         );
@@ -96,7 +77,7 @@ ViewDeckSingleSheetController useViewDeckSingleSheet({
 
     final actionLabel = isPublished ? 'Publish' : 'Unpublish';
     final confirmed = await showModal<bool>(
-      context: context,
+      context: _context,
       title: '$actionLabel deck?',
       subtitle: isPublished
           ? 'Publishing "${ViewDeckSingleHelper.title(deck)}" makes it available after your next sync.'
@@ -117,7 +98,7 @@ ViewDeckSingleSheetController useViewDeckSingleSheet({
     );
     if (confirmed != true) return;
 
-    isSavingPublishState.value = true;
+    _isSavingPublishStateNotifier.value = true;
 
     try {
       final updated = await ViewDeckSingleHelper.updatePublishedState(
@@ -125,24 +106,14 @@ ViewDeckSingleSheetController useViewDeckSingleSheet({
         isPublished: isPublished,
       );
       if (updated) {
-        controller.load();
+        _parentController.load();
       }
     } finally {
-      isSavingPublishState.value = false;
+      _isSavingPublishStateNotifier.value = false;
     }
   }
 
-  Future<void> setTags(List<String> tagNames) async {
-    final updated = await ViewDeckSingleHelper.updateTags(
-      deck: deck,
-      tagNames: tagNames,
-    );
-    if (updated) {
-      controller.load();
-    }
-  }
-
-  Future<void> setTitle(String value) async {
+  Future<void> updateTitle(String value) async {
     final updated = await ViewDeckSingleHelper.updateTextField(
       deck: deck,
       value: value,
@@ -150,12 +121,10 @@ ViewDeckSingleSheetController useViewDeckSingleSheet({
       selectCurrentValue: (deck) => deck.title,
       copyWithValue: (deck, value) => deck.copyWith(title: value),
     );
-    if (updated) {
-      controller.load();
-    }
+    if (updated) _parentController.load();
   }
 
-  Future<void> setShortDescription(String value) async {
+  Future<void> updateShortDescription(String value) async {
     final updated = await ViewDeckSingleHelper.updateTextField(
       deck: deck,
       value: value,
@@ -163,12 +132,10 @@ ViewDeckSingleSheetController useViewDeckSingleSheet({
       selectCurrentValue: (deck) => deck.shortDescription,
       copyWithValue: (deck, value) => deck.copyWith(shortDescription: value),
     );
-    if (updated) {
-      controller.load();
-    }
+    if (updated) _parentController.load();
   }
 
-  Future<void> setLongDescription(String value) async {
+  Future<void> updateLongDescription(String value) async {
     final updated = await ViewDeckSingleHelper.updateTextField(
       deck: deck,
       value: value,
@@ -176,24 +143,28 @@ ViewDeckSingleSheetController useViewDeckSingleSheet({
       selectCurrentValue: (deck) => deck.longDescription,
       copyWithValue: (deck, value) => deck.copyWith(longDescription: value),
     );
-    if (updated) {
-      controller.load();
-    }
+    if (updated) _parentController.load();
   }
 
-  Future<void> setCoverImage(PlatformFile file) async {
+  Future<void> updateTags(List<String> tagNames) async {
+    final updated = await ViewDeckSingleHelper.updateTags(
+      deck: deck,
+      tagNames: tagNames,
+    );
+    if (updated) _parentController.load();
+  }
+
+  Future<void> updateCoverImage(PlatformFile file) async {
     final updated = await ViewDeckSingleHelper.updateCoverImage(
       deck: deck,
       file: file,
     );
-    if (updated) {
-      controller.load();
-    }
+    if (updated) _parentController.load();
   }
 
-  Future<void> deleteDeckDialog() async {
+  Future<void> deleteDeck() async {
     final confirmed = await showModal<bool>(
-      context: context,
+      context: _context,
       title: 'Delete deck?',
       subtitle:
           '"${ViewDeckSingleHelper.title(deck)}" and all its cards will be removed.',
@@ -207,24 +178,31 @@ ViewDeckSingleSheetController useViewDeckSingleSheet({
         ),
       ],
     );
-
     if (confirmed != true) return;
 
-    await controller.deleteDeck(deck.id);
-    if (context.mounted) {
-      Navigator.of(context).pop();
+    await _parentController.deleteDeck(deck.id);
+    if (_context.mounted) {
+      Navigator.of(_context).pop();
     }
   }
+}
+
+ViewDeckSingleSheetController useViewDeckSingleSheet({
+  required BuildContext context,
+  required Deck initialDeck,
+  required ViewDecksLocalController controller,
+}) {
+  final deckListenable = useMemoized(() => LocalDB.deck.box.listenable());
+  useListenable(deckListenable);
+
+  final deck = LocalDB.deck.selectByPk({'id': initialDeck.id}) ?? initialDeck;
+  final isSavingPublishState = useState(false);
 
   return ViewDeckSingleSheetController(
     deck: deck,
     isSavingPublishState: isSavingPublishState.value,
-    onPublishedChanged: setPublished,
-    onTitleChanged: setTitle,
-    onShortDescriptionChanged: setShortDescription,
-    onLongDescriptionChanged: setLongDescription,
-    onTagsChanged: setTags,
-    onCoverImagePicked: setCoverImage,
-    onDeletePressed: deleteDeckDialog,
+    context: context,
+    parentController: controller,
+    isSavingPublishStateNotifier: isSavingPublishState,
   );
 }

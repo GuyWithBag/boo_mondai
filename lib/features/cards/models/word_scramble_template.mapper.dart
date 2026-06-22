@@ -16,6 +16,7 @@ class WordScrambleTemplateMapper
       MapperContainer.globals.use(_instance = WordScrambleTemplateMapper._());
       CardTemplateMapper.ensureInitialized().addSubMapper(_instance!);
       TagMapper.ensureInitialized();
+      CardMediaAttachmentMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -64,6 +65,15 @@ class WordScrambleTemplateMapper
     opt: true,
     def: const [],
   );
+  static List<CardMediaAttachment> _$attachments(WordScrambleTemplate v) =>
+      v.attachments;
+  static const Field<WordScrambleTemplate, List<CardMediaAttachment>>
+  _f$attachments = Field(
+    'attachments',
+    _$attachments,
+    opt: true,
+    def: const [],
+  );
   static String _$sentenceToScramble(WordScrambleTemplate v) =>
       v.sentenceToScramble;
   static const Field<WordScrambleTemplate, String> _f$sentenceToScramble =
@@ -96,6 +106,7 @@ class WordScrambleTemplateMapper
     #updatedAt: _f$updatedAt,
     #sourceTemplateId: _f$sourceTemplateId,
     #tags: _f$tags,
+    #attachments: _f$attachments,
     #sentenceToScramble: _f$sentenceToScramble,
     #imageUrl: _f$imageUrl,
     #audioUrl: _f$audioUrl,
@@ -118,6 +129,7 @@ class WordScrambleTemplateMapper
       updatedAt: data.dec(_f$updatedAt),
       sourceTemplateId: data.dec(_f$sourceTemplateId),
       tags: data.dec(_f$tags),
+      attachments: data.dec(_f$attachments),
       sentenceToScramble: data.dec(_f$sentenceToScramble),
       imageUrl: data.dec(_f$imageUrl),
       audioUrl: data.dec(_f$audioUrl),
@@ -197,6 +209,13 @@ abstract class WordScrambleTemplateCopyWith<
   @override
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags;
   @override
+  ListCopyWith<
+    $R,
+    CardMediaAttachment,
+    CardMediaAttachmentCopyWith<$R, CardMediaAttachment, CardMediaAttachment>
+  >
+  get attachments;
+  @override
   $R call({
     String? id,
     String? deckId,
@@ -205,6 +224,7 @@ abstract class WordScrambleTemplateCopyWith<
     DateTime? updatedAt,
     String? sourceTemplateId,
     List<Tag>? tags,
+    List<CardMediaAttachment>? attachments,
     String? sentenceToScramble,
     String? imageUrl,
     String? audioUrl,
@@ -229,6 +249,17 @@ class _WordScrambleTemplateCopyWithImpl<$R, $Out>
     (v) => call(tags: v),
   );
   @override
+  ListCopyWith<
+    $R,
+    CardMediaAttachment,
+    CardMediaAttachmentCopyWith<$R, CardMediaAttachment, CardMediaAttachment>
+  >
+  get attachments => ListCopyWith(
+    $value.attachments,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(attachments: v),
+  );
+  @override
   $R call({
     String? id,
     String? deckId,
@@ -237,6 +268,7 @@ class _WordScrambleTemplateCopyWithImpl<$R, $Out>
     DateTime? updatedAt,
     Object? sourceTemplateId = $none,
     List<Tag>? tags,
+    List<CardMediaAttachment>? attachments,
     String? sentenceToScramble,
     Object? imageUrl = $none,
     Object? audioUrl = $none,
@@ -249,6 +281,7 @@ class _WordScrambleTemplateCopyWithImpl<$R, $Out>
       if (updatedAt != null) #updatedAt: updatedAt,
       if (sourceTemplateId != $none) #sourceTemplateId: sourceTemplateId,
       if (tags != null) #tags: tags,
+      if (attachments != null) #attachments: attachments,
       if (sentenceToScramble != null) #sentenceToScramble: sentenceToScramble,
       if (imageUrl != $none) #imageUrl: imageUrl,
       if (audioUrl != $none) #audioUrl: audioUrl,
@@ -263,6 +296,7 @@ class _WordScrambleTemplateCopyWithImpl<$R, $Out>
     updatedAt: data.get(#updatedAt, or: $value.updatedAt),
     sourceTemplateId: data.get(#sourceTemplateId, or: $value.sourceTemplateId),
     tags: data.get(#tags, or: $value.tags),
+    attachments: data.get(#attachments, or: $value.attachments),
     sentenceToScramble: data.get(
       #sentenceToScramble,
       or: $value.sentenceToScramble,

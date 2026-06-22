@@ -5,6 +5,7 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/features/app_theme/app_theme.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         StudyRating,
@@ -13,7 +14,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         StudySessionService,
         Button,
-                ButtonColor,
+        ButtonColor,
         textStyle,
         TextSize,
         TextWeight,
@@ -208,37 +209,27 @@ class RatingArea extends HookWidget {
           },
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            spacing: tokens.spaceLayoutGapMd,
             children: [
-              Text(
-                'How well did you know it?',
-                style: textStyle.resolve(tokens, [
-                  TextSize.labelSmall,
-                  TextWeight.heavy,
-                  TextColor.muted,
-                ]),
-              ),
-              // const SizedBox(height: AppSpacing.sm),
-              SizedBox(height: 16.h),
+              SectionEyebrow('How well did you know it?', isUpperCase: false),
               Row(
+                spacing: tokens.spaceLayoutGapSm,
                 children: [
                   RatingButton(
                     StudyRating.again,
                     ctrl: studySessionController,
                     onTap: () => onRatingTap(StudyRating.again),
                   ),
-                  const SizedBox(width: AppSpacing.sm),
                   RatingButton(
                     StudyRating.hard,
                     ctrl: studySessionController,
                     onTap: () => onRatingTap(StudyRating.hard),
                   ),
-                  const SizedBox(width: AppSpacing.sm),
                   RatingButton(
                     ctrl: studySessionController,
                     StudyRating.good,
                     onTap: () => onRatingTap(StudyRating.good),
                   ),
-                  const SizedBox(width: AppSpacing.sm),
                   RatingButton(
                     StudyRating.easy,
                     ctrl: studySessionController,

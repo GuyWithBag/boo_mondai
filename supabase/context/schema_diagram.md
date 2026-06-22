@@ -126,12 +126,21 @@ erDiagram
         uuid tag_id PK, FK
     }
 
+    card_template_attachments {
+        uuid id PK
+        uuid template_id FK
+        text kind
+        text storage_path
+        text public_url
+    }
+
     decks ||--o{ card_templates : "contains"
     card_templates ||--o{ card_templates : "forks from (source)"
     card_templates ||--o{ multiple_choice_options : "has options (if MCQ)"
     card_templates ||--o{ fill_in_the_blank_segments : "has segments (if FITB)"
     card_templates ||--o{ match_madness_pairs : "has pairs (if Match)"
     card_templates ||--o{ card_template_tags : "has"
+    card_templates ||--o{ card_template_attachments : "has media"
 
 ```
 

@@ -5,7 +5,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextFieldFrame,
         TextFieldSize,
         TextFieldState,
-        TextFieldTone,
+        TextFieldColor,
         TextField;
 import 'package:flutter/material.dart' hide TextField;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -32,9 +32,9 @@ class FillInTheBlankAnswerInput extends StatelessWidget {
     final tokens = context.themeTokens<AppTokens>();
     final tone = revealed
         ? correct
-              ? TextFieldTone.success
-              : TextFieldTone.error
-        : TextFieldTone.brand;
+              ? TextFieldColor.success
+              : TextFieldColor.error
+        : TextFieldColor.brand;
     final state = revealed && !correct
         ? TextFieldState.incorrect
         : TextFieldState.idle;

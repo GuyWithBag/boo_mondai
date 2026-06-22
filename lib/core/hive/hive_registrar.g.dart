@@ -9,6 +9,8 @@ extension HiveRegistrar on HiveInterface {
   void registerAdapters() {
     registerAdapter(CachedProfileAdapter());
     registerAdapter(CardAdapter());
+    registerAdapter(CardMediaAttachmentAdapter());
+    registerAdapter(CardMediaKindAdapter());
     registerAdapter(CardTemplateTagAdapter());
     registerAdapter(CardTypeAdapter());
     registerAdapter(DeckAdapter());
@@ -51,6 +53,8 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
   void registerAdapters() {
     registerAdapter(CachedProfileAdapter());
     registerAdapter(CardAdapter());
+    registerAdapter(CardMediaAttachmentAdapter());
+    registerAdapter(CardMediaKindAdapter());
     registerAdapter(CardTemplateTagAdapter());
     registerAdapter(CardTypeAdapter());
     registerAdapter(DeckAdapter());

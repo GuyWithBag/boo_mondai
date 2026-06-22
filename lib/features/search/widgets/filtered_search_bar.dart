@@ -9,7 +9,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         SearchResults,
         TextFieldFrame,
         TextFieldSize,
-        TextFieldTone,
+        TextFieldColor,
         textFieldStyle,
         useFilteredSearchBarController,
         Button;
@@ -284,7 +284,6 @@ class FilteredSearchBar<TObject, TFilter extends SearchFilter>
     final style = textFieldStyle.resolve(tokens, const [
       TextFieldSize.normal,
       TextFieldFrame.outline,
-      TextFieldTone.neutral,
     ]);
     final filterEnabled = searchController.isFilterButtonEnabled(
       showFilterButton: showFilterButton,

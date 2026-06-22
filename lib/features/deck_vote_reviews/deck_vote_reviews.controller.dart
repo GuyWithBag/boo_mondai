@@ -1,137 +1,105 @@
-import 'package:boo_mondai/core/database/localdbs.dart';
-import 'package:boo_mondai/features/auth/auth.service.dart';
-import 'package:boo_mondai/features/deck_comments/deck_comment.widget.dart';
-import 'package:boo_mondai/features/deck_vote_reviews/deck_vote_reviews.service.dart';
-import 'package:boo_mondai/features/deck_vote_reviews/models/deck_vote_review.dto.dart';
-import 'package:boo_mondai/features/deck_vote_reviews/models/deck_vote_review_comment.dto.dart';
-import 'package:boo_mondai/features/decks/models/deck.dto.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:boo_mondai/lib.barrel.dart'
+    show
+        DeckVoteReviewComment,
+        DeckVoteReview,
+        Deck,
+        DeckVoteReviewsService,
+        AuthService,
+        LocalDB,
+        DiscussionItem;
+import 'package:flutter/foundation.dart' show ValueNotifier;
+import 'package:flutter_hooks/flutter_hooks.dart' show useState, useEffect;
 
 class DeckVoteReviewsController {
-  const DeckVoteReviewsController({
-    required this.reviews,
-    required this.reviewComments,
-    required this.isLoading,
-    required this.isSubmittingReview,
-    required this.isSubmittingReviewComment,
-    required this.items,
-    required this.repliesFor,
-    required this.canEditItem,
-    required this.addReview,
-    required this.addReviewReply,
-    required this.updateReviewItem,
-    required this.error,
-    required this.clearError,
-  });
+  DeckVoteReviewsController({
+    required this.deck,
+    required this.currentVoteValue,
+    required ValueNotifier<List<DeckVoteReview>> reviews,
+    required ValueNotifier<Map<String, List<DeckVoteReviewComment>>>
+    reviewComments,
+    required ValueNotifier<bool> isLoading,
+    required ValueNotifier<bool> isSubmittingReview,
+    required ValueNotifier<bool> isSubmittingReviewComment,
+    required ValueNotifier<Exception?> error,
+    this.onReviewChanged,
+  }) : _reviews = reviews,
+       _reviewComments = reviewComments,
+       _isLoading = isLoading,
+       _isSubmittingReview = isSubmittingReview,
+       _isSubmittingReviewComment = isSubmittingReviewComment,
+       _error = error;
 
-  final List<DeckVoteReview> reviews;
-  final Map<String, List<DeckVoteReviewComment>> reviewComments;
-  final bool isLoading;
-  final bool isSubmittingReview;
-  final bool isSubmittingReviewComment;
-  final List<DeckCommentItem> items;
-  final List<DeckCommentItem> Function(String itemId) repliesFor;
-  final bool Function(DeckCommentItem item) canEditItem;
-  final Future<bool> Function({
-    required int voteValue,
-    required String title,
-    required String body,
-  })
-  addReview;
-  final Future<bool> Function(String body, {String? parentCommentId})
-  addReviewReply;
-  final Future<bool> Function(
-    DeckCommentItem item,
-    String body, {
-    String? title,
-  })
-  updateReviewItem;
-  final Exception? error;
-  final VoidCallback clearError;
+  final Deck deck;
+  final int? currentVoteValue;
+  final Future<void> Function()? onReviewChanged;
+
+  final ValueNotifier<List<DeckVoteReview>> _reviews;
+  final ValueNotifier<Map<String, List<DeckVoteReviewComment>>> _reviewComments;
+  final ValueNotifier<bool> _isLoading;
+  final ValueNotifier<bool> _isSubmittingReview;
+  final ValueNotifier<bool> _isSubmittingReviewComment;
+  final ValueNotifier<Exception?> _error;
+
+  // ─── Read-only state ────────────────────────────────────────────────────
+
+  List<DeckVoteReview> get reviews => _reviews.value;
+  Map<String, List<DeckVoteReviewComment>> get reviewComments =>
+      _reviewComments.value;
+  bool get isLoading => _isLoading.value;
+  bool get isSubmittingReview => _isSubmittingReview.value;
+  bool get isSubmittingReviewComment => _isSubmittingReviewComment.value;
+  Exception? get error => _error.value;
 
   int get count => reviews.length;
-}
 
-DeckVoteReviewsController useDeckVoteReviewsController({
-  required Deck deck,
-  required int? currentVoteValue,
-  Future<void> Function()? onReviewChanged,
-  bool enabled = true,
-}) {
-  final reviews = useState(const <DeckVoteReview>[]);
-  final reviewComments = useState(
-    const <String, List<DeckVoteReviewComment>>{},
-  );
-  final isLoading = useState(false);
-  final isSubmittingReview = useState(false);
-  final isSubmittingReviewComment = useState(false);
-  final error = useState<Exception?>(null);
+  List<DiscussionItem> get items =>
+      reviews.map(DiscussionItem.fromReview).toList(growable: false);
 
-  useEffect(() {
-    Future<void> loadReviews() async {
-      isLoading.value = true;
-      error.value = null;
+  void clearError() {
+    _error.value = null;
+  }
 
-      try {
-        final loadedReviews = await DeckVoteReviewsService.getByDeck(deck.id);
-        final loadedReviewComments = <String, List<DeckVoteReviewComment>>{};
-        for (final review in loadedReviews) {
-          loadedReviewComments[review.id] =
-              await DeckVoteReviewsService.getComments(review.id);
-        }
+  // ─── Derived lookups ────────────────────────────────────────────────────
 
-        reviews.value = loadedReviews;
-        reviewComments.value = loadedReviewComments;
-      } on Exception catch (e) {
-        error.value = e;
-      } finally {
-        isLoading.value = false;
-      }
-    }
-
-    if (enabled) {
-      loadReviews();
-    }
-    return null;
-  }, [deck.id, enabled]);
-
-  final reviewByItemId = {
-    for (final review in reviews.value) review.id: review,
+  Map<String, DeckVoteReview> get _reviewByItemId => {
+    for (final review in reviews) review.id: review,
   };
-  final reviewCommentByItemId = {
-    for (final commentsForReview in reviewComments.value.values)
+
+  Map<String, DeckVoteReviewComment> get _reviewCommentByItemId => {
+    for (final commentsForReview in reviewComments.values)
       for (final comment in commentsForReview) comment.id: comment,
   };
-  final reviewIdByCommentId = {
-    for (final entry in reviewComments.value.entries)
+
+  Map<String, String> get _reviewIdByCommentId => {
+    for (final entry in reviewComments.entries)
       for (final comment in entry.value) comment.id: entry.key,
   };
-  final reviewIds = reviews.value.map((review) => review.id).toSet();
 
-  Future<void> reloadReviewComments(String reviewId) async {
-    reviewComments.value = {
-      ...reviewComments.value,
-      reviewId: await DeckVoteReviewsService.getComments(reviewId),
-    };
-  }
+  Set<String> get _reviewIds => reviews.map((review) => review.id).toSet();
 
-  Future<void> reloadReviews() async {
-    final loadedReviews = await DeckVoteReviewsService.getByDeck(deck.id);
-    final loadedReviewComments = <String, List<DeckVoteReviewComment>>{};
-    for (final review in loadedReviews) {
-      loadedReviewComments[review.id] =
-          await DeckVoteReviewsService.getComments(review.id);
+  List<DiscussionItem> repliesFor(String itemId) {
+    if (_reviewIds.contains(itemId)) {
+      return (reviewComments[itemId] ?? const [])
+          .where((comment) => comment.parentCommentId == null)
+          .map(DiscussionItem.fromReviewComment)
+          .toList(growable: false);
     }
 
-    reviews.value = loadedReviews;
-    reviewComments.value = loadedReviewComments;
+    final reviewId = _reviewIdByCommentId[itemId];
+    if (reviewId == null) return const [];
+
+    return (reviewComments[reviewId] ?? const [])
+        .where((comment) => comment.parentCommentId == itemId)
+        .map(DiscussionItem.fromReviewComment)
+        .toList(growable: false);
   }
 
-  bool canInteract(String message) {
+  // ─── Permissions ────────────────────────────────────────────────────────
+
+  bool _canInteract(String message) {
     if (AuthService.isAuthenticatedRemote) return true;
 
-    error.value = Exception(message);
+    _error.value = Exception(message);
     return false;
   }
 
@@ -149,22 +117,49 @@ DeckVoteReviewsController useDeckVoteReviewsController({
     return profile.id == comment.userId;
   }
 
-  List<DeckCommentItem> repliesFor(String itemId) {
-    if (reviewIds.contains(itemId)) {
-      return (reviewComments.value[itemId] ?? const [])
-          .where((comment) => comment.parentCommentId == null)
-          .map(DeckCommentItem.fromReviewComment)
-          .toList(growable: false);
+  bool canEditItem(DiscussionItem item) {
+    final review = _reviewByItemId[item.id];
+    if (review != null) return canEditReview(review);
+
+    final comment = _reviewCommentByItemId[item.id];
+    return comment != null && canEditReviewComment(comment);
+  }
+
+  // ─── Loading ────────────────────────────────────────────────────────────
+
+  Future<void> loadReviews() async {
+    _isLoading.value = true;
+    _error.value = null;
+
+    try {
+      await _reloadReviews();
+    } on Exception catch (e) {
+      _error.value = e;
+    } finally {
+      _isLoading.value = false;
+    }
+  }
+
+  Future<void> _reloadReviews() async {
+    final loadedReviews = await DeckVoteReviewsService.getByDeck(deck.id);
+    final loadedReviewComments = <String, List<DeckVoteReviewComment>>{};
+    for (final review in loadedReviews) {
+      loadedReviewComments[review.id] =
+          await DeckVoteReviewsService.getComments(review.id);
     }
 
-    final reviewId = reviewIdByCommentId[itemId];
-    if (reviewId == null) return const [];
-
-    return (reviewComments.value[reviewId] ?? const [])
-        .where((comment) => comment.parentCommentId == itemId)
-        .map(DeckCommentItem.fromReviewComment)
-        .toList(growable: false);
+    _reviews.value = loadedReviews;
+    _reviewComments.value = loadedReviewComments;
   }
+
+  Future<void> _reloadReviewComments(String reviewId) async {
+    _reviewComments.value = {
+      ..._reviewComments.value,
+      reviewId: await DeckVoteReviewsService.getComments(reviewId),
+    };
+  }
+
+  // ─── Mutations ──────────────────────────────────────────────────────────
 
   Future<bool> addReview({
     required int voteValue,
@@ -173,10 +168,10 @@ DeckVoteReviewsController useDeckVoteReviewsController({
   }) async {
     final trimmedBody = body.trim();
     if (trimmedBody.isEmpty) return false;
-    if (!canInteract('Sign in to review decks.')) return false;
+    if (!_canInteract('Sign in to review decks.')) return false;
 
-    isSubmittingReview.value = true;
-    error.value = null;
+    _isSubmittingReview.value = true;
+    _error.value = null;
 
     try {
       final profile = LocalDB.profile.getOrCreate();
@@ -187,90 +182,105 @@ DeckVoteReviewsController useDeckVoteReviewsController({
         title: title.trim(),
         body: trimmedBody,
       );
-      await reloadReviews();
+      await _reloadReviews();
       await onReviewChanged?.call();
       return true;
     } on Exception catch (e) {
-      error.value = e;
+      _error.value = e;
       return false;
     } finally {
-      isSubmittingReview.value = false;
+      _isSubmittingReview.value = false;
     }
   }
 
   Future<bool> updateReviewItem(
-    DeckCommentItem item,
+    DiscussionItem item,
     String body, {
     String? title,
   }) async {
     final trimmedBody = body.trim();
     if (trimmedBody.isEmpty) return false;
 
-    final review = reviewByItemId[item.id];
+    final review = _reviewByItemId[item.id];
     if (review != null) {
-      if (!canEditReview(review)) {
-        error.value = Exception('You can only edit your own reviews.');
-        return false;
-      }
-
-      isSubmittingReview.value = true;
-      error.value = null;
-
-      try {
-        await DeckVoteReviewsService.updateReview(
-          reviewId: review.id,
-          voteValue: currentVoteValue ?? review.voteValueAtCreation,
-          title: title ?? '',
-          body: trimmedBody,
-        );
-        await reloadReviews();
-        return true;
-      } on Exception catch (e) {
-        error.value = e;
-        return false;
-      } finally {
-        isSubmittingReview.value = false;
-      }
+      return _updateReview(review, trimmedBody, title: title);
     }
 
-    final comment = reviewCommentByItemId[item.id];
+    final comment = _reviewCommentByItemId[item.id];
     if (comment == null) return false;
-    if (!canEditReviewComment(comment)) {
-      error.value = Exception('You can only edit your own review comments.');
+    return _updateReviewComment(comment, trimmedBody);
+  }
+
+  Future<bool> _updateReview(
+    DeckVoteReview review,
+    String trimmedBody, {
+    String? title,
+  }) async {
+    if (!canEditReview(review)) {
+      _error.value = Exception('You can only edit your own reviews.');
       return false;
     }
 
-    isSubmittingReviewComment.value = true;
-    error.value = null;
+    _isSubmittingReview.value = true;
+    _error.value = null;
+
+    try {
+      await DeckVoteReviewsService.updateReview(
+        reviewId: review.id,
+        voteValue: currentVoteValue ?? review.voteValueAtCreation,
+        title: title ?? '',
+        body: trimmedBody,
+      );
+      await _reloadReviews();
+      return true;
+    } on Exception catch (e) {
+      _error.value = e;
+      return false;
+    } finally {
+      _isSubmittingReview.value = false;
+    }
+  }
+
+  Future<bool> _updateReviewComment(
+    DeckVoteReviewComment comment,
+    String trimmedBody,
+  ) async {
+    if (!canEditReviewComment(comment)) {
+      _error.value = Exception('You can only edit your own review comments.');
+      return false;
+    }
+
+    _isSubmittingReviewComment.value = true;
+    _error.value = null;
 
     try {
       await DeckVoteReviewsService.updateComment(
         commentId: comment.id,
         body: trimmedBody,
       );
-      await reloadReviewComments(comment.reviewId);
+      await _reloadReviewComments(comment.reviewId);
       return true;
     } on Exception catch (e) {
-      error.value = e;
+      _error.value = e;
       return false;
     } finally {
-      isSubmittingReviewComment.value = false;
+      _isSubmittingReviewComment.value = false;
     }
   }
 
   Future<bool> addReviewReply(String body, {String? parentCommentId}) async {
     final trimmedBody = body.trim();
     if (trimmedBody.isEmpty || parentCommentId == null) return false;
-    if (!canInteract('Sign in to reply to reviews.')) return false;
+    if (!_canInteract('Sign in to reply to reviews.')) return false;
 
-    final isReplyingToReview = reviewIds.contains(parentCommentId);
+    final isReplyingToReview = _reviewIds.contains(parentCommentId);
     final reviewId = isReplyingToReview
         ? parentCommentId
-        : reviewIdByCommentId[parentCommentId];
+        : _reviewIdByCommentId[parentCommentId];
     if (reviewId == null) return false;
 
-    isSubmittingReviewComment.value = true;
-    error.value = null;
+    _isSubmittingReviewComment.value = true;
+    _error.value = null;
 
     try {
       final profile = LocalDB.profile.getOrCreate();
@@ -280,39 +290,50 @@ DeckVoteReviewsController useDeckVoteReviewsController({
         body: trimmedBody,
         parentCommentId: isReplyingToReview ? null : parentCommentId,
       );
-      await reloadReviewComments(reviewId);
+      await _reloadReviewComments(reviewId);
       return true;
     } on Exception catch (e) {
-      error.value = e;
+      _error.value = e;
       return false;
     } finally {
-      isSubmittingReviewComment.value = false;
+      _isSubmittingReviewComment.value = false;
     }
   }
+}
 
-  return DeckVoteReviewsController(
-    reviews: reviews.value,
-    reviewComments: reviewComments.value,
-    isLoading: isLoading.value,
-    isSubmittingReview: isSubmittingReview.value,
-    isSubmittingReviewComment: isSubmittingReviewComment.value,
-    items: reviews.value
-        .map(DeckCommentItem.fromReview)
-        .toList(growable: false),
-    repliesFor: repliesFor,
-    canEditItem: (item) {
-      final review = reviewByItemId[item.id];
-      if (review != null) return canEditReview(review);
-
-      final comment = reviewCommentByItemId[item.id];
-      return comment != null && canEditReviewComment(comment);
-    },
-    addReview: addReview,
-    addReviewReply: addReviewReply,
-    updateReviewItem: updateReviewItem,
-    error: error.value,
-    clearError: () {
-      error.value = null;
-    },
+DeckVoteReviewsController useDeckVoteReviewsController({
+  required Deck deck,
+  required int? currentVoteValue,
+  Future<void> Function()? onReviewChanged,
+  bool enabled = true,
+}) {
+  final reviews = useState(const <DeckVoteReview>[]);
+  final reviewComments = useState(
+    const <String, List<DeckVoteReviewComment>>{},
   );
+  final isLoading = useState(false);
+  final isSubmittingReview = useState(false);
+  final isSubmittingReviewComment = useState(false);
+  final error = useState<Exception?>(null);
+
+  final controller = DeckVoteReviewsController(
+    deck: deck,
+    currentVoteValue: currentVoteValue,
+    reviews: reviews,
+    reviewComments: reviewComments,
+    isLoading: isLoading,
+    isSubmittingReview: isSubmittingReview,
+    isSubmittingReviewComment: isSubmittingReviewComment,
+    error: error,
+    onReviewChanged: onReviewChanged,
+  );
+
+  useEffect(() {
+    if (enabled) {
+      controller.loadReviews();
+    }
+    return null;
+  }, [deck.id, enabled]);
+
+  return controller;
 }

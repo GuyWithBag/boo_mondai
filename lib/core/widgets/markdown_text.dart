@@ -4,7 +4,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextColor,
         TextFieldFrame,
         TextFieldSize,
-        TextFieldTone,
+        TextFieldColor,
         TextSize,
         TextWeight,
         TextField,
@@ -15,6 +15,8 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:theme_variants/theme_variants.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+typedef MarkdownAttachmentUrlResolver = String? Function(Uri uri);
 
 enum MarkdownTextMode {
   /// Renders markdown as styled preview. Text is selectable but not editable.
@@ -55,15 +57,13 @@ class MarkdownText extends HookWidget {
     this.maxLines = 1,
     this.expands = false,
     this.textAlignVertical,
-    this.variants = const [
-      TextFieldSize.normal,
-      TextFieldFrame.outline,
-      TextFieldTone.neutral,
-    ],
+    this.variants = const [TextFieldSize.normal, TextFieldFrame.outline],
     this.mode = MarkdownTextMode.raw,
     this.onTapLink,
+    this.resolveAttachmentUrl,
     this.baseTextStyle,
     super.key,
+    this.placeholderTextStyle,
   });
 
   final String data;
@@ -74,6 +74,7 @@ class MarkdownText extends HookWidget {
   final ValueChanged<String>? onSubmitted;
   final String? placeholder;
   final TextStyle? baseTextStyle;
+  final TextStyle? placeholderTextStyle;
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
   final bool obscureText;
@@ -87,6 +88,10 @@ class MarkdownText extends HookWidget {
   /// opened via [url_launcher] automatically.
   final MarkdownTapLinkCallback? onTapLink;
 
+  /// Resolves markdown attachment URIs like `attachment:<id>` to displayable
+  /// URLs. Used for images and by the default link launcher.
+  final MarkdownAttachmentUrlResolver? resolveAttachmentUrl;
+
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
@@ -97,7 +102,13 @@ class MarkdownText extends HookWidget {
           TextWeight.body,
           TextColor.baseline,
         ]);
-
+    final resolvedPlaceholderTextStyle =
+        placeholderTextStyle ??
+        textStyle.resolve(tokens, const [
+          TextSize.label,
+          TextWeight.body,
+          TextColor.muted,
+        ]);
     return switch (mode) {
       MarkdownTextMode.previewSelectable => _buildPreviewSelectable(
         tokens,
@@ -113,6 +124,7 @@ class MarkdownText extends HookWidget {
         onChanged: onChanged,
         onSubmitted: onSubmitted,
         placeholder: placeholder,
+        placeholderTextStyle: resolvedPlaceholderTextStyle,
         resolvedTextStyle: resolvedTextStyle,
         keyboardType: keyboardType,
         textInputAction: textInputAction,
@@ -139,6 +151,7 @@ class MarkdownText extends HookWidget {
         textAlignVertical: textAlignVertical,
         variants: variants,
         onTapLink: onTapLink,
+        resolveAttachmentUrl: resolveAttachmentUrl,
         tokens: tokens,
       ),
     };
@@ -155,7 +168,8 @@ class MarkdownText extends HookWidget {
     return MarkdownBody(
       data: data,
       selectable: true,
-      onTapLink: onTapLink ?? _launchLink,
+      onTapLink: onTapLink ?? _buildLaunchLink(resolveAttachmentUrl),
+      imageBuilder: _buildImageBuilder(tokens, resolveAttachmentUrl),
       styleSheet: MarkdownHelper.getMarkdownStyleSheet(
         tokens,
         resolvedTextStyle,
@@ -171,7 +185,8 @@ class MarkdownText extends HookWidget {
     return MarkdownBody(
       data: data,
       selectable: false,
-      onTapLink: onTapLink ?? _launchLink,
+      onTapLink: onTapLink ?? _buildLaunchLink(resolveAttachmentUrl),
+      imageBuilder: _buildImageBuilder(tokens, resolveAttachmentUrl),
       styleSheet: MarkdownHelper.getMarkdownStyleSheet(
         tokens,
         resolvedTextStyle,
@@ -195,13 +210,66 @@ class MarkdownText extends HookWidget {
 /// Default link handler used by preview modes when [MarkdownText.onTapLink]
 /// is null. Launches [href] via url_launcher, ignoring null or un-launchable
 /// URIs silently.
-Future<void> _launchLink(String text, String? href, String title) async {
-  if (href == null) return;
+MarkdownTapLinkCallback _buildLaunchLink(
+  MarkdownAttachmentUrlResolver? resolveAttachmentUrl,
+) {
+  return (String text, String? href, String title) async {
+    if (href == null) return;
+    final uri = Uri.tryParse(href);
+    if (uri == null) return;
+
+    final resolvedHref = _resolveAttachmentHref(uri, resolveAttachmentUrl);
+    if (resolvedHref == null) return;
+
+    await _launchLink(resolvedHref);
+  };
+}
+
+Future<void> _launchLink(String href) async {
   final uri = Uri.tryParse(href);
   if (uri == null) return;
   if (await canLaunchUrl(uri)) {
     await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
+}
+
+MarkdownImageBuilder? _buildImageBuilder(
+  AppTokens tokens,
+  MarkdownAttachmentUrlResolver? resolveAttachmentUrl,
+) {
+  if (resolveAttachmentUrl == null) return null;
+
+  return (Uri uri, String? title, String? alt) {
+    final src = _resolveAttachmentHref(uri, resolveAttachmentUrl);
+    if (src == null) return const SizedBox.shrink();
+
+    final resolvedUri = Uri.tryParse(src);
+    if (resolvedUri == null || !resolvedUri.hasScheme) {
+      return const SizedBox.shrink();
+    }
+
+    if (resolvedUri.scheme == 'http' || resolvedUri.scheme == 'https') {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(tokens.radiusSurfaceXsm),
+        child: Image.network(
+          src,
+          fit: BoxFit.contain,
+          semanticLabel: alt,
+          errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+        ),
+      );
+    }
+
+    return const SizedBox.shrink();
+  };
+}
+
+String? _resolveAttachmentHref(
+  Uri uri,
+  MarkdownAttachmentUrlResolver? resolveAttachmentUrl,
+) {
+  if (uri.scheme != 'attachment') return uri.toString();
+  return resolveAttachmentUrl?.call(uri);
 }
 
 // =============================================================================
@@ -225,6 +293,7 @@ class _InputField extends HookWidget {
     this.maxLines,
     this.expands = false,
     this.textAlignVertical,
+    required this.placeholderTextStyle,
   });
 
   final String data;
@@ -234,6 +303,7 @@ class _InputField extends HookWidget {
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onSubmitted;
   final String? placeholder;
+  final TextStyle placeholderTextStyle;
   final TextStyle resolvedTextStyle;
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
@@ -263,6 +333,7 @@ class _InputField extends HookWidget {
       onChanged: onChanged,
       onSubmitted: onSubmitted,
       placeholder: placeholder,
+      placeholderTextStyle: placeholderTextStyle,
       style: resolvedTextStyle,
       keyboardType: keyboardType ?? TextInputType.multiline,
       textInputAction: textInputAction ?? TextInputAction.newline,
@@ -297,6 +368,7 @@ class _InputPreviewField extends HookWidget {
     this.expands = false,
     this.textAlignVertical,
     this.onTapLink,
+    this.resolveAttachmentUrl,
   });
 
   final String data;
@@ -315,6 +387,7 @@ class _InputPreviewField extends HookWidget {
   final TextAlignVertical? textAlignVertical;
   final Iterable<Object> variants;
   final MarkdownTapLinkCallback? onTapLink;
+  final MarkdownAttachmentUrlResolver? resolveAttachmentUrl;
   final AppTokens tokens;
 
   @override
@@ -372,7 +445,8 @@ class _InputPreviewField extends HookWidget {
         // launcher. Tapping a link should NOT switch to edit mode, so
         // the GestureDetector above won't interfere because MarkdownBody
         // calls onTapLink and stops the gesture from bubbling.
-        onTapLink: onTapLink ?? _launchLink,
+        onTapLink: onTapLink ?? _buildLaunchLink(resolveAttachmentUrl),
+        imageBuilder: _buildImageBuilder(tokens, resolveAttachmentUrl),
         styleSheet: MarkdownHelper.getMarkdownStyleSheet(
           tokens,
           resolvedTextStyle,

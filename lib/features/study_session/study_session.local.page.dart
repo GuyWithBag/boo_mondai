@@ -129,6 +129,7 @@ class StudySessionPage extends HookWidget {
     );
 
     return Scaffold(
+      scrollable: false,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(76),
         child: SafeArea(
@@ -143,11 +144,9 @@ class StudySessionPage extends HookWidget {
         studySessionController: controller,
         interactionsController: interactionsController,
       ),
-      body: SafeArea(
-        child: StudySessionCardStage(
-          studySessionController: controller,
-          interactionsController: interactionsController,
-        ),
+      body: StudySessionCardStage(
+        studySessionController: controller,
+        interactionsController: interactionsController,
       ),
     );
   }

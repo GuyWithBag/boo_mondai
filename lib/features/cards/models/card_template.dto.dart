@@ -3,6 +3,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/core/models/dto.dart';
+import 'package:boo_mondai/features/cards/models/card_media_attachment.dto.dart';
 import 'package:boo_mondai/features/cards/models/fill_in_the_blanks_template.dto.dart';
 import 'package:boo_mondai/features/cards/models/flashcard_template.dto.dart';
 import 'package:boo_mondai/features/cards/models/identification_template.dto.dart';
@@ -42,6 +43,9 @@ abstract class CardTemplate with CardTemplateMappable implements DTO {
   // Joined from card_template_tags
   final List<Tag> tags;
 
+  // Joined from card_template_attachments
+  final List<CardMediaAttachment> attachments;
+
   const CardTemplate({
     required this.id,
     required this.deckId,
@@ -50,7 +54,20 @@ abstract class CardTemplate with CardTemplateMappable implements DTO {
     required this.updatedAt,
     this.sourceTemplateId,
     this.tags = const [],
+    this.attachments = const [],
   });
+
+  String? resolveAttachmentUrl(Uri uri) {
+    if (uri.scheme != 'attachment') return uri.toString();
+
+    final attachmentId = uri.path.isNotEmpty ? uri.path : uri.host;
+    for (final attachment in attachments) {
+      if (attachment.id == attachmentId) {
+        return attachment.publicUrl;
+      }
+    }
+    return null;
+  }
 
   bool checkAnswer(String userAnswer, {bool isReversed = false});
 }
