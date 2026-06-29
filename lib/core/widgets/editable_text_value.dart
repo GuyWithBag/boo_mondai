@@ -148,30 +148,28 @@ class EditableTextValue extends HookWidget {
               variants: fieldVariants,
             ),
           SizedBox(height: tokens.spaceLayoutGapSm),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Button(
-                  style: buttonStyle.resolve(tokens, const [ButtonVariant.flat]),
-                  leading: const Icon(Icons.close),
-                  onPressed: isSaving.value ? null : cancel,
-                ),
-                SizedBox(width: tokens.spaceLayoutGapSm),
-                Button(
-                  style: buttonStyle.resolve(
-                    tokens,
-                    const [ButtonColor.success, ButtonVariant.flat],
-                  ),
-                  leading: const Icon(Icons.check),
-                  onPressed: isSaving.value ? null : save,
-                ),
-              ],
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Button.icon(
+                icon: Icons.close,
+                onPressed: isSaving.value ? null : cancel,
+                tokens: tokens,
+              ),
+              SizedBox(width: tokens.spaceLayoutGapSm),
+              Button.icon(
+                color: ButtonColor.success,
+                icon: Icons.check,
+                onPressed: isSaving.value ? null : save,
+                tokens: tokens,
+              ),
+            ],
+          ),
         ],
       );
     }
 
-    final valueWidget = isMarkdown && value.trim().isNotEmpty
+    final previewText = isMarkdown && value.trim().isNotEmpty
         ? MarkdownText(
             data: value,
             baseTextStyle: textStyle,
@@ -190,13 +188,9 @@ class EditableTextValue extends HookWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: TextHelper.getMainAxisAlignmentForTextAlign(textAlign),
       children: [
-        Flexible(child: valueWidget),
+        Flexible(child: previewText),
         if (enabled)
-          Button(
-            style: buttonStyle.resolve(tokens, const [ButtonVariant.flat]),
-            leading: const Icon(Icons.edit),
-            onPressed: edit,
-          ),
+          Button.iconSmall(icon: Icons.edit, onPressed: edit, tokens: tokens),
       ],
     );
   }

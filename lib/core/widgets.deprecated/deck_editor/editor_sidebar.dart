@@ -1,6 +1,6 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/pages/deck_editor/editor_sidebar.dart
-// PURPOSE: Sidebar listing all templates in the deck with add button
+// PURPOSE: SideBar listing all templates in the deck with add button
 // PROVIDERS: none
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -9,8 +9,8 @@ import 'package:boo_mondai/lib.barrel.dart'
     show AppColors, CardTemplate, AppSpacing;
 import 'package:flutter/material.dart';
 
-class EditorSidebar extends StatelessWidget {
-  const EditorSidebar({
+class EditorSideBar extends StatelessWidget {
+  const EditorSideBar({
     super.key,
     required this.templates, // <-- CHANGED
     required this.activeTemplateId, // <-- CHANGED

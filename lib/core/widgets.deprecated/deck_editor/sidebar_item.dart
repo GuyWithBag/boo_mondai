@@ -7,8 +7,8 @@
 
 // import 'package:flutter/material.dart';
 
-// class SidebarItem extends StatelessWidget {
-//   const SidebarItem({
+// class SideBarItem extends StatelessWidget {
+//   const SideBarItem({
 //     super.key,
 //     required this.template, // <-- CHANGED
 //     required this.isActive,

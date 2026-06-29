@@ -78,6 +78,81 @@ void main() {
     expect(find.text('Leading item'), findsNothing);
     expect(find.text('Skeleton'), findsWidgets);
   });
+
+  testWidgets('hides header on empty state by default', (tester) async {
+    await tester.pumpWidget(
+      _TestApp(
+        home: ListingStatesWrapper<int>.list(
+          isLoading: false,
+          items: const [],
+          header: const Text('Header'),
+          emptyState: const EmptyState(
+            icon: Icons.inbox,
+            title: 'Empty',
+            message: 'No rows',
+          ),
+          onRetry: () {},
+          skeletonTile: const Text('Skeleton'),
+          itemBuilder: (_, _, item) => Text('Item $item'),
+        ),
+      ),
+    );
+
+    expect(find.text('Header'), findsNothing);
+    expect(find.text('Empty'), findsOneWidget);
+  });
+
+  testWidgets('renders header on empty state when configured', (tester) async {
+    await tester.pumpWidget(
+      _TestApp(
+        home: ListingStatesWrapper<int>.list(
+          isLoading: false,
+          items: const [],
+          header: const Text('Header'),
+          showHeaderWhenEmpty: true,
+          emptyState: const EmptyState(
+            icon: Icons.inbox,
+            title: 'Empty',
+            message: 'No rows',
+          ),
+          onRetry: () {},
+          skeletonTile: const Text('Skeleton'),
+          itemBuilder: (_, _, item) => Text('Item $item'),
+        ),
+      ),
+    );
+
+    expect(find.text('Header'), findsOneWidget);
+    expect(find.text('Empty'), findsOneWidget);
+  });
+
+  testWidgets('renders leading grid item before non-empty items', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _TestApp(
+        home: ListingStatesWrapper<int>.grid(
+          isLoading: false,
+          items: const [1],
+          emptyState: const EmptyState(
+            icon: Icons.inbox,
+            title: 'Empty',
+            message: 'No rows',
+          ),
+          onRetry: () {},
+          skeletonTile: const Text('Skeleton'),
+          leadingItem: const Text('Leading item'),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+          ),
+          itemBuilder: (_, _, item) => Text('Item $item'),
+        ),
+      ),
+    );
+
+    expect(find.text('Leading item'), findsOneWidget);
+    expect(find.text('Item 1'), findsOneWidget);
+  });
 }
 
 class _TestApp extends StatelessWidget {

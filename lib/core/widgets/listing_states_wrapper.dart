@@ -16,6 +16,8 @@ class ListingStatesWrapper<T> extends StatelessWidget {
     required this.layoutBuilder,
     this.leadingItem,
     this.showLeadingItemAlways = true,
+    this.header,
+    this.showHeaderWhenEmpty = false,
   });
 
   /// 1. Constructor for ListView.separated
@@ -28,10 +30,12 @@ class ListingStatesWrapper<T> extends StatelessWidget {
     required this.onRetry,
     required this.skeletonTile,
     required this.itemBuilder,
-    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry padding = EdgeInsets.zero,
     double separatorHeight = 12.0,
     this.leadingItem,
     this.showLeadingItemAlways = true,
+    this.header,
+    this.showHeaderWhenEmpty = false,
   }) : layoutBuilder = ((context, itemCount, builder) {
          final showLeading =
              leadingItem != null && (showLeadingItemAlways || items.isNotEmpty);
@@ -53,6 +57,8 @@ class ListingStatesWrapper<T> extends StatelessWidget {
     this.exception,
     this.leadingItem,
     this.showLeadingItemAlways = true,
+    this.header,
+    this.showHeaderWhenEmpty = false,
     required this.items,
     required this.emptyState,
     required this.onRetry,
@@ -61,11 +67,16 @@ class ListingStatesWrapper<T> extends StatelessWidget {
     required SliverGridDelegate gridDelegate,
     EdgeInsetsGeometry? padding,
   }) : layoutBuilder = ((context, itemCount, builder) {
+         final showLeading =
+             leadingItem != null && (showLeadingItemAlways || items.isNotEmpty);
          return GridView.builder(
            padding: padding,
            gridDelegate: gridDelegate,
-           itemCount: itemCount,
-           itemBuilder: builder,
+           itemCount: itemCount + (showLeading ? 1 : 0),
+           itemBuilder: (context, index) {
+             if (showLeading && index == 0) return leadingItem;
+             return builder(context, showLeading ? index - 1 : index);
+           },
          );
        });
 
@@ -81,6 +92,8 @@ class ListingStatesWrapper<T> extends StatelessWidget {
     required this.itemBuilder,
     this.leadingItem,
     this.showLeadingItemAlways = true,
+    this.header,
+    this.showHeaderWhenEmpty = false,
     double spacing = 8.0,
     double runSpacing = 8.0,
     WrapAlignment alignment = WrapAlignment.start,
@@ -115,31 +128,51 @@ class ListingStatesWrapper<T> extends StatelessWidget {
   /// An item to add at the start of the list
   final Widget? leadingItem;
   final bool showLeadingItemAlways;
+  final Widget? header;
+  final bool showHeaderWhenEmpty;
 
   @override
   Widget build(BuildContext context) {
     if (exception != null) {
-      return ErrorState(exception: exception, onRetry: onRetry);
+      return _withHeader(ErrorState(exception: exception, onRetry: onRetry));
     }
 
     if (isLoading) {
-      return Skeletonizer(
-        enabled: true,
-        child: layoutBuilder(
-          context,
-          6, // The number of dummy skeleton items to show
-          (context, index) => skeletonTile,
+      return _withHeader(
+        Skeletonizer(
+          enabled: true,
+          child: layoutBuilder(
+            context,
+            6, // The number of dummy skeleton items to show
+            (context, index) => skeletonTile,
+          ),
         ),
       );
     }
 
     if (items.isEmpty) {
-      return emptyState;
+      return _withHeader(emptyState, isEmpty: true);
     }
 
-    return layoutBuilder(context, items.length, (context, index) {
-      final item = items[index];
-      return itemBuilder(context, index, item);
-    });
+    return _withHeader(
+      layoutBuilder(context, items.length, (context, index) {
+        final item = items[index];
+        return itemBuilder(context, index, item);
+      }),
+    );
+  }
+
+  Widget _withHeader(Widget body, {bool isEmpty = false}) {
+    final shouldShowHeader =
+        header != null && (!isEmpty || showHeaderWhenEmpty);
+    if (!shouldShowHeader) return body;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        header!,
+        Expanded(child: body),
+      ],
+    );
   }
 }
