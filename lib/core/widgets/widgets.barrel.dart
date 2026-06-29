@@ -7,7 +7,6 @@ export 'empty_state_widget.dart';
 export 'error_state.dart';
 export 'error_text.dart';
 export 'listing_states_wrapper.dart';
-export 'physical_card.side.dart';
 export 'physical_deck.dart';
 export 'deck_profiles_label.dart';
 export 'profile_label.dart';

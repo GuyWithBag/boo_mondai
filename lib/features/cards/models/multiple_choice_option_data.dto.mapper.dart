@@ -13,9 +13,8 @@ class MultipleChoiceOptionDataMapper
   static MultipleChoiceOptionDataMapper? _instance;
   static MultipleChoiceOptionDataMapper ensureInitialized() {
     if (_instance == null) {
-      MapperContainer.globals.use(
-        _instance = MultipleChoiceOptionDataMapper._(),
-      );
+      MapperContainer.globals
+          .use(_instance = MultipleChoiceOptionDataMapper._());
     }
     return _instance!;
   }
@@ -24,16 +23,11 @@ class MultipleChoiceOptionDataMapper
   final String id = 'MultipleChoiceOptionData';
 
   static String _$text(MultipleChoiceOptionData v) => v.text;
-  static const Field<MultipleChoiceOptionData, String> _f$text = Field(
-    'text',
-    _$text,
-  );
+  static const Field<MultipleChoiceOptionData, String> _f$text =
+      Field('text', _$text);
   static bool _$isCorrect(MultipleChoiceOptionData v) => v.isCorrect;
-  static const Field<MultipleChoiceOptionData, bool> _f$isCorrect = Field(
-    'isCorrect',
-    _$isCorrect,
-    key: r'is_correct',
-  );
+  static const Field<MultipleChoiceOptionData, bool> _f$isCorrect =
+      Field('isCorrect', _$isCorrect, key: r'is_correct');
 
   @override
   final MappableFields<MultipleChoiceOptionData> fields = const {
@@ -43,9 +37,7 @@ class MultipleChoiceOptionDataMapper
 
   static MultipleChoiceOptionData _instantiate(DecodingData data) {
     return MultipleChoiceOptionData(
-      text: data.dec(_f$text),
-      isCorrect: data.dec(_f$isCorrect),
-    );
+        text: data.dec(_f$text), isCorrect: data.dec(_f$isCorrect));
   }
 
   @override
@@ -71,57 +63,44 @@ mixin MultipleChoiceOptionDataMappable {
         .encodeMap<MultipleChoiceOptionData>(this as MultipleChoiceOptionData);
   }
 
-  MultipleChoiceOptionDataCopyWith<
-    MultipleChoiceOptionData,
-    MultipleChoiceOptionData,
-    MultipleChoiceOptionData
-  >
-  get copyWith =>
-      _MultipleChoiceOptionDataCopyWithImpl<
-        MultipleChoiceOptionData,
-        MultipleChoiceOptionData
-      >(this as MultipleChoiceOptionData, $identity, $identity);
+  MultipleChoiceOptionDataCopyWith<MultipleChoiceOptionData,
+          MultipleChoiceOptionData, MultipleChoiceOptionData>
+      get copyWith => _MultipleChoiceOptionDataCopyWithImpl<
+              MultipleChoiceOptionData, MultipleChoiceOptionData>(
+          this as MultipleChoiceOptionData, $identity, $identity);
   @override
   String toString() {
-    return MultipleChoiceOptionDataMapper.ensureInitialized().stringifyValue(
-      this as MultipleChoiceOptionData,
-    );
+    return MultipleChoiceOptionDataMapper.ensureInitialized()
+        .stringifyValue(this as MultipleChoiceOptionData);
   }
 
   @override
   bool operator ==(Object other) {
-    return MultipleChoiceOptionDataMapper.ensureInitialized().equalsValue(
-      this as MultipleChoiceOptionData,
-      other,
-    );
+    return MultipleChoiceOptionDataMapper.ensureInitialized()
+        .equalsValue(this as MultipleChoiceOptionData, other);
   }
 
   @override
   int get hashCode {
-    return MultipleChoiceOptionDataMapper.ensureInitialized().hashValue(
-      this as MultipleChoiceOptionData,
-    );
+    return MultipleChoiceOptionDataMapper.ensureInitialized()
+        .hashValue(this as MultipleChoiceOptionData);
   }
 }
 
 extension MultipleChoiceOptionDataValueCopy<$R, $Out>
     on ObjectCopyWith<$R, MultipleChoiceOptionData, $Out> {
   MultipleChoiceOptionDataCopyWith<$R, MultipleChoiceOptionData, $Out>
-  get $asMultipleChoiceOptionData => $base.as(
-    (v, t, t2) => _MultipleChoiceOptionDataCopyWithImpl<$R, $Out>(v, t, t2),
-  );
+      get $asMultipleChoiceOptionData => $base.as((v, t, t2) =>
+          _MultipleChoiceOptionDataCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
 abstract class MultipleChoiceOptionDataCopyWith<
-  $R,
-  $In extends MultipleChoiceOptionData,
-  $Out
->
-    implements ClassCopyWith<$R, $In, $Out> {
+    $R,
+    $In extends MultipleChoiceOptionData,
+    $Out> implements ClassCopyWith<$R, $In, $Out> {
   $R call({String? text, bool? isCorrect});
   MultipleChoiceOptionDataCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-    Then<$Out2, $R2> t,
-  );
+      Then<$Out2, $R2> t);
 }
 
 class _MultipleChoiceOptionDataCopyWithImpl<$R, $Out>
@@ -134,20 +113,17 @@ class _MultipleChoiceOptionDataCopyWithImpl<$R, $Out>
   late final ClassMapperBase<MultipleChoiceOptionData> $mapper =
       MultipleChoiceOptionDataMapper.ensureInitialized();
   @override
-  $R call({String? text, bool? isCorrect}) => $apply(
-    FieldCopyWithData({
-      if (text != null) #text: text,
-      if (isCorrect != null) #isCorrect: isCorrect,
-    }),
-  );
+  $R call({String? text, bool? isCorrect}) => $apply(FieldCopyWithData({
+        if (text != null) #text: text,
+        if (isCorrect != null) #isCorrect: isCorrect
+      }));
   @override
   MultipleChoiceOptionData $make(CopyWithData data) => MultipleChoiceOptionData(
-    text: data.get(#text, or: $value.text),
-    isCorrect: data.get(#isCorrect, or: $value.isCorrect),
-  );
+      text: data.get(#text, or: $value.text),
+      isCorrect: data.get(#isCorrect, or: $value.isCorrect));
 
   @override
   MultipleChoiceOptionDataCopyWith<$R2, MultipleChoiceOptionData, $Out2>
-  $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-      _MultipleChoiceOptionDataCopyWithImpl<$R2, $Out2>($value, $cast, t);
+      $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+          _MultipleChoiceOptionDataCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }

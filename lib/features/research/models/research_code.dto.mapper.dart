@@ -26,57 +26,32 @@ class ResearchCodeMapper extends ClassMapperBase<ResearchCode> {
   static String _$code(ResearchCode v) => v.code;
   static const Field<ResearchCode, String> _f$code = Field('code', _$code);
   static String _$targetRole(ResearchCode v) => v.targetRole;
-  static const Field<ResearchCode, String> _f$targetRole = Field(
-    'targetRole',
-    _$targetRole,
-    key: r'target_role',
-  );
+  static const Field<ResearchCode, String> _f$targetRole =
+      Field('targetRole', _$targetRole, key: r'target_role');
   static String _$unlocks(ResearchCode v) => v.unlocks;
-  static const Field<ResearchCode, String> _f$unlocks = Field(
-    'unlocks',
-    _$unlocks,
-  );
+  static const Field<ResearchCode, String> _f$unlocks =
+      Field('unlocks', _$unlocks);
   static String _$createdBy(ResearchCode v) => v.createdBy;
-  static const Field<ResearchCode, String> _f$createdBy = Field(
-    'createdBy',
-    _$createdBy,
-    key: r'created_by',
-  );
+  static const Field<ResearchCode, String> _f$createdBy =
+      Field('createdBy', _$createdBy, key: r'created_by');
   static String? _$usedBy(ResearchCode v) => v.usedBy;
-  static const Field<ResearchCode, String> _f$usedBy = Field(
-    'usedBy',
-    _$usedBy,
-    key: r'used_by',
-    opt: true,
-  );
+  static const Field<ResearchCode, String> _f$usedBy =
+      Field('usedBy', _$usedBy, key: r'used_by', opt: true);
   static DateTime? _$usedAt(ResearchCode v) => v.usedAt;
-  static const Field<ResearchCode, DateTime> _f$usedAt = Field(
-    'usedAt',
-    _$usedAt,
-    key: r'used_at',
-    opt: true,
-  );
+  static const Field<ResearchCode, DateTime> _f$usedAt =
+      Field('usedAt', _$usedAt, key: r'used_at', opt: true);
   static DateTime _$createdAt(ResearchCode v) => v.createdAt;
-  static const Field<ResearchCode, DateTime> _f$createdAt = Field(
-    'createdAt',
-    _$createdAt,
-    key: r'created_at',
-  );
+  static const Field<ResearchCode, DateTime> _f$createdAt =
+      Field('createdAt', _$createdAt, key: r'created_at');
   static CachedProfile? _$createdByProfile(ResearchCode v) =>
       v.createdByProfile;
   static const Field<ResearchCode, CachedProfile> _f$createdByProfile = Field(
-    'createdByProfile',
-    _$createdByProfile,
-    key: r'created_by_profile',
-    opt: true,
-  );
+      'createdByProfile', _$createdByProfile,
+      key: r'created_by_profile', opt: true);
   static CachedProfile? _$usedByProfile(ResearchCode v) => v.usedByProfile;
   static const Field<ResearchCode, CachedProfile> _f$usedByProfile = Field(
-    'usedByProfile',
-    _$usedByProfile,
-    key: r'used_by_profile',
-    opt: true,
-  );
+      'usedByProfile', _$usedByProfile,
+      key: r'used_by_profile', opt: true);
 
   @override
   final MappableFields<ResearchCode> fields = const {
@@ -94,17 +69,16 @@ class ResearchCodeMapper extends ClassMapperBase<ResearchCode> {
 
   static ResearchCode _instantiate(DecodingData data) {
     return ResearchCode(
-      id: data.dec(_f$id),
-      code: data.dec(_f$code),
-      targetRole: data.dec(_f$targetRole),
-      unlocks: data.dec(_f$unlocks),
-      createdBy: data.dec(_f$createdBy),
-      usedBy: data.dec(_f$usedBy),
-      usedAt: data.dec(_f$usedAt),
-      createdAt: data.dec(_f$createdAt),
-      createdByProfile: data.dec(_f$createdByProfile),
-      usedByProfile: data.dec(_f$usedByProfile),
-    );
+        id: data.dec(_f$id),
+        code: data.dec(_f$code),
+        targetRole: data.dec(_f$targetRole),
+        unlocks: data.dec(_f$unlocks),
+        createdBy: data.dec(_f$createdBy),
+        usedBy: data.dec(_f$usedBy),
+        usedAt: data.dec(_f$usedAt),
+        createdAt: data.dec(_f$createdAt),
+        createdByProfile: data.dec(_f$createdByProfile),
+        usedByProfile: data.dec(_f$usedByProfile));
   }
 
   @override
@@ -121,43 +95,34 @@ class ResearchCodeMapper extends ClassMapperBase<ResearchCode> {
 
 mixin ResearchCodeMappable {
   String toJson() {
-    return ResearchCodeMapper.ensureInitialized().encodeJson<ResearchCode>(
-      this as ResearchCode,
-    );
+    return ResearchCodeMapper.ensureInitialized()
+        .encodeJson<ResearchCode>(this as ResearchCode);
   }
 
   Map<String, dynamic> toMap() {
-    return ResearchCodeMapper.ensureInitialized().encodeMap<ResearchCode>(
-      this as ResearchCode,
-    );
+    return ResearchCodeMapper.ensureInitialized()
+        .encodeMap<ResearchCode>(this as ResearchCode);
   }
 
   ResearchCodeCopyWith<ResearchCode, ResearchCode, ResearchCode> get copyWith =>
       _ResearchCodeCopyWithImpl<ResearchCode, ResearchCode>(
-        this as ResearchCode,
-        $identity,
-        $identity,
-      );
+          this as ResearchCode, $identity, $identity);
   @override
   String toString() {
-    return ResearchCodeMapper.ensureInitialized().stringifyValue(
-      this as ResearchCode,
-    );
+    return ResearchCodeMapper.ensureInitialized()
+        .stringifyValue(this as ResearchCode);
   }
 
   @override
   bool operator ==(Object other) {
-    return ResearchCodeMapper.ensureInitialized().equalsValue(
-      this as ResearchCode,
-      other,
-    );
+    return ResearchCodeMapper.ensureInitialized()
+        .equalsValue(this as ResearchCode, other);
   }
 
   @override
   int get hashCode {
-    return ResearchCodeMapper.ensureInitialized().hashValue(
-      this as ResearchCode,
-    );
+    return ResearchCodeMapper.ensureInitialized()
+        .hashValue(this as ResearchCode);
   }
 }
 
@@ -171,18 +136,17 @@ abstract class ResearchCodeCopyWith<$R, $In extends ResearchCode, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   CachedProfileCopyWith<$R, CachedProfile, CachedProfile>? get createdByProfile;
   CachedProfileCopyWith<$R, CachedProfile, CachedProfile>? get usedByProfile;
-  $R call({
-    String? id,
-    String? code,
-    String? targetRole,
-    String? unlocks,
-    String? createdBy,
-    String? usedBy,
-    DateTime? usedAt,
-    DateTime? createdAt,
-    CachedProfile? createdByProfile,
-    CachedProfile? usedByProfile,
-  });
+  $R call(
+      {String? id,
+      String? code,
+      String? targetRole,
+      String? unlocks,
+      String? createdBy,
+      String? usedBy,
+      DateTime? usedAt,
+      DateTime? createdAt,
+      CachedProfile? createdByProfile,
+      CachedProfile? usedByProfile});
   ResearchCodeCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -196,54 +160,51 @@ class _ResearchCodeCopyWithImpl<$R, $Out>
       ResearchCodeMapper.ensureInitialized();
   @override
   CachedProfileCopyWith<$R, CachedProfile, CachedProfile>?
-  get createdByProfile => $value.createdByProfile?.copyWith.$chain(
-    (v) => call(createdByProfile: v),
-  );
+      get createdByProfile => $value.createdByProfile?.copyWith
+          .$chain((v) => call(createdByProfile: v));
   @override
   CachedProfileCopyWith<$R, CachedProfile, CachedProfile>? get usedByProfile =>
       $value.usedByProfile?.copyWith.$chain((v) => call(usedByProfile: v));
   @override
-  $R call({
-    String? id,
-    String? code,
-    String? targetRole,
-    String? unlocks,
-    String? createdBy,
-    Object? usedBy = $none,
-    Object? usedAt = $none,
-    DateTime? createdAt,
-    Object? createdByProfile = $none,
-    Object? usedByProfile = $none,
-  }) => $apply(
-    FieldCopyWithData({
-      if (id != null) #id: id,
-      if (code != null) #code: code,
-      if (targetRole != null) #targetRole: targetRole,
-      if (unlocks != null) #unlocks: unlocks,
-      if (createdBy != null) #createdBy: createdBy,
-      if (usedBy != $none) #usedBy: usedBy,
-      if (usedAt != $none) #usedAt: usedAt,
-      if (createdAt != null) #createdAt: createdAt,
-      if (createdByProfile != $none) #createdByProfile: createdByProfile,
-      if (usedByProfile != $none) #usedByProfile: usedByProfile,
-    }),
-  );
+  $R call(
+          {String? id,
+          String? code,
+          String? targetRole,
+          String? unlocks,
+          String? createdBy,
+          Object? usedBy = $none,
+          Object? usedAt = $none,
+          DateTime? createdAt,
+          Object? createdByProfile = $none,
+          Object? usedByProfile = $none}) =>
+      $apply(FieldCopyWithData({
+        if (id != null) #id: id,
+        if (code != null) #code: code,
+        if (targetRole != null) #targetRole: targetRole,
+        if (unlocks != null) #unlocks: unlocks,
+        if (createdBy != null) #createdBy: createdBy,
+        if (usedBy != $none) #usedBy: usedBy,
+        if (usedAt != $none) #usedAt: usedAt,
+        if (createdAt != null) #createdAt: createdAt,
+        if (createdByProfile != $none) #createdByProfile: createdByProfile,
+        if (usedByProfile != $none) #usedByProfile: usedByProfile
+      }));
   @override
   ResearchCode $make(CopyWithData data) => ResearchCode(
-    id: data.get(#id, or: $value.id),
-    code: data.get(#code, or: $value.code),
-    targetRole: data.get(#targetRole, or: $value.targetRole),
-    unlocks: data.get(#unlocks, or: $value.unlocks),
-    createdBy: data.get(#createdBy, or: $value.createdBy),
-    usedBy: data.get(#usedBy, or: $value.usedBy),
-    usedAt: data.get(#usedAt, or: $value.usedAt),
-    createdAt: data.get(#createdAt, or: $value.createdAt),
-    createdByProfile: data.get(#createdByProfile, or: $value.createdByProfile),
-    usedByProfile: data.get(#usedByProfile, or: $value.usedByProfile),
-  );
+      id: data.get(#id, or: $value.id),
+      code: data.get(#code, or: $value.code),
+      targetRole: data.get(#targetRole, or: $value.targetRole),
+      unlocks: data.get(#unlocks, or: $value.unlocks),
+      createdBy: data.get(#createdBy, or: $value.createdBy),
+      usedBy: data.get(#usedBy, or: $value.usedBy),
+      usedAt: data.get(#usedAt, or: $value.usedAt),
+      createdAt: data.get(#createdAt, or: $value.createdAt),
+      createdByProfile:
+          data.get(#createdByProfile, or: $value.createdByProfile),
+      usedByProfile: data.get(#usedByProfile, or: $value.usedByProfile));
 
   @override
   ResearchCodeCopyWith<$R2, ResearchCode, $Out2> $chain<$R2, $Out2>(
-    Then<$Out2, $R2> t,
-  ) => _ResearchCodeCopyWithImpl<$R2, $Out2>($value, $cast, t);
+          Then<$Out2, $R2> t) =>
+      _ResearchCodeCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }

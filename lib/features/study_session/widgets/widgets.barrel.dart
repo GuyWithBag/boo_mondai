@@ -6,8 +6,6 @@ export 'fill_in_the_blanks.card.dart';
 export 'flashcard.backside.dart';
 export 'flashcard.card.dart';
 export 'matching_type.card.dart';
-export 'study_session.appbar.dart';
-export 'study_session.bottom_nav_bar.dart';
 export 'study_session.card_stage.dart';
 export 'flashcard.frontside.dart';
 export 'multiple_choice.card.dart';

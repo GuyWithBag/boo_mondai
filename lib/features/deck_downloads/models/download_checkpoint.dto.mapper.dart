@@ -21,46 +21,28 @@ class DownloadCheckpointMapper extends ClassMapperBase<DownloadCheckpoint> {
   final String id = 'DownloadCheckpoint';
 
   static String _$deckId(DownloadCheckpoint v) => v.deckId;
-  static const Field<DownloadCheckpoint, String> _f$deckId = Field(
-    'deckId',
-    _$deckId,
-    key: r'deck_id',
-  );
+  static const Field<DownloadCheckpoint, String> _f$deckId =
+      Field('deckId', _$deckId, key: r'deck_id');
   static String _$deckTitle(DownloadCheckpoint v) => v.deckTitle;
-  static const Field<DownloadCheckpoint, String> _f$deckTitle = Field(
-    'deckTitle',
-    _$deckTitle,
-    key: r'deck_title',
-  );
+  static const Field<DownloadCheckpoint, String> _f$deckTitle =
+      Field('deckTitle', _$deckTitle, key: r'deck_title');
   static int _$totalTemplates(DownloadCheckpoint v) => v.totalTemplates;
-  static const Field<DownloadCheckpoint, int> _f$totalTemplates = Field(
-    'totalTemplates',
-    _$totalTemplates,
-    key: r'total_templates',
-  );
+  static const Field<DownloadCheckpoint, int> _f$totalTemplates =
+      Field('totalTemplates', _$totalTemplates, key: r'total_templates');
   static List<String> _$fetchedTemplateIds(DownloadCheckpoint v) =>
       v.fetchedTemplateIds;
   static const Field<DownloadCheckpoint, List<String>> _f$fetchedTemplateIds =
-      Field(
-        'fetchedTemplateIds',
-        _$fetchedTemplateIds,
-        key: r'fetched_template_ids',
-      );
+      Field('fetchedTemplateIds', _$fetchedTemplateIds,
+          key: r'fetched_template_ids');
   static DownloadCheckpointStatus _$status(DownloadCheckpoint v) => v.status;
   static const Field<DownloadCheckpoint, DownloadCheckpointStatus> _f$status =
       Field('status', _$status);
   static DateTime _$createdAt(DownloadCheckpoint v) => v.createdAt;
-  static const Field<DownloadCheckpoint, DateTime> _f$createdAt = Field(
-    'createdAt',
-    _$createdAt,
-    key: r'created_at',
-  );
+  static const Field<DownloadCheckpoint, DateTime> _f$createdAt =
+      Field('createdAt', _$createdAt, key: r'created_at');
   static DateTime _$updatedAt(DownloadCheckpoint v) => v.updatedAt;
-  static const Field<DownloadCheckpoint, DateTime> _f$updatedAt = Field(
-    'updatedAt',
-    _$updatedAt,
-    key: r'updated_at',
-  );
+  static const Field<DownloadCheckpoint, DateTime> _f$updatedAt =
+      Field('updatedAt', _$updatedAt, key: r'updated_at');
 
   @override
   final MappableFields<DownloadCheckpoint> fields = const {
@@ -75,14 +57,13 @@ class DownloadCheckpointMapper extends ClassMapperBase<DownloadCheckpoint> {
 
   static DownloadCheckpoint _instantiate(DecodingData data) {
     return DownloadCheckpoint(
-      deckId: data.dec(_f$deckId),
-      deckTitle: data.dec(_f$deckTitle),
-      totalTemplates: data.dec(_f$totalTemplates),
-      fetchedTemplateIds: data.dec(_f$fetchedTemplateIds),
-      status: data.dec(_f$status),
-      createdAt: data.dec(_f$createdAt),
-      updatedAt: data.dec(_f$updatedAt),
-    );
+        deckId: data.dec(_f$deckId),
+        deckTitle: data.dec(_f$deckTitle),
+        totalTemplates: data.dec(_f$totalTemplates),
+        fetchedTemplateIds: data.dec(_f$fetchedTemplateIds),
+        status: data.dec(_f$status),
+        createdAt: data.dec(_f$createdAt),
+        updatedAt: data.dec(_f$updatedAt));
   }
 
   @override
@@ -108,68 +89,50 @@ mixin DownloadCheckpointMappable {
         .encodeMap<DownloadCheckpoint>(this as DownloadCheckpoint);
   }
 
-  DownloadCheckpointCopyWith<
-    DownloadCheckpoint,
-    DownloadCheckpoint,
-    DownloadCheckpoint
-  >
-  get copyWith =>
-      _DownloadCheckpointCopyWithImpl<DownloadCheckpoint, DownloadCheckpoint>(
-        this as DownloadCheckpoint,
-        $identity,
-        $identity,
-      );
+  DownloadCheckpointCopyWith<DownloadCheckpoint, DownloadCheckpoint,
+          DownloadCheckpoint>
+      get copyWith => _DownloadCheckpointCopyWithImpl<DownloadCheckpoint,
+          DownloadCheckpoint>(this as DownloadCheckpoint, $identity, $identity);
   @override
   String toString() {
-    return DownloadCheckpointMapper.ensureInitialized().stringifyValue(
-      this as DownloadCheckpoint,
-    );
+    return DownloadCheckpointMapper.ensureInitialized()
+        .stringifyValue(this as DownloadCheckpoint);
   }
 
   @override
   bool operator ==(Object other) {
-    return DownloadCheckpointMapper.ensureInitialized().equalsValue(
-      this as DownloadCheckpoint,
-      other,
-    );
+    return DownloadCheckpointMapper.ensureInitialized()
+        .equalsValue(this as DownloadCheckpoint, other);
   }
 
   @override
   int get hashCode {
-    return DownloadCheckpointMapper.ensureInitialized().hashValue(
-      this as DownloadCheckpoint,
-    );
+    return DownloadCheckpointMapper.ensureInitialized()
+        .hashValue(this as DownloadCheckpoint);
   }
 }
 
 extension DownloadCheckpointValueCopy<$R, $Out>
     on ObjectCopyWith<$R, DownloadCheckpoint, $Out> {
   DownloadCheckpointCopyWith<$R, DownloadCheckpoint, $Out>
-  get $asDownloadCheckpoint => $base.as(
-    (v, t, t2) => _DownloadCheckpointCopyWithImpl<$R, $Out>(v, t, t2),
-  );
+      get $asDownloadCheckpoint => $base.as(
+          (v, t, t2) => _DownloadCheckpointCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
-abstract class DownloadCheckpointCopyWith<
-  $R,
-  $In extends DownloadCheckpoint,
-  $Out
->
-    implements ClassCopyWith<$R, $In, $Out> {
+abstract class DownloadCheckpointCopyWith<$R, $In extends DownloadCheckpoint,
+    $Out> implements ClassCopyWith<$R, $In, $Out> {
   ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>>
-  get fetchedTemplateIds;
-  $R call({
-    String? deckId,
-    String? deckTitle,
-    int? totalTemplates,
-    List<String>? fetchedTemplateIds,
-    DownloadCheckpointStatus? status,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-  });
+      get fetchedTemplateIds;
+  $R call(
+      {String? deckId,
+      String? deckTitle,
+      int? totalTemplates,
+      List<String>? fetchedTemplateIds,
+      DownloadCheckpointStatus? status,
+      DateTime? createdAt,
+      DateTime? updatedAt});
   DownloadCheckpointCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-    Then<$Out2, $R2> t,
-  );
+      Then<$Out2, $R2> t);
 }
 
 class _DownloadCheckpointCopyWithImpl<$R, $Out>
@@ -182,47 +145,41 @@ class _DownloadCheckpointCopyWithImpl<$R, $Out>
       DownloadCheckpointMapper.ensureInitialized();
   @override
   ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>>
-  get fetchedTemplateIds => ListCopyWith(
-    $value.fetchedTemplateIds,
-    (v, t) => ObjectCopyWith(v, $identity, t),
-    (v) => call(fetchedTemplateIds: v),
-  );
+      get fetchedTemplateIds => ListCopyWith(
+          $value.fetchedTemplateIds,
+          (v, t) => ObjectCopyWith(v, $identity, t),
+          (v) => call(fetchedTemplateIds: v));
   @override
-  $R call({
-    String? deckId,
-    String? deckTitle,
-    int? totalTemplates,
-    List<String>? fetchedTemplateIds,
-    DownloadCheckpointStatus? status,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-  }) => $apply(
-    FieldCopyWithData({
-      if (deckId != null) #deckId: deckId,
-      if (deckTitle != null) #deckTitle: deckTitle,
-      if (totalTemplates != null) #totalTemplates: totalTemplates,
-      if (fetchedTemplateIds != null) #fetchedTemplateIds: fetchedTemplateIds,
-      if (status != null) #status: status,
-      if (createdAt != null) #createdAt: createdAt,
-      if (updatedAt != null) #updatedAt: updatedAt,
-    }),
-  );
+  $R call(
+          {String? deckId,
+          String? deckTitle,
+          int? totalTemplates,
+          List<String>? fetchedTemplateIds,
+          DownloadCheckpointStatus? status,
+          DateTime? createdAt,
+          DateTime? updatedAt}) =>
+      $apply(FieldCopyWithData({
+        if (deckId != null) #deckId: deckId,
+        if (deckTitle != null) #deckTitle: deckTitle,
+        if (totalTemplates != null) #totalTemplates: totalTemplates,
+        if (fetchedTemplateIds != null) #fetchedTemplateIds: fetchedTemplateIds,
+        if (status != null) #status: status,
+        if (createdAt != null) #createdAt: createdAt,
+        if (updatedAt != null) #updatedAt: updatedAt
+      }));
   @override
   DownloadCheckpoint $make(CopyWithData data) => DownloadCheckpoint(
-    deckId: data.get(#deckId, or: $value.deckId),
-    deckTitle: data.get(#deckTitle, or: $value.deckTitle),
-    totalTemplates: data.get(#totalTemplates, or: $value.totalTemplates),
-    fetchedTemplateIds: data.get(
-      #fetchedTemplateIds,
-      or: $value.fetchedTemplateIds,
-    ),
-    status: data.get(#status, or: $value.status),
-    createdAt: data.get(#createdAt, or: $value.createdAt),
-    updatedAt: data.get(#updatedAt, or: $value.updatedAt),
-  );
+      deckId: data.get(#deckId, or: $value.deckId),
+      deckTitle: data.get(#deckTitle, or: $value.deckTitle),
+      totalTemplates: data.get(#totalTemplates, or: $value.totalTemplates),
+      fetchedTemplateIds:
+          data.get(#fetchedTemplateIds, or: $value.fetchedTemplateIds),
+      status: data.get(#status, or: $value.status),
+      createdAt: data.get(#createdAt, or: $value.createdAt),
+      updatedAt: data.get(#updatedAt, or: $value.updatedAt));
 
   @override
   DownloadCheckpointCopyWith<$R2, DownloadCheckpoint, $Out2> $chain<$R2, $Out2>(
-    Then<$Out2, $R2> t,
-  ) => _DownloadCheckpointCopyWithImpl<$R2, $Out2>($value, $cast, t);
+          Then<$Out2, $R2> t) =>
+      _DownloadCheckpointCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
