@@ -38,3 +38,4 @@ export 'show_bottom_sheet.dart';
 export 'text_field.dart';
 export 'chip_input.controller.dart';
 export 'toggle_button.dart';
+export 'bottom_nav_bar.dart';

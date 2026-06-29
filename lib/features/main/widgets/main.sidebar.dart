@@ -1,11 +1,12 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/widgets/sidebar.dart (or your specific path)
-// PURPOSE: Sidebar navigation using a ListView and custom Buttons
+// PURPOSE: SideBar navigation using a ListView and custom Buttons
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        Button, buttonStyle,
+        Button,
+        buttonStyle,
         ButtonColor,
         ButtonVariant,
         Pages,
@@ -17,10 +18,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart' show GoRouterHelper;
 import 'package:theme_variants/theme_variants.dart';
 
-class Sidebar extends StatelessWidget {
+class SideBar extends StatelessWidget {
   final int currentPageIndex;
 
-  const Sidebar({super.key, required this.currentPageIndex});
+  const SideBar({super.key, required this.currentPageIndex});
 
   @override
   Widget build(BuildContext context) {
@@ -57,10 +58,10 @@ class Sidebar extends StatelessWidget {
                       : page.icon!,
                 ),
                 selected: isSelected,
-                style: buttonStyle.resolve(
-                  tokens,
-                  const [ButtonVariant.text, ButtonColor.baseline],
-                ),
+                style: buttonStyle.resolve(tokens, const [
+                  ButtonVariant.text,
+                  ButtonColor.baseline,
+                ]),
                 mainAxisAlignment: MainAxisAlignment.start,
                 onPressed: () => context.go(page.url),
                 child: Text(page.name),

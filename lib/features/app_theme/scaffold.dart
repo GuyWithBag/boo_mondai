@@ -14,10 +14,9 @@ class Scaffold extends HookWidget {
     super.key,
     required this.body,
     this.appBar,
-    this.appBarHeight = 130,
     this.sidebar,
     this.sidebarWidth = 280,
-    this.bottomNavigationBar,
+    this.bottomNavBar,
     this.backgroundColor,
     this.maxWidth,
     this.padding,
@@ -32,29 +31,29 @@ class Scaffold extends HookWidget {
     this.center = false,
     this.shouldConstrainWidth = false,
     this.floatingActionButton,
-    this.floatingSidebar = false,
-    this.floatingSidebarInitiallyOpen = false,
-    this.haveSidebarOpenButton = false,
-    this.haveBottomNavbarBottomPadding = true,
-    this.showBottomNavbar = true,
-    this.showAppbar = true,
+    this.floatingSideBar = false,
+    this.floatingSideBarInitiallyOpen = false,
+    this.haveSideBarOpenButton = false,
+    this.haveBottomNavBarBottomGap = true,
+    this.showBottomNavBar = true,
+    this.showAppBar = true,
     this.isFloatingAppBar = false,
+    this.inheritMainBottomNavBarHeight = true,
+    this.scrollController,
   }) : assert(
          !onlyShowFloatingActionButtonsWhenTyping ||
              !hideFloatingActionButtonsWhenTyping,
          'onlyShowFloatingActionButtonsWhenTyping and '
          'hideFloatingActionButtonsWhenTyping cannot both be true.',
        ),
-       assert(appBarHeight >= 0, 'appBarHeight cannot be negative.'),
        assert(sidebarWidth >= 0, 'sidebarWidth cannot be negative.');
 
   final Widget body;
   final PreferredSizeWidget? appBar;
   final bool isFloatingAppBar;
-  final double appBarHeight;
   final Widget? sidebar;
   final double sidebarWidth;
-  final Widget? bottomNavigationBar;
+  final PreferredSizeWidget? bottomNavBar;
   final Color? backgroundColor;
   final double? maxWidth;
   final EdgeInsetsGeometry? padding;
@@ -69,12 +68,14 @@ class Scaffold extends HookWidget {
   final bool center;
   final bool shouldConstrainWidth;
   final Widget? floatingActionButton;
-  final bool showBottomNavbar;
-  final bool showAppbar;
-  final bool floatingSidebar;
-  final bool floatingSidebarInitiallyOpen;
-  final bool haveSidebarOpenButton;
-  final bool haveBottomNavbarBottomPadding;
+  final bool showBottomNavBar;
+  final bool showAppBar;
+  final bool floatingSideBar;
+  final bool floatingSideBarInitiallyOpen;
+  final bool haveSideBarOpenButton;
+  final bool haveBottomNavBarBottomGap;
+  final bool inheritMainBottomNavBarHeight;
+  final ScrollController? scrollController;
 
   static const _animationDuration = Duration(milliseconds: 220);
   static const _fabMargin = 20.0;
@@ -87,20 +88,45 @@ class Scaffold extends HookWidget {
     final isMobile = Breakpoints.isMobile(viewportSize);
     final keyboardVisible = mediaQuery.viewInsets.bottom > 0;
     final mainController = context.watch<MainController>();
-
-    final shouldHaveAppbar = appBar != null && showAppbar && !isFloatingAppBar;
-    final shouldHaveFloatingAppbar =
-        appBar != null && showAppbar && isFloatingAppBar;
-    final shouldHaveBottomNavbar =
+    final shouldHaveAppBar = appBar != null && showAppBar && !isFloatingAppBar;
+    final shouldHaveFloatingAppBar =
+        appBar != null && showAppBar && isFloatingAppBar;
+    final shouldHaveBottomNavBar =
         !hideNavigation &&
         isMobile &&
-        (bottomNavigationBar != null) &&
-        showBottomNavbar;
+        (bottomNavBar != null) &&
+        showBottomNavBar;
+    final shouldHaveBottomNavBarGap =
+        (shouldHaveBottomNavBar || inheritMainBottomNavBarHeight) &&
+        haveBottomNavBarBottomGap;
 
-    final isBottomNavbarVisible = useState(shouldHaveBottomNavbar);
-    final isAppbarVisible = useState(shouldHaveAppbar);
+    double getTrueBottomNavBarHeight() {
+      if (inheritMainBottomNavBarHeight) {
+        return mainController.bottomNavBarHeight +
+            mediaQuery.viewPadding.bottom;
+      }
+      if (shouldHaveBottomNavBar) {
+        return bottomNavBar!.preferredSize.height +
+            mediaQuery.viewPadding.bottom;
+      }
+      return 0;
+    }
 
-    final isSidebarVisible = useState(floatingSidebarInitiallyOpen);
+    double getTrueAppBarHeight() {
+      if (shouldHaveAppBar || shouldHaveFloatingAppBar) {
+        return appBar!.preferredSize.height + mediaQuery.viewPadding.top;
+      }
+      return 0;
+    }
+
+    final double effectiveBottomNavBarHeight = getTrueBottomNavBarHeight();
+    final double effectiveAppBarHeight = getTrueAppBarHeight();
+
+    final isBottomNavBarVisible = useState(shouldHaveBottomNavBar);
+    final shouldHaveEitherAppBar = shouldHaveAppBar || shouldHaveFloatingAppBar;
+    final isEitherAppBarVisible = useState(shouldHaveEitherAppBar);
+
+    final isSideBarVisible = useState(floatingSideBarInitiallyOpen);
 
     bool handleScrollNotification(ScrollNotification notification) {
       if (notification.metrics.axis != Axis.vertical) {
@@ -108,8 +134,8 @@ class Scaffold extends HookWidget {
       }
 
       if (notification.metrics.pixels <= 0) {
-        if (hideBottomNavigationBarOnScroll) isBottomNavbarVisible.value = true;
-        if (hideAppBarOnScroll) isAppbarVisible.value = true;
+        if (hideBottomNavigationBarOnScroll) isBottomNavBarVisible.value = true;
+        if (hideAppBarOnScroll) isEitherAppBarVisible.value = true;
         return false;
       }
 
@@ -121,25 +147,22 @@ class Scaffold extends HookWidget {
       if (direction == ScrollDirection.idle) return false;
 
       if (hideBottomNavigationBarOnScroll) {
-        isBottomNavbarVisible.value = direction == ScrollDirection.forward;
+        isBottomNavBarVisible.value = direction == ScrollDirection.forward;
       }
       if (hideAppBarOnScroll) {
-        isAppbarVisible.value = direction == ScrollDirection.forward;
+        isEitherAppBarVisible.value = direction == ScrollDirection.forward;
       }
       return false;
     }
 
-    final showDockedSidebar =
-        !hideNavigation && !isMobile && sidebar != null && !floatingSidebar;
-    final showFloatingSidebar =
+    final showDockedSideBar =
+        !hideNavigation && !isMobile && sidebar != null && !floatingSideBar;
+    final showFloatingSideBar =
         !hideNavigation &&
         sidebar != null &&
-        (floatingSidebar || isMobile || haveSidebarOpenButton);
-    final bottomNavigationBarHeight = mainController.bottomNavbarHeight;
-    // final effectiveBottomNavigationHeight = shouldHaveBottomNavbar
-    //     ? bottomNavigationBarHeight
-    //     : 0.0;
-    final effectiveSidebarWidth = showDockedSidebar ? sidebarWidth : 0.0;
+        (floatingSideBar || isMobile || haveSideBarOpenButton);
+
+    final effectiveSideBarWidth = showDockedSideBar ? sidebarWidth : 0.0;
 
     final contentPadding =
         padding ??
@@ -154,8 +177,8 @@ class Scaffold extends HookWidget {
 
     if (safeArea) {
       content = SafeArea(
-        top: shouldHaveAppbar,
-        bottom: shouldHaveBottomNavbar,
+        top: shouldHaveAppBar,
+        bottom: shouldHaveBottomNavBar,
         child: content,
       );
     }
@@ -164,23 +187,39 @@ class Scaffold extends HookWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: scrollable ? MainAxisSize.min : MainAxisSize.max,
       children: [
-        if (shouldHaveAppbar) SizedBox(height: appBar!.preferredSize.height),
-        if (!shouldHaveFloatingAppbar)
+        if (shouldHaveAppBar) SizedBox(height: effectiveAppBarHeight),
+        if (!shouldHaveFloatingAppBar)
           Flexible(child: paddedBody)
         else
           Stack(
             children: [
               paddedBody,
-              Positioned(top: 0, left: 0, right: 0, child: appBar!),
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: SizedBox(
+                  height: effectiveAppBarHeight,
+                  child: _AnimatedOverlay(
+                    visible: isEitherAppBarVisible.value,
+                    hiddenOffset: const Offset(0, -1),
+                    child: appBar!,
+                  ),
+                ),
+              ),
             ],
           ),
-        if (haveBottomNavbarBottomPadding)
-          SizedBox(height: bottomNavigationBarHeight),
+        if (shouldHaveBottomNavBarGap)
+          SizedBox(height: effectiveBottomNavBarHeight),
       ],
     );
 
     if (scrollable) {
-      content = SingleChildScrollView(child: content);
+      content = SingleChildScrollView(
+        padding: EdgeInsets.zero,
+        controller: scrollController,
+        child: content,
+      );
     }
 
     if (shouldConstrainWidth) {
@@ -203,7 +242,7 @@ class Scaffold extends HookWidget {
 
     final stackChildren = <Widget>[
       Positioned.fill(child: content),
-      if (showDockedSidebar)
+      if (showDockedSideBar)
         _AnimatedOverlay(
           visible: true,
           hiddenOffset: const Offset(-1, 0),
@@ -212,51 +251,51 @@ class Scaffold extends HookWidget {
             child: SizedBox(width: sidebarWidth, child: sidebar!),
           ),
         ),
-      if (shouldHaveAppbar)
+      if (shouldHaveAppBar)
         Positioned(
           top: 0,
-          left: effectiveSidebarWidth,
+          left: effectiveSideBarWidth,
           right: 0,
           child: _AnimatedOverlay(
-            visible: isAppbarVisible.value,
+            visible: isEitherAppBarVisible.value,
             hiddenOffset: const Offset(0, -1),
-            child: appBar!,
+            child: SizedBox(height: effectiveAppBarHeight, child: appBar!),
           ),
         ),
-      if (shouldHaveBottomNavbar)
+      if (shouldHaveBottomNavBar)
         Positioned(
           left: 0,
           right: 0,
           bottom: 0,
           child: _AnimatedOverlay(
-            visible: isBottomNavbarVisible.value,
+            visible: isBottomNavBarVisible.value,
             // visible: true,
             hiddenOffset: const Offset(0, 1),
             child: SizedBox(
-              height: bottomNavigationBarHeight,
-              child: bottomNavigationBar!,
+              height: effectiveBottomNavBarHeight,
+              child: bottomNavBar!,
             ),
           ),
         ),
-      if (showFloatingSidebar)
+      if (showFloatingSideBar)
         Positioned.fill(
           child: IgnorePointer(
-            ignoring: !isSidebarVisible.value,
+            ignoring: !isSideBarVisible.value,
             child: AnimatedOpacity(
-              opacity: isSidebarVisible.value ? 1 : 0,
+              opacity: isSideBarVisible.value ? 1 : 0,
               duration: _animationDuration,
               child: Stack(
                 children: [
                   Positioned.fill(
                     child: GestureDetector(
-                      onTap: () => isSidebarVisible.value = false,
+                      onTap: () => isSideBarVisible.value = false,
                       child: ColoredBox(
                         color: Colors.black.withValues(alpha: 0.24),
                       ),
                     ),
                   ),
                   _AnimatedOverlay(
-                    visible: isSidebarVisible.value,
+                    visible: isSideBarVisible.value,
                     hiddenOffset: const Offset(-1, 0),
                     child: Align(
                       alignment: Alignment.centerLeft,
@@ -275,12 +314,12 @@ class Scaffold extends HookWidget {
         context: context,
         tokens: tokens,
         visible: _showFloatingActionButtons(
-          isBottomNavbarVisible: isBottomNavbarVisible.value,
+          isBottomNavBarVisible: isBottomNavBarVisible.value,
           keyboardVisible: keyboardVisible,
         ),
-        bottomInset: shouldHaveBottomNavbar ? bottomNavigationBarHeight : 0,
-        onOpenSidebar: showFloatingSidebar || showDockedSidebar
-            ? () => isSidebarVisible.value = !isSidebarVisible.value
+        bottomInset: shouldHaveBottomNavBar ? effectiveBottomNavBarHeight : 0,
+        onOpenSideBar: showFloatingSideBar || showDockedSideBar
+            ? () => isSideBarVisible.value = !isSideBarVisible.value
             : null,
       ),
     ];
@@ -292,10 +331,10 @@ class Scaffold extends HookWidget {
   }
 
   bool _showFloatingActionButtons({
-    required bool isBottomNavbarVisible,
+    required bool isBottomNavBarVisible,
     required bool keyboardVisible,
   }) {
-    if (hideFloatingActionButtonOnScroll && isBottomNavbarVisible) {
+    if (hideFloatingActionButtonOnScroll && isBottomNavBarVisible) {
       return false;
     }
     if (onlyShowFloatingActionButtonsWhenTyping && !keyboardVisible) {
@@ -312,12 +351,12 @@ class Scaffold extends HookWidget {
     required AppTokens tokens,
     required bool visible,
     required double bottomInset,
-    required VoidCallback? onOpenSidebar,
+    required VoidCallback? onOpenSideBar,
   }) {
     final children = <Widget>[];
     final bottom = _fabMargin + bottomInset;
 
-    if (haveSidebarOpenButton && onOpenSidebar != null) {
+    if (haveSideBarOpenButton && onOpenSideBar != null) {
       children.add(
         Positioned(
           left: _fabMargin,
@@ -327,7 +366,7 @@ class Scaffold extends HookWidget {
             hiddenOffset: const Offset(0, 1),
             child: Button.icon(
               icon: Icons.menu,
-              onPressed: onOpenSidebar,
+              onPressed: onOpenSideBar,
               color: ButtonColor.primary,
               variant: ButtonVariant.elevated,
               tokens: tokens,

@@ -125,14 +125,12 @@ final textFieldStyle = VariantStyle.textFieldParts<AppTokens>(
       TextFieldStylePart.text({
         TextStylePart.fontSize(tokens.textSizeLabelLarge.sp),
         TextStylePart.fontWeight(tokens.fontWeightTextHeavy),
-        TextStylePart.height(tokens.lineHeightTextTitle),
       }),
     },
     TextFieldSize.bodyLarge: (tokens) => {
       TextFieldStylePart.text({
         TextStylePart.fontSize(tokens.textSizeBodyLarge.sp),
         TextStylePart.fontWeight(tokens.fontWeightTextStrong),
-        TextStylePart.height(tokens.lineHeightFieldDisplay),
       }),
     },
     TextFieldSize.normal: (tokens) => {

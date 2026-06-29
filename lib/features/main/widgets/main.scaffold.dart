@@ -26,16 +26,17 @@ class MainScaffold extends StatelessWidget {
     return Scaffold(
       body: child,
       hideNavigation: hideNavigation,
-      sidebar: Sidebar(currentPageIndex: currentIndex),
-      bottomNavigationBar: BottomNavbar(currentPageIndex: currentIndex),
-      haveBottomNavbarBottomPadding: false,
+      sidebar: SideBar(currentPageIndex: currentIndex),
+      bottomNavBar: MainBottomNavBar(currentPageIndex: currentIndex),
       padding: EdgeInsets.zero,
       scrollable: false,
       safeArea: false,
       center: false,
+      haveBottomNavBarBottomGap: false,
       shouldConstrainWidth: false,
-      showBottomNavbar: controller.isBottomNavbarVisible,
-      showAppbar: controller.isAppbarVisible,
+      inheritMainBottomNavBarHeight: false,
+      showBottomNavBar: controller.isBottomNavBarVisible,
+      showAppBar: controller.isAppBarVisible,
     );
   }
 }

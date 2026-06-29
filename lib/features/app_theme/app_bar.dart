@@ -30,18 +30,20 @@ class AppBar extends StatelessWidget implements PreferredSizeWidget {
     this.collapsible = false,
     this.scrollController,
     this.collapseDistance = 0,
-    this.height = 138,
-    this.bottomHeight = 50,
+    this.preferredHeight = AppBar.preferredHeightDefault,
+    this.preferredBottomHeight = 50,
     this.showBottomBorder = false,
     this.child,
-    this.subSection,
+    this.header,
+    this.preferredHeaderHeight = 62,
   });
 
   final String? title;
   final Widget? child;
   final List<Widget> actions;
   final Widget? bottom;
-  final Widget? subSection;
+  final Widget? header;
+  final double preferredHeaderHeight;
   final bool transparentBackground;
   final EdgeInsetsGeometry? padding;
   final double? actionsSpacing;
@@ -52,16 +54,21 @@ class AppBar extends StatelessWidget implements PreferredSizeWidget {
   final ScrollController? scrollController;
   final double collapseDistance;
 
-  /// This is the height required. This is needed for scrolling purposes for Scaffold.
-  final double height;
-  final double bottomHeight;
+  /// This is the preferredHeight required. This is needed for scrolling purposes for Scaffold.
+  final double preferredHeight;
+  final double preferredBottomHeight;
   final bool showBottomBorder;
 
   double _getTotalHeight() {
-    final total = height + (bottom == null ? bottomHeight : 0);
+    final total =
+        preferredHeight +
+        (bottom == null ? 0 : preferredBottomHeight) +
+        (header == null ? 0 : preferredHeaderHeight);
 
     return total;
   }
+
+  static const double preferredHeightDefault = 90;
 
   @override
   Size get preferredSize => Size(0, _getTotalHeight());
@@ -84,34 +91,40 @@ class AppBar extends StatelessWidget implements PreferredSizeWidget {
                 onPop ??
                 () {
                   context.pop();
-                  mainController.setBottomNavbarVisible(true);
+                  mainController.setBottomNavBarVisible(true);
                 },
             tokens: tokens,
           )
         : null;
-    final totalHeight = _getTotalHeight();
+
     final effectivePopButton = popButtonWidget;
     final effectiveActions = [for (final action in actions) action];
     final effectiveBottom = bottom;
+    final resolvedSurfaceStyle = surfaceStyle.resolve(tokens, [
+      SurfaceShape.sharp,
+      SurfaceBorder.bottom,
+      if (transparentBackground) SurfaceColor.invisible,
+    ]);
+    final spacing = tokens.spaceLayoutGapSm;
 
-    return SizedBox(
-      height: height,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Flexible(
-            child: Surface(
-              style: surfaceStyle.resolve(tokens, [
-                SurfaceShape.sharp,
-                SurfaceBorder.bottom,
-                if (transparentBackground) SurfaceColor.invisible,
-              ]),
-              child: SafeArea(
-                bottom: false,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Flexible(
+          child: Surface(
+            style: resolvedSurfaceStyle,
+            child: SafeArea(
+              bottom: false,
+              child: Column(
+                spacing: spacing,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height:
+                        preferredHeight -
+                        resolvedSurfaceStyle.padding!.vertical -
+                        spacing,
+                    child: Row(
                       spacing: tokens.spaceLayoutGapSm,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -135,26 +148,26 @@ class AppBar extends StatelessWidget implements PreferredSizeWidget {
                         ],
                       ],
                     ),
-                    // subSection ?? SizedBox.shrink(),
-                  ],
-                ),
+                  ),
+                  ?header,
+                ],
               ),
             ),
           ),
-          if (effectiveBottom != null)
-            SizedBox(
-              height: bottomHeight,
-              child: Padding(
-                padding: EdgeInsetsDirectional.only(
-                  start: tokens.spaceScaffoldPadding,
-                  end: tokens.spaceScaffoldPadding,
-                  bottom: tokens.spaceScaffoldPadding,
-                ),
-                child: effectiveBottom,
+        ),
+        if (effectiveBottom != null)
+          SizedBox(
+            height: preferredBottomHeight,
+            child: Padding(
+              padding: EdgeInsetsDirectional.only(
+                start: tokens.spaceScaffoldPadding,
+                end: tokens.spaceScaffoldPadding,
+                bottom: tokens.spaceScaffoldPadding,
               ),
+              child: effectiveBottom,
             ),
-        ],
-      ),
+          ),
+      ],
     );
   }
 }

@@ -1,17 +1,18 @@
+import 'package:boo_mondai/lib.barrel.dart';
 import 'package:flutter/foundation.dart';
 
 class MainController extends ChangeNotifier {
-  bool isBottomNavbarVisible = true;
-  bool isAppbarVisible = true;
-  double bottomNavbarHeight = 130;
+  bool isBottomNavBarVisible = true;
+  bool isAppBarVisible = true;
+  double bottomNavBarHeight = BottomNavBar.preferredHeightDefault;
 
-  void setBottomNavbarVisible(bool value) {
-    isBottomNavbarVisible = value;
+  void setBottomNavBarVisible(bool value) {
+    isBottomNavBarVisible = value;
     notifyListeners();
   }
 
-  void setAppbarVisible(bool value) {
-    isAppbarVisible = value;
+  void setAppBarVisible(bool value) {
+    isAppBarVisible = value;
     notifyListeners();
   }
 }
