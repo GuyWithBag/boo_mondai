@@ -8,7 +8,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         IdentificationTemplate,
         WordScrambleTemplate,
         AppTokens,
-        Button, buttonStyle,
+        Button,
+        buttonStyle,
         PanelHeader,
         ButtonColor,
         ButtonVariant;
@@ -16,8 +17,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-class EditDeckSidebar extends StatelessWidget {
-  const EditDeckSidebar({
+class EditDeckSideBar extends StatelessWidget {
+  const EditDeckSideBar({
     required this.templates,
     required this.activeTemplateId,
     required this.onAdd,
@@ -76,10 +77,7 @@ class EditDeckSidebar extends StatelessWidget {
         children: [
           PanelHeader(
             title: 'Cards (${templates.length})',
-            trailing: Button(
-              leading: const Icon(Icons.add),
-              onPressed: onAdd,
-            ),
+            trailing: Button(leading: const Icon(Icons.add), onPressed: onAdd),
           ),
           Expanded(
             child: ListView(
@@ -93,7 +91,10 @@ class EditDeckSidebar extends StatelessWidget {
                         : () => onTemplateSelected(template.id),
                     leading: Icon(_iconFor(template)),
                     mainAxisAlignment: MainAxisAlignment.start,
-                    style: buttonStyle.resolve(tokens, const [ButtonVariant.text, ButtonColor.baseline]),
+                    style: buttonStyle.resolve(tokens, const [
+                      ButtonVariant.text,
+                      ButtonColor.baseline,
+                    ]),
                     child: Text(
                       _labelFor(template),
                       maxLines: 2,

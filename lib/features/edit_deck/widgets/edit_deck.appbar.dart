@@ -12,7 +12,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         MetaLabel,
         TextFieldFrame,
         TextFieldSize,
-        ButtonSize;
+        ButtonSize,
+        BottomNavBar;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart'
     show
@@ -30,8 +31,8 @@ import 'package:flutter/material.dart'
         Row;
 import 'package:theme_variants/theme_variants.dart';
 
-class EditDeckAppbar extends StatelessWidget implements PreferredSizeWidget {
-  const EditDeckAppbar({
+class EditDeckAppBar extends StatelessWidget implements PreferredSizeWidget {
+  const EditDeckAppBar({
     required this.titleController,
     required this.onSave,
     this.isSaving = false,
@@ -41,18 +42,15 @@ class EditDeckAppbar extends StatelessWidget implements PreferredSizeWidget {
   final TextEditingController titleController;
   final Future<void> Function() onSave;
   final bool isSaving;
-  final double height = 130;
 
   @override
-  // TODO: implement preferredSize
-  Size get preferredSize => Size(0, height);
+  Size get preferredSize => Size(0, BottomNavBar.preferredHeightDefault);
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
 
     return AppBar(
-      height: height,
       actions: [
         Button(
           style: buttonStyle.resolve(tokens, const [

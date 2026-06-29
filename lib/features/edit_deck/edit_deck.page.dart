@@ -4,10 +4,10 @@
 
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        EditDeckAppbar,
-        EditDeckBottomNavbar,
+        EditDeckAppBar,
+        EditDeckBottomNavBar,
         EditDeckEditorBody,
-        EditDeckSidebar,
+        EditDeckSideBar,
         Scaffold,
         showSnackbar,
         useEditDeckController,
@@ -64,7 +64,7 @@ class EditDeckPage extends HookWidget {
     final tokens = context.themeTokens<AppTokens>();
 
     return Scaffold(
-      appBar: EditDeckAppbar(
+      appBar: EditDeckAppBar(
         titleController: titleController,
         onSave: () async {
           if (!validate()) return;
@@ -75,25 +75,24 @@ class EditDeckPage extends HookWidget {
         },
         isSaving: controller.isLoading,
       ),
-      appBarHeight: 88.0,
       floatingActionButton: Button.icon(
         icon: Icons.add,
         onPressed: addTemplate,
         tokens: tokens,
       ),
-      sidebar: EditDeckSidebar(
+      sidebar: EditDeckSideBar(
         activeTemplateId: controller.activeTemplateId,
         onAdd: addTemplate,
         onTemplateSelected: selectTemplate,
         templates: controller.templates,
       ),
-      bottomNavigationBar: controller.hasActiveTemplate
-          ? EditDeckBottomNavbar(editor: controller)
+      bottomNavBar: controller.hasActiveTemplate
+          ? EditDeckBottomNavBar(editor: controller)
           : null,
-      haveSidebarOpenButton: true,
+      haveSideBarOpenButton: true,
       hideAppBarOnScroll: true,
       hideFloatingActionButtonOnScroll: true,
-      floatingSidebar: true,
+      floatingSideBar: true,
       body: Form(
         key: formKey,
         child: EditDeckEditorBody(editor: controller),

@@ -1,22 +1,22 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
-        EditDeckController,
-        SurfaceBorder,
-        SurfacePadding,
-        SurfaceShadow,
-        SurfaceShape,
+        BottomNavBar,
         Button,
-        useSelectionController,
-        surfaceStyle;
+        EditDeckController,
+        useSelectionController;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-class EditDeckBottomNavbar extends HookWidget {
-  const EditDeckBottomNavbar({required this.editor, super.key});
+class EditDeckBottomNavBar extends HookWidget implements PreferredSizeWidget {
+  const EditDeckBottomNavBar({required this.editor, super.key});
 
   final EditDeckController editor;
+
+  @override
+  // TODO: implement preferredSize
+  Size get preferredSize => Size(0, BottomNavBar.preferredHeightDefault);
 
   @override
   Widget build(BuildContext context) {
@@ -35,48 +35,33 @@ class EditDeckBottomNavbar extends HookWidget {
       },
     );
 
-    return Surface(
-      style: surfaceStyle.resolve(tokens, const [
-        SurfaceBorder.top,
-        SurfacePadding.none,
-        SurfaceShape.sharp,
-        SurfaceShadow.none,
-      ]),
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: tokens.spaceLayoutGapMd,
-            vertical: tokens.spaceLayoutGapSm,
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    spacing: tokens.spaceLayoutGapSm,
-                    children: [
-                      for (var index = 0; index < formats.length; index++) ...[
-                        Button(
-                          leading: Icon(formats[index].$1),
-                          selected: selection.isSelected(index),
-                          onPressed: () => selection.select(index),
-                          child: Text(
-                            formats[index].$2,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
+    return BottomNavBar(
+      child: Row(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                spacing: tokens.spaceLayoutGapSm,
+                children: [
+                  for (var index = 0; index < formats.length; index++) ...[
+                    Button(
+                      leading: Icon(formats[index].$1),
+                      selected: selection.isSelected(index),
+                      onPressed: () => selection.select(index),
+                      child: Text(
+                        formats[index].$2,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ],
               ),
-              SizedBox(width: tokens.spaceLayoutGapMd),
-            ],
+            ),
           ),
-        ),
+          SizedBox(width: tokens.spaceLayoutGapMd),
+        ],
       ),
     );
   }
