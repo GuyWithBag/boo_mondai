@@ -8,7 +8,6 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         Button,
-        ButtonColor,
         ChangeTrackerController,
         CreateDeckTile,
         Deck,
@@ -28,7 +27,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         ViewDecksHelper,
         ViewDecksLocalController,
         AppTokens,
-        buttonStyle,
         showSnackbar,
         useFilteredSearchBarController,
         useSyncController,
@@ -41,15 +39,16 @@ import 'package:flutter/material.dart'
         Widget,
         Icon,
         Text,
-        SizedBox,
         StatelessWidget,
         VoidCallback,
         WidgetsBinding,
         Icons,
-        CrossAxisAlignment,
         Column,
         ElevatedButton,
-        LayoutBuilder;
+        EdgeInsets,
+        Expanded,
+        LayoutBuilder,
+        SliverGridDelegateWithMaxCrossAxisExtent;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -203,20 +202,21 @@ class ViewDecksLocalPage extends HookWidget {
             onPressed: () => context.push('/view-cards'),
           ),
         ],
+        header: searchBar,
       ),
+      scrollable: false,
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          searchBar,
-          const SizedBox(height: 24),
-          _DeckListBody(
-            error: controller.error,
-            isLoading: controller.isLoading,
-            onRetry: controller.load,
-            onPressed: controller.goToDeck,
-            onCreate: () => controller.createDeck(context),
-            decks: visibleDecks,
-            hasSearchQuery: hasSearchQuery,
+          Expanded(
+            child: _DeckListBody(
+              error: controller.error,
+              isLoading: controller.isLoading,
+              onRetry: controller.load,
+              onPressed: controller.goToDeck,
+              onCreate: () => controller.createDeck(context),
+              decks: visibleDecks,
+              hasSearchQuery: hasSearchQuery,
+            ),
           ),
         ],
       ),
@@ -247,52 +247,67 @@ class _DeckListBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        const spacing = 16.0;
-        final availableWidth = constraints.maxWidth.isFinite
-            ? constraints.maxWidth
-            : 616.0;
-        final tileWidth = ((availableWidth - spacing) / 2)
-            .clamp(0.0, availableWidth)
-            .toDouble();
+    final tokens = context.themeTokens<AppTokens>();
+    const spacing = 16.0;
 
-        return ListingStatesWrapper<Deck>.wrap(
-          isLoading: isLoading,
-          exception: error,
-          items: decks,
-          onRetry: onRetry,
-          skeletonTile: DeckTile(deck: null, width: tileWidth),
-          emptyState: hasSearchQuery
-              ? const EmptyState(
-                  icon: Icons.search_off,
-                  title: 'No decks found',
-                  message: 'Try another search or remove filters',
-                )
-              : EmptyState(
-                  icon: Icons.layers,
-                  title: 'No decks yet',
-                  message: 'Create your first deck to get started',
-                  action: ElevatedButton(
-                    onPressed: onCreate,
-                    child: Text('Create Deck'),
-                  ),
-                ),
-          spacing: spacing,
-          runSpacing: spacing,
-          leadingItem: CreateDeckTile(width: tileWidth, onPressed: onCreate),
-          itemBuilder: (_, _, deck) {
-            return DeckTile(
-              deck: deck,
-              width: tileWidth,
-              state: DeckTileState.defaultView,
-              onPressed: () {
-                onPressed(context, deck);
-              },
-            );
-          },
+    return ListingStatesWrapper<Deck>.grid(
+      isLoading: isLoading,
+      exception: error,
+      items: decks,
+      onRetry: onRetry,
+      skeletonTile: _GridTileMaxWidthConstraints(
+        builder: (width) => DeckTile(deck: null, width: width),
+      ),
+      emptyState: hasSearchQuery
+          ? const EmptyState(
+              icon: Icons.search_off,
+              title: 'No decks found',
+              message: 'Try another search or remove filters',
+            )
+          : EmptyState(
+              icon: Icons.layers,
+              title: 'No decks yet',
+              message: 'Create your first deck to get started',
+              action: ElevatedButton(
+                onPressed: onCreate,
+                child: Text('Create Deck'),
+              ),
+            ),
+      padding: const EdgeInsets.only(bottom: 100),
+      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+        maxCrossAxisExtent: tokens.studyCardWidth,
+        mainAxisSpacing: spacing,
+        crossAxisSpacing: spacing,
+        childAspectRatio: tokens.studyCardAspectRatio,
+      ),
+      leadingItem: _GridTileMaxWidthConstraints(
+        builder: (width) => CreateDeckTile(width: width, onPressed: onCreate),
+      ),
+      itemBuilder: (_, _, deck) {
+        return _GridTileMaxWidthConstraints(
+          builder: (width) => DeckTile(
+            deck: deck,
+            width: width,
+            state: DeckTileState.defaultView,
+            onPressed: () {
+              onPressed(context, deck);
+            },
+          ),
         );
       },
+    );
+  }
+}
+
+class _GridTileMaxWidthConstraints extends StatelessWidget {
+  const _GridTileMaxWidthConstraints({required this.builder});
+
+  final Widget Function(double width) builder;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) => builder(constraints.maxWidth),
     );
   }
 }

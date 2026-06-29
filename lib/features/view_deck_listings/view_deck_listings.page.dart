@@ -22,15 +22,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         Scaffold,
         AppTokens;
 import 'package:flutter/material.dart'
-    show
-        BuildContext,
-        Widget,
-        StatelessWidget,
-        CrossAxisAlignment,
-        Icons,
-        Center,
-        Expanded,
-        Column;
+    show BuildContext, Widget, StatelessWidget, Icons, Center;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -63,51 +55,42 @@ class _ViewDeckListingsView extends HookWidget {
     final visibleDecks = searchController.results;
     final hasSearchQuery = searchController.text.trim().isNotEmpty;
     final tokens = context.themeTokens<AppTokens>();
+    final searchBar = FilteredSearchBar<Deck, DeckSearchFilter>(
+      controller: searchController,
+      filterCodec: const DeckSearchFilterCodec(),
+      searchResults: const DeckSearchResults(),
+      items: controller.decks,
+      placeholder: 'Search public decks',
+      resultLabelBuilder: (deck) => deck.title,
+    );
+
     return Scaffold(
-      appBar: AppBar(title: 'Browse Decks'),
+      appBar: AppBar(title: 'Browse Decks', header: searchBar),
       scrollable: false,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          FilteredSearchBar<Deck, DeckSearchFilter>(
-            controller: searchController,
-            filterCodec: const DeckSearchFilterCodec(),
-            searchResults: const DeckSearchResults(),
-            items: controller.decks,
-            placeholder: 'Search public decks',
-            resultLabelBuilder: (deck) => deck.title,
-          ),
-          Expanded(
-            child: ListingStatesWrapper<Deck>.list(
-              isLoading: controller.isLoading,
-              exception: controller.error,
-              items: visibleDecks,
-              emptyState: hasSearchQuery
-                  ? const EmptyState(
-                      icon: Icons.search_off,
-                      title: 'No decks found',
-                      message: 'Try a different query or remove filters.',
-                    )
-                  : const EmptyState(
-                      icon: Icons.public,
-                      title: 'No public decks yet',
-                      message: 'Published community decks will appear here.',
-                    ),
-              onRetry: controller.loadPublicDecks,
-              skeletonTile: Center(child: DeckListingTile(deck: _skeletonDeck)),
-              separatorHeight: tokens.spaceLayoutGapMd,
-              itemBuilder: (context, _, deck) {
-                return Center(
-                  child: DeckListingTile(
-                    deck: deck,
-                    onPressed: () =>
-                        showViewDeckListingSingleSheet(context, deck),
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
+      body: ListingStatesWrapper<Deck>.list(
+        isLoading: controller.isLoading,
+        exception: controller.error,
+        items: visibleDecks,
+        emptyState: hasSearchQuery
+            ? const EmptyState(
+                icon: Icons.search_off,
+                title: 'No decks found',
+                message: 'Try a different query or remove filters.',
+              )
+            : const EmptyState(
+                icon: Icons.public,
+                title: 'No public decks yet',
+                message: 'Published community decks will appear here.',
+              ),
+        onRetry: controller.loadPublicDecks,
+        skeletonTile: Center(child: DeckListingTile(deck: _skeletonDeck)),
+        separatorHeight: tokens.spaceLayoutGapMd,
+        itemBuilder: (context, _, deck) {
+          return DeckListingTile(
+            deck: deck,
+            onPressed: () => showViewDeckListingSingleSheet(context, deck),
+          );
+        },
       ),
     );
   }

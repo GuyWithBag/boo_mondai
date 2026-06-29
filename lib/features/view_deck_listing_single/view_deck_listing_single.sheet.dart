@@ -2,10 +2,11 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         AppBar,
         AppTokens,
+        BackgroundImageSurface,
         Button,
         ButtonColor,
-        buttonStyle,
         ChangeTrackerController,
+        ChipTone,
         DateHelper,
         Deck,
         DeckDetails,
@@ -13,55 +14,26 @@ import 'package:boo_mondai/lib.barrel.dart'
         DeckProfilesLabel,
         DeckTile,
         DeckTileState,
-        ErrorState,
+        DiscussionSection,
+        ImageHelper,
         MetaLabel,
         Scaffold,
+        SurfaceBorder,
         SurfaceColor,
         SurfacePadding,
+        SurfaceShadow,
         SurfaceShape,
         ViewDeckListingSingleController,
+        ViewDeckListingSingleHelper,
         ViewDeckListingsController,
+        ViewDeckSingleHelper,
         showBottomSheet,
         surfaceStyle,
-        useViewDeckListingSingleController,
-        ViewDeckSingleHelper,
-        ChipTone,
-        SurfaceBorder,
-        SurfaceShadow,
-        DiscussionSection;
-import 'package:flutter/material.dart'
-    show
-        BuildContext,
-        Widget,
-        StatelessWidget,
-        ScrollController,
-        VoidCallback,
-        Icon,
-        Center,
-        SizedBox,
-        Text,
-        WidgetsBinding,
-        ScaffoldMessenger,
-        SnackBar,
-        DraggableScrollableSheet,
-        CrossAxisAlignment,
-        EdgeInsets,
-        Icons,
-        Row,
-        Column,
-        SliverToBoxAdapter,
-        CustomScrollView,
-        Positioned,
-        Stack,
-        Colors,
-        CarouselView,
-        MainAxisAlignment,
-        Clip,
-        Axis;
+        useViewDeckListingSingleController;
+import 'package:flutter/material.dart' hide Scaffold, AppBar, showBottomSheet;
 import 'package:flutter_hooks/flutter_hooks.dart' show HookWidget, useEffect;
 
 import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
-import 'package:go_router/go_router.dart' show GoRouterHelper;
 import 'package:provider/provider.dart'
     show ChangeNotifierProvider, ReadContext;
 import 'package:theme_variants/theme_variants.dart'
@@ -106,7 +78,6 @@ class ViewDeckListingSingleSheet extends HookWidget {
       controller: controller,
       changeReviewController: changeReviewController,
     );
-    final sheetDeck = sheet.deck;
 
     useEffect(() {
       final error = sheet.error;
@@ -123,13 +94,6 @@ class ViewDeckListingSingleSheet extends HookWidget {
       return null;
     }, [sheet.error]);
 
-    if (sheetDeck == null) {
-      return ErrorState(
-        exception: Exception('Online deck not found.'),
-        onRetry: () => context.pop(),
-      );
-    }
-
     return DraggableScrollableSheet(
       expand: false,
       initialChildSize: 1,
@@ -142,22 +106,35 @@ class ViewDeckListingSingleSheet extends HookWidget {
               .copyWith(clipBehavior: Clip.antiAlias),
           child: Scaffold(
             backgroundColor: Colors.transparent,
-            scrollable: false,
-            center: false,
-            shouldConstrainWidth: false,
+            scrollable: true,
+            scrollController: scrollController,
+            isFloatingAppBar: true,
             padding: EdgeInsets.zero,
-            body: _Body(
-              initialMode: initialMode,
-              scrollController: scrollController,
-              controller: sheet,
-              onBackPressed: () {
-                if (context.canPop()) {
-                  context.pop();
-                  return;
-                }
-                context.go('/');
-              },
+            appBar: AppBar(
+              transparentBackground: true,
+              actions: [
+                if (sheet.canPublish) ...[
+                  Button.icon(
+                    icon: Icons.public_outlined,
+                    color: ButtonColor.primary,
+                    tokens: tokens,
+                    onPressed: sheet.publishDraft,
+                  ),
+                ],
+                Button.icon(
+                  icon: sheet.isDownloading
+                      ? Icons.sync
+                      : Icons.cloud_download_outlined,
+                  color: ButtonColor.primary,
+                  tokens: tokens,
+                  onPressed:
+                      sheet.isDownloading || sheet.onDownloadPressed == null
+                      ? null
+                      : sheet.onDownloadPressed,
+                ),
+              ],
             ),
+            body: _Body(initialMode: initialMode, controller: sheet),
           ),
         );
       },
@@ -166,16 +143,9 @@ class ViewDeckListingSingleSheet extends HookWidget {
 }
 
 class _Body extends StatelessWidget {
-  const _Body({
-    required this.scrollController,
-    required this.controller,
-    required this.onBackPressed,
-    required this.initialMode,
-  });
+  const _Body({required this.controller, required this.initialMode});
 
-  final ScrollController scrollController;
   final ViewDeckListingSingleController controller;
-  final VoidCallback onBackPressed;
   final DeckListingSheetMode initialMode;
 
   @override
@@ -184,195 +154,139 @@ class _Body extends StatelessWidget {
     final tokens = context.themeTokens<AppTokens>();
     final headerHeight = 350.h.clamp(300.0, 390.0).toDouble();
     final tags = deck.tags.map((tag) => tag.name).toList(growable: false);
+    final carouselImageUrls = ViewDeckListingSingleHelper.carouselImageUrls(
+      deck,
+    );
     final isEditing = initialMode == DeckListingSheetMode.editor;
 
-    return Stack(
+    return Column(
+      spacing: tokens.spaceLayoutGapMd,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        CustomScrollView(
-          controller: scrollController,
-          slivers: [
-            SliverToBoxAdapter(
-              child: Column(
-                spacing: tokens.spaceLayoutGapMd,
-                crossAxisAlignment: CrossAxisAlignment.start,
+        SizedBox(
+          height: headerHeight,
+          child: CarouselView.weighted(
+            scrollDirection: Axis.horizontal,
+            flexWeights: const <int>[1],
+            children: List<Widget>.generate(carouselImageUrls.length, (
+              int index,
+            ) {
+              return BackgroundImageSurface(
+                image: ImageHelper.getImageProviderFromSource(
+                  carouselImageUrls[index],
+                ),
+              );
+            }),
+          ),
+        ),
+        Surface(
+          style: surfaceStyle.resolve(tokens, const [
+            SurfaceShape.topRounded,
+            SurfaceColor.muted,
+            SurfaceBorder.top,
+            SurfaceShadow.none,
+            SurfacePadding.scaffold,
+          ]),
+          child: Column(
+            spacing: tokens.spaceLayoutGapMd,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                spacing: tokens.spaceLayoutGapSm,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  SizedBox(
-                    height: headerHeight,
-                    child: CarouselView.weighted(
-                      scrollDirection: Axis.horizontal,
-                      flexWeights: const <int>[1],
-                      children: List<Widget>.generate(10, (int index) {
-                        return Center(child: Text('Item $index'));
-                      }),
+                  DeckProfilesLabel(
+                    profileName: deck.userProfile!.username,
+                    profileAvatarUrl: deck.userProfile!.avatarUrl,
+                    sourceProfileAvatarUrl:
+                        ViewDeckSingleHelper.sourceProfileAvatarUrl(deck),
+                    sourceProfileName: ViewDeckSingleHelper.sourceProfileName(
+                      deck,
                     ),
                   ),
-                  Surface(
-                    style: surfaceStyle.resolve(tokens, const [
-                      SurfaceShape.topRounded,
-                      SurfaceColor.muted,
-                      SurfaceBorder.top,
-                      SurfaceShadow.none,
-                      SurfacePadding.scaffold,
-                    ]),
-                    child: Column(
-                      spacing: tokens.spaceLayoutGapMd,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          spacing: tokens.spaceLayoutGapSm,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            DeckProfilesLabel(
-                              profileName: deck.userProfile!.username,
-                              profileAvatarUrl: deck.userProfile!.avatarUrl,
-                              sourceProfileAvatarUrl:
-                                  ViewDeckSingleHelper.sourceProfileAvatarUrl(
-                                    deck,
-                                  ),
-                              sourceProfileName:
-                                  ViewDeckSingleHelper.sourceProfileName(deck),
-                            ),
-                            Row(
-                              spacing: tokens.spaceLayoutGapSm,
-                              children: [
-                                Button(leading: const Icon(Icons.arrow_upward)),
-                                Button(
-                                  leading: const Icon(Icons.arrow_downward),
-                                ),
-                                Button(
-                                  leading: const Icon(Icons.monitor_heart),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            MetaLabel(label: '', icon: Icons.download),
-                            MetaLabel(label: '', icon: Icons.arrow_upward),
-                            MetaLabel(label: '', icon: Icons.arrow_downward),
-                            MetaLabel(label: '', icon: Icons.favorite),
-                          ],
-                        ),
-                        Center(
-                          child: DeckTile(
-                            deck: deck,
-                            state: DeckTileState.spread,
-                            width: 190,
-                          ),
-                        ),
-                        DeckDetails(
-                          title: ViewDeckSingleHelper.title(deck),
-                          shortDescription:
-                              ViewDeckSingleHelper.shortDescription(deck),
-                          longDescription: ViewDeckSingleHelper.longDescription(
-                            deck,
-                          ),
-                          isEditable: isEditing,
-                          tags: tags,
-                          areTagsEditable: deck.isEditable,
-                          tagsPlaceholder: deck.isEditable
-                              ? 'Add tags'
-                              : 'No tags yet',
-                          tagsTone: ChipTone.ghost,
-                          onTitleChanged: controller.updateTitle,
-                          onShortDescriptionChanged:
-                              controller.updateShortDescription,
-                          onLongDescriptionChanged:
-                              controller.updateLongDescription,
-                          metaLabels: Column(
-                            spacing: tokens.spaceLayoutGapSm,
-                            children: [
-                              Row(
-                                spacing: tokens.spaceLayoutGapSm,
-                                children: [
-                                  MetaLabel(
-                                    icon: Icons.new_releases_outlined,
-                                    label:
-                                        'v${deck.version}+${deck.buildNumber}',
-                                    tooltip: 'Deck version and build number',
-                                  ),
-                                  MetaLabel(
-                                    icon: Icons.style_outlined,
-                                    label: '${deck.cardCount} cards',
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                spacing: tokens.spaceLayoutGapSm,
-                                children: [
-                                  MetaLabel(
-                                    icon: Icons.calendar_today_outlined,
-                                    label: DateHelper.formatDateYyyyMmDd(
-                                      deck.createdAt,
-                                    ),
-                                    tooltip:
-                                        'Created ${DateHelper.formatDateYyyyMmDd(deck.createdAt)}',
-                                  ),
-                                  MetaLabel(
-                                    icon: Icons.update_outlined,
-                                    label: DateHelper.formatDateYyyyMmDd(
-                                      deck.updatedAt,
-                                    ),
-                                    tooltip:
-                                        'Updated ${DateHelper.formatDateYyyyMmDd(deck.updatedAt)}',
-                                  ),
-                                  MetaLabel(
-                                    icon: Icons.update_outlined,
-                                    label: DateHelper.formatDateYyyyMmDd(
-                                      deck.updatedAt,
-                                    ),
-                                    tooltip:
-                                        'Published ${DateHelper.formatDateYyyyMmDd(deck.updatedAt)}',
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        // SectionEyebrow('Featured Cards'),
-                        if (deck.isPublished) ...[
-                          DiscussionSection(sheet: controller),
-                        ],
-                      ],
-                    ),
+                  Row(
+                    spacing: tokens.spaceLayoutGapSm,
+                    children: [
+                      Button.icon(icon: Icons.arrow_upward, tokens: tokens),
+                      Button.icon(icon: Icons.arrow_downward, tokens: tokens),
+                      Button.icon(icon: Icons.monitor_heart, tokens: tokens),
+                    ],
                   ),
                 ],
               ),
-            ),
-          ],
-        ),
-        Positioned(
-          top: tokens.spaceLayoutPadding,
-          left: 0,
-          right: 0,
-          child: AppBar(
-            transparentBackground: true,
-            onPop: onBackPressed,
-            actions: [
-              if (controller.canPublish) ...[
-                Button(
-                  leading: const Icon(Icons.public_outlined),
-                  style: buttonStyle.resolve(tokens, const [
-                    ButtonColor.success,
-                  ]),
-                  onPressed: controller.publishDraft,
-                ),
-              ],
-              Button(
-                leading: Icon(
-                  controller.isDownloading
-                      ? Icons.sync
-                      : Icons.cloud_download_outlined,
-                ),
-                style: buttonStyle.resolve(tokens, const [ButtonColor.success]),
-                onPressed:
-                    controller.isDownloading ||
-                        controller.onDownloadPressed == null
-                    ? null
-                    : controller.onDownloadPressed,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  MetaLabel(label: '', icon: Icons.download),
+                  MetaLabel(label: '', icon: Icons.arrow_upward),
+                  MetaLabel(label: '', icon: Icons.arrow_downward),
+                  MetaLabel(label: '', icon: Icons.favorite),
+                ],
               ),
+              Center(
+                child: DeckTile(
+                  deck: deck,
+                  state: DeckTileState.spread,
+                  width: 190,
+                ),
+              ),
+              DeckDetails(
+                title: ViewDeckSingleHelper.title(deck),
+                shortDescription: ViewDeckSingleHelper.shortDescription(deck),
+                longDescription: ViewDeckSingleHelper.longDescription(deck),
+                isEditable: isEditing,
+                tags: tags,
+                areTagsEditable: deck.isEditable,
+                tagsPlaceholder: deck.isEditable ? 'Add tags' : 'No tags yet',
+                tagsTone: ChipTone.ghost,
+                onTitleChanged: controller.updateTitle,
+                onShortDescriptionChanged: controller.updateShortDescription,
+                onLongDescriptionChanged: controller.updateLongDescription,
+                metaLabels: Column(
+                  spacing: tokens.spaceLayoutGapSm,
+                  children: [
+                    Row(
+                      spacing: tokens.spaceLayoutGapSm,
+                      children: [
+                        MetaLabel(
+                          icon: Icons.new_releases_outlined,
+                          label: 'v${deck.version}+${deck.buildNumber}',
+                          tooltip: 'Deck version and build number',
+                        ),
+                        MetaLabel(
+                          icon: Icons.style_outlined,
+                          label: '${deck.cardCount} cards',
+                        ),
+                      ],
+                    ),
+                    Row(
+                      spacing: tokens.spaceLayoutGapSm,
+                      children: [
+                        MetaLabel(
+                          icon: Icons.calendar_today_outlined,
+                          label: DateHelper.formatDateYyyyMmDd(deck.createdAt),
+                          tooltip:
+                              'Created ${DateHelper.formatDateYyyyMmDd(deck.createdAt)}',
+                        ),
+                        MetaLabel(
+                          icon: Icons.update_outlined,
+                          label: DateHelper.formatDateYyyyMmDd(deck.updatedAt),
+                          tooltip:
+                              'Updated ${DateHelper.formatDateYyyyMmDd(deck.updatedAt)}',
+                        ),
+                        MetaLabel(
+                          icon: Icons.update_outlined,
+                          label: DateHelper.formatDateYyyyMmDd(deck.updatedAt),
+                          tooltip:
+                              'Published ${DateHelper.formatDateYyyyMmDd(deck.updatedAt)}',
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              // SectionEyebrow('Featured Cards'),
+              if (deck.isPublished) ...[DiscussionSection(sheet: controller)],
             ],
           ),
         ),

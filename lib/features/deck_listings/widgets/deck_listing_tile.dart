@@ -1,20 +1,22 @@
 import 'package:boo_mondai/core/widgets/background_image_surface.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        Deck,
-        useDeckListingInteractionsController,
         AppTokens,
-        surfaceStyle,
+        Deck,
+        DeckTile,
+        HeaderBadge,
+        ImageHelper,
+        MetaLabel,
+        SurfaceBorder,
+        SurfaceColor,
         SurfacePadding,
         SurfaceShape,
-        DeckTile,
-        MetaLabel,
-        textStyle,
+        TextColor,
         TextSize,
         TextWeight,
-        TextColor,
-        HeaderBadge,
-        ImageHelper;
+        surfaceStyle,
+        textStyle,
+        useDeckListingInteractionsController;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -73,7 +75,7 @@ class DeckListingTile extends HookWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             AspectRatio(
-              aspectRatio: 16 / 8.5,
+              aspectRatio: 16 / 9,
               child: BackgroundImageSurface(
                 image: backgroundImage,
                 style: surfaceStyle.resolve(tokens, const [
@@ -126,109 +128,105 @@ class DeckListingTile extends HookWidget {
                 ),
               ),
             ),
-            DecoratedBox(
-              decoration: BoxDecoration(color: tokens.colorMuted),
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(
-                  tokens.spaceLayoutGapLg,
-                  tokens.spaceLayoutGapSm,
-                  tokens.spaceLayoutGapLg,
-                  tokens.spaceLayoutGapMd,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            title,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: textStyle.resolve(tokens, const [
-                              TextSize.header,
-                              TextWeight.heavy,
-                            ]),
+            Surface(
+              style: surfaceStyle.resolve(tokens, const [
+                SurfaceColor.muted,
+                SurfaceShape.sharp,
+                SurfaceBorder.top,
+              ]),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: textStyle.resolve(tokens, const [
+                            TextSize.header,
+                            TextWeight.heavy,
+                          ]),
+                        ),
+                      ),
+                      SizedBox(width: tokens.spaceLayoutGapMd),
+                      if (listing != null)
+                        _FavoriteButton(
+                          count: _formatCount(
+                            interactionsController.favoritesCount,
+                          ),
+                          isSelected: interactionsController.isFavorite,
+                          onPressed:
+                              interactionsController.isBusy ||
+                                  !interactionsEnabled
+                              ? null
+                              : () {
+                                  interactionsController.toggleFavorite();
+                                },
+                        ),
+                    ],
+                  ),
+                  SizedBox(height: tokens.spaceLayoutGapSm),
+                  Text(
+                    description,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: textStyle.resolve(tokens, const [
+                      TextSize.label,
+                      TextWeight.body,
+                      TextColor.muted,
+                    ]),
+                  ),
+                  SizedBox(height: tokens.spaceLayoutGapMd),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Wrap(
+                          spacing: tokens.spaceLayoutGapMd,
+                          runSpacing: tokens.spaceLayoutGapSm,
+                          children: [
+                            MetaLabel(
+                              icon: Icons.style_outlined,
+                              label: '${deck.cardCount} cards',
+                            ),
+                            MetaLabel(
+                              icon: Icons.new_releases_outlined,
+                              label: 'v$version+${deck.buildNumber}',
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (listing != null) ...[
+                        _InlineMetric(
+                          icon: Icons.keyboard_arrow_down,
+                          label: _formatCount(
+                            interactionsController.downvotesCount,
                           ),
                         ),
                         SizedBox(width: tokens.spaceLayoutGapMd),
-                        if (listing != null)
-                          _FavoriteButton(
-                            count: _formatCount(
-                              interactionsController.favoritesCount,
-                            ),
-                            isSelected: interactionsController.isFavorite,
-                            onPressed:
-                                interactionsController.isBusy ||
-                                    !interactionsEnabled
-                                ? null
-                                : () {
-                                    interactionsController.toggleFavorite();
-                                  },
-                          ),
-                      ],
-                    ),
-                    SizedBox(height: tokens.spaceLayoutGapSm),
-                    Text(
-                      description,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: textStyle.resolve(tokens, const [
-                        TextSize.label,
-                        TextWeight.body,
-                        TextColor.muted,
-                      ]),
-                    ),
-                    SizedBox(height: tokens.spaceLayoutGapMd),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Wrap(
-                            spacing: tokens.spaceLayoutGapMd,
-                            runSpacing: tokens.spaceLayoutGapSm,
-                            children: [
-                              MetaLabel(
-                                icon: Icons.style_outlined,
-                                label: '${deck.cardCount} cards',
-                              ),
-                              MetaLabel(
-                                icon: Icons.new_releases_outlined,
-                                label: 'v$version+${deck.buildNumber}',
-                              ),
-                            ],
+                        _InlineMetric(
+                          icon: Icons.keyboard_arrow_up,
+                          label: _formatCount(
+                            interactionsController.upvotesCount,
                           ),
                         ),
-                        if (listing != null) ...[
-                          _InlineMetric(
-                            icon: Icons.keyboard_arrow_down,
-                            label: _formatCount(
-                              interactionsController.downvotesCount,
-                            ),
-                          ),
-                          SizedBox(width: tokens.spaceLayoutGapMd),
-                          _InlineMetric(
-                            icon: Icons.keyboard_arrow_up,
-                            label: _formatCount(
-                              interactionsController.upvotesCount,
-                            ),
-                          ),
-                        ],
+                      ],
+                    ],
+                  ),
+                  if (tags.isNotEmpty) ...[
+                    SizedBox(height: tokens.spaceLayoutGapMd),
+                    Wrap(
+                      spacing: tokens.spaceLayoutGapSm,
+                      runSpacing: tokens.spaceLayoutGapSm,
+                      children: [
+                        for (final tag in tags) HeaderBadge(label: tag.name),
                       ],
                     ),
-                    if (tags.isNotEmpty) ...[
-                      SizedBox(height: tokens.spaceLayoutGapMd),
-                      Wrap(
-                        spacing: tokens.spaceLayoutGapSm,
-                        runSpacing: tokens.spaceLayoutGapSm,
-                        children: [
-                          for (final tag in tags) HeaderBadge(label: tag.name),
-                        ],
-                      ),
-                    ],
                   ],
-                ),
+                ],
               ),
             ),
           ],

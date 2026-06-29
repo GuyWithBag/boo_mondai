@@ -6,3 +6,4 @@ export 'widgets/widgets.barrel.dart';
 // Other files
 export 'decks.remote.db.dart';
 export 'decks.local.db.dart';
+export 'decks.service.dart';

@@ -21,16 +21,11 @@ abstract final class ViewDeckListingSingleHelper {
   }
 
   static List<String> carouselImageUrls(Deck deck) {
-    final imageUrls = <String>[
-      ...?deck.listing?.featuredImages,
-      ?deck.coverImageUrl,
-    ].map((value) => value.trim()).where((value) => value.isNotEmpty).toSet();
-
-    if (imageUrls.isNotEmpty) {
-      return imageUrls.toList(growable: false);
-    }
-
-    return const [_fallbackImageUrl];
+    return <String>[...?deck.listing?.featuredImages, ?deck.coverImageUrl]
+        .map((value) => value.trim())
+        .where((value) => value.isNotEmpty)
+        .toSet()
+        .toList(growable: false);
   }
 
   static String profileName(Deck deck) {
@@ -60,5 +55,3 @@ abstract final class ViewDeckListingSingleHelper {
     return deck.listing?.forksCount ?? 0;
   }
 }
-
-const _fallbackImageUrl = 'https://i.redd.it/jvu7xrv8qug11.jpg';
