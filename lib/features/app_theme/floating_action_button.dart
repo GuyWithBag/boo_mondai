@@ -1,6 +1,7 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show Button, ButtonColor, ButtonVariant;
+    show AppTokens, Button, ButtonColor, ButtonPadding, ButtonVariant, buttonStyle;
 import 'package:flutter/material.dart';
+import 'package:theme_variants/theme_variants.dart';
 
 class FloatingActionButton extends StatelessWidget {
   const FloatingActionButton({
@@ -16,11 +17,15 @@ class FloatingActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Button.icon(
-      color: ButtonColor.primary,
-      variant: ButtonVariant.elevated,
+    final tokens = context.themeTokens<AppTokens>();
+    return Button(
+      style: buttonStyle.resolve(tokens, const [
+        ButtonColor.primary,
+        ButtonVariant.elevated,
+        ButtonPadding.none,
+      ]),
+      leading: Icon(icon),
       onPressed: onPressed,
-      icon: icon,
     );
   }
 }

@@ -7,7 +7,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         textStyle,
         TextSize,
         TextWeight,
-        Button;
+        Button,
+        buttonStyle;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -118,7 +119,7 @@ class Modal<T> extends StatelessWidget {
                     children: [
                       ...actions.map(
                         (action) => Button(
-                          variants: [action.color],
+                          style: buttonStyle.resolve(tokens, [action.color]),
                           onPressed: () {
                             action.onPressed?.call();
                             Navigator.pop(context, action.value);

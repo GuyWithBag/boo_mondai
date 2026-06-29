@@ -2,8 +2,6 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
         Button,
-        ButtonColor,
-        ButtonVariant,
         CardTemplateFormState,
         MatchPair,
         SectionEyebrow,
@@ -78,9 +76,9 @@ class MatchingTypeEditor extends HookWidget {
             ],
           ),
 
-          Button(
+          Button.dashed(
+            tokens: tokens,
             leading: const Icon(Icons.add),
-            variants: const [ButtonVariant.dashed, ButtonColor.dashed],
             onPressed: editor.addPair,
             child: const Text('Add Pair'),
           ),

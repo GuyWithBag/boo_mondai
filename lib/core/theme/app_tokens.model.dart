@@ -220,9 +220,9 @@ class AppTokens with AppTokensMappable {
   final double spaceScaffoldPadding = 20;
   final double spaceScaffoldPaddingMobileY = 28;
 
-  final double spaceLayoutPadding = 20;
-  final double spaceLayoutPaddingSm = 15;
-  final double spaceLayoutPaddingXsm = 10;
+  final double spaceLayoutPaddingLg = 20;
+  final double spaceLayoutPadding = 15;
+  final double spaceLayoutPaddingSm = 10;
   final double spaceLayoutGapLg = 24;
   final double spaceLayoutGapMd = 18;
   final double spaceLayoutGapSm = 8;

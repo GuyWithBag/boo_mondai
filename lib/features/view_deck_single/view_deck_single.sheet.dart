@@ -3,6 +3,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         Button,
         ButtonColor,
+        buttonStyle,
         ChipTone,
         DeckDetails,
         Deck,
@@ -20,7 +21,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         surfaceStyle,
         useViewDeckSingleSheet,
         Scaffold,
-        CollapsingHeaderItem,
         ViewDeckSingleBottomNavbar,
         BackgroundImageSurface,
         SurfaceBorder,
@@ -30,35 +30,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         DateHelper,
         ImageHelper,
         showBottomSheet;
-import 'package:flutter/material.dart'
-    show
-        BuildContext,
-        Widget,
-        StatelessWidget,
-        ScrollController,
-        VoidCallback,
-        Chip,
-        Colors,
-        Clip,
-        EdgeInsets,
-        DraggableScrollableSheet,
-        Positioned,
-        SizedBox,
-        Column,
-        Stack,
-        SliverToBoxAdapter,
-        CustomScrollView,
-        Alignment,
-        Icons,
-        WrapAlignment,
-        Icon,
-        Text,
-        ChoiceChip,
-        ChipTheme,
-        Wrap,
-        CrossAxisAlignment,
-        MainAxisAlignment,
-        Row;
+import 'package:flutter/material.dart' hide AppBar, Scaffold, showBottomSheet;
 import 'package:flutter_hooks/flutter_hooks.dart' show HookWidget;
 import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
 import 'package:go_router/go_router.dart' show GoRouterHelper;
@@ -88,6 +60,9 @@ class ViewDeckSingleSheet extends HookWidget {
       controller: decksController,
     );
     final sheetDeck = sheet.deck;
+    final publishChipStyle = chipStyle.resolve(tokens, [
+      deck.isPublished ? ChipTone.filled : ChipTone.hard,
+    ]);
 
     return DraggableScrollableSheet(
       expand: false,
@@ -104,22 +79,53 @@ class ViewDeckSingleSheet extends HookWidget {
             bottomNavigationBar: ViewDeckSingleBottomNavbar(deck: sheetDeck),
             scrollable: false,
             center: false,
-            constrainWidth: false,
-            padding: EdgeInsets.zero,
-            body: _Body(
-              scrollController: scrollController,
-              controller: sheet,
-              onBackPressed: () {
-                if (context.canPop()) {
-                  context.pop();
-                  return;
-                }
-                context.go('/');
-              },
-              onEditPressed: sheetDeck.isEditable
-                  ? () => context.push('/decks-local/${sheetDeck.id}/edit')
-                  : null,
+            shouldConstrainWidth: false,
+            haveBottomNavbarBottomPadding: false,
+            isFloatingAppBar: true,
+            appBar: AppBar(
+              transparentBackground: true,
+              actions: [
+                Button.icon(
+                  tokens: tokens,
+                  icon: Icons.edit,
+                  onPressed: sheetDeck.isEditable
+                      ? () => context.push('/decks-local/${sheetDeck.id}/edit')
+                      : null,
+                ),
+                Button.icon(
+                  tokens: tokens,
+                  icon: Icons.delete_outline,
+                  color: ButtonColor.error,
+                  onPressed: sheet.deleteDeck,
+                ),
+              ],
+              bottom: Wrap(
+                alignment: WrapAlignment.end,
+                spacing: tokens.spaceLayoutGapSm,
+                runSpacing: tokens.spaceLayoutGapSm,
+                children: [
+                  if (deck.isPremade) const HeaderBadge(label: 'Premade'),
+                  ChipTheme(
+                    data: publishChipStyle,
+                    child: ChoiceChip(
+                      avatar: Icon(
+                        deck.isPublished
+                            ? Icons.public_outlined
+                            : Icons.public_off_outlined,
+                      ),
+                      label: Text(deck.isPublished ? 'Published' : 'Draft'),
+                      selected: deck.isPublished,
+                      onSelected: sheet.isSavingPublishState
+                          ? null
+                          : sheet.setPublished,
+                    ),
+                  ),
+                  if (!deck.isEditable) const Chip(label: Text('Locked')),
+                ],
+              ),
             ),
+            padding: EdgeInsets.zero,
+            body: _Body(scrollController: scrollController, sheet: sheet),
           ),
         );
       },
@@ -128,111 +134,124 @@ class ViewDeckSingleSheet extends HookWidget {
 }
 
 class _Body extends StatelessWidget {
-  const _Body({
-    required this.scrollController,
-    required this.controller,
-    required this.onBackPressed,
-    required this.onEditPressed,
-  });
+  const _Body({required this.scrollController, required this.sheet});
 
   final ScrollController scrollController;
-  final ViewDeckSingleSheetController controller;
-  final VoidCallback onBackPressed;
-  final VoidCallback? onEditPressed;
+  final ViewDeckSingleSheetController sheet;
 
   @override
   Widget build(BuildContext context) {
-    final deck = controller.deck;
+    final deck = sheet.deck;
     final tokens = context.themeTokens<AppTokens>();
-    final publishChipStyle = chipStyle.resolve(tokens, [
-      deck.isPublished ? ChipTone.filled : ChipTone.hard,
-    ]);
+    // final publishChipStyle = chipStyle.resolve(tokens, [
+    //   deck.isPublished ? ChipTone.filled : ChipTone.hard,
+    // ]);
 
     final deckWidth = 160.w;
     final headerHeight = 350.h.clamp(300.0, 390.0).toDouble();
 
+    // return Stack(
+    //   clipBehavior: Clip.none,
+    //   children: [
+    // Positioned(
+    //   left: 0,
+    //   right: 0,
+    //   top: 0,
+    //   height: headerHeight + tokens.radiusSurfaceLg,
+    //   child: BackgroundImageSurface(
+    //     image: ImageHelper.getImageProviderFromSource(deck.coverImageUrl),
+    //     onImagePicked: deck.isEditable ? sheet.updateCoverImage : null,
+    //   ),
+    // ),
+
+    // SingleChildScrollView(
+    //   sheet: scrollController,
+    //   child: Column(
+    //     children: [
+    //       SizedBox(height: headerHeight),
+    //       _BodySubSection(
+    //         sheet: sheet,
+    //         deckWidth: deckWidth,
+    //         scrollController: scrollController,
+    //         collapseDistance: headerHeight * 0.55,
+    //       ),
+    //     ],
+    //   ),
+    // ),
+    // Positioned(
+    //   left: 0,
+    //   right: 0,
+    //   top: 0,
+    //   child: AppBar(
+    //     transparentBackground: true,
+    //     actions: [
+    //       Button.icon(
+    //         tokens: tokens,
+    //         icon: Icons.edit,
+    //         onPressed: onEditPressed,
+    //       ),
+    //       Button.icon(
+    //         tokens: tokens,
+    //         icon: Icons.delete_outline,
+    //         color: ButtonColor.error,
+    //         onPressed: sheet.deleteDeck,
+    //       ),
+    //     ],
+    //     bottom: Wrap(
+    //       alignment: WrapAlignment.end,
+    //       spacing: tokens.spaceLayoutGapSm,
+    //       runSpacing: tokens.spaceLayoutGapSm,
+    //       children: [
+    //         if (deck.isPremade) const HeaderBadge(label: 'Premade'),
+    //         ChipTheme(
+    //           data: publishChipStyle,
+    //           child: ChoiceChip(
+    //             avatar: Icon(
+    //               deck.isPublished
+    //                   ? Icons.public_outlined
+    //                   : Icons.public_off_outlined,
+    //             ),
+    //             label: Text(deck.isPublished ? 'Published' : 'Draft'),
+    //             selected: deck.isPublished,
+    //             onSelected: sheet.isSavingPublishState
+    //                 ? null
+    //                 : sheet.setPublished,
+    //           ),
+    //         ),
+    //         if (!deck.isEditable) const Chip(label: Text('Locked')),
+    //       ],
+    //     ),
+    //   ),
+    // ),
+    // ],
+    // );
+
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        CustomScrollView(
-          controller: scrollController,
-          slivers: [
-            SliverToBoxAdapter(
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    top: 0,
-                    height: headerHeight + tokens.radiusSurfaceLg,
-                    child: BackgroundImageSurface(
-                      image: ImageHelper.getImageProviderFromSource(
-                        deck.coverImageUrl,
-                      ),
-                      onImagePicked: deck.isEditable
-                          ? controller.updateCoverImage
-                          : null,
-                    ),
-                  ),
-                  Column(
-                    children: [
-                      SizedBox(height: headerHeight),
-                      _BodySubSection(
-                        controller: controller,
-                        deckWidth: deckWidth,
-                        scrollController: scrollController,
-                        collapseDistance: headerHeight * 0.55,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
         Positioned(
           left: 0,
           right: 0,
           top: 0,
-          child: AppBar(
-            transparentBackground: true,
-            onPop: onBackPressed,
-            collapsible: true,
-            scrollController: scrollController,
-            collapseDistance: headerHeight * 0.55,
-            actions: [
-              Button.icon(icon: Icons.edit, onPressed: onEditPressed),
-              Button.icon(
-                icon: Icons.delete_outline,
-                color: ButtonColor.error,
-                onPressed: controller.deleteDeck,
+          height: headerHeight + tokens.radiusSurfaceLg,
+          child: BackgroundImageSurface(
+            image: ImageHelper.getImageProviderFromSource(deck.coverImageUrl),
+            onImagePicked: deck.isEditable ? sheet.updateCoverImage : null,
+          ),
+        ),
+
+        SingleChildScrollView(
+          controller: scrollController,
+          child: Column(
+            children: [
+              SizedBox(height: headerHeight),
+              _BodySubSection(
+                sheet: sheet,
+                deckWidth: deckWidth,
+                scrollController: scrollController,
+                collapseDistance: headerHeight * 0.55,
               ),
             ],
-            bottom: Wrap(
-              alignment: WrapAlignment.end,
-              spacing: tokens.spaceLayoutGapSm,
-              runSpacing: tokens.spaceLayoutGapSm,
-              children: [
-                if (deck.isPremade) const HeaderBadge(label: 'Premade'),
-                ChipTheme(
-                  data: publishChipStyle,
-                  child: ChoiceChip(
-                    avatar: Icon(
-                      deck.isPublished
-                          ? Icons.public_outlined
-                          : Icons.public_off_outlined,
-                    ),
-                    label: Text(deck.isPublished ? 'Published' : 'Draft'),
-                    selected: deck.isPublished,
-                    onSelected: controller.isSavingPublishState
-                        ? null
-                        : controller.setPublished,
-                  ),
-                ),
-                if (!deck.isEditable) const Chip(label: Text('Locked')),
-              ],
-            ),
           ),
         ),
       ],
@@ -242,20 +261,20 @@ class _Body extends StatelessWidget {
 
 class _BodySubSection extends StatelessWidget {
   const _BodySubSection({
-    required this.controller,
+    required this.sheet,
     required this.deckWidth,
     required this.scrollController,
     required this.collapseDistance,
   });
 
-  final ViewDeckSingleSheetController controller;
+  final ViewDeckSingleSheetController sheet;
   final double deckWidth;
   final ScrollController scrollController;
   final double collapseDistance;
 
   @override
   Widget build(BuildContext context) {
-    final deck = controller.deck;
+    final deck = sheet.deck;
     final tags = deck.tags.map((tag) => tag.name).toList(growable: false);
     final tokens = context.themeTokens<AppTokens>();
 
@@ -295,11 +314,11 @@ class _BodySubSection extends StatelessWidget {
                   title: ViewDeckSingleHelper.title(deck),
                   shortDescription: ViewDeckSingleHelper.shortDescription(deck),
                   longDescription: ViewDeckSingleHelper.longDescription(deck),
-                  onTitleChanged: controller.updateTitle,
-                  onShortDescriptionChanged: controller.updateShortDescription,
-                  onLongDescriptionChanged: controller.updateLongDescription,
+                  onTitleChanged: sheet.updateTitle,
+                  onShortDescriptionChanged: sheet.updateShortDescription,
+                  onLongDescriptionChanged: sheet.updateLongDescription,
                   tags: tags,
-                  onTagsChanged: controller.updateTags,
+                  onTagsChanged: sheet.updateTags,
                   areTagsEditable: deck.isEditable,
                   tagsPlaceholder: deck.isEditable ? 'Add tags' : 'No tags yet',
                   tagsTone: ChipTone.ghost,
@@ -326,50 +345,40 @@ class _BodySubSection extends StatelessWidget {
             top:
                 -(deckWidth / tokens.studyCardAspectRatio) +
                 (tokens.radiusSurfaceLg - tokens.spaceLayoutPadding),
-            child: CollapsingHeaderItem(
-              scrollController: scrollController,
-              collapseDistance: collapseDistance,
-              alignment: Alignment.bottomLeft,
-              child: DeckTile(
-                deck: deck,
-                width: deckWidth,
-                state: DeckTileState.bare,
-                isImageEditable: deck.isEditable,
-                onImagePicked: controller.updateCoverImage,
-              ),
+            child: DeckTile(
+              deck: deck,
+              width: deckWidth,
+              state: DeckTileState.bare,
+              isImageEditable: deck.isEditable,
+              onImagePicked: sheet.updateCoverImage,
             ),
           ),
           Positioned(
             right: tokens.spaceLayoutPadding,
             top: -tokens.radiusSurfaceLg - tokens.spaceLayoutPadding,
-            child: CollapsingHeaderItem(
-              scrollController: scrollController,
-              collapseDistance: collapseDistance,
-              alignment: Alignment.bottomLeft,
-              child: Column(
-                spacing: tokens.spaceLayoutGapSm,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  MetaLabel(
-                    icon: Icons.new_releases_outlined,
-                    label: 'v${deck.version}+${deck.buildNumber}',
-                    tooltip: 'Deck version and build number',
-                  ),
-                  MetaLabel(
-                    icon: Icons.calendar_today_outlined,
-                    label: DateHelper.formatDateYyyyMmDd(deck.createdAt),
-                    tooltip:
-                        'Created ${DateHelper.formatDateYyyyMmDd(deck.createdAt)}',
-                  ),
-                  MetaLabel(
-                    icon: Icons.update_outlined,
-                    label: DateHelper.formatDateYyyyMmDd(deck.updatedAt),
-                    tooltip:
-                        'Updated ${DateHelper.formatDateYyyyMmDd(deck.updatedAt)}',
-                  ),
-                ],
-              ),
+            child: Column(
+              spacing: tokens.spaceLayoutGapSm,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                MetaLabel(
+                  icon: Icons.new_releases_outlined,
+                  label: 'v${deck.version}+${deck.buildNumber}',
+                  tooltip: 'Deck version and build number',
+                ),
+                MetaLabel(
+                  icon: Icons.calendar_today_outlined,
+                  label: DateHelper.formatDateYyyyMmDd(deck.createdAt),
+                  tooltip:
+                      'Created ${DateHelper.formatDateYyyyMmDd(deck.createdAt)}',
+                ),
+                MetaLabel(
+                  icon: Icons.update_outlined,
+                  label: DateHelper.formatDateYyyyMmDd(deck.updatedAt),
+                  tooltip:
+                      'Updated ${DateHelper.formatDateYyyyMmDd(deck.updatedAt)}',
+                ),
+              ],
             ),
           ),
         ],

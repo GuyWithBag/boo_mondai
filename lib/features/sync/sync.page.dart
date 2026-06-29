@@ -9,7 +9,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         ChangeTrackerStatus,
         ProgressBar,
         ChangeTrackerSummaryChips,
-        Button,
+        Button, buttonStyle,
         ButtonColor;
 import 'package:flutter/material.dart'
     show
@@ -184,10 +184,10 @@ class SyncPage extends StatelessWidget {
                         SizedBox(width: tokens.spaceLayoutGapSm.w),
                         Expanded(
                           child: Button(
-                            variants: const [
+                            style: buttonStyle.resolve(tokens, const [
                               ButtonColor.primary,
                               ButtonColor.primary,
-                            ],
+                            ]),
                             onPressed: onApply,
                             child: const Text('APPLY'),
                           ),

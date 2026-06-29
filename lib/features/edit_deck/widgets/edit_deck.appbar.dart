@@ -4,24 +4,28 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         Button,
         ButtonColor,
+        ButtonPadding,
+        buttonStyle,
         HeaderBadge,
         MarkdownText,
         MarkdownTextMode,
         MetaLabel,
         TextFieldFrame,
         TextFieldSize,
-        TextFieldColor;
+        ButtonSize;
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart'
     show
         TextEditingController,
         StatelessWidget,
-        PreferredSizeWidget,
-        Size,
         Widget,
         BuildContext,
         CrossAxisAlignment,
         MainAxisAlignment,
         Icons,
+        SizedBox,
+        CircularProgressIndicator,
+        Icon,
         Column,
         Row;
 import 'package:theme_variants/theme_variants.dart';
@@ -37,41 +41,35 @@ class EditDeckAppbar extends StatelessWidget implements PreferredSizeWidget {
   final TextEditingController titleController;
   final Future<void> Function() onSave;
   final bool isSaving;
-
-  static const _toolbarHeight = 88.0;
+  final double height = 130;
 
   @override
-  Size get preferredSize => const Size.fromHeight(_toolbarHeight);
+  // TODO: implement preferredSize
+  Size get preferredSize => Size(0, height);
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
 
     return AppBar(
-      // subSection: Row(
-      //   mainAxisAlignment: MainAxisAlignment.end,
-      //   children: [
-      //     Button(
-      //       variants: const [ButtonColor.primary],
-      //       onPressed: isSaving ? null : onSave,
-      //       child: isSaving
-      //           ? const SizedBox.square(
-      //               dimension: 18,
-      //               child: CircularProgressIndicator(strokeWidth: 2),
-      //             )
-      //           : const Text('Save'),
-      //     ),
-      //   ],
-      // ),
+      height: height,
       actions: [
-        Button.icon(
-          color: ButtonColor.primary,
+        Button(
+          style: buttonStyle.resolve(tokens, const [
+            ButtonColor.primary,
+            ButtonSize.icon,
+            ButtonPadding.none,
+          ]),
           onPressed: isSaving ? null : onSave,
-          icon: Icons.save,
+          leading: isSaving
+              ? const SizedBox.square(
+                  dimension: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Icon(Icons.save),
         ),
       ],
       child: Column(
-        // spacing: tokens.spaceLayoutGapSm,
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

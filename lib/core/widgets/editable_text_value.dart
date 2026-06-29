@@ -3,6 +3,7 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
         Button,
+        buttonStyle,
         ButtonVariant,
         ButtonColor,
         MarkdownText,
@@ -24,6 +25,7 @@ import 'package:flutter/material.dart'
         TextInputAction,
         MainAxisAlignment,
         Icons,
+        Icon,
         Column,
         TextOverflow,
         Text,
@@ -146,23 +148,25 @@ class EditableTextValue extends HookWidget {
               variants: fieldVariants,
             ),
           SizedBox(height: tokens.spaceLayoutGapSm),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Button.icon(
-                icon: Icons.close,
-                variant: ButtonVariant.flat,
-                onPressed: isSaving.value ? null : cancel,
-              ),
-              SizedBox(width: tokens.spaceLayoutGapSm),
-              Button.icon(
-                icon: Icons.check,
-                color: ButtonColor.success,
-                variant: ButtonVariant.flat,
-                onPressed: isSaving.value ? null : save,
-              ),
-            ],
-          ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Button(
+                  style: buttonStyle.resolve(tokens, const [ButtonVariant.flat]),
+                  leading: const Icon(Icons.close),
+                  onPressed: isSaving.value ? null : cancel,
+                ),
+                SizedBox(width: tokens.spaceLayoutGapSm),
+                Button(
+                  style: buttonStyle.resolve(
+                    tokens,
+                    const [ButtonColor.success, ButtonVariant.flat],
+                  ),
+                  leading: const Icon(Icons.check),
+                  onPressed: isSaving.value ? null : save,
+                ),
+              ],
+            ),
         ],
       );
     }
@@ -187,7 +191,12 @@ class EditableTextValue extends HookWidget {
       mainAxisAlignment: TextHelper.getMainAxisAlignmentForTextAlign(textAlign),
       children: [
         Flexible(child: valueWidget),
-        if (enabled) ...[Button.iconSmall(icon: Icons.edit, onPressed: edit)],
+        if (enabled)
+          Button(
+            style: buttonStyle.resolve(tokens, const [ButtonVariant.flat]),
+            leading: const Icon(Icons.edit),
+            onPressed: edit,
+          ),
       ],
     );
   }

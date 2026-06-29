@@ -1,3 +1,4 @@
+import 'package:boo_mondai/core/core.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         FlashcardTemplate,
@@ -10,6 +11,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         PhysicalCard;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class FlashcardCard extends HookWidget {
   const FlashcardCard({
@@ -27,9 +29,9 @@ class FlashcardCard extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final physicalCardController = useMemoized(
-      () => PhysicalCardController(context, width: 460),
-      const [],
+    final physicalCardController = usePhysicalCardController(
+      context,
+      width: 300.w,
     );
 
     useEffect(() {

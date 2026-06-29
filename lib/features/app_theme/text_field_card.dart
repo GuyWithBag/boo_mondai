@@ -73,12 +73,18 @@ class TextFieldCard extends StatelessWidget {
                 SizedBox(height: tokens.spaceLayoutGapMd),
               ],
             ),
-            if (hasAttachments)
+              if (hasAttachments)
               Row(
                 children: [
-                  Button.icon(onPressed: () {}, icon: Icons.image_outlined),
+                  Button(
+                    leading: const Icon(Icons.image_outlined),
+                    onPressed: () {},
+                  ),
                   SizedBox(width: tokens.spaceLayoutGapSm),
-                  Button.icon(onPressed: () {}, icon: Icons.mic),
+                  Button(
+                    leading: const Icon(Icons.mic),
+                    onPressed: () {},
+                  ),
                 ],
               ),
           ],

@@ -118,11 +118,17 @@ class DownloadsTile extends StatelessWidget {
             // Actions
             if (_isActive) ...[
               if (_isPaused)
-                Button.icon(icon: Icons.play_arrow_rounded, onPressed: onResume)
+                Button(
+                  leading: const Icon(Icons.play_arrow_rounded),
+                  onPressed: onResume,
+                )
               else
-                Button.icon(icon: Icons.pause_rounded, onPressed: onPause),
-              Button.icon(
-                icon: Icons.delete_outline_rounded,
+                Button(
+                  leading: const Icon(Icons.pause_rounded),
+                  onPressed: onPause,
+                ),
+              Button(
+                leading: const Icon(Icons.delete_outline_rounded),
                 onPressed: onCancel,
               ),
             ] else if (_isCompleted && localDeck != null) ...[
@@ -130,13 +136,13 @@ class DownloadsTile extends StatelessWidget {
                 onPressed: () => showViewDeckSingleSheet(context, localDeck!),
                 child: const Text('VIEW DECK'),
               ),
-              Button.icon(
-                icon: Icons.delete_outline_rounded,
+              Button(
+                leading: const Icon(Icons.delete_outline_rounded),
                 onPressed: onDismiss,
               ),
             ] else if (_isFailed) ...[
-              Button.icon(
-                icon: Icons.delete_outline_rounded,
+              Button(
+                leading: const Icon(Icons.delete_outline_rounded),
                 onPressed: onDismiss,
               ),
             ],

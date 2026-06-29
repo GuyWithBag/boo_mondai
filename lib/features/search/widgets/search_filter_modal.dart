@@ -2,7 +2,7 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         ModalTone,
         AppTokens,
-        Button,
+        Button, buttonStyle,
         ButtonColor,
         SearchFilter,
         SearchFilterCodec,
@@ -103,7 +103,7 @@ class _SearchFilterBody<TFilter extends SearchFilter> extends HookWidget {
             ),
             SizedBox(width: tokens.spaceLayoutGapSm),
             Button(
-              variants: const [ButtonColor.primary],
+              style: buttonStyle.resolve(tokens, const [ButtonColor.primary]),
               onPressed: () => Navigator.pop(context, filter.value),
               child: const Text('Apply'),
             ),

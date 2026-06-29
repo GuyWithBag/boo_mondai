@@ -95,7 +95,6 @@ class DeckDetails extends StatelessWidget {
           style: surfaceStyle.resolve(tokens, const [
             SurfaceBorder.none,
             SurfaceShape.roundedXsm,
-            SurfacePadding.sm,
           ]),
           child: Column(
             spacing: tokens.spaceLayoutGapSm,

@@ -1,5 +1,5 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, LocalDB, DrillService, ButtonColor, Button, Deck;
+    show AppTokens, LocalDB, DrillService, ButtonColor, Button, buttonStyle, Deck;
 import 'package:flutter/material.dart'
     show
         StatelessWidget,
@@ -54,7 +54,7 @@ class ViewDeckSingleBottomNavbar extends StatelessWidget {
                   ? '$eligibleCards.length cards ready'
                   : 'Completed',
               child: Button(
-                variants: const [ButtonColor.primary],
+                style: buttonStyle.resolve(tokens, const [ButtonColor.primary]),
                 onPressed: canDrill
                     ? () => context.push('/drill/${deck.id}/session')
                     : null,

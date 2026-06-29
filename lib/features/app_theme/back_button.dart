@@ -14,8 +14,8 @@ class BackButton extends StatelessWidget {
         horizontal: horizontalPadding,
         vertical: verticalPadding + 4,
       ),
-      child: Button.icon(
-        icon: Icons.arrow_back,
+      child: Button(
+        leading: const Icon(Icons.arrow_back),
         onPressed: () {
           if (context.canPop()) {
             context.pop();

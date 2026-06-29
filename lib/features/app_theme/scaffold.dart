@@ -1,61 +1,22 @@
+import 'package:boo_mondai/core/theme/breakpoints.dart';
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, Breakpoints, Button, MainController;
-import 'package:flutter/material.dart'
-    show
-        BuildContext,
-        Widget,
-        Color,
-        EdgeInsetsGeometry,
-        UserScrollNotification,
-        VerticalDivider,
-        Offset,
-        VoidCallback,
-        StatelessWidget,
-        ValueKey,
-        SizedBox,
-        EdgeInsets,
-        Padding,
-        ClipRect,
-        BoxConstraints,
-        ConstrainedBox,
-        Center,
-        SingleChildScrollView,
-        Expanded,
-        Column,
-        LayoutBuilder,
-        MediaQuery,
-        NotificationListener,
-        Row,
-        Positioned,
-        Curves,
-        AnimatedSlide,
-        AnimatedOpacity,
-        IgnorePointer,
-        Stack,
-        MainAxisSize,
-        Icons,
-        KeyedSubtree,
-        CurvedAnimation,
-        Alignment,
-        Tween,
-        SlideTransition,
-        SizeTransition,
-        AnimatedSwitcher,
-        SafeArea;
+    show AppTokens, Button, ButtonColor, ButtonVariant, MainController;
+import 'package:flutter/material.dart' hide Scaffold;
 import 'package:flutter/material.dart' as material show Scaffold;
 import 'package:flutter/rendering.dart' show ScrollDirection;
-import 'package:flutter_hooks/flutter_hooks.dart' show useState, HookWidget;
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart' show WatchContext;
-import 'package:theme_variants/theme_variants.dart' show ThemeVariantsContext;
-
-typedef MScaffold = Scaffold;
+import 'package:theme_variants/theme_variants.dart';
 
 class Scaffold extends HookWidget {
   const Scaffold({
     super.key,
     required this.body,
     this.appBar,
+    this.appBarHeight = 130,
     this.sidebar,
+    this.sidebarWidth = 280,
     this.bottomNavigationBar,
     this.backgroundColor,
     this.maxWidth,
@@ -65,25 +26,34 @@ class Scaffold extends HookWidget {
     this.hideBottomNavigationBarOnScroll = false,
     this.hideFloatingActionButtonOnScroll = false,
     this.onlyShowFloatingActionButtonsWhenTyping = false,
-    this.hideFloatingActionButtonsWhenTyping = false,
+    this.hideFloatingActionButtonsWhenTyping = true,
     this.scrollable = true,
     this.safeArea = true,
-    this.center = true,
-    this.constrainWidth = true,
+    this.center = false,
+    this.shouldConstrainWidth = false,
     this.floatingActionButton,
     this.floatingSidebar = false,
     this.floatingSidebarInitiallyOpen = false,
     this.haveSidebarOpenButton = false,
+    this.haveBottomNavbarBottomPadding = true,
+    this.showBottomNavbar = true,
+    this.showAppbar = true,
+    this.isFloatingAppBar = false,
   }) : assert(
          !onlyShowFloatingActionButtonsWhenTyping ||
              !hideFloatingActionButtonsWhenTyping,
          'onlyShowFloatingActionButtonsWhenTyping and '
          'hideFloatingActionButtonsWhenTyping cannot both be true.',
-       );
+       ),
+       assert(appBarHeight >= 0, 'appBarHeight cannot be negative.'),
+       assert(sidebarWidth >= 0, 'sidebarWidth cannot be negative.');
 
   final Widget body;
-  final Widget? appBar;
+  final PreferredSizeWidget? appBar;
+  final bool isFloatingAppBar;
+  final double appBarHeight;
   final Widget? sidebar;
+  final double sidebarWidth;
   final Widget? bottomNavigationBar;
   final Color? backgroundColor;
   final double? maxWidth;
@@ -97,352 +67,320 @@ class Scaffold extends HookWidget {
   final bool scrollable;
   final bool safeArea;
   final bool center;
-  final bool constrainWidth;
+  final bool shouldConstrainWidth;
   final Widget? floatingActionButton;
+  final bool showBottomNavbar;
+  final bool showAppbar;
   final bool floatingSidebar;
   final bool floatingSidebarInitiallyOpen;
   final bool haveSidebarOpenButton;
+  final bool haveBottomNavbarBottomPadding;
+
+  static const _animationDuration = Duration(milliseconds: 220);
+  static const _fabMargin = 20.0;
 
   @override
   Widget build(BuildContext context) {
-    final isFloatingSidebarOpen = useState(floatingSidebarInitiallyOpen);
-    final isAppBarVisible = useState(true);
-    final isFloatingActionButtonVisible = useState(true);
-    final isTyping = MediaQuery.viewInsetsOf(context).bottom > 0;
     final tokens = context.themeTokens<AppTokens>();
-    final effectiveMaxWidth = maxWidth ?? tokens.spaceScaffoldMaxWidth;
-    final effectivePadding =
+    final mediaQuery = MediaQuery.of(context);
+    final viewportSize = mediaQuery.size;
+    final isMobile = Breakpoints.isMobile(viewportSize);
+    final keyboardVisible = mediaQuery.viewInsets.bottom > 0;
+    final mainController = context.watch<MainController>();
+
+    final shouldHaveAppbar = appBar != null && showAppbar && !isFloatingAppBar;
+    final shouldHaveFloatingAppbar =
+        appBar != null && showAppbar && isFloatingAppBar;
+    final shouldHaveBottomNavbar =
+        !hideNavigation &&
+        isMobile &&
+        (bottomNavigationBar != null) &&
+        showBottomNavbar;
+
+    final isBottomNavbarVisible = useState(shouldHaveBottomNavbar);
+    final isAppbarVisible = useState(shouldHaveAppbar);
+
+    final isSidebarVisible = useState(floatingSidebarInitiallyOpen);
+
+    bool handleScrollNotification(ScrollNotification notification) {
+      if (notification.metrics.axis != Axis.vertical) {
+        return false;
+      }
+
+      if (notification.metrics.pixels <= 0) {
+        if (hideBottomNavigationBarOnScroll) isBottomNavbarVisible.value = true;
+        if (hideAppBarOnScroll) isAppbarVisible.value = true;
+        return false;
+      }
+
+      final direction = switch (notification) {
+        UserScrollNotification(:final direction) => direction,
+        _ => ScrollDirection.idle,
+      };
+
+      if (direction == ScrollDirection.idle) return false;
+
+      if (hideBottomNavigationBarOnScroll) {
+        isBottomNavbarVisible.value = direction == ScrollDirection.forward;
+      }
+      if (hideAppBarOnScroll) {
+        isAppbarVisible.value = direction == ScrollDirection.forward;
+      }
+      return false;
+    }
+
+    final showDockedSidebar =
+        !hideNavigation && !isMobile && sidebar != null && !floatingSidebar;
+    final showFloatingSidebar =
+        !hideNavigation &&
+        sidebar != null &&
+        (floatingSidebar || isMobile || haveSidebarOpenButton);
+    final bottomNavigationBarHeight = mainController.bottomNavbarHeight;
+    // final effectiveBottomNavigationHeight = shouldHaveBottomNavbar
+    //     ? bottomNavigationBarHeight
+    //     : 0.0;
+    final effectiveSidebarWidth = showDockedSidebar ? sidebarWidth : 0.0;
+
+    final contentPadding =
         padding ??
         EdgeInsets.symmetric(
           horizontal: tokens.spaceScaffoldPadding,
           vertical: tokens.spaceScaffoldPaddingMobileY,
         );
 
-    Widget content = Padding(padding: effectivePadding, child: body);
+    final paddedBody = Padding(padding: contentPadding, child: body);
 
-    if (constrainWidth) {
-      content = ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: effectiveMaxWidth),
+    Widget content = paddedBody;
+
+    if (safeArea) {
+      content = SafeArea(
+        top: shouldHaveAppbar,
+        bottom: shouldHaveBottomNavbar,
         child: content,
       );
     }
 
-    if (center) {
-      content = Center(child: content);
-    }
-
-    // if (safeArea) {
-    //   content = SafeArea(child: content);
-    // }
+    content = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: scrollable ? MainAxisSize.min : MainAxisSize.max,
+      children: [
+        if (shouldHaveAppbar) SizedBox(height: appBar!.preferredSize.height),
+        if (!shouldHaveFloatingAppbar)
+          Flexible(child: paddedBody)
+        else
+          Stack(
+            children: [
+              paddedBody,
+              Positioned(top: 0, left: 0, right: 0, child: appBar!),
+            ],
+          ),
+        if (haveBottomNavbarBottomPadding)
+          SizedBox(height: bottomNavigationBarHeight),
+      ],
+    );
 
     if (scrollable) {
       content = SingleChildScrollView(child: content);
     }
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isMobile = Breakpoints.isMobile(constraints.biggest);
-        final useFloatingSidebar = floatingSidebar || haveSidebarOpenButton;
-        final canShowSidebar = !hideNavigation && sidebar != null;
-        final showSidebar = canShowSidebar && (useFloatingSidebar || !isMobile);
+    if (shouldConstrainWidth) {
+      content = ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: maxWidth ?? tokens.spaceScaffoldMaxWidth,
+        ),
+        child: content,
+      );
+    }
 
-        final mainController = context.watch<MainController>();
-        final scaffoldBody = _withSidebar(
-          child: content,
-          showSidebar: showSidebar,
-          sidebar: sidebar,
-          floatingSidebar: useFloatingSidebar,
-          isFloatingSidebarOpen: isFloatingSidebarOpen.value,
-        );
-        final floatingActionButtonRow = _floatingActionButtonRow(
-          floatingActionButton: floatingActionButton,
-          showSidebarOpenButton:
-              canShowSidebar && useFloatingSidebar && haveSidebarOpenButton,
-          isSidebarOpen: isFloatingSidebarOpen.value,
-          onSidebarOpenButtonPressed: () {
-            isFloatingSidebarOpen.value = !isFloatingSidebarOpen.value;
-          },
-          tokens: tokens,
-        );
-        final effectiveFloatingActionButton = floatingActionButtonRow == null
-            ? null
-            : _AnimatedFloatingActionButton(
-                isVisible:
-                    !hideFloatingActionButtonOnScroll ||
-                    isFloatingActionButtonVisible.value,
-                onlyShowWhenTyping: onlyShowFloatingActionButtonsWhenTyping,
-                hideWhenTyping: hideFloatingActionButtonsWhenTyping,
-                isTyping: isTyping,
-                child: floatingActionButtonRow,
-              );
+    // if (center) {
+    //   content = Align(alignment: Alignment.topCenter, child: content);
+    // }
 
-        final body = Column(
-          children: [
-            if (appBar != null)
-              _AnimatedAppBar(isVisible: isAppBarVisible.value, child: appBar!),
-            Expanded(
-              child: _autoHideNavigationWrapper(
-                controller: mainController,
-                onShowAppBar: () => isAppBarVisible.value = true,
-                onHideAppBar: () => isAppBarVisible.value = false,
-                onShowFloatingActionButton: () {
-                  isFloatingActionButtonVisible.value = true;
-                },
-                onHideFloatingActionButton: () {
-                  isFloatingActionButtonVisible.value = false;
-                },
-                child: scaffoldBody,
-                hideAppBarOnScroll: hideAppBarOnScroll,
-                hideBottomNavigationBarOnScroll:
-                    hideBottomNavigationBarOnScroll,
-                hideFloatingActionButtonOnScroll:
-                    hideFloatingActionButtonOnScroll,
-              ),
-            ),
-          ],
-        );
-
-        return material.Scaffold(
-          floatingActionButton: effectiveFloatingActionButton,
-          bottomNavigationBar: bottomNavigationBar != null
-              ? _AnimatedBottomNavbar(
-                  isVisible:
-                      !hideBottomNavigationBarOnScroll ||
-                      mainController.isBottomNavbarVisible,
-                  child: bottomNavigationBar!,
-                )
-              : null,
-          backgroundColor: backgroundColor ?? tokens.colorScaffoldBackground,
-          body: safeArea ? SafeArea(child: body) : body,
-        );
-      },
+    content = NotificationListener<ScrollNotification>(
+      onNotification: handleScrollNotification,
+      child: content,
     );
-  }
-}
 
-Widget _autoHideNavigationWrapper({
-  required Widget child,
-  required bool hideAppBarOnScroll,
-  required bool hideBottomNavigationBarOnScroll,
-  required bool hideFloatingActionButtonOnScroll,
-  required MainController controller,
-  required VoidCallback onShowAppBar,
-  required VoidCallback onHideAppBar,
-  required VoidCallback onShowFloatingActionButton,
-  required VoidCallback onHideFloatingActionButton,
-}) {
-  return NotificationListener<UserScrollNotification>(
-    onNotification: (notification) {
-      if (!hideAppBarOnScroll &&
-          !hideBottomNavigationBarOnScroll &&
-          !hideFloatingActionButtonOnScroll) {
-        return false;
-      }
-
-      switch (notification.direction) {
-        case ScrollDirection.reverse:
-          if (hideAppBarOnScroll) {
-            onHideAppBar();
-          }
-          if (hideBottomNavigationBarOnScroll) {
-            controller.hideBottomNavbar();
-          }
-          if (hideFloatingActionButtonOnScroll) {
-            onHideFloatingActionButton();
-          }
-        case ScrollDirection.forward:
-          if (hideAppBarOnScroll) {
-            onShowAppBar();
-          }
-          if (hideBottomNavigationBarOnScroll) {
-            controller.showBottomNavbar();
-          }
-          if (hideFloatingActionButtonOnScroll) {
-            onShowFloatingActionButton();
-          }
-        case ScrollDirection.idle:
-          break;
-      }
-
-      return false;
-    },
-    child: child,
-  );
-}
-
-class _AnimatedAppBar extends StatelessWidget {
-  const _AnimatedAppBar({required this.isVisible, required this.child});
-
-  static const _duration = Duration(milliseconds: 180);
-
-  final bool isVisible;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRect(
-      child: IgnorePointer(
-        ignoring: !isVisible,
-        child: AnimatedOpacity(
-          duration: _duration,
-          curve: Curves.easeOutCubic,
-          opacity: isVisible ? 1 : 0,
-          child: AnimatedSlide(
-            duration: _duration,
-            curve: Curves.easeOutCubic,
-            offset: isVisible ? Offset.zero : const Offset(0, -1),
-            child: child,
+    final stackChildren = <Widget>[
+      Positioned.fill(child: content),
+      if (showDockedSidebar)
+        _AnimatedOverlay(
+          visible: true,
+          hiddenOffset: const Offset(-1, 0),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: SizedBox(width: sidebarWidth, child: sidebar!),
           ),
         ),
+      if (shouldHaveAppbar)
+        Positioned(
+          top: 0,
+          left: effectiveSidebarWidth,
+          right: 0,
+          child: _AnimatedOverlay(
+            visible: isAppbarVisible.value,
+            hiddenOffset: const Offset(0, -1),
+            child: appBar!,
+          ),
+        ),
+      if (shouldHaveBottomNavbar)
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          child: _AnimatedOverlay(
+            visible: isBottomNavbarVisible.value,
+            // visible: true,
+            hiddenOffset: const Offset(0, 1),
+            child: SizedBox(
+              height: bottomNavigationBarHeight,
+              child: bottomNavigationBar!,
+            ),
+          ),
+        ),
+      if (showFloatingSidebar)
+        Positioned.fill(
+          child: IgnorePointer(
+            ignoring: !isSidebarVisible.value,
+            child: AnimatedOpacity(
+              opacity: isSidebarVisible.value ? 1 : 0,
+              duration: _animationDuration,
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: GestureDetector(
+                      onTap: () => isSidebarVisible.value = false,
+                      child: ColoredBox(
+                        color: Colors.black.withValues(alpha: 0.24),
+                      ),
+                    ),
+                  ),
+                  _AnimatedOverlay(
+                    visible: isSidebarVisible.value,
+                    hiddenOffset: const Offset(-1, 0),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: SafeArea(
+                        right: false,
+                        child: SizedBox(width: sidebarWidth, child: sidebar!),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ..._floatingActionButtons(
+        context: context,
+        tokens: tokens,
+        visible: _showFloatingActionButtons(
+          isBottomNavbarVisible: isBottomNavbarVisible.value,
+          keyboardVisible: keyboardVisible,
+        ),
+        bottomInset: shouldHaveBottomNavbar ? bottomNavigationBarHeight : 0,
+        onOpenSidebar: showFloatingSidebar || showDockedSidebar
+            ? () => isSidebarVisible.value = !isSidebarVisible.value
+            : null,
       ),
+    ];
+
+    return material.Scaffold(
+      backgroundColor: backgroundColor ?? tokens.colorScaffoldBackground,
+      body: Stack(clipBehavior: Clip.none, children: stackChildren),
     );
+  }
+
+  bool _showFloatingActionButtons({
+    required bool isBottomNavbarVisible,
+    required bool keyboardVisible,
+  }) {
+    if (hideFloatingActionButtonOnScroll && isBottomNavbarVisible) {
+      return false;
+    }
+    if (onlyShowFloatingActionButtonsWhenTyping && !keyboardVisible) {
+      return false;
+    }
+    if (hideFloatingActionButtonsWhenTyping && keyboardVisible) {
+      return false;
+    }
+    return true;
+  }
+
+  List<Widget> _floatingActionButtons({
+    required BuildContext context,
+    required AppTokens tokens,
+    required bool visible,
+    required double bottomInset,
+    required VoidCallback? onOpenSidebar,
+  }) {
+    final children = <Widget>[];
+    final bottom = _fabMargin + bottomInset;
+
+    if (haveSidebarOpenButton && onOpenSidebar != null) {
+      children.add(
+        Positioned(
+          left: _fabMargin,
+          bottom: bottom,
+          child: _AnimatedOverlay(
+            visible: visible,
+            hiddenOffset: const Offset(0, 1),
+            child: Button.icon(
+              icon: Icons.menu,
+              onPressed: onOpenSidebar,
+              color: ButtonColor.primary,
+              variant: ButtonVariant.elevated,
+              tokens: tokens,
+            ),
+          ),
+        ),
+      );
+    }
+
+    if (floatingActionButton != null) {
+      children.add(
+        Positioned(
+          right: _fabMargin,
+          bottom: bottom,
+          child: _AnimatedOverlay(
+            visible: visible,
+            hiddenOffset: const Offset(0, 1),
+            child: floatingActionButton!,
+          ),
+        ),
+      );
+    }
+
+    return children;
   }
 }
 
-class _AnimatedFloatingActionButton extends StatelessWidget {
-  const _AnimatedFloatingActionButton({
-    required this.isVisible,
-    required this.onlyShowWhenTyping,
-    required this.hideWhenTyping,
-    required this.isTyping,
+class _AnimatedOverlay extends StatelessWidget {
+  const _AnimatedOverlay({
+    required this.visible,
+    required this.hiddenOffset,
     required this.child,
   });
 
-  static const _duration = Duration(milliseconds: 180);
-
-  final bool isVisible;
-  final bool onlyShowWhenTyping;
-  final bool hideWhenTyping;
-  final bool isTyping;
+  final bool visible;
+  final Offset hiddenOffset;
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    final typingVisible =
-        (!onlyShowWhenTyping || isTyping) && (!hideWhenTyping || !isTyping);
-    final effectiveVisible = isVisible && typingVisible;
-
-    return IgnorePointer(
-      ignoring: !effectiveVisible,
-      child: AnimatedOpacity(
-        duration: _duration,
-        curve: Curves.easeOutCubic,
-        opacity: effectiveVisible ? 1 : 0,
-        child: AnimatedSlide(
-          duration: _duration,
+    return child
+        .animate(target: visible ? 1 : 0)
+        .fade(
+          duration: Scaffold._animationDuration,
           curve: Curves.easeOutCubic,
-          offset: effectiveVisible ? Offset.zero : const Offset(0, 1),
-          child: child,
-        ),
-      ),
-    );
-  }
-}
-
-class _AnimatedBottomNavbar extends StatelessWidget {
-  const _AnimatedBottomNavbar({required this.isVisible, required this.child});
-
-  static const _duration = Duration(milliseconds: 180);
-
-  final bool isVisible;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedSwitcher(
-      duration: _duration,
-      reverseDuration: _duration,
-      switchInCurve: Curves.easeOutCubic,
-      switchOutCurve: Curves.easeInCubic,
-      transitionBuilder: (child, animation) {
-        final curved = CurvedAnimation(
-          parent: animation,
+          begin: 0,
+          end: 1,
+        )
+        .slide(
+          duration: Scaffold._animationDuration,
           curve: Curves.easeOutCubic,
-          reverseCurve: Curves.easeInCubic,
+          begin: hiddenOffset,
+          end: Offset.zero,
         );
-
-        return SizeTransition(
-          sizeFactor: curved,
-          alignment: Alignment.topCenter,
-          child: SlideTransition(
-            position: Tween<Offset>(
-              begin: const Offset(0, 1),
-              end: Offset.zero,
-            ).animate(curved),
-            child: child,
-          ),
-        );
-      },
-      child: isVisible
-          ? KeyedSubtree(key: const ValueKey('shown'), child: child)
-          : const SizedBox.shrink(key: ValueKey('hidden')),
-    );
   }
-}
-
-Widget _withSidebar({
-  required Widget child,
-  required bool showSidebar,
-  required bool floatingSidebar,
-  required bool isFloatingSidebarOpen,
-  Widget? sidebar,
-}) {
-  if (!showSidebar || sidebar == null) {
-    return child;
-  }
-
-  if (!floatingSidebar) {
-    return Row(
-      children: [
-        sidebar,
-        const VerticalDivider(width: 1),
-        Expanded(child: child),
-      ],
-    );
-  }
-
-  return Stack(
-    children: [
-      Positioned.fill(child: child),
-      Positioned(
-        left: 0,
-        top: 0,
-        bottom: 0,
-        child: IgnorePointer(
-          ignoring: !isFloatingSidebarOpen,
-          child: AnimatedSlide(
-            duration: const Duration(milliseconds: 180),
-            curve: Curves.easeOutCubic,
-            offset: isFloatingSidebarOpen ? Offset.zero : const Offset(-1, 0),
-            child: sidebar,
-          ),
-        ),
-      ),
-    ],
-  );
-}
-
-Widget? _floatingActionButtonRow({
-  required Widget? floatingActionButton,
-  required bool showSidebarOpenButton,
-  required bool isSidebarOpen,
-  required VoidCallback onSidebarOpenButtonPressed,
-  required AppTokens tokens,
-}) {
-  if (floatingActionButton == null && !showSidebarOpenButton) {
-    return null;
-  }
-
-  return Row(
-    mainAxisSize: MainAxisSize.min,
-    spacing: tokens.spaceLayoutGapSm,
-    children: [
-      ?floatingActionButton,
-      if (showSidebarOpenButton)
-        Button.icon(
-          icon: isSidebarOpen ? Icons.close : Icons.menu,
-          onPressed: onSidebarOpenButtonPressed,
-        ),
-    ],
-  );
 }

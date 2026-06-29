@@ -33,9 +33,8 @@ class TextField extends StatelessWidget {
     this.focusNode,
     this.undoController,
     // Intentionally omitted: decoration — use [placeholder] and the token
-    // system instead. Pass [decorationOverride] for one-off overrides.
+    // system instead.
     this.placeholder,
-    this.decorationOverride,
     this.keyboardType,
     this.textInputAction,
     this.textCapitalization = TextCapitalization.none,
@@ -127,12 +126,8 @@ class TextField extends StatelessWidget {
   final Iterable<Object> variants;
 
   /// Hint text rendered by [InputDecoration.hintText].
-  /// Prefer this over putting hint text inside [decorationOverride].
+  /// Prefer this over putting hint text inside a decoration override.
   final String? placeholder;
-
-  /// Optional override applied on top of the token-derived [InputDecoration].
-  /// Use sparingly — prefer [variants] for systematic styling.
-  final material.InputDecoration? decorationOverride;
 
   // ---------------------------------------------------------------------------
   // Material TextField params (mirrors flutter/material/text_field.dart)
@@ -352,28 +347,22 @@ class TextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final tokenStyle = textFieldStyle.resolve(tokens, variants);
-
+    final resolvedStyle = textFieldStyle.resolve(tokens, variants);
     final baseDecoration = material.InputDecoration(
       hintText: placeholder,
       hintStyle: placeholderTextStyle,
-    ).applyDefaults(tokenStyle.decorationTheme);
-
-    final effectiveDecoration = decorationOverride != null
-        ? baseDecoration.copyWith()
-        : baseDecoration;
+    ).applyDefaults(resolvedStyle.decorationTheme);
 
     return material.TextField(
       groupId: groupId,
-
       controller: controller,
       focusNode: focusNode,
       undoController: undoController,
-      decoration: effectiveDecoration,
+      decoration: baseDecoration,
       keyboardType: keyboardType,
       textInputAction: textInputAction,
       textCapitalization: textCapitalization,
-      style: style ?? tokenStyle.textStyle,
+      style: style ?? resolvedStyle.textStyle,
       strutStyle: strutStyle,
       textAlign: textAlign,
       textAlignVertical: textAlignVertical,
@@ -408,7 +397,7 @@ class TextField extends StatelessWidget {
       cursorHeight: cursorHeight,
       cursorRadius: cursorRadius,
       cursorOpacityAnimates: cursorOpacityAnimates,
-      cursorColor: cursorColor ?? tokenStyle.cursorColor,
+      cursorColor: cursorColor ?? resolvedStyle.cursorColor,
       cursorErrorColor: cursorErrorColor,
       selectionHeightStyle: selectionHeightStyle ?? BoxHeightStyle.tight,
       selectionWidthStyle: selectionWidthStyle ?? BoxWidthStyle.tight,

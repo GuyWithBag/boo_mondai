@@ -7,8 +7,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         LoadingIndicator,
         AppSpacing,
         ErrorText,
+        AppTokens,
         ButtonColor,
         Button,
+        buttonStyle,
         ButtonVariant,
         TextFieldSize,
         TextFieldFrame,
@@ -18,6 +20,7 @@ import 'package:flutter/material.dart' hide BackButton, TextField;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:theme_variants/theme_variants.dart';
 
 class LoginPage extends HookWidget {
   const LoginPage({super.key});
@@ -116,7 +119,10 @@ class LoginPage extends HookWidget {
                   ],
                   const SizedBox(height: AppSpacing.lg),
                   Button(
-                    variants: const [ButtonColor.primary],
+                    style: buttonStyle.resolve(
+                      context.themeTokens<AppTokens>(),
+                      const [ButtonColor.primary],
+                    ),
                     onPressed: auth.isLoading ? null : performSignIn,
                     child: auth.isLoading
                         ? const LoadingIndicator()
@@ -124,11 +130,10 @@ class LoginPage extends HookWidget {
                   ),
                   const SizedBox(height: AppSpacing.md),
                   Button(
-                    variants: const [
-                      ButtonColor.primary,
-                      ButtonColor.primary,
-                      ButtonVariant.flat,
-                    ],
+                    style: buttonStyle.resolve(
+                      context.themeTokens<AppTokens>(),
+                      const [ButtonColor.primary, ButtonVariant.flat],
+                    ),
                     onPressed: navigateToRegister,
                     child: const Text("Don't have an account? Sign Up"),
                   ),

@@ -46,9 +46,9 @@ class MultipleChoiceOptionsPanel extends StatelessWidget {
               ],
             ],
           ),
-          Button(
+          Button.dashed(
+            tokens: tokens,
             leading: const Icon(Icons.add),
-            variants: const [ButtonVariant.dashed, ButtonColor.dashed],
             onPressed: controller.addOption,
             child: const Text('Add Option'),
           ),

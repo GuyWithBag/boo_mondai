@@ -39,7 +39,10 @@ class ChangeTrackerActions extends StatelessWidget {
           children: [
             SizedBox(
               width: double.infinity,
-              child: Button(onPressed: onBack, child: const Text('BACK')),
+              child: Button(
+                onPressed: onBack,
+                child: const Text('BACK'),
+              ),
             ),
             SizedBox(height: tokens.spaceLayoutGapSm.h),
             Row(

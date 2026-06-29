@@ -8,6 +8,7 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         Button,
+        ButtonColor,
         ChangeTrackerController,
         CreateDeckTile,
         Deck,
@@ -26,6 +27,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         SyncPage,
         ViewDecksHelper,
         ViewDecksLocalController,
+        AppTokens,
+        buttonStyle,
         showSnackbar,
         useFilteredSearchBarController,
         useSyncController,
@@ -50,12 +53,14 @@ import 'package:flutter/material.dart'
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:theme_variants/theme_variants.dart';
 
 class ViewDecksLocalPage extends HookWidget {
   const ViewDecksLocalPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final tokens = context.themeTokens<AppTokens>();
     final controller = context.watch<ViewDecksLocalController>();
     final reviewController = context.watch<ChangeTrackerController>();
     final importController = useMemoized(() => ImportExportController());
@@ -188,10 +193,12 @@ class ViewDecksLocalPage extends HookWidget {
             onSync: () => syncController.sync(reviewController),
           ),
           Button.icon(
+            tokens: tokens,
             icon: Icons.file_open_outlined,
             onPressed: importController.isLoading ? null : importDecksFromFile,
           ),
           Button.icon(
+            tokens: tokens,
             icon: Icons.layers_rounded,
             onPressed: () => context.push('/view-cards'),
           ),

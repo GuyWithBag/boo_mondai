@@ -24,47 +24,95 @@ Set<StylePart<TextFieldStyle>> textFieldPalette({
     TextFieldStylePart.text({TextStylePart.color(textColor)}),
     if (fillColor != null)
       TextFieldStylePart.decoration({InputDecorationPart.fillColor(fillColor)}),
-    TextFieldStylePart.decoration({
-      InputDecorationPart.enabledBorderParts({
-        InputBorderPart.borderSideParts({BorderSidePart.color(borderColor)}),
-      }),
-      InputDecorationPart.focusedBorderParts({
-        InputBorderPart.borderSideParts({BorderSidePart.color(borderColor)}),
-      }),
-      InputDecorationPart.disabledBorderParts({
-        InputBorderPart.borderSideParts({BorderSidePart.color(borderColor)}),
-      }),
-      InputDecorationPart.errorBorderParts({
-        InputBorderPart.borderSideParts({BorderSidePart.color(borderColor)}),
-      }),
-      InputDecorationPart.focusedErrorBorderParts({
-        InputBorderPart.borderSideParts({BorderSidePart.color(borderColor)}),
-      }),
-    }),
+    TextFieldStylePart.decoration(_borderColorDecorationParts(borderColor)),
+  };
+}
+
+Set<StylePart<InputDecorationThemeData>> _outlineBorderDecorationParts(
+  AppTokens tokens,
+) {
+  final parts = _outlineBorderParts(tokens);
+  return {
+    InputDecorationPart.borderParts(parts),
+    InputDecorationPart.enabledBorderParts(parts),
+    InputDecorationPart.focusedBorderParts(parts),
+    InputDecorationPart.disabledBorderParts(parts),
+    InputDecorationPart.errorBorderParts(parts),
+    InputDecorationPart.focusedErrorBorderParts(parts),
+  };
+}
+
+Set<StylePart<InputBorder>> _outlineBorderParts(AppTokens tokens) {
+  return {
+    InputBorderPart.width(tokens.borderWidthDefault.w),
+    InputBorderPart.borderRadius(
+      BorderRadius.circular(tokens.radiusSurfaceXsm.r),
+    ),
+    InputBorderPart.outline(),
+  };
+}
+
+Set<StylePart<InputDecorationThemeData>> _underlineBorderDecorationParts(
+  AppTokens tokens,
+) {
+  final parts = _underlineBorderParts(tokens);
+  return {
+    InputDecorationPart.borderParts(parts),
+    InputDecorationPart.enabledBorderParts(parts),
+    InputDecorationPart.focusedBorderParts(parts),
+    InputDecorationPart.disabledBorderParts(parts),
+    InputDecorationPart.errorBorderParts(parts),
+    InputDecorationPart.focusedErrorBorderParts(parts),
+  };
+}
+
+Set<StylePart<InputBorder>> _underlineBorderParts(AppTokens tokens) {
+  return {
+    InputBorderPart.width(tokens.borderWidthDefault.w),
+    InputBorderPart.underline(),
+  };
+}
+
+Set<StylePart<InputDecorationThemeData>> _noBorderDecorationParts() {
+  final parts = {InputBorderPart.none()};
+  return {
+    InputDecorationPart.borderParts(parts),
+    InputDecorationPart.enabledBorderParts(parts),
+    InputDecorationPart.focusedBorderParts(parts),
+    InputDecorationPart.disabledBorderParts(parts),
+    InputDecorationPart.errorBorderParts(parts),
+    InputDecorationPart.focusedErrorBorderParts(parts),
+  };
+}
+
+Set<StylePart<InputDecorationThemeData>> _borderColorDecorationParts(
+  Color borderColor,
+) {
+  final parts = {InputBorderPart.color(borderColor)};
+  return {
+    InputDecorationPart.borderParts(parts),
+    InputDecorationPart.enabledBorderParts(parts),
+    InputDecorationPart.focusedBorderParts(parts),
+    InputDecorationPart.disabledBorderParts(parts),
+    InputDecorationPart.errorBorderParts(parts),
+    InputDecorationPart.focusedErrorBorderParts(parts),
   };
 }
 
 final textFieldStyle = VariantStyle.textFieldParts<AppTokens>(
   base: (tokens) => {
-    TextFieldStylePart.cursorColor(tokens.colorPrimary),
+    TextFieldStylePart.cursorColor(tokens.colorTextBaseline),
     TextFieldStylePart.text({
       TextStylePart.color(tokens.colorTextBaseline),
       TextStylePart.fontWeight(tokens.fontWeightTextStrong),
     }),
-    TextFieldStylePart.decoration({
-      InputDecorationPart.filled(false),
-      InputDecorationPart.border(InputBorder.none),
-      InputDecorationPart.enabledBorder(InputBorder.none),
-      InputDecorationPart.focusedBorder(InputBorder.none),
-      InputDecorationPart.contentPadding(EdgeInsets.zero),
-    }),
   },
   defaultVariants: const [
     TextFieldSize.normal,
-    TextFieldFrame.none,
-    TextFieldColor.baseline,
+    TextFieldFrame.outline,
     TextFieldState.idle,
     TextFieldAlign.start,
+    TextFieldColor.baseline,
   ],
   variants: {
     TextFieldAlign.start: (_) => {
@@ -94,12 +142,7 @@ final textFieldStyle = VariantStyle.textFieldParts<AppTokens>(
     },
     TextFieldFrame.none: (_) => {
       TextFieldStylePart.decoration({
-        InputDecorationPart.border(InputBorder.none),
-        InputDecorationPart.enabledBorder(InputBorder.none),
-        InputDecorationPart.focusedBorder(InputBorder.none),
-        InputDecorationPart.disabledBorder(InputBorder.none),
-        InputDecorationPart.errorBorder(InputBorder.none),
-        InputDecorationPart.focusedErrorBorder(InputBorder.none),
+        ..._noBorderDecorationParts(),
         InputDecorationPart.contentPadding(EdgeInsets.zero),
       }),
     },
@@ -107,15 +150,7 @@ final textFieldStyle = VariantStyle.textFieldParts<AppTokens>(
       TextFieldStylePart.decoration({
         InputDecorationPart.filled(true),
         InputDecorationPart.fillColor(tokens.colorScaffoldBackground),
-        InputDecorationPart.contentPadding(EdgeInsets.all(16.r)),
-        InputDecorationPart.borderParts({
-          InputBorderPart.borderRadius(
-            BorderRadius.circular(tokens.radiusSurfaceXsm.r),
-          ),
-          InputBorderPart.borderSideParts({
-            BorderSidePart.width(tokens.borderWidthDefault.w),
-          }),
-        }),
+        ..._outlineBorderDecorationParts(tokens),
       }),
     },
     TextFieldFrame.underline: (tokens) => {
@@ -123,16 +158,13 @@ final textFieldStyle = VariantStyle.textFieldParts<AppTokens>(
         InputDecorationPart.contentPadding(
           EdgeInsets.symmetric(horizontal: 18.w, vertical: 12.h),
         ),
-        InputDecorationPart.borderParts({
-          InputBorderPart.borderRadius(BorderRadius.circular(12.r)),
-          InputBorderPart.borderSideParts({BorderSidePart.width(4.w)}),
-        }),
+        ..._underlineBorderDecorationParts(tokens),
       }),
     },
     TextFieldColor.baseline: (tokens) => textFieldPalette(
       textColor: tokens.colorTextBaseline,
       cursorColor: tokens.colorTextBaseline,
-      borderColor: tokens.colorTextBaseline,
+      borderColor: tokens.colorBorderNeutralSubtle,
     ),
     TextFieldColor.transparentBg: (tokens) => textFieldPalette(
       textColor: tokens.colorTextBaseline,
@@ -148,14 +180,14 @@ final textFieldStyle = VariantStyle.textFieldParts<AppTokens>(
     TextFieldColor.success: (tokens) => textFieldPalette(
       textColor: tokens.colorActionSuccess,
       cursorColor: tokens.colorActionSuccess,
-      fillColor: tokens.colorActionSuccess.withValues(alpha: 0.12),
       borderColor: tokens.colorActionSuccess,
+      fillColor: tokens.colorActionSuccess.withValues(alpha: 0.12),
     ),
     TextFieldColor.error: (tokens) => textFieldPalette(
       textColor: tokens.colorActionError,
       cursorColor: tokens.colorActionError,
-      fillColor: tokens.colorActionError.withValues(alpha: 0.12),
       borderColor: tokens.colorActionError,
+      fillColor: tokens.colorActionError.withValues(alpha: 0.12),
     ),
     TextFieldState.idle: (_) => const <StylePart<TextFieldStyle>>{},
     TextFieldState.incorrect: (_) => {

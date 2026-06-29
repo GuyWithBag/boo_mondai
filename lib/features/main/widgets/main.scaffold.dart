@@ -21,18 +21,21 @@ class MainScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     final auth = context.watch<AuthController>();
     final hideNavigation = auth.currentProfile.role == 'group_b_participant';
+    final controller = context.watch<MainController>();
 
     return Scaffold(
       body: child,
       hideNavigation: hideNavigation,
-      hideBottomNavigationBarOnScroll: true,
       sidebar: Sidebar(currentPageIndex: currentIndex),
       bottomNavigationBar: BottomNavbar(currentPageIndex: currentIndex),
+      haveBottomNavbarBottomPadding: false,
       padding: EdgeInsets.zero,
       scrollable: false,
       safeArea: false,
       center: false,
-      constrainWidth: false,
+      shouldConstrainWidth: false,
+      showBottomNavbar: controller.isBottomNavbarVisible,
+      showAppbar: controller.isAppbarVisible,
     );
   }
 }

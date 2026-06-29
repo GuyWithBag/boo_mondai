@@ -11,6 +11,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextColor,
         ButtonVariant,
         Button,
+        buttonStyle,
         PhysicalCardSide,
         ScaleHelper,
         MarkdownText;
@@ -64,53 +65,50 @@ class MultipleChoiceCard extends HookWidget {
       return null;
     }, [template.id, interactionsController]);
 
-    return PhysicalCardSide(
-      maxWidth: maxWidth,
-      child: Column(
-        spacing: tokens.spaceLayoutGapMd,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            spacing: tokens.spaceLayoutGapMd,
-            children: [
-              Text(
-                'Select Answer'.toUpperCase(),
-                textAlign: TextAlign.center,
-                style: eyebrowStyle,
-              ),
-              MarkdownText(data: template.questionPrompt),
-            ],
-          ),
-          Column(
-            children: [
-              for (final entry in template.options.asMap().entries) ...[
-                SizedBox(
-                  width: double.infinity,
-                  child: Button(
-                    variants: [
-                      ..._optionVariants(entry.value),
-                      ButtonVariant.flat,
-                    ],
-                    selected:
-                        !isRevealed && selectedOption.value == entry.value.id,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    onPressed: isRevealed
-                        ? null
-                        : () {
-                            selectedOption.value = entry.value.id;
-                            interactionsController?.setAnswer(entry.value.id);
-                            interactionsController?.setCanReveal(true);
-                          },
-                    child: MarkdownText(
-                      data: _optionLabel(entry.value, entry.key),
-                    ),
+    return Column(
+      spacing: tokens.spaceLayoutGapMd,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          spacing: tokens.spaceLayoutGapMd,
+          children: [
+            Text(
+              'Select Answer'.toUpperCase(),
+              textAlign: TextAlign.center,
+              style: eyebrowStyle,
+            ),
+            MarkdownText(data: template.questionPrompt),
+          ],
+        ),
+        Column(
+          children: [
+            for (final entry in template.options.asMap().entries) ...[
+              SizedBox(
+                width: double.infinity,
+                child: Button(
+                  style: buttonStyle.resolve(tokens, [
+                    ..._optionVariants(entry.value),
+                    ButtonVariant.flat,
+                  ]),
+                  selected:
+                      !isRevealed && selectedOption.value == entry.value.id,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  onPressed: isRevealed
+                      ? null
+                      : () {
+                          selectedOption.value = entry.value.id;
+                          interactionsController?.setAnswer(entry.value.id);
+                          interactionsController?.setCanReveal(true);
+                        },
+                  child: MarkdownText(
+                    data: _optionLabel(entry.value, entry.key),
                   ),
                 ),
-              ],
+              ),
             ],
-          ),
-        ],
-      ),
+          ],
+        ),
+      ],
     );
   }
 

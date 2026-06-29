@@ -4,6 +4,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         Button,
         ButtonColor,
+        buttonStyle,
         ChangeTrackerController,
         DateHelper,
         Deck,
@@ -35,6 +36,7 @@ import 'package:flutter/material.dart'
         StatelessWidget,
         ScrollController,
         VoidCallback,
+        Icon,
         Center,
         SizedBox,
         Text,
@@ -142,7 +144,7 @@ class ViewDeckListingSingleSheet extends HookWidget {
             backgroundColor: Colors.transparent,
             scrollable: false,
             center: false,
-            constrainWidth: false,
+            shouldConstrainWidth: false,
             padding: EdgeInsets.zero,
             body: _Body(
               initialMode: initialMode,
@@ -233,9 +235,13 @@ class _Body extends StatelessWidget {
                             Row(
                               spacing: tokens.spaceLayoutGapSm,
                               children: [
-                                Button.icon(icon: Icons.arrow_upward),
-                                Button.icon(icon: Icons.arrow_downward),
-                                Button.icon(icon: Icons.monitor_heart),
+                                Button(leading: const Icon(Icons.arrow_upward)),
+                                Button(
+                                  leading: const Icon(Icons.arrow_downward),
+                                ),
+                                Button(
+                                  leading: const Icon(Icons.monitor_heart),
+                                ),
                               ],
                             ),
                           ],
@@ -346,17 +352,21 @@ class _Body extends StatelessWidget {
             onPop: onBackPressed,
             actions: [
               if (controller.canPublish) ...[
-                Button.icon(
-                  icon: Icons.public_outlined,
-                  color: ButtonColor.success,
+                Button(
+                  leading: const Icon(Icons.public_outlined),
+                  style: buttonStyle.resolve(tokens, const [
+                    ButtonColor.success,
+                  ]),
                   onPressed: controller.publishDraft,
                 ),
               ],
-              Button.icon(
-                icon: controller.isDownloading
-                    ? Icons.sync
-                    : Icons.cloud_download_outlined,
-                color: ButtonColor.success,
+              Button(
+                leading: Icon(
+                  controller.isDownloading
+                      ? Icons.sync
+                      : Icons.cloud_download_outlined,
+                ),
+                style: buttonStyle.resolve(tokens, const [ButtonColor.success]),
                 onPressed:
                     controller.isDownloading ||
                         controller.onDownloadPressed == null

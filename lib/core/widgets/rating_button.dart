@@ -5,14 +5,16 @@
 
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        StudySessionController,
-        StudyRating,
-        ButtonColor,
-        Button,
         AppTokens,
+        Button,
+        ButtonColor,
         ButtonPadding,
-        textStyle,
-        TextSize;
+        StudyRating,
+        StudySessionController,
+        TextSize,
+        TextWeight,
+        buttonStyle,
+        textStyle;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -57,13 +59,16 @@ class RatingButton extends StatelessWidget {
     }
 
     final tokens = context.themeTokens<AppTokens>();
-
+    final resolvedButtonStyle = buttonStyle.resolve(tokens, [
+      color,
+      ButtonPadding.sm,
+    ]);
     return Expanded(
       child: Tooltip(
         message: 'Press $shortcut',
         child: Button(
           onPressed: onTap,
-          variants: [color, ButtonPadding.sm],
+          style: resolvedButtonStyle,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             spacing: tokens.spaceLayoutGapXsm,
@@ -74,9 +79,14 @@ class RatingButton extends StatelessWidget {
                 child: Text(
                   reviewTime,
                   textAlign: TextAlign.center,
-                  style: textStyle.resolve(tokens, const [
-                    TextSize.labelSmall,
-                  ]).copyWith(),
+                  style: textStyle
+                      .resolve(tokens, const [
+                        TextSize.labelSmall,
+                        TextWeight.heavy,
+                      ])
+                      .copyWith(
+                        color: resolvedButtonStyle.contentStyle.textStyle.color,
+                      ),
                 ),
               ),
             ],

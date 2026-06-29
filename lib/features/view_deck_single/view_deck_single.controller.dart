@@ -22,9 +22,9 @@ class ViewDeckSingleSheetController {
     required BuildContext context,
     required ViewDecksLocalController parentController,
     required ValueNotifier<bool> isSavingPublishStateNotifier,
-  })  : _context = context,
-        _parentController = parentController,
-        _isSavingPublishStateNotifier = isSavingPublishStateNotifier;
+  }) : _context = context,
+       _parentController = parentController,
+       _isSavingPublishStateNotifier = isSavingPublishStateNotifier;
 
   final Deck deck;
   final bool isSavingPublishState;

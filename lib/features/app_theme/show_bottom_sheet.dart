@@ -7,29 +7,22 @@ import 'package:provider/provider.dart' show ReadContext;
 Future<T?> showBottomSheet<T>({
   required BuildContext context,
   required WidgetBuilder builder,
-  bool runWithBottomNavbarHidden = true,
+  bool hideBottomNavbar = true,
   bool isScrollControlled = true,
   bool useSafeArea = true,
-}) {
-  Future<T?> show() => showModalBottomSheet<T>(
+}) async {
+  final mainController = context.read<MainController>();
+  if (hideBottomNavbar) {
+    mainController.setBottomNavbarVisible(false);
+  }
+
+  final result = await showModalBottomSheet<T>(
     context: context,
     isScrollControlled: isScrollControlled,
     useSafeArea: useSafeArea,
     backgroundColor: Colors.transparent,
     builder: builder,
   );
-
-  if (runWithBottomNavbarHidden) {
-    final mainController = context.read<MainController>();
-
-    return mainController.runWithBottomNavbarHidden(() async {
-      try {
-        return await show();
-      } finally {
-        mainController.showBottomNavbar();
-      }
-    });
-  }
-
-  return show();
+  mainController.setBottomNavbarVisible(true);
+  return result;
 }

@@ -7,20 +7,30 @@
 
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        AuthController,
-        ViewReviewsController,
-        ViewLeaderboardController,
-        LocalDB,
-        LeaderboardSection,
-        ReadyToReviewCard,
-        StreaksCard,
+        AppBar,
         AppTokens,
-        Scaffold;
-import 'package:flutter/material.dart' hide Scaffold;
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
-import 'package:theme_variants/theme_variants.dart';
+        AuthController,
+        LeaderboardSection,
+        LocalDB,
+        ReadyToReviewCard,
+        Scaffold,
+        StreaksCard,
+        ViewLeaderboardController,
+        ViewReviewsController;
+import 'package:flutter/material.dart'
+    show
+        BuildContext,
+        Widget,
+        Column,
+        RefreshIndicator,
+        Expanded,
+        SizedBox,
+        Colors,
+        Container;
+import 'package:flutter_hooks/flutter_hooks.dart' show HookWidget, useEffect;
+import 'package:go_router/go_router.dart' show GoRouterHelper;
+import 'package:provider/provider.dart' show WatchContext;
+import 'package:theme_variants/theme_variants.dart' show ThemeVariantsContext;
 
 class HomePage extends HookWidget {
   const HomePage({super.key});
@@ -41,6 +51,24 @@ class HomePage extends HookWidget {
     }, []);
 
     return Scaffold(
+      appBar: AppBar(title: 'Home'),
+      scrollable: true,
+      // body: Column(
+      //   spacing: tokens.spaceLayoutGapMd,
+      //   children: [
+      //     // ReadyToReviewCard(
+      //     //   dueCount: reviewDashboard.totalDue,
+      //     //   onStartSession: () => context.push('/review/session'),
+      //     // ),
+      //     // StreaksCard(streak: LocalDB.streak.getOrCreate()),
+      //     // LeaderboardSection(
+      //     //   entries: leaderboard.entries,
+      //     //   isLoading: leaderboard.isLoading,
+      //     //   currentUserId: auth.currentProfile.id,
+      //     // ),
+      //     // Container(color: Colors.red),
+      //   ],
+      // ),
       body: RefreshIndicator(
         onRefresh: () async {
           await Future.wait([
@@ -65,5 +93,15 @@ class HomePage extends HookWidget {
         ),
       ),
     );
+    // return Expanded(
+    //   child: Column(children: [Container(color: Colors.red, height: 100)]),
+    // );
+    // return Container(color: Colors.red, height: 100);
+    // return Scaffold(
+    //   scrollable: false,
+    //   shouldConstrainWidth: false,
+    //   safeArea: false,
+    //   body: Container(color: Colors.red),
+    // );
   }
 }

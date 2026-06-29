@@ -13,7 +13,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         StudySessionCardStageController,
         AppTokens,
         StudySessionService,
-        Button,
+        Button, buttonStyle,
         ButtonColor,
         textStyle,
         TextSize,
@@ -114,29 +114,29 @@ class RatingArea extends HookWidget {
                 },
               ),
             },
-            child: SizedBox(
-              width: double.infinity,
-              child: submissionStyle == SubmissionStyle.none
-                  ? const SizedBox(height: 54)
-                  : submissionStyle == SubmissionStyle.showAnswer
-                  ? Button(
-                      onPressed: interactionsController.canReveal
-                          ? onSubmit
-                          : null,
-                      leading: const Icon(Icons.visibility_outlined),
-                      child: const Text('Show Answer'),
-                    )
-                  : Button(
-                      onPressed: interactionsController.canReveal
-                          ? onSubmit
-                          : null,
-                      leading: const Icon(Icons.check),
-                      variants: const [
-                        ButtonColor.primary,
-                        ButtonColor.primary,
-                      ],
-                      child: const Text('Submit'),
-                    ),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: submissionStyle == SubmissionStyle.none
+                        ? const SizedBox(height: 54)
+                        : submissionStyle == SubmissionStyle.showAnswer
+                        ? Button(
+                            onPressed: interactionsController.canReveal
+                                ? onSubmit
+                                : null,
+                            leading: const Icon(Icons.visibility_outlined),
+                            child: const Text('Show Answer'),
+                          )
+                        : Button(
+                            onPressed: interactionsController.canReveal
+                                ? onSubmit
+                                : null,
+                            leading: const Icon(Icons.check),
+                            style: buttonStyle.resolve(
+                              tokens,
+                              const [ButtonColor.primary],
+                            ),
+                            child: const Text('Submit'),
+                          ),
             ),
           ),
         );
@@ -162,7 +162,7 @@ class RatingArea extends HookWidget {
               child: Button(
                 onPressed: onContinue,
                 leading: const Icon(Icons.arrow_forward),
-                variants: const [ButtonColor.primary],
+                style: buttonStyle.resolve(tokens, const [ButtonColor.primary]),
                 child: const Text('Continue'),
               ),
             ),

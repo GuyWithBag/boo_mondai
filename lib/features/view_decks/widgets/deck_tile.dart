@@ -11,12 +11,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         BackgroundImagePicked,
         Button,
         ButtonColor,
+        buttonStyle,
         Deck,
         AppTokens,
         ImageHelper,
         ScaleHelper,
         useCubeController,
-        PhysicalCardSide,
         PhysicalCardController,
         PhysicalCard,
         PhysicalDeck;
@@ -202,9 +202,11 @@ class DeckTile extends HookWidget {
                     Positioned(
                       top: 8,
                       right: 8,
-                      child: Button.iconSmall(
-                        icon: Icons.edit,
-                        color: ButtonColor.primary,
+                      child: Button(
+                        leading: const Icon(Icons.edit),
+                        style: buttonStyle.resolve(tokens, const [
+                          ButtonColor.primary,
+                        ]),
                         onPressed: () =>
                             _pickAndApplyImage(effectiveOnImagePicked),
                       ),
@@ -214,9 +216,8 @@ class DeckTile extends HookWidget {
                   for (final controller in cardControllers)
                     PhysicalCard(
                       controller: controller,
-                      front: PhysicalCardSide(
-                        maxWidth: cardWidth,
-                        child: BackgroundImageSurface(
+                      front: PhysicalCard(
+                        front: BackgroundImageSurface(
                           image: coverImage,
                           onImagePicked: effectiveOnImagePicked,
                         ),

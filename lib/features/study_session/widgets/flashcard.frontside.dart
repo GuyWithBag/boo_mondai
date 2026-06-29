@@ -1,6 +1,8 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
+        AppTokens,
         Button,
+        buttonStyle,
         ButtonColor,
         ButtonVariant,
         FlashcardTemplate,
@@ -8,6 +10,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         PhysicalCardSide,
         StudyCard;
 import 'package:flutter/material.dart';
+import 'package:theme_variants/theme_variants.dart';
 
 class FlashcardFrontSide extends StatelessWidget {
   const FlashcardFrontSide({
@@ -35,29 +38,31 @@ class FlashcardFrontSide extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PhysicalCardSide(
-      maxWidth: maxWidth,
-      child: SizedBox.expand(
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            Positioned.fill(
-              child: MarkdownText(
-                data: template.getQuestion(isReversed: studyCard.isReversed),
+    final tokens = context.themeTokens<AppTokens>();
+
+    return SizedBox.expand(
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Positioned.fill(
+            child: MarkdownText(
+              data: template.getQuestion(isReversed: studyCard.isReversed),
+            ),
+          ),
+          if (showRevealButton)
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Button(
+                style: buttonStyle.resolve(tokens, const [
+                  ButtonVariant.text,
+                  ButtonColor.baseline,
+                ]),
+                leading: const Icon(Icons.touch_app),
+                onPressed: onReveal,
+                child: const Text('Tap to reveal'),
               ),
             ),
-            if (showRevealButton)
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Button(
-                  variants: const [ButtonVariant.text, ButtonColor.baseline],
-                  leading: const Icon(Icons.touch_app),
-                  onPressed: onReveal,
-                  child: const Text('Tap to reveal'),
-                ),
-              ),
-          ],
-        ),
+        ],
       ),
     );
   }

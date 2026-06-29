@@ -23,7 +23,7 @@ enum SurfaceShape {
   circle,
 }
 
-enum SurfacePadding { baseline, text, none, xsm, scaffold, sm }
+enum SurfacePadding { baseline, text, none, xsm, scaffold, large }
 
 enum SurfaceBorder { baseline, sidebar, none, top, bottom }
 
@@ -178,14 +178,14 @@ final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
         DecorationPart.borderRadius(BorderRadius.zero),
       }),
     },
+    SurfacePadding.large: (tokens) => {
+      SurfaceStylePart.padding(EdgeInsets.all(tokens.spaceLayoutPaddingLg)),
+    },
     SurfacePadding.baseline: (tokens) => {
       SurfaceStylePart.padding(EdgeInsets.all(tokens.spaceLayoutPadding)),
     },
-    SurfacePadding.sm: (tokens) => {
-      SurfaceStylePart.padding(EdgeInsets.all(tokens.spaceLayoutPaddingSm)),
-    },
     SurfacePadding.xsm: (tokens) => {
-      SurfaceStylePart.padding(EdgeInsets.all(tokens.spaceLayoutPaddingXsm)),
+      SurfaceStylePart.padding(EdgeInsets.all(tokens.spaceLayoutPaddingSm)),
     },
     SurfacePadding.scaffold: (tokens) => {
       SurfaceStylePart.padding(EdgeInsets.all(tokens.spaceScaffoldPadding)),

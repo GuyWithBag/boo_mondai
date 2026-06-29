@@ -2,6 +2,7 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
         Button,
+        buttonStyle,
         ButtonVariant,
         CardTemplate,
         ChipTone,
@@ -17,7 +18,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         MultipleChoiceTemplate,
         PhysicalCard,
         PhysicalCardController,
-        PhysicalCardSide,
         StudyCard,
         WordScrambleTemplate,
         MatchingTypeCard,
@@ -240,6 +240,7 @@ class _FlashcardPreview extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = context.themeTokens<AppTokens>();
     final controller = useMemoized(
       () => PhysicalCardController(context, width: width, perspective: 0.001),
       [width],
@@ -271,9 +272,9 @@ class _FlashcardPreview extends HookWidget {
           bottom: 8,
           child: Tooltip(
             message: 'Flip card',
-            child: Button.iconSmall(
-              icon: Icons.flip,
-              variant: ButtonVariant.flat,
+            child: Button(
+              style: buttonStyle.resolve(tokens, const [ButtonVariant.flat]),
+              leading: const Icon(Icons.flip),
               onPressed: () => controller.flip(),
             ),
           ),
@@ -320,8 +321,8 @@ class _PromptPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PhysicalCardSide(
-      child: Center(
+    return PhysicalCard(
+      front: Center(
         child: Padding(
           padding: EdgeInsets.all(20.w),
           child: MarkdownText(data: prompt),
@@ -338,8 +339,8 @@ class _UnknownTemplatePreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PhysicalCardSide(
-      child: Center(
+    return PhysicalCard(
+      front: Center(
         child: Padding(
           padding: EdgeInsets.all(20.w),
           child: Text(label, textAlign: TextAlign.center),

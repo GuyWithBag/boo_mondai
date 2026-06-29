@@ -12,9 +12,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         showSnackbar,
         useEditDeckController,
         Button,
-        ButtonColor;
+        AppTokens;
 import 'package:flutter/material.dart' hide Scaffold;
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:theme_variants/theme_variants.dart';
 
 class EditDeckPage extends HookWidget {
   const EditDeckPage({
@@ -60,6 +61,8 @@ class EditDeckPage extends HookWidget {
       controller.selectTemplate(templateId);
     }
 
+    final tokens = context.themeTokens<AppTokens>();
+
     return Scaffold(
       appBar: EditDeckAppbar(
         titleController: titleController,
@@ -72,10 +75,11 @@ class EditDeckPage extends HookWidget {
         },
         isSaving: controller.isLoading,
       ),
+      appBarHeight: 88.0,
       floatingActionButton: Button.icon(
-        color: ButtonColor.primary,
-        onPressed: addTemplate,
         icon: Icons.add,
+        onPressed: addTemplate,
+        tokens: tokens,
       ),
       sidebar: EditDeckSidebar(
         activeTemplateId: controller.activeTemplateId,

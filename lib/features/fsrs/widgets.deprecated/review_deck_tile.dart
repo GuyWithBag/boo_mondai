@@ -3,6 +3,7 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
         Button,
+        buttonStyle,
         ButtonVariant,
         Deck,
         DeckTile,
@@ -54,10 +55,10 @@ class ReviewDeckTile extends StatelessWidget {
               child: _ReviewDeckDetails(stats: stats, completion: completion),
             ),
             SizedBox(width: tokens.spaceLayoutGapMd.w),
-            Button.icon(
+            Button(
+              style: buttonStyle.resolve(tokens, const [ButtonVariant.flat]),
               onPressed: () {},
-              icon: Icons.visibility_outlined,
-              variant: ButtonVariant.flat,
+              leading: const Icon(Icons.visibility_outlined),
             ),
           ],
         ),

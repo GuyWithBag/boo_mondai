@@ -7,10 +7,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         showSearchFilterModal,
         SearchResultTile,
         SearchResults,
-        TextFieldFrame,
-        TextFieldSize,
-        TextFieldColor,
-        textFieldStyle,
+        TextField,
         useFilteredSearchBarController,
         Button;
 import 'package:flutter/material.dart'
@@ -23,7 +20,6 @@ import 'package:flutter/material.dart'
         OverlayEntry,
         RenderBox,
         Offset,
-        Icon,
         LayerLink,
         Colors,
         BoxConstraints,
@@ -43,9 +39,6 @@ import 'package:flutter/material.dart'
         Overlay,
         TextInputAction,
         Icons,
-        IconButton,
-        InputDecoration,
-        TextField,
         Row,
         WidgetsBinding,
         CompositedTransformTarget;
@@ -275,16 +268,12 @@ class FilteredSearchBar<TObject, TFilter extends SearchFilter>
       onResultsChanged?.call(searchController.results);
     }
 
-    void clearValue() {
-      searchController.clearValue();
-      onChanged?.call('');
-      onCleared?.call();
-    }
+    // void clearValue() {
+    //   searchController.clearValue();
+    //   onChanged?.call('');
+    //   onCleared?.call();
+    // }
 
-    final style = textFieldStyle.resolve(tokens, const [
-      TextFieldSize.normal,
-      TextFieldFrame.outline,
-    ]);
     final filterEnabled = searchController.isFilterButtonEnabled(
       showFilterButton: showFilterButton,
       enabled: enabled,
@@ -303,27 +292,18 @@ class FilteredSearchBar<TObject, TFilter extends SearchFilter>
               autofocus: autofocus,
               onChanged: onChanged,
               onSubmitted: onSubmitted,
+              placeholder: 'Search Here',
               textInputAction: TextInputAction.search,
-              cursorColor: style.cursorColor,
-              style: style.textStyle,
-              decoration: InputDecoration(
-                hintText: placeholder,
-                prefixIcon: searchController.hasText
-                    ? IconButton(
-                        tooltip: 'Clear search',
-                        icon: const Icon(Icons.close),
-                        onPressed: clearValue,
-                      )
-                    : const Icon(Icons.search),
-                prefixIconColor: searchController.hasText
-                    ? tokens.colorTextBaseline
-                    : tokens.colorTextMuted,
-              ).applyDefaults(style.decorationTheme),
+              variants: const [],
               onTap: searchController.updateDropdownState,
             ),
           ),
           if (filterEnabled)
-            Button.icon(icon: Icons.tune, onPressed: openFilters),
+            Button.icon(
+              icon: Icons.tune,
+              onPressed: openFilters,
+              tokens: tokens,
+            ),
         ],
       ),
     );

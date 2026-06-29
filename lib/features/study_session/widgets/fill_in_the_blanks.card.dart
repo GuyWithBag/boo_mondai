@@ -87,48 +87,44 @@ class FillInTheBlanksCard extends HookWidget {
       );
     }
 
-    return PhysicalCardSide(
-      maxWidth: maxWidth,
-      child: SingleChildScrollView(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(minHeight: 480.h),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Fill in the blank'.toUpperCase(),
-                textAlign: TextAlign.center,
-                style: eyebrowStyle,
+    return SingleChildScrollView(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minHeight: 480.h),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Fill in the blank'.toUpperCase(),
+              textAlign: TextAlign.center,
+              style: eyebrowStyle,
+            ),
+            SizedBox(height: 48.h),
+            for (final entry in template.segments.asMap().entries) ...[
+              Wrap(
+                alignment: WrapAlignment.center,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 12.w,
+                runSpacing: 16.h,
+                children: [
+                  Text(entry.value.prefix, style: blankTextStyle),
+                  isRevealed
+                      ? _PreviewAnswer(
+                          label: entry.value.correctAnswer,
+                          scale: contentScale,
+                        )
+                      : FillInTheBlankAnswerInput(
+                          revealed: interactionsController?.isRevealed ?? false,
+                          correct: _isCorrect(entry.key, blankInputs.value),
+                          correctAnswer: entry.value.correctAnswer,
+                          scale: contentScale,
+                          onChanged: (value) =>
+                              updateBlankInput(entry.key, value),
+                        ),
+                  Text(entry.value.suffix, style: blankTextStyle),
+                ],
               ),
-              SizedBox(height: 48.h),
-              for (final entry in template.segments.asMap().entries) ...[
-                Wrap(
-                  alignment: WrapAlignment.center,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  spacing: 12.w,
-                  runSpacing: 16.h,
-                  children: [
-                    Text(entry.value.prefix, style: blankTextStyle),
-                    isRevealed
-                        ? _PreviewAnswer(
-                            label: entry.value.correctAnswer,
-                            scale: contentScale,
-                          )
-                        : FillInTheBlankAnswerInput(
-                            revealed:
-                                interactionsController?.isRevealed ?? false,
-                            correct: _isCorrect(entry.key, blankInputs.value),
-                            correctAnswer: entry.value.correctAnswer,
-                            scale: contentScale,
-                            onChanged: (value) =>
-                                updateBlankInput(entry.key, value),
-                          ),
-                    Text(entry.value.suffix, style: blankTextStyle),
-                  ],
-                ),
-              ],
             ],
-          ),
+          ],
         ),
       ),
     );

@@ -175,25 +175,27 @@ class DiscussionTile extends HookWidget {
                 ),
               ] else ...[
                 if (discussionTileController.canReply)
-                  Button.icon(
-                    icon: Icons.reply,
+                  Button(
+                    leading: const Icon(Icons.reply),
                     onPressed: isSubmitting
                         ? null
                         : discussionTileController.toggleReplying,
                   ),
                 if (discussionTileController.canEditItem)
-                  Button.icon(
-                    icon: Icons.edit_outlined,
+                  Button(
+                    leading: const Icon(Icons.edit_outlined),
                     onPressed: isSubmitting
                         ? null
                         : discussionTileController.startEditing,
                   ),
                 if (discussionTileController.item.isReview &&
                     discussionTileController.onLike != null)
-                  Button.icon(
-                    icon: discussionTileController.item.isLiked
-                        ? Icons.thumb_down_alt_outlined
-                        : Icons.thumb_up_alt_outlined,
+                  Button(
+                    leading: Icon(
+                      discussionTileController.item.isLiked
+                          ? Icons.thumb_down_alt_outlined
+                          : Icons.thumb_up_alt_outlined,
+                    ),
                     onPressed:
                         isSubmitting ||
                             discussionTileController.isLikeSubmitting.value

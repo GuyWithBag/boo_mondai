@@ -1,5 +1,6 @@
 import 'package:boo_mondai/features/features.barrel.dart';
-import 'package:boo_mondai/lib.barrel.dart' show AppSpacing, Button, AppTokens;
+import 'package:boo_mondai/lib.barrel.dart'
+    show AppSpacing, Button, ButtonColor, AppTokens, buttonStyle;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart'
     show Surface, ThemeVariantsContext;
@@ -28,7 +29,11 @@ class SelectionActionBar extends StatelessWidget {
           Expanded(child: Text('$count selected')),
           ...actions,
           const SizedBox(width: AppSpacing.sm),
-          Button.icon(icon: Icons.close_rounded, onPressed: onClear),
+          Button.icon(
+            icon: Icons.close_rounded,
+            onPressed: onClear,
+            tokens: tokens,
+          ),
         ],
       ),
     );

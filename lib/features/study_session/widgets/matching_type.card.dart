@@ -90,44 +90,41 @@ class MatchingTypeCard extends HookWidget {
       selectedMatch.value = null;
     }
 
-    return PhysicalCardSide(
-      maxWidth: maxWidth,
-      child: Column(
-        spacing: tokens.spaceLayoutGapMd,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            'Match the pairs'.toUpperCase(),
-            textAlign: TextAlign.center,
-            style: eyebrowStyle,
-          ),
+    return Column(
+      spacing: tokens.spaceLayoutGapMd,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          'Match the pairs'.toUpperCase(),
+          textAlign: TextAlign.center,
+          style: eyebrowStyle,
+        ),
 
-          Row(
-            spacing: tokens.spaceLayoutGapSm,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: _MatchColumn(
-                  items: terms,
-                  selectedMatch: selectedMatch.value,
-                  matchedItems: matchedItems.value,
-                  previewRevealed: isRevealed,
-                  onItemPressed: handleMatchTap,
-                ),
+        Row(
+          spacing: tokens.spaceLayoutGapSm,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: _MatchColumn(
+                items: terms,
+                selectedMatch: selectedMatch.value,
+                matchedItems: matchedItems.value,
+                previewRevealed: isRevealed,
+                onItemPressed: handleMatchTap,
               ),
-              Expanded(
-                child: _MatchColumn(
-                  items: matches,
-                  selectedMatch: selectedMatch.value,
-                  matchedItems: matchedItems.value,
-                  previewRevealed: isRevealed,
-                  onItemPressed: handleMatchTap,
-                ),
+            ),
+            Expanded(
+              child: _MatchColumn(
+                items: matches,
+                selectedMatch: selectedMatch.value,
+                matchedItems: matchedItems.value,
+                previewRevealed: isRevealed,
+                onItemPressed: handleMatchTap,
               ),
-            ],
-          ),
-        ],
-      ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

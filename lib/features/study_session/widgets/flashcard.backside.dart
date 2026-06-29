@@ -1,13 +1,6 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show
-        FlashcardTemplate,
-        StudyCard,
-        AppTokens,
-        PhysicalCardSide,
-        MarkdownText,
-        SurfaceColor;
+    show FlashcardTemplate, StudyCard, AppTokens, MarkdownText;
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 class FlashcardBackSide extends StatelessWidget {
@@ -26,32 +19,20 @@ class FlashcardBackSide extends StatelessWidget {
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
 
-    return PhysicalCardSide(
-      maxWidth: maxWidth,
-      surfaceStyleVariants: const [SurfaceColor.primarySoft],
-      child: Center(
-        child: Column(
-          key: const ValueKey('flashcard-back'),
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            MarkdownText(
-              data: template.getQuestion(isReversed: studyCard.isReversed),
-            ),
-            SizedBox(height: 26.h),
-            Container(
-              width: 64.w,
-              height: 4.h,
-              decoration: BoxDecoration(
-                color: tokens.colorBorderNeutralSubtle,
-                borderRadius: BorderRadius.circular(999),
-              ),
-            ),
-            SizedBox(height: 32.h),
-            MarkdownText(
-              data: template.getAnswer(isReversed: studyCard.isReversed),
-            ),
-          ],
-        ),
+    return Center(
+      child: Column(
+        key: const ValueKey('flashcard-back'),
+        mainAxisSize: MainAxisSize.min,
+        spacing: tokens.spaceLayoutGapMd,
+        children: [
+          MarkdownText(
+            data: template.getQuestion(isReversed: studyCard.isReversed),
+          ),
+          Divider(),
+          MarkdownText(
+            data: template.getAnswer(isReversed: studyCard.isReversed),
+          ),
+        ],
       ),
     );
   }

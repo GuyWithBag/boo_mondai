@@ -87,9 +87,8 @@ class ProfileAvatar extends StatelessWidget {
           Positioned(
             right: -radius * 0.08,
             bottom: -radius * 0.08,
-            child: Button.iconSmall(
-              icon: Icons.edit,
-              color: ButtonColor.primary,
+            child: Button(
+              leading: const Icon(Icons.edit),
               onPressed: () => _pickAndApplyImage(onImagePicked!),
             ),
           ),

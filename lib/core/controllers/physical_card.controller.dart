@@ -14,7 +14,7 @@ class PhysicalCardController extends ChangeNotifier {
     double yaw = 0,
     double roll = 0,
     double scale = 1.0,
-    double perspective = 0.0015,
+    double perspective = 1,
     Offset position = Offset.zero,
     Duration animationDuration = const Duration(milliseconds: 260),
     Curve animationCurve = Curves.easeOutCubic,

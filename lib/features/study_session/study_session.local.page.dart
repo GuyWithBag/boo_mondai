@@ -3,11 +3,54 @@
 // PURPOSE: Unified session interface for both Drill and Review modes
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/lib.barrel.dart';
-import 'package:flutter/material.dart' hide Scaffold;
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:provider/provider.dart';
-import 'package:go_router/go_router.dart';
+import 'package:boo_mondai/lib.barrel.dart'
+    show
+        AppBar,
+        AppSpacing,
+        AppTokens,
+        Button,
+        DrillSessionController,
+        ErrorState,
+        ErrorText,
+        FlashcardTemplate,
+        ProgressBar,
+        ReviewSessionController,
+        Scaffold,
+        SessionException,
+        SessionMode,
+        StreakController,
+        StudySessionCardStage,
+        StudySessionController,
+        TextColor,
+        TextSize,
+        TextWeight,
+        ViewReviewsController,
+        textStyle,
+        useStudySessionCardStageController,
+        surfaceStyle,
+        SurfaceShape,
+        RatingArea,
+        SurfacePadding;
+import 'package:flutter/material.dart'
+    show
+        Icons,
+        SizedBox,
+        Widget,
+        BuildContext,
+        Icon,
+        Text,
+        WidgetsBinding,
+        MainAxisSize,
+        Colors,
+        Column,
+        Center,
+        Expanded,
+        Row,
+        SafeArea;
+import 'package:flutter_hooks/flutter_hooks.dart' show useEffect, HookWidget;
+import 'package:go_router/go_router.dart' show GoRouterHelper;
+import 'package:provider/provider.dart' show WatchContext, ReadContext;
+import 'package:theme_variants/theme_variants.dart';
 
 class StudySessionPage extends HookWidget {
   const StudySessionPage({super.key, required this.deckId, required this.mode});
@@ -25,6 +68,7 @@ class StudySessionPage extends HookWidget {
 
     final StudySessionController controller;
     final ViewReviewsController? dashboardController;
+    final tokens = context.themeTokens<AppTokens>();
 
     if (mode == SessionMode.drill) {
       controller = context.watch<DrillSessionController>();
@@ -111,8 +155,7 @@ class StudySessionPage extends HookWidget {
       return ErrorText(controller.error);
     }
 
-    void closeSession() {
-      controller.reset();
+    void onPop() {
       if (mode == SessionMode.review) {
         dashboardController?.load();
       }
@@ -130,19 +173,34 @@ class StudySessionPage extends HookWidget {
 
     return Scaffold(
       scrollable: false,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(76),
-        child: SafeArea(
-          bottom: false,
-          child: StudySessionAppbar(
-            controller: controller,
-            onClose: closeSession,
-          ),
+      appBar: AppBar(
+        onPop: onPop,
+        child: Row(
+          spacing: tokens.spaceLayoutGapMd,
+          children: [
+            Expanded(
+              child: ProgressBar(value: controller.getProgressPercentage()),
+            ),
+            Text(
+              '${controller.currentIndex} / ${controller.queue.length}',
+              style: textStyle.resolve(tokens, [
+                TextSize.labelSmall,
+                TextWeight.heavy,
+                TextColor.muted,
+              ]),
+            ),
+          ],
         ),
       ),
-      bottomNavigationBar: StudySessionBottomNavBar(
-        studySessionController: controller,
-        interactionsController: interactionsController,
+      bottomNavigationBar: Surface(
+        style: surfaceStyle.resolve(tokens, const [SurfaceShape.topRounded]),
+        child: SafeArea(
+          top: false,
+          child: RatingArea(
+            studySessionController: controller,
+            interactionsController: interactionsController,
+          ),
+        ),
       ),
       body: StudySessionCardStage(
         studySessionController: controller,

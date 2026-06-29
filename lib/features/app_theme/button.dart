@@ -1,14 +1,15 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
+        ButtonState,
+        AppTokens,
+        buttonStyle,
         ButtonSize,
         ButtonPadding,
         ButtonVariant,
-        ButtonColor,
-        ButtonState,
-        AppTokens,
-        buttonStyle;
+        ButtonColor;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 class Button extends HookWidget {
@@ -20,9 +21,10 @@ class Button extends HookWidget {
     this.selected = false,
     this.mainAxisAlignment = MainAxisAlignment.center,
     this.axis = Axis.horizontal,
-    this.variants = const [],
+    this.style,
+    bool dashed = false,
     super.key,
-  });
+  }) : _isDashed = dashed;
 
   final Widget? child;
   final VoidCallback? onPressed;
@@ -31,7 +33,8 @@ class Button extends HookWidget {
   final bool selected;
   final MainAxisAlignment mainAxisAlignment;
   final Axis axis;
-  final List<Object> variants;
+  final SurfaceStyle? style;
+  final bool _isDashed;
 
   static Button icon({
     VoidCallback? onPressed,
@@ -39,27 +42,68 @@ class Button extends HookWidget {
     ButtonColor color = ButtonColor.baseline,
     ButtonVariant variant = ButtonVariant.elevated,
     bool selected = false,
+    required AppTokens tokens,
   }) {
     return Button(
       onPressed: onPressed,
       leading: icon == null ? null : Icon(icon),
       selected: selected,
-      variants: [color, ButtonSize.icon, ButtonPadding.none, variant],
+      dashed: variant == ButtonVariant.dashed,
+      style: buttonStyle.resolve(tokens, [
+        color,
+        ButtonSize.icon,
+        ButtonPadding.none,
+        variant,
+      ]),
+    );
+  }
+
+  static Button dashed({
+    required AppTokens tokens,
+    VoidCallback? onPressed,
+    Widget? child,
+    Widget? leading,
+    Widget? trailing,
+    bool selected = false,
+    MainAxisAlignment mainAxisAlignment = MainAxisAlignment.center,
+    Axis axis = Axis.horizontal,
+  }) {
+    return Button(
+      onPressed: onPressed,
+      leading: leading,
+      trailing: trailing,
+      selected: selected,
+      mainAxisAlignment: mainAxisAlignment,
+      axis: axis,
+      style: buttonStyle.resolve(tokens, const [
+        ButtonVariant.dashed,
+        ButtonColor.dashed,
+      ]),
+      dashed: true,
+      child: child,
     );
   }
 
   static Button iconSmall({
+    required SurfaceStyle style,
     VoidCallback? onPressed,
     IconData? icon,
     ButtonColor color = ButtonColor.muted,
     ButtonVariant variant = ButtonVariant.text,
     bool selected = false,
+    required AppTokens tokens,
   }) {
     return Button(
       onPressed: onPressed,
       leading: icon == null ? null : Icon(icon),
       selected: selected,
-      variants: [color, ButtonSize.smallIcon, ButtonPadding.none, variant],
+      dashed: variant == ButtonVariant.dashed,
+      style: buttonStyle.resolve(tokens, [
+        color,
+        ButtonSize.smallIcon,
+        ButtonPadding.none,
+        variant,
+      ]),
     );
   }
 
@@ -70,18 +114,20 @@ class Button extends HookWidget {
     ButtonColor color = ButtonColor.baseline,
     ButtonVariant variant = ButtonVariant.elevated,
     bool selected = false,
+    required AppTokens tokens,
   }) {
     return Button(
       onPressed: onPressed,
       leading: icon == null ? null : Icon(icon),
       selected: selected,
       axis: Axis.vertical,
-      variants: [
+      dashed: variant == ButtonVariant.dashed,
+      style: buttonStyle.resolve(tokens, [
         color,
         ButtonSize.iconWithLabel,
         ButtonPadding.iconWithLabel,
         variant,
-      ],
+      ]),
       child: Text(
         label,
         maxLines: 2,
@@ -119,10 +165,41 @@ class Button extends HookWidget {
       return null;
     }, [onPressed, selected]);
 
-    final resolvedStyle = buttonStyle.resolve(tokens, [
-      ...variants,
-      state.value,
-    ]);
+    final effectiveStyle = style ?? buttonStyle.resolve(tokens);
+    var resolvedStyle = effectiveStyle;
+
+    if (state.value == ButtonState.selected) {
+      resolvedStyle = resolvedStyle.copyWith(
+        decoration: resolvedStyle.decoration.copyWith(
+          color: tokens.colorPrimarySoft,
+          border: Border.all(
+            color: tokens.colorPrimaryBright,
+            width: tokens.borderWidthDefault.w,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: tokens.colorPrimaryBright,
+              offset: Offset(0, tokens.buttonShadowOffset.h),
+              blurRadius: 0,
+            ),
+          ],
+        ),
+        contentStyle: resolvedStyle.contentStyle.copyWith(
+          textStyle: resolvedStyle.textStyle.copyWith(
+            color: tokens.colorPrimary,
+          ),
+          iconTheme: resolvedStyle.iconTheme.copyWith(
+            color: tokens.colorPrimary,
+          ),
+        ),
+      );
+    } else if (state.value == ButtonState.disabled) {
+      resolvedStyle = resolvedStyle.copyWith(opacity: 0.5);
+    } else if (state.value == ButtonState.pressed) {
+      resolvedStyle = resolvedStyle.copyWith(
+        transform: Matrix4.translationValues(0, 0, 0),
+      );
+    }
 
     final contentChild = switch (axis) {
       Axis.horizontal => Row(
@@ -164,7 +241,7 @@ class Button extends HookWidget {
       child: contentChild,
     );
 
-    final paintedContent = variants.contains(ButtonVariant.dashed)
+    final paintedContent = _isDashed
         ? SizedBox(
             width: double.infinity,
             child: CustomPaint(
@@ -172,7 +249,7 @@ class Button extends HookWidget {
                 color: state.value == ButtonState.hovered
                     ? tokens.colorPrimary
                     : tokens.colorBorderNeutralSubtle,
-                radius: tokens.radiusSurfaceXsm,
+                radius: tokens.radiusSurfaceXsm.r,
               ),
               child: content,
             ),
@@ -208,7 +285,7 @@ class Button extends HookWidget {
     );
 
     return Padding(
-      padding: variants.contains(ButtonVariant.elevated)
+      padding: resolvedStyle.transform != null
           ? EdgeInsets.only(top: tokens.buttonShadowOffset)
           : EdgeInsets.zero,
       child: button,
