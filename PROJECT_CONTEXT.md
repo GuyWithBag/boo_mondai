@@ -187,7 +187,7 @@ Guard logic:
 Platform nav differences:
   - Mobile: [BottomNavigationBar / NavigationBar]
   - Web: [Top nav bar / NavigationRail]
-  - Desktop: [Sidebar / NavigationRail + expanded labels]
+  - Desktop: [SideBar / NavigationRail + expanded labels]
 ```
 
 ---
