@@ -7,7 +7,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         ChangeTrackerController,
         DownloadsTile,
         EmptyState,
-        ViewDeckDownloadsAppbar,
+        ViewDeckDownloadsAppBar,
         ViewDeckDownloadsController;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -34,7 +34,7 @@ class _ViewDeckDownloadsView extends StatelessWidget {
     final controller = context.watch<ViewDeckDownloadsController>();
 
     return Scaffold(
-      appBar: const ViewDeckDownloadsAppbar(),
+      appBar: const ViewDeckDownloadsAppBar(),
       body: controller.isEmpty
           ? const Center(
               child: EmptyState(

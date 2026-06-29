@@ -3,7 +3,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         Button,
         ButtonColor,
-        buttonStyle,
         ChipTone,
         DeckDetails,
         Deck,
@@ -21,7 +20,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         surfaceStyle,
         useViewDeckSingleSheet,
         Scaffold,
-        ViewDeckSingleBottomNavbar,
+        ViewDeckSingleBottomNavBar,
         BackgroundImageSurface,
         SurfaceBorder,
         SurfaceShadow,
@@ -59,9 +58,9 @@ class ViewDeckSingleSheet extends HookWidget {
       initialDeck: deck,
       controller: decksController,
     );
-    final sheetDeck = sheet.deck;
+    final activeDeck = sheet.deck;
     final publishChipStyle = chipStyle.resolve(tokens, [
-      deck.isPublished ? ChipTone.filled : ChipTone.hard,
+      activeDeck.isPublished ? ChipTone.filled : ChipTone.hard,
     ]);
 
     return DraggableScrollableSheet(
@@ -76,20 +75,21 @@ class ViewDeckSingleSheet extends HookWidget {
               .copyWith(clipBehavior: Clip.antiAlias),
           child: Scaffold(
             backgroundColor: Colors.transparent,
-            bottomNavigationBar: ViewDeckSingleBottomNavbar(deck: sheetDeck),
-            scrollable: false,
+            bottomNavBar: ViewDeckSingleBottomNavBar(deck: activeDeck),
+            scrollable: true,
             center: false,
             shouldConstrainWidth: false,
-            haveBottomNavbarBottomPadding: false,
+            inheritMainBottomNavBarHeight: false,
             isFloatingAppBar: true,
+            scrollController: scrollController,
             appBar: AppBar(
               transparentBackground: true,
               actions: [
                 Button.icon(
                   tokens: tokens,
                   icon: Icons.edit,
-                  onPressed: sheetDeck.isEditable
-                      ? () => context.push('/decks-local/${sheetDeck.id}/edit')
+                  onPressed: activeDeck.isEditable
+                      ? () => context.push('/decks-local/${activeDeck.id}/edit')
                       : null,
                 ),
                 Button.icon(
@@ -104,28 +104,30 @@ class ViewDeckSingleSheet extends HookWidget {
                 spacing: tokens.spaceLayoutGapSm,
                 runSpacing: tokens.spaceLayoutGapSm,
                 children: [
-                  if (deck.isPremade) const HeaderBadge(label: 'Premade'),
+                  if (activeDeck.isPremade) const HeaderBadge(label: 'Premade'),
                   ChipTheme(
                     data: publishChipStyle,
                     child: ChoiceChip(
                       avatar: Icon(
-                        deck.isPublished
+                        activeDeck.isPublished
                             ? Icons.public_outlined
                             : Icons.public_off_outlined,
                       ),
-                      label: Text(deck.isPublished ? 'Published' : 'Draft'),
-                      selected: deck.isPublished,
+                      label: Text(
+                        activeDeck.isPublished ? 'Published' : 'Draft',
+                      ),
+                      selected: activeDeck.isPublished,
                       onSelected: sheet.isSavingPublishState
                           ? null
                           : sheet.setPublished,
                     ),
                   ),
-                  if (!deck.isEditable) const Chip(label: Text('Locked')),
+                  if (!activeDeck.isEditable) const Chip(label: Text('Locked')),
                 ],
               ),
             ),
             padding: EdgeInsets.zero,
-            body: _Body(scrollController: scrollController, sheet: sheet),
+            body: _Body(sheet: sheet),
           ),
         );
       },
@@ -134,97 +136,17 @@ class ViewDeckSingleSheet extends HookWidget {
 }
 
 class _Body extends StatelessWidget {
-  const _Body({required this.scrollController, required this.sheet});
+  const _Body({required this.sheet});
 
-  final ScrollController scrollController;
   final ViewDeckSingleSheetController sheet;
 
   @override
   Widget build(BuildContext context) {
     final deck = sheet.deck;
     final tokens = context.themeTokens<AppTokens>();
-    // final publishChipStyle = chipStyle.resolve(tokens, [
-    //   deck.isPublished ? ChipTone.filled : ChipTone.hard,
-    // ]);
 
     final deckWidth = 160.w;
-    final headerHeight = 350.h.clamp(300.0, 390.0).toDouble();
-
-    // return Stack(
-    //   clipBehavior: Clip.none,
-    //   children: [
-    // Positioned(
-    //   left: 0,
-    //   right: 0,
-    //   top: 0,
-    //   height: headerHeight + tokens.radiusSurfaceLg,
-    //   child: BackgroundImageSurface(
-    //     image: ImageHelper.getImageProviderFromSource(deck.coverImageUrl),
-    //     onImagePicked: deck.isEditable ? sheet.updateCoverImage : null,
-    //   ),
-    // ),
-
-    // SingleChildScrollView(
-    //   sheet: scrollController,
-    //   child: Column(
-    //     children: [
-    //       SizedBox(height: headerHeight),
-    //       _BodySubSection(
-    //         sheet: sheet,
-    //         deckWidth: deckWidth,
-    //         scrollController: scrollController,
-    //         collapseDistance: headerHeight * 0.55,
-    //       ),
-    //     ],
-    //   ),
-    // ),
-    // Positioned(
-    //   left: 0,
-    //   right: 0,
-    //   top: 0,
-    //   child: AppBar(
-    //     transparentBackground: true,
-    //     actions: [
-    //       Button.icon(
-    //         tokens: tokens,
-    //         icon: Icons.edit,
-    //         onPressed: onEditPressed,
-    //       ),
-    //       Button.icon(
-    //         tokens: tokens,
-    //         icon: Icons.delete_outline,
-    //         color: ButtonColor.error,
-    //         onPressed: sheet.deleteDeck,
-    //       ),
-    //     ],
-    //     bottom: Wrap(
-    //       alignment: WrapAlignment.end,
-    //       spacing: tokens.spaceLayoutGapSm,
-    //       runSpacing: tokens.spaceLayoutGapSm,
-    //       children: [
-    //         if (deck.isPremade) const HeaderBadge(label: 'Premade'),
-    //         ChipTheme(
-    //           data: publishChipStyle,
-    //           child: ChoiceChip(
-    //             avatar: Icon(
-    //               deck.isPublished
-    //                   ? Icons.public_outlined
-    //                   : Icons.public_off_outlined,
-    //             ),
-    //             label: Text(deck.isPublished ? 'Published' : 'Draft'),
-    //             selected: deck.isPublished,
-    //             onSelected: sheet.isSavingPublishState
-    //                 ? null
-    //                 : sheet.setPublished,
-    //           ),
-    //         ),
-    //         if (!deck.isEditable) const Chip(label: Text('Locked')),
-    //       ],
-    //     ),
-    //   ),
-    // ),
-    // ],
-    // );
+    final headerHeight = 300.h;
 
     return Stack(
       clipBehavior: Clip.none,
@@ -241,14 +163,12 @@ class _Body extends StatelessWidget {
         ),
 
         SingleChildScrollView(
-          controller: scrollController,
           child: Column(
             children: [
               SizedBox(height: headerHeight),
               _BodySubSection(
                 sheet: sheet,
                 deckWidth: deckWidth,
-                scrollController: scrollController,
                 collapseDistance: headerHeight * 0.55,
               ),
             ],
@@ -263,13 +183,11 @@ class _BodySubSection extends StatelessWidget {
   const _BodySubSection({
     required this.sheet,
     required this.deckWidth,
-    required this.scrollController,
     required this.collapseDistance,
   });
 
   final ViewDeckSingleSheetController sheet;
   final double deckWidth;
-  final ScrollController scrollController;
   final double collapseDistance;
 
   @override
@@ -320,6 +238,7 @@ class _BodySubSection extends StatelessWidget {
                   tags: tags,
                   onTagsChanged: sheet.updateTags,
                   areTagsEditable: deck.isEditable,
+                  isEditable: deck.isEditable,
                   tagsPlaceholder: deck.isEditable ? 'Add tags' : 'No tags yet',
                   tagsTone: ChipTone.ghost,
                   metaLabels: Wrap(

@@ -1,5 +1,16 @@
+import 'dart:ui';
+
+import 'package:boo_mondai/features/app_theme/app_theme.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, LocalDB, DrillService, ButtonColor, Button, buttonStyle, Deck;
+    show
+        AppTokens,
+        Button,
+        ButtonColor,
+        Deck,
+        DrillService,
+        LocalDB,
+        Scaffold,
+        buttonStyle;
 import 'package:flutter/material.dart'
     show
         StatelessWidget,
@@ -12,14 +23,20 @@ import 'package:flutter/material.dart'
         EdgeInsets,
         Padding,
         MediaQuery,
-        View;
+        View,
+        PreferredSizeWidget;
 import 'package:go_router/go_router.dart' show GoRouterHelper;
-import 'package:theme_variants/theme_variants.dart' show ThemeVariantsContext;
+import 'package:theme_variants/theme_variants.dart'
+    show ThemeVariantsContext, Surface;
 
-class ViewDeckSingleBottomNavbar extends StatelessWidget {
-  const ViewDeckSingleBottomNavbar({super.key, required this.deck});
+class ViewDeckSingleBottomNavBar extends StatelessWidget
+    implements PreferredSizeWidget {
+  const ViewDeckSingleBottomNavBar({super.key, required this.deck});
 
   final Deck deck;
+
+  @override
+  Size get preferredSize => Size(0, BottomNavBar.preferredHeightDefault);
 
   @override
   Widget build(BuildContext context) {
@@ -29,12 +46,8 @@ class ViewDeckSingleBottomNavbar extends StatelessWidget {
     final eligibleCards = DrillService.getEligibleDrillCards(deck.id, userId);
     final canDrill = eligibleCards.isNotEmpty;
 
-    return Padding(
-      padding: EdgeInsets.only(
-        bottom: _bottomSystemInset(context) + tokens.spaceLayoutGapSm,
-        right: tokens.spaceScaffoldPadding,
-        left: tokens.spaceScaffoldPadding,
-      ),
+    return BottomNavBar(
+      variants: const [SurfaceShape.roundedSm],
       child: Row(
         spacing: tokens.spaceLayoutGapMd,
         children: [
@@ -66,20 +79,4 @@ class ViewDeckSingleBottomNavbar extends StatelessWidget {
       ),
     );
   }
-}
-
-double _bottomSystemInset(BuildContext context) {
-  final mediaQuery = MediaQuery.of(context);
-  final view = View.of(context);
-  final devicePixelRatio = view.devicePixelRatio;
-  final viewPaddingBottom = view.viewPadding.bottom / devicePixelRatio;
-  final gestureInsetBottom = view.systemGestureInsets.bottom / devicePixelRatio;
-
-  return [
-    mediaQuery.padding.bottom,
-    mediaQuery.viewPadding.bottom,
-    mediaQuery.systemGestureInsets.bottom,
-    viewPaddingBottom,
-    gestureInsetBottom,
-  ].reduce((max, value) => value > max ? value : max);
 }

@@ -4,9 +4,9 @@
 
 import 'package:flutter/material.dart';
 
-class ViewDeckDownloadsAppbar extends StatelessWidget
+class ViewDeckDownloadsAppBar extends StatelessWidget
     implements PreferredSizeWidget {
-  const ViewDeckDownloadsAppbar({super.key});
+  const ViewDeckDownloadsAppBar({super.key});
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight + 32);

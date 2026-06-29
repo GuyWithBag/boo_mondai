@@ -1,11 +1,8 @@
 import 'package:boo_mondai/core/database/localdbs.dart';
-import 'package:boo_mondai/core/helpers/image.helper.dart' show ImageHelper;
 import 'package:boo_mondai/features/decks/models/deck.dto.dart';
 import 'package:boo_mondai/features/decks/models/visibility_state.dto.dart';
 import 'package:boo_mondai/features/profile/models/cached_profile.dart';
 import 'package:boo_mondai/features/profile/models/profile.dto.dart';
-import 'package:boo_mondai/features/tags/models/tag.dto.dart';
-import 'package:file_picker/file_picker.dart' show PlatformFile;
 
 abstract final class ViewDeckSingleHelper {
   static String title(Deck deck) {
@@ -54,110 +51,6 @@ abstract final class ViewDeckSingleHelper {
       VisibilityState.public => 'Public',
       VisibilityState.unlisted => 'Unlisted',
     };
-  }
-
-  static Future<bool> updatePublishedState({
-    required Deck deck,
-    required bool isPublished,
-  }) async {
-    await LocalDB.deck.upsert(
-      deck.copyWith(isPublished: isPublished, updatedAt: DateTime.now()),
-    );
-    return true;
-  }
-
-  static Future<bool> updateTags({
-    required Deck deck,
-    required List<String> tagNames,
-  }) async {
-    if (!deck.isEditable) {
-      return false;
-    }
-
-    final normalizedTagNames = tagNames
-        .map((tagName) => tagName.trim())
-        .where((tagName) => tagName.isNotEmpty)
-        .toList();
-    final currentTagNames = deck.tags.map((tag) => tag.name).toList();
-
-    if (_sameTagNames(normalizedTagNames, currentTagNames)) {
-      return false;
-    }
-
-    final existingTagsByName = {
-      for (final tag in deck.tags) tag.name.toLowerCase(): tag,
-    };
-    final updatedTags = [
-      for (final tagName in normalizedTagNames)
-        existingTagsByName[tagName.toLowerCase()] ??
-            Tag.createNow(name: tagName, userId: deck.userId),
-    ];
-
-    await LocalDB.deck.upsert(
-      deck.copyWith(tags: updatedTags, updatedAt: DateTime.now()),
-    );
-    return true;
-  }
-
-  static Future<bool> updateTextField({
-    required Deck deck,
-    required String value,
-    required bool allowEmpty,
-    required String Function(Deck deck) selectCurrentValue,
-    required Deck Function(Deck deck, String value) copyWithValue,
-  }) async {
-    if (!deck.isEditable) {
-      return false;
-    }
-
-    final trimmedValue = value.trim();
-    if (!allowEmpty && trimmedValue.isEmpty) {
-      return false;
-    }
-    if (trimmedValue == selectCurrentValue(deck)) {
-      return false;
-    }
-
-    final updatedDeck = copyWithValue(
-      deck,
-      trimmedValue,
-    ).copyWith(updatedAt: DateTime.now());
-
-    await LocalDB.deck.upsert(updatedDeck);
-    return true;
-  }
-
-  static Future<bool> updateCoverImage({
-    required Deck deck,
-    required PlatformFile file,
-  }) async {
-    if (!deck.isEditable) {
-      return false;
-    }
-
-    final imageSource = ImageHelper.getImageSourceFromPickedFile(file);
-    if (imageSource == null || imageSource == deck.coverImageUrl) {
-      return false;
-    }
-
-    await LocalDB.deck.upsert(
-      deck.copyWith(coverImageUrl: imageSource, updatedAt: DateTime.now()),
-    );
-    return true;
-  }
-
-  static bool _sameTagNames(List<String> left, List<String> right) {
-    if (left.length != right.length) {
-      return false;
-    }
-
-    for (var i = 0; i < left.length; i++) {
-      if (left[i] != right[i]) {
-        return false;
-      }
-    }
-
-    return true;
   }
 
   static Object? _profile(Deck deck) {
