@@ -8,12 +8,14 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppBar,
         AppSpacing,
         AppTokens,
+        BottomNavBar,
         Button,
         DrillSessionController,
         ErrorState,
         ErrorText,
         FlashcardTemplate,
         ProgressBar,
+        RatingArea,
         ReviewSessionController,
         Scaffold,
         SessionException,
@@ -21,16 +23,15 @@ import 'package:boo_mondai/lib.barrel.dart'
         StreakController,
         StudySessionCardStage,
         StudySessionController,
+        SurfacePadding,
+        SurfaceShape,
         TextColor,
         TextSize,
         TextWeight,
         ViewReviewsController,
-        textStyle,
-        useStudySessionCardStageController,
         surfaceStyle,
-        SurfaceShape,
-        RatingArea,
-        SurfacePadding;
+        textStyle,
+        useStudySessionCardStageController;
 import 'package:flutter/material.dart'
     show
         Icons,
@@ -192,14 +193,10 @@ class StudySessionPage extends HookWidget {
           ],
         ),
       ),
-      bottomNavigationBar: Surface(
-        style: surfaceStyle.resolve(tokens, const [SurfaceShape.topRounded]),
-        child: SafeArea(
-          top: false,
-          child: RatingArea(
-            studySessionController: controller,
-            interactionsController: interactionsController,
-          ),
+      bottomNavBar: BottomNavBar(
+        child: RatingArea(
+          studySessionController: controller,
+          interactionsController: interactionsController,
         ),
       ),
       body: StudySessionCardStage(

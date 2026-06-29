@@ -12,6 +12,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         AuthController,
         LeaderboardSection,
         LocalDB,
+        MainController,
         ReadyToReviewCard,
         Scaffold,
         StreaksCard,
@@ -29,7 +30,7 @@ import 'package:flutter/material.dart'
         Container;
 import 'package:flutter_hooks/flutter_hooks.dart' show HookWidget, useEffect;
 import 'package:go_router/go_router.dart' show GoRouterHelper;
-import 'package:provider/provider.dart' show WatchContext;
+import 'package:provider/provider.dart' show WatchContext, ReadContext;
 import 'package:theme_variants/theme_variants.dart' show ThemeVariantsContext;
 
 class HomePage extends HookWidget {
@@ -53,22 +54,6 @@ class HomePage extends HookWidget {
     return Scaffold(
       appBar: AppBar(title: 'Home'),
       scrollable: true,
-      // body: Column(
-      //   spacing: tokens.spaceLayoutGapMd,
-      //   children: [
-      //     // ReadyToReviewCard(
-      //     //   dueCount: reviewDashboard.totalDue,
-      //     //   onStartSession: () => context.push('/review/session'),
-      //     // ),
-      //     // StreaksCard(streak: LocalDB.streak.getOrCreate()),
-      //     // LeaderboardSection(
-      //     //   entries: leaderboard.entries,
-      //     //   isLoading: leaderboard.isLoading,
-      //     //   currentUserId: auth.currentProfile.id,
-      //     // ),
-      //     // Container(color: Colors.red),
-      //   ],
-      // ),
       body: RefreshIndicator(
         onRefresh: () async {
           await Future.wait([
@@ -76,6 +61,7 @@ class HomePage extends HookWidget {
             leaderboard.fetchLeaderboard(),
           ]);
         },
+
         child: Column(
           spacing: tokens.spaceLayoutGapMd,
           children: [
@@ -93,15 +79,5 @@ class HomePage extends HookWidget {
         ),
       ),
     );
-    // return Expanded(
-    //   child: Column(children: [Container(color: Colors.red, height: 100)]),
-    // );
-    // return Container(color: Colors.red, height: 100);
-    // return Scaffold(
-    //   scrollable: false,
-    //   shouldConstrainWidth: false,
-    //   safeArea: false,
-    //   body: Container(color: Colors.red),
-    // );
   }
 }
