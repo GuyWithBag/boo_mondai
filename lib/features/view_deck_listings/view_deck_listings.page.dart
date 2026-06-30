@@ -66,7 +66,7 @@ class _ViewDeckListingsView extends HookWidget {
 
     return Scaffold(
       appBar: AppBar(title: 'Browse Decks', header: searchBar),
-      scrollable: false,
+      scrollable: true,
       body: ListingStatesWrapper<Deck>.list(
         isLoading: controller.isLoading,
         exception: controller.error,
@@ -83,6 +83,7 @@ class _ViewDeckListingsView extends HookWidget {
                 message: 'Published community decks will appear here.',
               ),
         onRetry: controller.loadPublicDecks,
+        useParentScroll: true,
         skeletonTile: Center(child: DeckListingTile(deck: _skeletonDeck)),
         separatorHeight: tokens.spaceLayoutGapMd,
         itemBuilder: (context, _, deck) {

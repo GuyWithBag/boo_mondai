@@ -6,7 +6,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         SearchFilter,
         SearchFilterDirective;
 
-abstract final class ReviewDeckSearchFilterDirective {
+abstract final class StudyDeckSearchFilterDirective {
   static const due = SearchFilterDirective(
     name: 'due',
     aliases: ['threshold', 'filter', 'mode'],
@@ -19,8 +19,8 @@ abstract final class ReviewDeckSearchFilterDirective {
   );
 }
 
-class ReviewDeckSearchFilter implements SearchFilter {
-  const ReviewDeckSearchFilter({
+class StudyDeckSearchFilter implements SearchFilter {
+  const StudyDeckSearchFilter({
     required this.freeText,
     required this.dueFilter,
     required this.fuzzyCutoff,
@@ -32,7 +32,7 @@ class ReviewDeckSearchFilter implements SearchFilter {
   @override
   final int fuzzyCutoff;
 
-  static ReviewDeckSearchFilter parse(
+  static StudyDeckSearchFilter parse(
     String input, {
     DueFilterThreshold defaultDueFilter = DueFilterThreshold.lookAheadOneDay,
     int defaultFuzzyCutoff = 60,
@@ -57,16 +57,16 @@ class ReviewDeckSearchFilter implements SearchFilter {
 
       if (value.isEmpty) continue;
 
-      if (ReviewDeckSearchFilterDirective.due.matches(key)) {
+      if (StudyDeckSearchFilterDirective.due.matches(key)) {
         dueFilter = _parseDueFilter(value) ?? dueFilter;
-      } else if (ReviewDeckSearchFilterDirective.fuzzy.matches(key)) {
+      } else if (StudyDeckSearchFilterDirective.fuzzy.matches(key)) {
         fuzzyCutoff = int.tryParse(value) ?? fuzzyCutoff;
       } else {
         freeTextParts.add(token);
       }
     }
 
-    return ReviewDeckSearchFilter(
+    return StudyDeckSearchFilter(
       freeText: freeTextParts.join(' ').trim(),
       dueFilter: dueFilter,
       fuzzyCutoff: fuzzyCutoff.clamp(0, 100).toInt(),

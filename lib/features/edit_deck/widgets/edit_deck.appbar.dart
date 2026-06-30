@@ -67,25 +67,12 @@ class EditDeckAppBar extends StatelessWidget implements PreferredSizeWidget {
               : const Icon(Icons.save),
         ),
       ],
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Row(
-            spacing: tokens.spaceLayoutGapSm,
-            children: [
-              const HeaderBadge(label: 'Draft Deck'),
-              const MetaLabel(icon: Icons.lock, label: 'Private'),
-            ],
-          ),
-          MarkdownText(
-            data: titleController.text,
-            controller: titleController,
-            placeholder: 'Deck Title...',
-            mode: MarkdownTextMode.input,
-            variants: const [TextFieldSize.labelLarge, TextFieldFrame.none],
-          ),
-        ],
+      child: MarkdownText(
+        data: titleController.text,
+        controller: titleController,
+        placeholder: 'Deck Title...',
+        mode: MarkdownTextMode.input,
+        variants: const [TextFieldSize.bodyLarge, TextFieldFrame.none],
       ),
     );
   }

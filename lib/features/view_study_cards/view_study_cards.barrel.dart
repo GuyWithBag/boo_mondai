@@ -3,5 +3,5 @@
 // Barrel files
 export 'models/models.barrel.dart';
 // Other files
-export 'view_reviews.controller.dart';
-export 'view_reviews.page.dart';
+export 'view_study_cards.controller.dart';
+export 'view_study_cards.page.dart';

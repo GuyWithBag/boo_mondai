@@ -21,7 +21,7 @@ export 'search/search.barrel.dart';
 export 'study_session/study_session.barrel.dart';
 export 'tags/tags.barrel.dart';
 export 'sync/sync.barrel.dart';
-export 'view_reviews/view_reviews.barrel.dart';
+export 'view_study_cards/view_study_cards.barrel.dart';
 export 'deck_downloads/deck_downloads.barrel.dart';
 export 'view_deck_downloads/view_deck_downloads.barrel.dart';
 export 'settings/settings.barrel.dart';

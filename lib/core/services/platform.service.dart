@@ -7,7 +7,10 @@
 
 import 'dart:io' show Platform;
 
-import 'package:flutter/foundation.dart';
+import 'package:boo_mondai/lib.barrel.dart' show AppTokens;
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/material.dart';
+import 'package:theme_variants/theme_variants.dart';
 
 abstract final class PlatformService {
   static bool get isWeb => kIsWeb;
@@ -16,4 +19,18 @@ abstract final class PlatformService {
 
   static bool get isDesktop =>
       Platform.isLinux || Platform.isMacOS || Platform.isWindows;
+
+  static EdgeInsets getScaffoldPadding(BuildContext context) {
+    final tokens = context.themeTokens<AppTokens>();
+    if (isMobile) {
+      return EdgeInsets.symmetric(
+        horizontal: tokens.spaceScaffoldPadding,
+        vertical: tokens.spaceScaffoldPaddingMobileY,
+      );
+    }
+    return EdgeInsets.symmetric(
+      horizontal: tokens.spaceScaffoldPadding,
+      vertical: tokens.spaceScaffoldPadding,
+    );
+  }
 }

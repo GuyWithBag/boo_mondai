@@ -1,3 +1,4 @@
+import 'package:boo_mondai/core/services/platform.service.dart';
 import 'package:boo_mondai/core/theme/breakpoints.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show AppTokens, Button, ButtonColor, ButtonVariant, MainController;
@@ -31,7 +32,7 @@ class Scaffold extends HookWidget {
     this.center = false,
     this.shouldConstrainWidth = false,
     this.floatingActionButton,
-    this.floatingSideBar = false,
+    this.isFloatingSideBar = false,
     this.floatingSideBarInitiallyOpen = false,
     this.haveSideBarOpenButton = false,
     this.haveBottomNavBarBottomGap = true,
@@ -70,7 +71,7 @@ class Scaffold extends HookWidget {
   final Widget? floatingActionButton;
   final bool showBottomNavBar;
   final bool showAppBar;
-  final bool floatingSideBar;
+  final bool isFloatingSideBar;
   final bool floatingSideBarInitiallyOpen;
   final bool haveSideBarOpenButton;
   final bool haveBottomNavBarBottomGap;
@@ -78,7 +79,6 @@ class Scaffold extends HookWidget {
   final ScrollController? scrollController;
 
   static const _animationDuration = Duration(milliseconds: 220);
-  static const _fabMargin = 20.0;
 
   @override
   Widget build(BuildContext context) {
@@ -125,8 +125,18 @@ class Scaffold extends HookWidget {
     final isBottomNavBarVisible = useState(shouldHaveBottomNavBar);
     final shouldHaveEitherAppBar = shouldHaveAppBar || shouldHaveFloatingAppBar;
     final isEitherAppBarVisible = useState(shouldHaveEitherAppBar);
-
     final isSideBarVisible = useState(floatingSideBarInitiallyOpen);
+
+    final shouldHaveSideBarButton = haveSideBarOpenButton;
+    final scaffoldPadding = PlatformService.getScaffoldPadding(context);
+    final fabBottomPadding =
+        tokens.spaceLayoutGapMd + effectiveBottomNavBarHeight;
+
+    final isEitherFabVisible = useState(
+      _getShouldShowEitherFab(keyboardVisible: keyboardVisible),
+    );
+    final shouldHaveFab = floatingActionButton != null;
+    final shouldHaveEitherFab = shouldHaveSideBarButton || shouldHaveFab;
 
     bool handleScrollNotification(ScrollNotification notification) {
       if (notification.metrics.axis != Axis.vertical) {
@@ -156,20 +166,15 @@ class Scaffold extends HookWidget {
     }
 
     final showDockedSideBar =
-        !hideNavigation && !isMobile && sidebar != null && !floatingSideBar;
+        !hideNavigation && !isMobile && sidebar != null && !isFloatingSideBar;
     final showFloatingSideBar =
         !hideNavigation &&
         sidebar != null &&
-        (floatingSideBar || isMobile || haveSideBarOpenButton);
+        (isFloatingSideBar || isMobile || haveSideBarOpenButton);
 
     final effectiveSideBarWidth = showDockedSideBar ? sidebarWidth : 0.0;
 
-    final contentPadding =
-        padding ??
-        EdgeInsets.symmetric(
-          horizontal: tokens.spaceScaffoldPadding,
-          vertical: tokens.spaceScaffoldPaddingMobileY,
-        );
+    final contentPadding = padding ?? scaffoldPadding;
 
     final paddedBody = Padding(padding: contentPadding, child: body);
 
@@ -310,18 +315,32 @@ class Scaffold extends HookWidget {
             ),
           ),
         ),
-      ..._floatingActionButtons(
-        context: context,
-        tokens: tokens,
-        visible: _showFloatingActionButtons(
-          isBottomNavBarVisible: isBottomNavBarVisible.value,
-          keyboardVisible: keyboardVisible,
+
+      if (shouldHaveEitherFab)
+        Positioned(
+          right: scaffoldPadding.right,
+          bottom: fabBottomPadding,
+          child: _AnimatedOverlay(
+            visible: isEitherFabVisible.value,
+            hiddenOffset: const Offset(0, 1),
+            child: Row(
+              spacing: tokens.spaceLayoutGapSm,
+              children: [
+                if (shouldHaveSideBarButton)
+                  Button.icon(
+                    icon: Icons.menu,
+                    onPressed: showFloatingSideBar || showDockedSideBar
+                        ? () => isSideBarVisible.value = !isSideBarVisible.value
+                        : null,
+                    color: ButtonColor.baseline,
+                    tokens: tokens,
+                  ),
+
+                ?floatingActionButton,
+              ],
+            ),
+          ),
         ),
-        bottomInset: shouldHaveBottomNavBar ? effectiveBottomNavBarHeight : 0,
-        onOpenSideBar: showFloatingSideBar || showDockedSideBar
-            ? () => isSideBarVisible.value = !isSideBarVisible.value
-            : null,
-      ),
     ];
 
     return material.Scaffold(
@@ -330,13 +349,10 @@ class Scaffold extends HookWidget {
     );
   }
 
-  bool _showFloatingActionButtons({
-    required bool isBottomNavBarVisible,
-    required bool keyboardVisible,
-  }) {
-    if (hideFloatingActionButtonOnScroll && isBottomNavBarVisible) {
-      return false;
-    }
+  bool _getShouldShowEitherFab({required bool keyboardVisible}) {
+    // if (hideFloatingActionButtonOnScroll) {
+    //   return false;
+    // }
     if (onlyShowFloatingActionButtonsWhenTyping && !keyboardVisible) {
       return false;
     }
@@ -344,53 +360,6 @@ class Scaffold extends HookWidget {
       return false;
     }
     return true;
-  }
-
-  List<Widget> _floatingActionButtons({
-    required BuildContext context,
-    required AppTokens tokens,
-    required bool visible,
-    required double bottomInset,
-    required VoidCallback? onOpenSideBar,
-  }) {
-    final children = <Widget>[];
-    final bottom = _fabMargin + bottomInset;
-
-    if (haveSideBarOpenButton && onOpenSideBar != null) {
-      children.add(
-        Positioned(
-          left: _fabMargin,
-          bottom: bottom,
-          child: _AnimatedOverlay(
-            visible: visible,
-            hiddenOffset: const Offset(0, 1),
-            child: Button.icon(
-              icon: Icons.menu,
-              onPressed: onOpenSideBar,
-              color: ButtonColor.primary,
-              variant: ButtonVariant.elevated,
-              tokens: tokens,
-            ),
-          ),
-        ),
-      );
-    }
-
-    if (floatingActionButton != null) {
-      children.add(
-        Positioned(
-          right: _fabMargin,
-          bottom: bottom,
-          child: _AnimatedOverlay(
-            visible: visible,
-            hiddenOffset: const Offset(0, 1),
-            child: floatingActionButton!,
-          ),
-        ),
-      );
-    }
-
-    return children;
   }
 }
 

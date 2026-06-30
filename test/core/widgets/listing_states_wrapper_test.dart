@@ -53,6 +53,34 @@ void main() {
     expect(find.text('Item 1'), findsOneWidget);
   });
 
+  testWidgets('list can defer scrolling to parent scroll view', (tester) async {
+    await tester.pumpWidget(
+      _TestApp(
+        home: SingleChildScrollView(
+          child: ListingStatesWrapper<int>.list(
+            isLoading: false,
+            useParentScroll: true,
+            items: const [1],
+            emptyState: const EmptyState(
+              icon: Icons.inbox,
+              title: 'Empty',
+              message: 'No rows',
+            ),
+            onRetry: () {},
+            skeletonTile: const Text('Skeleton'),
+            itemBuilder: (_, _, item) => Text('Item $item'),
+          ),
+        ),
+      ),
+    );
+
+    final listView = tester.widget<ListView>(find.byType(ListView));
+
+    expect(listView.shrinkWrap, isTrue);
+    expect(listView.physics, isA<NeverScrollableScrollPhysics>());
+    expect(find.text('Item 1'), findsOneWidget);
+  });
+
   testWidgets('hides leading list item while loading when configured', (
     tester,
   ) async {
@@ -151,6 +179,37 @@ void main() {
     );
 
     expect(find.text('Leading item'), findsOneWidget);
+    expect(find.text('Item 1'), findsOneWidget);
+  });
+
+  testWidgets('grid can defer scrolling to parent scroll view', (tester) async {
+    await tester.pumpWidget(
+      _TestApp(
+        home: SingleChildScrollView(
+          child: ListingStatesWrapper<int>.grid(
+            isLoading: false,
+            useParentScroll: true,
+            items: const [1],
+            emptyState: const EmptyState(
+              icon: Icons.inbox,
+              title: 'Empty',
+              message: 'No rows',
+            ),
+            onRetry: () {},
+            skeletonTile: const Text('Skeleton'),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+            ),
+            itemBuilder: (_, _, item) => Text('Item $item'),
+          ),
+        ),
+      ),
+    );
+
+    final gridView = tester.widget<GridView>(find.byType(GridView));
+
+    expect(gridView.shrinkWrap, isTrue);
+    expect(gridView.physics, isA<NeverScrollableScrollPhysics>());
     expect(find.text('Item 1'), findsOneWidget);
   });
 }

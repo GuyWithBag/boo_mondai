@@ -15,7 +15,6 @@ class EditDeckBottomNavBar extends HookWidget implements PreferredSizeWidget {
   final EditDeckController editor;
 
   @override
-  // TODO: implement preferredSize
   Size get preferredSize => Size(0, BottomNavBar.preferredHeightDefault);
 
   @override
@@ -36,32 +35,25 @@ class EditDeckBottomNavBar extends HookWidget implements PreferredSizeWidget {
     );
 
     return BottomNavBar(
-      child: Row(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                spacing: tokens.spaceLayoutGapSm,
-                children: [
-                  for (var index = 0; index < formats.length; index++) ...[
-                    Button(
-                      leading: Icon(formats[index].$1),
-                      selected: selection.isSelected(index),
-                      onPressed: () => selection.select(index),
-                      child: Text(
-                        formats[index].$2,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ],
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          spacing: tokens.spaceLayoutGapSm,
+          children: [
+            for (var index = 0; index < formats.length; index++) ...[
+              Button(
+                leading: Icon(formats[index].$1),
+                selected: selection.isSelected(index),
+                onPressed: () => selection.select(index),
+                child: Text(
+                  formats[index].$2,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-            ),
-          ),
-          SizedBox(width: tokens.spaceLayoutGapMd),
-        ],
+            ],
+          ],
+        ),
       ),
     );
   }

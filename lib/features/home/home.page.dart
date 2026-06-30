@@ -1,7 +1,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/pages/home_page.dart
 // PURPOSE: Dashboard — streak, due reviews, leaderboard preview
-// PROVIDERS: AuthController, StreakController, ViewReviewsController, ViewLeaderboardController
+// PROVIDERS: AuthController, StreakController, ViewStudyCardsController, ViewLeaderboardController
 // HOOKS: useEffect
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -17,7 +17,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         Scaffold,
         StreaksCard,
         ViewLeaderboardController,
-        ViewReviewsController;
+        ViewStudyCardsController;
 import 'package:flutter/material.dart'
     show
         BuildContext,
@@ -39,7 +39,7 @@ class HomePage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthController>();
-    final reviewDashboard = context.watch<ViewReviewsController>();
+    final reviewDashboard = context.watch<ViewStudyCardsController>();
     final leaderboard = context.watch<ViewLeaderboardController>();
     final tokens = context.themeTokens<AppTokens>();
 

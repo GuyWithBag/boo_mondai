@@ -1,15 +1,19 @@
-import 'package:boo_mondai/features/decks/models/deck.dto.dart';
-import 'package:boo_mondai/features/review.study_session/models/deck_review_stats.dart'
-    show DeckDueStats, DeckHistoricalStats, DeckReviewStats;
-import 'package:boo_mondai/features/search/filters/review_deck.search_filter.dart';
-import 'package:boo_mondai/features/search/results/review_deck.search_results.dart';
-import 'package:boo_mondai/features/study_session/models/due_filter_threshold.dart';
-import 'package:boo_mondai/features/view_reviews/models/review_deck_entry.dart';
+import 'package:boo_mondai/lib.barrel.dart'
+    show
+        StudyDeckSearchFilter,
+        DueFilterThreshold,
+        DeckReviewStats,
+        StudyDeckSearchResults,
+        Deck,
+        DeckDueStats,
+        DeckHistoricalStats,
+        StudyDeckEntry;
+
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('parses review filter directives', () {
-    final filter = ReviewDeckSearchFilter.parse('japanese due:1h fuzzy:42');
+    final filter = StudyDeckSearchFilter.parse('japanese due:1h fuzzy:42');
 
     expect(filter.freeText, 'japanese');
     expect(filter.dueFilter, DueFilterThreshold.lookAheadOneHour);
@@ -19,7 +23,7 @@ void main() {
 
   test('filters review entries by free text', () {
     final entries = [
-      ReviewDeckEntry(
+      StudyDeckEntry(
         deck: Deck.createNow(
           userId: 'user-1',
           title: 'Japanese Basics',
@@ -32,7 +36,7 @@ void main() {
           historical: DeckHistoricalStats(again: 1, hard: 2, good: 3, easy: 4),
         ),
       ),
-      ReviewDeckEntry(
+      StudyDeckEntry(
         deck: Deck.createNow(
           userId: 'user-1',
           title: 'French Basics',
@@ -47,9 +51,9 @@ void main() {
       ),
     ];
 
-    final results = const ReviewDeckSearchResults().resolve(
+    final results = const StudyDeckSearchResults().resolve(
       items: entries,
-      filter: ReviewDeckSearchFilter.parse('japanese'),
+      filter: StudyDeckSearchFilter.parse('japanese'),
     );
 
     expect(results, hasLength(1));

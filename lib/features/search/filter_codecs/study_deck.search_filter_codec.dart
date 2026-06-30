@@ -2,29 +2,29 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         DueFilterThreshold,
         SegmentOption,
-        ReviewDeckSearchFilter,
+        StudyDeckSearchFilter,
         SearchFilterCodec,
         SearchFilterModalField,
         SearchFilterDirective,
         SearchFilterTextEditor,
-        ReviewDeckSearchFilterDirective,
+        StudyDeckSearchFilterDirective,
         SearchFilterEnumEditor,
         SearchFilterSliderEditor;
 
-final class ReviewDeckSearchFilterCodec
-    implements SearchFilterCodec<ReviewDeckSearchFilter> {
-  const ReviewDeckSearchFilterCodec();
+final class StudyDeckSearchFilterCodec
+    implements SearchFilterCodec<StudyDeckSearchFilter> {
+  const StudyDeckSearchFilterCodec();
 
   @override
-  ReviewDeckSearchFilter parse(String input) {
-    return ReviewDeckSearchFilter.parse(input);
+  StudyDeckSearchFilter parse(String input) {
+    return StudyDeckSearchFilter.parse(input);
   }
 
   @override
-  String format(ReviewDeckSearchFilter filter) => filter.toSearchText();
+  String format(StudyDeckSearchFilter filter) => filter.toSearchText();
 
   @override
-  List<SearchFilterModalField<ReviewDeckSearchFilter>> get modalFields => [
+  List<SearchFilterModalField<StudyDeckSearchFilter>> get modalFields => [
     SearchFilterModalField(
       directive: SearchFilterDirective(name: 'free_text', order: -1),
       label: 'Search terms',
@@ -33,7 +33,7 @@ final class ReviewDeckSearchFilterCodec
           value: filter.freeText,
           placeholder: 'Search review decks',
           onChanged: (value) => onChanged(
-            ReviewDeckSearchFilter(
+            StudyDeckSearchFilter(
               freeText: value,
               dueFilter: filter.dueFilter,
               fuzzyCutoff: filter.fuzzyCutoff,
@@ -43,13 +43,13 @@ final class ReviewDeckSearchFilterCodec
       },
     ),
     SearchFilterModalField(
-      directive: ReviewDeckSearchFilterDirective.due,
+      directive: StudyDeckSearchFilterDirective.due,
       label: 'Due window',
       buildEditor: (context, filter, onChanged) {
         return SearchFilterEnumEditor<DueFilterThreshold>(
           value: filter.dueFilter,
           onChanged: (value) => onChanged(
-            ReviewDeckSearchFilter(
+            StudyDeckSearchFilter(
               freeText: filter.freeText,
               dueFilter: value,
               fuzzyCutoff: filter.fuzzyCutoff,
@@ -74,7 +74,7 @@ final class ReviewDeckSearchFilterCodec
       },
     ),
     SearchFilterModalField(
-      directive: ReviewDeckSearchFilterDirective.fuzzy,
+      directive: StudyDeckSearchFilterDirective.fuzzy,
       label: 'Fuzzy cutoff',
       buildEditor: (context, filter, onChanged) {
         return SearchFilterSliderEditor(
@@ -84,7 +84,7 @@ final class ReviewDeckSearchFilterCodec
           divisions: 100,
           labelBuilder: (value) => 'Cutoff: $value',
           onChanged: (value) => onChanged(
-            ReviewDeckSearchFilter(
+            StudyDeckSearchFilter(
               freeText: filter.freeText,
               dueFilter: filter.dueFilter,
               fuzzyCutoff: value,

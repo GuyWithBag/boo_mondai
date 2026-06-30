@@ -1,16 +1,15 @@
-import 'package:boo_mondai/features/search/filters/review_deck.search_filter.dart';
-import 'package:boo_mondai/features/search/results/search_results.dart';
-import 'package:boo_mondai/features/view_reviews/models/review_deck_entry.dart';
+import 'package:boo_mondai/lib.barrel.dart'
+    show StudyDeckSearchFilter, StudyDeckEntry, SearchResults;
 import 'package:fuzzywuzzy/fuzzywuzzy.dart';
 
-final class ReviewDeckSearchResults
-    implements SearchResults<ReviewDeckEntry, ReviewDeckSearchFilter> {
-  const ReviewDeckSearchResults();
+final class StudyDeckSearchResults
+    implements SearchResults<StudyDeckEntry, StudyDeckSearchFilter> {
+  const StudyDeckSearchResults();
 
   @override
-  List<ReviewDeckEntry> resolve({
-    required Iterable<ReviewDeckEntry> items,
-    required ReviewDeckSearchFilter filter,
+  List<StudyDeckEntry> resolve({
+    required Iterable<StudyDeckEntry> items,
+    required StudyDeckSearchFilter filter,
   }) {
     final normalizedFreeText = filter.freeText.trim();
 
@@ -18,7 +17,7 @@ final class ReviewDeckSearchResults
       return items.toList();
     }
 
-    return extractAllSorted<ReviewDeckEntry>(
+    return extractAllSorted<StudyDeckEntry>(
       query: normalizedFreeText,
       choices: items.toList(),
       cutoff: filter.fuzzyCutoff,
@@ -26,7 +25,7 @@ final class ReviewDeckSearchResults
     ).map((result) => result.choice).toList();
   }
 
-  String _searchText(ReviewDeckEntry entry) {
+  String _searchText(StudyDeckEntry entry) {
     final historical = entry.stats.historical;
     final due = entry.stats.due;
     return [

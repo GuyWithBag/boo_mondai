@@ -10,19 +10,19 @@ import 'package:boo_mondai/lib.barrel.dart'
         DeckHistoricalStats,
         LocalDB,
         Services,
-        ReviewDeckSearchResults,
-        ReviewDeckEntry,
-        ReviewDeckSearchFilter,
+        StudyDeckSearchResults,
+        StudyDeckEntry,
+        StudyDeckSearchFilter,
         DueFilterThreshold,
-        ReviewDeckSearchFilterCodec,
+        StudyDeckSearchFilterCodec,
         VisibilityState;
 
-class ViewReviewsController extends Controller {
-  static const reviewSearchFilterCodec = ReviewDeckSearchFilterCodec();
-  static const reviewSearchResults = ReviewDeckSearchResults();
+class ViewStudyCardsController extends Controller {
+  static const reviewSearchFilterCodec = StudyDeckSearchFilterCodec();
+  static const reviewSearchResults = StudyDeckSearchResults();
 
-  List<ReviewDeckEntry> _deckEntries = [];
-  ReviewDeckSearchFilter _reviewFilter = const ReviewDeckSearchFilter(
+  List<StudyDeckEntry> _deckEntries = [];
+  StudyDeckSearchFilter _reviewFilter = const StudyDeckSearchFilter(
     freeText: '',
     dueFilter: DueFilterThreshold.lookAheadOneDay,
     fuzzyCutoff: 60,
@@ -31,15 +31,15 @@ class ViewReviewsController extends Controller {
   // Cache historical stats so we don't recalculate them on filter change
   Map<String, DeckHistoricalStats>? _cachedHistoricalStats;
 
-  List<ReviewDeckEntry> get deckEntries => List.unmodifiable(_deckEntries);
+  List<StudyDeckEntry> get deckEntries => List.unmodifiable(_deckEntries);
   List<DeckReviewStats> get deckStats =>
       _deckEntries.map((entry) => entry.stats).toList(growable: false);
-  ReviewDeckSearchFilter get reviewFilter => _reviewFilter;
+  StudyDeckSearchFilter get reviewFilter => _reviewFilter;
   DueFilterThreshold get dueFilter => _reviewFilter.dueFilter;
 
   int get totalDue => _deckEntries.fold(0, (sum, deck) => sum + deck.totalDue);
 
-  void setReviewFilter(ReviewDeckSearchFilter filter) {
+  void setReviewFilter(StudyDeckSearchFilter filter) {
     if (_reviewFilter.freeText == filter.freeText &&
         _reviewFilter.dueFilter == filter.dueFilter &&
         _reviewFilter.fuzzyCutoff == filter.fuzzyCutoff) {
@@ -83,7 +83,7 @@ class ViewReviewsController extends Controller {
       );
 
       // 3. Merge them together for the UI
-      final combinedEntries = <ReviewDeckEntry>[];
+      final combinedEntries = <StudyDeckEntry>[];
 
       for (final deckId in dueMap.keys) {
         final deck = deckMap[deckId];
@@ -101,7 +101,7 @@ class ViewReviewsController extends Controller {
         );
 
         combinedEntries.add(
-          ReviewDeckEntry(
+          StudyDeckEntry(
             deck:
                 deck ??
                 Deck(

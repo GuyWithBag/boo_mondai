@@ -36,11 +36,16 @@ class ListingStatesWrapper<T> extends StatelessWidget {
     this.showLeadingItemAlways = true,
     this.header,
     this.showHeaderWhenEmpty = false,
+    bool useParentScroll = false,
   }) : layoutBuilder = ((context, itemCount, builder) {
          final showLeading =
              leadingItem != null && (showLeadingItemAlways || items.isNotEmpty);
          return ListView.separated(
            padding: padding,
+           shrinkWrap: useParentScroll,
+           physics: useParentScroll
+               ? const NeverScrollableScrollPhysics()
+               : null,
            itemCount: itemCount + (showLeading ? 1 : 0),
            separatorBuilder: (_, _) => SizedBox(height: separatorHeight),
            itemBuilder: (context, index) {
@@ -65,12 +70,17 @@ class ListingStatesWrapper<T> extends StatelessWidget {
     required this.skeletonTile,
     required this.itemBuilder,
     required SliverGridDelegate gridDelegate,
-    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry padding = EdgeInsets.zero,
+    bool useParentScroll = false,
   }) : layoutBuilder = ((context, itemCount, builder) {
          final showLeading =
              leadingItem != null && (showLeadingItemAlways || items.isNotEmpty);
          return GridView.builder(
            padding: padding,
+           shrinkWrap: useParentScroll,
+           physics: useParentScroll
+               ? const NeverScrollableScrollPhysics()
+               : null,
            gridDelegate: gridDelegate,
            itemCount: itemCount + (showLeading ? 1 : 0),
            itemBuilder: (context, index) {

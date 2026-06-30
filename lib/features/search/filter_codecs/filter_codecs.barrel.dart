@@ -5,4 +5,4 @@ export 'deck.search_filter_codec.dart';
 export 'deck_listing.search_filter_codec.dart';
 export 'card_template.search_filter_codec.dart';
 export 'study_card.search_filter_codec.dart';
-export 'review_deck.search_filter_codec.dart';
+export 'study_deck.search_filter_codec.dart';

@@ -5,4 +5,4 @@ export 'deck.search_filter.dart';
 export 'deck_listing.search_filter.dart';
 export 'card_template.search_filter.dart';
 export 'study_card.search_filter.dart';
-export 'review_deck.search_filter.dart';
+export 'study_deck.search_filter.dart';

@@ -43,10 +43,8 @@ import 'package:flutter/material.dart'
         VoidCallback,
         WidgetsBinding,
         Icons,
-        Column,
         ElevatedButton,
         EdgeInsets,
-        Expanded,
         LayoutBuilder,
         SliverGridDelegateWithMaxCrossAxisExtent;
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -204,21 +202,14 @@ class ViewDecksLocalPage extends HookWidget {
         ],
         header: searchBar,
       ),
-      scrollable: false,
-      body: Column(
-        children: [
-          Expanded(
-            child: _DeckListBody(
-              error: controller.error,
-              isLoading: controller.isLoading,
-              onRetry: controller.load,
-              onPressed: controller.goToDeck,
-              onCreate: () => controller.createDeck(context),
-              decks: visibleDecks,
-              hasSearchQuery: hasSearchQuery,
-            ),
-          ),
-        ],
+      body: _DeckListBody(
+        error: controller.error,
+        isLoading: controller.isLoading,
+        onRetry: controller.load,
+        onPressed: controller.goToDeck,
+        onCreate: () => controller.createDeck(context),
+        decks: visibleDecks,
+        hasSearchQuery: hasSearchQuery,
       ),
     );
   }
@@ -254,6 +245,7 @@ class _DeckListBody extends StatelessWidget {
       isLoading: isLoading,
       exception: error,
       items: decks,
+      useParentScroll: true,
       onRetry: onRetry,
       skeletonTile: _GridTileMaxWidthConstraints(
         builder: (width) => DeckTile(deck: null, width: width),

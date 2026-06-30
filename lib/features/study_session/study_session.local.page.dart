@@ -28,7 +28,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextColor,
         TextSize,
         TextWeight,
-        ViewReviewsController,
+        ViewStudyCardsController,
         surfaceStyle,
         textStyle,
         useStudySessionCardStageController;
@@ -68,7 +68,7 @@ class StudySessionPage extends HookWidget {
     }
 
     final StudySessionController controller;
-    final ViewReviewsController? dashboardController;
+    final ViewStudyCardsController? dashboardController;
     final tokens = context.themeTokens<AppTokens>();
 
     if (mode == SessionMode.drill) {
@@ -76,7 +76,7 @@ class StudySessionPage extends HookWidget {
       dashboardController = null;
     } else {
       controller = context.watch<ReviewSessionController>();
-      dashboardController = context.read<ViewReviewsController>();
+      dashboardController = context.read<ViewStudyCardsController>();
     }
 
     // ── KICK OFF THE SESSION ──────────────────────────────

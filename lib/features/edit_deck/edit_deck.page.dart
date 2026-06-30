@@ -89,10 +89,12 @@ class EditDeckPage extends HookWidget {
       bottomNavBar: controller.hasActiveTemplate
           ? EditDeckBottomNavBar(editor: controller)
           : null,
+      // bottomNavBar: EditDeckBottomNavBar(editor: controller),
       haveSideBarOpenButton: true,
-      hideAppBarOnScroll: true,
-      hideFloatingActionButtonOnScroll: true,
-      floatingSideBar: true,
+      // hideAppBarOnScroll: true,
+      // hideFloatingActionButtonOnScroll: true,
+      inheritMainBottomNavBarHeight: false,
+      isFloatingSideBar: true,
       body: Form(
         key: formKey,
         child: EditDeckEditorBody(editor: controller),
