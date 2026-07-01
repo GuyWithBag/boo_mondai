@@ -7,9 +7,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextSize,
         TextWeight,
         TextColor,
-        PhysicalCardSide,
+        PhysicalCard,
         ScaleHelper,
-        Button;
+        Button,
+        usePhysicalCardController;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -19,20 +20,14 @@ class MatchingTypeCard extends HookWidget {
   const MatchingTypeCard({
     super.key,
     required this.template,
-    required this.interactionsController,
+    this.interactionsController,
+    this.isRevealed = false,
     this.maxWidth,
-  }) : previewRevealed = false;
-
-  const MatchingTypeCard.preview({
-    super.key,
-    required this.template,
-    this.maxWidth,
-  }) : interactionsController = null,
-       previewRevealed = true;
+  });
 
   final MatchMadnessTemplate template;
   final StudySessionCardStageController? interactionsController;
-  final bool previewRevealed;
+  final bool isRevealed;
   final double? maxWidth;
 
   @override
@@ -56,8 +51,12 @@ class MatchingTypeCard extends HookWidget {
     final matches = template.pairs.map((pair) => pair.match).toList();
     final selectedMatch = useState<String?>(null);
     final matchedItems = useState<Set<String>>({});
-    final isRevealed =
-        previewRevealed || interactionsController?.isRevealed == true;
+    final effectiveIsRevealed =
+        isRevealed || interactionsController?.isRevealed == true;
+    final physicalCardController = usePhysicalCardController(
+      context,
+      width: maxWidth,
+    );
 
     useEffect(() {
       selectedMatch.value = null;
@@ -66,7 +65,7 @@ class MatchingTypeCard extends HookWidget {
     }, [template.id, interactionsController]);
 
     void handleMatchTap(String item) {
-      if (isRevealed) return;
+      if (effectiveIsRevealed) return;
       final selected = selectedMatch.value;
       if (selected == null) {
         selectedMatch.value = item;
@@ -90,41 +89,44 @@ class MatchingTypeCard extends HookWidget {
       selectedMatch.value = null;
     }
 
-    return Column(
-      spacing: tokens.spaceLayoutGapMd,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
-          'Match the pairs'.toUpperCase(),
-          textAlign: TextAlign.center,
-          style: eyebrowStyle,
-        ),
+    return PhysicalCard(
+      controller: physicalCardController,
+      front: Column(
+        spacing: tokens.spaceLayoutGapMd,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'Match the pairs'.toUpperCase(),
+            textAlign: TextAlign.center,
+            style: eyebrowStyle,
+          ),
 
-        Row(
-          spacing: tokens.spaceLayoutGapSm,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: _MatchColumn(
-                items: terms,
-                selectedMatch: selectedMatch.value,
-                matchedItems: matchedItems.value,
-                previewRevealed: isRevealed,
-                onItemPressed: handleMatchTap,
+          Row(
+            spacing: tokens.spaceLayoutGapSm,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: _MatchColumn(
+                  items: terms,
+                  selectedMatch: selectedMatch.value,
+                  matchedItems: matchedItems.value,
+                  isRevealed: effectiveIsRevealed,
+                  onItemPressed: handleMatchTap,
+                ),
               ),
-            ),
-            Expanded(
-              child: _MatchColumn(
-                items: matches,
-                selectedMatch: selectedMatch.value,
-                matchedItems: matchedItems.value,
-                previewRevealed: isRevealed,
-                onItemPressed: handleMatchTap,
+              Expanded(
+                child: _MatchColumn(
+                  items: matches,
+                  selectedMatch: selectedMatch.value,
+                  matchedItems: matchedItems.value,
+                  isRevealed: effectiveIsRevealed,
+                  onItemPressed: handleMatchTap,
+                ),
               ),
-            ),
-          ],
-        ),
-      ],
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
@@ -134,14 +136,14 @@ class _MatchColumn extends StatelessWidget {
     required this.items,
     required this.selectedMatch,
     required this.matchedItems,
-    required this.previewRevealed,
+    required this.isRevealed,
     required this.onItemPressed,
   });
 
   final List<String> items;
   final String? selectedMatch;
   final Set<String> matchedItems;
-  final bool previewRevealed;
+  final bool isRevealed;
   final ValueChanged<String>? onItemPressed;
 
   @override
@@ -152,8 +154,8 @@ class _MatchColumn extends StatelessWidget {
           _MatchButton(
             value: item,
             selected: selectedMatch == item,
-            matched: previewRevealed ? false : matchedItems.contains(item),
-            onPressed: previewRevealed || onItemPressed == null
+            matched: isRevealed ? false : matchedItems.contains(item),
+            onPressed: isRevealed || onItemPressed == null
                 ? null
                 : () => onItemPressed!(item),
           ),

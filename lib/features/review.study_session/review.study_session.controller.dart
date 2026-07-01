@@ -187,6 +187,7 @@ class ReviewSessionController
     if (realTimeSaving) {
       await LocalDB.fsrsCard.upsert(updatedCard);
       await LocalDB.reviewLog.upsert(log);
+      await Services.streak.refreshFromReviewLogs();
       await LocalDB.reviewSession.upsert(session!); // Assumes repo exists
     } else {
       _pendingCards[updatedCard.id] = updatedCard;
@@ -229,6 +230,7 @@ class ReviewSessionController
         if (_pendingLogs.isNotEmpty) {
           await LocalDB.reviewLog.upsertMany(_pendingLogs);
         }
+        await Services.streak.refreshFromReviewLogs();
         await LocalDB.reviewSession.upsert(session!);
       }
       notifyListeners();

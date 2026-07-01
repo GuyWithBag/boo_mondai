@@ -99,31 +99,38 @@ class ViewDeckSingleSheet extends HookWidget {
                   onPressed: sheet.deleteDeck,
                 ),
               ],
-              bottom: Wrap(
-                alignment: WrapAlignment.end,
-                spacing: tokens.spaceLayoutGapSm,
-                runSpacing: tokens.spaceLayoutGapSm,
-                children: [
-                  if (activeDeck.isPremade) const HeaderBadge(label: 'Premade'),
-                  ChipTheme(
-                    data: publishChipStyle,
-                    child: ChoiceChip(
-                      avatar: Icon(
-                        activeDeck.isPublished
-                            ? Icons.public_outlined
-                            : Icons.public_off_outlined,
+              bottom: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: tokens.spaceScaffoldPadding,
+                ),
+                child: Wrap(
+                  alignment: WrapAlignment.end,
+                  spacing: tokens.spaceLayoutGapSm,
+                  runSpacing: tokens.spaceLayoutGapSm,
+                  children: [
+                    if (activeDeck.isPremade)
+                      const HeaderBadge(label: 'Premade'),
+                    ChipTheme(
+                      data: publishChipStyle,
+                      child: ChoiceChip(
+                        avatar: Icon(
+                          activeDeck.isPublished
+                              ? Icons.public_outlined
+                              : Icons.public_off_outlined,
+                        ),
+                        label: Text(
+                          activeDeck.isPublished ? 'Published' : 'Draft',
+                        ),
+                        selected: activeDeck.isPublished,
+                        onSelected: sheet.isSavingPublishState
+                            ? null
+                            : sheet.setPublished,
                       ),
-                      label: Text(
-                        activeDeck.isPublished ? 'Published' : 'Draft',
-                      ),
-                      selected: activeDeck.isPublished,
-                      onSelected: sheet.isSavingPublishState
-                          ? null
-                          : sheet.setPublished,
                     ),
-                  ),
-                  if (!activeDeck.isEditable) const Chip(label: Text('Locked')),
-                ],
+                    if (!activeDeck.isEditable)
+                      const Chip(label: Text('Locked')),
+                  ],
+                ),
               ),
             ),
             padding: EdgeInsets.zero,

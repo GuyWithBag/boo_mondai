@@ -13,6 +13,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         DeckDueStats,
         DeckHistoricalStats,
         LocalDB,
+        Services,
         DueFilterExtension;
 import 'package:fsrs/fsrs.dart';
 import 'package:fsrs/fsrs.dart' as fsrs;
@@ -40,6 +41,7 @@ class FsrsService {
 
     await LocalDB.fsrsCard.upsert(newCard);
     await LocalDB.reviewLog.upsert(newLog);
+    await Services.streak.refreshFromReviewLogs();
   }
 
   // ── Due Stats (Calculated dynamically based on time/filter) ──

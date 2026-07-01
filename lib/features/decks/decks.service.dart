@@ -1,5 +1,13 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show Deck, DeckListing, ImageHelper, LocalDB, Tag;
+    show
+        CardTemplate,
+        Deck,
+        DeckListing,
+        ImageHelper,
+        LocalDB,
+        RemoteDB,
+        Tag,
+        VisibilityState;
 import 'package:file_picker/file_picker.dart' show PlatformFile;
 
 abstract final class DecksService {
@@ -16,6 +24,51 @@ abstract final class DecksService {
     await LocalDB.deckListing.upsert(listing);
 
     return updatedDeck;
+  }
+
+  static Future<Deck> saveListingDraft(Deck deck) async {
+    await LocalDB.deck.upsert(deck);
+
+    final listing = deck.listing;
+    if (listing != null) {
+      await LocalDB.deckListing.upsert(listing);
+    }
+
+    return deck;
+  }
+
+  static Future<Deck> publishListingDraft(Deck deck) async {
+    final now = DateTime.now();
+    final listing =
+        (deck.listing ??
+                DeckListing(deckId: deck.id, createdAt: now, updatedAt: now))
+            .copyWith(updatedAt: now);
+    final publishedDeck = deck.copyWith(
+      isPublished: true,
+      visibilityState: VisibilityState.public,
+      listing: listing,
+      updatedAt: now,
+    );
+
+    await saveListingDraft(publishedDeck);
+    await RemoteDB.deck.upsert(publishedDeck);
+    await RemoteDB.deckListing.upsert(listing);
+
+    return publishedDeck;
+  }
+
+  static Future<Deck> unpublishListingDraft(Deck deck) async {
+    final now = DateTime.now();
+    final unpublishedDeck = deck.copyWith(
+      isPublished: false,
+      visibilityState: VisibilityState.private,
+      updatedAt: now,
+    );
+
+    await saveListingDraft(unpublishedDeck);
+    await RemoteDB.deck.upsert(unpublishedDeck);
+
+    return unpublishedDeck;
   }
 
   static Future<Deck?> update({
@@ -134,6 +187,77 @@ abstract final class DecksService {
     );
 
     await LocalDB.deck.upsert(updatedDeck);
+    return updatedDeck;
+  }
+
+  static Future<Deck?> updateListingFeaturedImage({
+    required Deck deck,
+    required int index,
+    required PlatformFile file,
+  }) async {
+    if (!deck.isEditable || index < 0) {
+      return null;
+    }
+
+    final imageSource = ImageHelper.getImageSourceFromPickedFile(file);
+    if (imageSource == null) {
+      return null;
+    }
+
+    final now = DateTime.now();
+    final listing =
+        deck.listing ??
+        DeckListing(deckId: deck.id, createdAt: now, updatedAt: now);
+    final featuredImages = listing.featuredImages.toList();
+
+    if (index < featuredImages.length) {
+      if (featuredImages[index] == imageSource) {
+        return null;
+      }
+      featuredImages[index] = imageSource;
+    } else if (!featuredImages.contains(imageSource)) {
+      featuredImages.add(imageSource);
+    } else {
+      return null;
+    }
+
+    final updatedListing = listing.copyWith(
+      featuredImages: featuredImages,
+      updatedAt: now,
+    );
+    final updatedDeck = deck.copyWith(listing: updatedListing, updatedAt: now);
+
+    await LocalDB.deck.upsert(updatedDeck);
+    await LocalDB.deckListing.upsert(updatedListing);
+    return updatedDeck;
+  }
+
+  static Future<Deck?> addListingFeaturedCard({
+    required Deck deck,
+    required CardTemplate template,
+  }) async {
+    if (!deck.isEditable) {
+      return null;
+    }
+
+    final now = DateTime.now();
+    final listing =
+        deck.listing ??
+        DeckListing(deckId: deck.id, createdAt: now, updatedAt: now);
+    final featuredCards = listing.featuredCards.toList();
+    final hasTemplate = featuredCards.any((card) => card['id'] == template.id);
+    if (hasTemplate) {
+      return null;
+    }
+
+    final updatedListing = listing.copyWith(
+      featuredCards: [...featuredCards, template.toMap()],
+      updatedAt: now,
+    );
+    final updatedDeck = deck.copyWith(listing: updatedListing, updatedAt: now);
+
+    await LocalDB.deck.upsert(updatedDeck);
+    await LocalDB.deckListing.upsert(updatedListing);
     return updatedDeck;
   }
 

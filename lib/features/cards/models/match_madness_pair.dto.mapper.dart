@@ -23,25 +23,41 @@ class MatchMadnessPairMapper extends ClassMapperBase<MatchMadnessPair> {
   static String _$id(MatchMadnessPair v) => v.id;
   static const Field<MatchMadnessPair, String> _f$id = Field('id', _$id);
   static String _$templateId(MatchMadnessPair v) => v.templateId;
-  static const Field<MatchMadnessPair, String> _f$templateId =
-      Field('templateId', _$templateId, key: r'template_id');
+  static const Field<MatchMadnessPair, String> _f$templateId = Field(
+    'templateId',
+    _$templateId,
+    key: r'template_id',
+  );
   static String? _$sourceTemplateId(MatchMadnessPair v) => v.sourceTemplateId;
   static const Field<MatchMadnessPair, String> _f$sourceTemplateId = Field(
-      'sourceTemplateId', _$sourceTemplateId,
-      key: r'source_template_id', opt: true);
+    'sourceTemplateId',
+    _$sourceTemplateId,
+    key: r'source_template_id',
+    opt: true,
+  );
   static String _$term(MatchMadnessPair v) => v.term;
   static const Field<MatchMadnessPair, String> _f$term = Field('term', _$term);
   static String _$match(MatchMadnessPair v) => v.match;
-  static const Field<MatchMadnessPair, String> _f$match =
-      Field('match', _$match);
+  static const Field<MatchMadnessPair, String> _f$match = Field(
+    'match',
+    _$match,
+  );
   static bool _$isAutoPicked(MatchMadnessPair v) => v.isAutoPicked;
   static const Field<MatchMadnessPair, bool> _f$isAutoPicked = Field(
-      'isAutoPicked', _$isAutoPicked,
-      key: r'is_auto_picked', opt: true, def: false);
+    'isAutoPicked',
+    _$isAutoPicked,
+    key: r'is_auto_picked',
+    opt: true,
+    def: false,
+  );
   static int _$displayOrder(MatchMadnessPair v) => v.displayOrder;
   static const Field<MatchMadnessPair, int> _f$displayOrder = Field(
-      'displayOrder', _$displayOrder,
-      key: r'display_order', opt: true, def: 0);
+    'displayOrder',
+    _$displayOrder,
+    key: r'display_order',
+    opt: true,
+    def: 0,
+  );
 
   @override
   final MappableFields<MatchMadnessPair> fields = const {
@@ -56,13 +72,14 @@ class MatchMadnessPairMapper extends ClassMapperBase<MatchMadnessPair> {
 
   static MatchMadnessPair _instantiate(DecodingData data) {
     return MatchMadnessPair(
-        id: data.dec(_f$id),
-        templateId: data.dec(_f$templateId),
-        sourceTemplateId: data.dec(_f$sourceTemplateId),
-        term: data.dec(_f$term),
-        match: data.dec(_f$match),
-        isAutoPicked: data.dec(_f$isAutoPicked),
-        displayOrder: data.dec(_f$displayOrder));
+      id: data.dec(_f$id),
+      templateId: data.dec(_f$templateId),
+      sourceTemplateId: data.dec(_f$sourceTemplateId),
+      term: data.dec(_f$term),
+      match: data.dec(_f$match),
+      isAutoPicked: data.dec(_f$isAutoPicked),
+      displayOrder: data.dec(_f$displayOrder),
+    );
   }
 
   @override
@@ -89,47 +106,56 @@ mixin MatchMadnessPairMappable {
   }
 
   MatchMadnessPairCopyWith<MatchMadnessPair, MatchMadnessPair, MatchMadnessPair>
-      get copyWith =>
-          _MatchMadnessPairCopyWithImpl<MatchMadnessPair, MatchMadnessPair>(
-              this as MatchMadnessPair, $identity, $identity);
+  get copyWith =>
+      _MatchMadnessPairCopyWithImpl<MatchMadnessPair, MatchMadnessPair>(
+        this as MatchMadnessPair,
+        $identity,
+        $identity,
+      );
   @override
   String toString() {
-    return MatchMadnessPairMapper.ensureInitialized()
-        .stringifyValue(this as MatchMadnessPair);
+    return MatchMadnessPairMapper.ensureInitialized().stringifyValue(
+      this as MatchMadnessPair,
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return MatchMadnessPairMapper.ensureInitialized()
-        .equalsValue(this as MatchMadnessPair, other);
+    return MatchMadnessPairMapper.ensureInitialized().equalsValue(
+      this as MatchMadnessPair,
+      other,
+    );
   }
 
   @override
   int get hashCode {
-    return MatchMadnessPairMapper.ensureInitialized()
-        .hashValue(this as MatchMadnessPair);
+    return MatchMadnessPairMapper.ensureInitialized().hashValue(
+      this as MatchMadnessPair,
+    );
   }
 }
 
 extension MatchMadnessPairValueCopy<$R, $Out>
     on ObjectCopyWith<$R, MatchMadnessPair, $Out> {
   MatchMadnessPairCopyWith<$R, MatchMadnessPair, $Out>
-      get $asMatchMadnessPair => $base
-          .as((v, t, t2) => _MatchMadnessPairCopyWithImpl<$R, $Out>(v, t, t2));
+  get $asMatchMadnessPair =>
+      $base.as((v, t, t2) => _MatchMadnessPairCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
 abstract class MatchMadnessPairCopyWith<$R, $In extends MatchMadnessPair, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  $R call(
-      {String? id,
-      String? templateId,
-      String? sourceTemplateId,
-      String? term,
-      String? match,
-      bool? isAutoPicked,
-      int? displayOrder});
+  $R call({
+    String? id,
+    String? templateId,
+    String? sourceTemplateId,
+    String? term,
+    String? match,
+    bool? isAutoPicked,
+    int? displayOrder,
+  });
   MatchMadnessPairCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-      Then<$Out2, $R2> t);
+    Then<$Out2, $R2> t,
+  );
 }
 
 class _MatchMadnessPairCopyWithImpl<$R, $Out>
@@ -141,36 +167,38 @@ class _MatchMadnessPairCopyWithImpl<$R, $Out>
   late final ClassMapperBase<MatchMadnessPair> $mapper =
       MatchMadnessPairMapper.ensureInitialized();
   @override
-  $R call(
-          {String? id,
-          String? templateId,
-          Object? sourceTemplateId = $none,
-          String? term,
-          String? match,
-          bool? isAutoPicked,
-          int? displayOrder}) =>
-      $apply(FieldCopyWithData({
-        if (id != null) #id: id,
-        if (templateId != null) #templateId: templateId,
-        if (sourceTemplateId != $none) #sourceTemplateId: sourceTemplateId,
-        if (term != null) #term: term,
-        if (match != null) #match: match,
-        if (isAutoPicked != null) #isAutoPicked: isAutoPicked,
-        if (displayOrder != null) #displayOrder: displayOrder
-      }));
+  $R call({
+    String? id,
+    String? templateId,
+    Object? sourceTemplateId = $none,
+    String? term,
+    String? match,
+    bool? isAutoPicked,
+    int? displayOrder,
+  }) => $apply(
+    FieldCopyWithData({
+      if (id != null) #id: id,
+      if (templateId != null) #templateId: templateId,
+      if (sourceTemplateId != $none) #sourceTemplateId: sourceTemplateId,
+      if (term != null) #term: term,
+      if (match != null) #match: match,
+      if (isAutoPicked != null) #isAutoPicked: isAutoPicked,
+      if (displayOrder != null) #displayOrder: displayOrder,
+    }),
+  );
   @override
   MatchMadnessPair $make(CopyWithData data) => MatchMadnessPair(
-      id: data.get(#id, or: $value.id),
-      templateId: data.get(#templateId, or: $value.templateId),
-      sourceTemplateId:
-          data.get(#sourceTemplateId, or: $value.sourceTemplateId),
-      term: data.get(#term, or: $value.term),
-      match: data.get(#match, or: $value.match),
-      isAutoPicked: data.get(#isAutoPicked, or: $value.isAutoPicked),
-      displayOrder: data.get(#displayOrder, or: $value.displayOrder));
+    id: data.get(#id, or: $value.id),
+    templateId: data.get(#templateId, or: $value.templateId),
+    sourceTemplateId: data.get(#sourceTemplateId, or: $value.sourceTemplateId),
+    term: data.get(#term, or: $value.term),
+    match: data.get(#match, or: $value.match),
+    isAutoPicked: data.get(#isAutoPicked, or: $value.isAutoPicked),
+    displayOrder: data.get(#displayOrder, or: $value.displayOrder),
+  );
 
   @override
   MatchMadnessPairCopyWith<$R2, MatchMadnessPair, $Out2> $chain<$R2, $Out2>(
-          Then<$Out2, $R2> t) =>
-      _MatchMadnessPairCopyWithImpl<$R2, $Out2>($value, $cast, t);
+    Then<$Out2, $R2> t,
+  ) => _MatchMadnessPairCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }

@@ -2,9 +2,9 @@
 
 // Barrel files
 export 'widgets/widgets.barrel.dart';
+export 'models/models.barrel.dart';
 // Other files
 export 'view_cards.controller.dart';
-export 'view_cards.search_state.dart';
 export 'view_cards.query.dart';
 export 'view_cards.search_scope.dart';
 export 'view_cards.page.dart';

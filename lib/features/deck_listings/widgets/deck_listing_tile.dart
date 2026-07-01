@@ -4,9 +4,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         Deck,
         DeckTile,
+        DeckTileState,
         HeaderBadge,
         ImageHelper,
         MetaLabel,
+        NumberHelper,
+        ProfileLabel,
         SurfaceBorder,
         SurfaceColor,
         SurfacePadding,
@@ -63,8 +66,12 @@ class DeckListingTile extends HookWidget {
       return null;
     }, [interactionsController.error]);
 
+    final deckTileWidth = 90.0;
+    final deckTileTopPosition =
+        -(deckTileWidth / tokens.studyCardAspectRatio) + 10;
+
     final tile = ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 580),
+      constraints: BoxConstraints(maxWidth: 580.0),
       child: Surface(
         style: surfaceStyle.resolve(tokens, const [
           SurfacePadding.none,
@@ -75,7 +82,7 @@ class DeckListingTile extends HookWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             AspectRatio(
-              aspectRatio: 16 / 9,
+              aspectRatio: tokens.deckListingFeaturedImagesAspectRatio,
               child: BackgroundImageSurface(
                 image: backgroundImage,
                 style: surfaceStyle.resolve(tokens, const [
@@ -85,7 +92,6 @@ class DeckListingTile extends HookWidget {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    _HeaderScrim(color: tokens.colorSurfaceBackground),
                     Positioned(
                       top: tokens.spaceLayoutGapMd,
                       right: tokens.spaceLayoutGapLg,
@@ -98,29 +104,31 @@ class DeckListingTile extends HookWidget {
                             const HeaderBadge(label: 'Unpublished'),
                           MetaLabel(
                             icon: Icons.download_outlined,
-                            label: _formatCount(listing?.downloadsCount ?? 0),
+                            label: NumberHelper.formatAbbreviatedCount(
+                              listing?.downloadsCount ?? 0,
+                            ),
                           ),
                           MetaLabel(
                             icon: Icons.call_split_outlined,
-                            label: _formatCount(listing?.forksCount ?? 0),
+                            label: NumberHelper.formatAbbreviatedCount(
+                              listing?.forksCount ?? 0,
+                            ),
                           ),
                           MetaLabel(
                             icon: Icons.chat_bubble_outline,
-                            label: _formatCount(listing?.commentsCount ?? 0),
+                            label: NumberHelper.formatAbbreviatedCount(
+                              listing?.commentsCount ?? 0,
+                            ),
                           ),
                         ],
                       ),
                     ),
                     Positioned(
-                      left: tokens.spaceLayoutGapLg,
-                      bottom: tokens.spaceLayoutGapMd,
-                      child: DeckTile(deck: deck, width: 150),
-                    ),
-                    Positioned(
                       right: tokens.spaceLayoutGapLg,
                       bottom: tokens.spaceLayoutGapMd,
-                      child: _CreatorBadge(
-                        name: creatorName,
+                      child: ProfileLabel(
+                        displayName: creatorName,
+                        facingLeft: true,
                         avatarUrl: deck.userProfile?.avatarUrl,
                       ),
                     ),
@@ -128,106 +136,121 @@ class DeckListingTile extends HookWidget {
                 ),
               ),
             ),
-            Surface(
-              style: surfaceStyle.resolve(tokens, const [
-                SurfaceColor.muted,
-                SurfaceShape.sharp,
-                SurfaceBorder.top,
-              ]),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Surface(
+                  style: surfaceStyle.resolve(tokens, const [
+                    SurfaceColor.muted,
+                    SurfaceShape.sharp,
+                    SurfaceBorder.top,
+                  ]),
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Expanded(
-                        child: Text(
-                          title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: textStyle.resolve(tokens, const [
-                            TextSize.header,
-                            TextWeight.heavy,
-                          ]),
-                        ),
-                      ),
-                      SizedBox(width: tokens.spaceLayoutGapMd),
-                      if (listing != null)
-                        _FavoriteButton(
-                          count: _formatCount(
-                            interactionsController.favoritesCount,
-                          ),
-                          isSelected: interactionsController.isFavorite,
-                          onPressed:
-                              interactionsController.isBusy ||
-                                  !interactionsEnabled
-                              ? null
-                              : () {
-                                  interactionsController.toggleFavorite();
-                                },
-                        ),
-                    ],
-                  ),
-                  SizedBox(height: tokens.spaceLayoutGapSm),
-                  Text(
-                    description,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: textStyle.resolve(tokens, const [
-                      TextSize.label,
-                      TextWeight.body,
-                      TextColor.muted,
-                    ]),
-                  ),
-                  SizedBox(height: tokens.spaceLayoutGapMd),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Wrap(
-                          spacing: tokens.spaceLayoutGapMd,
-                          runSpacing: tokens.spaceLayoutGapSm,
-                          children: [
-                            MetaLabel(
-                              icon: Icons.style_outlined,
-                              label: '${deck.cardCount} cards',
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: textStyle.resolve(tokens, const [
+                                TextSize.header,
+                                TextWeight.heavy,
+                              ]),
                             ),
-                            MetaLabel(
-                              icon: Icons.new_releases_outlined,
-                              label: 'v$version+${deck.buildNumber}',
+                          ),
+                          SizedBox(width: tokens.spaceLayoutGapMd),
+                          if (listing != null)
+                            _FavoriteButton(
+                              count: NumberHelper.formatAbbreviatedCount(
+                                interactionsController.favoritesCount,
+                              ),
+                              isSelected: interactionsController.isFavorite,
+                              onPressed:
+                                  interactionsController.isBusy ||
+                                      !interactionsEnabled
+                                  ? null
+                                  : () {
+                                      interactionsController.toggleFavorite();
+                                    },
+                            ),
+                        ],
+                      ),
+                      SizedBox(height: tokens.spaceLayoutGapSm),
+                      Text(
+                        description,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: textStyle.resolve(tokens, const [
+                          TextSize.label,
+                          TextWeight.body,
+                          TextColor.muted,
+                        ]),
+                      ),
+                      SizedBox(height: tokens.spaceLayoutGapMd),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Wrap(
+                              spacing: tokens.spaceLayoutGapMd,
+                              runSpacing: tokens.spaceLayoutGapSm,
+                              children: [
+                                MetaLabel(
+                                  icon: Icons.style_outlined,
+                                  label: '${deck.cardCount} cards',
+                                ),
+                                MetaLabel(
+                                  icon: Icons.new_releases_outlined,
+                                  label: 'v$version+${deck.buildNumber}',
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (listing != null) ...[
+                            _InlineMetric(
+                              icon: Icons.keyboard_arrow_down,
+                              label: NumberHelper.formatAbbreviatedCount(
+                                interactionsController.downvotesCount,
+                              ),
+                            ),
+                            SizedBox(width: tokens.spaceLayoutGapMd),
+                            _InlineMetric(
+                              icon: Icons.keyboard_arrow_up,
+                              label: NumberHelper.formatAbbreviatedCount(
+                                interactionsController.upvotesCount,
+                              ),
                             ),
                           ],
-                        ),
+                        ],
                       ),
-                      if (listing != null) ...[
-                        _InlineMetric(
-                          icon: Icons.keyboard_arrow_down,
-                          label: _formatCount(
-                            interactionsController.downvotesCount,
-                          ),
-                        ),
-                        SizedBox(width: tokens.spaceLayoutGapMd),
-                        _InlineMetric(
-                          icon: Icons.keyboard_arrow_up,
-                          label: _formatCount(
-                            interactionsController.upvotesCount,
-                          ),
+                      if (tags.isNotEmpty) ...[
+                        SizedBox(height: tokens.spaceLayoutGapMd),
+                        Wrap(
+                          spacing: tokens.spaceLayoutGapSm,
+                          runSpacing: tokens.spaceLayoutGapSm,
+                          children: [
+                            for (final tag in tags)
+                              HeaderBadge(label: tag.name),
+                          ],
                         ),
                       ],
                     ],
                   ),
-                  if (tags.isNotEmpty) ...[
-                    SizedBox(height: tokens.spaceLayoutGapMd),
-                    Wrap(
-                      spacing: tokens.spaceLayoutGapSm,
-                      runSpacing: tokens.spaceLayoutGapSm,
-                      children: [
-                        for (final tag in tags) HeaderBadge(label: tag.name),
-                      ],
-                    ),
-                  ],
-                ],
-              ),
+                ),
+                Positioned(
+                  left: tokens.spaceLayoutPadding,
+                  top: deckTileTopPosition,
+                  child: DeckTile(
+                    deck: deck,
+                    width: deckTileWidth,
+                    state: DeckTileState.bare,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -269,113 +292,6 @@ class DeckListingTile extends HookWidget {
     }
 
     return value;
-  }
-
-  String _formatCount(int value) {
-    if (value >= 1000000) {
-      return '${(value / 1000000).toStringAsFixed(1)}m';
-    }
-
-    if (value >= 1000) {
-      return '${(value / 1000).toStringAsFixed(1)}k';
-    }
-
-    return value.toString();
-  }
-}
-
-class _HeaderScrim extends StatelessWidget {
-  const _HeaderScrim({required this.color});
-
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                color.withValues(alpha: 0),
-                color.withValues(alpha: 0.08),
-                color.withValues(alpha: 0.74),
-              ],
-              stops: const [0, 0.56, 1],
-            ),
-          ),
-        ),
-        DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-              colors: [
-                color.withValues(alpha: 0.42),
-                color.withValues(alpha: 0.08),
-                color.withValues(alpha: 0.34),
-              ],
-              stops: const [0, 0.48, 1],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _CreatorBadge extends StatelessWidget {
-  const _CreatorBadge({required this.name, required this.avatarUrl});
-
-  final String name;
-  final String? avatarUrl;
-
-  @override
-  Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
-    final trimmedName = name.trim().isEmpty ? 'Unknown creator' : name.trim();
-    final trimmedAvatarUrl = avatarUrl?.trim();
-    final hasAvatar = trimmedAvatarUrl != null && trimmedAvatarUrl.isNotEmpty;
-
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'By',
-              style: textStyle.resolve(tokens, const [
-                TextSize.labelSmall,
-                TextColor.muted,
-              ]),
-            ),
-            Text(
-              trimmedName,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: textStyle.resolve(tokens, const [
-                TextSize.label,
-                TextWeight.strong,
-              ]),
-            ),
-          ],
-        ),
-        SizedBox(width: tokens.spaceLayoutGapSm),
-        CircleAvatar(
-          radius: 28,
-          backgroundColor: tokens.colorPrimarySoft,
-          foregroundColor: tokens.colorPrimary,
-          backgroundImage: hasAvatar ? NetworkImage(trimmedAvatarUrl) : null,
-          child: hasAvatar ? null : const Icon(Icons.person_outline),
-        ),
-      ],
-    );
   }
 }
 
@@ -444,27 +360,3 @@ class _InlineMetric extends StatelessWidget {
     );
   }
 }
-
-// class _Metric extends StatelessWidget {
-//   const _Metric({required this.icon, required this.label});
-
-//   final IconData icon;
-//   final String label;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Row(
-//       mainAxisSize: MainAxisSize.min,
-//       children: [
-//         Icon(icon, size: 16, color: AppColors.colorTextSecondary),
-//         const SizedBox(width: AppSpacing.xs),
-//         Text(
-//           label,
-//           style: Theme.of(
-//             context,
-//           ).textTheme.labelMedium?.copyWith(color: AppColors.colorTextSecondary),
-//         ),
-//       ],
-//     );
-//   }
-// }

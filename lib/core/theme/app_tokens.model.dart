@@ -237,10 +237,11 @@ class AppTokens with AppTokensMappable {
   final double textSizeHeaderLarge = 36;
   final double textSizeHeader = 24;
   final double textSizeHeader2 = 30;
+  final double textSizeBody = 20;
+  final double textSizeBodyLarge = 30;
   final double textSizeLabelLarge = 16;
   final double textSizeLabel = 14;
   final double textSizeLabelSmall = 10;
-  final double textSizeBodyLarge = 30;
 
   final double sizeIconMd = 18;
   final double sizeIconLg = 24;
@@ -251,4 +252,6 @@ class AppTokens with AppTokensMappable {
   final double studyCardTextSizeFront = 68;
   final double studyCardTextSizeBack = 42;
   final double studyCardTextSizeBackContent = 34;
+
+  final double deckListingFeaturedImagesAspectRatio = 83 / 65;
 }

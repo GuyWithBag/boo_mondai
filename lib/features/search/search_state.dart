@@ -1,8 +1,8 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show SearchFilter, FilteredSearchBarController, SearchScope;
+    show FilteredSearchBarController, SearchFilter, SearchScope;
 
-class ViewCardsSearchState<TObject, TFilter extends SearchFilter> {
-  ViewCardsSearchState({
+class SearchState<TValue, TObject, TFilter extends SearchFilter> {
+  SearchState({
     required this.scope,
     required this.initialText,
     this.initialFilter,
@@ -15,10 +15,13 @@ class ViewCardsSearchState<TObject, TFilter extends SearchFilter> {
          initialFilter: initialFilter,
        );
 
-  final SearchScope<TObject, TFilter> scope;
+  final SearchScope<TValue, TObject, TFilter> scope;
   final String initialText;
   final TFilter? initialFilter;
   final FilteredSearchBarController<TObject, TFilter> controller;
+
+  bool get hasSearchQuery => controller.text.trim().isNotEmpty;
+  List<TObject> get results => controller.results;
 
   void setItems(Iterable<TObject> items) {
     controller.setItems(items);

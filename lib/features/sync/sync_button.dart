@@ -45,6 +45,7 @@ class SyncButton extends StatelessWidget {
       message: isAuthenticated ? 'Sync decks' : 'Sign in to sync',
       child: Button.icon(
         icon: Icons.sync_rounded,
+        color: ButtonColor.primary,
         tokens: tokens,
         onPressed: () {
           if (!isAuthenticated) {

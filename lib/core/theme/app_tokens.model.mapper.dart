@@ -376,6 +376,14 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
   static const Field<AppTokens, double> _f$textSizeHeader2 = Field(
       'textSizeHeader2', _$textSizeHeader2,
       key: r'text_size_header2', mode: FieldMode.member);
+  static double _$textSizeBody(AppTokens v) => v.textSizeBody;
+  static const Field<AppTokens, double> _f$textSizeBody = Field(
+      'textSizeBody', _$textSizeBody,
+      key: r'text_size_body', mode: FieldMode.member);
+  static double _$textSizeBodyLarge(AppTokens v) => v.textSizeBodyLarge;
+  static const Field<AppTokens, double> _f$textSizeBodyLarge = Field(
+      'textSizeBodyLarge', _$textSizeBodyLarge,
+      key: r'text_size_body_large', mode: FieldMode.member);
   static double _$textSizeLabelLarge(AppTokens v) => v.textSizeLabelLarge;
   static const Field<AppTokens, double> _f$textSizeLabelLarge = Field(
       'textSizeLabelLarge', _$textSizeLabelLarge,
@@ -388,10 +396,6 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
   static const Field<AppTokens, double> _f$textSizeLabelSmall = Field(
       'textSizeLabelSmall', _$textSizeLabelSmall,
       key: r'text_size_label_small', mode: FieldMode.member);
-  static double _$textSizeBodyLarge(AppTokens v) => v.textSizeBodyLarge;
-  static const Field<AppTokens, double> _f$textSizeBodyLarge = Field(
-      'textSizeBodyLarge', _$textSizeBodyLarge,
-      key: r'text_size_body_large', mode: FieldMode.member);
   static double _$sizeIconMd(AppTokens v) => v.sizeIconMd;
   static const Field<AppTokens, double> _f$sizeIconMd = Field(
       'sizeIconMd', _$sizeIconMd,
@@ -426,6 +430,14 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
   static const Field<AppTokens, double> _f$studyCardTextSizeBackContent = Field(
       'studyCardTextSizeBackContent', _$studyCardTextSizeBackContent,
       key: r'study_card_text_size_back_content', mode: FieldMode.member);
+  static double _$deckListingFeaturedImagesAspectRatio(AppTokens v) =>
+      v.deckListingFeaturedImagesAspectRatio;
+  static const Field<AppTokens, double>
+      _f$deckListingFeaturedImagesAspectRatio = Field(
+          'deckListingFeaturedImagesAspectRatio',
+          _$deckListingFeaturedImagesAspectRatio,
+          key: r'deck_listing_featured_images_aspect_ratio',
+          mode: FieldMode.member);
 
   @override
   final MappableFields<AppTokens> fields = const {
@@ -513,10 +525,11 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
     #textSizeHeaderLarge: _f$textSizeHeaderLarge,
     #textSizeHeader: _f$textSizeHeader,
     #textSizeHeader2: _f$textSizeHeader2,
+    #textSizeBody: _f$textSizeBody,
+    #textSizeBodyLarge: _f$textSizeBodyLarge,
     #textSizeLabelLarge: _f$textSizeLabelLarge,
     #textSizeLabel: _f$textSizeLabel,
     #textSizeLabelSmall: _f$textSizeLabelSmall,
-    #textSizeBodyLarge: _f$textSizeBodyLarge,
     #sizeIconMd: _f$sizeIconMd,
     #sizeIconLg: _f$sizeIconLg,
     #studyCardAspectRatio: _f$studyCardAspectRatio,
@@ -525,6 +538,8 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
     #studyCardTextSizeFront: _f$studyCardTextSizeFront,
     #studyCardTextSizeBack: _f$studyCardTextSizeBack,
     #studyCardTextSizeBackContent: _f$studyCardTextSizeBackContent,
+    #deckListingFeaturedImagesAspectRatio:
+        _f$deckListingFeaturedImagesAspectRatio,
   };
 
   static AppTokens _instantiate(DecodingData data) {

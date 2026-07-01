@@ -7,7 +7,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         ButtonVariant,
         FlashcardTemplate,
         MarkdownText,
-        PhysicalCardSide,
         StudyCard;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -16,19 +15,11 @@ class FlashcardFrontSide extends StatelessWidget {
   const FlashcardFrontSide({
     required this.template,
     required this.studyCard,
-    required this.onReveal,
+    this.onReveal,
     this.showRevealButton = true,
     this.maxWidth = 460,
     super.key,
   });
-
-  const FlashcardFrontSide.preview({
-    required this.template,
-    required this.studyCard,
-    this.maxWidth = 460,
-    super.key,
-  }) : onReveal = null,
-       showRevealButton = false;
 
   final FlashcardTemplate template;
   final StudyCard studyCard;

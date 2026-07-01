@@ -86,7 +86,7 @@ class DeckDetails extends StatelessWidget {
           isMarkdown: true,
           onSave: onLongDescriptionChanged,
           textStyle: textStyle.resolve(tokens, const [
-            TextSize.bodyLarge,
+            TextSize.body,
             TextWeight.body,
           ]),
         ),

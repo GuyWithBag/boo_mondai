@@ -17,7 +17,7 @@ class FillInTheBlanksTemplateMapper
           .use(_instance = FillInTheBlanksTemplateMapper._());
       CardTemplateMapper.ensureInitialized().addSubMapper(_instance!);
       TagMapper.ensureInitialized();
-      CardMediaAttachmentMapper.ensureInitialized();
+      CardAttachmentMapper.ensureInitialized();
       FillInTheBlankSegmentMapper.ensureInitialized();
     }
     return _instance!;
@@ -48,9 +48,9 @@ class FillInTheBlanksTemplateMapper
   static List<Tag> _$tags(FillInTheBlanksTemplate v) => v.tags;
   static const Field<FillInTheBlanksTemplate, List<Tag>> _f$tags =
       Field('tags', _$tags, opt: true, def: const []);
-  static List<CardMediaAttachment> _$attachments(FillInTheBlanksTemplate v) =>
+  static List<CardAttachment> _$attachments(FillInTheBlanksTemplate v) =>
       v.attachments;
-  static const Field<FillInTheBlanksTemplate, List<CardMediaAttachment>>
+  static const Field<FillInTheBlanksTemplate, List<CardAttachment>>
       _f$attachments =
       Field('attachments', _$attachments, opt: true, def: const []);
   static List<FillInTheBlankSegment> _$segments(FillInTheBlanksTemplate v) =>
@@ -153,11 +153,9 @@ abstract class FillInTheBlanksTemplateCopyWith<
   @override
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags;
   @override
-  ListCopyWith<
-      $R,
-      CardMediaAttachment,
-      CardMediaAttachmentCopyWith<$R, CardMediaAttachment,
-          CardMediaAttachment>> get attachments;
+  ListCopyWith<$R, CardAttachment,
+          CardAttachmentCopyWith<$R, CardAttachment, CardAttachment>>
+      get attachments;
   ListCopyWith<
       $R,
       FillInTheBlankSegment,
@@ -172,7 +170,7 @@ abstract class FillInTheBlanksTemplateCopyWith<
       DateTime? updatedAt,
       String? sourceTemplateId,
       List<Tag>? tags,
-      List<CardMediaAttachment>? attachments,
+      List<CardAttachment>? attachments,
       List<FillInTheBlankSegment>? segments});
   FillInTheBlanksTemplateCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
       Then<$Out2, $R2> t);
@@ -191,14 +189,10 @@ class _FillInTheBlanksTemplateCopyWithImpl<$R, $Out>
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags => ListCopyWith(
       $value.tags, (v, t) => v.copyWith.$chain(t), (v) => call(tags: v));
   @override
-  ListCopyWith<
-      $R,
-      CardMediaAttachment,
-      CardMediaAttachmentCopyWith<$R, CardMediaAttachment,
-          CardMediaAttachment>> get attachments => ListCopyWith(
-      $value.attachments,
-      (v, t) => v.copyWith.$chain(t),
-      (v) => call(attachments: v));
+  ListCopyWith<$R, CardAttachment,
+          CardAttachmentCopyWith<$R, CardAttachment, CardAttachment>>
+      get attachments => ListCopyWith($value.attachments,
+          (v, t) => v.copyWith.$chain(t), (v) => call(attachments: v));
   @override
   ListCopyWith<
       $R,
@@ -215,7 +209,7 @@ class _FillInTheBlanksTemplateCopyWithImpl<$R, $Out>
           DateTime? updatedAt,
           Object? sourceTemplateId = $none,
           List<Tag>? tags,
-          List<CardMediaAttachment>? attachments,
+          List<CardAttachment>? attachments,
           List<FillInTheBlankSegment>? segments}) =>
       $apply(FieldCopyWithData({
         if (id != null) #id: id,

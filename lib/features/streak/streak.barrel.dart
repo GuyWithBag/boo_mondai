@@ -5,3 +5,5 @@ export 'streaks.remote.db.dart';
 export 'streak.dto.dart';
 export 'streak.controller.dart';
 export 'streak.local.db.dart';
+export 'streak.helper.dart';
+export 'streak.service.dart';

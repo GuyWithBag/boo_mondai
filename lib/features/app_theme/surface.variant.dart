@@ -260,6 +260,7 @@ final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
       SurfaceStylePart.decoration({
         DecorationPart.color(tokens.colorTransparent),
         DecorationPart.borderParts({BorderPart.color(tokens.colorTransparent)}),
+        DecorationPart.borderParts({BorderPart.width(0)}),
         DecorationPart.boxShadowParts({
           BoxShadowPart.color(tokens.colorTransparent),
         }),

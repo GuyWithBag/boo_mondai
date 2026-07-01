@@ -11,3 +11,4 @@ export 'filter_codecs/filter_codecs.barrel.dart';
 export 'search_text_parser.dart';
 export 'search_directive_property.dart';
 export 'search_result_tile.dart';
+export 'search_state.dart';

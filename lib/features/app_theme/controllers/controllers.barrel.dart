@@ -2,3 +2,4 @@
 
 // Other files
 export 'replacement_span.controller.dart';
+export 'scaffold.controller.dart';

@@ -84,7 +84,7 @@ class Button extends HookWidget {
     );
   }
 
-  static Button iconSmall({
+  static Button iconOnlySmall({
     VoidCallback? onPressed,
     IconData? icon,
     ButtonColor color = ButtonColor.muted,

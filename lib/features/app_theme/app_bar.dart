@@ -12,7 +12,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         textStyle;
 import 'package:flutter/material.dart' hide AppBar;
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart' show ReadContext;
 import 'package:theme_variants/theme_variants.dart';
 
 class AppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -31,7 +30,7 @@ class AppBar extends StatelessWidget implements PreferredSizeWidget {
     this.scrollController,
     this.collapseDistance = 0,
     this.preferredHeight = AppBar.preferredHeightDefault,
-    this.preferredBottomHeight = 50,
+    this.preferredBottomHeight = 45,
     this.showBottomBorder = false,
     this.child,
     this.header,
@@ -76,7 +75,6 @@ class AppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final mainController = context.read<MainController>();
     final route = ModalRoute.of(context);
     final canPop =
         automaticallyImplyPopButton &&
@@ -91,7 +89,6 @@ class AppBar extends StatelessWidget implements PreferredSizeWidget {
                 onPop ??
                 () {
                   context.pop();
-                  mainController.setBottomNavBarVisible(true);
                 },
             tokens: tokens,
           )
@@ -100,11 +97,22 @@ class AppBar extends StatelessWidget implements PreferredSizeWidget {
     final effectivePopButton = popButtonWidget;
     final effectiveActions = [for (final action in actions) action];
     final effectiveBottom = bottom;
-    final resolvedSurfaceStyle = surfaceStyle.resolve(tokens, [
-      SurfaceShape.sharp,
-      SurfaceBorder.bottom,
-      if (transparentBackground) SurfaceColor.invisible,
-    ]);
+    final resolvedSurfaceStyle = surfaceStyle
+        .resolve(tokens, [
+          SurfaceShape.sharp,
+          SurfaceBorder.bottom,
+          if (transparentBackground) SurfaceColor.invisible,
+        ])
+        .copyWith(
+          padding: EdgeInsets.only(
+            left: tokens.spaceLayoutPadding,
+            right: tokens.spaceLayoutPadding,
+            top: tokens.spaceLayoutPadding,
+            bottom: transparentBackground
+                ? tokens.spaceLayoutPadding / 2
+                : tokens.spaceLayoutPadding,
+          ),
+        );
     final spacing = tokens.spaceLayoutGapSm;
 
     return Column(
@@ -129,15 +137,20 @@ class AppBar extends StatelessWidget implements PreferredSizeWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        ?effectivePopButton,
-                        if (title != null)
-                          Text(
-                            title!,
-                            style: textStyle.resolve(tokens, const [
-                              TextSize.header,
-                              TextWeight.heavy,
-                            ]),
-                          ),
+                        Row(
+                          spacing: tokens.spaceLayoutGapMd,
+                          children: [
+                            ?effectivePopButton,
+                            if (title != null)
+                              Text(
+                                title!,
+                                style: textStyle.resolve(tokens, const [
+                                  TextSize.header,
+                                  TextWeight.heavy,
+                                ]),
+                              ),
+                          ],
+                        ),
                         if (child != null) Expanded(child: child!),
                         if (effectiveActions.isNotEmpty) ...[
                           Row(
@@ -156,40 +169,8 @@ class AppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
         if (effectiveBottom != null)
-          SizedBox(
-            height: preferredBottomHeight,
-            child: Padding(
-              padding: EdgeInsetsDirectional.only(
-                start: tokens.spaceScaffoldPadding,
-                end: tokens.spaceScaffoldPadding,
-                bottom: tokens.spaceScaffoldPadding,
-              ),
-              child: effectiveBottom,
-            ),
-          ),
+          SizedBox(height: preferredBottomHeight, child: effectiveBottom),
       ],
     );
   }
 }
-
-//   Widget? _maybeCollapse({
-//     required Widget? child,
-//     required Alignment alignment,
-//   }) {
-//     final controller = scrollController;
-
-//     if (child == null) {
-//       return null;
-//     }
-
-//     if (!collapsible || controller == null) {
-//       return child;
-//     }
-
-//     return CollapsingHeaderItem(
-//       scrollController: controller,
-//       collapseDistance: collapseDistance,
-//       alignment: alignment,
-//       child: child,
-//     );
-//   }

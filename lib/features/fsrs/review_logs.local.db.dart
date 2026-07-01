@@ -17,7 +17,12 @@ class ReviewLogsLocalDB extends HiveLocalDB<FsrsReviewLog> {
   };
 
   List<FsrsReviewLog> getByCardId(String cardId) => guardSync(
-    () => box.values.where((e) => e.log.cardId.toString() == cardId).toList(),
+    () => box.values.where((e) => e.fsrsCardId == cardId).toList(),
     action: 'getByCardId($cardId)',
+  );
+
+  List<DateTime> activityDates() => guardSync(
+    () => box.values.map((e) => e.createdAt).toList(),
+    action: 'activityDates',
   );
 }

@@ -1,302 +1,302 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        Deck,
-        DeckListing,
-        DeckListingInteractionsController,
         AuthService,
-        LocalDB,
-        RemoteDB,
-        VisibilityState,
-        ViewDeckListingsController,
+        CardTemplate,
         ChangeTrackerController,
+        Controller,
+        Deck,
         DeckCommentsController,
+        DeckListingInteractionsController,
+        DecksService,
         DeckVoteReviewsController,
+        DiscussionItem,
+        LocalDB,
+        ViewDeckListingSingleHelper,
+        ViewDeckListingsController,
         useDeckCommentsController,
-        useDeckVoteReviewsController,
-        DiscussionItem;
-import 'package:flutter/material.dart' show ValueChanged, ValueNotifier;
+        useDeckVoteReviewsController;
+import 'package:file_picker/file_picker.dart' show PlatformFile;
+import 'package:flutter/material.dart' show ValueChanged;
 import 'package:flutter_hooks/flutter_hooks.dart'
-    show useListenable, useState, useMemoized, useEffect;
+    show useEffect, useListenable, useMemoized;
 
-enum DeckListingSheetMode { editor, preview }
+enum DeckListingSheetState { editor, preview }
 
 ViewDeckListingSingleController useViewDeckListingSingleController({
   required String deckId,
   required Deck initialDeck,
-  required DeckListingSheetMode initialMode,
+  required DeckListingSheetState initialState,
   required ViewDeckListingsController controller,
-  required ChangeTrackerController changeReviewController,
+  required ChangeTrackerController changeTrackerController,
 }) {
-  useListenable(controller);
-  final mode = useState(initialMode);
-
-  final deck = _deckById(controller.decks, deckId) ?? initialDeck;
-  final selectedDeckId = deck.id;
-  final localDeck = LocalDB.deck.selectByPk({'id': selectedDeckId});
-  final canEdit = localDeck != null && localDeck.isEditable;
-  final canPublish = canEdit && !deck.isPublished && deck.listing != null;
-  final interactionsEnabled = deck.isPublished && deck.listing != null;
-
-  final interactionsController = useMemoized(
-    () => DeckListingInteractionsController(deck: deck),
-    [selectedDeckId],
+  final sheetController = useMemoized(
+    () => ViewDeckListingSingleController(
+      deckId: deckId,
+      initialDeck: initialDeck,
+      initialState: initialState,
+      parentController: controller,
+      changeTrackerController: changeTrackerController,
+    ),
+    [deckId, controller, changeTrackerController],
   );
-  final interactionTick = useState(0);
 
-  useEffect(() {
-    void notify() => interactionTick.value++;
+  useListenable(sheetController);
+  useEffect(() => sheetController.dispose, [sheetController]);
 
-    interactionsController.addListener(notify);
-    if (interactionsEnabled) {
-      interactionsController.loadInteractionState();
-    }
-
-    return () {
-      interactionsController.removeListener(notify);
-      interactionsController.dispose();
-    };
-  }, [interactionsController, selectedDeckId, interactionsEnabled]);
-
-  interactionTick.value;
-
-  final listing = deck.listing;
   final commentsController = useDeckCommentsController(
-    deck: deck,
-    enabled: deck.isPublished,
+    deck: sheetController.deck,
+    enabled: sheetController.deck.isPublished,
   );
   final reviewsController = useDeckVoteReviewsController(
-    deck: deck,
-    currentVoteValue: interactionsController.voteValue,
-    onReviewChanged: interactionsController.loadInteractionState,
-    enabled: deck.isPublished,
+    deck: sheetController.deck,
+    currentVoteValue: sheetController.voteValue,
+    onReviewChanged: sheetController.loadInteractionState,
+    enabled: sheetController.deck.isPublished,
   );
-
-  final error =
-      controller.error ??
-      interactionsController.error ??
-      commentsController.error ??
-      reviewsController.error;
-  final isLoadingDiscussion =
-      commentsController.isLoading || reviewsController.isLoading;
-
-  final vc = ViewDeckListingSingleController(
-    // Public state
-    deck: deck,
-    mode: mode.value,
-    canEdit: canEdit,
-    canPublish: canPublish,
-    upvotesCount: interactionsController.upvotesCount,
-    downvotesCount: interactionsController.downvotesCount,
-    favoritesCount: interactionsController.favoritesCount,
-    commentsCount: commentsController.isLoading
-        ? listing?.commentsCount ?? commentsController.count
-        : commentsController.count,
-    reviewsCount: reviewsController.isLoading
-        ? listing?.reviewsCount ?? reviewsController.count
-        : reviewsController.count,
-    voteValue: interactionsController.voteValue,
-    isFavorite: interactionsController.isFavorite,
-    isBusy: interactionsController.isBusy,
-    isDownloading: controller.isDownloadingDeck(deckId),
-    isLoadingDiscussion: isLoadingDiscussion,
-    isSubmittingComment: commentsController.isSubmitting,
-    isSubmittingReview: reviewsController.isSubmittingReview,
-    isSubmittingReviewComment: reviewsController.isSubmittingReviewComment,
-    reviewItems: reviewsController.items,
-    commentItems: commentsController.items,
-    reviewRepliesFor: reviewsController.repliesFor,
-    commentRepliesFor: commentsController.repliesFor,
-    canEditCommentItem: commentsController.canEditItem,
-    canEditReviewItem: reviewsController.canEditItem,
-    onUpvotePressed: interactionsEnabled
-        ? interactionsController.toggleUpvote
-        : null,
-    onDownvotePressed: interactionsEnabled
-        ? interactionsController.toggleDownvote
-        : null,
-    onFavoritePressed: interactionsEnabled
-        ? interactionsController.toggleFavorite
-        : null,
-    onDownloadPressed: deck.isPublished
-        ? () =>
-              controller.downloadDeck(deck, controller: changeReviewController)
-        : null,
-    onModeChanged: (value) => mode.value = value,
-    error: error,
-    // Private dependencies
-    activeDeck: deck,
-    parentController: controller,
-    interactionsController: interactionsController,
+  sheetController.bindDiscussionControllers(
     commentsController: commentsController,
     reviewsController: reviewsController,
-    modeNotifier: mode,
   );
 
-  return vc;
+  return sheetController;
 }
 
-class ViewDeckListingSingleController {
+class ViewDeckListingSingleController extends Controller {
   ViewDeckListingSingleController({
-    required this.deck,
-    required this.mode,
-    required this.canEdit,
-    required this.canPublish,
-    required this.upvotesCount,
-    required this.downvotesCount,
-    required this.favoritesCount,
-    required this.commentsCount,
-    required this.reviewsCount,
-    required this.voteValue,
-    required this.isFavorite,
-    required this.isBusy,
-    required this.isDownloading,
-    required this.isLoadingDiscussion,
-    required this.isSubmittingComment,
-    required this.isSubmittingReview,
-    required this.isSubmittingReviewComment,
-    required this.reviewItems,
-    required this.commentItems,
-    required this.reviewRepliesFor,
-    required this.commentRepliesFor,
-    required this.canEditCommentItem,
-    required this.canEditReviewItem,
-    required this.onUpvotePressed,
-    required this.onDownvotePressed,
-    required this.onFavoritePressed,
-    required this.onDownloadPressed,
-    required this.onModeChanged,
-    required this.error,
-    required Deck activeDeck,
+    required String deckId,
+    required Deck initialDeck,
+    required DeckListingSheetState initialState,
     required ViewDeckListingsController parentController,
-    required DeckListingInteractionsController interactionsController,
+    required ChangeTrackerController changeTrackerController,
+  }) : _deckId = deckId,
+       _deck = initialDeck,
+       _state = initialState,
+       _parentController = parentController,
+       _changeTrackerController = changeTrackerController,
+       _interactionsController = DeckListingInteractionsController(
+         deck: initialDeck,
+       ) {
+    _syncDeckFromParent();
+    _parentController.addListener(_syncFromParentController);
+    _interactionsController.addListener(notifyListeners);
+    if (_interactionsEnabled) {
+      _interactionsController.loadInteractionState();
+    }
+  }
+
+  final String _deckId;
+  final ViewDeckListingsController _parentController;
+  final ChangeTrackerController _changeTrackerController;
+  final DeckListingInteractionsController _interactionsController;
+  final ViewDeckListingSingleHelper helper =
+      const ViewDeckListingSingleHelper();
+
+  Deck _deck;
+  DeckListingSheetState _state;
+  DeckCommentsController? _commentsController;
+  DeckVoteReviewsController? _reviewsController;
+
+  Deck get deck => _deck;
+  DeckListingSheetState get state => _state;
+
+  bool get canEdit {
+    final localDeck = LocalDB.deck.selectByPk({'id': _deck.id});
+    return localDeck != null && localDeck.isEditable;
+  }
+
+  bool get canPublish => canEdit && !_deck.isPublished && _deck.listing != null;
+  bool get canUnpublish => canEdit && _deck.isPublished;
+  bool get _interactionsEnabled => _deck.isPublished && _deck.listing != null;
+
+  int get upvotesCount => _interactionsController.upvotesCount;
+  int get downvotesCount => _interactionsController.downvotesCount;
+  int get favoritesCount => _interactionsController.favoritesCount;
+  int get commentsCount {
+    final commentsController = _commentsController;
+    if (commentsController == null) return _deck.listing?.commentsCount ?? 0;
+
+    return commentsController.isLoading
+        ? _deck.listing?.commentsCount ?? commentsController.count
+        : commentsController.count;
+  }
+
+  int get reviewsCount {
+    final reviewsController = _reviewsController;
+    if (reviewsController == null) return _deck.listing?.reviewsCount ?? 0;
+
+    return reviewsController.isLoading
+        ? _deck.listing?.reviewsCount ?? reviewsController.count
+        : reviewsController.count;
+  }
+
+  int? get voteValue => _interactionsController.voteValue;
+  bool get isFavorite => _interactionsController.isFavorite;
+  bool get isBusy => _interactionsController.isBusy;
+  bool get isDownloading => _parentController.isDownloadingDeck(_deckId);
+  bool get isLoadingDiscussion =>
+      (_commentsController?.isLoading ?? false) ||
+      (_reviewsController?.isLoading ?? false);
+  bool get isSubmittingComment => _commentsController?.isSubmitting ?? false;
+  bool get isSubmittingReview =>
+      _reviewsController?.isSubmittingReview ?? false;
+  bool get isSubmittingReviewComment =>
+      _reviewsController?.isSubmittingReviewComment ?? false;
+  List<DiscussionItem> get reviewItems =>
+      _reviewsController?.items ?? const <DiscussionItem>[];
+  List<DiscussionItem> get commentItems =>
+      _commentsController?.items ?? const <DiscussionItem>[];
+  @override
+  Exception? get error =>
+      _parentController.error ??
+      _interactionsController.error ??
+      _commentsController?.error ??
+      _reviewsController?.error;
+
+  Future<void> Function()? get onUpvotePressed =>
+      _interactionsEnabled ? _interactionsController.toggleUpvote : null;
+  Future<void> Function()? get onDownvotePressed =>
+      _interactionsEnabled ? _interactionsController.toggleDownvote : null;
+  Future<void> Function()? get onFavoritePressed =>
+      _interactionsEnabled ? _interactionsController.toggleFavorite : null;
+  Future<void> Function()? get onDownloadPressed => _deck.isPublished
+      ? () => _parentController.downloadDeck(
+          _deck,
+          controller: _changeTrackerController,
+        )
+      : null;
+  ValueChanged<DeckListingSheetState> get onModeChanged => setState;
+
+  List<DiscussionItem> reviewRepliesFor(String itemId) {
+    return _reviewsController?.repliesFor(itemId) ?? const <DiscussionItem>[];
+  }
+
+  List<DiscussionItem> commentRepliesFor(String itemId) {
+    return _commentsController?.repliesFor(itemId) ?? const <DiscussionItem>[];
+  }
+
+  bool canEditCommentItem(DiscussionItem item) {
+    return _commentsController?.canEditItem(item) ?? false;
+  }
+
+  bool canEditReviewItem(DiscussionItem item) {
+    return _reviewsController?.canEditItem(item) ?? false;
+  }
+
+  void bindDiscussionControllers({
     required DeckCommentsController commentsController,
     required DeckVoteReviewsController reviewsController,
-    required ValueNotifier<DeckListingSheetMode> modeNotifier,
-  }) : _activeDeck = activeDeck,
-       _parentController = parentController,
-       _interactionsController = interactionsController,
-       _commentsController = commentsController,
-       _reviewsController = reviewsController,
-       _modeNotifier = modeNotifier;
+  }) {
+    _commentsController = commentsController;
+    _reviewsController = reviewsController;
+  }
 
-  // --- Public state ---
+  void setState(DeckListingSheetState value) {
+    if (_state == value) return;
 
-  final Deck? deck;
-  final DeckListingSheetMode mode;
-  final bool canEdit;
-  final bool canPublish;
-  final int upvotesCount;
-  final int downvotesCount;
-  final int favoritesCount;
-  final int commentsCount;
-  final int reviewsCount;
-  final int? voteValue;
-  final bool isFavorite;
-  final bool isBusy;
-  final bool isDownloading;
-  final bool isLoadingDiscussion;
-  final bool isSubmittingComment;
-  final bool isSubmittingReview;
-  final bool isSubmittingReviewComment;
-  final List<DiscussionItem> reviewItems;
-  final List<DiscussionItem> commentItems;
-  final List<DiscussionItem> Function(String itemId) reviewRepliesFor;
-  final List<DiscussionItem> Function(String itemId) commentRepliesFor;
-  final bool Function(DiscussionItem item) canEditCommentItem;
-  final bool Function(DiscussionItem item) canEditReviewItem;
-  final Future<void> Function()? onUpvotePressed;
-  final Future<void> Function()? onDownvotePressed;
-  final Future<void> Function()? onFavoritePressed;
-  final Future<void> Function()? onDownloadPressed;
-  final ValueChanged<DeckListingSheetMode> onModeChanged;
-  final Exception? error;
+    _state = value;
+    notifyListeners();
+  }
 
-  // --- Private dependencies ---
-
-  final Deck _activeDeck;
-  final ViewDeckListingsController _parentController;
-  final DeckListingInteractionsController _interactionsController;
-  final DeckCommentsController _commentsController;
-  final DeckVoteReviewsController _reviewsController;
-  final ValueNotifier<DeckListingSheetMode> _modeNotifier;
-
-  // --- Delegated discussion actions ---
+  Future<void> loadInteractionState() {
+    return _interactionsController.loadInteractionState();
+  }
 
   Future<bool> submitReview({
     required int voteValue,
     required String title,
     required String body,
-  }) => _reviewsController.addReview(
-    voteValue: voteValue,
-    title: title,
-    body: body,
-  );
-
-  Future<bool> replyToReview(String body, {String? parentCommentId}) =>
-      _reviewsController.addReviewReply(body, parentCommentId: parentCommentId);
-
-  Future<bool> editReview(DiscussionItem item, String body, {String? title}) =>
-      _reviewsController.updateReviewItem(item, body, title: title);
-
-  Future<bool> submitComment(String body, {String? parentCommentId}) =>
-      _commentsController.addComment(body, parentCommentId: parentCommentId);
-
-  Future<bool> editComment(DiscussionItem item, String body, {String? title}) =>
-      _commentsController.updateCommentItem(item, body, title: title);
-
-  // --- Draft editing ---
-
-  Future<void> updateDraft(Deck updatedDeck) async {
-    await LocalDB.deck.upsert(updatedDeck);
-    final updatedListing = updatedDeck.listing;
-    if (updatedListing != null) {
-      await LocalDB.deckListing.upsert(updatedListing);
-    }
-    _parentController.replaceDeck(updatedDeck);
-  }
-
-  Future<void> _updateTextField({
-    required String value,
-    required bool allowEmpty,
-    required String Function(Deck deck) selectCurrentValue,
-    required Deck Function(Deck deck, String value) copyWithValue,
   }) async {
-    if (!canEdit) return;
-
-    final trimmedValue = value.trim();
-    if (!allowEmpty && trimmedValue.isEmpty) return;
-    if (trimmedValue == selectCurrentValue(_activeDeck)) return;
-
-    await updateDraft(
-      copyWithValue(
-        _activeDeck,
-        trimmedValue,
-      ).copyWith(updatedAt: DateTime.now()),
-    );
+    return _reviewsController?.addReview(
+          voteValue: voteValue,
+          title: title,
+          body: body,
+        ) ??
+        false;
   }
 
-  Future<void> updateTitle(String value) => _updateTextField(
-    value: value,
-    allowEmpty: false,
-    selectCurrentValue: (deck) => deck.title,
-    copyWithValue: (deck, value) => deck.copyWith(title: value),
-  );
+  Future<bool> replyToReview(String body, {String? parentCommentId}) async {
+    return _reviewsController?.addReviewReply(
+          body,
+          parentCommentId: parentCommentId,
+        ) ??
+        false;
+  }
 
-  Future<void> updateShortDescription(String value) => _updateTextField(
-    value: value,
-    allowEmpty: true,
-    selectCurrentValue: (deck) => deck.shortDescription,
-    copyWithValue: (deck, value) => deck.copyWith(shortDescription: value),
-  );
+  Future<bool> editReview(
+    DiscussionItem item,
+    String body, {
+    String? title,
+  }) async {
+    return _reviewsController?.updateReviewItem(item, body, title: title) ??
+        false;
+  }
 
-  Future<void> updateLongDescription(String value) => _updateTextField(
-    value: value,
-    allowEmpty: true,
-    selectCurrentValue: (deck) => deck.longDescription,
-    copyWithValue: (deck, value) => deck.copyWith(longDescription: value),
-  );
+  Future<bool> submitComment(String body, {String? parentCommentId}) async {
+    return _commentsController?.addComment(
+          body,
+          parentCommentId: parentCommentId,
+        ) ??
+        false;
+  }
 
-  // --- Publishing ---
+  Future<bool> editComment(
+    DiscussionItem item,
+    String body, {
+    String? title,
+  }) async {
+    return _commentsController?.updateCommentItem(item, body, title: title) ??
+        false;
+  }
+
+  Future<void> updateTitle(String value) async {
+    final updatedDeck = await DecksService.update(deck: _deck, title: value);
+    _applyUpdatedDeck(updatedDeck);
+  }
+
+  Future<void> updateShortDescription(String value) async {
+    final updatedDeck = await DecksService.update(
+      deck: _deck,
+      shortDescription: value,
+    );
+    _applyUpdatedDeck(updatedDeck);
+  }
+
+  Future<void> updateLongDescription(String value) async {
+    final updatedDeck = await DecksService.update(
+      deck: _deck,
+      longDescription: value,
+    );
+    _applyUpdatedDeck(updatedDeck);
+  }
+
+  Future<void> updateListingFeaturedImage(int index, PlatformFile file) async {
+    final updatedDeck = await DecksService.updateListingFeaturedImage(
+      deck: _deck,
+      index: index,
+      file: file,
+    );
+    _applyUpdatedDeck(updatedDeck);
+  }
+
+  List<CardTemplate> availableFeaturedCardTemplates() {
+    final featuredCardIds = {
+      for (final card in _deck.listing?.featuredCards ?? const [])
+        if (card['id'] case final String id) id,
+    };
+
+    return LocalDB.cardTemplate
+        .getByDeckId(_deck.id)
+        .where((template) => !featuredCardIds.contains(template.id))
+        .toList(growable: false);
+  }
+
+  Future<void> addListingFeaturedCard(CardTemplate template) async {
+    final updatedDeck = await DecksService.addListingFeaturedCard(
+      deck: _deck,
+      template: template,
+    );
+    _applyUpdatedDeck(updatedDeck);
+  }
 
   Future<void> publishDraft() async {
     if (!canPublish) return;
@@ -307,42 +307,58 @@ class ViewDeckListingSingleController {
       return;
     }
 
-    final now = DateTime.now();
-    final listing = _activeDeck.listing;
-    final publishedListing =
-        (listing ??
-                DeckListing(
-                  deckId: _activeDeck.id,
-                  createdAt: now,
-                  updatedAt: now,
-                ))
-            .copyWith(updatedAt: now);
-    final publishedDeck = _activeDeck.copyWith(
-      isPublished: true,
-      visibilityState: VisibilityState.public,
-      listing: publishedListing,
-      updatedAt: now,
-    );
-
-    await updateDraft(publishedDeck);
-    await RemoteDB.deck.upsert(publishedDeck);
-    await RemoteDB.deckListing.upsert(publishedListing);
-    _modeNotifier.value = DeckListingSheetMode.preview;
+    final publishedDeck = await DecksService.publishListingDraft(_deck);
+    _applyUpdatedDeck(publishedDeck);
+    setState(DeckListingSheetState.preview);
+    await _interactionsController.loadInteractionState();
   }
 
-  // --- Error handling ---
+  Future<void> unpublishDraft() async {
+    if (!canUnpublish) return;
+    if (!AuthService.isAuthenticatedRemote) {
+      _parentController.setError(
+        Exception('Sign in to unpublish deck listings.'),
+      );
+      return;
+    }
+
+    final unpublishedDeck = await DecksService.unpublishListingDraft(_deck);
+    _applyUpdatedDeck(unpublishedDeck);
+  }
 
   void clearErrors() {
     _parentController.setError(null);
     _interactionsController.setError(null);
-    _commentsController.clearError();
-    _reviewsController.clearError();
+    _commentsController?.clearError();
+    _reviewsController?.clearError();
   }
-}
 
-Deck? _deckById(List<Deck> decks, String deckId) {
-  for (final deck in decks) {
-    if (deck.id == deckId) return deck;
+  void _syncFromParentController() {
+    _syncDeckFromParent();
+    notifyListeners();
   }
-  return null;
+
+  bool _syncDeckFromParent() {
+    final parentDeck = helper.deckById(_parentController.decks, _deckId);
+    if (parentDeck == null || parentDeck == _deck) return false;
+
+    _deck = parentDeck;
+    return true;
+  }
+
+  void _applyUpdatedDeck(Deck? updatedDeck) {
+    if (updatedDeck == null) return;
+
+    _deck = updatedDeck;
+    _parentController.replaceDeck(updatedDeck);
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _parentController.removeListener(_syncFromParentController);
+    _interactionsController.removeListener(notifyListeners);
+    _interactionsController.dispose();
+    super.dispose();
+  }
 }

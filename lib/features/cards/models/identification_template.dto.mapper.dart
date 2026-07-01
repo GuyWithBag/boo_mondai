@@ -16,7 +16,7 @@ class IdentificationTemplateMapper
       MapperContainer.globals.use(_instance = IdentificationTemplateMapper._());
       CardTemplateMapper.ensureInitialized().addSubMapper(_instance!);
       TagMapper.ensureInitialized();
-      CardMediaAttachmentMapper.ensureInitialized();
+      CardAttachmentMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -46,9 +46,9 @@ class IdentificationTemplateMapper
   static List<Tag> _$tags(IdentificationTemplate v) => v.tags;
   static const Field<IdentificationTemplate, List<Tag>> _f$tags =
       Field('tags', _$tags, opt: true, def: const []);
-  static List<CardMediaAttachment> _$attachments(IdentificationTemplate v) =>
+  static List<CardAttachment> _$attachments(IdentificationTemplate v) =>
       v.attachments;
-  static const Field<IdentificationTemplate, List<CardMediaAttachment>>
+  static const Field<IdentificationTemplate, List<CardAttachment>>
       _f$attachments =
       Field('attachments', _$attachments, opt: true, def: const []);
   static String _$promptText(IdentificationTemplate v) => v.promptText;
@@ -166,11 +166,9 @@ abstract class IdentificationTemplateCopyWith<
   @override
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags;
   @override
-  ListCopyWith<
-      $R,
-      CardMediaAttachment,
-      CardMediaAttachmentCopyWith<$R, CardMediaAttachment,
-          CardMediaAttachment>> get attachments;
+  ListCopyWith<$R, CardAttachment,
+          CardAttachmentCopyWith<$R, CardAttachment, CardAttachment>>
+      get attachments;
   @override
   $R call(
       {String? id,
@@ -180,7 +178,7 @@ abstract class IdentificationTemplateCopyWith<
       DateTime? updatedAt,
       String? sourceTemplateId,
       List<Tag>? tags,
-      List<CardMediaAttachment>? attachments,
+      List<CardAttachment>? attachments,
       String? promptText,
       String? acceptedAnswers,
       String? imageUrl,
@@ -202,14 +200,10 @@ class _IdentificationTemplateCopyWithImpl<$R, $Out>
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags => ListCopyWith(
       $value.tags, (v, t) => v.copyWith.$chain(t), (v) => call(tags: v));
   @override
-  ListCopyWith<
-      $R,
-      CardMediaAttachment,
-      CardMediaAttachmentCopyWith<$R, CardMediaAttachment,
-          CardMediaAttachment>> get attachments => ListCopyWith(
-      $value.attachments,
-      (v, t) => v.copyWith.$chain(t),
-      (v) => call(attachments: v));
+  ListCopyWith<$R, CardAttachment,
+          CardAttachmentCopyWith<$R, CardAttachment, CardAttachment>>
+      get attachments => ListCopyWith($value.attachments,
+          (v, t) => v.copyWith.$chain(t), (v) => call(attachments: v));
   @override
   $R call(
           {String? id,
@@ -219,7 +213,7 @@ class _IdentificationTemplateCopyWithImpl<$R, $Out>
           DateTime? updatedAt,
           Object? sourceTemplateId = $none,
           List<Tag>? tags,
-          List<CardMediaAttachment>? attachments,
+          List<CardAttachment>? attachments,
           String? promptText,
           String? acceptedAnswers,
           Object? imageUrl = $none,

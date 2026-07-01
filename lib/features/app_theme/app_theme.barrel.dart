@@ -3,6 +3,7 @@
 // Barrel files
 export 'models/models.barrel.dart';
 export 'controllers/controllers.barrel.dart';
+export 'helpers/helpers.barrel.dart';
 // Other files
 export 'back_button.dart';
 export 'chip.variant.dart';

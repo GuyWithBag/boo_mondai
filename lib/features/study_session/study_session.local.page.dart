@@ -23,31 +23,13 @@ import 'package:boo_mondai/lib.barrel.dart'
         StreakController,
         StudySessionCardStage,
         StudySessionController,
-        SurfacePadding,
-        SurfaceShape,
         TextColor,
         TextSize,
         TextWeight,
         ViewStudyCardsController,
-        surfaceStyle,
         textStyle,
         useStudySessionCardStageController;
-import 'package:flutter/material.dart'
-    show
-        Icons,
-        SizedBox,
-        Widget,
-        BuildContext,
-        Icon,
-        Text,
-        WidgetsBinding,
-        MainAxisSize,
-        Colors,
-        Column,
-        Center,
-        Expanded,
-        Row,
-        SafeArea;
+import 'package:flutter/material.dart' hide AppBar, Scaffold;
 import 'package:flutter_hooks/flutter_hooks.dart' show useEffect, HookWidget;
 import 'package:go_router/go_router.dart' show GoRouterHelper;
 import 'package:provider/provider.dart' show WatchContext, ReadContext;
@@ -194,11 +176,13 @@ class StudySessionPage extends HookWidget {
         ),
       ),
       bottomNavBar: BottomNavBar(
+        preferredHeight: 130,
         child: RatingArea(
           studySessionController: controller,
           interactionsController: interactionsController,
         ),
       ),
+      inheritMainBottomNavBarHeight: false,
       body: StudySessionCardStage(
         studySessionController: controller,
         interactionsController: interactionsController,

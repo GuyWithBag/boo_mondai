@@ -3,7 +3,8 @@
 // PURPOSE: UI state for user's daily FSRS review streak
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/lib.barrel.dart' show Controller, Streak, LocalDB;
+import 'package:boo_mondai/lib.barrel.dart'
+    show Controller, Streak, LocalDB, Services;
 
 class StreakController extends Controller {
   Streak? get streak => LocalDB.streak.retrieve();
@@ -23,7 +24,7 @@ class StreakController extends Controller {
 
   Future<void> recordActivity(DateTime activityDate) async {
     try {
-      await LocalDB.streak.recordActivity(activityDate);
+      await Services.streak.refreshFromReviewLogs();
       notifyListeners();
     } on Exception catch (e) {
       setError(e);

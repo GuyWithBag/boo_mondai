@@ -5,31 +5,38 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/lib.barrel.dart' show AppSpacing, AppColors;
-import 'package:boo_mondai/features/profile/widgets/profile_avatar.dart';
+import 'package:boo_mondai/core/theme/app_tokens.model.dart';
+import 'package:boo_mondai/lib.barrel.dart'
+    show AppSpacing, AppColors, ProfileAvatar;
 import 'package:flutter/material.dart';
+import 'package:theme_variants/theme_variants.dart';
 
 class ProfileLabel extends StatelessWidget {
   const ProfileLabel({
     super.key,
     required this.displayName,
-    required this.label,
+    this.label = 'By',
     this.avatarUrl,
     this.isSourceAuthor = false,
+    this.facingLeft = false,
   });
 
   final String displayName;
   final String label;
   final String? avatarUrl;
   final bool isSourceAuthor;
+  final bool facingLeft;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final name = displayName.trim().isEmpty ? '...' : displayName.trim();
     final imageUrl = avatarUrl?.trim();
+    final tokens = context.themeTokens<AppTokens>();
 
     return Row(
+      textDirection: facingLeft ? TextDirection.rtl : TextDirection.ltr,
+      spacing: tokens.spaceLayoutGapSm,
       children: [
         ProfileAvatar(
           displayName: name,
@@ -37,9 +44,10 @@ class ProfileLabel extends StatelessWidget {
           radius: isSourceAuthor ? 16 : 18,
           isSourceAuthor: isSourceAuthor,
         ),
-        const SizedBox(width: AppSpacing.xs),
         Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: facingLeft
+              ? CrossAxisAlignment.end
+              : CrossAxisAlignment.start,
           children: [
             Text(
               label,

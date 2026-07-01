@@ -16,7 +16,7 @@ class WordScrambleTemplateMapper
       MapperContainer.globals.use(_instance = WordScrambleTemplateMapper._());
       CardTemplateMapper.ensureInitialized().addSubMapper(_instance!);
       TagMapper.ensureInitialized();
-      CardMediaAttachmentMapper.ensureInitialized();
+      CardAttachmentMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -46,9 +46,9 @@ class WordScrambleTemplateMapper
   static List<Tag> _$tags(WordScrambleTemplate v) => v.tags;
   static const Field<WordScrambleTemplate, List<Tag>> _f$tags =
       Field('tags', _$tags, opt: true, def: const []);
-  static List<CardMediaAttachment> _$attachments(WordScrambleTemplate v) =>
+  static List<CardAttachment> _$attachments(WordScrambleTemplate v) =>
       v.attachments;
-  static const Field<WordScrambleTemplate, List<CardMediaAttachment>>
+  static const Field<WordScrambleTemplate, List<CardAttachment>>
       _f$attachments =
       Field('attachments', _$attachments, opt: true, def: const []);
   static String _$sentenceToScramble(WordScrambleTemplate v) =>
@@ -161,11 +161,9 @@ abstract class WordScrambleTemplateCopyWith<
   @override
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags;
   @override
-  ListCopyWith<
-      $R,
-      CardMediaAttachment,
-      CardMediaAttachmentCopyWith<$R, CardMediaAttachment,
-          CardMediaAttachment>> get attachments;
+  ListCopyWith<$R, CardAttachment,
+          CardAttachmentCopyWith<$R, CardAttachment, CardAttachment>>
+      get attachments;
   @override
   $R call(
       {String? id,
@@ -175,7 +173,7 @@ abstract class WordScrambleTemplateCopyWith<
       DateTime? updatedAt,
       String? sourceTemplateId,
       List<Tag>? tags,
-      List<CardMediaAttachment>? attachments,
+      List<CardAttachment>? attachments,
       String? sentenceToScramble,
       String? imageUrl,
       String? audioUrl});
@@ -195,14 +193,10 @@ class _WordScrambleTemplateCopyWithImpl<$R, $Out>
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags => ListCopyWith(
       $value.tags, (v, t) => v.copyWith.$chain(t), (v) => call(tags: v));
   @override
-  ListCopyWith<
-      $R,
-      CardMediaAttachment,
-      CardMediaAttachmentCopyWith<$R, CardMediaAttachment,
-          CardMediaAttachment>> get attachments => ListCopyWith(
-      $value.attachments,
-      (v, t) => v.copyWith.$chain(t),
-      (v) => call(attachments: v));
+  ListCopyWith<$R, CardAttachment,
+          CardAttachmentCopyWith<$R, CardAttachment, CardAttachment>>
+      get attachments => ListCopyWith($value.attachments,
+          (v, t) => v.copyWith.$chain(t), (v) => call(attachments: v));
   @override
   $R call(
           {String? id,
@@ -212,7 +206,7 @@ class _WordScrambleTemplateCopyWithImpl<$R, $Out>
           DateTime? updatedAt,
           Object? sourceTemplateId = $none,
           List<Tag>? tags,
-          List<CardMediaAttachment>? attachments,
+          List<CardAttachment>? attachments,
           String? sentenceToScramble,
           Object? imageUrl = $none,
           Object? audioUrl = $none}) =>

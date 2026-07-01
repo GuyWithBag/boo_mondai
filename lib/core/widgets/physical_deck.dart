@@ -26,6 +26,7 @@ class PhysicalDeck extends StatelessWidget {
     required this.controller,
     this.hasTags = false,
     this.showInfoCover = true,
+    this.isCoverImageEditable = false,
     this.textScaleBaseWidth,
     this.onCoverImagePicked,
   });
@@ -34,6 +35,7 @@ class PhysicalDeck extends StatelessWidget {
   final CubeController controller;
   final bool hasTags;
   final bool showInfoCover;
+  final bool isCoverImageEditable;
   final double? textScaleBaseWidth;
   final BackgroundImagePicked? onCoverImagePicked;
 
@@ -87,6 +89,7 @@ class PhysicalDeck extends StatelessWidget {
         builder: (context, constraints) {
           return BackgroundImageSurface(
             image: coverImage,
+            isEditable: isCoverImageEditable,
             onImagePicked: onCoverImagePicked,
             clipBehavior: Clip.none,
             style: surfaceStyle.resolve(tokens, const [

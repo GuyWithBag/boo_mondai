@@ -10,6 +10,7 @@ enum TextSize {
   label,
   labelSmall,
   bodyLarge,
+  body,
   cardFront,
   cardBack,
   cardBackContent,
@@ -32,43 +33,35 @@ final textStyle = VariantStyle.textParts<AppTokens>(
   variants: {
     TextSize.headerLarge: (tokens) => {
       TextStylePart.fontSize(tokens.textSizeHeaderLarge.sp),
-      // TextStylePart.height(tokens.lineHeightTextDisplay),
     },
     TextSize.header: (tokens) => {
       TextStylePart.fontSize(tokens.textSizeHeader.sp),
-      TextStylePart.height(tokens.lineHeightTextDisplay),
     },
     TextSize.header2: (tokens) => {
       TextStylePart.fontSize(tokens.textSizeHeader2.sp),
-      // TextStylePart.height(tokens.lineHeightTextDisplay),
     },
     TextSize.labelLarge: (tokens) => {
       TextStylePart.fontSize(tokens.textSizeLabelLarge.sp),
-      TextStylePart.height(tokens.lineHeightTextTitle),
     },
     TextSize.label: (tokens) => {
       TextStylePart.fontSize(tokens.textSizeLabel.sp),
-      TextStylePart.height(tokens.lineHeightTextBody),
     },
     TextSize.labelSmall: (tokens) => {
       TextStylePart.fontSize(tokens.textSizeLabelSmall.sp),
       (style) => style.copyWith(letterSpacing: tokens.letterSpacingTextEyebrow),
     },
+    TextSize.body: (tokens) => {TextStylePart.fontSize(tokens.textSizeBody.sp)},
     TextSize.bodyLarge: (tokens) => {
       TextStylePart.fontSize(tokens.textSizeBodyLarge.sp),
-      TextStylePart.height(tokens.lineHeightFieldDisplay),
     },
     TextSize.cardFront: (tokens) => {
       TextStylePart.fontSize(tokens.studyCardTextSizeFront.sp),
-      TextStylePart.height(tokens.lineHeightTextDisplay),
     },
     TextSize.cardBack: (tokens) => {
       TextStylePart.fontSize(tokens.studyCardTextSizeBack.sp),
-      TextStylePart.height(tokens.lineHeightTextTitle),
     },
     TextSize.cardBackContent: (tokens) => {
       TextStylePart.fontSize(tokens.studyCardTextSizeBackContent.sp),
-      TextStylePart.height(tokens.lineHeightFieldDisplay),
     },
     TextWeight.body: (tokens) => {
       TextStylePart.fontWeight(tokens.fontWeightTextBody),

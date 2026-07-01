@@ -2,34 +2,38 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         AppBar,
         AppTokens,
-        BackgroundImageSurface,
         Button,
         ButtonColor,
+        CardTemplate,
         ChangeTrackerController,
         ChipTone,
         DateHelper,
         Deck,
         DeckDetails,
-        DeckListingSheetMode,
+        DeckListingSheetState,
         DeckProfilesLabel,
         DeckTile,
         DeckTileState,
         DiscussionSection,
-        ImageHelper,
+        EditableCarousel,
+        EditableFeaturedCardsColumn,
         MetaLabel,
+        NumberHelper,
         Scaffold,
         SurfaceBorder,
         SurfaceColor,
         SurfacePadding,
         SurfaceShadow,
         SurfaceShape,
+        ViewCardsTile,
         ViewDeckListingSingleController,
-        ViewDeckListingSingleHelper,
         ViewDeckListingsController,
         ViewDeckSingleHelper,
         showBottomSheet,
+        showModal,
         surfaceStyle,
-        useViewDeckListingSingleController;
+        useViewDeckListingSingleController,
+        SectionEyebrow;
 import 'package:flutter/material.dart' hide Scaffold, AppBar, showBottomSheet;
 import 'package:flutter_hooks/flutter_hooks.dart' show HookWidget, useEffect;
 
@@ -42,7 +46,7 @@ import 'package:theme_variants/theme_variants.dart'
 Future<void> showViewDeckListingSingleSheet(
   BuildContext context,
   Deck deck, {
-  DeckListingSheetMode initialMode = DeckListingSheetMode.preview,
+  DeckListingSheetState initialState = DeckListingSheetState.preview,
 }) {
   return showBottomSheet(
     context: context,
@@ -50,7 +54,10 @@ Future<void> showViewDeckListingSingleSheet(
       final controller = ViewDeckListingsController()..decks = [deck];
       return ChangeNotifierProvider<ViewDeckListingsController>.value(
         value: controller,
-        child: ViewDeckListingSingleSheet(deck: deck, initialMode: initialMode),
+        child: ViewDeckListingSingleSheet(
+          deck: deck,
+          initialState: initialState,
+        ),
       );
     },
   );
@@ -60,24 +67,25 @@ class ViewDeckListingSingleSheet extends HookWidget {
   const ViewDeckListingSingleSheet({
     super.key,
     required this.deck,
-    this.initialMode = DeckListingSheetMode.preview,
+    this.initialState = DeckListingSheetState.preview,
   });
 
   final Deck deck;
-  final DeckListingSheetMode initialMode;
+  final DeckListingSheetState initialState;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
     final controller = context.read<ViewDeckListingsController>();
-    final changeReviewController = context.read<ChangeTrackerController>();
+    final changeTrackerController = context.read<ChangeTrackerController>();
     final sheet = useViewDeckListingSingleController(
       deckId: deck.id,
       initialDeck: deck,
-      initialMode: initialMode,
+      initialState: initialState,
       controller: controller,
-      changeReviewController: changeReviewController,
+      changeTrackerController: changeTrackerController,
     );
+    final isEditing = sheet.state == DeckListingSheetState.editor;
 
     useEffect(() {
       final error = sheet.error;
@@ -94,12 +102,59 @@ class ViewDeckListingSingleSheet extends HookWidget {
       return null;
     }, [sheet.error]);
 
+    List<Widget> getAppBarActions() {
+      final children = <Widget>[];
+      if (isEditing) {
+        if (sheet.deck.isPublished) {
+          children.add(
+            Button.icon(
+              icon: Icons.public_off_outlined,
+              color: ButtonColor.error,
+              tokens: tokens,
+              onPressed: sheet.canUnpublish ? sheet.unpublishDraft : null,
+            ),
+          );
+        } else {
+          children.add(
+            Button.icon(
+              icon: Icons.public_outlined,
+              color: ButtonColor.success,
+              tokens: tokens,
+              onPressed: sheet.canPublish ? sheet.publishDraft : null,
+            ),
+          );
+        }
+      } else {
+        children.add(
+          Button.icon(
+            icon: sheet.isDownloading
+                ? Icons.sync
+                : Icons.cloud_download_outlined,
+            color: ButtonColor.primary,
+            tokens: tokens,
+            onPressed: sheet.isDownloading || sheet.onDownloadPressed == null
+                ? null
+                : sheet.onDownloadPressed,
+          ),
+        );
+      }
+      return children;
+    }
+
     return DraggableScrollableSheet(
       expand: false,
       initialChildSize: 1,
       minChildSize: 0.4,
       maxChildSize: 1,
       builder: (context, scrollController) {
+        final appBar = AppBar(
+          transparentBackground: true,
+          actions: getAppBarActions(),
+          preferredHeight: 80,
+        );
+        final appBarHeight =
+            appBar.preferredSize.height + MediaQuery.viewPaddingOf(context).top;
+
         return Surface(
           style: surfaceStyle
               .resolve(tokens, const [SurfacePadding.none])
@@ -110,31 +165,8 @@ class ViewDeckListingSingleSheet extends HookWidget {
             scrollController: scrollController,
             isFloatingAppBar: true,
             padding: EdgeInsets.zero,
-            appBar: AppBar(
-              transparentBackground: true,
-              actions: [
-                if (sheet.canPublish) ...[
-                  Button.icon(
-                    icon: Icons.public_outlined,
-                    color: ButtonColor.primary,
-                    tokens: tokens,
-                    onPressed: sheet.publishDraft,
-                  ),
-                ],
-                Button.icon(
-                  icon: sheet.isDownloading
-                      ? Icons.sync
-                      : Icons.cloud_download_outlined,
-                  color: ButtonColor.primary,
-                  tokens: tokens,
-                  onPressed:
-                      sheet.isDownloading || sheet.onDownloadPressed == null
-                      ? null
-                      : sheet.onDownloadPressed,
-                ),
-              ],
-            ),
-            body: _Body(initialMode: initialMode, controller: sheet),
+            appBar: appBar,
+            body: _Body(controller: sheet, appBarHeight: appBarHeight),
           ),
         );
       },
@@ -143,21 +175,20 @@ class ViewDeckListingSingleSheet extends HookWidget {
 }
 
 class _Body extends StatelessWidget {
-  const _Body({required this.controller, required this.initialMode});
+  const _Body({required this.controller, required this.appBarHeight});
 
   final ViewDeckListingSingleController controller;
-  final DeckListingSheetMode initialMode;
+  final double appBarHeight;
 
   @override
   Widget build(BuildContext context) {
-    final deck = controller.deck!;
+    final deck = controller.deck;
+    final helper = controller.helper;
     final tokens = context.themeTokens<AppTokens>();
     final headerHeight = 350.h.clamp(300.0, 390.0).toDouble();
     final tags = deck.tags.map((tag) => tag.name).toList(growable: false);
-    final carouselImageUrls = ViewDeckListingSingleHelper.carouselImageUrls(
-      deck,
-    );
-    final isEditing = initialMode == DeckListingSheetMode.editor;
+    final carouselImageUrls = helper.carouselImageUrls(deck);
+    final isEditing = controller.state == DeckListingSheetState.editor;
 
     return Column(
       spacing: tokens.spaceLayoutGapMd,
@@ -165,18 +196,21 @@ class _Body extends StatelessWidget {
       children: [
         SizedBox(
           height: headerHeight,
-          child: CarouselView.weighted(
-            scrollDirection: Axis.horizontal,
-            flexWeights: const <int>[1],
-            children: List<Widget>.generate(carouselImageUrls.length, (
-              int index,
-            ) {
-              return BackgroundImageSurface(
-                image: ImageHelper.getImageProviderFromSource(
-                  carouselImageUrls[index],
-                ),
-              );
-            }),
+          child: Padding(
+            padding: EdgeInsets.only(
+              top: appBarHeight,
+              left: tokens.spaceScaffoldPadding,
+              right: tokens.spaceScaffoldPadding,
+            ),
+            child: AspectRatio(
+              aspectRatio: tokens.deckListingFeaturedImagesAspectRatio,
+              child: EditableCarousel(
+                imageSources: carouselImageUrls,
+                maxImageCount: 5,
+                isEditable: isEditing,
+                onImagePicked: controller.updateListingFeaturedImage,
+              ),
+            ),
           ),
         ),
         Surface(
@@ -204,23 +238,64 @@ class _Body extends StatelessWidget {
                       deck,
                     ),
                   ),
-                  Row(
-                    spacing: tokens.spaceLayoutGapSm,
-                    children: [
-                      Button.icon(icon: Icons.arrow_upward, tokens: tokens),
-                      Button.icon(icon: Icons.arrow_downward, tokens: tokens),
-                      Button.icon(icon: Icons.monitor_heart, tokens: tokens),
-                    ],
-                  ),
+                  if (!isEditing)
+                    Row(
+                      spacing: tokens.spaceLayoutGapSm,
+                      children: [
+                        Button.icon(
+                          icon: Icons.arrow_upward,
+                          tokens: tokens,
+                          onPressed: controller.isBusy
+                              ? null
+                              : controller.onUpvotePressed,
+                        ),
+                        Button.icon(
+                          icon: Icons.arrow_downward,
+                          tokens: tokens,
+                          onPressed: controller.isBusy
+                              ? null
+                              : controller.onDownvotePressed,
+                        ),
+                        Button.icon(
+                          icon: controller.isFavorite
+                              ? Icons.favorite
+                              : Icons.favorite_border,
+                          tokens: tokens,
+                          onPressed: controller.isBusy
+                              ? null
+                              : controller.onFavoritePressed,
+                        ),
+                      ],
+                    ),
                 ],
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  MetaLabel(label: '', icon: Icons.download),
-                  MetaLabel(label: '', icon: Icons.arrow_upward),
-                  MetaLabel(label: '', icon: Icons.arrow_downward),
-                  MetaLabel(label: '', icon: Icons.favorite),
+                  MetaLabel(
+                    label: NumberHelper.formatAbbreviatedCount(
+                      helper.downloadsCount(deck),
+                    ),
+                    icon: Icons.download,
+                  ),
+                  MetaLabel(
+                    label: NumberHelper.formatAbbreviatedCount(
+                      controller.upvotesCount,
+                    ),
+                    icon: Icons.arrow_upward,
+                  ),
+                  MetaLabel(
+                    label: NumberHelper.formatAbbreviatedCount(
+                      controller.downvotesCount,
+                    ),
+                    icon: Icons.arrow_downward,
+                  ),
+                  MetaLabel(
+                    label: NumberHelper.formatAbbreviatedCount(
+                      controller.favoritesCount,
+                    ),
+                    icon: Icons.favorite,
+                  ),
                 ],
               ),
               Center(
@@ -231,9 +306,9 @@ class _Body extends StatelessWidget {
                 ),
               ),
               DeckDetails(
-                title: ViewDeckSingleHelper.title(deck),
-                shortDescription: ViewDeckSingleHelper.shortDescription(deck),
-                longDescription: ViewDeckSingleHelper.longDescription(deck),
+                title: helper.title(deck),
+                shortDescription: helper.shortDescription(deck),
+                longDescription: helper.longDescription(deck),
                 isEditable: isEditing,
                 tags: tags,
                 areTagsEditable: deck.isEditable,
@@ -285,12 +360,50 @@ class _Body extends StatelessWidget {
                   ],
                 ),
               ),
-              // SectionEyebrow('Featured Cards'),
-              if (deck.isPublished) ...[DiscussionSection(sheet: controller)],
+              SectionEyebrow('Featured Cards'),
+              EditableFeaturedCardsColumn(
+                featuredCards: deck.listing?.featuredCards ?? const [],
+                isEditable: isEditing,
+                onAddPressed: () => _addFeaturedCard(context),
+                maxCardCount: 3,
+              ),
+              if (!isEditing) ...[DiscussionSection(sheet: controller)],
             ],
           ),
         ),
       ],
     );
+  }
+
+  Future<void> _addFeaturedCard(BuildContext context) async {
+    final templates = controller.availableFeaturedCardTemplates();
+    if (templates.isEmpty) return;
+
+    final selected = await showModal<CardTemplate>(
+      context: context,
+      title: 'Add featured card',
+      child: SizedBox(
+        height: 420,
+        child: ListView.separated(
+          itemCount: templates.length,
+          separatorBuilder: (_, _) => SizedBox(
+            height: context.themeTokens<AppTokens>().spaceLayoutGapMd,
+          ),
+          itemBuilder: (context, index) {
+            final template = templates[index];
+
+            return Center(
+              child: GestureDetector(
+                onTap: () => Navigator.of(context).pop(template),
+                child: ViewCardsTile.template(template: template),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+    if (selected == null) return;
+
+    await controller.addListingFeaturedCard(selected);
   }
 }

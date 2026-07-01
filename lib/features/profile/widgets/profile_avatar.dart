@@ -1,17 +1,11 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        AppTokens,
         BackgroundImagePicked,
+        BackgroundImageEditButtonPosition,
         BackgroundImageSurface,
-        Button,
-        ButtonColor,
-        SurfaceBorder,
         SurfaceShape,
-        ImageHelper,
-        pickBackgroundImageFile,
-        surfaceStyle;
+        ImageHelper;
 import 'package:flutter/material.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class ProfileAvatar extends StatelessWidget {
   const ProfileAvatar({
@@ -46,12 +40,12 @@ class ProfileAvatar extends StatelessWidget {
           dimension: radius * 2,
           child: BackgroundImageSurface(
             image: image,
+            isEditable: onImagePicked != null,
             onImagePicked: onImagePicked,
             missingImageIcon: null,
-            style: surfaceStyle.resolve(
-              context.themeTokens<AppTokens>(),
-              const [SurfaceShape.circle, SurfaceBorder.none],
-            ),
+            shape: SurfaceShape.circle,
+            editButtonPosition: BackgroundImageEditButtonPosition.bottomRight,
+            editButtonInset: -radius * 0.08,
             child: !hasImage
                 ? Center(
                     child: Text(
@@ -83,23 +77,7 @@ class ProfileAvatar extends StatelessWidget {
               ),
             ),
           ),
-        if (onImagePicked != null)
-          Positioned(
-            right: -radius * 0.08,
-            bottom: -radius * 0.08,
-            child: Button(
-              leading: const Icon(Icons.edit),
-              onPressed: () => _pickAndApplyImage(onImagePicked!),
-            ),
-          ),
       ],
     );
-  }
-
-  Future<void> _pickAndApplyImage(BackgroundImagePicked onImagePicked) async {
-    final file = await pickBackgroundImageFile();
-    if (file == null) return;
-
-    await onImagePicked(file);
   }
 }

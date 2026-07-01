@@ -5,9 +5,10 @@
 
 import 'package:boo_mondai/lib.barrel.dart';
 import 'package:flutter/material.dart' hide Scaffold;
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
 
-class MainScaffold extends StatelessWidget {
+class MainScaffold extends HookWidget {
   final int currentIndex;
   final Widget child;
 
@@ -22,10 +23,15 @@ class MainScaffold extends StatelessWidget {
     final auth = context.watch<AuthController>();
     final hideNavigation = auth.currentProfile.role == 'group_b_participant';
     final controller = context.watch<MainController>();
+    final scaffoldController = useScaffoldController(
+      hideNavigation: hideNavigation,
+      showBottomNavBar: controller.isBottomNavBarVisible,
+      showAppBar: controller.isAppBarVisible,
+    );
 
     return Scaffold(
+      controller: scaffoldController,
       body: child,
-      hideNavigation: hideNavigation,
       sidebar: SideBar(currentPageIndex: currentIndex),
       bottomNavBar: MainBottomNavBar(currentPageIndex: currentIndex),
       padding: EdgeInsets.zero,
@@ -35,8 +41,6 @@ class MainScaffold extends StatelessWidget {
       haveBottomNavBarBottomGap: false,
       shouldConstrainWidth: false,
       inheritMainBottomNavBarHeight: false,
-      showBottomNavBar: controller.isBottomNavBarVisible,
-      showAppBar: controller.isAppBarVisible,
     );
   }
 }

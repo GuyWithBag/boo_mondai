@@ -2,4 +2,7 @@
 
 // Other files
 export 'view_cards.scope_view.dart';
-export 'view_card.tile.dart';
+export 'view_cards.study_card_entries.dart';
+export 'view_cards.list_layout.dart';
+export 'view_cards.tile.dart';
+export 'view_cards_by_pair.tile.dart';

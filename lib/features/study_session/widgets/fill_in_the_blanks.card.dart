@@ -10,7 +10,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         FillInTheBlankAnswerInput,
         MarkdownText,
         ScaleHelper,
-        PhysicalCardSide;
+        PhysicalCard,
+        usePhysicalCardController;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -20,20 +21,14 @@ class FillInTheBlanksCard extends HookWidget {
   const FillInTheBlanksCard({
     super.key,
     required this.template,
-    required this.interactionsController,
+    this.interactionsController,
+    this.isRevealed = false,
     this.maxWidth,
-  }) : previewRevealed = false;
-
-  const FillInTheBlanksCard.preview({
-    super.key,
-    required this.template,
-    this.maxWidth,
-  }) : interactionsController = null,
-       previewRevealed = true;
+  });
 
   final FillInTheBlanksTemplate template;
   final StudySessionCardStageController? interactionsController;
-  final bool previewRevealed;
+  final bool isRevealed;
   final double? maxWidth;
 
   bool _isCorrect(int index, List<String> blankInputs) {
@@ -65,8 +60,12 @@ class FillInTheBlanksCard extends HookWidget {
     final blankInputs = useState<List<String>>(
       List.filled(template.segments.length, ''),
     );
-    final isRevealed =
-        previewRevealed || interactionsController?.isRevealed == true;
+    final effectiveIsRevealed =
+        isRevealed || interactionsController?.isRevealed == true;
+    final physicalCardController = usePhysicalCardController(
+      context,
+      width: maxWidth,
+    );
 
     useEffect(() {
       blankInputs.value = List.filled(template.segments.length, '');
@@ -87,44 +86,48 @@ class FillInTheBlanksCard extends HookWidget {
       );
     }
 
-    return SingleChildScrollView(
-      child: ConstrainedBox(
-        constraints: BoxConstraints(minHeight: 480.h),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Fill in the blank'.toUpperCase(),
-              textAlign: TextAlign.center,
-              style: eyebrowStyle,
-            ),
-            SizedBox(height: 48.h),
-            for (final entry in template.segments.asMap().entries) ...[
-              Wrap(
-                alignment: WrapAlignment.center,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                spacing: 12.w,
-                runSpacing: 16.h,
-                children: [
-                  Text(entry.value.prefix, style: blankTextStyle),
-                  isRevealed
-                      ? _PreviewAnswer(
-                          label: entry.value.correctAnswer,
-                          scale: contentScale,
-                        )
-                      : FillInTheBlankAnswerInput(
-                          revealed: interactionsController?.isRevealed ?? false,
-                          correct: _isCorrect(entry.key, blankInputs.value),
-                          correctAnswer: entry.value.correctAnswer,
-                          scale: contentScale,
-                          onChanged: (value) =>
-                              updateBlankInput(entry.key, value),
-                        ),
-                  Text(entry.value.suffix, style: blankTextStyle),
-                ],
+    return PhysicalCard(
+      controller: physicalCardController,
+      front: SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: 480.h),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Fill in the blank'.toUpperCase(),
+                textAlign: TextAlign.center,
+                style: eyebrowStyle,
               ),
+              SizedBox(height: 48.h),
+              for (final entry in template.segments.asMap().entries) ...[
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 12.w,
+                  runSpacing: 16.h,
+                  children: [
+                    Text(entry.value.prefix, style: blankTextStyle),
+                    effectiveIsRevealed
+                        ? _PreviewAnswer(
+                            label: entry.value.correctAnswer,
+                            scale: contentScale,
+                          )
+                        : FillInTheBlankAnswerInput(
+                            revealed:
+                                interactionsController?.isRevealed ?? false,
+                            correct: _isCorrect(entry.key, blankInputs.value),
+                            correctAnswer: entry.value.correctAnswer,
+                            scale: contentScale,
+                            onChanged: (value) =>
+                                updateBlankInput(entry.key, value),
+                          ),
+                    Text(entry.value.suffix, style: blankTextStyle),
+                  ],
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );

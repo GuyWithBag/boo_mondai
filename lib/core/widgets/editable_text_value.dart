@@ -190,7 +190,11 @@ class EditableTextValue extends HookWidget {
       children: [
         Flexible(child: previewText),
         if (enabled)
-          Button.iconSmall(icon: Icons.edit, onPressed: edit, tokens: tokens),
+          Button.iconOnlySmall(
+            icon: Icons.edit,
+            onPressed: edit,
+            tokens: tokens,
+          ),
       ],
     );
   }

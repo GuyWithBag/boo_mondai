@@ -89,10 +89,9 @@ Future<ExportPayloadModalResult?> showExportPayloadModal({
       ),
       Builder(
         builder: (context) => Button(
-          style: buttonStyle.resolve(
-            context.themeTokens<AppTokens>(),
-            const [ButtonColor.primary],
-          ),
+          style: buttonStyle.resolve(context.themeTokens<AppTokens>(), const [
+            ButtonColor.primary,
+          ]),
           onPressed: () => copyPayload(context),
           child: const Text('Copy JSON'),
         ),

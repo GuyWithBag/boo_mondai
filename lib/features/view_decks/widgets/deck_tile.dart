@@ -9,9 +9,6 @@ import 'package:boo_mondai/core/widgets/background_image_surface.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         BackgroundImagePicked,
-        Button,
-        ButtonColor,
-        buttonStyle,
         Deck,
         AppTokens,
         ImageHelper,
@@ -126,7 +123,6 @@ class DeckTile extends HookWidget {
       height: cardHeight,
       depth: 50,
       perspective: 0,
-      // scale: scale,
     );
 
     void applyTileState() {
@@ -195,22 +191,10 @@ class DeckTile extends HookWidget {
                     deck: deck,
                     controller: physicalDeckController,
                     showInfoCover: false,
+                    isCoverImageEditable: effectiveOnImagePicked != null,
                     onCoverImagePicked: effectiveOnImagePicked,
                     textScaleBaseWidth: cardWidth,
                   ),
-                  if (effectiveOnImagePicked != null)
-                    Positioned(
-                      top: 8,
-                      right: 8,
-                      child: Button(
-                        leading: const Icon(Icons.edit),
-                        style: buttonStyle.resolve(tokens, const [
-                          ButtonColor.primary,
-                        ]),
-                        onPressed: () =>
-                            _pickAndApplyImage(effectiveOnImagePicked),
-                      ),
-                    ),
                 ],
                 DeckTileState.spread => [
                   for (final controller in cardControllers)
@@ -219,6 +203,7 @@ class DeckTile extends HookWidget {
                       front: PhysicalCard(
                         front: BackgroundImageSurface(
                           image: coverImage,
+                          isEditable: effectiveOnImagePicked != null,
                           onImagePicked: effectiveOnImagePicked,
                         ),
                       ),
@@ -236,12 +221,5 @@ class DeckTile extends HookWidget {
         ),
       ),
     );
-  }
-
-  Future<void> _pickAndApplyImage(BackgroundImagePicked onImagePicked) async {
-    final file = await pickBackgroundImageFile();
-    if (file == null) return;
-
-    await onImagePicked(file);
   }
 }

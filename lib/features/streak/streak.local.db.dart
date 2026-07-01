@@ -6,7 +6,6 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart';
-import 'package:flutter/material.dart';
 
 class StreakLocalDB extends HiveSingleDataLocalDB<Streak> {
   @override
@@ -22,10 +21,28 @@ class StreakLocalDB extends HiveSingleDataLocalDB<Streak> {
     createdAt: DateTime.now(),
     id: uuid.v7(),
     userId: LocalDB.profile.getOrCreate().id,
-    currentStreak: 1,
-    longestStreak: 1,
-    lastActivityDate: DateTime.now(),
+    currentStreak: 0,
+    longestStreak: 0,
+    lastActivityDate: null,
   );
+
+  @override
+  Streak? retrieve() {
+    final streak = super.retrieve();
+    if (streak == null) return null;
+
+    final effectiveCurrentStreak = StreakHelper.effectiveCurrentStreak(
+      currentStreak: streak.currentStreak,
+      lastActivityDate: streak.lastActivityDate,
+      now: DateTime.now(),
+    );
+
+    if (effectiveCurrentStreak == streak.currentStreak) {
+      return streak;
+    }
+
+    return streak.copyWith(currentStreak: effectiveCurrentStreak);
+  }
 
   /// Records an activity for [userId] on [activityDate] and returns the
   /// updated [Streak]. Handles first-time, same-day, consecutive, and
@@ -47,9 +64,8 @@ class StreakLocalDB extends HiveSingleDataLocalDB<Streak> {
       return created;
     }
 
-    // Already counted today — no-op
     if (existing.lastActivityDate != null &&
-        DateUtils.isSameDay(existing.lastActivityDate, activityDate)) {
+        DateHelper.isSameLocalDate(existing.lastActivityDate!, activityDate)) {
       return existing;
     }
 
@@ -57,17 +73,12 @@ class StreakLocalDB extends HiveSingleDataLocalDB<Streak> {
     if (existing.lastActivityDate == null) {
       newCurrent = 1;
     } else {
-      final lastDay = DateTime(
-        existing.lastActivityDate!.year,
-        existing.lastActivityDate!.month,
-        existing.lastActivityDate!.day,
-      );
-      final today = DateTime(
-        activityDate.year,
-        activityDate.month,
-        activityDate.day,
-      );
-      newCurrent = today.difference(lastDay).inDays == 1
+      newCurrent =
+          DateHelper.daysBetweenLocalDates(
+                existing.lastActivityDate!,
+                activityDate,
+              ) ==
+              1
           ? existing.currentStreak + 1
           : 1;
     }
@@ -77,6 +88,7 @@ class StreakLocalDB extends HiveSingleDataLocalDB<Streak> {
         : existing.longestStreak;
 
     final updated = existing.copyWith(
+      updatedAt: DateTime.now(),
       currentStreak: newCurrent,
       longestStreak: newLongest,
       lastActivityDate: activityDate,

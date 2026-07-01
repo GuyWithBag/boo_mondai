@@ -3,10 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 class CreateDeckTile extends StatelessWidget {
-  const CreateDeckTile({super.key, required this.onPressed, this.width});
+  const CreateDeckTile({
+    super.key,
+    required this.onPressed,
+    this.width,
+    this.icon = Icons.add,
+  });
 
   final VoidCallback onPressed;
   final double? width;
+  final IconData icon;
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +23,7 @@ class CreateDeckTile extends StatelessWidget {
         aspectRatio: tokens.studyCardAspectRatio,
         child: Button.dashed(
           tokens: tokens,
-          leading: const Icon(Icons.add),
+          leading: Icon(icon),
           onPressed: onPressed,
         ),
       ),

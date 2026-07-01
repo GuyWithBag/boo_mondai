@@ -19,3 +19,4 @@ export 'editable_text_value.dart';
 export 'selection_action_bar.dart';
 export 'rating_button.dart';
 export 'physical_card.dart';
+export 'editable_carousel.dart';

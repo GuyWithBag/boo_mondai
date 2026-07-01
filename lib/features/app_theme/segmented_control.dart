@@ -28,12 +28,14 @@ class SegmentedControl<T> extends HookWidget {
     required this.onChanged,
     this.enabled = true,
     super.key,
+    this.isScrollable = false,
   });
 
   final List<SegmentOption<T>> options;
   final T value;
   final ValueChanged<T> onChanged;
   final bool enabled;
+  final bool isScrollable;
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +48,51 @@ class SegmentedControl<T> extends HookWidget {
       },
     );
 
+    Widget buildOption({
+      required SegmentOption<T> option,
+      required bool selected,
+      required bool enabled,
+      required VoidCallback onTap,
+    }) {
+      if (isScrollable) {
+        return _SegmentedControlOption<T>(
+          option: option,
+          selected: selected,
+          enabled: enabled,
+          onTap: onTap,
+        );
+      }
+      return Expanded(
+        child: _SegmentedControlOption<T>(
+          option: option,
+          selected: selected,
+          enabled: enabled,
+          onTap: onTap,
+        ),
+      );
+    }
+
+    Widget body = Row(
+      spacing: tokens.spaceLayoutGapSm,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        for (final option in options)
+          buildOption(
+            option: option,
+            selected: selection.isSelected(option.value),
+            enabled: enabled,
+            onTap: () => selection.select(option.value),
+          ),
+      ],
+    );
+
+    if (isScrollable) {
+      body = SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: body,
+      );
+    }
+
     return Surface(
       style: surfaceStyle
           .resolve(tokens, const [
@@ -57,21 +104,7 @@ class SegmentedControl<T> extends HookWidget {
           ])
           .copyWith(padding: EdgeInsets.all(10)),
 
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          spacing: tokens.spaceLayoutGapSm,
-          children: [
-            for (final option in options)
-              _SegmentedControlOption<T>(
-                option: option,
-                selected: selection.isSelected(option.value),
-                enabled: enabled,
-                onTap: () => selection.select(option.value),
-              ),
-          ],
-        ),
-      ),
+      child: body,
     );
   }
 }
@@ -104,7 +137,10 @@ class _SegmentedControlOption<T> extends StatelessWidget {
           style.decoration.borderRadius as BorderRadius? ??
           BorderRadius.circular(tokens.radiusSurfaceXsm),
       onTap: enabled ? onTap : null,
-      child: Surface(style: style, child: Text(option.label)),
+      child: Surface(
+        style: style,
+        child: Center(child: Text(option.label)),
+      ),
     );
   }
 }

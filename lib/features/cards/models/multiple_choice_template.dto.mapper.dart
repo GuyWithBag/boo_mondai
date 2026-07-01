@@ -16,7 +16,7 @@ class MultipleChoiceTemplateMapper
       MapperContainer.globals.use(_instance = MultipleChoiceTemplateMapper._());
       CardTemplateMapper.ensureInitialized().addSubMapper(_instance!);
       TagMapper.ensureInitialized();
-      CardMediaAttachmentMapper.ensureInitialized();
+      CardAttachmentMapper.ensureInitialized();
       MultipleChoiceOptionMapper.ensureInitialized();
     }
     return _instance!;
@@ -47,9 +47,9 @@ class MultipleChoiceTemplateMapper
   static List<Tag> _$tags(MultipleChoiceTemplate v) => v.tags;
   static const Field<MultipleChoiceTemplate, List<Tag>> _f$tags =
       Field('tags', _$tags, opt: true, def: const []);
-  static List<CardMediaAttachment> _$attachments(MultipleChoiceTemplate v) =>
+  static List<CardAttachment> _$attachments(MultipleChoiceTemplate v) =>
       v.attachments;
-  static const Field<MultipleChoiceTemplate, List<CardMediaAttachment>>
+  static const Field<MultipleChoiceTemplate, List<CardAttachment>>
       _f$attachments =
       Field('attachments', _$attachments, opt: true, def: const []);
   static String _$questionPrompt(MultipleChoiceTemplate v) => v.questionPrompt;
@@ -167,11 +167,9 @@ abstract class MultipleChoiceTemplateCopyWith<
   @override
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags;
   @override
-  ListCopyWith<
-      $R,
-      CardMediaAttachment,
-      CardMediaAttachmentCopyWith<$R, CardMediaAttachment,
-          CardMediaAttachment>> get attachments;
+  ListCopyWith<$R, CardAttachment,
+          CardAttachmentCopyWith<$R, CardAttachment, CardAttachment>>
+      get attachments;
   ListCopyWith<
       $R,
       MultipleChoiceOption,
@@ -186,7 +184,7 @@ abstract class MultipleChoiceTemplateCopyWith<
       DateTime? updatedAt,
       String? sourceTemplateId,
       List<Tag>? tags,
-      List<CardMediaAttachment>? attachments,
+      List<CardAttachment>? attachments,
       String? questionPrompt,
       List<MultipleChoiceOption>? options,
       String? imageUrl,
@@ -208,14 +206,10 @@ class _MultipleChoiceTemplateCopyWithImpl<$R, $Out>
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags => ListCopyWith(
       $value.tags, (v, t) => v.copyWith.$chain(t), (v) => call(tags: v));
   @override
-  ListCopyWith<
-      $R,
-      CardMediaAttachment,
-      CardMediaAttachmentCopyWith<$R, CardMediaAttachment,
-          CardMediaAttachment>> get attachments => ListCopyWith(
-      $value.attachments,
-      (v, t) => v.copyWith.$chain(t),
-      (v) => call(attachments: v));
+  ListCopyWith<$R, CardAttachment,
+          CardAttachmentCopyWith<$R, CardAttachment, CardAttachment>>
+      get attachments => ListCopyWith($value.attachments,
+          (v, t) => v.copyWith.$chain(t), (v) => call(attachments: v));
   @override
   ListCopyWith<
       $R,
@@ -232,7 +226,7 @@ class _MultipleChoiceTemplateCopyWithImpl<$R, $Out>
           DateTime? updatedAt,
           Object? sourceTemplateId = $none,
           List<Tag>? tags,
-          List<CardMediaAttachment>? attachments,
+          List<CardAttachment>? attachments,
           String? questionPrompt,
           List<MultipleChoiceOption>? options,
           Object? imageUrl = $none,

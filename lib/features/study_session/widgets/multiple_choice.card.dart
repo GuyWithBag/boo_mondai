@@ -12,9 +12,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         ButtonVariant,
         Button,
         buttonStyle,
-        PhysicalCardSide,
+        PhysicalCard,
         ScaleHelper,
-        MarkdownText;
+        MarkdownText,
+        usePhysicalCardController;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -23,20 +24,14 @@ class MultipleChoiceCard extends HookWidget {
   const MultipleChoiceCard({
     super.key,
     required this.template,
-    required this.interactionsController,
+    this.interactionsController,
+    this.isRevealed = false,
     this.maxWidth,
-  }) : previewRevealed = false;
-
-  const MultipleChoiceCard.preview({
-    super.key,
-    required this.template,
-    this.maxWidth,
-  }) : interactionsController = null,
-       previewRevealed = true;
+  });
 
   final MultipleChoiceTemplate template;
   final StudySessionCardStageController? interactionsController;
-  final bool previewRevealed;
+  final bool isRevealed;
   final double? maxWidth;
 
   @override
@@ -57,66 +52,72 @@ class MultipleChoiceCard extends HookWidget {
       contentScale,
     );
     final selectedOption = useState<String?>(null);
-    final isRevealed =
-        previewRevealed || interactionsController?.isRevealed == true;
+    final effectiveIsRevealed =
+        isRevealed || interactionsController?.isRevealed == true;
+    final physicalCardController = usePhysicalCardController(
+      context,
+      width: maxWidth,
+    );
 
     useEffect(() {
       selectedOption.value = null;
       return null;
     }, [template.id, interactionsController]);
 
-    return Column(
-      spacing: tokens.spaceLayoutGapMd,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Column(
-          spacing: tokens.spaceLayoutGapMd,
-          children: [
-            Text(
-              'Select Answer'.toUpperCase(),
-              textAlign: TextAlign.center,
-              style: eyebrowStyle,
-            ),
-            MarkdownText(data: template.questionPrompt),
-          ],
-        ),
-        Column(
-          children: [
-            for (final entry in template.options.asMap().entries) ...[
-              SizedBox(
-                width: double.infinity,
-                child: Button(
-                  style: buttonStyle.resolve(tokens, [
-                    ..._optionVariants(entry.value),
-                    ButtonVariant.flat,
-                  ]),
-                  selected:
-                      !isRevealed && selectedOption.value == entry.value.id,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  onPressed: isRevealed
-                      ? null
-                      : () {
-                          selectedOption.value = entry.value.id;
-                          interactionsController?.setAnswer(entry.value.id);
-                          interactionsController?.setCanReveal(true);
-                        },
-                  child: MarkdownText(
-                    data: _optionLabel(entry.value, entry.key),
+    return PhysicalCard(
+      controller: physicalCardController,
+      front: Column(
+        spacing: tokens.spaceLayoutGapMd,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            spacing: tokens.spaceLayoutGapMd,
+            children: [
+              Text(
+                'Select Answer'.toUpperCase(),
+                textAlign: TextAlign.center,
+                style: eyebrowStyle,
+              ),
+              MarkdownText(data: template.questionPrompt),
+            ],
+          ),
+          Column(
+            children: [
+              for (final entry in template.options.asMap().entries) ...[
+                SizedBox(
+                  width: double.infinity,
+                  child: Button(
+                    style: buttonStyle.resolve(tokens, [
+                      ..._optionVariants(entry.value, effectiveIsRevealed),
+                      ButtonVariant.flat,
+                    ]),
+                    selected:
+                        !effectiveIsRevealed &&
+                        selectedOption.value == entry.value.id,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    onPressed: effectiveIsRevealed
+                        ? null
+                        : () {
+                            selectedOption.value = entry.value.id;
+                            interactionsController?.setAnswer(entry.value.id);
+                            interactionsController?.setCanReveal(true);
+                          },
+                    child: MarkdownText(
+                      data: _optionLabel(entry.value, entry.key),
+                    ),
                   ),
                 ),
-              ),
+              ],
             ],
-          ],
-        ),
-      ],
+          ),
+        ],
+      ),
     );
   }
 
-  List<Object> _optionVariants(MultipleChoiceOption option) {
+  List<Object> _optionVariants(MultipleChoiceOption option, bool isRevealed) {
     final isSelected = interactionsController?.answer == option.id;
     final isCorrect = option.isCorrect;
-    final isRevealed =
-        previewRevealed || interactionsController?.isRevealed == true;
     if (isRevealed && isCorrect) {
       return [ButtonColor.success];
     }

@@ -11,6 +11,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         ChangeTrackerController,
         CreateDeckTile,
         Deck,
+        DeckListingTile,
         DeckSearchFilter,
         DeckTile,
         DeckTileState,
@@ -26,13 +27,15 @@ import 'package:boo_mondai/lib.barrel.dart'
         SyncPage,
         ViewDecksHelper,
         ViewDecksLocalController,
+        ViewDecksSearchScope,
         AppTokens,
         showSnackbar,
-        useFilteredSearchBarController,
         useSyncController,
         AuthService,
         AppBar,
-        Scaffold;
+        Scaffold,
+        SegmentOption,
+        SegmentedControl;
 import 'package:flutter/material.dart'
     show
         BuildContext,
@@ -46,7 +49,12 @@ import 'package:flutter/material.dart'
         ElevatedButton,
         EdgeInsets,
         LayoutBuilder,
-        SliverGridDelegateWithMaxCrossAxisExtent;
+        SliverGridDelegateWithMaxCrossAxisExtent,
+        Center,
+        Column,
+        CrossAxisAlignment,
+        SizedBox;
+import 'package:flutter/src/widgets/basic.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -115,15 +123,6 @@ class ViewDecksLocalPage extends HookWidget {
       return null;
     }, [syncController.changePlan]);
 
-    final searchController =
-        useFilteredSearchBarController<Deck, DeckSearchFilter>(
-          filterCodec: ViewDecksLocalController.deckSearchFilterCodec,
-          searchResults: ViewDecksLocalController.deckSearchResults,
-          items: controller.decks,
-        );
-
-    final visibleDecks = searchController.results;
-    final hasSearchQuery = searchController.text.trim().isNotEmpty;
     final syncPlan = ViewDecksHelper.currentSyncPlan(reviewController.entries);
 
     Future<void> importDecksFromFile() async {
@@ -169,26 +168,30 @@ class ViewDecksLocalPage extends HookWidget {
       );
     }
 
+    final searchState = controller.activeSearchState;
     final searchBar = FilteredSearchBar<Deck, DeckSearchFilter>(
-      controller: searchController,
-      filterCodec: ViewDecksLocalController.deckSearchFilterCodec,
-      searchResults: ViewDecksLocalController.deckSearchResults,
-      items: controller.decks,
+      controller: searchState.controller,
+      filterCodec: searchState.scope.filterCodec,
+      searchResults: searchState.scope.searchResults,
+      items: controller.isDeckScope
+          ? controller.decks
+          : controller.listingDecks,
       placeholder: 'Search decks',
       resultLabelBuilder: (deck) => deck.title,
-      onResultSelected: (deck) => controller.goToDeck(context, deck),
-      onSubmitted: (_) => controller.submitSearch(context, visibleDecks),
+      onResultSelected: (deck) {
+        if (controller.isDeckScope) {
+          controller.goToDeck(context, deck);
+        } else {
+          controller.goToListing(context, deck);
+        }
+      },
+      onSubmitted: (_) => controller.submitSearch(context, searchState.results),
     );
 
     return Scaffold(
       appBar: AppBar(
         title: 'My Decks',
         actions: [
-          SyncButton(
-            isSyncing: syncController.isSyncing,
-            isAuthenticated: AuthService.isAuthenticatedRemote,
-            onSync: () => syncController.sync(reviewController),
-          ),
           Button.icon(
             tokens: tokens,
             icon: Icons.file_open_outlined,
@@ -199,26 +202,54 @@ class ViewDecksLocalPage extends HookWidget {
             icon: Icons.layers_rounded,
             onPressed: () => context.push('/view-cards'),
           ),
+          SyncButton(
+            isSyncing: syncController.isSyncing,
+            isAuthenticated: AuthService.isAuthenticatedRemote,
+            onSync: () => syncController.sync(reviewController),
+          ),
         ],
         header: searchBar,
+        preferredBottomHeight: 70,
+        bottom: Padding(
+          padding: EdgeInsets.only(
+            left: tokens.spaceScaffoldPadding,
+            right: tokens.spaceScaffoldPadding,
+            top: tokens.spaceLayoutGapSm,
+          ),
+          child: SegmentedControl<ViewDecksSearchScope>(
+            value: controller.activeScope,
+            onChanged: controller.setActiveScope,
+            options: [
+              for (final option in controller.scopeOptions)
+                SegmentOption(value: option.value, label: option.label),
+            ],
+          ),
+        ),
       ),
-      body: _DeckListBody(
-        error: controller.error,
-        isLoading: controller.isLoading,
-        onRetry: controller.load,
-        onPressed: controller.goToDeck,
-        onCreate: () => controller.createDeck(context),
-        decks: visibleDecks,
-        hasSearchQuery: hasSearchQuery,
-      ),
+      body: controller.isDeckScope
+          ? _DeckListView(
+              error: controller.error,
+              isLoading: controller.isLoading,
+              onRetry: controller.load,
+              onPressed: controller.goToDeck,
+              onCreate: () => controller.createDeck(context),
+              decks: controller.visibleDecks,
+              hasSearchQuery: controller.hasSearchQuery,
+            )
+          : _DeckListingListView(
+              error: controller.error,
+              isLoading: controller.isLoading,
+              onRetry: controller.load,
+              onPressed: controller.goToListing,
+              decks: controller.visibleListingDecks,
+              hasSearchQuery: controller.hasSearchQuery,
+            ),
     );
   }
 }
 
-// ── _DeckListBody ─────────────────────────────────────────────────────────────
-
-class _DeckListBody extends StatelessWidget {
-  const _DeckListBody({
+class _DeckListView extends StatelessWidget {
+  const _DeckListView({
     required this.isLoading,
     required this.error,
     required this.decks,
@@ -285,6 +316,65 @@ class _DeckListBody extends StatelessWidget {
               onPressed(context, deck);
             },
           ),
+        );
+      },
+    );
+  }
+}
+
+class _DeckListingListView extends StatelessWidget {
+  const _DeckListingListView({
+    required this.isLoading,
+    required this.error,
+    required this.decks,
+    required this.onRetry,
+    required this.onPressed,
+    required this.hasSearchQuery,
+  });
+
+  final bool isLoading;
+  final Exception? error;
+  final List<Deck> decks;
+  final VoidCallback onRetry;
+  final Function(BuildContext context, Deck deck) onPressed;
+  final bool hasSearchQuery;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = context.themeTokens<AppTokens>();
+
+    return ListingStatesWrapper<Deck>.list(
+      isLoading: isLoading,
+      exception: error,
+      items: decks,
+      useParentScroll: true,
+      onRetry: onRetry,
+      skeletonTile: DeckListingTile(
+        deck: Deck.createNow(
+          userId: 'loading',
+          title: 'Loading listing',
+          shortDescription: 'Loading listing description',
+          isPublished: true,
+        ),
+      ),
+      emptyState: hasSearchQuery
+          ? const EmptyState(
+              icon: Icons.search_off,
+              title: 'No listings found',
+              message: 'Try another search or remove filters',
+            )
+          : const EmptyState(
+              icon: Icons.public,
+              title: 'No listings yet',
+              message: 'Create a deck listing to manage it here',
+            ),
+      separatorHeight: tokens.spaceLayoutGapMd,
+      itemBuilder: (context, _, deck) {
+        return DeckListingTile(
+          deck: deck,
+          onPressed: () {
+            onPressed(context, deck);
+          },
         );
       },
     );

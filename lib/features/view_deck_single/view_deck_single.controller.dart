@@ -3,7 +3,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         ButtonColor,
         Controller,
         Deck,
-        DeckListingSheetMode,
+        DeckListingSheetState,
         DecksService,
         ModalAction,
         ViewDecksLocalController,
@@ -77,7 +77,7 @@ class ViewDeckSingleSheetController extends Controller {
         await showViewDeckListingSingleSheet(
           _context,
           listingDeck,
-          initialMode: DeckListingSheetMode.editor,
+          initialState: DeckListingSheetState.editor,
         );
       }
       return;

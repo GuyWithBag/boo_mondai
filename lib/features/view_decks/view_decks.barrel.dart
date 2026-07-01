@@ -6,3 +6,4 @@ export 'helpers/helpers.barrel.dart';
 // Other files
 export 'view_decks.controller.dart';
 export 'view_decks.page.dart';
+export 'view_decks.search_scope.dart';

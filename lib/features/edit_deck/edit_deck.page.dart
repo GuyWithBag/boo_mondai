@@ -9,6 +9,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         EditDeckEditorBody,
         EditDeckSideBar,
         Scaffold,
+        useScaffoldController,
         showSnackbar,
         useEditDeckController,
         Button,
@@ -35,6 +36,7 @@ class EditDeckPage extends HookWidget {
     );
     final formKey = useMemoized(GlobalKey<FormState>.new);
     final titleController = useTextEditingController();
+    final scaffoldController = useScaffoldController(isFloatingSideBar: true);
 
     useEffect(() {
       final deckTitle = controller.deck?.title;
@@ -64,6 +66,7 @@ class EditDeckPage extends HookWidget {
     final tokens = context.themeTokens<AppTokens>();
 
     return Scaffold(
+      controller: scaffoldController,
       appBar: EditDeckAppBar(
         titleController: titleController,
         onSave: () async {
@@ -93,8 +96,8 @@ class EditDeckPage extends HookWidget {
       haveSideBarOpenButton: true,
       // hideAppBarOnScroll: true,
       // hideFloatingActionButtonOnScroll: true,
+      resizeToAvoidBottomInset: false,
       inheritMainBottomNavBarHeight: false,
-      isFloatingSideBar: true,
       body: Form(
         key: formKey,
         child: EditDeckEditorBody(editor: controller),

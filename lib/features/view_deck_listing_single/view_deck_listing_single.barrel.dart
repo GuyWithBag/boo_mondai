@@ -2,6 +2,7 @@
 
 // Barrel files
 export 'helpers/helpers.barrel.dart';
+export 'widgets/widgets.barrel.dart';
 // Other files
-export 'view_deck_listing_single.controller.dart';
 export 'view_deck_listing_single.sheet.dart';
+export 'view_deck_listing_single.controller.dart';
