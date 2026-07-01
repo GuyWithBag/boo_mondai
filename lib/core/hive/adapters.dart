@@ -31,6 +31,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         FsrsReviewLog,
         IdentificationTemplate,
         ImportExportBackup,
+        LocalImageCacheEntry,
         MatchMadnessPair,
         MatchMadnessTemplate,
         MultipleChoiceOption,
@@ -91,6 +92,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
   AdapterSpec<UserSettings>(),
   AdapterSpec<DownloadCheckpoint>(),
   AdapterSpec<DownloadCheckpointStatus>(),
+  AdapterSpec<LocalImageCacheEntry>(),
 ])
 // ignore: unused_element
 part 'adapters.g.dart';

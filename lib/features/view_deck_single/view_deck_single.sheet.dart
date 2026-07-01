@@ -9,6 +9,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         DeckProfilesLabel,
         DeckTile,
         HeaderBadge,
+        LocalImageResolverHelper,
         MetaLabel,
         DeckTileState,
         SurfacePadding,
@@ -158,17 +159,6 @@ class _Body extends StatelessWidget {
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        Positioned(
-          left: 0,
-          right: 0,
-          top: 0,
-          height: headerHeight + tokens.radiusSurfaceLg,
-          child: BackgroundImageSurface(
-            image: ImageHelper.getImageProviderFromSource(deck.coverImageUrl),
-            onImagePicked: deck.isEditable ? sheet.updateCoverImage : null,
-          ),
-        ),
-
         SingleChildScrollView(
           child: Column(
             children: [
@@ -179,6 +169,19 @@ class _Body extends StatelessWidget {
                 collapseDistance: headerHeight * 0.55,
               ),
             ],
+          ),
+        ),
+        Positioned(
+          left: 0,
+          right: 0,
+          top: 0,
+          height: headerHeight + tokens.radiusSurfaceLg,
+          child: BackgroundImageSurface(
+            image: ImageHelper.getImageProviderFromSource(
+              LocalImageResolverHelper.resolveDeckCover(deck),
+            ),
+            isEditable: deck.isEditable,
+            onImagePicked: deck.isEditable ? sheet.updateCoverImage : null,
           ),
         ),
       ],

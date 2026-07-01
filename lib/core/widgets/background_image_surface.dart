@@ -120,6 +120,8 @@ class BackgroundImageSurface extends StatelessWidget {
       return surface;
     }
 
+    final hitTestInset = editButtonInset < 0 ? 0.0 : editButtonInset;
+
     return Stack(
       fit: StackFit.expand,
       clipBehavior: Clip.none,
@@ -127,13 +129,13 @@ class BackgroundImageSurface extends StatelessWidget {
         Positioned.fill(child: surface),
         Positioned(
           top: editButtonPosition == BackgroundImageEditButtonPosition.topRight
-              ? editButtonInset
+              ? hitTestInset
               : null,
-          right: editButtonInset,
+          right: hitTestInset,
           bottom:
               editButtonPosition ==
                   BackgroundImageEditButtonPosition.bottomRight
-              ? editButtonInset
+              ? hitTestInset
               : null,
           child: Button.iconOnlySmall(
             icon: Icons.edit,

@@ -27,6 +27,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         FillInTheBlanksTemplate,
         FlashcardTemplate,
         IdentificationTemplate,
+        LocalImageCacheKeysHelper,
+        LocalImageCacheService,
+        LocalImagePathHelper,
         LocalDB,
         MatchMadnessPair,
         MatchMadnessTemplate,
@@ -165,7 +168,7 @@ class DeckDownloadsService {
       // 6. All templates fetched — write to local DB
       final localDeckId = localDeck?.id ?? uuid.v7();
       final now = DateTime.now();
-      final newLocalDeck = remoteDeck.copyWith(
+      var newLocalDeck = remoteDeck.copyWith(
         id: localDeckId,
         userId: LocalDB.profile.getOrCreate().id,
         sourceDeckId: remoteDeck.id,
@@ -198,6 +201,17 @@ class DeckDownloadsService {
       ];
 
       await LocalDB.deck.upsert(newLocalDeck);
+      final coverRemotePath = remoteDeck.coverImageUrl;
+      if (coverRemotePath != null &&
+          LocalImagePathHelper.isRemotePath(coverRemotePath)) {
+        final coverLocalPath = await LocalImageCacheService.cacheRemoteImage(
+          cacheKey: LocalImageCacheKeysHelper.deckCover(localDeckId),
+          remotePath: coverRemotePath,
+        );
+        if (coverLocalPath != null) {
+          await LocalDB.deck.upsert(newLocalDeck.copyWith(updatedAt: now));
+        }
+      }
       await LocalDB.cardTemplate.upsertMany(localTemplates);
       await StudyCardService.syncDeckStudyCards(
         deckId: localDeckId,

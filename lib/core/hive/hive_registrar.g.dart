@@ -28,6 +28,7 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(FsrsReviewLogAdapter());
     registerAdapter(IdentificationTemplateAdapter());
     registerAdapter(ImportExportBackupAdapter());
+    registerAdapter(LocalImageCacheEntryAdapter());
     registerAdapter(MatchMadnessPairAdapter());
     registerAdapter(MatchMadnessTemplateAdapter());
     registerAdapter(MultipleChoiceOptionAdapter());
@@ -73,6 +74,7 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(FsrsReviewLogAdapter());
     registerAdapter(IdentificationTemplateAdapter());
     registerAdapter(ImportExportBackupAdapter());
+    registerAdapter(LocalImageCacheEntryAdapter());
     registerAdapter(MatchMadnessPairAdapter());
     registerAdapter(MatchMadnessTemplateAdapter());
     registerAdapter(MultipleChoiceOptionAdapter());

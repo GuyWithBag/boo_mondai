@@ -12,6 +12,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         Deck,
         AppTokens,
         ImageHelper,
+        LocalImageResolverHelper,
         ScaleHelper,
         useCubeController,
         PhysicalCardController,
@@ -98,7 +99,7 @@ class DeckTile extends HookWidget {
     ).height;
     final animationScale = cardWidth / tokens.studyCardWidth;
     final coverImage = ImageHelper.getImageProviderFromSource(
-      deck?.coverImageUrl,
+      deck == null ? null : LocalImageResolverHelper.resolveDeckCover(deck!),
     );
     final effectiveOnImagePicked = isImageEditable ? onImagePicked : null;
     // final scale = 1.3;

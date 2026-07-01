@@ -8,7 +8,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         Controller,
         AuthService,
         AuthServiceResponse,
-        ImageHelper,
+        LocalImageCacheKeysHelper,
+        LocalImageCacheService,
         Profile,
         RemoteDB,
         LocalDB;
@@ -119,15 +120,15 @@ class AuthController extends Controller {
   }
 
   Future<void> updateAvatarImage(PlatformFile file) async {
-    final imageSource = ImageHelper.getImageSourceFromPickedFile(file);
-    if (imageSource == null) return;
-
     final profile = currentProfile;
-    if (profile.avatarUrl == imageSource) return;
-
-    await LocalDB.profile.upsert(
-      profile.copyWith(avatarUrl: imageSource, updatedAt: DateTime.now()),
+    final localPath = await LocalImageCacheService.savePickedImage(
+      cacheKey: LocalImageCacheKeysHelper.profileAvatar(profile.id),
+      file: file,
+      remotePath: profile.avatarUrl,
     );
+    if (localPath == null) return;
+
+    await LocalDB.profile.upsert(profile.copyWith(updatedAt: DateTime.now()));
     notifyListeners();
   }
 

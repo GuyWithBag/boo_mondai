@@ -34,6 +34,7 @@ class EditableCarousel extends StatelessWidget {
     return CarouselView.weighted(
       scrollDirection: Axis.horizontal,
       flexWeights: const <int>[1],
+      enableSplash: false,
       children: List<Widget>.generate(visibleItemCount, (int index) {
         final imageSource = index < imageSources.length
             ? imageSources[index]

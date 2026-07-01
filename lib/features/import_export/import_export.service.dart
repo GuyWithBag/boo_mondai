@@ -25,6 +25,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         ChangePreview,
         ImportCardsPayload,
         ImportExportBackup,
+        LocalImageCacheKeysHelper,
+        LocalImageCacheService,
+        LocalImagePathHelper,
+        LocalImageResolverHelper,
         ChangeBatchResult,
         ChangeRecord,
         ChangeComparer,
@@ -141,6 +145,41 @@ class ImportExportService {
     final templates = LocalDB.cardTemplate.getByDeckId(deckId);
     final archive = Archive();
     final templateEntries = <Map<String, dynamic>>[];
+    final deckMap = Map<String, dynamic>.from(deck.toMap());
+
+    final coverImageSource = LocalImageResolverHelper.resolveDeckCover(deck);
+    final coverImageBytes = await _resolveImageBytes(coverImageSource);
+    if (coverImageBytes == null) {
+      deckMap['cover_image_content_path'] = null;
+      deckMap['cover_image_byte_size'] = null;
+    } else {
+      const coverImageContentPath = 'media/deck-cover.png';
+      deckMap['cover_image_content_path'] = coverImageContentPath;
+      deckMap['cover_image_byte_size'] = coverImageBytes.length;
+      archive.addFile(
+        ArchiveFile.bytes(coverImageContentPath, coverImageBytes),
+      );
+    }
+
+    final featuredImageContentPaths = <String?>[];
+    final featuredImages = deck.listing?.featuredImages ?? const <String>[];
+    for (var index = 0; index < featuredImages.length; index++) {
+      final imageSource =
+          LocalImageResolverHelper.resolveDeckListingFeaturedImage(
+            deck: deck,
+            index: index,
+          );
+      final imageBytes = await _resolveImageBytes(imageSource);
+      if (imageBytes == null) {
+        featuredImageContentPaths.add(null);
+        continue;
+      }
+      final contentPath = 'media/featured-image-$index.png';
+      featuredImageContentPaths.add(contentPath);
+      archive.addFile(ArchiveFile.bytes(contentPath, imageBytes));
+    }
+    deckMap['deck_listing_featured_image_content_paths'] =
+        featuredImageContentPaths;
 
     for (final template in templates) {
       final templateMap = Map<String, dynamic>.from(template.toMap());
@@ -194,7 +233,7 @@ class ImportExportService {
       'format': 'boo_mondai_deck_bundle_v1',
       'exported_at': DateTime.now().toIso8601String(),
       'source_user_id': LocalDB.profile.getOrCreate().id,
-      'deck': deck.toMap(),
+      'deck': deckMap,
       'card_templates': templateEntries,
     };
     archive.addFile(ArchiveFile.string('manifest.json', jsonEncode(manifest)));
@@ -241,6 +280,15 @@ class ImportExportService {
       final currentUserId = LocalDB.profile.getOrCreate().id;
       final ownBackup = manifest['source_user_id'] == currentUserId;
       final deckMap = Map<String, dynamic>.from(manifest['deck'] as Map);
+      final coverImageContentPath =
+          deckMap.remove('cover_image_content_path') as String?;
+      deckMap.remove('cover_image_byte_size');
+      final featuredImageContentPaths =
+          (deckMap.remove('deck_listing_featured_image_content_paths')
+                      as List? ??
+                  const [])
+              .map((value) => value?.toString())
+              .toList(growable: false);
       final incomingDeck = DeckMapper.fromMap(deckMap);
       final matchingDeck = _findMatchingDeck(incomingDeck);
       if (matchingDeck != null) {
@@ -319,7 +367,7 @@ class ImportExportService {
         rewrittenTemplateMaps.add(rewritten);
       }
 
-      final deck = incomingDeck.copyWith(
+      var deck = incomingDeck.copyWith(
         id: targetDeckId,
         userId: currentUserId,
         isPublished: false,
@@ -330,6 +378,46 @@ class ImportExportService {
             ? incomingDeck.sourceDeckId
             : incomingDeck.sourceDeckId ?? incomingDeck.id,
       );
+      await _restoreBundledImage(
+        tempDir: tempDir,
+        contentPath: coverImageContentPath,
+        cacheKey: LocalImageCacheKeysHelper.deckCover(deck.id),
+        remotePath: _remotePathOrNull(incomingDeck.coverImageUrl),
+      );
+
+      final listing = incomingDeck.listing;
+      if (listing != null) {
+        final featuredImages = listing.featuredImages.toList();
+        for (var index = 0; index < featuredImageContentPaths.length; index++) {
+          final localPath = await _restoreBundledImage(
+            tempDir: tempDir,
+            contentPath: featuredImageContentPaths[index],
+            cacheKey: LocalImageCacheKeysHelper.deckListingFeaturedImage(
+              deck.id,
+              index,
+            ),
+            remotePath: index < listing.featuredImages.length
+                ? _remotePathOrNull(listing.featuredImages[index])
+                : null,
+          );
+          if (localPath == null) continue;
+          if (index < featuredImages.length) {
+            featuredImages[index] =
+                _remotePathOrNull(featuredImages[index]) ?? '';
+          } else {
+            while (featuredImages.length < index) {
+              featuredImages.add('');
+            }
+            featuredImages.add('');
+          }
+        }
+        final updatedListing = listing.copyWith(
+          deckId: deck.id,
+          featuredImages: featuredImages,
+        );
+        await LocalDB.deckListing.upsert(updatedListing);
+        deck = deck.copyWith(listing: updatedListing);
+      }
       final templates = _decodeTemplates(rewrittenTemplateMaps);
       await LocalDB.deck.upsert(deck);
       await LocalDB.cardTemplate.upsertMany(templates);
@@ -881,6 +969,63 @@ class ImportExportService {
       );
     }
     return null;
+  }
+
+  static Future<Uint8List?> _resolveImageBytes(String? source) async {
+    final value = source?.trim();
+    if (value == null || value.isEmpty) return null;
+
+    if (value.startsWith('data:') && value.contains(',')) {
+      return base64Decode(value.substring(value.indexOf(',') + 1));
+    }
+
+    if (LocalImagePathHelper.isRemotePath(value)) {
+      try {
+        final response = await http.get(Uri.parse(value));
+        if (response.statusCode >= 200 && response.statusCode < 300) {
+          return response.bodyBytes;
+        }
+      } on Exception catch (e) {
+        developer.log(
+          'Failed to download bundled image source',
+          name: 'ImportExportService',
+          error: e,
+        );
+      }
+      return null;
+    }
+
+    final file = File(value);
+    if (await file.exists()) {
+      return file.readAsBytes();
+    }
+    return null;
+  }
+
+  static Future<String?> _restoreBundledImage({
+    required Directory tempDir,
+    required String? contentPath,
+    required String cacheKey,
+    required String? remotePath,
+  }) async {
+    if (contentPath == null || contentPath.trim().isEmpty) return null;
+
+    final file = File('${tempDir.path}/$contentPath');
+    if (!await file.exists()) return null;
+
+    return LocalImageCacheService.saveBytes(
+      cacheKey: cacheKey,
+      bytes: await file.readAsBytes(),
+      mimeType: 'image/png',
+      remotePath: remotePath,
+    );
+  }
+
+  static String? _remotePathOrNull(String? value) {
+    if (value == null || !LocalImagePathHelper.isRemotePath(value)) {
+      return null;
+    }
+    return value;
   }
 
   static Deck? _findMatchingDeck(Deck incomingDeck) {

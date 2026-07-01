@@ -3,8 +3,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         CardTemplate,
         Deck,
         DeckListing,
-        ImageHelper,
         LocalDB,
+        LocalImageCacheKeysHelper,
+        LocalImageCacheService,
+        LocalImagePathHelper,
         RemoteDB,
         Tag,
         VisibilityState;
@@ -176,15 +178,16 @@ abstract final class DecksService {
       return null;
     }
 
-    final imageSource = ImageHelper.getImageSourceFromPickedFile(file);
-    if (imageSource == null || imageSource == deck.coverImageUrl) {
+    final localPath = await LocalImageCacheService.savePickedImage(
+      cacheKey: LocalImageCacheKeysHelper.deckCover(deck.id),
+      file: file,
+      remotePath: deck.coverImageUrl,
+    );
+    if (localPath == null) {
       return null;
     }
 
-    final updatedDeck = deck.copyWith(
-      coverImageUrl: imageSource,
-      updatedAt: DateTime.now(),
-    );
+    final updatedDeck = deck.copyWith(updatedAt: DateTime.now());
 
     await LocalDB.deck.upsert(updatedDeck);
     return updatedDeck;
@@ -199,8 +202,17 @@ abstract final class DecksService {
       return null;
     }
 
-    final imageSource = ImageHelper.getImageSourceFromPickedFile(file);
-    if (imageSource == null) {
+    final localPath = await LocalImageCacheService.savePickedImage(
+      cacheKey: LocalImageCacheKeysHelper.deckListingFeaturedImage(
+        deck.id,
+        index,
+      ),
+      file: file,
+      remotePath: index < (deck.listing?.featuredImages.length ?? 0)
+          ? deck.listing?.featuredImages[index]
+          : null,
+    );
+    if (localPath == null) {
       return null;
     }
 
@@ -211,14 +223,15 @@ abstract final class DecksService {
     final featuredImages = listing.featuredImages.toList();
 
     if (index < featuredImages.length) {
-      if (featuredImages[index] == imageSource) {
-        return null;
-      }
-      featuredImages[index] = imageSource;
-    } else if (!featuredImages.contains(imageSource)) {
-      featuredImages.add(imageSource);
+      featuredImages[index] =
+          LocalImagePathHelper.isRemotePath(featuredImages[index])
+          ? featuredImages[index]
+          : '';
     } else {
-      return null;
+      while (featuredImages.length < index) {
+        featuredImages.add('');
+      }
+      featuredImages.add('');
     }
 
     final updatedListing = listing.copyWith(

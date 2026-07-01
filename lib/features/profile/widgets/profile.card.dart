@@ -1,7 +1,11 @@
 import 'package:boo_mondai/core/theme/app_tokens.model.dart';
 import 'package:boo_mondai/features/app_theme/app_theme.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
-    show AuthController, EditableTextValue, ProfileAvatar;
+    show
+        AuthController,
+        EditableTextValue,
+        LocalImageResolverHelper,
+        ProfileAvatar;
 import 'package:flutter/material.dart'
     show
         BuildContext,
@@ -43,7 +47,7 @@ class ProfileCard extends StatelessWidget {
         children: [
           ProfileAvatar(
             displayName: displayName,
-            avatarUrl: profile.avatarUrl,
+            avatarUrl: LocalImageResolverHelper.resolveProfileAvatar(profile),
             radius: 66,
             onImagePicked: auth.updateAvatarImage,
           ),

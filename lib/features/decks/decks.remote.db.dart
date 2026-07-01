@@ -4,7 +4,13 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart'
-    show SupabaseRemoteDB, Deck, DeckSortField, SearchSortDirection, DeckMapper;
+    show
+        SupabaseRemoteDB,
+        Deck,
+        DeckSortField,
+        SearchSortDirection,
+        DeckMapper,
+        LocalImagePathHelper;
 
 class DecksRemoteDB extends SupabaseRemoteDB<Deck> {
   @override
@@ -14,7 +20,15 @@ class DecksRemoteDB extends SupabaseRemoteDB<Deck> {
   Deck Function(Map<String, dynamic>) get fromMap => DeckMapper.fromMap;
 
   @override
-  Map<String, dynamic> toMap(Deck item) => item.toMap();
+  Map<String, dynamic> toMap(Deck item) {
+    final map = item.toMap();
+    final coverImageUrl = item.coverImageUrl;
+    if (coverImageUrl != null &&
+        !LocalImagePathHelper.isRemotePath(coverImageUrl)) {
+      map['cover_image_url'] = null;
+    }
+    return map;
+  }
 
   @override
   Map<String, Object?> primaryKeyFromItem(Deck item) => {'id': item.id};

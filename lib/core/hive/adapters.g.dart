@@ -2159,3 +2159,55 @@ class AttachmentTypeAdapter extends TypeAdapter<AttachmentType> {
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
+
+class LocalImageCacheEntryAdapter extends TypeAdapter<LocalImageCacheEntry> {
+  @override
+  final typeId = 42;
+
+  @override
+  LocalImageCacheEntry read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return LocalImageCacheEntry(
+      cacheKey: fields[0] as String,
+      localPath: fields[1] as String,
+      remotePath: fields[2] as String?,
+      mimeType: fields[3] as String?,
+      byteSize: (fields[4] as num?)?.toInt(),
+      createdAt: fields[5] as DateTime,
+      updatedAt: fields[6] as DateTime,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, LocalImageCacheEntry obj) {
+    writer
+      ..writeByte(7)
+      ..writeByte(0)
+      ..write(obj.cacheKey)
+      ..writeByte(1)
+      ..write(obj.localPath)
+      ..writeByte(2)
+      ..write(obj.remotePath)
+      ..writeByte(3)
+      ..write(obj.mimeType)
+      ..writeByte(4)
+      ..write(obj.byteSize)
+      ..writeByte(5)
+      ..write(obj.createdAt)
+      ..writeByte(6)
+      ..write(obj.updatedAt);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is LocalImageCacheEntryAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}

@@ -7,6 +7,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         DeckTileState,
         HeaderBadge,
         ImageHelper,
+        LocalImageResolverHelper,
         MetaLabel,
         NumberHelper,
         ProfileLabel,
@@ -46,7 +47,7 @@ class DeckListingTile extends HookWidget {
         : deck.shortDescription;
     final version = deck.version.isEmpty ? '1.0.0' : deck.version;
     final backgroundImage = ImageHelper.getImageProviderFromSource(
-      _listingImageUrl(deck),
+      LocalImageResolverHelper.resolveDeckListingFeaturedImage(deck: deck),
     );
     final creatorName = deck.userProfile?.username ?? 'Unknown creator';
 
@@ -129,7 +130,11 @@ class DeckListingTile extends HookWidget {
                       child: ProfileLabel(
                         displayName: creatorName,
                         facingLeft: true,
-                        avatarUrl: deck.userProfile?.avatarUrl,
+                        avatarUrl: deck.userProfile == null
+                            ? null
+                            : LocalImageResolverHelper.resolveCachedProfileAvatar(
+                                deck.userProfile!,
+                              ),
                       ),
                     ),
                   ],
@@ -267,31 +272,6 @@ class DeckListingTile extends HookWidget {
         child: tile,
       ),
     );
-  }
-
-  String? _listingImageUrl(Deck deck) {
-    final featuredImageUrl = _firstNonEmpty(deck.listing?.featuredImages);
-
-    return featuredImageUrl ?? _nonEmptyOrNull(deck.coverImageUrl);
-  }
-
-  String? _firstNonEmpty(List<String>? values) {
-    if (values == null) return null;
-
-    for (final value in values) {
-      final trimmed = value.trim();
-      if (trimmed.isNotEmpty) return trimmed;
-    }
-
-    return null;
-  }
-
-  String? _nonEmptyOrNull(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return null;
-    }
-
-    return value;
   }
 }
 
