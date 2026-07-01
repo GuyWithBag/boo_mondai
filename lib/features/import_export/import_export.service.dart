@@ -1,9 +1,19 @@
 import 'dart:convert';
+import 'dart:developer' as developer;
+import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:archive/archive.dart';
+import 'package:boo_mondai/features/card_attachments/helpers/attachment_label.helper.dart';
+import 'package:boo_mondai/features/card_attachments/helpers/mime.helper.dart';
+import 'package:boo_mondai/features/card_attachments/media_storage.service.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         CardTemplate,
         CardTemplateMapper,
+        CardAttachment,
+        CardLinkAttachment,
+        CardMediaAttachment,
         Deck,
         DeckMapper,
         DeckImportMode,
@@ -32,6 +42,38 @@ import 'package:boo_mondai/lib.barrel.dart'
         StudyCardService,
         WordScrambleTemplate,
         uuid;
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
+
+enum ImportMatchStrategy { byId, byFrontText, byFrontAndBackText }
+
+enum ImportConflictStrategy { skip, overwrite, keepNewer }
+
+class ImportOptions {
+  final ImportMatchStrategy matchStrategy;
+  final ImportConflictStrategy conflictStrategy;
+
+  const ImportOptions({
+    this.matchStrategy = ImportMatchStrategy.byId,
+    this.conflictStrategy = ImportConflictStrategy.overwrite,
+  });
+}
+
+sealed class ImportResult {
+  const ImportResult();
+}
+
+class ImportSuccess extends ImportResult {
+  final String deckId;
+
+  const ImportSuccess(this.deckId);
+}
+
+class ImportFailure extends ImportResult {
+  final String reason;
+
+  const ImportFailure(this.reason);
+}
 
 /// Static import/export operations for decks and card templates.
 class ImportExportService {
@@ -88,6 +130,222 @@ class ImportExportService {
     }
 
     return ChangeBatchResult(values: values, failures: failures, changes: logs);
+  }
+
+  static Future<File> exportDeckBundle(String deckId) async {
+    final deck = LocalDB.deck.selectByPk({'id': deckId});
+    if (deck == null) {
+      throw Exception('Deck not found: $deckId');
+    }
+
+    final templates = LocalDB.cardTemplate.getByDeckId(deckId);
+    final archive = Archive();
+    final templateEntries = <Map<String, dynamic>>[];
+
+    for (final template in templates) {
+      final templateMap = Map<String, dynamic>.from(template.toMap());
+      final attachmentEntries = <Map<String, dynamic>>[];
+      for (final attachment in template.attachments) {
+        switch (attachment) {
+          case CardMediaAttachment a:
+            final extension = MimeHelper.extensionFromMimeType(a.mimeType);
+            final contentPath = 'media/${a.id}.$extension';
+            final bytes = await _resolveMediaBytes(a);
+            attachmentEntries.add({
+              'attachment_source': 'media',
+              'id': a.id,
+              'template_id': a.templateId,
+              'type': a.type.name,
+              'label': a.label,
+              'storage_path': a.storagePath,
+              'public_url': a.publicUrl,
+              'mime_type': a.mimeType,
+              'alt_text': a.altText,
+              'created_at': a.createdAt.toIso8601String(),
+              'content_path': bytes == null ? null : contentPath,
+              'byte_size': bytes?.length,
+            });
+            if (bytes == null) {
+              developer.log(
+                'Skipped missing media attachment ${a.id}',
+                name: 'ImportExportService',
+              );
+            } else {
+              archive.addFile(ArchiveFile.bytes(contentPath, bytes));
+            }
+          case CardLinkAttachment a:
+            attachmentEntries.add({
+              'attachment_source': 'link',
+              'id': a.id,
+              'template_id': a.templateId,
+              'type': a.type.name,
+              'label': a.label,
+              'url': a.url,
+              'alt_text': a.altText,
+              'created_at': a.createdAt.toIso8601String(),
+            });
+        }
+      }
+      templateMap['attachments'] = attachmentEntries;
+      templateEntries.add(templateMap);
+    }
+
+    final manifest = {
+      'format': 'boo_mondai_deck_bundle_v1',
+      'exported_at': DateTime.now().toIso8601String(),
+      'source_user_id': LocalDB.profile.getOrCreate().id,
+      'deck': deck.toMap(),
+      'card_templates': templateEntries,
+    };
+    archive.addFile(ArchiveFile.string('manifest.json', jsonEncode(manifest)));
+
+    final cache = await getTemporaryDirectory();
+    final fileName = '${_safeBundleFileName(deck.title)}.boomondai.zip';
+    final file = File('${cache.path}/$fileName');
+    final bytes = ZipEncoder().encodeBytes(archive);
+    await file.writeAsBytes(bytes, flush: true);
+    return file;
+  }
+
+  static Future<ImportResult> importDeckBundle(
+    File bundleFile,
+    ImportOptions options,
+  ) async {
+    Directory? tempDir;
+    try {
+      if (!bundleFile.path.endsWith('.zip') &&
+          !bundleFile.path.endsWith('.boomondai.zip')) {
+        return const ImportFailure('Expected a .zip or .boomondai.zip file.');
+      }
+
+      tempDir = await Directory.systemTemp.createTemp('boo_mondai_bundle_');
+      final archive = ZipDecoder().decodeBytes(await bundleFile.readAsBytes());
+      final manifestFile = archive.findFile('manifest.json');
+      if (manifestFile == null) {
+        return const ImportFailure('Bundle is missing manifest.json.');
+      }
+
+      final manifest = jsonDecode(utf8.decode(manifestFile.content));
+      if (manifest is! Map<String, dynamic> ||
+          manifest['format'] != 'boo_mondai_deck_bundle_v1') {
+        return const ImportFailure('Unsupported bundle format.');
+      }
+
+      for (final file in archive.files) {
+        if (!file.isFile || file.name == 'manifest.json') continue;
+        final output = File('${tempDir.path}/${file.name}');
+        await output.parent.create(recursive: true);
+        await output.writeAsBytes(file.content);
+      }
+
+      final currentUserId = LocalDB.profile.getOrCreate().id;
+      final ownBackup = manifest['source_user_id'] == currentUserId;
+      final deckMap = Map<String, dynamic>.from(manifest['deck'] as Map);
+      final incomingDeck = DeckMapper.fromMap(deckMap);
+      final matchingDeck = _findMatchingDeck(incomingDeck);
+      if (matchingDeck != null) {
+        if (options.conflictStrategy == ImportConflictStrategy.skip) {
+          return ImportSuccess(matchingDeck.id);
+        }
+        if (options.conflictStrategy == ImportConflictStrategy.keepNewer &&
+            !incomingDeck.updatedAt.isAfter(matchingDeck.updatedAt)) {
+          return ImportSuccess(matchingDeck.id);
+        }
+      }
+
+      final targetDeckId = ownBackup
+          ? incomingDeck.id
+          : matchingDeck?.id ?? uuid.v7();
+      final templateMaps = _extractTemplateMaps(manifest);
+      final templateIdMap = {
+        for (final map in templateMaps)
+          (map['id'] as String): ownBackup ? map['id'] as String : uuid.v7(),
+      };
+      final attachmentIdMap = {
+        for (final template in templateMaps)
+          for (final raw in (template['attachments'] as List? ?? const []))
+            if (raw is Map)
+              (raw['id'] as String): ownBackup
+                  ? raw['id'] as String
+                  : uuid.v7(),
+      };
+
+      final rewrittenTemplateMaps = <Map<String, dynamic>>[];
+      final labels = <String>[];
+      for (final templateMap in templateMaps) {
+        final oldTemplateId = templateMap['id'] as String;
+        final rewritten = Map<String, dynamic>.from(templateMap)
+          ..['id'] = templateIdMap[oldTemplateId]
+          ..['deck_id'] = targetDeckId;
+        final attachments = <Map<String, dynamic>>[];
+        for (final raw in (templateMap['attachments'] as List? ?? const [])) {
+          if (raw is! Map) continue;
+          final attachment = Map<String, dynamic>.from(raw);
+          final sanitized = AttachmentLabelHelper.sanitizeLabel(
+            (attachment['label'] ?? '').toString(),
+          );
+          final label =
+              AttachmentLabelHelper.validateAttachmentLabel(
+                    sanitized,
+                    labels,
+                  ) ==
+                  null
+              ? sanitized
+              : AttachmentLabelHelper.generateFallbackLabel(labels);
+          labels.add(label);
+          attachment
+            ..['id'] = attachmentIdMap[raw['id']]
+            ..['template_id'] = templateIdMap[oldTemplateId]
+            ..['label'] = label
+            ..['type'] ??= raw['kind'];
+
+          if (attachment['attachment_source'] == 'media' &&
+              attachment['content_path'] != null) {
+            final mediaFile = File(
+              '${tempDir.path}/${attachment['content_path']}',
+            );
+            if (await mediaFile.exists()) {
+              attachment['localPath'] =
+                  await MediaStorageService.saveMediaLocally(
+                    attachmentId: attachment['id'] as String,
+                    bytes: await mediaFile.readAsBytes(),
+                    mimeType: attachment['mime_type'] as String,
+                  );
+            }
+          }
+          attachments.add(attachment);
+        }
+        rewritten['attachments'] = attachments;
+        rewrittenTemplateMaps.add(rewritten);
+      }
+
+      final deck = incomingDeck.copyWith(
+        id: targetDeckId,
+        userId: currentUserId,
+        isPublished: false,
+        isEditable: true,
+        userProfile: null,
+        listing: null,
+        sourceDeckId: ownBackup
+            ? incomingDeck.sourceDeckId
+            : incomingDeck.sourceDeckId ?? incomingDeck.id,
+      );
+      final templates = _decodeTemplates(rewrittenTemplateMaps);
+      await LocalDB.deck.upsert(deck);
+      await LocalDB.cardTemplate.upsertMany(templates);
+      await StudyCardService.syncDeckStudyCards(
+        deckId: deck.id,
+        templates: templates,
+      );
+
+      return ImportSuccess(deck.id);
+    } on Exception catch (e) {
+      return ImportFailure(e.toString());
+    } finally {
+      if (tempDir != null && await tempDir.exists()) {
+        await tempDir.delete(recursive: true);
+      }
+    }
   }
 
   /// Exports cards from one deck, optionally scoped to [templateIds].
@@ -597,11 +855,61 @@ class ImportExportService {
     return maps.map(CardTemplateMapper.fromMap).toList(growable: false);
   }
 
+  static Future<Uint8List?> _resolveMediaBytes(
+    CardMediaAttachment attachment,
+  ) async {
+    final localPath = attachment.localPath;
+    if (localPath != null) {
+      final file = File(localPath);
+      if (await file.exists()) {
+        return file.readAsBytes();
+      }
+    }
+
+    final publicUrl = attachment.publicUrl;
+    if (publicUrl == null || publicUrl.isEmpty) return null;
+    try {
+      final response = await http.get(Uri.parse(publicUrl));
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return response.bodyBytes;
+      }
+    } on Exception catch (e) {
+      developer.log(
+        'Failed to download media attachment ${attachment.id}',
+        name: 'ImportExportService',
+        error: e,
+      );
+    }
+    return null;
+  }
+
+  static Deck? _findMatchingDeck(Deck incomingDeck) {
+    final byId = LocalDB.deck.selectByPk({'id': incomingDeck.id});
+    if (byId != null) return byId;
+
+    final byTitle = LocalDB.deck.selectMany(
+      where: (deck) => deck.title == incomingDeck.title,
+      limit: 1,
+    );
+    return byTitle.isEmpty ? null : byTitle.first;
+  }
+
+  static String _safeBundleFileName(String title) {
+    final sanitized = AttachmentLabelHelper.sanitizeLabel(
+      title,
+    ).replaceAll(RegExp(r'\s+'), '_');
+    return sanitized.isEmpty ? 'deck' : sanitized;
+  }
+
   static List<CardTemplate> _copyTemplatesForDeck({
     required List<CardTemplate> templates,
     required String deckId,
   }) {
     final idMap = {for (final template in templates) template.id: uuid.v7()};
+    final attachmentIdMap = {
+      for (final template in templates)
+        for (final attachment in template.attachments) attachment.id: uuid.v7(),
+    };
     final now = DateTime.now();
     return [
       for (final template in templates)
@@ -610,6 +918,7 @@ class ImportExportService {
           targetDeckId: deckId,
           targetId: idMap[template.id]!,
           idMap: idMap,
+          attachmentIdMap: attachmentIdMap,
           createdAt: now,
         ),
     ];
@@ -627,6 +936,9 @@ class ImportExportService {
       targetDeckId: deckId,
       targetId: targetId,
       idMap: idMap,
+      attachmentIdMap: {
+        for (final attachment in source.attachments) attachment.id: uuid.v7(),
+      },
       createdAt: createdAt,
     );
   }
@@ -636,9 +948,15 @@ class ImportExportService {
     required String targetDeckId,
     required String targetId,
     required Map<String, String> idMap,
+    required Map<String, String> attachmentIdMap,
     required DateTime createdAt,
   }) {
     final now = DateTime.now();
+    final attachments = _copyAttachments(
+      source.attachments,
+      targetTemplateId: targetId,
+      attachmentIdMap: attachmentIdMap,
+    );
     return switch (source) {
       FlashcardTemplate t => FlashcardTemplate(
         id: targetId,
@@ -648,6 +966,7 @@ class ImportExportService {
         updatedAt: now,
         sourceTemplateId: t.sourceTemplateId ?? t.id,
         tags: t.tags,
+        attachments: attachments,
         frontText: t.frontText,
         backText: t.backText,
         frontImageUrl: t.frontImageUrl,
@@ -664,6 +983,7 @@ class ImportExportService {
         updatedAt: now,
         sourceTemplateId: t.sourceTemplateId ?? t.id,
         tags: t.tags,
+        attachments: attachments,
         promptText: t.promptText,
         acceptedAnswers: t.acceptedAnswers,
         imageUrl: t.imageUrl,
@@ -677,6 +997,7 @@ class ImportExportService {
         updatedAt: now,
         sourceTemplateId: t.sourceTemplateId ?? t.id,
         tags: t.tags,
+        attachments: attachments,
         questionPrompt: t.questionPrompt,
         options: [
           for (final option in t.options)
@@ -699,6 +1020,7 @@ class ImportExportService {
         updatedAt: now,
         sourceTemplateId: t.sourceTemplateId ?? t.id,
         tags: t.tags,
+        attachments: attachments,
         segments: [
           for (final segment in t.segments)
             FillInTheBlankSegment(
@@ -719,6 +1041,7 @@ class ImportExportService {
         updatedAt: now,
         sourceTemplateId: t.sourceTemplateId ?? t.id,
         tags: t.tags,
+        attachments: attachments,
         pairs: [
           for (final pair in t.pairs)
             MatchMadnessPair(
@@ -742,6 +1065,7 @@ class ImportExportService {
         updatedAt: now,
         sourceTemplateId: t.sourceTemplateId ?? t.id,
         tags: t.tags,
+        attachments: attachments,
         sentenceToScramble: t.sentenceToScramble,
         imageUrl: t.imageUrl,
         audioUrl: t.audioUrl,
@@ -750,6 +1074,39 @@ class ImportExportService {
         'Unsupported card template type: ${source.runtimeType}',
       ),
     };
+  }
+
+  static List<CardAttachment> _copyAttachments(
+    List<CardAttachment> attachments, {
+    required String targetTemplateId,
+    required Map<String, String> attachmentIdMap,
+  }) {
+    return [
+      for (final attachment in attachments)
+        switch (attachment) {
+          CardMediaAttachment a => CardMediaAttachment(
+            id: attachmentIdMap[a.id] ?? uuid.v7(),
+            templateId: targetTemplateId,
+            type: a.type,
+            label: a.label,
+            storagePath: a.storagePath,
+            publicUrl: a.publicUrl,
+            localPath: a.localPath,
+            mimeType: a.mimeType,
+            altText: a.altText,
+            createdAt: a.createdAt,
+          ),
+          CardLinkAttachment a => CardLinkAttachment(
+            id: attachmentIdMap[a.id] ?? uuid.v7(),
+            templateId: targetTemplateId,
+            type: a.type,
+            label: a.label,
+            url: a.url,
+            altText: a.altText,
+            createdAt: a.createdAt,
+          ),
+        },
+    ];
   }
 
   static int _similarityScore({

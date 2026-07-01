@@ -5,6 +5,9 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         CardTemplate,
+        CardAttachment,
+        CardLinkAttachment,
+        CardMediaAttachment,
         CardTemplatesRemoteDB,
         ChangeRecord,
         ChangePreview,
@@ -34,6 +37,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         VisibilityState,
         WordScrambleTemplate,
         uuid;
+import 'package:boo_mondai/features/card_attachments/media_storage.service.dart';
+import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart' show CountOption;
 
 const _kPageSize = 20;
@@ -176,6 +181,10 @@ class DeckDownloadsService {
       final templateIdMap = {
         for (final t in allFetchedTemplates) t.id: uuid.v7(),
       };
+      final attachmentIdMap = {
+        for (final t in allFetchedTemplates)
+          for (final attachment in t.attachments) attachment.id: uuid.v7(),
+      };
       final localTemplates = [
         for (final t in allFetchedTemplates)
           _copyTemplate(
@@ -183,6 +192,7 @@ class DeckDownloadsService {
             localDeckId: localDeckId,
             localTemplateId: templateIdMap[t.id]!,
             templateIdMap: templateIdMap,
+            attachmentIdMap: attachmentIdMap,
             now: now,
           ),
       ];
@@ -192,6 +202,17 @@ class DeckDownloadsService {
       await StudyCardService.syncDeckStudyCards(
         deckId: localDeckId,
         templates: localTemplates,
+      );
+
+      checkpoint = checkpoint.copyWith(
+        downloadedAttachmentIds: existing?.downloadedAttachmentIds ?? const [],
+        updatedAt: DateTime.now(),
+      );
+      await _downloadMediaPhase(
+        entryId: entry.id,
+        reporter: reporter,
+        checkpoint: checkpoint,
+        localTemplates: localTemplates,
       );
 
       // 7. Clean up checkpoint
@@ -421,8 +442,14 @@ class DeckDownloadsService {
     required String localDeckId,
     required String localTemplateId,
     required Map<String, String> templateIdMap,
+    required Map<String, String> attachmentIdMap,
     required DateTime now,
   }) {
+    final attachments = _copyAttachments(
+      template.attachments,
+      localTemplateId: localTemplateId,
+      attachmentIdMap: attachmentIdMap,
+    );
     return switch (template) {
       FlashcardTemplate t => FlashcardTemplate(
         id: localTemplateId,
@@ -432,6 +459,7 @@ class DeckDownloadsService {
         updatedAt: now,
         sourceTemplateId: t.id,
         tags: t.tags,
+        attachments: attachments,
         frontText: t.frontText,
         backText: t.backText,
         frontImageUrl: t.frontImageUrl,
@@ -448,6 +476,7 @@ class DeckDownloadsService {
         updatedAt: now,
         sourceTemplateId: t.id,
         tags: t.tags,
+        attachments: attachments,
         promptText: t.promptText,
         acceptedAnswers: t.acceptedAnswers,
         imageUrl: t.imageUrl,
@@ -461,6 +490,7 @@ class DeckDownloadsService {
         updatedAt: now,
         sourceTemplateId: t.id,
         tags: t.tags,
+        attachments: attachments,
         questionPrompt: t.questionPrompt,
         options: [
           for (final option in t.options)
@@ -483,6 +513,7 @@ class DeckDownloadsService {
         updatedAt: now,
         sourceTemplateId: t.id,
         tags: t.tags,
+        attachments: attachments,
         segments: [
           for (final segment in t.segments)
             FillInTheBlankSegment(
@@ -503,6 +534,7 @@ class DeckDownloadsService {
         updatedAt: now,
         sourceTemplateId: t.id,
         tags: t.tags,
+        attachments: attachments,
         pairs: [
           for (final pair in t.pairs)
             MatchMadnessPair(
@@ -527,10 +559,143 @@ class DeckDownloadsService {
         updatedAt: now,
         sourceTemplateId: t.id,
         tags: t.tags,
+        attachments: attachments,
         sentenceToScramble: t.sentenceToScramble,
         imageUrl: t.imageUrl,
         audioUrl: t.audioUrl,
       ),
+      _ => throw UnsupportedError(
+        'Unsupported card template type: ${template.runtimeType}',
+      ),
+    };
+  }
+
+  List<CardAttachment> _copyAttachments(
+    List<CardAttachment> attachments, {
+    required String localTemplateId,
+    required Map<String, String> attachmentIdMap,
+  }) {
+    return [
+      for (final attachment in attachments)
+        switch (attachment) {
+          CardMediaAttachment a => CardMediaAttachment(
+            id: attachmentIdMap[a.id] ?? uuid.v7(),
+            templateId: localTemplateId,
+            type: a.type,
+            label: a.label,
+            storagePath: a.storagePath,
+            publicUrl: a.publicUrl,
+            localPath: a.localPath,
+            mimeType: a.mimeType,
+            altText: a.altText,
+            createdAt: a.createdAt,
+          ),
+          CardLinkAttachment a => CardLinkAttachment(
+            id: attachmentIdMap[a.id] ?? uuid.v7(),
+            templateId: localTemplateId,
+            type: a.type,
+            label: a.label,
+            url: a.url,
+            altText: a.altText,
+            createdAt: a.createdAt,
+          ),
+        },
+    ];
+  }
+
+  Future<void> _downloadMediaPhase({
+    required String entryId,
+    required ChangeTrackerReporter reporter,
+    required DownloadCheckpoint checkpoint,
+    required List<CardTemplate> localTemplates,
+  }) async {
+    final completed = checkpoint.downloadedAttachmentIds.toSet();
+    final mediaAttachments = [
+      for (final template in localTemplates)
+        for (final attachment in template.attachments)
+          if (attachment is CardMediaAttachment) attachment,
+    ];
+    if (mediaAttachments.isEmpty) return;
+
+    var currentCheckpoint = checkpoint;
+    for (var i = 0; i < mediaAttachments.length; i++) {
+      if (_pausedEntryIds.contains(entryId)) {
+        await _downloadCheckpoints.upsert(
+          currentCheckpoint.copyWith(
+            status: DownloadCheckpointStatus.paused,
+            updatedAt: DateTime.now(),
+          ),
+        );
+        reporter.update(entryId, status: ChangeTrackerStatus.paused);
+        return;
+      }
+
+      final attachment = mediaAttachments[i];
+      if (completed.contains(attachment.id) || attachment.publicUrl == null) {
+        continue;
+      }
+
+      final response = await http.get(Uri.parse(attachment.publicUrl!));
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        continue;
+      }
+
+      final localPath = await MediaStorageService.saveMediaLocally(
+        attachmentId: attachment.id,
+        bytes: response.bodyBytes,
+        mimeType: attachment.mimeType,
+      );
+      await _updateLocalAttachmentPath(
+        attachmentId: attachment.id,
+        localPath: localPath,
+      );
+
+      completed.add(attachment.id);
+      currentCheckpoint = currentCheckpoint.copyWith(
+        downloadedAttachmentIds: completed.toList(),
+        updatedAt: DateTime.now(),
+      );
+      await _downloadCheckpoints.upsert(currentCheckpoint);
+      reporter.update(
+        entryId,
+        progress: 0.9 + ((i + 1) / mediaAttachments.length) * 0.1,
+      );
+    }
+  }
+
+  Future<void> _updateLocalAttachmentPath({
+    required String attachmentId,
+    required String localPath,
+  }) async {
+    for (final template in LocalDB.cardTemplate.selectMany()) {
+      final index = template.attachments.indexWhere(
+        (attachment) => attachment.id == attachmentId,
+      );
+      if (index == -1) continue;
+
+      final attachment = template.attachments[index];
+      if (attachment is! CardMediaAttachment) return;
+
+      final updatedAttachments = [...template.attachments];
+      updatedAttachments[index] = attachment.copyWith(localPath: localPath);
+      await LocalDB.cardTemplate.upsert(
+        _templateWithAttachments(template, updatedAttachments),
+      );
+      return;
+    }
+  }
+
+  CardTemplate _templateWithAttachments(
+    CardTemplate template,
+    List<CardAttachment> attachments,
+  ) {
+    return switch (template) {
+      FlashcardTemplate t => t.copyWith(attachments: attachments),
+      IdentificationTemplate t => t.copyWith(attachments: attachments),
+      MultipleChoiceTemplate t => t.copyWith(attachments: attachments),
+      FillInTheBlanksTemplate t => t.copyWith(attachments: attachments),
+      MatchMadnessTemplate t => t.copyWith(attachments: attachments),
+      WordScrambleTemplate t => t.copyWith(attachments: attachments),
       _ => throw UnsupportedError(
         'Unsupported card template type: ${template.runtimeType}',
       ),

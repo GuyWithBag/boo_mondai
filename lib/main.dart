@@ -33,12 +33,16 @@ import 'package:flutter/material.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:unite_keyboard_visibility/unite_keyboard_visibility.dart'
+    show UniteKeyboardVisibility;
 
 @BarrelConfig(
   exclude: [
     'lib/core/hive/hive.barrel.dart',
     'lib/core/helpers/image_file_provider_io.dart',
     'lib/core/helpers/image_file_provider_stub.dart',
+    'lib/features/card_attachments/models/card_attachment.dto.dart',
+    'lib/features/card_attachments/models/card_link_attachment.dto.dart',
     'lib/**/**/*.mapper.dart',
     'lib/**/*.mapper.dart',
     'lib/*.mapper.dart',
@@ -57,6 +61,7 @@ Future<void> main() async {
   await RemoteDB.init();
   await LocalDB.init();
   Services.init();
+  await UniteKeyboardVisibility.instance.initialize();
   // ── Settings (must come before notifications) ───────
   final settingsController = SettingsController();
   await settingsController.init();

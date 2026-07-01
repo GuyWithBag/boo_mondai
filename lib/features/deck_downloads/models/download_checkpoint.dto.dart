@@ -14,6 +14,7 @@ class DownloadCheckpoint with DownloadCheckpointMappable {
   final String deckTitle;
   final int totalTemplates; // known after first page fetch
   final List<String> fetchedTemplateIds; // ids already written to Hive
+  final List<String> downloadedAttachmentIds;
   final DownloadCheckpointStatus status;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -23,6 +24,7 @@ class DownloadCheckpoint with DownloadCheckpointMappable {
     required this.deckTitle,
     required this.totalTemplates,
     required this.fetchedTemplateIds,
+    this.downloadedAttachmentIds = const [],
     required this.status,
     required this.createdAt,
     required this.updatedAt,

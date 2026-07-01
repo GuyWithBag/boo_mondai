@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:boo_mondai/lib.barrel.dart'
     show
@@ -9,6 +10,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         DeckImportMode,
         ChangePreview,
         ImportCardsPayload,
+        ImportFailure,
+        ImportOptions,
+        ImportResult,
         ChangeRecord,
         ImportExportService;
 import 'package:file_picker/file_picker.dart';
@@ -69,6 +73,19 @@ class ImportExportController extends Controller {
     } on Exception catch (e) {
       setError(e);
       return const [];
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  Future<File?> exportDeckBundle(String deckId) async {
+    setLoading(true);
+    try {
+      latestFailures = const [];
+      return ImportExportService.exportDeckBundle(deckId);
+    } on Exception catch (e) {
+      setError(e);
+      return null;
     } finally {
       setLoading(false);
     }
@@ -202,6 +219,35 @@ class ImportExportController extends Controller {
       );
     } on Exception catch (e) {
       return ImportFileResult(status: ImportFileStatus.failed, error: e);
+    }
+  }
+
+  Future<ImportResult?> importDeckBundleFromFile({
+    ImportOptions options = const ImportOptions(),
+  }) async {
+    final result = await FilePicker.pickFiles(
+      dialogTitle: 'Import deck bundle',
+      type: FileType.custom,
+      allowedExtensions: const ['zip', 'boomondai.zip'],
+      withData: false,
+    );
+    if (result == null || result.files.isEmpty) {
+      return null;
+    }
+
+    final path = result.files.single.path;
+    if (path == null) {
+      return const ImportFailure('Unable to read selected file.');
+    }
+
+    setLoading(true);
+    try {
+      return ImportExportService.importDeckBundle(File(path), options);
+    } on Exception catch (e) {
+      setError(e);
+      return ImportFailure(e.toString());
+    } finally {
+      setLoading(false);
     }
   }
 

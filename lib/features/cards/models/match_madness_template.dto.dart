@@ -1,8 +1,8 @@
-import 'package:boo_mondai/features/cards/models/card_media_attachment.dto.dart';
 import 'package:boo_mondai/features/cards/models/card_template.dto.dart';
 import 'package:boo_mondai/features/cards/models/match_madness_pair.dto.dart';
 import 'package:boo_mondai/features/tags/models/tag.dto.dart';
 import 'package:dart_mappable/dart_mappable.dart';
+import 'package:boo_mondai/features/card_attachments/models/card_media_attachment.dto.dart';
 
 part 'match_madness_template.dto.mapper.dart';
 

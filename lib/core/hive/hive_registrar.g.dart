@@ -7,10 +7,11 @@ import 'package:boo_mondai/core/hive/adapters.dart';
 
 extension HiveRegistrar on HiveInterface {
   void registerAdapters() {
+    registerAdapter(AttachmentTypeAdapter());
     registerAdapter(CachedProfileAdapter());
     registerAdapter(CardAdapter());
+    registerAdapter(CardLinkAttachmentAdapter());
     registerAdapter(CardMediaAttachmentAdapter());
-    registerAdapter(CardMediaKindAdapter());
     registerAdapter(CardTemplateTagAdapter());
     registerAdapter(CardTypeAdapter());
     registerAdapter(DeckAdapter());
@@ -51,10 +52,11 @@ extension HiveRegistrar on HiveInterface {
 
 extension IsolatedHiveRegistrar on IsolatedHiveInterface {
   void registerAdapters() {
+    registerAdapter(AttachmentTypeAdapter());
     registerAdapter(CachedProfileAdapter());
     registerAdapter(CardAdapter());
+    registerAdapter(CardLinkAttachmentAdapter());
     registerAdapter(CardMediaAttachmentAdapter());
-    registerAdapter(CardMediaKindAdapter());
     registerAdapter(CardTemplateTagAdapter());
     registerAdapter(CardTypeAdapter());
     registerAdapter(DeckAdapter());

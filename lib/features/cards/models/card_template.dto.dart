@@ -3,7 +3,8 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/core/models/dto.dart';
-import 'package:boo_mondai/features/cards/models/card_media_attachment.dto.dart';
+import 'package:boo_mondai/features/card_attachments/helpers/attachment_uri.helper.dart';
+import 'package:boo_mondai/features/card_attachments/models/card_media_attachment.dto.dart';
 import 'package:boo_mondai/features/cards/models/fill_in_the_blanks_template.dto.dart';
 import 'package:boo_mondai/features/cards/models/flashcard_template.dto.dart';
 import 'package:boo_mondai/features/cards/models/identification_template.dto.dart';
@@ -44,7 +45,7 @@ abstract class CardTemplate with CardTemplateMappable implements DTO {
   final List<Tag> tags;
 
   // Joined from card_template_attachments
-  final List<CardMediaAttachment> attachments;
+  final List<CardAttachment> attachments;
 
   const CardTemplate({
     required this.id,
@@ -63,7 +64,7 @@ abstract class CardTemplate with CardTemplateMappable implements DTO {
     final attachmentId = uri.path.isNotEmpty ? uri.path : uri.host;
     for (final attachment in attachments) {
       if (attachment.id == attachmentId) {
-        return attachment.publicUrl;
+        return AttachmentUriHelper.resolveAttachmentUri(attachment);
       }
     }
     return null;

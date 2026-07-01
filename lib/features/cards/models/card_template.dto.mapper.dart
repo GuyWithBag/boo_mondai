@@ -20,7 +20,7 @@ class CardTemplateMapper extends ClassMapperBase<CardTemplate> {
       MatchMadnessTemplateMapper.ensureInitialized();
       WordScrambleTemplateMapper.ensureInitialized();
       TagMapper.ensureInitialized();
-      CardMediaAttachmentMapper.ensureInitialized();
+      CardAttachmentMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -49,9 +49,8 @@ class CardTemplateMapper extends ClassMapperBase<CardTemplate> {
   static List<Tag> _$tags(CardTemplate v) => v.tags;
   static const Field<CardTemplate, List<Tag>> _f$tags =
       Field('tags', _$tags, opt: true, def: const []);
-  static List<CardMediaAttachment> _$attachments(CardTemplate v) =>
-      v.attachments;
-  static const Field<CardTemplate, List<CardMediaAttachment>> _f$attachments =
+  static List<CardAttachment> _$attachments(CardTemplate v) => v.attachments;
+  static const Field<CardTemplate, List<CardAttachment>> _f$attachments =
       Field('attachments', _$attachments, opt: true, def: const []);
 
   @override
@@ -92,11 +91,9 @@ mixin CardTemplateMappable {
 abstract class CardTemplateCopyWith<$R, $In extends CardTemplate, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags;
-  ListCopyWith<
-      $R,
-      CardMediaAttachment,
-      CardMediaAttachmentCopyWith<$R, CardMediaAttachment,
-          CardMediaAttachment>> get attachments;
+  ListCopyWith<$R, CardAttachment,
+          CardAttachmentCopyWith<$R, CardAttachment, CardAttachment>>
+      get attachments;
   $R call(
       {String? id,
       String? deckId,
@@ -105,6 +102,6 @@ abstract class CardTemplateCopyWith<$R, $In extends CardTemplate, $Out>
       DateTime? updatedAt,
       String? sourceTemplateId,
       List<Tag>? tags,
-      List<CardMediaAttachment>? attachments});
+      List<CardAttachment>? attachments});
   CardTemplateCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }

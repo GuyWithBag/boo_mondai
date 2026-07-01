@@ -262,7 +262,7 @@ class FillInTheBlanksTemplateAdapter
       tags: fields[7] == null ? const [] : (fields[7] as List).cast<Tag>(),
       attachments: fields[8] == null
           ? const []
-          : (fields[8] as List).cast<CardMediaAttachment>(),
+          : (fields[8] as List).cast<CardAttachment>(),
       segments: (fields[0] as List).cast<FillInTheBlankSegment>(),
     );
   }
@@ -323,7 +323,7 @@ class MultipleChoiceTemplateAdapter
       tags: fields[10] == null ? const [] : (fields[10] as List).cast<Tag>(),
       attachments: fields[11] == null
           ? const []
-          : (fields[11] as List).cast<CardMediaAttachment>(),
+          : (fields[11] as List).cast<CardAttachment>(),
       questionPrompt: fields[0] as String,
       options: (fields[1] as List).cast<MultipleChoiceOption>(),
       imageUrl: fields[2] as String?,
@@ -392,7 +392,7 @@ class FlashcardTemplateAdapter extends TypeAdapter<FlashcardTemplate> {
       tags: fields[13] == null ? const [] : (fields[13] as List).cast<Tag>(),
       attachments: fields[14] == null
           ? const []
-          : (fields[14] as List).cast<CardMediaAttachment>(),
+          : (fields[14] as List).cast<CardAttachment>(),
       frontText: fields[0] as String,
       backText: fields[1] as String,
       frontImageUrl: fields[2] as String?,
@@ -470,7 +470,7 @@ class MatchMadnessTemplateAdapter extends TypeAdapter<MatchMadnessTemplate> {
       tags: fields[7] == null ? const [] : (fields[7] as List).cast<Tag>(),
       attachments: fields[8] == null
           ? const []
-          : (fields[8] as List).cast<CardMediaAttachment>(),
+          : (fields[8] as List).cast<CardAttachment>(),
       pairs: (fields[0] as List).cast<MatchMadnessPair>(),
     );
   }
@@ -531,7 +531,7 @@ class IdentificationTemplateAdapter
       tags: fields[10] == null ? const [] : (fields[10] as List).cast<Tag>(),
       attachments: fields[11] == null
           ? const []
-          : (fields[11] as List).cast<CardMediaAttachment>(),
+          : (fields[11] as List).cast<CardAttachment>(),
       promptText: fields[0] as String,
       acceptedAnswers: fields[1] as String,
       imageUrl: fields[2] as String?,
@@ -703,7 +703,7 @@ class WordScrambleTemplateAdapter extends TypeAdapter<WordScrambleTemplate> {
       tags: fields[9] == null ? const [] : (fields[9] as List).cast<Tag>(),
       attachments: fields[10] == null
           ? const []
-          : (fields[10] as List).cast<CardMediaAttachment>(),
+          : (fields[10] as List).cast<CardAttachment>(),
       sentenceToScramble: fields[0] as String,
       imageUrl: fields[1] as String?,
       audioUrl: fields[2] as String?,
@@ -1930,6 +1930,9 @@ class DownloadCheckpointAdapter extends TypeAdapter<DownloadCheckpoint> {
       deckTitle: fields[1] as String,
       totalTemplates: (fields[2] as num).toInt(),
       fetchedTemplateIds: (fields[3] as List).cast<String>(),
+      downloadedAttachmentIds: fields[7] == null
+          ? const []
+          : (fields[7] as List).cast<String>(),
       status: fields[4] as DownloadCheckpointStatus,
       createdAt: fields[5] as DateTime,
       updatedAt: fields[6] as DateTime,
@@ -1939,7 +1942,7 @@ class DownloadCheckpointAdapter extends TypeAdapter<DownloadCheckpoint> {
   @override
   void write(BinaryWriter writer, DownloadCheckpoint obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.deckId)
       ..writeByte(1)
@@ -1953,7 +1956,9 @@ class DownloadCheckpointAdapter extends TypeAdapter<DownloadCheckpoint> {
       ..writeByte(5)
       ..write(obj.createdAt)
       ..writeByte(6)
-      ..write(obj.updatedAt);
+      ..write(obj.updatedAt)
+      ..writeByte(7)
+      ..write(obj.downloadedAttachmentIds);
   }
 
   @override
@@ -2018,10 +2023,12 @@ class CardMediaAttachmentAdapter extends TypeAdapter<CardMediaAttachment> {
     return CardMediaAttachment(
       id: fields[0] as String,
       templateId: fields[1] as String,
-      kind: fields[2] as CardMediaKind,
+      type: fields[8] as AttachmentType,
+      label: fields[9] as String,
       storagePath: fields[3] as String,
       publicUrl: fields[4] as String?,
-      mimeType: fields[5] as String?,
+      localPath: fields[10] as String?,
+      mimeType: fields[5] as String,
       altText: fields[6] as String?,
       createdAt: fields[7] as DateTime,
     );
@@ -2030,13 +2037,11 @@ class CardMediaAttachmentAdapter extends TypeAdapter<CardMediaAttachment> {
   @override
   void write(BinaryWriter writer, CardMediaAttachment obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(10)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
       ..write(obj.templateId)
-      ..writeByte(2)
-      ..write(obj.kind)
       ..writeByte(3)
       ..write(obj.storagePath)
       ..writeByte(4)
@@ -2046,7 +2051,13 @@ class CardMediaAttachmentAdapter extends TypeAdapter<CardMediaAttachment> {
       ..writeByte(6)
       ..write(obj.altText)
       ..writeByte(7)
-      ..write(obj.createdAt);
+      ..write(obj.createdAt)
+      ..writeByte(8)
+      ..write(obj.type)
+      ..writeByte(9)
+      ..write(obj.label)
+      ..writeByte(10)
+      ..write(obj.localPath);
   }
 
   @override
@@ -2060,28 +2071,80 @@ class CardMediaAttachmentAdapter extends TypeAdapter<CardMediaAttachment> {
           typeId == other.typeId;
 }
 
-class CardMediaKindAdapter extends TypeAdapter<CardMediaKind> {
+class CardLinkAttachmentAdapter extends TypeAdapter<CardLinkAttachment> {
   @override
-  final typeId = 38;
+  final typeId = 39;
 
   @override
-  CardMediaKind read(BinaryReader reader) {
+  CardLinkAttachment read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return CardLinkAttachment(
+      id: fields[0] as String,
+      templateId: fields[1] as String,
+      type: fields[2] as AttachmentType,
+      label: fields[3] as String,
+      url: fields[4] as String,
+      altText: fields[5] as String?,
+      createdAt: fields[6] as DateTime,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, CardLinkAttachment obj) {
+    writer
+      ..writeByte(7)
+      ..writeByte(0)
+      ..write(obj.id)
+      ..writeByte(1)
+      ..write(obj.templateId)
+      ..writeByte(2)
+      ..write(obj.type)
+      ..writeByte(3)
+      ..write(obj.label)
+      ..writeByte(4)
+      ..write(obj.url)
+      ..writeByte(5)
+      ..write(obj.altText)
+      ..writeByte(6)
+      ..write(obj.createdAt);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CardLinkAttachmentAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class AttachmentTypeAdapter extends TypeAdapter<AttachmentType> {
+  @override
+  final typeId = 40;
+
+  @override
+  AttachmentType read(BinaryReader reader) {
     switch (reader.readByte()) {
       case 0:
-        return CardMediaKind.image;
+        return AttachmentType.image;
       case 1:
-        return CardMediaKind.audio;
+        return AttachmentType.audio;
       default:
-        return CardMediaKind.image;
+        return AttachmentType.image;
     }
   }
 
   @override
-  void write(BinaryWriter writer, CardMediaKind obj) {
+  void write(BinaryWriter writer, AttachmentType obj) {
     switch (obj) {
-      case CardMediaKind.image:
+      case AttachmentType.image:
         writer.writeByte(0);
-      case CardMediaKind.audio:
+      case AttachmentType.audio:
         writer.writeByte(1);
     }
   }
@@ -2092,7 +2155,7 @@ class CardMediaKindAdapter extends TypeAdapter<CardMediaKind> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is CardMediaKindAdapter &&
+      other is AttachmentTypeAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

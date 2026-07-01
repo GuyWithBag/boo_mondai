@@ -36,3 +36,4 @@ export 'leaderboard/leaderboard.barrel.dart';
 export 'streak/streak.barrel.dart';
 export 'view_discussion/view_discussion.barrel.dart';
 export 'view_study_cards/view_study_cards.barrel.dart';
+export 'card_attachments/card_attachments.barrel.dart';

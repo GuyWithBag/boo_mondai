@@ -5,4 +5,3 @@ export 'models/models.barrel.dart';
 // Other files
 export 'card_templates.remote.db.dart';
 export 'card_templates.local.db.dart';
-export 'card_media_attachments.remote.db.dart';

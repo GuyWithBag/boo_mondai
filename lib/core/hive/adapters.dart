@@ -10,8 +10,10 @@ library;
 import 'package:boo_mondai/lib.barrel.dart'
     show
         CachedProfile,
+        AttachmentType,
+        CardAttachment,
+        CardLinkAttachment,
         CardMediaAttachment,
-        CardMediaKind,
         CardTemplate,
         CardTemplateTag,
         CardType,
@@ -53,6 +55,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
   AdapterSpec<CachedProfile>(),
   AdapterSpec<Deck>(),
   AdapterSpec<CardMediaAttachment>(),
+  AdapterSpec<CardLinkAttachment>(),
   AdapterSpec<MultipleChoiceOption>(),
   AdapterSpec<FillInTheBlanksTemplate>(),
   AdapterSpec<MultipleChoiceTemplate>(),
@@ -75,7 +78,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
   AdapterSpec<Streak>(),
   AdapterSpec<Rating>(),
   AdapterSpec<CardType>(),
-  AdapterSpec<CardMediaKind>(),
+  AdapterSpec<AttachmentType>(),
   AdapterSpec<QuestionType>(),
   AdapterSpec<User>(),
   AdapterSpec<VisibilityState>(),

@@ -14,4 +14,3 @@ export 'identification_template.dto.dart';
 export 'match_madness_template.dto.dart';
 export 'multiple_choice_template.dto.dart';
 export 'word_scramble_template.dart';
-export 'card_media_attachment.dto.dart';
