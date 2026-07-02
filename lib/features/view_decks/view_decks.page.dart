@@ -49,12 +49,8 @@ import 'package:flutter/material.dart'
         ElevatedButton,
         EdgeInsets,
         LayoutBuilder,
-        SliverGridDelegateWithMaxCrossAxisExtent,
-        Center,
-        Column,
-        CrossAxisAlignment,
-        SizedBox;
-import 'package:flutter/src/widgets/basic.dart';
+        Padding,
+        SliverGridDelegateWithMaxCrossAxisExtent;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -296,7 +292,6 @@ class _DeckListView extends StatelessWidget {
                 child: Text('Create Deck'),
               ),
             ),
-      padding: const EdgeInsets.only(bottom: 100),
       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
         maxCrossAxisExtent: tokens.studyCardWidth,
         mainAxisSpacing: spacing,
