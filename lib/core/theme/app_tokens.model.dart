@@ -57,8 +57,8 @@ Good:
 spaceLayoutGapSm
 spaceLayoutGapMd
 spaceLayoutGapLg
-sizeIconMd
-sizeIconLg
+sizeIconSm
+sizeIcon
 radiusSurfaceXsm
 radiusSurface
 
@@ -218,6 +218,7 @@ class AppTokens with AppTokensMappable {
   final double borderWidthDefault = 2;
 
   final double spaceScaffoldPadding = 20;
+  final double spaceScaffoldPaddingXsm = 2;
   final double spaceScaffoldPaddingMobileY = 28;
 
   final double spaceLayoutPaddingLg = 20;
@@ -243,8 +244,9 @@ class AppTokens with AppTokensMappable {
   final double textSizeLabel = 14;
   final double textSizeLabelSmall = 10;
 
-  final double sizeIconMd = 18;
-  final double sizeIconLg = 24;
+  final double sizeIconSm = 18;
+  final double sizeIcon = 24;
+  final double sizeIconLg = 30;
 
   final double studyCardAspectRatio = 5 / 7;
   final double studyCardWidth = 300;

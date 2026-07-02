@@ -40,3 +40,4 @@ export 'text_field.dart';
 export 'chip_input.controller.dart';
 export 'toggle_button.dart';
 export 'bottom_nav_bar.dart';
+export 'tool_bar.dart';

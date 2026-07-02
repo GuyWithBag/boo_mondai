@@ -99,7 +99,7 @@ class SegmentedControl<T> extends HookWidget {
             SurfaceColor.muted,
             SurfaceBorder.none,
             SurfaceShadow.none,
-            SurfacePadding.xsm,
+            SurfacePadding.sm,
             SurfaceShape.roundedSm,
           ])
           .copyWith(padding: EdgeInsets.all(10)),

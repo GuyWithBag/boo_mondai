@@ -11,7 +11,7 @@ final metaLabelStyle = VariantStyle.contentParts<AppTokens>(
       TextStylePart.fontWeight(tokens.fontWeightTextStrong),
       (style) => style.copyWith(letterSpacing: tokens.letterSpacingTextEyebrow),
     }),
-    ContentStylePart.icon({IconThemePart.size(tokens.sizeIconMd.sp)}),
+    ContentStylePart.icon({IconThemePart.size(tokens.sizeIconSm.sp)}),
   },
   defaultVariants: const [MetaLabelTone.muted],
   variants: {

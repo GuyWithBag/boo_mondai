@@ -42,7 +42,6 @@ class EditableTextValue extends HookWidget {
     this.textStyle,
     this.maxLines = 1,
     this.isMarkdown = false,
-    this.markdownMode = MarkdownTextMode.input,
     this.fieldVariants = const [TextFieldSize.normal, TextFieldFrame.underline],
     super.key,
     this.textAlign,
@@ -57,7 +56,6 @@ class EditableTextValue extends HookWidget {
   final TextStyle? placeholderTextStyle;
   final int? maxLines;
   final bool isMarkdown;
-  final MarkdownTextMode markdownMode;
   final Iterable<Object> fieldVariants;
   final TextAlign? textAlign;
 
@@ -122,7 +120,7 @@ class EditableTextValue extends HookWidget {
               onChanged: (value) {
                 markdownValue.value = value;
               },
-              mode: markdownMode,
+              mode: MarkdownTextMode.inputPreview,
               enabled: !isSaving.value,
               maxLines: maxLines,
               placeholder: placeholder,
@@ -174,6 +172,7 @@ class EditableTextValue extends HookWidget {
             data: value,
             baseTextStyle: textStyle,
             maxLines: maxLines,
+            mode: MarkdownTextMode.previewSelectable,
           )
         : Text(
             value,

@@ -84,11 +84,33 @@ class Button extends HookWidget {
     );
   }
 
+  static Button iconOnly({
+    VoidCallback? onPressed,
+    IconData? icon,
+    ButtonColor color = ButtonColor.muted,
+    ButtonVariant variant = ButtonVariant.textShadowed,
+    bool selected = false,
+    required AppTokens tokens,
+  }) {
+    return Button(
+      onPressed: onPressed,
+      leading: icon == null ? null : Icon(icon),
+      selected: selected,
+      dashed: variant == ButtonVariant.dashed,
+      style: buttonStyle.resolve(tokens, [
+        color,
+        ButtonSize.largeIcon,
+        ButtonPadding.none,
+        variant,
+      ]),
+    );
+  }
+
   static Button iconOnlySmall({
     VoidCallback? onPressed,
     IconData? icon,
     ButtonColor color = ButtonColor.muted,
-    ButtonVariant variant = ButtonVariant.text,
+    ButtonVariant variant = ButtonVariant.textShadowed,
     bool selected = false,
     required AppTokens tokens,
   }) {

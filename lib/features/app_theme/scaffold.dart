@@ -23,6 +23,7 @@ class Scaffold extends HookWidget {
     this.sidebar,
     this.sidebarWidth = 280,
     this.bottomNavBar,
+    this.toolBar,
     this.backgroundColor,
     this.maxWidth,
     this.padding,
@@ -34,6 +35,7 @@ class Scaffold extends HookWidget {
     this.center = false,
     this.shouldConstrainWidth = false,
     this.floatingActionButton,
+    this.preferredFloatingActionButtonHeight = 48,
     this.floatingSideBarInitiallyOpen = false,
     this.haveSideBarOpenButton = false,
     this.haveBottomNavBarBottomGap = true,
@@ -41,6 +43,7 @@ class Scaffold extends HookWidget {
     this.inheritMainBottomNavBarHeight = true,
     this.scrollController,
     this.resizeToAvoidBottomInset = false,
+    this.resizeBodyForKeyboard = false,
   }) : assert(sidebarWidth >= 0, 'sidebarWidth cannot be negative.');
 
   final Widget body;
@@ -50,6 +53,7 @@ class Scaffold extends HookWidget {
   final Widget? sidebar;
   final double sidebarWidth;
   final PreferredSizeWidget? bottomNavBar;
+  final PreferredSizeWidget? toolBar;
   final Color? backgroundColor;
   final double? maxWidth;
   final EdgeInsetsGeometry? padding;
@@ -62,12 +66,14 @@ class Scaffold extends HookWidget {
   final bool center;
   final bool shouldConstrainWidth;
   final Widget? floatingActionButton;
+  final double preferredFloatingActionButtonHeight;
   final bool floatingSideBarInitiallyOpen;
   final bool haveSideBarOpenButton;
   final bool haveBottomNavBarBottomGap;
   final bool inheritMainBottomNavBarHeight;
   final ScrollController? scrollController;
   final bool resizeToAvoidBottomInset;
+  final bool resizeBodyForKeyboard;
 
   static const _animationDuration = Duration(milliseconds: 220);
 
@@ -90,9 +96,11 @@ class Scaffold extends HookWidget {
       sidebar: sidebar,
       sidebarWidth: sidebarWidth,
       bottomNavBar: bottomNavBar,
+      toolBar: toolBar,
       padding: padding,
       hideNavigation: controller.hideNavigation,
       floatingActionButton: floatingActionButton,
+      preferredFloatingActionButtonHeight: preferredFloatingActionButtonHeight,
       showBottomNavBar: controller.showBottomNavBar,
       showAppBar: controller.showAppBar,
       isFloatingSideBar: controller.isFloatingSideBar,
@@ -100,14 +108,40 @@ class Scaffold extends HookWidget {
       haveSideBarOpenButton: haveSideBarOpenButton,
       haveBottomNavBarBottomGap: haveBottomNavBarBottomGap,
       inheritMainBottomNavBarHeight: inheritMainBottomNavBarHeight,
+      isUserInputFocusing: controller.isUserInputFocusing,
     );
+
+    useEffect(() {
+      if (toolBar == null && !resizeBodyForKeyboard) {
+        controller.isUserInputFocusing = false;
+        return null;
+      }
+
+      void updateUserInputFocus() {
+        final focusedContext = FocusManager.instance.primaryFocus?.context;
+        controller.isUserInputFocusing =
+            focusedContext?.widget is EditableText ||
+            focusedContext?.findAncestorWidgetOfExactType<EditableText>() !=
+                null;
+      }
+
+      FocusManager.instance.addListener(updateUserInputFocus);
+      updateUserInputFocus();
+      return () {
+        FocusManager.instance.removeListener(updateUserInputFocus);
+      };
+    }, [controller, resizeBodyForKeyboard, toolBar]);
 
     final shouldHaveAppBar = helper.shouldHaveAppBar;
     final shouldHaveFloatingAppBar = helper.shouldHaveFloatingAppBar;
     final shouldHaveBottomNavBar = helper.shouldHaveBottomNavBar;
+    final shouldHaveToolBar = helper.shouldHaveToolBar;
     final shouldBodyHaveBottomScaffoldSafeArea =
         helper.shouldBodyHaveBottomScaffoldSafeArea;
     final effectiveBottomNavBarHeight = helper.trueBottomNavBarHeight;
+    final effectiveToolBarHeight = helper.trueToolBarHeight;
+    final effectiveBottomScaffoldSafeAreaHeight =
+        helper.bottomScaffoldSafeAreaHeight;
     final effectiveAppBarHeight = helper.trueAppBarHeight;
     final showDockedSideBar = helper.shouldHaveDockedSideBar;
     final showFloatingSideBar = helper.shouldHaveFloatingSideBar;
@@ -116,6 +150,11 @@ class Scaffold extends HookWidget {
     final shouldHaveEitherFab = helper.shouldHaveEitherFab;
     final scaffoldPadding = helper.scaffoldPadding;
     final fabBottomPadding = helper.fabBottomPadding;
+    final keyboardBottomInset = resizeBodyForKeyboard
+        ? mediaQuery.viewInsets.bottom
+        : 0.0;
+    final contentBottomInset =
+        keyboardBottomInset + (shouldHaveToolBar ? effectiveToolBarHeight : 0);
 
     final paddedBody = Padding(padding: helper.contentPadding, child: body);
 
@@ -156,7 +195,7 @@ class Scaffold extends HookWidget {
         else
           Flexible(child: paddedBody),
         if (shouldBodyHaveBottomScaffoldSafeArea)
-          SizedBox(height: effectiveBottomNavBarHeight),
+          SizedBox(height: effectiveBottomScaffoldSafeAreaHeight),
       ],
     );
 
@@ -191,7 +230,13 @@ class Scaffold extends HookWidget {
     );
 
     final stackChildren = <Widget>[
-      Positioned.fill(child: content),
+      Positioned(
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: contentBottomInset,
+        child: content,
+      ),
       if (showDockedSideBar)
         _AnimatedOverlay(
           visible: true,
@@ -225,6 +270,17 @@ class Scaffold extends HookWidget {
               height: effectiveBottomNavBarHeight,
               child: bottomNavBar!,
             ),
+          ),
+        ),
+      if (shouldHaveToolBar)
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: mediaQuery.viewInsets.bottom,
+          child: _AnimatedOverlay(
+            visible: controller.isUserInputFocusing,
+            hiddenOffset: const Offset(0, 1),
+            child: SizedBox(height: effectiveToolBarHeight, child: toolBar!),
           ),
         ),
       if (showFloatingSideBar)
@@ -268,21 +324,24 @@ class Scaffold extends HookWidget {
           child: _AnimatedOverlay(
             visible: controller.isEitherFabVisible,
             hiddenOffset: const Offset(0, 1),
-            child: Row(
-              spacing: tokens.spaceLayoutGapSm,
-              children: [
-                if (shouldHaveSideBarButton)
-                  Button.icon(
-                    icon: Icons.menu,
-                    onPressed: showFloatingSideBar || showDockedSideBar
-                        ? controller.toggleSideBarVisibility
-                        : null,
-                    color: ButtonColor.baseline,
-                    tokens: tokens,
-                  ),
+            child: SizedBox(
+              height: preferredFloatingActionButtonHeight,
+              child: Row(
+                spacing: tokens.spaceLayoutGapSm,
+                children: [
+                  if (shouldHaveSideBarButton)
+                    Button.icon(
+                      icon: Icons.menu,
+                      onPressed: showFloatingSideBar || showDockedSideBar
+                          ? controller.toggleSideBarVisibility
+                          : null,
+                      color: ButtonColor.baseline,
+                      tokens: tokens,
+                    ),
 
-                ?floatingActionButton,
-              ],
+                  ?floatingActionButton,
+                ],
+              ),
             ),
           ),
         ),

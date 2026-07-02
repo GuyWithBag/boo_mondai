@@ -3,8 +3,7 @@ import 'dart:async' show FutureOr;
 import 'package:boo_mondai/lib.barrel.dart'
     show BackgroundImageSurface, ImageHelper, SurfaceBorder;
 import 'package:file_picker/file_picker.dart' show PlatformFile;
-import 'package:flutter/material.dart'
-    show Axis, BuildContext, CarouselView, Icons, StatelessWidget, Widget;
+import 'package:flutter/material.dart';
 
 typedef EditableCarouselImagePicked =
     FutureOr<void> Function(int index, PlatformFile file);
@@ -33,7 +32,7 @@ class EditableCarousel extends StatelessWidget {
 
     return CarouselView.weighted(
       scrollDirection: Axis.horizontal,
-      flexWeights: const <int>[1],
+      flexWeights: const <int>[10, 1],
       enableSplash: false,
       children: List<Widget>.generate(visibleItemCount, (int index) {
         final imageSource = index < imageSources.length

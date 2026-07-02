@@ -81,7 +81,7 @@ class Modal<T> extends StatelessWidget {
               children: [
                 if (leading != null) ...[
                   IconTheme.merge(
-                    data: IconThemeData(size: tokens.sizeIconLg),
+                    data: IconThemeData(size: tokens.sizeIcon),
                     child: leading!,
                   ),
                   SizedBox(height: tokens.spaceLayoutGapLg),

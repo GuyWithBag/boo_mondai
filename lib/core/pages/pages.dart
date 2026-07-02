@@ -1,3 +1,4 @@
+import 'package:boo_mondai/features/view_deck_downloads/view_deck_downloads.page.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppPage,
@@ -39,6 +40,15 @@ class Pages {
           }
           return const HomePage();
         },
+  );
+
+  static final downloads = AppPage(
+    url: '/downloads',
+    icon: Icons.download,
+    name: 'Home',
+    builder:
+        (context, {pathParameters = const {}, queryParameters = const {}}) =>
+            const ViewDeckDownloadsPage(),
   );
 
   static final decksOnline = AppPage(
@@ -264,5 +274,6 @@ class Pages {
     researchCode,
     researchSurvey,
     researchTest,
+    downloads,
   ];
 }

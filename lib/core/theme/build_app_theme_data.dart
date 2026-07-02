@@ -177,7 +177,7 @@ ThemeData buildAppThemeData(AppTokens tokens, Brightness brightness) {
       ),
       iconTheme: IconThemeData(
         color: tokens.colorTextBaseline,
-        size: tokens.sizeIconMd,
+        size: tokens.sizeIconSm,
       ),
       checkmarkColor: tokens.colorPrimary,
       deleteIconColor: tokens.colorTextMuted,

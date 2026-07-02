@@ -1,27 +1,25 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
-        TextSize,
-        surfaceStyle,
-        textStyle,
-        TextWeight,
-        TextColor,
-        TextFieldSize,
-        TextFieldFrame,
-        TextFieldColor,
         MarkdownText,
         MarkdownTextMode,
-        Button;
+        SectionEyebrow,
+        SurfaceShape,
+        TextFieldFrame,
+        TextFieldSize,
+        surfaceStyle;
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-class TextFieldCard extends StatelessWidget {
+class TextFieldCard extends HookWidget {
   const TextFieldCard({
     required this.title,
     required this.placeholder,
     this.hasAttachments = true,
     this.controller,
     this.onChanged,
+    this.onFocused,
     this.minHeight,
     super.key,
   });
@@ -30,63 +28,53 @@ class TextFieldCard extends StatelessWidget {
   final String placeholder;
   final TextEditingController? controller;
   final ValueChanged<String>? onChanged;
+  final ValueChanged<TextEditingController>? onFocused;
   final double? minHeight;
   final bool hasAttachments;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final resolvedSurfaceStyle = surfaceStyle.resolve(tokens);
+    final focusNode = useFocusNode();
+    final resolvedSurfaceStyle = surfaceStyle.resolve(tokens, const [
+      SurfaceShape.roundedSm,
+    ]);
 
-    return SizedBox(
-      height: minHeight ?? 260,
+    useEffect(() {
+      void listener() {
+        final controller = this.controller;
+        if (focusNode.hasFocus && controller != null) {
+          onFocused?.call(controller);
+        }
+      }
+
+      focusNode.addListener(listener);
+      return () => focusNode.removeListener(listener);
+    }, [focusNode, controller, onFocused]);
+
+    return ConstrainedBox(
+      constraints: BoxConstraints(minHeight: minHeight ?? 260),
       child: Surface(
         style: resolvedSurfaceStyle,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              title.toUpperCase(),
-              style: textStyle.resolve(tokens, [
-                TextSize.labelSmall,
-                TextWeight.heavy,
-                TextColor.muted,
-              ]),
+            SectionEyebrow(title.toUpperCase()),
+            SizedBox(height: tokens.spaceLayoutGapMd),
+            MarkdownText(
+              data: controller?.text ?? '',
+              controller: controller,
+              focusNode: focusNode,
+              onChanged: onChanged,
+              maxLines: null,
+              expands: false,
+              textAlignVertical: TextAlignVertical.top,
+              placeholder: placeholder,
+              mode: MarkdownTextMode.input,
+              variants: const [TextFieldSize.bodyLarge, TextFieldFrame.none],
             ),
-            SizedBox(height: tokens.spaceLayoutGapLg),
-            Expanded(
-              child: MarkdownText(
-                data: controller?.text ?? '',
-                controller: controller,
-                onChanged: onChanged,
-                maxLines: null,
-                expands: true,
-                textAlignVertical: TextAlignVertical.top,
-                placeholder: placeholder,
-                mode: MarkdownTextMode.input,
-                variants: const [TextFieldSize.bodyLarge, TextFieldFrame.none],
-              ),
-            ),
-            Column(
-              children: [
-                Divider(),
-                SizedBox(height: tokens.spaceLayoutGapMd),
-              ],
-            ),
-              if (hasAttachments)
-              Row(
-                children: [
-                  Button(
-                    leading: const Icon(Icons.image_outlined),
-                    onPressed: () {},
-                  ),
-                  SizedBox(width: tokens.spaceLayoutGapSm),
-                  Button(
-                    leading: const Icon(Icons.mic),
-                    onPressed: () {},
-                  ),
-                ],
-              ),
+            Divider(),
           ],
         ),
       ),

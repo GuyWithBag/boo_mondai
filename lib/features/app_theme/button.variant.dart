@@ -3,11 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-enum ButtonSize { sm, md, lg, icon, smallIcon, iconWithLabel, fab, extendedFab }
+enum ButtonSize {
+  sm,
+  md,
+  lg,
+  icon,
+  smallIcon,
+  largeIcon,
+  iconWithLabel,
+  fab,
+  extendedFab,
+}
 
 enum ButtonState { idle, hovered, selected, disabled, pressed }
 
-enum ButtonVariant { flat, elevated, text, dashed }
+enum ButtonVariant { flat, elevated, text, dashed, textShadowed }
 
 enum ButtonColor {
   primary,
@@ -40,7 +50,12 @@ Set<StylePart<SurfaceStyle>> _buttonPalette({
       DecorationPart.boxShadowParts({BoxShadowPart.color(shadow)}),
     }),
     SurfaceStylePart.text({TextStylePart.color(foreground)}),
-    SurfaceStylePart.icon({IconThemePart.color(foreground)}),
+    SurfaceStylePart.icon({
+      IconThemePart.color(foreground),
+      IconThemePart.shadowParts({
+        ShadowPart.color(foreground.withValues(alpha: 0.35)),
+      }),
+    }),
   };
 }
 
@@ -159,37 +174,43 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
     ),
     ButtonSize.sm: (tokens) => {
       SurfaceStylePart.text({TextStylePart.fontSize(tokens.textSizeLabel.sp)}),
-      SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconMd.sp)}),
+      SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconSm.sp)}),
     },
     ButtonSize.md: (tokens) => {
       SurfaceStylePart.text({TextStylePart.fontSize(tokens.textSizeLabel.sp)}),
-      SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconMd.sp)}),
+      SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconSm.sp)}),
     },
     ButtonSize.lg: (tokens) => {
       SurfaceStylePart.text({TextStylePart.fontSize(tokens.textSizeLabel.sp)}),
-      SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconLg.sp)}),
+      SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIcon.sp)}),
     },
     ButtonSize.icon: (tokens) => {
-      SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconLg.sp)}),
+      SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIcon.sp)}),
       SurfaceStylePart.text({TextStylePart.fontSize(tokens.textSizeLabel.sp)}),
       SurfaceStylePart.height(48.h),
       SurfaceStylePart.width(48.w),
     },
     ButtonSize.smallIcon: (tokens) => {
-      SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconMd.sp)}),
+      SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconSm.sp)}),
       SurfaceStylePart.text({TextStylePart.fontSize(tokens.textSizeLabel.sp)}),
-      SurfaceStylePart.height(tokens.sizeIconMd.h),
-      SurfaceStylePart.width(tokens.sizeIconMd.w),
+      SurfaceStylePart.height(tokens.sizeIconSm.h),
+      SurfaceStylePart.width(tokens.sizeIconSm.w),
+    },
+    ButtonSize.largeIcon: (tokens) => {
+      SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconLg.sp)}),
+      SurfaceStylePart.text({TextStylePart.fontSize(tokens.textSizeLabel.sp)}),
+      SurfaceStylePart.height(tokens.sizeIconLg.h),
+      SurfaceStylePart.width(tokens.sizeIconLg.w),
     },
     ButtonSize.iconWithLabel: (tokens) => {
       SurfaceStylePart.constraints(const BoxConstraints(minWidth: 48)),
-      SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconLg.sp)}),
+      SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIcon.sp)}),
       SurfaceStylePart.text({
         TextStylePart.fontSize(tokens.textSizeLabelSmall.sp),
       }),
     },
     ButtonSize.fab: (tokens) => {
-      SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconLg.sp)}),
+      SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIcon.sp)}),
       SurfaceStylePart.height(64.h),
       SurfaceStylePart.width(64.w),
     },
@@ -198,7 +219,7 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
         TextStylePart.fontSize(tokens.textSizeLabel.sp),
         TextStylePart.fontWeight(tokens.fontWeightTextHeavy),
       }),
-      SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconMd.sp)}),
+      SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconSm.sp)}),
       SurfaceStylePart.height(64.h),
     },
     ButtonPadding.none: (_) => {SurfaceStylePart.padding(EdgeInsets.zero)},
@@ -293,7 +314,29 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
         }),
       }),
     },
+    ButtonVariant.textShadowed: (tokens) => {
+      SurfaceStylePart.decoration({
+        DecorationPart.boxShadowParts({
+          BoxShadowPart.offset(Offset.zero),
+          BoxShadowPart.blurRadius(0),
+        }),
+        DecorationPart.borderParts({
+          BorderPart.width(0),
+          BorderPart.style(BorderStyle.none),
+        }),
+      }),
+      SurfaceStylePart.icon({
+        IconThemePart.shadowParts({
+          // ShadowPart.color(foreground.withValues(alpha: 0.35)),
+          ShadowPart.offset(
+            Offset(0, 1),
+          ), // not const if constructor isn't const
+          ShadowPart.blurRadius(0),
+        }),
+      }),
+    },
   },
+
   compoundVariants: [
     CompoundVariantParts<AppTokens, SurfaceStyle>(
       when: const {ButtonVariant.text, ButtonState.selected},

@@ -15,6 +15,7 @@ ScaffoldController useScaffoldController({
   bool isEitherAppBarVisible = true,
   bool isSideBarVisible = false,
   bool isEitherFabVisible = true,
+  bool isUserInputFocusing = false,
 }) {
   final controller = useMemoized(
     () => ScaffoldController(
@@ -26,6 +27,7 @@ ScaffoldController useScaffoldController({
       isEitherAppBarVisible: isEitherAppBarVisible,
       isSideBarVisible: isSideBarVisible,
       isEitherFabVisible: isEitherFabVisible,
+      isUserInputFocusing: isUserInputFocusing,
     ),
   );
   controller.updateConfig(
@@ -50,6 +52,7 @@ class ScaffoldController extends Controller {
     bool isEitherAppBarVisible = true,
     bool isSideBarVisible = false,
     bool isEitherFabVisible = true,
+    bool isUserInputFocusing = false,
   }) : _hideNavigation = hideNavigation,
        _showBottomNavBar = showBottomNavBar,
        _showAppBar = showAppBar,
@@ -57,7 +60,8 @@ class ScaffoldController extends Controller {
        _isBottomNavBarVisible = isBottomNavBarVisible,
        _isEitherAppBarVisible = isEitherAppBarVisible,
        _isSideBarVisible = isSideBarVisible,
-       _isEitherFabVisible = isEitherFabVisible;
+       _isEitherFabVisible = isEitherFabVisible,
+       _isUserInputFocusing = isUserInputFocusing;
 
   bool _hideNavigation;
   bool _showBottomNavBar;
@@ -67,6 +71,7 @@ class ScaffoldController extends Controller {
   bool _isEitherAppBarVisible;
   bool _isSideBarVisible;
   bool _isEitherFabVisible;
+  bool _isUserInputFocusing;
 
   bool get hideNavigation => _hideNavigation;
   bool get showBottomNavBar => _showBottomNavBar;
@@ -76,6 +81,7 @@ class ScaffoldController extends Controller {
   bool get isEitherAppBarVisible => _isEitherAppBarVisible;
   bool get isSideBarVisible => _isSideBarVisible;
   bool get isEitherFabVisible => _isEitherFabVisible;
+  bool get isUserInputFocusing => _isUserInputFocusing;
 
   void updateConfig({
     required bool hideNavigation,
@@ -110,6 +116,12 @@ class ScaffoldController extends Controller {
   set isEitherFabVisible(bool value) {
     if (_isEitherFabVisible == value) return;
     _isEitherFabVisible = value;
+    notifyListeners();
+  }
+
+  set isUserInputFocusing(bool value) {
+    if (_isUserInputFocusing == value) return;
+    _isUserInputFocusing = value;
     notifyListeners();
   }
 

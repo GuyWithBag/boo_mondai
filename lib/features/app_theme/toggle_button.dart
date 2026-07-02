@@ -1,7 +1,6 @@
 import 'package:boo_mondai/features/app_theme/button.dart';
 import 'package:boo_mondai/features/app_theme/button.variant.dart';
-import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, buttonStyle;
+import 'package:boo_mondai/lib.barrel.dart' show AppTokens, buttonStyle;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 

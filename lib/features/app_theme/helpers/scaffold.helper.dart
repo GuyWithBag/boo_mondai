@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:boo_mondai/lib.barrel.dart'
     show Breakpoints, PlatformService, AppTokens, MainController;
 import 'package:flutter/material.dart';
@@ -11,9 +13,11 @@ class ScaffoldHelper {
     required this.sidebar,
     required this.sidebarWidth,
     required this.bottomNavBar,
+    required this.toolBar,
     required this.padding,
     required this.hideNavigation,
     required this.floatingActionButton,
+    required this.preferredFloatingActionButtonHeight,
     required this.showBottomNavBar,
     required this.showAppBar,
     required this.isFloatingSideBar,
@@ -21,6 +25,7 @@ class ScaffoldHelper {
     required this.haveSideBarOpenButton,
     required this.haveBottomNavBarBottomGap,
     required this.inheritMainBottomNavBarHeight,
+    required this.isUserInputFocusing,
   });
 
   final AppTokens tokens;
@@ -30,9 +35,11 @@ class ScaffoldHelper {
   final Widget? sidebar;
   final double sidebarWidth;
   final PreferredSizeWidget? bottomNavBar;
+  final PreferredSizeWidget? toolBar;
   final EdgeInsetsGeometry? padding;
   final bool hideNavigation;
   final Widget? floatingActionButton;
+  final double preferredFloatingActionButtonHeight;
   final bool showBottomNavBar;
   final bool showAppBar;
   final bool isFloatingSideBar;
@@ -40,6 +47,7 @@ class ScaffoldHelper {
   final bool haveSideBarOpenButton;
   final bool haveBottomNavBarBottomGap;
   final bool inheritMainBottomNavBarHeight;
+  final bool isUserInputFocusing;
 
   bool get shouldHaveAppBar =>
       appBar != null && showAppBar && !isFloatingAppBar;
@@ -55,11 +63,17 @@ class ScaffoldHelper {
     return !hideNavigation &&
         isMobile &&
         bottomNavBar != null &&
-        showBottomNavBar;
+        showBottomNavBar &&
+        !shouldHaveToolBar;
   }
 
+  bool get shouldHaveToolBar => toolBar != null && isUserInputFocusing;
+
   bool get shouldBodyHaveBottomScaffoldSafeArea =>
-      (shouldHaveBottomNavBar || inheritMainBottomNavBarHeight) &&
+      (shouldHaveToolBar ||
+          shouldHaveBottomNavBar ||
+          shouldHaveEitherFab ||
+          inheritMainBottomNavBarHeight) &&
       haveBottomNavBarBottomGap;
 
   double get trueBottomNavBarHeight {
@@ -72,6 +86,20 @@ class ScaffoldHelper {
     return 0;
   }
 
+  double get trueToolBarHeight {
+    if (shouldHaveToolBar) {
+      return toolBar!.preferredSize.height + mediaQuery.viewPadding.bottom;
+    }
+    return 0;
+  }
+
+  double get trueBottomOverlayHeight {
+    if (shouldHaveToolBar) {
+      return trueToolBarHeight;
+    }
+    return trueBottomNavBarHeight;
+  }
+
   double get trueAppBarHeight {
     if (shouldHaveEitherAppBar) {
       return appBar!.preferredSize.height + mediaQuery.viewPadding.top;
@@ -79,21 +107,37 @@ class ScaffoldHelper {
     return 0;
   }
 
-  bool get shouldHaveSideBarButton => haveSideBarOpenButton;
+  bool get shouldHaveSideBarButton =>
+      haveSideBarOpenButton && !shouldHaveToolBar;
 
   EdgeInsets get scaffoldPadding {
     return PlatformService.getScaffoldPadding(tokens);
   }
 
-  bool get shouldHaveFab => floatingActionButton != null;
+  bool get shouldHaveFab => floatingActionButton != null && !shouldHaveToolBar;
 
   bool get shouldHaveEitherFab => shouldHaveSideBarButton || shouldHaveFab;
 
   double get fabBottomPadding {
     return tokens.spaceLayoutGapMd +
-        (trueBottomNavBarHeight == 0
+        (trueBottomOverlayHeight == 0
             ? mediaQuery.viewPadding.bottom
-            : trueBottomNavBarHeight);
+            : trueBottomOverlayHeight);
+  }
+
+  double get trueFloatingActionButtonHeight {
+    if (shouldHaveEitherFab) {
+      return preferredFloatingActionButtonHeight;
+    }
+    return 0;
+  }
+
+  double get bottomScaffoldSafeAreaHeight {
+    final floatingActionButtonBottomHeight = shouldHaveEitherFab
+        ? fabBottomPadding + trueFloatingActionButtonHeight
+        : 0.0;
+
+    return math.max(trueBottomOverlayHeight, floatingActionButtonBottomHeight);
   }
 
   bool get shouldHaveDockedSideBar {

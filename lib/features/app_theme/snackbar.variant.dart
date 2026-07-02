@@ -51,7 +51,7 @@ final appSnackbarStyle = VariantStyle.surfaceParts<AppTokens>(
       }),
       ContentStylePart.icon({
         IconThemePart.color(tokens.colorTextBaseline),
-        IconThemePart.size(tokens.sizeIconMd.sp),
+        IconThemePart.size(tokens.sizeIconSm.sp),
       }),
     }),
   },
