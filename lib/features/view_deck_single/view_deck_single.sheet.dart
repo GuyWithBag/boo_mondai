@@ -155,22 +155,13 @@ class _Body extends StatelessWidget {
 
     final deckWidth = 160.w;
     final headerHeight = 300.h;
+    final deckHeight = deckWidth / tokens.studyCardAspectRatio;
+    final deckFloatInset =
+        deckHeight - (tokens.radiusSurfaceLg - tokens.spaceLayoutPadding);
 
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        SingleChildScrollView(
-          child: Column(
-            children: [
-              SizedBox(height: headerHeight),
-              _BodySubSection(
-                sheet: sheet,
-                deckWidth: deckWidth,
-                collapseDistance: headerHeight * 0.55,
-              ),
-            ],
-          ),
-        ),
         Positioned(
           left: 0,
           right: 0,
@@ -180,8 +171,19 @@ class _Body extends StatelessWidget {
             image: ImageHelper.getImageProviderFromSource(
               LocalImageResolverHelper.resolveDeckCover(deck),
             ),
-            isEditable: deck.isEditable,
-            onImagePicked: deck.isEditable ? sheet.updateCoverImage : null,
+          ),
+        ),
+        SingleChildScrollView(
+          child: Column(
+            children: [
+              SizedBox(height: headerHeight - deckFloatInset),
+              _BodySubSection(
+                sheet: sheet,
+                deckWidth: deckWidth,
+                collapseDistance: headerHeight * 0.55,
+                floatingHitInset: deckFloatInset,
+              ),
+            ],
           ),
         ),
       ],
@@ -194,11 +196,13 @@ class _BodySubSection extends StatelessWidget {
     required this.sheet,
     required this.deckWidth,
     required this.collapseDistance,
+    required this.floatingHitInset,
   });
 
   final ViewDeckSingleSheetController sheet;
   final double deckWidth;
   final double collapseDistance;
+  final double floatingHitInset;
 
   @override
   Widget build(BuildContext context) {
@@ -211,69 +215,73 @@ class _BodySubSection extends StatelessWidget {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          Surface(
-            style: surfaceStyle.resolve(tokens, const [
-              SurfaceShape.topRounded,
-              SurfaceColor.muted,
-              SurfaceBorder.top,
-              SurfaceShadow.none,
-              SurfacePadding.scaffold,
-            ]),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    DeckProfilesLabel(
-                      profileName: ViewDeckSingleHelper.profileName(deck),
-                      profileAvatarUrl: ViewDeckSingleHelper.profileAvatarUrl(
-                        deck,
-                      ),
-                      sourceProfileName: ViewDeckSingleHelper.sourceProfileName(
-                        deck,
-                      ),
-                      sourceProfileAvatarUrl:
-                          ViewDeckSingleHelper.sourceProfileAvatarUrl(deck),
-                    ),
-                  ],
-                ),
-                DeckDetails(
-                  title: ViewDeckSingleHelper.title(deck),
-                  shortDescription: ViewDeckSingleHelper.shortDescription(deck),
-                  longDescription: ViewDeckSingleHelper.longDescription(deck),
-                  onTitleChanged: sheet.updateTitle,
-                  onShortDescriptionChanged: sheet.updateShortDescription,
-                  onLongDescriptionChanged: sheet.updateLongDescription,
-                  tags: tags,
-                  onTagsChanged: sheet.updateTags,
-                  areTagsEditable: deck.isEditable,
-                  isEditable: deck.isEditable,
-                  tagsPlaceholder: deck.isEditable ? 'Add tags' : 'No tags yet',
-                  tagsTone: ChipTone.ghost,
-                  metaLabels: Wrap(
-                    spacing: tokens.spaceLayoutGapMd,
-                    runSpacing: tokens.spaceLayoutGapSm,
+          Padding(
+            padding: EdgeInsets.only(top: floatingHitInset),
+            child: Surface(
+              style: surfaceStyle.resolve(tokens, const [
+                SurfaceShape.topRounded,
+                SurfaceColor.muted,
+                SurfaceBorder.top,
+                SurfaceShadow.none,
+                SurfacePadding.scaffold,
+              ]),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      MetaLabel(
-                        icon: Icons.visibility_outlined,
-                        label: ViewDeckSingleHelper.visibilityLabel(deck),
-                      ),
-                      MetaLabel(
-                        icon: Icons.style_outlined,
-                        label: '${deck.cardCount} cards',
+                      DeckProfilesLabel(
+                        profileName: ViewDeckSingleHelper.profileName(deck),
+                        profileAvatarUrl: ViewDeckSingleHelper.profileAvatarUrl(
+                          deck,
+                        ),
+                        sourceProfileName:
+                            ViewDeckSingleHelper.sourceProfileName(deck),
+                        sourceProfileAvatarUrl:
+                            ViewDeckSingleHelper.sourceProfileAvatarUrl(deck),
                       ),
                     ],
                   ),
-                ),
-              ],
+                  DeckDetails(
+                    title: ViewDeckSingleHelper.title(deck),
+                    shortDescription: ViewDeckSingleHelper.shortDescription(
+                      deck,
+                    ),
+                    longDescription: ViewDeckSingleHelper.longDescription(deck),
+                    onTitleChanged: sheet.updateTitle,
+                    onShortDescriptionChanged: sheet.updateShortDescription,
+                    onLongDescriptionChanged: sheet.updateLongDescription,
+                    tags: tags,
+                    onTagsChanged: sheet.updateTags,
+                    areTagsEditable: deck.isEditable,
+                    isEditable: deck.isEditable,
+                    tagsPlaceholder: deck.isEditable
+                        ? 'Add tags'
+                        : 'No tags yet',
+                    tagsTone: ChipTone.ghost,
+                    metaLabels: Wrap(
+                      spacing: tokens.spaceLayoutGapMd,
+                      runSpacing: tokens.spaceLayoutGapSm,
+                      children: [
+                        MetaLabel(
+                          icon: Icons.visibility_outlined,
+                          label: ViewDeckSingleHelper.visibilityLabel(deck),
+                        ),
+                        MetaLabel(
+                          icon: Icons.style_outlined,
+                          label: '${deck.cardCount} cards',
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           Positioned(
             left: tokens.spaceLayoutPadding,
-            top:
-                -(deckWidth / tokens.studyCardAspectRatio) +
-                (tokens.radiusSurfaceLg - tokens.spaceLayoutPadding),
+            top: 0,
             child: DeckTile(
               deck: deck,
               width: deckWidth,
@@ -284,7 +292,10 @@ class _BodySubSection extends StatelessWidget {
           ),
           Positioned(
             right: tokens.spaceLayoutPadding,
-            top: -tokens.radiusSurfaceLg - tokens.spaceLayoutPadding,
+            top:
+                floatingHitInset -
+                tokens.radiusSurfaceLg -
+                tokens.spaceLayoutPadding,
             child: Column(
               spacing: tokens.spaceLayoutGapSm,
               crossAxisAlignment: CrossAxisAlignment.end,

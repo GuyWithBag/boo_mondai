@@ -5,7 +5,6 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/core/widgets/background_image_surface.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         BackgroundImagePicked,
@@ -17,6 +16,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         useCubeController,
         PhysicalCardController,
         PhysicalCard,
+        BackgroundImageSurface,
         PhysicalDeck;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';

@@ -185,13 +185,13 @@ class _Body extends StatelessWidget {
     final deck = controller.deck;
     final helper = controller.helper;
     final tokens = context.themeTokens<AppTokens>();
-    final headerHeight = 350.h.clamp(300.0, 390.0).toDouble();
+    final headerHeight = 370.h;
     final tags = deck.tags.map((tag) => tag.name).toList(growable: false);
     final carouselImageUrls = helper.carouselImageUrls(deck);
     final isEditing = controller.state == DeckListingSheetState.editor;
 
     return Column(
-      spacing: tokens.spaceLayoutGapMd,
+      spacing: tokens.spaceLayoutGapXsm,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
@@ -199,16 +199,18 @@ class _Body extends StatelessWidget {
           child: Padding(
             padding: EdgeInsets.only(
               top: appBarHeight,
-              left: tokens.spaceScaffoldPadding,
-              right: tokens.spaceScaffoldPadding,
+              left: tokens.spaceScaffoldPaddingXsm,
+              right: tokens.spaceScaffoldPaddingXsm,
             ),
-            child: AspectRatio(
-              aspectRatio: tokens.deckListingFeaturedImagesAspectRatio,
-              child: EditableCarousel(
-                imageSources: carouselImageUrls,
-                maxImageCount: 5,
-                isEditable: isEditing,
-                onImagePicked: controller.updateListingFeaturedImage,
+            child: Center(
+              child: AspectRatio(
+                aspectRatio: tokens.deckListingFeaturedImagesAspectRatio,
+                child: EditableCarousel(
+                  imageSources: carouselImageUrls,
+                  maxImageCount: 5,
+                  isEditable: isEditing,
+                  onImagePicked: controller.updateListingFeaturedImage,
+                ),
               ),
             ),
           ),

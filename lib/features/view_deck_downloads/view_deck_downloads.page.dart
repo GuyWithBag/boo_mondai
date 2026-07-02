@@ -8,8 +8,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         DownloadsTile,
         EmptyState,
         ViewDeckDownloadsAppBar,
+        Scaffold,
         ViewDeckDownloadsController;
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Scaffold;
 import 'package:provider/provider.dart';
 
 class ViewDeckDownloadsPage extends StatelessWidget {

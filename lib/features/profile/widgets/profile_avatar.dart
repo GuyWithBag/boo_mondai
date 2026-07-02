@@ -45,7 +45,7 @@ class ProfileAvatar extends StatelessWidget {
             missingImageIcon: null,
             shape: SurfaceShape.circle,
             editButtonPosition: BackgroundImageEditButtonPosition.bottomRight,
-            editButtonInset: -radius * 0.08,
+            // editButtonInset: -radius * 0.08,
             child: !hasImage
                 ? Center(
                     child: Text(

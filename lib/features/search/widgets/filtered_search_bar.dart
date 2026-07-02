@@ -282,7 +282,7 @@ class FilteredSearchBar<TObject, TFilter extends SearchFilter>
     return CompositedTransformTarget(
       link: layerLink,
       child: Row(
-        spacing: tokens.spaceLayoutGapMd,
+        spacing: tokens.spaceLayoutGapSm,
         children: [
           Expanded(
             child: TextField(

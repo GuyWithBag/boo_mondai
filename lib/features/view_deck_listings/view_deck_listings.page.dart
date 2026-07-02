@@ -6,24 +6,27 @@
 
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        ViewDeckListingsController,
+        AppBar,
+        AppTokens,
+        Button,
         Deck,
+        DeckListingTile,
         DeckSearchFilter,
         DeckSearchFilterCodec,
         DeckSearchResults,
+        EmptyState,
         FilteredSearchBar,
         ListingStatesWrapper,
-        EmptyState,
-        DeckListingTile,
+        Pages,
+        Scaffold,
+        ViewDeckListingsController,
         VisibilityState,
         showViewDeckListingSingleSheet,
-        useFilteredSearchBarController,
-        AppBar,
-        Scaffold,
-        AppTokens;
+        useFilteredSearchBarController;
 import 'package:flutter/material.dart'
     show BuildContext, Widget, StatelessWidget, Icons, Center;
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -65,7 +68,17 @@ class _ViewDeckListingsView extends HookWidget {
     );
 
     return Scaffold(
-      appBar: AppBar(title: 'Browse Decks', header: searchBar),
+      appBar: AppBar(
+        title: 'Browse Decks',
+        header: searchBar,
+        actions: [
+          Button.icon(
+            tokens: tokens,
+            icon: Pages.downloads.icon,
+            onPressed: () => context.push(Pages.downloads.url),
+          ),
+        ],
+      ),
       scrollable: true,
       body: ListingStatesWrapper<Deck>.list(
         isLoading: controller.isLoading,
