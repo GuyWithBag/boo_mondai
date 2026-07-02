@@ -19,9 +19,14 @@ import 'package:theme_variants/theme_variants.dart'
     show ThemeVariantsContext, Surface;
 
 class FlashcardEditor extends HookWidget {
-  const FlashcardEditor({required this.formState, super.key});
+  const FlashcardEditor({
+    required this.formState,
+    this.onMarkdownFieldFocused,
+    super.key,
+  });
 
   final CardTemplateFormState formState;
+  final ValueChanged<TextEditingController>? onMarkdownFieldFocused;
 
   @override
   Widget build(BuildContext context) {
@@ -41,20 +46,20 @@ class FlashcardEditor extends HookWidget {
           style: surfaceStyle.resolve(tokens, const [SurfaceColor.baseline]),
           child: Column(
             spacing: tokens.spaceLayoutGapMd,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Column(
+                spacing: tokens.spaceLayoutGapMd,
+
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'Card Type',
-                    style: textStyle
-                        .resolve(tokens, [
-                          TextSize.labelLarge,
-                          TextWeight.heavy,
-                        ])
-                        .copyWith(fontSize: 18),
+                    style: textStyle.resolve(tokens, [
+                      TextSize.labelLarge,
+                      TextWeight.heavy,
+                    ]),
                   ),
-                  const SizedBox(height: 6),
                   Text(
                     editor.directionHint,
                     style: textStyle.resolve(tokens, [
@@ -78,11 +83,13 @@ class FlashcardEditor extends HookWidget {
           title: 'Front (Prompt)',
           placeholder: 'Type a word...',
           controller: editor.frontController,
+          onFocused: onMarkdownFieldFocused,
         ),
         TextFieldCard(
           title: 'Back (Answer)',
           placeholder: 'Type the translation...',
           controller: editor.backController,
+          onFocused: onMarkdownFieldFocused,
         ),
       ],
     );

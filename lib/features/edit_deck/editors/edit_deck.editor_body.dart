@@ -13,9 +13,14 @@ import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 class EditDeckEditorBody extends StatelessWidget {
-  const EditDeckEditorBody({required this.editor, super.key});
+  const EditDeckEditorBody({
+    required this.editor,
+    this.onMarkdownFieldFocused,
+    super.key,
+  });
 
   final EditDeckController editor;
+  final ValueChanged<TextEditingController>? onMarkdownFieldFocused;
 
   @override
   Widget build(BuildContext context) {
@@ -30,9 +35,11 @@ class EditDeckEditorBody extends StatelessWidget {
           switch (editor.questionType) {
             QuestionType.flashcard => FlashcardEditor(
               formState: editor.formState,
+              onMarkdownFieldFocused: onMarkdownFieldFocused,
             ),
             QuestionType.multipleChoice => MultipleChoiceEditor(
               formState: editor.formState,
+              onMarkdownFieldFocused: onMarkdownFieldFocused,
             ),
             QuestionType.fillInTheBlanks => FillInTheBlanksEditor(
               formState: editor.formState,
@@ -40,7 +47,10 @@ class EditDeckEditorBody extends StatelessWidget {
             QuestionType.matchMadness => MatchingTypeEditor(
               formState: editor.formState,
             ),
-            _ => FlashcardEditor(formState: editor.formState),
+            _ => FlashcardEditor(
+              formState: editor.formState,
+              onMarkdownFieldFocused: onMarkdownFieldFocused,
+            ),
           },
           if (editor.error != null) ...[
             const SizedBox(height: 16),

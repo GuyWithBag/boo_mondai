@@ -6,4 +6,3 @@ export 'use_flashcard_editor.dart';
 export 'use_multiple_choice_editor.dart';
 export 'use_matching_type_editor.dart';
 export 'fill_in_the_blanks.editor.controller.dart';
-export 'edit_deck.hook.dart';

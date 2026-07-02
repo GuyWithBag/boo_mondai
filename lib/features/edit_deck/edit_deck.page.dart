@@ -4,16 +4,18 @@
 
 import 'package:boo_mondai/lib.barrel.dart'
     show
+        AppTokens,
+        Button,
         EditDeckAppBar,
         EditDeckBottomNavBar,
         EditDeckEditorBody,
         EditDeckSideBar,
         Scaffold,
-        useScaffoldController,
+        ToolBar,
         showSnackbar,
         useEditDeckController,
-        Button,
-        AppTokens;
+        useScaffoldController,
+        useToolBarController;
 import 'package:flutter/material.dart' hide Scaffold;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -35,21 +37,8 @@ class EditDeckPage extends HookWidget {
       initialTemplateId: initialTemplateId,
     );
     final formKey = useMemoized(GlobalKey<FormState>.new);
-    final titleController = useTextEditingController();
     final scaffoldController = useScaffoldController(isFloatingSideBar: true);
-
-    useEffect(() {
-      final deckTitle = controller.deck?.title;
-      if (deckTitle != null && titleController.text.isEmpty) {
-        titleController.text = deckTitle;
-      }
-      return null;
-    }, [controller.deck?.id, controller.deck?.title]);
-
-    useEffect(() {
-      controller.ensureVisibleQuestionType();
-      return null;
-    }, [controller.questionType]);
+    final toolBarController = useToolBarController();
 
     bool validate() => formKey.currentState?.validate() ?? true;
 
@@ -63,16 +52,36 @@ class EditDeckPage extends HookWidget {
       controller.selectTemplate(templateId);
     }
 
+    Future<void> addImageAttachment() async {
+      final markdown = await controller
+          .pickAndAddImageAttachmentMarkdownToActiveTemplate();
+      if (markdown == null) return;
+
+      toolBarController.insertMarkdown(markdown);
+    }
+
     final tokens = context.themeTokens<AppTokens>();
+    final canUseMarkdownActions = toolBarController.hasActiveTextController;
+
+    Button markdownAction({
+      required IconData icon,
+      required VoidCallback onPressed,
+    }) {
+      return Button.icon(
+        icon: icon,
+        onPressed: canUseMarkdownActions ? onPressed : null,
+        tokens: tokens,
+      );
+    }
 
     return Scaffold(
       controller: scaffoldController,
       appBar: EditDeckAppBar(
-        titleController: titleController,
+        titleController: controller.titleController,
         onSave: () async {
           if (!validate()) return;
 
-          await controller.saveDeck(title: titleController.text);
+          await controller.saveDeck(title: controller.titleController.text);
           if (!context.mounted) return;
           showSnackbar(context, message: 'Deck Saved');
         },
@@ -96,11 +105,84 @@ class EditDeckPage extends HookWidget {
       haveSideBarOpenButton: true,
       // hideAppBarOnScroll: true,
       // hideFloatingActionButtonOnScroll: true,
-      resizeToAvoidBottomInset: false,
+      // resizeToAvoidBottomInset: false,
+      resizeBodyForKeyboard: true,
       inheritMainBottomNavBarHeight: false,
+      toolBar: ToolBar(
+        actions: [
+          Button.icon(
+            icon: Icons.image_outlined,
+            onPressed: canUseMarkdownActions ? addImageAttachment : null,
+            tokens: tokens,
+          ),
+          markdownAction(
+            icon: Icons.title,
+            onPressed: () => toolBarController.insertHeading(1),
+          ),
+          markdownAction(
+            icon: Icons.format_size,
+            onPressed: () => toolBarController.insertHeading(2),
+          ),
+          markdownAction(
+            icon: Icons.format_bold,
+            onPressed: toolBarController.toggleBold,
+          ),
+          markdownAction(
+            icon: Icons.format_italic,
+            onPressed: toolBarController.toggleItalic,
+          ),
+          markdownAction(
+            icon: Icons.format_strikethrough,
+            onPressed: toolBarController.toggleStrikethrough,
+          ),
+          markdownAction(
+            icon: Icons.code,
+            onPressed: toolBarController.toggleInlineCode,
+          ),
+          markdownAction(
+            icon: Icons.data_object,
+            onPressed: toolBarController.insertCodeBlock,
+          ),
+          markdownAction(
+            icon: Icons.format_quote,
+            onPressed: toolBarController.insertBlockQuote,
+          ),
+          markdownAction(
+            icon: Icons.format_list_bulleted,
+            onPressed: toolBarController.insertUnorderedList,
+          ),
+          markdownAction(
+            icon: Icons.format_list_numbered,
+            onPressed: toolBarController.insertOrderedList,
+          ),
+          markdownAction(
+            icon: Icons.check_box_outlined,
+            onPressed: toolBarController.insertTaskList,
+          ),
+          markdownAction(
+            icon: Icons.link,
+            onPressed: toolBarController.insertLink,
+          ),
+          markdownAction(
+            icon: Icons.add_photo_alternate_outlined,
+            onPressed: toolBarController.insertImage,
+          ),
+          markdownAction(
+            icon: Icons.horizontal_rule,
+            onPressed: toolBarController.insertHorizontalRule,
+          ),
+          markdownAction(
+            icon: Icons.table_chart_outlined,
+            onPressed: toolBarController.insertTable,
+          ),
+        ],
+      ),
       body: Form(
         key: formKey,
-        child: EditDeckEditorBody(editor: controller),
+        child: EditDeckEditorBody(
+          editor: controller,
+          onMarkdownFieldFocused: toolBarController.setActiveTextController,
+        ),
       ),
     );
   }

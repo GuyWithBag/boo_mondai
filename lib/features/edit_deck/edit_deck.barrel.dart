@@ -7,5 +7,7 @@ export 'widgets/widgets.barrel.dart';
 export 'helpers/helpers.barrel.dart';
 export 'editors/editors.barrel.dart';
 // Other files
+export 'draft_form.service.dart';
 export 'edit_deck.controller.dart';
 export 'edit_deck.page.dart';
+export 'edit_deck.service.dart';

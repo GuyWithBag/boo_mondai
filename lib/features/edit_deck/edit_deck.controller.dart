@@ -6,29 +6,40 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         Controller,
+        CardAttachment,
+        CardAttachmentService,
         CardTemplate,
         Deck,
         CardTemplateFormState,
-        FlashcardTemplate,
-        IdentificationTemplate,
-        MultipleChoiceTemplate,
-        FillInTheBlanksTemplate,
-        WordScrambleTemplate,
-        MatchMadnessTemplate,
-        MultipleChoiceOption,
-        FillInTheBlankSegment,
-        MatchMadnessPair,
         LocalDB,
-        uuid,
-        CardType,
         QuestionType,
         EditDeckQuestionTypeHelper,
-        StudyCardService,
-        MultipleChoiceOptionData,
-        defaultMultipleChoiceOptions,
-        MatchPairData,
-        defaultMatchPairs,
-        TextHelper;
+        CardTemplateDraftFormAdapter,
+        DraftFormSession,
+        EditDeckService;
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart' show TextEditingController;
+
+import 'package:flutter_hooks/flutter_hooks.dart'
+    show useEffect, useListenable, useMemoized;
+
+EditDeckController useEditDeckController({
+  required String deckId,
+  String? initialTemplateId,
+}) {
+  final controller = useMemoized(
+    () => EditDeckController(
+      deckId: deckId,
+      initialTemplateId: initialTemplateId,
+    ),
+    [deckId, initialTemplateId],
+  );
+
+  useListenable(controller);
+  useEffect(() => controller.dispose, [controller]);
+
+  return controller;
+}
 
 class EditDeckController extends Controller {
   EditDeckController({required String deckId, String? initialTemplateId}) {
@@ -37,21 +48,29 @@ class EditDeckController extends Controller {
   }
 
   Deck? _deck;
-  List<CardTemplate> _templates = []; // Replaced _cards
   bool _isDirty = false;
   String? _pendingInitialTemplateId;
 
   // Editor State
-  String? _activeTemplateId; // Replaced _activeCardId
+  final TextEditingController titleController = TextEditingController();
   final CardTemplateFormState formState = CardTemplateFormState.empty();
+  late final CardTemplateDraftFormAdapter _draftAdapter =
+      CardTemplateDraftFormAdapter(formState: formState);
+  late final DraftFormSession<CardTemplate> _draftSession = DraftFormSession(
+    adapter: _draftAdapter,
+  );
 
   // ── Getters ───────────────────────────────────────
 
   Deck? get deck => _deck;
-  List<CardTemplate> get templates => List.unmodifiable(_templates);
+  List<CardTemplate> get templateDrafts => _draftSession.drafts;
+  List<CardTemplate> get templates => templateDrafts;
   bool get isDirty => _isDirty;
-  String? get activeTemplateId => _activeTemplateId;
-  bool get hasActiveTemplate => _activeTemplateId != null;
+  String? get activeTemplateId => _draftSession.activeDraftId;
+  CardTemplate? get activeTemplate => _draftSession.activeDraft;
+  List<CardAttachment> get activeTemplateAttachments =>
+      activeTemplate?.attachments ?? const [];
+  bool get hasActiveTemplate => activeTemplateId != null;
   QuestionType get questionType => formState.questionType.value;
   int get selectedFormatIndex =>
       EditDeckQuestionTypeHelper.selectedFormatIndex(questionType);
@@ -61,10 +80,12 @@ class EditDeckController extends Controller {
   }
 
   void setQuestionType(QuestionType value) {
-    formState.questionType.value = value;
+    formState.questionType.value = EditDeckQuestionTypeHelper.isVisible(value)
+        ? value
+        : QuestionType.flashcard;
     formState.cardType.value =
         EditDeckQuestionTypeHelper.cardTypeForQuestionType(
-          value,
+          formState.questionType.value,
           formState.cardType.value,
         );
     notifyListeners();
@@ -73,8 +94,7 @@ class EditDeckController extends Controller {
   void ensureVisibleQuestionType() {
     if (EditDeckQuestionTypeHelper.isVisible(questionType)) return;
 
-    formState.questionType.value = QuestionType.flashcard;
-    formState.cardType.value = CardType.normal;
+    _draftAdapter.ensureVisibleQuestionType();
     notifyListeners();
   }
 
@@ -89,6 +109,7 @@ class EditDeckController extends Controller {
 
   @override
   void dispose() {
+    titleController.dispose();
     formState.dispose();
     super.dispose();
   }
@@ -98,13 +119,15 @@ class EditDeckController extends Controller {
 
     try {
       _deck = LocalDB.deck.selectByPk({'id': deckId});
-      _templates = LocalDB.cardTemplate.getByDeckId(deckId);
+      _syncTitleController();
+      _draftSession.setDrafts(LocalDB.cardTemplate.getByDeckId(deckId));
 
       final pendingInitialTemplateId = _pendingInitialTemplateId;
-      final initialTemplate = _templates.where((template) {
+      final initialTemplate = _draftSession.drafts.where((template) {
         return template.id == pendingInitialTemplateId;
       }).firstOrNull;
-      final templateToSelect = initialTemplate ?? _templates.firstOrNull;
+      final templateToSelect =
+          initialTemplate ?? _draftSession.drafts.firstOrNull;
 
       _pendingInitialTemplateId = null;
       if (templateToSelect != null) {
@@ -121,35 +144,14 @@ class EditDeckController extends Controller {
 
   /// Selects a template, saving the current draft first if one exists.
   void selectTemplate(String? templateId) {
-    if (_activeTemplateId != null) {
-      saveActiveTemplateToDraft();
-    }
-
-    _activeTemplateId = templateId;
-
-    if (templateId != null) {
-      final template = _templates.where((t) => t.id == templateId).firstOrNull;
-      if (template != null) {
-        _populateFormFromTemplate(template);
-      }
-    }
+    _draftSession.selectDraft(templateId);
     notifyListeners();
   }
 
-  /// Pushes the current form data into the working memory `_templates` list
+  /// Pushes the current form data into the working-memory draft list.
   void saveActiveTemplateToDraft() {
-    if (_activeTemplateId == null) return;
-
-    final draft = _templates
-        .where((t) => t.id == _activeTemplateId)
-        .firstOrNull;
-    final updated = _mergeFormIntoDraft(draft);
-
+    final updated = _draftSession.saveActiveDraft();
     if (updated != null) {
-      _templates = [
-        for (final t in _templates)
-          if (t.id == updated.id) updated else t,
-      ];
       _isDirty = true;
       notifyListeners();
     }
@@ -160,12 +162,61 @@ class EditDeckController extends Controller {
   void addTemplate() {
     if (_deck == null) return;
 
-    final newTemplate = _createTemplateForCurrentQuestionType();
-    if (newTemplate == null) return;
+    final newTemplate = _draftAdapter.createDraft(
+      deck: _deck!,
+      questionType: questionType,
+      cardType: formState.cardType.value,
+      sortOrder: _draftSession.drafts.length,
+    );
 
-    _templates = [..._templates, newTemplate];
+    _draftSession.addDraft(newTemplate);
     _isDirty = true;
-    selectTemplate(newTemplate.id);
+    notifyListeners();
+  }
+
+  void addAttachmentToActiveTemplate(CardAttachment attachment) {
+    if (activeTemplateId == null) return;
+
+    saveActiveTemplateToDraft();
+
+    final template = activeTemplate;
+    if (template == null) return;
+
+    final updated = _draftAdapter.copyDraftWithAttachments(
+      draft: template,
+      attachments: [...template.attachments, attachment],
+    );
+    _draftSession.replaceDraft(updated);
+    _isDirty = true;
+    notifyListeners();
+  }
+
+  Future<CardAttachment?> pickAndAddImageAttachmentToActiveTemplate() async {
+    final templateId = activeTemplateId;
+    if (templateId == null) return null;
+
+    final result = await FilePicker.pickFiles(
+      type: FileType.image,
+      allowMultiple: false,
+      withData: true,
+    );
+    final file = result?.files.firstOrNull;
+    if (file == null) return null;
+
+    final attachment = await CardAttachmentService.createLocalImageAttachment(
+      templateId: templateId,
+      file: file,
+      existingAttachments: activeTemplateAttachments,
+    );
+    addAttachmentToActiveTemplate(attachment);
+    return attachment;
+  }
+
+  Future<String?> pickAndAddImageAttachmentMarkdownToActiveTemplate() async {
+    final attachment = await pickAndAddImageAttachmentToActiveTemplate();
+    if (attachment == null) return null;
+
+    return CardAttachmentService.markdownImageReference(attachment);
   }
 
   // ── Deck Persistence ───────────────────────────────
@@ -179,24 +230,19 @@ class EditDeckController extends Controller {
     if (title != null) {
       updateDeckTitle(title);
     }
-    saveActiveTemplateToDraft();
+    final templateDrafts = _draftSession.commitAll();
 
     setLoading(true);
 
     try {
-      final updatedDeck = _deck!.copyWith(
-        cardCount: _templates.length,
-        updatedAt: DateTime.now(),
-      );
-
-      await LocalDB.deck.upsert(updatedDeck);
-      await LocalDB.cardTemplate.upsertMany(_templates);
-      await StudyCardService.syncDeckStudyCards(
-        deckId: updatedDeck.id,
-        templates: _templates,
+      final updatedDeck = await EditDeckService.saveDeck(
+        deck: _deck!,
+        templateDrafts: templateDrafts,
+        title: title,
       );
 
       _deck = updatedDeck;
+      _syncTitleController();
       _isDirty = false;
     } on Exception catch (e) {
       setError(e);
@@ -207,316 +253,10 @@ class EditDeckController extends Controller {
 
   // ── Private Helpers ───────────────────────────────
 
-  void _populateFormFromTemplate(CardTemplate template) {
-    // Reset the form so old data doesn't bleed over
-    formState.cardType.value = CardType.normal;
-    formState.frontController.clear();
-    formState.backController.clear();
-    formState.identificationAnswerController.clear();
-    formState.fillInTheBlankSentenceController.clear();
-    formState.fillInTheBlankAnswersController.clear();
+  void _syncTitleController() {
+    final title = _deck?.title;
+    if (title == null || titleController.text == title) return;
 
-    // Use Dart 3 pattern matching to extract data precisely
-    switch (template) {
-      case FlashcardTemplate f:
-        formState.questionType.value = QuestionType.flashcard;
-        formState.cardType.value = f.cardType;
-        formState.frontController.text = f.frontText;
-        formState.backController.text = f.backText;
-        break;
-
-      case IdentificationTemplate i:
-        formState.questionType.value = QuestionType.identification;
-        formState.frontController.text = i.promptText;
-        formState.identificationAnswerController.text = i.acceptedAnswers;
-        break;
-
-      case MultipleChoiceTemplate m:
-        formState.questionType.value = QuestionType.multipleChoice;
-        formState.frontController.text = m.questionPrompt;
-        formState.multipleChoiceOptions.value = m.options.isNotEmpty
-            ? m.options
-                  .map(
-                    (o) => MultipleChoiceOptionData(
-                      text: o.optionText,
-                      isCorrect: o.isCorrect,
-                    ),
-                  )
-                  .toList()
-            : [...defaultMultipleChoiceOptions];
-        break;
-
-      case FillInTheBlanksTemplate fb:
-        formState.questionType.value = QuestionType.fillInTheBlanks;
-        if (fb.segments.isNotEmpty) {
-          formState.fillInTheBlankSentenceController.text =
-              fb.segments.first.fullText; // Assuming logic holds
-          formState.fillInTheBlankAnswersController.text = fb.segments
-              .map((seg) => seg.correctAnswer.replaceAll(',', r'\,'))
-              .join(',');
-        }
-        break;
-
-      case WordScrambleTemplate ws:
-        formState.questionType.value = QuestionType.wordScramble;
-        formState.frontController.text = ws.sentenceToScramble;
-        break;
-
-      case MatchMadnessTemplate mm:
-        formState.questionType.value = QuestionType.matchMadness;
-        formState.matchPairs.value = mm.pairs.isNotEmpty
-            ? mm.pairs
-                  .map((p) => MatchPairData(term: p.term, match: p.match))
-                  .toList()
-            : [...defaultMatchPairs];
-        break;
-
-      default:
-        break;
-    }
-  }
-
-  CardTemplate? _mergeFormIntoDraft(CardTemplate? draft) {
-    if (draft == null || _deck == null) return null;
-
-    final qType = formState.questionType.value;
-
-    // Preserve the shared base metadata
-    final id = draft.id;
-    final deckId = draft.deckId;
-    final sortOrder = draft.sortOrder;
-    final createdAt = draft.createdAt;
-    final sourceId = draft.sourceTemplateId;
-
-    // Build the specific template based on what the UI dropdown is currently set to
-    switch (qType) {
-      case QuestionType.flashcard:
-        return FlashcardTemplate(
-          id: id,
-          updatedAt: DateTime.now(),
-
-          deckId: deckId,
-          sortOrder: sortOrder,
-          createdAt: createdAt,
-          sourceTemplateId: sourceId,
-          frontText: formState.frontController.text.trim(),
-          backText: formState.backController.text.trim(),
-          cardType: formState.cardType.value,
-        );
-
-      case QuestionType.identification:
-        return IdentificationTemplate(
-          id: id,
-          updatedAt: DateTime.now(),
-
-          deckId: deckId,
-          sortOrder: sortOrder,
-          createdAt: createdAt,
-          sourceTemplateId: sourceId,
-          promptText: formState.frontController.text.trim(),
-          acceptedAnswers: formState.identificationAnswerController.text.trim(),
-        );
-
-      case QuestionType.multipleChoice:
-        return MultipleChoiceTemplate(
-          id: id,
-          deckId: deckId,
-          updatedAt: DateTime.now(),
-
-          sortOrder: sortOrder,
-          createdAt: createdAt,
-          sourceTemplateId: sourceId,
-          questionPrompt: formState.frontController.text.trim(),
-          options: _buildOptions(id),
-        );
-
-      case QuestionType.fillInTheBlanks:
-        return FillInTheBlanksTemplate(
-          id: id,
-          deckId: deckId,
-          updatedAt: DateTime.now(),
-
-          sortOrder: sortOrder,
-          createdAt: createdAt,
-          sourceTemplateId: sourceId,
-          segments: _buildSegments(id),
-        );
-
-      case QuestionType.wordScramble:
-        return WordScrambleTemplate(
-          id: id,
-          updatedAt: DateTime.now(),
-
-          deckId: deckId,
-          sortOrder: sortOrder,
-          createdAt: createdAt,
-          sourceTemplateId: sourceId,
-          sentenceToScramble: formState.frontController.text.trim(),
-        );
-
-      case QuestionType.matchMadness:
-        return MatchMadnessTemplate(
-          id: id,
-          deckId: deckId,
-          updatedAt: DateTime.now(),
-
-          sortOrder: sortOrder,
-          createdAt: createdAt,
-          sourceTemplateId: sourceId,
-          pairs: _buildPairs(id),
-        );
-    }
-  }
-
-  // ── Build Helpers for Complex Types ───────────────────────────────
-
-  List<MultipleChoiceOption> _buildOptions(String templateId) {
-    final tuples = formState.multipleChoiceOptions.value;
-    return List.generate(
-      tuples.length,
-      (i) => MultipleChoiceOption(
-        id: uuid.v7(),
-        templateId: templateId, // Use the new ID reference
-        optionText: tuples[i].text,
-        isCorrect: tuples[i].isCorrect,
-        displayOrder: i,
-      ),
-    );
-  }
-
-  List<FillInTheBlankSegment> _buildSegments(String templateId) {
-    final sentence = formState.fillInTheBlankSentenceController.text.trim();
-    final answers = TextHelper.getTrimmedCommaSeparatedValues(
-      formState.fillInTheBlankAnswersController.text,
-    );
-    if (sentence.isEmpty || answers.isEmpty) return [];
-
-    final lowerSentence = sentence.toLowerCase();
-    var searchStart = 0;
-    final segments = <FillInTheBlankSegment>[];
-
-    for (final answer in answers) {
-      final lowerAnswer = answer.toLowerCase();
-      var blankStart = lowerSentence.indexOf(lowerAnswer, searchStart);
-      if (blankStart == -1) {
-        blankStart = lowerSentence.indexOf(lowerAnswer);
-      }
-      if (blankStart == -1) continue;
-
-      final blankEnd = blankStart + answer.length;
-      searchStart = blankEnd;
-      segments.add(
-        FillInTheBlankSegment(
-          id: uuid.v7(),
-          cardId: templateId,
-          fullText: sentence,
-          blankStart: blankStart,
-          blankEnd: blankEnd,
-          correctAnswer: answer,
-        ),
-      );
-    }
-
-    return segments;
-  }
-
-  List<MatchMadnessPair> _buildPairs(String templateId) {
-    final tuples = formState.matchPairs.value;
-    return List.generate(
-      tuples.length,
-      (i) => MatchMadnessPair(
-        id: uuid.v7(),
-        templateId: templateId, // Use the new ID reference
-        term: tuples[i].term,
-        match: tuples[i].match,
-        displayOrder: i,
-      ),
-    );
-  }
-
-  CardTemplate? _createTemplateForCurrentQuestionType() {
-    final deck = _deck;
-    if (deck == null) return null;
-
-    final now = DateTime.now();
-    final id = uuid.v7();
-    final sortOrder = _templates.length;
-
-    return switch (formState.questionType.value) {
-      QuestionType.flashcard => FlashcardTemplate(
-        id: id,
-        deckId: deck.id,
-        sortOrder: sortOrder,
-        createdAt: now,
-        updatedAt: now,
-        frontText: '',
-        backText: '',
-        cardType: formState.cardType.value,
-      ),
-      QuestionType.multipleChoice => MultipleChoiceTemplate(
-        id: id,
-        deckId: deck.id,
-        sortOrder: sortOrder,
-        createdAt: now,
-        updatedAt: now,
-        questionPrompt: '',
-        options: [
-          for (
-            var index = 0;
-            index < defaultMultipleChoiceOptions.length;
-            index++
-          )
-            MultipleChoiceOption(
-              id: uuid.v7(),
-              templateId: id,
-              optionText: defaultMultipleChoiceOptions[index].text,
-              isCorrect: defaultMultipleChoiceOptions[index].isCorrect,
-              displayOrder: index,
-            ),
-        ],
-      ),
-      QuestionType.fillInTheBlanks => FillInTheBlanksTemplate(
-        id: id,
-        deckId: deck.id,
-        sortOrder: sortOrder,
-        createdAt: now,
-        updatedAt: now,
-        segments: const [],
-      ),
-      QuestionType.matchMadness => MatchMadnessTemplate(
-        id: id,
-        deckId: deck.id,
-        sortOrder: sortOrder,
-        createdAt: now,
-        updatedAt: now,
-        pairs: [
-          for (var index = 0; index < defaultMatchPairs.length; index++)
-            MatchMadnessPair(
-              id: uuid.v7(),
-              templateId: id,
-              term: defaultMatchPairs[index].term,
-              match: defaultMatchPairs[index].match,
-              displayOrder: index,
-            ),
-        ],
-      ),
-      QuestionType.identification => IdentificationTemplate(
-        id: id,
-        deckId: deck.id,
-        sortOrder: sortOrder,
-        createdAt: now,
-        updatedAt: now,
-        promptText: '',
-        acceptedAnswers: '',
-      ),
-      QuestionType.wordScramble => WordScrambleTemplate(
-        id: id,
-        deckId: deck.id,
-        sortOrder: sortOrder,
-        createdAt: now,
-        updatedAt: now,
-        sentenceToScramble: '',
-      ),
-    };
+    titleController.text = title;
   }
 }
