@@ -9,7 +9,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         surfaceStyle,
         SurfaceBorder,
         SurfaceShape,
-        SurfacePadding;
+        SurfacePadding,
+        ButtonVariant;
 import 'package:flutter/material.dart'
     show
         Text,
@@ -80,7 +81,7 @@ class DiscussionComposerTile extends HookWidget {
       style: surfaceStyle.resolve(tokens, const [
         SurfaceBorder.none,
         SurfaceShape.roundedSm,
-        SurfacePadding.xsm,
+        SurfacePadding.sm,
       ]),
       child: Column(
         spacing: tokens.spaceLayoutGapMd,
@@ -103,6 +104,7 @@ class DiscussionComposerTile extends HookWidget {
                   ),
                 ),
                 ToggleButton(
+                  variant: ButtonVariant.flat,
                   value: isPositiveVote,
                   onChanged: isSubmitting
                       ? null

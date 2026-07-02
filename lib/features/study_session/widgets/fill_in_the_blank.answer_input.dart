@@ -2,6 +2,7 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
         MarkdownText,
+        MarkdownTextMode,
         TextFieldFrame,
         TextFieldSize,
         TextFieldState,
@@ -64,7 +65,10 @@ class FillInTheBlankAnswerInput extends StatelessWidget {
               border: Border.all(color: tokens.colorActionSuccess),
               borderRadius: BorderRadius.circular(10.r * scale),
             ),
-            child: MarkdownText(data: correctAnswer),
+            child: MarkdownText(
+              data: correctAnswer,
+              mode: MarkdownTextMode.preview,
+            ),
           ),
         ],
       ],

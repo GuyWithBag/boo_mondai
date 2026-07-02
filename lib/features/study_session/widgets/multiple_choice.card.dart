@@ -15,6 +15,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         PhysicalCard,
         ScaleHelper,
         MarkdownText,
+        MarkdownTextMode,
         usePhysicalCardController;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -78,7 +79,11 @@ class MultipleChoiceCard extends HookWidget {
                 textAlign: TextAlign.center,
                 style: eyebrowStyle,
               ),
-              MarkdownText(data: template.questionPrompt),
+              MarkdownText(
+                data: template.questionPrompt,
+                mode: MarkdownTextMode.previewSelectable,
+                resolveAttachmentUrl: template.resolveAttachmentUrl,
+              ),
             ],
           ),
           Column(
@@ -104,6 +109,8 @@ class MultipleChoiceCard extends HookWidget {
                           },
                     child: MarkdownText(
                       data: _optionLabel(entry.value, entry.key),
+                      mode: MarkdownTextMode.previewSelectable,
+                      resolveAttachmentUrl: template.resolveAttachmentUrl,
                     ),
                   ),
                 ),

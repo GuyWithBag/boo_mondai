@@ -10,6 +10,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         IdentificationTemplate,
         MatchMadnessTemplate,
         MarkdownText,
+        MarkdownTextMode,
         MultipleChoiceCard,
         MultipleChoiceTemplate,
         PhysicalCard,
@@ -142,17 +143,24 @@ class ViewCardsTile extends StatelessWidget {
         maxWidth: width,
         isRevealed: true,
       ),
-      IdentificationTemplate t => _PromptPreview(prompt: t.promptText),
-      WordScrambleTemplate t => _PromptPreview(prompt: t.sentenceToScramble),
+      IdentificationTemplate t => _PromptPreview(
+        prompt: t.promptText,
+        template: t,
+      ),
+      WordScrambleTemplate t => _PromptPreview(
+        prompt: t.sentenceToScramble,
+        template: t,
+      ),
       _ => _UnknownTemplatePreview(label: template.runtimeType.toString()),
     };
   }
 }
 
 class _PromptPreview extends StatelessWidget {
-  const _PromptPreview({required this.prompt});
+  const _PromptPreview({required this.prompt, required this.template});
 
   final String prompt;
+  final CardTemplate template;
 
   @override
   Widget build(BuildContext context) {
@@ -160,7 +168,11 @@ class _PromptPreview extends StatelessWidget {
       front: Center(
         child: Padding(
           padding: EdgeInsets.all(20.w),
-          child: MarkdownText(data: prompt),
+          child: MarkdownText(
+            data: prompt,
+            mode: MarkdownTextMode.previewSelectable,
+            resolveAttachmentUrl: template.resolveAttachmentUrl,
+          ),
         ),
       ),
     );

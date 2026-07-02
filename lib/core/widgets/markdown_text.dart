@@ -4,10 +4,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextColor,
         TextFieldFrame,
         TextFieldSize,
-        TextFieldColor,
         TextSize,
         TextWeight,
         TextField,
+        ImageHelper,
         textStyle,
         MarkdownHelper;
 import 'package:flutter/material.dart' hide TextField;
@@ -243,24 +243,18 @@ MarkdownImageBuilder? _buildImageBuilder(
     final src = _resolveAttachmentHref(uri, resolveAttachmentUrl);
     if (src == null) return const SizedBox.shrink();
 
-    final resolvedUri = Uri.tryParse(src);
-    if (resolvedUri == null || !resolvedUri.hasScheme) {
-      return const SizedBox.shrink();
-    }
+    final image = ImageHelper.getImageProviderFromSource(src);
+    if (image == null) return const SizedBox.shrink();
 
-    if (resolvedUri.scheme == 'http' || resolvedUri.scheme == 'https') {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(tokens.radiusSurfaceXsm),
-        child: Image.network(
-          src,
-          fit: BoxFit.contain,
-          semanticLabel: alt,
-          errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
-        ),
-      );
-    }
-
-    return const SizedBox.shrink();
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(tokens.radiusSurfaceXsm),
+      child: Image(
+        image: image,
+        fit: BoxFit.contain,
+        semanticLabel: alt,
+        errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+      ),
+    );
   };
 }
 

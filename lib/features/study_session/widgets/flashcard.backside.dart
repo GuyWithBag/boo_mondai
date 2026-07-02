@@ -1,5 +1,10 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show FlashcardTemplate, StudyCard, AppTokens, MarkdownText;
+    show
+        FlashcardTemplate,
+        StudyCard,
+        AppTokens,
+        MarkdownText,
+        MarkdownTextMode;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -26,11 +31,15 @@ class FlashcardBackSide extends StatelessWidget {
         spacing: tokens.spaceLayoutGapMd,
         children: [
           MarkdownText(
+            mode: MarkdownTextMode.previewSelectable,
             data: template.getQuestion(isReversed: studyCard.isReversed),
+            resolveAttachmentUrl: template.resolveAttachmentUrl,
           ),
           Divider(),
           MarkdownText(
+            mode: MarkdownTextMode.previewSelectable,
             data: template.getAnswer(isReversed: studyCard.isReversed),
+            resolveAttachmentUrl: template.resolveAttachmentUrl,
           ),
         ],
       ),

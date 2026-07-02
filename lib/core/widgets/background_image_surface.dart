@@ -57,8 +57,7 @@ class BackgroundImageSurface extends StatelessWidget {
     this.missingImageIcon = Icons.image_not_supported_outlined,
     this.missingImageIconSize = 40,
     this.isEditable = false,
-    this.editButtonPosition = BackgroundImageEditButtonPosition.topRight,
-    this.editButtonInset = 8,
+    this.editButtonPosition = BackgroundImageEditButtonPosition.bottomRight,
     this.onImagePicked,
     this.border = SurfaceBorder.none,
   });
@@ -74,7 +73,6 @@ class BackgroundImageSurface extends StatelessWidget {
   final double missingImageIconSize;
   final bool isEditable;
   final BackgroundImageEditButtonPosition editButtonPosition;
-  final double editButtonInset;
   final BackgroundImagePicked? onImagePicked;
   final SurfaceBorder border;
 
@@ -90,38 +88,57 @@ class BackgroundImageSurface extends StatelessWidget {
     );
     final showEditButton = isEditable && onImagePicked != null;
 
+    Widget getIcon() {
+      if (isEditable) {
+        return Button.iconOnly(
+          tokens: tokens,
+          icon: Icons.edit,
+          onPressed: _pickImage,
+        );
+      }
+      return missingImageIcon == null
+          ? const SizedBox.shrink()
+          : Icon(missingImageIcon, size: missingImageIconSize);
+    }
+
+    List<Widget> getStackChildren() {
+      final children = <Widget>[];
+      if (image != null) {
+        children.add(
+          Positioned.fill(
+            child: Image(image: image!, fit: fit, alignment: imageAlignment),
+          ),
+        );
+      } else {
+        children.add(
+          Center(
+            child: IconTheme(
+              data: finalStyle.iconTheme.copyWith(color: tokens.colorMuted),
+              child: getIcon(),
+            ),
+          ),
+        );
+      }
+      if (child != null) {
+        children.add(
+          Positioned.fill(
+            child: Padding(padding: childPadding, child: child),
+          ),
+        );
+      }
+      return children;
+    }
+
     final surface = Surface(
       style: finalStyle,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          if (image case final image?)
-            Positioned.fill(
-              child: Image(image: image, fit: fit, alignment: imageAlignment),
-            )
-          else
-            Center(
-              child: IconTheme(
-                data: finalStyle.iconTheme.copyWith(color: tokens.colorMuted),
-                child: missingImageIcon == null
-                    ? const SizedBox.shrink()
-                    : Icon(missingImageIcon, size: missingImageIconSize),
-              ),
-            ),
-          if (child != null)
-            Positioned.fill(
-              child: Padding(padding: childPadding, child: child),
-            ),
-        ],
-      ),
+      child: Stack(fit: StackFit.expand, children: getStackChildren()),
     );
 
-    if (!showEditButton) {
+    if (!showEditButton || image == null) {
       return surface;
     }
 
-    final hitTestInset = editButtonInset < 0 ? 0.0 : editButtonInset;
-
+    final editButtonPadding = tokens.spaceLayoutPaddingSm;
     return Stack(
       fit: StackFit.expand,
       clipBehavior: Clip.none,
@@ -129,13 +146,13 @@ class BackgroundImageSurface extends StatelessWidget {
         Positioned.fill(child: surface),
         Positioned(
           top: editButtonPosition == BackgroundImageEditButtonPosition.topRight
-              ? hitTestInset
+              ? editButtonPadding
               : null,
-          right: hitTestInset,
+          right: editButtonPadding,
           bottom:
               editButtonPosition ==
                   BackgroundImageEditButtonPosition.bottomRight
-              ? hitTestInset
+              ? editButtonPadding
               : null,
           child: Button.iconOnlySmall(
             icon: Icons.edit,

@@ -1,19 +1,21 @@
+import 'package:boo_mondai/features/app_theme/surface.variant.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        MarkdownText,
-        MarkdownTextMode,
-        ProfileLabel,
-        MetaLabel,
+        AppTokens,
         Button,
-        DiscussionRepliesFor,
-        DiscussionItem,
-        DiscussionReplyCallback,
+        ButtonVariant,
         DiscussionEditCallback,
+        DiscussionItem,
         DiscussionLikeCallback,
         DiscussionPermission,
+        DiscussionRepliesFor,
+        DiscussionReplyCallback,
+        MarkdownText,
+        MarkdownTextMode,
+        MetaLabel,
+        ProfileLabel,
         TextField,
-        useDiscussionTileController,
-        AppTokens;
+        useDiscussionTileController;
 import 'package:flutter/material.dart'
     show
         CrossAxisAlignment,
@@ -34,7 +36,8 @@ import 'package:flutter/material.dart'
         Alignment,
         Align;
 import 'package:flutter_hooks/flutter_hooks.dart' show HookWidget;
-import 'package:theme_variants/theme_variants.dart' show ThemeVariantsContext;
+import 'package:theme_variants/theme_variants.dart'
+    show ThemeVariantsContext, Surface;
 
 class DiscussionTile extends HookWidget {
   const DiscussionTile({
@@ -116,21 +119,25 @@ class DiscussionTile extends HookWidget {
               spacing: tokens.spaceLayoutGapMd,
               children: [
                 if (discussionTileController.item.isReview)
-                  TextField(
-                    controller: discussionTileController.editTitleController,
+                  MarkdownText(
+                    data:
+                        discussionTileController.editTitleController.value.text,
                     maxLines: 1,
                     textInputAction: TextInputAction.next,
                     placeholder: 'Review title',
                   ),
-                MarkdownText(
-                  data: discussionTileController.editBody.value,
-                  onChanged: (value) =>
-                      discussionTileController.editBody.value = value,
-                  mode: MarkdownTextMode.input,
-                  placeholder: discussionTileController.item.isReview
-                      ? 'Update review'
-                      : 'Update comment',
-                  maxLines: 8,
+                Surface(
+                  style: surfaceStyle.resolve(tokens, const []),
+                  child: MarkdownText(
+                    data: discussionTileController.editBody.value,
+                    onChanged: (value) =>
+                        discussionTileController.editBody.value = value,
+                    mode: MarkdownTextMode.input,
+                    placeholder: discussionTileController.item.isReview
+                        ? 'Update review'
+                        : 'Update comment',
+                    maxLines: 8,
+                  ),
                 ),
               ],
             )
@@ -175,27 +182,29 @@ class DiscussionTile extends HookWidget {
                 ),
               ] else ...[
                 if (discussionTileController.canReply)
-                  Button(
-                    leading: const Icon(Icons.reply),
+                  Button.icon(
+                    icon: Icons.reply,
+                    tokens: tokens,
                     onPressed: isSubmitting
                         ? null
                         : discussionTileController.toggleReplying,
                   ),
                 if (discussionTileController.canEditItem)
-                  Button(
-                    leading: const Icon(Icons.edit_outlined),
+                  Button.icon(
+                    icon: Icons.edit_outlined,
+                    tokens: tokens,
                     onPressed: isSubmitting
                         ? null
                         : discussionTileController.startEditing,
                   ),
                 if (discussionTileController.item.isReview &&
                     discussionTileController.onLike != null)
-                  Button(
-                    leading: Icon(
-                      discussionTileController.item.isLiked
-                          ? Icons.thumb_down_alt_outlined
-                          : Icons.thumb_up_alt_outlined,
-                    ),
+                  Button.icon(
+                    tokens: tokens,
+                    icon: discussionTileController.item.isLiked
+                        ? Icons.thumb_down_alt_outlined
+                        : Icons.thumb_up_alt_outlined,
+                    variant: ButtonVariant.flat,
                     onPressed:
                         isSubmitting ||
                             discussionTileController.isLikeSubmitting.value

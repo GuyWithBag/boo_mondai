@@ -2,12 +2,13 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
         Button,
-        buttonStyle,
         ButtonColor,
         ButtonVariant,
         FlashcardTemplate,
         MarkdownText,
-        StudyCard;
+        MarkdownTextMode,
+        StudyCard,
+        buttonStyle;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -37,7 +38,9 @@ class FlashcardFrontSide extends StatelessWidget {
         children: [
           Positioned.fill(
             child: MarkdownText(
+              mode: MarkdownTextMode.previewSelectable,
               data: template.getQuestion(isReversed: studyCard.isReversed),
+              resolveAttachmentUrl: template.resolveAttachmentUrl,
             ),
           ),
           if (showRevealButton)

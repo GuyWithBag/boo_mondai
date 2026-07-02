@@ -9,6 +9,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextColor,
         FillInTheBlankAnswerInput,
         MarkdownText,
+        MarkdownTextMode,
         ScaleHelper,
         PhysicalCard,
         usePhysicalCardController;
@@ -151,7 +152,7 @@ class _PreviewAnswer extends StatelessWidget {
         border: Border.all(color: tokens.colorActionSuccess),
         borderRadius: BorderRadius.circular(10.r * scale),
       ),
-      child: MarkdownText(data: label),
+      child: MarkdownText(data: label, mode: MarkdownTextMode.preview),
     );
   }
 }
