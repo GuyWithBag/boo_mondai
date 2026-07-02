@@ -1,4 +1,3 @@
-import 'package:boo_mondai/features/app_theme/surface.variant.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
@@ -14,27 +13,32 @@ import 'package:boo_mondai/lib.barrel.dart'
         MarkdownTextMode,
         MetaLabel,
         ProfileLabel,
-        TextField,
-        useDiscussionTileController;
+        surfaceStyle,
+        useDiscussionTileController,
+        SurfaceBorder,
+        SurfaceShape,
+        SurfacePadding;
 import 'package:flutter/material.dart'
     show
-        CrossAxisAlignment,
-        Column,
-        Widget,
-        BuildContext,
-        Text,
-        CircularProgressIndicator,
-        Icon,
-        EdgeInsets,
-        Expanded,
-        MainAxisSize,
-        Icons,
-        Row,
-        TextInputAction,
-        MainAxisAlignment,
-        Padding,
+        Align,
         Alignment,
-        Align;
+        BoxConstraints,
+        BuildContext,
+        CircularProgressIndicator,
+        Column,
+        ConstrainedBox,
+        CrossAxisAlignment,
+        EdgeInsets,
+        Icon,
+        Icons,
+        MainAxisAlignment,
+        MainAxisSize,
+        Padding,
+        Row,
+        SelectableText,
+        Text,
+        TextInputAction,
+        Widget;
 import 'package:flutter_hooks/flutter_hooks.dart' show HookWidget;
 import 'package:theme_variants/theme_variants.dart'
     show ThemeVariantsContext, Surface;
@@ -63,7 +67,7 @@ class DiscussionTile extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final discussionTileController = useDiscussionTileController(
+    final controller = useDiscussionTileController(
       item: item,
       repliesFor: repliesFor,
       onReply: onReply,
@@ -77,12 +81,27 @@ class DiscussionTile extends HookWidget {
     final wasEdited =
         item.updatedAt.difference(item.createdAt).abs() >
         const Duration(seconds: 1);
+    final isEditingDiscussion = controller.isEditing;
+    final isReplyingToDiscussion = controller.isReplying;
+    final isLikeSubmitting = controller.isLikeSubmitting;
+    final isReview = controller.item.isReview;
+    final isDeletedDiscussion = item.isDeleted;
+    final shouldDisplayEditTitleField = isEditingDiscussion.value && isReview;
+    final shouldDisplayReviewTitle =
+        isReview && !isDeletedDiscussion && (item.title ?? '').isNotEmpty;
+    final shouldDisplayDeletedDiscussionMessage = isDeletedDiscussion;
+    final shouldDisplayReplyAction = controller.canReply;
+    final shouldDisplayEditAction = controller.canEditItem;
+    final shouldDisplayLikeAction = isReview && controller.onLike != null;
+    final shouldDisableLikeAction = isSubmitting || isLikeSubmitting.value;
+    final editBodyPlaceholder = isReview ? 'Update review' : 'Update comment';
+    final deletedDiscussionLabel = isReview ? 'review' : 'comment';
 
     return Padding(
       padding: EdgeInsets.only(left: isNested ? tokens.spaceLayoutGapLg : 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: tokens.spaceLayoutGapMd,
+        spacing: tokens.spaceLayoutGapSm,
         children: [
           // Header: author + dates
           Row(
@@ -114,48 +133,62 @@ class DiscussionTile extends HookWidget {
           ),
 
           // Body: editable or display
-          if (discussionTileController.isEditing.value)
+          if (isEditingDiscussion.value)
             Column(
-              spacing: tokens.spaceLayoutGapMd,
+              spacing: tokens.spaceLayoutGapSm,
               children: [
-                if (discussionTileController.item.isReview)
+                if (shouldDisplayEditTitleField)
                   MarkdownText(
-                    data:
-                        discussionTileController.editTitleController.value.text,
+                    data: controller.editTitleController.text,
+                    controller: controller.editTitleController,
                     maxLines: 1,
                     textInputAction: TextInputAction.next,
                     placeholder: 'Review title',
                   ),
-                Surface(
-                  style: surfaceStyle.resolve(tokens, const []),
-                  child: MarkdownText(
-                    data: discussionTileController.editBody.value,
-                    onChanged: (value) =>
-                        discussionTileController.editBody.value = value,
-                    mode: MarkdownTextMode.input,
-                    placeholder: discussionTileController.item.isReview
-                        ? 'Update review'
-                        : 'Update comment',
-                    maxLines: 8,
-                  ),
+                MarkdownText(
+                  data: controller.editBody.value,
+                  onChanged: (value) => controller.editBody.value = value,
+                  mode: MarkdownTextMode.input,
+                  placeholder: editBodyPlaceholder,
+                  maxLines: null,
                 ),
               ],
             )
           else
             Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: tokens.spaceLayoutGapMd,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              spacing: tokens.spaceLayoutGapSm,
               children: [
-                if (item.isReview &&
-                    !item.isDeleted &&
-                    (item.title ?? '').isNotEmpty)
-                  Text(item.title!),
-                if (item.isDeleted)
-                  Text(
-                    'This ${item.isReview ? 'review' : 'comment'} was deleted.',
-                  )
-                else
-                  MarkdownText(data: item.body),
+                if (shouldDisplayReviewTitle)
+                  Surface(
+                    style: surfaceStyle.resolve(tokens, const [
+                      SurfaceBorder.none,
+                      SurfaceShape.roundedXsm,
+                      SurfacePadding.sm,
+                    ]),
+                    child: MarkdownText(
+                      data: item.title!,
+                      mode: MarkdownTextMode.previewSelectable,
+                    ),
+                  ),
+                Surface(
+                  style: surfaceStyle.resolve(tokens, const [
+                    SurfaceBorder.none,
+                    SurfaceShape.roundedXsm,
+                    SurfacePadding.sm,
+                  ]),
+                  child: shouldDisplayDeletedDiscussionMessage
+                      ? SelectableText(
+                          'This $deletedDiscussionLabel was deleted.',
+                        )
+                      : ConstrainedBox(
+                          constraints: BoxConstraints(minHeight: 100),
+                          child: MarkdownText(
+                            data: item.body,
+                            mode: MarkdownTextMode.previewSelectable,
+                          ),
+                        ),
+                ),
               ],
             ),
 
@@ -164,76 +197,62 @@ class DiscussionTile extends HookWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             spacing: tokens.spaceLayoutGapSm,
             children: [
-              if (discussionTileController.isEditing.value) ...[
+              if (isEditingDiscussion.value) ...[
                 Button(
-                  onPressed: isSubmitting
-                      ? null
-                      : discussionTileController.cancelEditing,
+                  onPressed: isSubmitting ? null : controller.cancelEditing,
                   child: const Text('Cancel'),
                 ),
                 Button(
-                  onPressed: isSubmitting
-                      ? null
-                      : discussionTileController.submitEdit,
+                  onPressed: isSubmitting ? null : controller.submitEdit,
                   leading: isSubmitting
                       ? const CircularProgressIndicator()
                       : const Icon(Icons.check),
                   child: const Text('Save'),
                 ),
               ] else ...[
-                if (discussionTileController.canReply)
+                if (shouldDisplayReplyAction)
                   Button.icon(
                     icon: Icons.reply,
                     tokens: tokens,
-                    onPressed: isSubmitting
-                        ? null
-                        : discussionTileController.toggleReplying,
+                    onPressed: isSubmitting ? null : controller.toggleReplying,
                   ),
-                if (discussionTileController.canEditItem)
+                if (shouldDisplayEditAction)
                   Button.icon(
                     icon: Icons.edit_outlined,
                     tokens: tokens,
-                    onPressed: isSubmitting
-                        ? null
-                        : discussionTileController.startEditing,
+                    onPressed: isSubmitting ? null : controller.startEditing,
                   ),
-                if (discussionTileController.item.isReview &&
-                    discussionTileController.onLike != null)
+                if (shouldDisplayLikeAction)
                   Button.icon(
                     tokens: tokens,
-                    icon: discussionTileController.item.isLiked
+                    icon: controller.item.isLiked
                         ? Icons.thumb_down_alt_outlined
                         : Icons.thumb_up_alt_outlined,
                     variant: ButtonVariant.flat,
-                    onPressed:
-                        isSubmitting ||
-                            discussionTileController.isLikeSubmitting.value
+                    onPressed: shouldDisableLikeAction
                         ? null
-                        : discussionTileController.submitLike,
+                        : controller.submitLike,
                   ),
               ],
             ],
           ),
 
           // Reply composer
-          if (discussionTileController.isReplying.value)
+          if (isReplyingToDiscussion.value)
             Column(
               spacing: tokens.spaceLayoutGapMd,
               children: [
                 MarkdownText(
-                  data: discussionTileController.replyBody.value,
-                  onChanged: (value) =>
-                      discussionTileController.replyBody.value = value,
+                  data: controller.replyBody.value,
+                  onChanged: (value) => controller.replyBody.value = value,
                   mode: MarkdownTextMode.input,
                   placeholder: 'Write a reply',
-                  maxLines: 6,
+                  maxLines: null,
                 ),
                 Align(
                   alignment: Alignment.centerRight,
                   child: Button(
-                    onPressed: isSubmitting
-                        ? null
-                        : discussionTileController.submitReply,
+                    onPressed: isSubmitting ? null : controller.submitReply,
                     leading: isSubmitting
                         ? const CircularProgressIndicator()
                         : const Icon(Icons.send_outlined),
@@ -244,7 +263,7 @@ class DiscussionTile extends HookWidget {
             ),
 
           // Nested replies
-          for (final reply in discussionTileController.replies)
+          for (final reply in controller.replies)
             DiscussionTile(
               item: reply,
               repliesFor: repliesFor,

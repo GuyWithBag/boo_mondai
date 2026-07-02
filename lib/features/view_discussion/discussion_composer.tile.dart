@@ -59,6 +59,12 @@ class DiscussionComposerTile extends HookWidget {
     final tokens = context.themeTokens<AppTokens>();
     final isReview = type == DiscussionType.review;
     final isPositiveVote = voteValue.value > 0;
+    final shouldDisplayReviewFields = isReview;
+    final shouldEnableVoteToggle = !isSubmitting;
+    final shouldEnableSubmitAction = !isSubmitting;
+    final shouldDisplaySubmitProgress = isSubmitting;
+    final bodyPlaceholder = isReview ? 'Write a review' : 'Write a comment';
+    final submitButtonLabel = isReview ? 'Post Review' : 'Post Comment';
 
     Future<bool> submit() {
       if (isReview) {
@@ -86,7 +92,7 @@ class DiscussionComposerTile extends HookWidget {
       child: Column(
         spacing: tokens.spaceLayoutGapMd,
         children: [
-          if (isReview) ...[
+          if (shouldDisplayReviewFields) ...[
             Row(
               spacing: tokens.spaceLayoutGapSm,
               children: [
@@ -106,37 +112,38 @@ class DiscussionComposerTile extends HookWidget {
                 ToggleButton(
                   variant: ButtonVariant.flat,
                   value: isPositiveVote,
-                  onChanged: isSubmitting
-                      ? null
-                      : (value) => voteValue.value = value ? 1 : -1,
+                  onChanged: shouldEnableVoteToggle
+                      ? (value) => voteValue.value = value ? 1 : -1
+                      : null,
                 ),
               ],
             ),
           ],
           Column(
+            spacing: tokens.spaceLayoutGapSm,
             children: [
               TextField(
                 controller: bodyController,
                 minLines: 4,
-                maxLines: 6,
+                maxLines: null,
                 textInputAction: TextInputAction.newline,
-                placeholder: isReview ? 'Write a review' : 'Write a comment',
+                placeholder: bodyPlaceholder,
               ),
               SizedBox(
                 width: double.infinity,
                 child: Button(
-                  onPressed: isSubmitting
-                      ? null
-                      : () async {
+                  onPressed: shouldEnableSubmitAction
+                      ? () async {
                           final posted = await submit();
                           if (posted) clearFields();
-                        },
-                  child: isSubmitting
+                        }
+                      : null,
+                  child: shouldDisplaySubmitProgress
                       ? const SizedBox.square(
                           dimension: 16,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : Text(isReview ? 'Post Review' : 'Post Comment'),
+                      : Text(submitButtonLabel),
                 ),
               ),
             ],
