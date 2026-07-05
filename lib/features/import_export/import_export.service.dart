@@ -22,7 +22,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         FlashcardTemplate,
         IdentificationTemplate,
         ImportCardMatchCandidate,
-        ChangePreview,
+        ChangePlan,
         ImportCardsPayload,
         ImportExportBackup,
         LocalImageCacheKeysHelper,
@@ -30,8 +30,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         LocalImagePathHelper,
         LocalImageResolverHelper,
         ChangeBatchResult,
-        ChangeRecord,
-        ChangeComparer,
+        ChangedEntity,
+        ChangeDifferenceHelper,
         ChangeSource,
         ChangeType,
         ChangeResult,
@@ -84,7 +84,7 @@ class ImportExportService {
   const ImportExportService._();
 
   /// Exports one deck with templates, tags, and media URL references.
-  static Future<ChangeResult<Map<String, dynamic>>> exportDeck(
+  static Future<ChangeResult<Map<String, dynamic>, Object?>> exportDeck(
     String deckId,
   ) async {
     final deck = LocalDB.deck.selectByPk({'id': deckId});
@@ -93,15 +93,15 @@ class ImportExportService {
     }
     final templates = LocalDB.cardTemplate.getByDeckId(deckId);
     final payload = _buildDeckPayload(deck: deck, templates: templates);
-    final logs = [
-      ChangeRecord(
+    final logs = <ChangedEntity<Object?>>[
+      ChangedEntity<Object?>(
         type: ChangeType.added,
         source: ChangeSource.importExport,
         entityType: 'deck',
         entityId: deck.id,
         title: 'Exported ${deck.title}',
         subtitle: '${templates.length} cards',
-        after: deck,
+        afterChange: deck,
       ),
     ];
     await _storeBackup(
@@ -121,7 +121,7 @@ class ImportExportService {
   ) async {
     final values = <Map<String, dynamic>>[];
     final failures = <String>[];
-    final logs = <ChangeRecord>[];
+    final logs = <ChangedEntity>[];
 
     for (final deckId in deckIds) {
       try {
@@ -437,7 +437,7 @@ class ImportExportService {
   }
 
   /// Exports cards from one deck, optionally scoped to [templateIds].
-  static Future<ChangeResult<Map<String, dynamic>>> exportCards({
+  static Future<ChangeResult<Map<String, dynamic>, CardTemplate>> exportCards({
     required String deckId,
     List<String>? templateIds,
   }) async {
@@ -460,8 +460,8 @@ class ImportExportService {
       'card_templates': [for (final template in selected) template.toMap()],
     };
 
-    final logs = [
-      ChangeRecord(
+    final logs = <ChangedEntity<CardTemplate>>[
+      ChangedEntity<CardTemplate>(
         type: ChangeType.added,
         source: ChangeSource.importExport,
         entityType: 'card_templates',
@@ -484,7 +484,7 @@ class ImportExportService {
   }
 
   /// Imports one deck payload using [mode] and optional [targetDeckId].
-  static Future<ChangeResult<Deck?>> importDeck({
+  static Future<ChangeResult<Deck?, Object?>> importDeck({
     required Map<String, dynamic> payload,
     DeckImportMode mode = DeckImportMode.createNew,
     String? targetDeckId,
@@ -495,17 +495,17 @@ class ImportExportService {
     final incomingDeck = DeckMapper.fromMap(deckMap);
     final incomingTemplateMaps = _extractTemplateMaps(payload);
     final incomingTemplates = _decodeTemplates(incomingTemplateMaps);
-    final logs = <ChangeRecord>[];
+    final logs = <ChangedEntity<Object?>>[];
 
     if (mode == DeckImportMode.skip) {
       logs.add(
-        ChangeRecord(
+        ChangedEntity(
           type: ChangeType.skipped,
           source: ChangeSource.importExport,
           entityType: 'deck',
           entityId: incomingDeck.id,
           title: 'Skipped ${incomingDeck.title}',
-          after: incomingDeck,
+          afterChange: incomingDeck,
         ),
       );
       return ChangeResult(value: null, changes: logs);
@@ -543,16 +543,16 @@ class ImportExportService {
       );
 
       logs.add(
-        ChangeRecord(
+        ChangedEntity(
           type: ChangeType.modified,
           source: ChangeSource.importExport,
           entityType: 'deck',
           entityId: target.id,
           title: 'Updated ${target.title}',
           subtitle: '${copiedTemplates.length} imported cards',
-          before: target,
-          after: updatedDeck,
-          fields: ChangeComparer.decks(target, updatedDeck),
+          beforeChange: target,
+          afterChange: updatedDeck,
+          changedProperties: ChangeDifferenceHelper.decks(target, updatedDeck),
         ),
       );
 
@@ -594,14 +594,14 @@ class ImportExportService {
     );
 
     logs.add(
-      ChangeRecord(
+      ChangedEntity(
         type: ChangeType.added,
         source: ChangeSource.importExport,
         entityType: 'deck',
         entityId: createdDeck.id,
         title: createdDeck.title,
         subtitle: '${copiedTemplates.length} imported cards',
-        after: createdDeck,
+        afterChange: createdDeck,
       ),
     );
 
@@ -618,7 +618,7 @@ class ImportExportService {
   }
 
   /// Imports one deck from raw JSON.
-  static Future<ChangeResult<Deck?>> importDeckJson({
+  static Future<ChangeResult<Deck?, Object?>> importDeckJson({
     required String rawJson,
     DeckImportMode mode = DeckImportMode.createNew,
     String? targetDeckId,
@@ -638,7 +638,7 @@ class ImportExportService {
   }) async {
     final values = <Deck?>[];
     final failures = <String>[];
-    final logs = <ChangeRecord>[];
+    final logs = <ChangedEntity>[];
 
     for (var i = 0; i < payloads.length; i++) {
       try {
@@ -686,7 +686,8 @@ class ImportExportService {
   }
 
   /// Previews card import and detects likely update candidates.
-  static Future<ChangePreview<ImportCardsPayload>> previewCardImport({
+  static Future<ChangePlan<ImportCardsPayload, CardTemplate>>
+  previewCardImport({
     required String deckId,
     required List<Map<String, dynamic>> incomingTemplateMaps,
     CardSimilarityConfig similarity = const CardSimilarityConfig(),
@@ -694,7 +695,7 @@ class ImportExportService {
     final incoming = _decodeTemplates(incomingTemplateMaps);
     final existing = LocalDB.cardTemplate.getByDeckId(deckId);
     final candidates = <ImportCardMatchCandidate>[];
-    final changes = <ChangeRecord>[];
+    final changes = <ChangedEntity<CardTemplate>>[];
 
     for (final template in incoming) {
       final incomingPreview = _templatePreview(template);
@@ -734,34 +735,37 @@ class ImportExportService {
           (template) => template.id == existingTemplateId,
         );
         changes.add(
-          ChangeRecord(
+          ChangedEntity(
             type: ChangeType.modified,
             source: ChangeSource.importExport,
             entityType: 'card_template',
             entityId: local.id,
-            title: ChangeComparer.templateTitle(local),
+            title: ChangeDifferenceHelper.templateTitle(local),
             subtitle: 'Likely imported card update',
-            before: local,
-            after: template,
-            fields: ChangeComparer.templates(local, template),
+            beforeChange: local,
+            afterChange: template,
+            changedProperties: ChangeDifferenceHelper.templates(
+              local,
+              template,
+            ),
           ),
         );
       } else {
         changes.add(
-          ChangeRecord(
+          ChangedEntity(
             type: ChangeType.added,
             source: ChangeSource.importExport,
             entityType: 'card_template',
             entityId: template.id,
-            title: ChangeComparer.templateTitle(template),
+            title: ChangeDifferenceHelper.templateTitle(template),
             subtitle: 'Imported card will be added',
-            after: template,
+            afterChange: template,
           ),
         );
       }
     }
 
-    return ChangePreview<ImportCardsPayload>(
+    return ChangePlan<ImportCardsPayload, CardTemplate>(
       payload: ImportCardsPayload(
         deckId: deckId,
         incomingTemplates: incomingTemplateMaps,
@@ -772,7 +776,8 @@ class ImportExportService {
   }
 
   /// JSON helper for [previewCardImport].
-  static Future<ChangePreview<ImportCardsPayload>> previewCardImportJson({
+  static Future<ChangePlan<ImportCardsPayload, CardTemplate>>
+  previewCardImportJson({
     required String deckId,
     required String rawJson,
     CardSimilarityConfig similarity = const CardSimilarityConfig(),
@@ -801,11 +806,12 @@ class ImportExportService {
   }
 
   /// Applies card import decisions and returns detailed change logs.
-  static Future<ChangeResult<List<CardTemplate>>> applyCardImportPlan({
-    required ChangePreview<ImportCardsPayload> plan,
+  static Future<ChangeResult<List<CardTemplate>, CardTemplate>>
+  applyCardImportPlan({
+    required ChangePlan<ImportCardsPayload, CardTemplate> plan,
     required List<CardImportDecision> decisions,
   }) async {
-    final logs = <ChangeRecord>[];
+    final logs = <ChangedEntity<CardTemplate>>[];
     final payload = plan.payload;
     final incoming = _decodeTemplates(payload.incomingTemplates);
     final decisionByIncomingId = {
@@ -817,14 +823,14 @@ class ImportExportService {
       final decision = decisionByIncomingId[template.id];
       if (decision?.action == CardImportAction.skip) {
         logs.add(
-          ChangeRecord(
+          ChangedEntity(
             type: ChangeType.skipped,
             source: ChangeSource.importExport,
             entityType: 'card_template',
             entityId: template.id,
-            title: ChangeComparer.templateTitle(template),
+            title: ChangeDifferenceHelper.templateTitle(template),
             subtitle: 'Skipped imported card',
-            after: template,
+            afterChange: template,
           ),
         );
         continue;
@@ -837,7 +843,7 @@ class ImportExportService {
         });
         if (existing == null) {
           logs.add(
-            ChangeRecord(
+            ChangedEntity(
               type: ChangeType.skipped,
               source: ChangeSource.importExport,
               entityType: 'card_template',
@@ -858,16 +864,19 @@ class ImportExportService {
         await LocalDB.cardTemplate.upsert(updated);
         written.add(updated);
         logs.add(
-          ChangeRecord(
+          ChangedEntity(
             type: ChangeType.modified,
             source: ChangeSource.importExport,
             entityType: 'card_template',
             entityId: existing.id,
-            title: ChangeComparer.templateTitle(updated),
+            title: ChangeDifferenceHelper.templateTitle(updated),
             subtitle: 'Updated imported card',
-            before: existing,
-            after: updated,
-            fields: ChangeComparer.templates(existing, updated),
+            beforeChange: existing,
+            afterChange: updated,
+            changedProperties: ChangeDifferenceHelper.templates(
+              existing,
+              updated,
+            ),
           ),
         );
         continue;
@@ -882,14 +891,14 @@ class ImportExportService {
       await LocalDB.cardTemplate.upsert(created);
       written.add(created);
       logs.add(
-        ChangeRecord(
+        ChangedEntity(
           type: ChangeType.added,
           source: ChangeSource.importExport,
           entityType: 'card_template',
           entityId: created.id,
-          title: ChangeComparer.templateTitle(created),
+          title: ChangeDifferenceHelper.templateTitle(created),
           subtitle: 'Imported new card',
-          after: created,
+          afterChange: created,
         ),
       );
     }
@@ -1334,7 +1343,7 @@ class ImportExportService {
     required String? entityId,
     required String title,
     required Map<String, dynamic> payload,
-    required List<ChangeRecord> logs,
+    required List<ChangedEntity> logs,
   }) async {
     final backup = ImportExportBackup(
       id: uuid.v7(),

@@ -1,4 +1,4 @@
-/// Operation type represented by a [ChangeRecord].
+/// Operation type represented by a [ChangedEntity].
 enum ChangeType {
   /// Entity will be created or copied in.
   added,

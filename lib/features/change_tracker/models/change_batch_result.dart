@@ -1,6 +1,10 @@
-import 'package:boo_mondai/lib.barrel.dart' show ChangeRecord;
+import 'package:boo_mondai/lib.barrel.dart' show ChangedEntity;
 
 /// Result returned after a batch change operation where entries can fail.
+///
+/// The generic [TValue] is the successful item type produced by the workflow.
+/// Failed items are represented as human-readable messages in [failures] so a
+/// caller can show partial success without throwing away successful [values].
 class ChangeBatchResult<TValue> {
   /// Creates a batch result from successful [values] and failure messages.
   const ChangeBatchResult({
@@ -16,5 +20,5 @@ class ChangeBatchResult<TValue> {
   final List<String> failures;
 
   /// Changes that were produced by successful entries.
-  final List<ChangeRecord> changes;
+  final List<ChangedEntity> changes;
 }

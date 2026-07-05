@@ -2,6 +2,7 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         CardTemplate,
         ChangedProperty,
+        ChangeType,
         Deck,
         FillInTheBlanksTemplate,
         FlashcardTemplate,
@@ -11,49 +12,53 @@ import 'package:boo_mondai/lib.barrel.dart'
         Tag,
         WordScrambleTemplate;
 
-/// Compares two versions of the same entity and returns the fields that changed
-/// as a list of [ChangedProperty].
+/// Compares two versions of the same entity and returns display-ready field
+/// differences.
 ///
-/// Used by [DeckDownloadsService] to populate [ChangeRecord.fields] before
+/// Used by [DeckDownloadsService] to populate [ChangedEntity.changedProperties] before
 /// passing records to [ChangeTrackerController]. All methods are pure and
 /// stateless.
-abstract final class ChangeComparer {
-  /// Returns the metadata fields that differ between [before] and [after].
+abstract final class ChangeDifferenceHelper {
+  /// Returns the metadata changedProperties that differ between [before] and [after].
   ///
-  /// Returns an empty list when the decks are identical in all tracked fields.
+  /// Returns an empty list when the decks are identical in all tracked changedProperties.
   static List<ChangedProperty> decks(Deck before, Deck after) {
     return [
       if (before.title != after.title)
         ChangedProperty(
           propertyLabel: 'Title',
+          type: ChangeType.modified,
           before: before.title,
           after: after.title,
         ),
       if (before.shortDescription != after.shortDescription)
         ChangedProperty(
           propertyLabel: 'Short description',
+          type: ChangeType.modified,
           before: before.shortDescription,
           after: after.shortDescription,
         ),
       if (before.longDescription != after.longDescription)
         ChangedProperty(
           propertyLabel: 'Long description',
+          type: ChangeType.modified,
           before: before.longDescription,
           after: after.longDescription,
         ),
       if (_tagText(before.tags) != _tagText(after.tags))
         ChangedProperty(
           propertyLabel: 'Tags',
+          type: ChangeType.modified,
           before: _tagText(before.tags),
           after: _tagText(after.tags),
         ),
     ];
   }
 
-  /// Returns the template fields that differ between [before] and [after].
+  /// Returns the template changedProperties that differ between [before] and [after].
   ///
   /// Returns an empty list when both templates are the same type and identical
-  /// in all tracked fields. Returns a single `Card type` entry when the
+  /// in all tracked changedProperties. Returns a single `Card type` entry when the
   /// templates are different subtypes.
   static List<ChangedProperty> templates(
     CardTemplate before,
@@ -64,6 +69,7 @@ abstract final class ChangeComparer {
       properties.add(
         ChangedProperty(
           propertyLabel: 'Tags',
+          type: ChangeType.modified,
           before: _tagText(before.tags),
           after: _tagText(after.tags),
         ),
@@ -107,6 +113,7 @@ abstract final class ChangeComparer {
       return [
         ChangedProperty(
           propertyLabel: 'Card type',
+          type: ChangeType.modified,
           before: before.runtimeType,
           after: after.runtimeType,
         ),
@@ -118,12 +125,14 @@ abstract final class ChangeComparer {
         if (b.frontText != a.frontText)
           ChangedProperty(
             propertyLabel: 'Front',
+            type: ChangeType.modified,
             before: b.frontText,
             after: a.frontText,
           ),
         if (b.backText != a.backText)
           ChangedProperty(
             propertyLabel: 'Back',
+            type: ChangeType.modified,
             before: b.backText,
             after: a.backText,
           ),
@@ -132,12 +141,14 @@ abstract final class ChangeComparer {
         if (b.promptText != a.promptText)
           ChangedProperty(
             propertyLabel: 'Prompt',
+            type: ChangeType.modified,
             before: b.promptText,
             after: a.promptText,
           ),
         if (b.acceptedAnswers != a.acceptedAnswers)
           ChangedProperty(
             propertyLabel: 'Accepted answers',
+            type: ChangeType.modified,
             before: b.acceptedAnswers,
             after: a.acceptedAnswers,
           ),
@@ -146,12 +157,14 @@ abstract final class ChangeComparer {
         if (b.questionPrompt != a.questionPrompt)
           ChangedProperty(
             propertyLabel: 'Question',
+            type: ChangeType.modified,
             before: b.questionPrompt,
             after: a.questionPrompt,
           ),
         if (_optionText(b) != _optionText(a))
           ChangedProperty(
             propertyLabel: 'Options',
+            type: ChangeType.modified,
             before: _optionText(b),
             after: _optionText(a),
           ),
@@ -160,6 +173,7 @@ abstract final class ChangeComparer {
         if (_segmentText(b) != _segmentText(a))
           ChangedProperty(
             propertyLabel: 'Segments',
+            type: ChangeType.modified,
             before: _segmentText(b),
             after: _segmentText(a),
           ),
@@ -168,6 +182,7 @@ abstract final class ChangeComparer {
         if (_pairText(b) != _pairText(a))
           ChangedProperty(
             propertyLabel: 'Pairs',
+            type: ChangeType.modified,
             before: _pairText(b),
             after: _pairText(a),
           ),
@@ -176,6 +191,7 @@ abstract final class ChangeComparer {
         if (b.sentenceToScramble != a.sentenceToScramble)
           ChangedProperty(
             propertyLabel: 'Sentence',
+            type: ChangeType.modified,
             before: b.sentenceToScramble,
             after: a.sentenceToScramble,
           ),

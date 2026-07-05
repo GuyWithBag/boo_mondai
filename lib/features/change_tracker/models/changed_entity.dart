@@ -1,23 +1,30 @@
-import 'package:boo_mondai/lib.barrel.dart'
-    show ChangedProperty, ChangeSource, ChangeType;
+import 'package:boo_mondai/features/change_tracker/models/change_source.dart';
+import 'package:boo_mondai/features/change_tracker/models/change_type.dart';
+import 'package:boo_mondai/features/change_tracker/models/changed_property.dart';
+import 'package:dart_mappable/dart_mappable.dart';
+
+part 'changed_entity.mapper.dart';
 
 /// A single human-readable record of one entity-level change within a
-/// [ChangePreview] or a completed [ChangeTrackerEntry].
+/// [ChangePlan] or a completed [ChangeTrackerEntry].
 ///
 /// Each record describes what happened to one entity (a deck, a card template,
 /// etc.) and optionally holds [ChangedProperty] entries for field-level detail.
-class ChangeRecord {
+/// Records are display-oriented, not persistence models; snapshots are kept as
+/// [Object] values and [toJson] is intended for diagnostics.
+@MappableClass()
+class ChangedEntity<T> with ChangedEntityMappable<T> {
   /// Creates a record for one entity-level operation.
-  const ChangeRecord({
+  const ChangedEntity({
     required this.type,
     required this.source,
     required this.entityType,
     required this.entityId,
     required this.title,
     this.subtitle,
-    this.before,
-    this.after,
-    this.fields = const [],
+    this.beforeChange,
+    this.afterChange,
+    this.changedProperties = const [],
     this.localId,
     this.remoteId,
     this.localUpdatedAt,
@@ -43,13 +50,17 @@ class ChangeRecord {
   final String? subtitle;
 
   /// Entity snapshot before the change.
-  final Object? before;
+  ///
+  /// Usually present for modified or removed records.
+  final T? beforeChange;
 
   /// Entity snapshot after the change.
-  final Object? after;
+  ///
+  /// Usually present for added or modified records.
+  final T? afterChange;
 
   /// Property-level diffs for modified entities.
-  final List<ChangedProperty> fields;
+  final List<ChangedProperty<Object?>> changedProperties;
 
   /// Local identifier when the change compares local and remote records.
   final String? localId;
@@ -62,24 +73,4 @@ class ChangeRecord {
 
   /// Remote record timestamp used for conflict/change explanations.
   final DateTime? remoteUpdatedAt;
-
-  /// Converts this record into a serializable map for debug output.
-  Map<String, dynamic> toJson() => {
-    'type': type.name,
-    'source': source.name,
-    'entity_type': entityType,
-    'entity_id': entityId,
-    'title': title,
-    if (subtitle != null) 'subtitle': subtitle,
-    if (before != null) 'before': before.toString(),
-    if (after != null) 'after': after.toString(),
-    if (fields.isNotEmpty)
-      'fields': [for (final field in fields) field.toJson()],
-    if (localId != null) 'local_id': localId,
-    if (remoteId != null) 'remote_id': remoteId,
-    if (localUpdatedAt != null)
-      'local_updated_at': localUpdatedAt!.toIso8601String(),
-    if (remoteUpdatedAt != null)
-      'remote_updated_at': remoteUpdatedAt!.toIso8601String(),
-  };
 }

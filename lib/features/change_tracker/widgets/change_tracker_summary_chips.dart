@@ -5,12 +5,15 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 /// Compact added/modified/removed counts for a tracked entry.
+///
+/// Used by review and sync surfaces to give a quick summary before the detailed
+/// [ChangedEntity] list.
 class ChangeTrackerSummaryChips extends StatelessWidget {
   /// Creates summary chips for [entry].
   const ChangeTrackerSummaryChips({super.key, required this.entry});
 
   /// Entry whose change counts should be summarized.
-  final ChangeTrackerEntry entry;
+  final ChangeTrackerEntry<Object?> entry;
 
   @override
   Widget build(BuildContext context) {

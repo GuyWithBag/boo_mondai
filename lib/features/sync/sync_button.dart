@@ -5,8 +5,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         Button,
         ButtonColor,
-        buttonStyle,
+        ButtonPadding,
+        ButtonSize,
+        ButtonVariant,
         SnackbarTone,
+        buttonStyle,
         showSnackbar;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -31,9 +34,14 @@ class SyncButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
     if (isSyncing) {
-      return const Padding(
-        padding: EdgeInsets.symmetric(horizontal: 12),
-        child: SizedBox(
+      return Button(
+        onPressed: null,
+        style: buttonStyle.resolve(tokens, const [
+          ButtonSize.icon,
+          ButtonPadding.none,
+          ButtonVariant.text,
+        ]),
+        child: const SizedBox(
           width: 20,
           height: 20,
           child: CircularProgressIndicator(strokeWidth: 2),

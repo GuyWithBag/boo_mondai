@@ -1,6 +1,11 @@
 import 'package:boo_mondai/core/services/uuid.dart';
-import 'package:boo_mondai/lib.barrel.dart'
-    show ChangeRecord, ChangeSource, ChangeType, ChangeTrackerStatus;
+import 'package:boo_mondai/features/change_tracker/models/changed_entity.dart';
+import 'package:boo_mondai/features/change_tracker/models/change_source.dart';
+import 'package:boo_mondai/features/change_tracker/models/change_tracker_status.dart';
+import 'package:boo_mondai/features/change_tracker/models/change_type.dart';
+import 'package:dart_mappable/dart_mappable.dart';
+
+part 'change_tracker_entry.mapper.dart';
 
 /// The runtime state of one tracked change operation managed by
 /// [ChangeTrackerController].
@@ -13,7 +18,8 @@ import 'package:boo_mondai/lib.barrel.dart'
 ///
 /// Entries are identified by [id] and may be looked up via
 /// [ChangeTrackerController.entryById].
-class ChangeTrackerEntry {
+@MappableClass()
+class ChangeTrackerEntry<T> with ChangeTrackerEntryMappable<T> {
   /// Creates a tracked entry, generating an id and start time when omitted.
   ChangeTrackerEntry({
     String? id,
@@ -41,9 +47,12 @@ class ChangeTrackerEntry {
   final ChangeTrackerStatus status;
 
   /// Changes shown to the user before or after applying.
-  final List<ChangeRecord> changes;
+  final List<ChangedEntity<T>> changes;
 
   /// Optional progress value from `0.0` to `1.0`.
+  ///
+  /// A null value means progress is indeterminate. Callers should clamp values
+  /// before passing them in; the entry preserves the value it receives.
   final double? progress;
 
   /// Human-readable error text when the plan fails.
@@ -56,8 +65,13 @@ class ChangeTrackerEntry {
   final DateTime? finishedAt;
 
   /// Whether the entry should still be treated as active by UI surfaces.
+  ///
+  /// Active entries represent work that may still change state or need user
+  /// attention. Terminal entries can be removed with
+  /// [ChangeTrackerController.clearFinished].
   bool get isActive =>
-      status == ChangeTrackerStatus.previewing ||
+      status == ChangeTrackerStatus.planning ||
+      status == ChangeTrackerStatus.fetching ||
       status == ChangeTrackerStatus.reviewing ||
       status == ChangeTrackerStatus.applying ||
       status == ChangeTrackerStatus.paused;
@@ -73,28 +87,4 @@ class ChangeTrackerEntry {
 
   int _count(ChangeType type) =>
       changes.where((change) => change.type == type).length;
-
-  /// Returns a new entry with selected lifecycle fields changed.
-  ChangeTrackerEntry copyWith({
-    ChangeTrackerStatus? status,
-    List<ChangeRecord>? changes,
-    double? progress,
-    String? errorMessage,
-    bool clearErrorMessage = false,
-    DateTime? finishedAt,
-  }) {
-    return ChangeTrackerEntry(
-      id: id,
-      source: source,
-      title: title,
-      status: status ?? this.status,
-      changes: changes ?? this.changes,
-      progress: progress ?? this.progress,
-      errorMessage: clearErrorMessage
-          ? null
-          : errorMessage ?? this.errorMessage,
-      startedAt: startedAt,
-      finishedAt: finishedAt ?? this.finishedAt,
-    );
-  }
 }

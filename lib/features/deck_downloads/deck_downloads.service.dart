@@ -9,11 +9,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         CardLinkAttachment,
         CardMediaAttachment,
         CardTemplatesRemoteDB,
-        ChangeRecord,
-        ChangePreview,
+        ChangedEntity,
+        ChangePlan,
         ChangeResult,
-        ChangeTrackerReporter,
-        ChangeComparer,
+        ChangeTrackerService,
+        ChangeDifferenceHelper,
         ChangeTrackerStatus,
         ChangeSource,
         ChangeType,
@@ -39,7 +39,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         StudyCardService,
         VisibilityState,
         WordScrambleTemplate,
-        uuid;
+        uuid,
+        ChangeTrackerEntry;
 import 'package:boo_mondai/features/card_attachments/media_storage.service.dart';
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart' show CountOption;
@@ -47,7 +48,10 @@ import 'package:supabase_flutter/supabase_flutter.dart' show CountOption;
 const _kPageSize = 20;
 
 class DeckDownloadsService {
-  DeckDownloadsService();
+  DeckDownloadsService({ChangeTrackerService? changeTrackerService})
+    : changeTrackerService = changeTrackerService ?? ChangeTrackerService();
+
+  final ChangeTrackerService changeTrackerService;
 
   final DecksRemoteDB _decks = RemoteDB.deck;
   final CardTemplatesRemoteDB _cardTemplates = RemoteDB.card;
@@ -58,25 +62,26 @@ class DeckDownloadsService {
 
   // ── Public API ────────────────────────────────────────────────────────────
 
-  Future<ChangeResult<DeckDownloadPayload>> downloadDeck(
-    Deck sourceDeck,
-    ChangeTrackerReporter reporter, {
+  Future<ChangeResult<DeckDownloadPayload, Object?>> downloadDeck(
+    Deck sourceDeck, {
     String? resumeEntryId,
   }) async {
     final entry = resumeEntryId != null
-        ? reporter.entryById(resumeEntryId)!
-        : reporter.start(
-            source: ChangeSource.deckDownload,
-            title: sourceDeck.title,
-            status: ChangeTrackerStatus.previewing,
-            progress: 0,
+        ? changeTrackerService.entryById(resumeEntryId)!
+        : changeTrackerService.start(
+            entry: ChangeTrackerEntry(
+              source: ChangeSource.deckDownload,
+              title: sourceDeck.title,
+              status: ChangeTrackerStatus.planning,
+              progress: 0,
+            ),
           );
 
     _pausedEntryIds.remove(entry.id);
 
     try {
       // 1. Fetch remote deck metadata
-      reporter.update(entry.id, progress: 0.05);
+      changeTrackerService.update(entry.id, progress: 0.05);
       final remoteDeck = await _decks.selectById(sourceDeck.id) ?? sourceDeck;
 
       // 2. Check for an existing local copy
@@ -85,7 +90,7 @@ class DeckDownloadsService {
       // 3. If already downloaded and no changes needed, return immediately
       final existingPlan = await previewDeckDownload(sourceDeck);
       if (localDeck != null && existingPlan.changes.isEmpty) {
-        reporter.complete(entry.id, changes: existingPlan.changes);
+        changeTrackerService.complete(entry.id, changes: existingPlan.changes);
         return ChangeResult(
           value: existingPlan.payload,
           changes: existingPlan.changes,
@@ -116,7 +121,7 @@ class DeckDownloadsService {
       final allFetchedTemplates = <CardTemplate>[];
       var offset = alreadyFetchedIds.length;
 
-      reporter.update(
+      changeTrackerService.update(
         entry.id,
         status: ChangeTrackerStatus.applying,
         progress: _downloadProgress(offset, totalCount),
@@ -131,7 +136,10 @@ class DeckDownloadsService {
               updatedAt: DateTime.now(),
             ),
           );
-          reporter.update(entry.id, status: ChangeTrackerStatus.paused);
+          changeTrackerService.update(
+            entry.id,
+            status: ChangeTrackerStatus.paused,
+          );
           return ChangeResult(
             value: existingPlan.payload,
             changes: existingPlan.changes,
@@ -159,7 +167,7 @@ class DeckDownloadsService {
         );
         await _downloadCheckpoints.upsert(checkpoint);
 
-        reporter.update(
+        changeTrackerService.update(
           entry.id,
           progress: _downloadProgress(offset, totalCount),
         );
@@ -224,7 +232,7 @@ class DeckDownloadsService {
       );
       await _downloadMediaPhase(
         entryId: entry.id,
-        reporter: reporter,
+        changeTrackerService: changeTrackerService,
         checkpoint: checkpoint,
         localTemplates: localTemplates,
       );
@@ -241,7 +249,7 @@ class DeckDownloadsService {
             : LocalDB.cardTemplate.getByDeckId(localDeckId),
       );
 
-      reporter.complete(entry.id, changes: changes);
+      changeTrackerService.complete(entry.id, changes: changes);
       return ChangeResult(
         value: DeckDownloadPayload(
           remoteDeck: remoteDeck,
@@ -252,7 +260,7 @@ class DeckDownloadsService {
         changes: changes,
       );
     } catch (e) {
-      reporter.fail(entry.id, e);
+      changeTrackerService.fail(entry.id, e);
       rethrow;
     }
   }
@@ -261,17 +269,16 @@ class DeckDownloadsService {
     _pausedEntryIds.add(entryId);
   }
 
-  Future<ChangeResult<DeckDownloadPayload>> resumeDownload(
+  Future<ChangeResult<DeckDownloadPayload, Object?>> resumeDownload(
     Deck sourceDeck,
-    ChangeTrackerReporter reporter,
     String entryId,
   ) {
-    return downloadDeck(sourceDeck, reporter, resumeEntryId: entryId);
+    return downloadDeck(sourceDeck, resumeEntryId: entryId);
   }
 
   // ── Preview ───────────────────────────────────────────────────────────────
 
-  Future<ChangePreview<DeckDownloadPayload>> previewDeckDownload(
+  Future<ChangePlan<DeckDownloadPayload, Object?>> previewDeckDownload(
     Deck sourceDeck,
   ) async {
     final remoteDeck = await _decks.selectById(sourceDeck.id) ?? sourceDeck;
@@ -286,7 +293,7 @@ class DeckDownloadsService {
         ? <CardTemplate>[]
         : LocalDB.cardTemplate.getByDeckId(localDeck.id);
 
-    return ChangePreview(
+    return ChangePlan(
       payload: DeckDownloadPayload(
         remoteDeck: remoteDeck,
         localDeck: localDeck,
@@ -325,38 +332,38 @@ class DeckDownloadsService {
     return matches.isEmpty ? null : matches.first;
   }
 
-  List<ChangeRecord> _buildDownloadChanges({
+  List<ChangedEntity> _buildDownloadChanges({
     required Deck remoteDeck,
     required Deck? localDeck,
     required List<CardTemplate> remoteTemplates,
     required List<CardTemplate> localTemplates,
   }) {
-    final changes = <ChangeRecord>[];
+    final changes = <ChangedEntity>[];
 
     if (localDeck == null) {
       changes.add(
-        ChangeRecord(
+        ChangedEntity(
           type: ChangeType.added,
           source: ChangeSource.deckDownload,
           entityType: 'deck',
           entityId: remoteDeck.id,
           title: remoteDeck.title,
           subtitle: 'Deck will be added to your local library.',
-          after: remoteDeck,
+          afterChange: remoteDeck,
           remoteId: remoteDeck.id,
           remoteUpdatedAt: remoteDeck.updatedAt,
         ),
       );
       changes.addAll(
         remoteTemplates.map(
-          (t) => ChangeRecord(
+          (t) => ChangedEntity(
             type: ChangeType.added,
             source: ChangeSource.deckDownload,
             entityType: 'card_template',
             entityId: t.id,
-            title: ChangeComparer.templateTitle(t),
+            title: ChangeDifferenceHelper.templateTitle(t),
             subtitle: 'Card will be copied from the published deck.',
-            after: t,
+            afterChange: t,
             remoteId: t.id,
             remoteUpdatedAt: t.updatedAt,
           ),
@@ -367,16 +374,19 @@ class DeckDownloadsService {
 
     if (remoteDeck.updatedAt.isAfter(localDeck.updatedAt)) {
       changes.add(
-        ChangeRecord(
+        ChangedEntity(
           type: ChangeType.modified,
           source: ChangeSource.deckDownload,
           entityType: 'deck',
           entityId: localDeck.id,
           title: localDeck.title,
           subtitle: 'Published deck metadata is newer than your local copy.',
-          before: localDeck,
-          after: remoteDeck,
-          fields: ChangeComparer.decks(localDeck, remoteDeck),
+          beforeChange: localDeck,
+          afterChange: remoteDeck,
+          changedProperties: ChangeDifferenceHelper.decks(
+            localDeck,
+            remoteDeck,
+          ),
           localId: localDeck.id,
           remoteId: remoteDeck.id,
           localUpdatedAt: localDeck.updatedAt,
@@ -395,30 +405,33 @@ class DeckDownloadsService {
       final localTemplate = localBySourceId[remoteTemplate.id];
       if (localTemplate == null) {
         changes.add(
-          ChangeRecord(
+          ChangedEntity(
             type: ChangeType.added,
             source: ChangeSource.deckDownload,
             entityType: 'card_template',
             entityId: remoteTemplate.id,
-            title: ChangeComparer.templateTitle(remoteTemplate),
+            title: ChangeDifferenceHelper.templateTitle(remoteTemplate),
             subtitle: 'Published deck has a card missing locally.',
-            after: remoteTemplate,
+            afterChange: remoteTemplate,
             remoteId: remoteTemplate.id,
             remoteUpdatedAt: remoteTemplate.updatedAt,
           ),
         );
       } else if (remoteTemplate.updatedAt.isAfter(localTemplate.updatedAt)) {
         changes.add(
-          ChangeRecord(
+          ChangedEntity(
             type: ChangeType.modified,
             source: ChangeSource.deckDownload,
             entityType: 'card_template',
             entityId: localTemplate.id,
-            title: ChangeComparer.templateTitle(localTemplate),
+            title: ChangeDifferenceHelper.templateTitle(localTemplate),
             subtitle: 'Published card is newer than your local copy.',
-            before: localTemplate,
-            after: remoteTemplate,
-            fields: ChangeComparer.templates(localTemplate, remoteTemplate),
+            beforeChange: localTemplate,
+            afterChange: remoteTemplate,
+            changedProperties: ChangeDifferenceHelper.templates(
+              localTemplate,
+              remoteTemplate,
+            ),
             localId: localTemplate.id,
             remoteId: remoteTemplate.id,
             localUpdatedAt: localTemplate.updatedAt,
@@ -432,15 +445,15 @@ class DeckDownloadsService {
       final sourceId = localTemplate.sourceTemplateId;
       if (sourceId == null || remoteIds.contains(sourceId)) continue;
       changes.add(
-        ChangeRecord(
+        ChangedEntity(
           type: ChangeType.removed,
           source: ChangeSource.deckDownload,
           entityType: 'card_template',
           entityId: localTemplate.id,
-          title: ChangeComparer.templateTitle(localTemplate),
+          title: ChangeDifferenceHelper.templateTitle(localTemplate),
           subtitle:
               'Local card points to a published card that no longer exists.',
-          before: localTemplate,
+          beforeChange: localTemplate,
           localId: localTemplate.id,
           remoteId: sourceId,
           localUpdatedAt: localTemplate.updatedAt,
@@ -619,7 +632,7 @@ class DeckDownloadsService {
 
   Future<void> _downloadMediaPhase({
     required String entryId,
-    required ChangeTrackerReporter reporter,
+    required ChangeTrackerService changeTrackerService,
     required DownloadCheckpoint checkpoint,
     required List<CardTemplate> localTemplates,
   }) async {
@@ -640,7 +653,10 @@ class DeckDownloadsService {
             updatedAt: DateTime.now(),
           ),
         );
-        reporter.update(entryId, status: ChangeTrackerStatus.paused);
+        changeTrackerService.update(
+          entryId,
+          status: ChangeTrackerStatus.paused,
+        );
         return;
       }
 
@@ -670,7 +686,7 @@ class DeckDownloadsService {
         updatedAt: DateTime.now(),
       );
       await _downloadCheckpoints.upsert(currentCheckpoint);
-      reporter.update(
+      changeTrackerService.update(
         entryId,
         progress: 0.9 + ((i + 1) / mediaAttachments.length) * 0.1,
       );

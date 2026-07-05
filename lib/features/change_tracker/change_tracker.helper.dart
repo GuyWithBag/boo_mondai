@@ -28,7 +28,7 @@ abstract final class ChangeTrackerHelper {
   }
 
   /// Returns the count of [type] changes in [entry].
-  static int typeCount(ChangeTrackerEntry entry, ChangeType type) {
+  static int typeCount(ChangeTrackerEntry<Object?> entry, ChangeType type) {
     return switch (type) {
       ChangeType.added => entry.addedCount,
       ChangeType.modified => entry.modifiedCount,

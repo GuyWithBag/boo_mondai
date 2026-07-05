@@ -1,17 +1,20 @@
 /// Lifecycle states for a [ChangeTrackerEntry].
+///
+/// The common review-first path is [planning] -> [fetching] -> [reviewing] ->
+/// [applying] -> [completed]. Workflows may also move to [failed], [canceled],
+/// [paused], or [alreadyUpToDate] depending on user action and feature needs.
 enum ChangeTrackerStatus {
   /// No operation has started. Initial state before [ChangeTrackerController.start].
   idle,
 
   /// The operation is discovering what will change. Progress is indeterminate.
-  previewing,
+  planning,
+
+  /// The operation is loading local or remote data needed to build a plan.
+  fetching,
 
   /// Changes have been computed and are awaiting user confirmation.
   reviewing,
-
-  /// The operation has finished and result details are ready for display.
-  /// Reserved for future use.
-  results,
 
   /// The operation is temporarily suspended and may be resumed.
   paused,

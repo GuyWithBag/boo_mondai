@@ -1,19 +1,29 @@
+import 'package:boo_mondai/lib.barrel.dart';
+
 /// The before and after value of a single labeled property within a
-/// [ChangeRecord] of type [ChangeType.modified].
+/// [ChangedEntity] of type [ChangeType.modified].
 ///
-/// Used by [ChangeComparer] to produce field-level diffs and rendered
-/// by [ChangeTrackerFieldDiff] in the review UI.
-class ChangedProperty {
-  const ChangedProperty({required this.propertyLabel, this.before, this.after});
+/// Used by [ChangeDifferenceHelper] to produce field-level diffs and rendered
+/// by [ChangedPropertyBlock] in the review UI.
+class ChangedProperty<T> {
+  /// Creates a display-ready property diff.
+  const ChangedProperty({
+    required this.propertyLabel,
+    this.before,
+    this.after,
+    required this.type,
+  });
 
   /// User-facing label for this property, such as `Title` or `Tags`.
   final String propertyLabel;
 
+  final ChangeType type;
+
   /// Property value before the change, or null for additions.
-  final Object? before;
+  final T? before;
 
   /// Property value after the change, or null for removals.
-  final Object? after;
+  final T? after;
 
   /// Serializes this property diff for debug output.
   Map<String, dynamic> toJson() => {

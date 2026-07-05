@@ -2,11 +2,10 @@
 
 // Other files
 export 'change_source.dart';
-export 'change_preview.dart';
 export 'change_result.dart';
 export 'change_type.dart';
-export 'change_record.dart';
 export 'changed_property.dart';
 export 'change_batch_result.dart';
 export 'change_tracker_status.dart';
-export 'change_comparer.dart';
+export 'change_plan.dart';
+export 'changed_entity.dart';

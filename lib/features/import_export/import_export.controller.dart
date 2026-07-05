@@ -4,16 +4,17 @@ import 'dart:io';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         CardImportDecision,
+        CardTemplate,
         CardSimilarityConfig,
         Controller,
         Deck,
         DeckImportMode,
-        ChangePreview,
+        ChangePlan,
         ImportCardsPayload,
         ImportFailure,
         ImportOptions,
         ImportResult,
-        ChangeRecord,
+        ChangedEntity,
         ImportExportService;
 import 'package:file_picker/file_picker.dart';
 
@@ -42,8 +43,8 @@ class ImportFileResult<T> {
 
 /// UI-facing state holder for import/export workflows.
 class ImportExportController extends Controller {
-  ChangePreview<ImportCardsPayload>? currentPlan;
-  List<ChangeRecord> latestChanges = const [];
+  ChangePlan<ImportCardsPayload, CardTemplate>? currentPlan;
+  List<ChangedEntity<Object?>> latestChanges = const [];
   List<String> latestFailures = const [];
 
   /// Exports one deck and stores change logs.
@@ -296,7 +297,7 @@ class ImportExportController extends Controller {
   }
 
   /// Builds a similarity plan for importing cards into one deck.
-  Future<ChangePreview<ImportCardsPayload>?> previewCardImport({
+  Future<ChangePlan<ImportCardsPayload, CardTemplate>?> previewCardImport({
     required String deckId,
     required List<Map<String, dynamic>> incomingTemplateMaps,
     CardSimilarityConfig similarity = const CardSimilarityConfig(),
@@ -321,7 +322,7 @@ class ImportExportController extends Controller {
   }
 
   /// Builds a similarity plan from raw JSON.
-  Future<ChangePreview<ImportCardsPayload>?> previewCardImportJson({
+  Future<ChangePlan<ImportCardsPayload, CardTemplate>?> previewCardImportJson({
     required String deckId,
     required String rawJson,
     CardSimilarityConfig similarity = const CardSimilarityConfig(),

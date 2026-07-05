@@ -4,20 +4,21 @@
 
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        SyncException,
-        DTO,
+        AuthService,
+        ChangePlan,
+        ChangedEntity,
+        ChangeResult,
+        ChangeSource,
+        ChangeTrackerController,
+        ChangeTrackerEntry,
+        ChangeTrackerStatus,
+        ChangeType,
+        MutableEntity,
         HiveLocalDB,
         SupabaseRemoteDB,
-        ChangeRecord,
-        ChangePreview,
-        ChangeResult,
-        ChangeTrackerStatus,
-        ChangeTrackerController,
-        ChangeSource,
-        ChangeType,
+        SyncException,
         SyncPlanPayload,
-        SyncSummary,
-        AuthService;
+        SyncSummary;
 
 /// Compares two DateTimes at millisecond precision, ignoring sub-millisecond
 /// differences introduced by Supabase's microsecond storage vs Dart/Hive's
@@ -38,7 +39,7 @@ class SyncService {
 
   /// Performs a highly-optimized network request to check if a sync is needed
   /// by ONLY downloading IDs and timestamps, bypassing heavy joined data.
-  static Future<bool> needsSync<T extends DTO>({
+  static Future<bool> doesTableNeedSync<T extends MutableEntity>({
     required HiveLocalDB<T> localDb,
     required SupabaseRemoteDB<T> remoteDb,
     required String userId,
@@ -86,24 +87,27 @@ class SyncService {
   }
 
   /// Builds a sync preview and registers its apply step with the ChangeTrackerController.
-  static Future<ChangePreview<SyncPlanPayload<T>>> sync<T extends DTO>({
+  static Future<ChangePlan<SyncPlanPayload<T>, T>>
+  sync<T extends MutableEntity>({
     required HiveLocalDB<T> localDb,
     required SupabaseRemoteDB<T> remoteDb,
     required String userId,
-    required ChangeTrackerController reviewController,
+    required ChangeTrackerController changeTrackerController,
     bool Function(T item)? localWhere,
   }) async {
-    late final ChangePreview<SyncPlanPayload<T>> syncPlan;
+    late final ChangePlan<SyncPlanPayload<T>, T> syncPlan;
 
     // 1. Force the _SyncPage loading screen to appear immediately
-    final entry = reviewController.start(
-      source: ChangeSource.sync,
-      title: 'Sync',
-      status: ChangeTrackerStatus.previewing,
-      progress: 0.1,
+    final entry = changeTrackerController.start<T>(
+      entry: ChangeTrackerEntry(
+        source: ChangeSource.sync,
+        title: 'Sync',
+        status: ChangeTrackerStatus.planning,
+        progress: 0.1,
+      ),
       onApply: () async {
         // This captures the 'syncPlan' variable once it's populated below
-        final result = await applySync(
+        final result = await applySync<T>(
           plan: syncPlan,
           localDb: localDb,
           remoteDb: remoteDb,
@@ -116,7 +120,12 @@ class SyncService {
       _ensureAuthenticated(userId: userId);
 
       // 2. Perform the ultra-fast check
-      final isSyncNeeded = await needsSync(
+      changeTrackerController.update(
+        entry.id,
+        status: ChangeTrackerStatus.fetching,
+        progress: 0.2,
+      );
+      final isSyncNeeded = await doesTableNeedSync<T>(
         localDb: localDb,
         remoteDb: remoteDb,
         userId: userId,
@@ -125,14 +134,14 @@ class SyncService {
 
       // 3. IF NO SYNC NEEDED: Bail out instantly to the new status
       if (!isSyncNeeded) {
-        reviewController.update(
+        changeTrackerController.update(
           entry.id,
           status: ChangeTrackerStatus.alreadyUpToDate,
           progress: 1.0,
         );
 
         // Initialize the late variable to an empty state
-        syncPlan = ChangePreview(
+        syncPlan = ChangePlan(
           payload: SyncPlanPayload<T>(
             tableName: remoteDb.tableName,
             pullItems: const [],
@@ -141,21 +150,26 @@ class SyncService {
           ),
           changes: const [],
         );
+
         return syncPlan;
       }
 
       // 4. IF SYNC NEEDED: Do the heavy lifting (download and diff)
-      reviewController.update(entry.id, progress: 0.4);
-      syncPlan = await previewSync(
+      changeTrackerController.update(
+        entry.id,
+        status: ChangeTrackerStatus.fetching,
+        progress: 0.4,
+      );
+      syncPlan = await previewSyncPlan<T>(
         localDb: localDb,
         remoteDb: remoteDb,
         userId: userId,
         localWhere: localWhere,
       );
 
-      // 5. Double check (just in case previewSync found no actionable changes)
+      // 5. Double check (just in case previewSyncPlan found no actionable changes)
       if (syncPlan.changes.isEmpty) {
-        reviewController.update(
+        changeTrackerController.update(
           entry.id,
           status: ChangeTrackerStatus.alreadyUpToDate,
           progress: 1.0,
@@ -164,7 +178,7 @@ class SyncService {
       }
 
       // 6. We have confirmed changes! Move to reviewing so the user can Apply.
-      reviewController.update(
+      changeTrackerController.update(
         entry.id,
         status: ChangeTrackerStatus.reviewing,
         progress: 1.0,
@@ -173,7 +187,7 @@ class SyncService {
 
       return syncPlan;
     } catch (e) {
-      reviewController.fail(entry.id, e);
+      changeTrackerController.fail(entry.id, e);
 
       if (e is SyncException) rethrow;
       throw SyncException(
@@ -184,7 +198,8 @@ class SyncService {
   }
 
   /// Previews pull/push decisions without mutating local or remote data.
-  static Future<ChangePreview<SyncPlanPayload<T>>> previewSync<T extends DTO>({
+  static Future<ChangePlan<SyncPlanPayload<T>, T>>
+  previewSyncPlan<T extends MutableEntity>({
     required HiveLocalDB<T> localDb,
     required SupabaseRemoteDB<T> remoteDb,
     required String userId,
@@ -192,7 +207,7 @@ class SyncService {
   }) async {
     try {
       _ensureAuthenticated(userId: userId);
-      final changes = <ChangeRecord>[];
+      final changes = <ChangedEntity<T>>[];
       final pullItems = <T>[];
       final pushItems = <T>[];
       var skipped = 0;
@@ -209,7 +224,7 @@ class SyncService {
         if (local == null) {
           pullItems.add(remote);
           changes.add(
-            ChangeRecord(
+            ChangedEntity(
               type: ChangeType.added,
               source: ChangeSource.sync,
               entityType: remoteDb.tableName,
@@ -225,7 +240,7 @@ class SyncService {
         if (_isStrictlyAfterMs(remote.updatedAt, local.updatedAt)) {
           pullItems.add(remote);
           changes.add(
-            ChangeRecord(
+            ChangedEntity(
               type: ChangeType.modified,
               source: ChangeSource.sync,
               entityType: remoteDb.tableName,
@@ -247,7 +262,7 @@ class SyncService {
         if (remote == null) {
           pushItems.add(local);
           changes.add(
-            ChangeRecord(
+            ChangedEntity(
               type: ChangeType.added,
               source: ChangeSource.sync,
               entityType: remoteDb.tableName,
@@ -263,7 +278,7 @@ class SyncService {
         if (_isStrictlyAfterMs(local.updatedAt, remote.updatedAt)) {
           pushItems.add(local);
           changes.add(
-            ChangeRecord(
+            ChangedEntity(
               type: ChangeType.modified,
               source: ChangeSource.sync,
               entityType: remoteDb.tableName,
@@ -278,7 +293,7 @@ class SyncService {
         }
       }
 
-      return ChangePreview(
+      return ChangePlan<SyncPlanPayload<T>, T>(
         payload: SyncPlanPayload<T>(
           tableName: remoteDb.tableName,
           pullItems: pullItems,
@@ -296,8 +311,9 @@ class SyncService {
   }
 
   /// Applies a previously previewed sync plan.
-  static Future<ChangeResult<SyncSummary>> applySync<T extends DTO>({
-    required ChangePreview<SyncPlanPayload<T>> plan,
+  static Future<ChangeResult<SyncSummary, T>>
+  applySync<T extends MutableEntity>({
+    required ChangePlan<SyncPlanPayload<T>, T> plan,
     required HiveLocalDB<T> localDb,
     required SupabaseRemoteDB<T> remoteDb,
   }) async {
@@ -318,13 +334,14 @@ class SyncService {
   }
 
   /// Previews and applies sync immediately without registering a review UI.
-  static Future<ChangeResult<SyncSummary>> syncImmediately<T extends DTO>({
+  static Future<ChangeResult<SyncSummary, T>>
+  syncImmediately<T extends MutableEntity>({
     required HiveLocalDB<T> localDb,
     required SupabaseRemoteDB<T> remoteDb,
     required String userId,
     bool Function(T item)? localWhere,
   }) async {
-    final isSyncNeeded = await needsSync(
+    final isSyncNeeded = await doesTableNeedSync<T>(
       localDb: localDb,
       remoteDb: remoteDb,
       userId: userId,
@@ -338,7 +355,7 @@ class SyncService {
       );
     }
 
-    final plan = await previewSync(
+    final plan = await previewSyncPlan<T>(
       localDb: localDb,
       remoteDb: remoteDb,
       userId: userId,
