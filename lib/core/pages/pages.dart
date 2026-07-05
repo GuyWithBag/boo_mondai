@@ -21,6 +21,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         PlaceholderAppPage,
         AnswerSurveyPage,
         ChangeTrackerPage,
+        ChangeTrackerRouteArgs,
         SettingsPage;
 import 'package:boo_mondai/features/view_cards/view_cards.page.dart'
     show ViewCardsPage;
@@ -33,7 +34,12 @@ class Pages {
     icon: Icons.home_outlined,
     name: 'Home',
     builder:
-        (context, {pathParameters = const {}, queryParameters = const {}}) {
+        (
+          context, {
+          pathParameters = const {},
+          queryParameters = const {},
+          extra,
+        }) {
           final auth = context.watch<AuthController>();
           if (auth.currentProfile.role == 'group_b_participant') {
             return const EnterResearchCodePage();
@@ -47,8 +53,12 @@ class Pages {
     icon: Icons.download,
     name: 'Home',
     builder:
-        (context, {pathParameters = const {}, queryParameters = const {}}) =>
-            const ViewDeckDownloadsPage(),
+        (
+          context, {
+          pathParameters = const {},
+          queryParameters = const {},
+          extra,
+        }) => const ViewDeckDownloadsPage(),
   );
 
   static final decksOnline = AppPage(
@@ -56,8 +66,12 @@ class Pages {
     icon: Icons.public_outlined,
     name: 'Browse',
     builder:
-        (context, {pathParameters = const {}, queryParameters = const {}}) =>
-            const ViewDeckListingsPage(),
+        (
+          context, {
+          pathParameters = const {},
+          queryParameters = const {},
+          extra,
+        }) => const ViewDeckListingsPage(),
   );
 
   static final decksLocal = AppPage(
@@ -65,8 +79,12 @@ class Pages {
     icon: Icons.library_books_outlined,
     name: 'Decks',
     builder:
-        (context, {pathParameters = const {}, queryParameters = const {}}) =>
-            const ViewDecksLocalPage(),
+        (
+          context, {
+          pathParameters = const {},
+          queryParameters = const {},
+          extra,
+        }) => const ViewDecksLocalPage(),
   );
 
   static final reviews = AppPage(
@@ -74,8 +92,12 @@ class Pages {
     icon: Icons.rate_review_outlined,
     name: 'Reviews',
     builder:
-        (context, {pathParameters = const {}, queryParameters = const {}}) =>
-            const ViewStudyCardsPage(),
+        (
+          context, {
+          pathParameters = const {},
+          queryParameters = const {},
+          extra,
+        }) => const ViewStudyCardsPage(),
   );
 
   static final account = AppPage(
@@ -83,105 +105,162 @@ class Pages {
     icon: Icons.person_outline,
     name: 'Account',
     builder:
-        (context, {pathParameters = const {}, queryParameters = const {}}) =>
-            const ViewAccountPage(),
+        (
+          context, {
+          pathParameters = const {},
+          queryParameters = const {},
+          extra,
+        }) => const ViewAccountPage(),
   );
 
   static final login = AppPage(
     url: '/login',
     name: 'Login',
     builder:
-        (context, {pathParameters = const {}, queryParameters = const {}}) =>
-            const LoginPage(),
+        (
+          context, {
+          pathParameters = const {},
+          queryParameters = const {},
+          extra,
+        }) => const LoginPage(),
   );
 
   static final register = AppPage(
     url: '/register',
     name: 'Register',
     builder:
-        (context, {pathParameters = const {}, queryParameters = const {}}) =>
-            const RegisterPage(),
+        (
+          context, {
+          pathParameters = const {},
+          queryParameters = const {},
+          extra,
+        }) => const RegisterPage(),
   );
 
   static final editDeck = AppPage(
     url: '/decks-local/:deckId/edit',
     name: 'Edit Deck',
     builder:
-        (context, {pathParameters = const {}, queryParameters = const {}}) =>
-            EditDeckPage(
-              deckId: pathParameters['deckId']!,
-              initialTemplateId: queryParameters['initialTemplateId'],
-            ),
+        (
+          context, {
+          pathParameters = const {},
+          queryParameters = const {},
+          extra,
+        }) => EditDeckPage(
+          deckId: pathParameters['deckId']!,
+          initialTemplateId: queryParameters['initialTemplateId'],
+        ),
   );
 
   static final viewCards = AppPage(
     url: '/view-cards',
     name: 'View Cards',
     builder:
-        (context, {pathParameters = const {}, queryParameters = const {}}) =>
-            ViewCardsPage(queryParameters: queryParameters),
+        (
+          context, {
+          pathParameters = const {},
+          queryParameters = const {},
+          extra,
+        }) => ViewCardsPage(queryParameters: queryParameters),
   );
 
   static final drillSession = AppPage(
     url: '/drill/:deckId/session',
     name: 'Drill Session',
     builder:
-        (context, {pathParameters = const {}, queryParameters = const {}}) =>
-            StudySessionPage(
-              deckId: pathParameters['deckId'],
-              mode: SessionMode.drill,
-            ),
+        (
+          context, {
+          pathParameters = const {},
+          queryParameters = const {},
+          extra,
+        }) => StudySessionPage(
+          deckId: pathParameters['deckId'],
+          mode: SessionMode.drill,
+        ),
   );
 
   static final drillResult = AppPage(
     url: '/drill/:sessionId/result',
     name: 'Drill Result',
     builder:
-        (context, {pathParameters = const {}, queryParameters = const {}}) =>
-            ViewDrillResultPage(sessionId: pathParameters['sessionId']!),
+        (
+          context, {
+          pathParameters = const {},
+          queryParameters = const {},
+          extra,
+        }) => ViewDrillResultPage(sessionId: pathParameters['sessionId']!),
   );
 
   static final reviewSession = AppPage(
     url: '/review/session',
     name: 'Review Session',
     builder:
-        (context, {pathParameters = const {}, queryParameters = const {}}) =>
-            const StudySessionPage(deckId: null, mode: SessionMode.review),
+        (
+          context, {
+          pathParameters = const {},
+          queryParameters = const {},
+          extra,
+        }) => const StudySessionPage(deckId: null, mode: SessionMode.review),
   );
 
   static final reviewDeckSession = AppPage(
     url: '/review/:deckId/session',
     name: 'Deck Review Session',
     builder:
-        (context, {pathParameters = const {}, queryParameters = const {}}) =>
-            StudySessionPage(
-              deckId: pathParameters['deckId'],
-              mode: SessionMode.review,
-            ),
+        (
+          context, {
+          pathParameters = const {},
+          queryParameters = const {},
+          extra,
+        }) => StudySessionPage(
+          deckId: pathParameters['deckId'],
+          mode: SessionMode.review,
+        ),
   );
 
   static final changeReview = AppPage(
     url: '/change-review/:entryId',
     name: 'Change Review',
     builder:
-        (context, {pathParameters = const {}, queryParameters = const {}}) =>
-            ChangeTrackerPage(entryId: pathParameters['entryId']!),
+        (
+          context, {
+          pathParameters = const {},
+          queryParameters = const {},
+          extra,
+        }) {
+          final args = extra;
+          return ChangeTrackerPage(
+            args: args is ChangeTrackerRouteArgs
+                ? args
+                : ChangeTrackerRouteArgs.missing(
+                    entryId: pathParameters['entryId']!,
+                  ),
+          );
+        },
   );
 
   static final research = AppPage(
     url: '/research',
     name: 'Research',
     builder:
-        (context, {pathParameters = const {}, queryParameters = const {}}) =>
-            const ResearcherDashboardPage(),
+        (
+          context, {
+          pathParameters = const {},
+          queryParameters = const {},
+          extra,
+        }) => const ResearcherDashboardPage(),
   );
 
   static final leaderboard = AppPage(
     url: '/leaderboard',
     name: 'Leaderboard',
     builder:
-        (context, {pathParameters = const {}, queryParameters = const {}}) =>
-            const ViewLeaderboardPage(),
+        (
+          context, {
+          pathParameters = const {},
+          queryParameters = const {},
+          extra,
+        }) => const ViewLeaderboardPage(),
   );
 
   static final settings = AppPage(
@@ -189,8 +268,12 @@ class Pages {
     icon: Icons.settings_outlined,
     name: 'Settings',
     builder:
-        (context, {pathParameters = const {}, queryParameters = const {}}) =>
-            const SettingsPage(),
+        (
+          context, {
+          pathParameters = const {},
+          queryParameters = const {},
+          extra,
+        }) => const SettingsPage(),
   );
 
   static final notifications = AppPage(
@@ -198,8 +281,12 @@ class Pages {
     icon: Icons.notifications_outlined,
     name: 'Notifications',
     builder:
-        (context, {pathParameters = const {}, queryParameters = const {}}) =>
-            const PlaceholderAppPage(title: 'Notifications'),
+        (
+          context, {
+          pathParameters = const {},
+          queryParameters = const {},
+          extra,
+        }) => const PlaceholderAppPage(title: 'Notifications'),
   );
 
   static final privacyPolicy = AppPage(
@@ -207,8 +294,12 @@ class Pages {
     icon: Icons.privacy_tip_outlined,
     name: 'Privacy Policy',
     builder:
-        (context, {pathParameters = const {}, queryParameters = const {}}) =>
-            const PlaceholderAppPage(title: 'Privacy Policy'),
+        (
+          context, {
+          pathParameters = const {},
+          queryParameters = const {},
+          extra,
+        }) => const PlaceholderAppPage(title: 'Privacy Policy'),
   );
 
   static final termsOfService = AppPage(
@@ -216,35 +307,51 @@ class Pages {
     icon: Icons.description_outlined,
     name: 'Terms of Service',
     builder:
-        (context, {pathParameters = const {}, queryParameters = const {}}) =>
-            const PlaceholderAppPage(title: 'Terms of Service'),
+        (
+          context, {
+          pathParameters = const {},
+          queryParameters = const {},
+          extra,
+        }) => const PlaceholderAppPage(title: 'Terms of Service'),
   );
 
   static final researchCode = AppPage(
     url: '/research/code',
     name: 'Research Code',
     builder:
-        (context, {pathParameters = const {}, queryParameters = const {}}) =>
-            const EnterResearchCodePage(),
+        (
+          context, {
+          pathParameters = const {},
+          queryParameters = const {},
+          extra,
+        }) => const EnterResearchCodePage(),
   );
 
   static final researchSurvey = AppPage(
     url: '/research/survey/:surveyType',
     name: 'Survey',
     builder:
-        (context, {pathParameters = const {}, queryParameters = const {}}) =>
-            AnswerSurveyPage(
-              surveyType: pathParameters['surveyType']!,
-              timePoint: queryParameters['timePoint'],
-            ),
+        (
+          context, {
+          pathParameters = const {},
+          queryParameters = const {},
+          extra,
+        }) => AnswerSurveyPage(
+          surveyType: pathParameters['surveyType']!,
+          timePoint: queryParameters['timePoint'],
+        ),
   );
 
   static final researchTest = AppPage(
     url: '/research/test/:testSet',
     name: 'Vocabulary Test',
     builder:
-        (context, {pathParameters = const {}, queryParameters = const {}}) =>
-            VocabularyTestPage(testSet: pathParameters['testSet']!),
+        (
+          context, {
+          pathParameters = const {},
+          queryParameters = const {},
+          extra,
+        }) => VocabularyTestPage(testSet: pathParameters['testSet']!),
   );
 
   static final shell = <AppPage>[

@@ -5,23 +5,20 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:dart_mappable/dart_mappable.dart';
+
+part 'mutable_entity.mapper.dart';
+
 /// Mutable model — synced via SyncService using updatedAt for conflict resolution.
-abstract class DTO {
+@MappableClass()
+abstract class MutableEntity {
   final String id;
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  const DTO({
+  const MutableEntity({
     required this.id,
     required this.createdAt,
     required this.updatedAt,
   });
-}
-
-/// Immutable model — written once, never modified. Synced by existence check only.
-abstract class WriteOnceDTO {
-  final String id;
-  final DateTime createdAt;
-
-  const WriteOnceDTO({required this.id, required this.createdAt});
 }

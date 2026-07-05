@@ -127,7 +127,7 @@ def move_replacements(moves: list[tuple[str, str]]) -> list[tuple[str, str]]:
 
 TOKEN_ALIASES = {
     "db": "DB",
-    "dto": "DTO",
+    "dto": "MutableEntity",
     "fsrs": "FSRS",
     "id": "ID",
     "localdb": "LocalDB",

@@ -6,6 +6,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         MainController,
         ScaffoldController,
         ScaffoldHelper,
+        ToolBar,
+        ToolBarScope,
         useScaffoldController;
 import 'package:flutter/material.dart' hide Scaffold;
 import 'package:flutter/material.dart' as material show Scaffold;
@@ -32,7 +34,7 @@ class Scaffold extends HookWidget {
     this.hideFloatingActionButtonOnScroll = false,
     this.scrollable = true,
     this.safeArea = true,
-    this.center = false,
+    this.centeredConstraint = true,
     this.shouldConstrainWidth = false,
     this.floatingActionButton,
     this.preferredFloatingActionButtonHeight = 48,
@@ -44,6 +46,7 @@ class Scaffold extends HookWidget {
     this.scrollController,
     this.resizeToAvoidBottomInset = false,
     this.resizeBodyForKeyboard = false,
+    this.centeredBody = false,
   }) : assert(sidebarWidth >= 0, 'sidebarWidth cannot be negative.');
 
   final Widget body;
@@ -63,7 +66,8 @@ class Scaffold extends HookWidget {
 
   final bool scrollable;
   final bool safeArea;
-  final bool center;
+  final bool centeredConstraint;
+  final bool centeredBody;
   final bool shouldConstrainWidth;
   final Widget? floatingActionButton;
   final double preferredFloatingActionButtonHeight;
@@ -156,7 +160,23 @@ class Scaffold extends HookWidget {
     final contentBottomInset =
         keyboardBottomInset + (shouldHaveToolBar ? effectiveToolBarHeight : 0);
 
-    final paddedBody = Padding(padding: helper.contentPadding, child: body);
+    final toolBarController = toolBar is ToolBar
+        ? (toolBar! as ToolBar).controller
+        : null;
+    final scopedBody = toolBarController == null
+        ? body
+        : ToolBarScope(controller: toolBarController, child: body);
+
+    Widget innerBody = scopedBody;
+
+    if (centeredBody) {
+      innerBody = Center(child: scopedBody);
+    }
+
+    final paddedBody = Padding(
+      padding: helper.contentPadding,
+      child: innerBody,
+    );
 
     Widget content = paddedBody;
 
@@ -216,9 +236,9 @@ class Scaffold extends HookWidget {
       );
     }
 
-    // if (center) {
-    //   content = Align(alignment: Alignment.topCenter, child: content);
-    // }
+    if (centeredConstraint) {
+      content = Align(alignment: Alignment.topCenter, child: content);
+    }
 
     content = NotificationListener<ScrollNotification>(
       onNotification: (notification) => controller.handleScrollNotification(

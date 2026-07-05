@@ -1,5 +1,5 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show EmptyState, ListingStatesWrapper;
+    show StatusLayoutState, ListingStatesWrapper;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -11,7 +11,7 @@ void main() {
         home: ListingStatesWrapper<int>.list(
           isLoading: false,
           items: const [],
-          emptyState: const EmptyState(
+          emptyState: const StatusLayoutState(
             icon: Icons.inbox,
             title: 'Empty',
             message: 'No rows',
@@ -36,7 +36,7 @@ void main() {
         home: ListingStatesWrapper<int>.list(
           isLoading: false,
           items: const [1],
-          emptyState: const EmptyState(
+          emptyState: const StatusLayoutState(
             icon: Icons.inbox,
             title: 'Empty',
             message: 'No rows',
@@ -61,7 +61,7 @@ void main() {
             isLoading: false,
             useParentScroll: true,
             items: const [1],
-            emptyState: const EmptyState(
+            emptyState: const StatusLayoutState(
               icon: Icons.inbox,
               title: 'Empty',
               message: 'No rows',
@@ -90,7 +90,7 @@ void main() {
           isLoading: true,
           showLeadingItemAlways: false,
           items: const [],
-          emptyState: const EmptyState(
+          emptyState: const StatusLayoutState(
             icon: Icons.inbox,
             title: 'Empty',
             message: 'No rows',
@@ -114,7 +114,7 @@ void main() {
           isLoading: false,
           items: const [],
           header: const Text('Header'),
-          emptyState: const EmptyState(
+          emptyState: const StatusLayoutState(
             icon: Icons.inbox,
             title: 'Empty',
             message: 'No rows',
@@ -138,7 +138,7 @@ void main() {
           items: const [],
           header: const Text('Header'),
           showHeaderWhenEmpty: true,
-          emptyState: const EmptyState(
+          emptyState: const StatusLayoutState(
             icon: Icons.inbox,
             title: 'Empty',
             message: 'No rows',
@@ -162,7 +162,7 @@ void main() {
         home: ListingStatesWrapper<int>.grid(
           isLoading: false,
           items: const [1],
-          emptyState: const EmptyState(
+          emptyState: const StatusLayoutState(
             icon: Icons.inbox,
             title: 'Empty',
             message: 'No rows',
@@ -190,7 +190,7 @@ void main() {
             isLoading: false,
             useParentScroll: true,
             items: const [1],
-            emptyState: const EmptyState(
+            emptyState: const StatusLayoutState(
               icon: Icons.inbox,
               title: 'Empty',
               message: 'No rows',

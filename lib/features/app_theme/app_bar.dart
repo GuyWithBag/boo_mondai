@@ -2,14 +2,14 @@ import 'package:boo_mondai/core/theme/app_tokens.model.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         Button,
-        MainController,
         SurfaceBorder,
         SurfaceColor,
         SurfaceShape,
         TextSize,
         TextWeight,
         surfaceStyle,
-        textStyle;
+        textStyle,
+        SelectionController;
 import 'package:flutter/material.dart' hide AppBar;
 import 'package:go_router/go_router.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -35,6 +35,9 @@ class AppBar extends StatelessWidget implements PreferredSizeWidget {
     this.child,
     this.header,
     this.preferredHeaderHeight = 62,
+    this.selectionController,
+    this.onSelectedDelete,
+    this.selectedActions = const [],
   });
 
   final String? title;
@@ -52,6 +55,9 @@ class AppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool collapsible;
   final ScrollController? scrollController;
   final double collapseDistance;
+  final SelectionController? selectionController;
+  final VoidCallback? onSelectedDelete;
+  final List<Widget> selectedActions;
 
   /// This is the preferredHeight required. This is needed for scrolling purposes for Scaffold.
   final double preferredHeight;
@@ -59,12 +65,11 @@ class AppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool showBottomBorder;
 
   double _getTotalHeight() {
-    final total =
-        preferredHeight +
-        (bottom == null ? 0 : preferredBottomHeight) +
-        (header == null ? 0 : preferredHeaderHeight);
+    final isSelecting = selectionController?.isEnabled ?? false;
 
-    return total;
+    return preferredHeight +
+        (!isSelecting && bottom != null ? preferredBottomHeight : 0) +
+        (header != null ? preferredHeaderHeight : 0);
   }
 
   static const double preferredHeightDefault = 90;
@@ -82,7 +87,7 @@ class AppBar extends StatelessWidget implements PreferredSizeWidget {
     final inferredPopButton = route is PopupRoute
         ? Icons.close
         : Icons.arrow_back;
-    final popButtonWidget = canPop
+    final effectivePopButton = canPop
         ? Button.icon(
             icon: popButton ?? inferredPopButton,
             onPressed:
@@ -94,13 +99,24 @@ class AppBar extends StatelessWidget implements PreferredSizeWidget {
           )
         : null;
 
-    final effectivePopButton = popButtonWidget;
+    final isSelectionState = selectionController?.isEnabled ?? false;
     final effectiveActions = [for (final action in actions) action];
+    final effectiveSelectionActions = <Widget>[
+      if (onSelectedDelete != null)
+        Button.icon(
+          icon: Icons.delete,
+          onPressed: onSelectedDelete,
+          tokens: tokens,
+        ),
+      if (isSelectionState) ...selectedActions,
+    ];
+
     final effectiveBottom = bottom;
     final resolvedSurfaceStyle = surfaceStyle
         .resolve(tokens, [
           SurfaceShape.sharp,
           SurfaceBorder.bottom,
+          if (isSelectionState) SurfaceColor.muted,
           if (transparentBackground) SurfaceColor.invisible,
         ])
         .copyWith(
@@ -140,10 +156,20 @@ class AppBar extends StatelessWidget implements PreferredSizeWidget {
                         Row(
                           spacing: tokens.spaceLayoutGapMd,
                           children: [
-                            ?effectivePopButton,
-                            if (title != null)
+                            if (isSelectionState)
+                              Button.icon(
+                                tokens: tokens,
+                                icon: Icons.cancel,
+                                onPressed: () {
+                                  selectionController!.clear();
+                                  selectionController!.isEnabled = false;
+                                },
+                              )
+                            else
+                              ?effectivePopButton,
+                            if (isSelectionState || title != null)
                               Text(
-                                title!,
+                                isSelectionState ? 'Selecting' : title!,
                                 style: textStyle.resolve(tokens, const [
                                   TextSize.header,
                                   TextWeight.heavy,
@@ -152,13 +178,14 @@ class AppBar extends StatelessWidget implements PreferredSizeWidget {
                           ],
                         ),
                         if (child != null) Expanded(child: child!),
-                        if (effectiveActions.isNotEmpty) ...[
+                        if (effectiveActions.isNotEmpty)
                           Row(
                             spacing: tokens.spaceLayoutGapSm,
                             mainAxisSize: MainAxisSize.min,
-                            children: effectiveActions,
+                            children: isSelectionState
+                                ? effectiveSelectionActions
+                                : effectiveActions,
                           ),
-                        ],
                       ],
                     ),
                   ),
@@ -168,7 +195,7 @@ class AppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
           ),
         ),
-        if (effectiveBottom != null)
+        if (effectiveBottom != null && !isSelectionState)
           SizedBox(height: preferredBottomHeight, child: effectiveBottom),
       ],
     );

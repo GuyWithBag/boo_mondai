@@ -3,5 +3,5 @@
 // Other files
 export 'controller.dart';
 export 'cube.controller.dart';
-export 'selection.controller.dart';
 export 'physical_card.controller.dart';
+export 'selection.controller.dart';

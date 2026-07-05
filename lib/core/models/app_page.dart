@@ -6,6 +6,7 @@ typedef PageBuilder =
       BuildContext context, {
       Map<String, String> pathParameters,
       Map<String, String> queryParameters,
+      Object? extra,
     });
 
 /// Route metadata and typed page builder.

@@ -11,6 +11,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextSize,
         TextWeight,
         SurfaceBorder,
+        SurfaceBorderColor,
         surfaceStyle,
         SurfaceShape,
         SurfacePadding,
@@ -30,6 +31,7 @@ class PhysicalDeck extends StatelessWidget {
     this.isCoverImageEditable = false,
     this.textScaleBaseWidth,
     this.onCoverImagePicked,
+    this.isSelected = false,
   });
 
   final Deck? deck;
@@ -39,6 +41,7 @@ class PhysicalDeck extends StatelessWidget {
   final bool isCoverImageEditable;
   final double? textScaleBaseWidth;
   final BackgroundImagePicked? onCoverImagePicked;
+  final bool isSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -68,22 +71,26 @@ class PhysicalDeck extends StatelessWidget {
     );
     final visibleTags = deck?.tags.take(8).toList() ?? const [];
 
+    final borderStyle = isSelected
+        ? SurfaceBorderColor.selected
+        : SurfaceBorderColor.inherit;
+
     return Cube(
       controller: controller,
       right: Surface(
-        style: surfaceStyle.resolve(tokens, const [SurfaceShape.sharp]),
+        style: surfaceStyle.resolve(tokens, [SurfaceShape.sharp, borderStyle]),
         child: SizedBox.shrink(),
       ),
       left: Surface(
-        style: surfaceStyle.resolve(tokens, const [SurfaceShape.sharp]),
+        style: surfaceStyle.resolve(tokens, [SurfaceShape.sharp, borderStyle]),
         child: SizedBox.shrink(),
       ),
       top: Surface(
-        style: surfaceStyle.resolve(tokens, const [SurfaceShape.sharp]),
+        style: surfaceStyle.resolve(tokens, [SurfaceShape.sharp, borderStyle]),
         child: SizedBox.shrink(),
       ),
       bottom: Surface(
-        style: surfaceStyle.resolve(tokens, const [SurfaceShape.sharp]),
+        style: surfaceStyle.resolve(tokens, [SurfaceShape.sharp, borderStyle]),
         child: SizedBox.shrink(),
       ),
       front: LayoutBuilder(
@@ -93,9 +100,10 @@ class PhysicalDeck extends StatelessWidget {
             isEditable: isCoverImageEditable,
             onImagePicked: onCoverImagePicked,
             clipBehavior: Clip.none,
-            style: surfaceStyle.resolve(tokens, const [
+            style: surfaceStyle.resolve(tokens, [
               SurfaceShape.sharp,
               SurfacePadding.none,
+              borderStyle,
             ]),
             child: showInfoCover
                 ? Stack(
@@ -111,10 +119,11 @@ class PhysicalDeck extends StatelessWidget {
                             minHeight: constraints.maxHeight * 0.34,
                           ),
                           child: Surface(
-                            style: surfaceStyle.resolve(tokens, const [
+                            style: surfaceStyle.resolve(tokens, [
                               SurfaceColor.muted,
                               SurfaceShape.sharp,
                               SurfacePadding.text,
+                              borderStyle,
                             ]),
                             child: Column(
                               mainAxisSize: MainAxisSize.min,

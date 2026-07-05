@@ -4,5 +4,4 @@
 export 'use_cube_controller.dart';
 export 'use_deck_listing_interactions_controller.dart';
 export 'use_study_session_card_stage_controller.dart';
-export 'use_selection_controller.dart';
 export 'use_physical_card_controller.dart';

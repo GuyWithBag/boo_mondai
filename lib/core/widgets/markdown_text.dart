@@ -7,6 +7,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextSize,
         TextWeight,
         TextField,
+        ToolBarScope,
         ImageHelper,
         textStyle,
         MarkdownHelper;
@@ -62,6 +63,7 @@ class MarkdownText extends HookWidget {
     this.onTapLink,
     this.resolveAttachmentUrl,
     this.baseTextStyle,
+    this.useToolBar = true,
     super.key,
     this.placeholderTextStyle,
   });
@@ -83,6 +85,7 @@ class MarkdownText extends HookWidget {
   final TextAlignVertical? textAlignVertical;
   final Iterable<Object> variants;
   final MarkdownTextMode mode;
+  final bool useToolBar;
 
   /// Called when a link is tapped in preview modes. When null, links are
   /// opened via [url_launcher] automatically.
@@ -133,6 +136,7 @@ class MarkdownText extends HookWidget {
         expands: expands,
         textAlignVertical: textAlignVertical,
         variants: variants,
+        useToolBar: useToolBar,
       ),
       MarkdownTextMode.inputPreview => _InputPreviewField(
         data: data,
@@ -153,6 +157,7 @@ class MarkdownText extends HookWidget {
         onTapLink: onTapLink,
         resolveAttachmentUrl: resolveAttachmentUrl,
         tokens: tokens,
+        useToolBar: useToolBar,
       ),
     };
   }
@@ -288,6 +293,7 @@ class _InputField extends HookWidget {
     this.expands = false,
     this.textAlignVertical,
     required this.placeholderTextStyle,
+    required this.useToolBar,
   });
 
   final String data;
@@ -306,11 +312,15 @@ class _InputField extends HookWidget {
   final bool expands;
   final TextAlignVertical? textAlignVertical;
   final Iterable<Object> variants;
+  final bool useToolBar;
 
   @override
   Widget build(BuildContext context) {
     final internalController = useTextEditingController(text: data);
     final effectiveController = controller ?? internalController;
+    final internalFocusNode = useFocusNode();
+    final effectiveFocusNode = focusNode ?? internalFocusNode;
+    final toolBarController = useToolBar ? ToolBarScope.maybeOf(context) : null;
 
     useEffect(() {
       if (effectiveController.text != data) {
@@ -319,10 +329,24 @@ class _InputField extends HookWidget {
       return null;
     }, [data, effectiveController]);
 
+    useEffect(() {
+      if (toolBarController == null) return null;
+
+      void listener() {
+        if (effectiveFocusNode.hasFocus) {
+          toolBarController.setActiveTextController(effectiveController);
+        }
+      }
+
+      effectiveFocusNode.addListener(listener);
+      listener();
+      return () => effectiveFocusNode.removeListener(listener);
+    }, [effectiveFocusNode, effectiveController, toolBarController]);
+
     return TextField(
       variants: variants,
       controller: effectiveController,
-      focusNode: focusNode,
+      focusNode: effectiveFocusNode,
       enabled: enabled,
       onChanged: onChanged,
       onSubmitted: onSubmitted,
@@ -363,6 +387,7 @@ class _InputPreviewField extends HookWidget {
     this.textAlignVertical,
     this.onTapLink,
     this.resolveAttachmentUrl,
+    required this.useToolBar,
   });
 
   final String data;
@@ -383,6 +408,7 @@ class _InputPreviewField extends HookWidget {
   final MarkdownTapLinkCallback? onTapLink;
   final MarkdownAttachmentUrlResolver? resolveAttachmentUrl;
   final AppTokens tokens;
+  final bool useToolBar;
 
   @override
   Widget build(BuildContext context) {
@@ -391,6 +417,7 @@ class _InputPreviewField extends HookWidget {
 
     final internalFocusNode = useFocusNode();
     final effectiveFocusNode = focusNode ?? internalFocusNode;
+    final toolBarController = useToolBar ? ToolBarScope.maybeOf(context) : null;
 
     final isEditing = useState(effectiveFocusNode.hasFocus);
 
@@ -406,6 +433,20 @@ class _InputPreviewField extends HookWidget {
       effectiveFocusNode.addListener(listener);
       return () => effectiveFocusNode.removeListener(listener);
     }, [effectiveFocusNode]);
+
+    useEffect(() {
+      if (toolBarController == null) return null;
+
+      void listener() {
+        if (effectiveFocusNode.hasFocus) {
+          toolBarController.setActiveTextController(effectiveController);
+        }
+      }
+
+      effectiveFocusNode.addListener(listener);
+      listener();
+      return () => effectiveFocusNode.removeListener(listener);
+    }, [effectiveFocusNode, effectiveController, toolBarController]);
 
     if (isEditing.value) {
       return TextField(

@@ -130,7 +130,7 @@ class DeckAdapter extends TypeAdapter<Deck> {
       isPublished: fields[11] as bool,
       isEditable: fields[12] == null ? true : fields[12] as bool,
       cardCount: (fields[13] as num).toInt(),
-      version: fields[14] == null ? '1.0.0' : fields[14] as String,
+      version: fields[14] == null ? '0.1.0+1' : fields[14] as String,
       buildNumber: fields[15] == null ? 1 : (fields[15] as num).toInt(),
       createdAt: fields[2] as DateTime,
       updatedAt: fields[1] as DateTime,

@@ -1,4 +1,4 @@
-import 'package:boo_mondai/lib.barrel.dart' show EmptyState, ErrorState;
+import 'package:boo_mondai/lib.barrel.dart' show StatusLayoutState, ErrorState;
 import 'package:flutter/widgets.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -124,7 +124,7 @@ class ListingStatesWrapper<T> extends StatelessWidget {
   final bool isLoading;
   final Exception? exception;
   final List<T> items;
-  final EmptyState emptyState;
+  final StatusLayoutState emptyState;
   final VoidCallback onRetry;
   final Widget skeletonTile;
   final Widget Function(BuildContext context, int index, T item) itemBuilder;

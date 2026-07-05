@@ -81,6 +81,7 @@ GoRouter createRouter(AuthController authController) {
                 context,
                 pathParameters: state.pathParameters,
                 queryParameters: state.uri.queryParameters,
+                extra: state.extra,
               ),
             ),
         ],
@@ -92,6 +93,7 @@ GoRouter createRouter(AuthController authController) {
             context,
             pathParameters: state.pathParameters,
             queryParameters: state.uri.queryParameters,
+            extra: state.extra,
           ),
         ),
       for (final page in Pages.appDetails)
@@ -101,6 +103,7 @@ GoRouter createRouter(AuthController authController) {
             context,
             pathParameters: state.pathParameters,
             queryParameters: state.uri.queryParameters,
+            extra: state.extra,
           ),
         ),
       for (final page in Pages.nonShell)
@@ -110,6 +113,7 @@ GoRouter createRouter(AuthController authController) {
             context,
             pathParameters: state.pathParameters,
             queryParameters: state.uri.queryParameters,
+            extra: state.extra,
           ),
         ),
     ],

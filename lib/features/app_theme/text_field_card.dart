@@ -19,7 +19,6 @@ class TextFieldCard extends HookWidget {
     this.hasAttachments = true,
     this.controller,
     this.onChanged,
-    this.onFocused,
     this.minHeight,
     super.key,
   });
@@ -28,7 +27,6 @@ class TextFieldCard extends HookWidget {
   final String placeholder;
   final TextEditingController? controller;
   final ValueChanged<String>? onChanged;
-  final ValueChanged<TextEditingController>? onFocused;
   final double? minHeight;
   final bool hasAttachments;
 
@@ -39,18 +37,6 @@ class TextFieldCard extends HookWidget {
     final resolvedSurfaceStyle = surfaceStyle.resolve(tokens, const [
       SurfaceShape.roundedSm,
     ]);
-
-    useEffect(() {
-      void listener() {
-        final controller = this.controller;
-        if (focusNode.hasFocus && controller != null) {
-          onFocused?.call(controller);
-        }
-      }
-
-      focusNode.addListener(listener);
-      return () => focusNode.removeListener(listener);
-    }, [focusNode, controller, onFocused]);
 
     return ConstrainedBox(
       constraints: BoxConstraints(minHeight: minHeight ?? 260),

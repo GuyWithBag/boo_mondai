@@ -1,10 +1,10 @@
-import 'package:boo_mondai/core/hooks/use_selection_controller.dart';
+import 'package:boo_mondai/lib.barrel.dart' show SelectionController;
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('selects one value in single select mode', () {
     final changes = <Set<int>>[];
-    final controller = SelectionValueController<int>(
+    final controller = SelectionController<int>(
       selectedValues: const [1],
       onSelectionChanged: changes.add,
     );
@@ -19,7 +19,7 @@ void main() {
   });
 
   test('toggles multiple values when multiple select is enabled', () {
-    final controller = SelectionValueController<int>(
+    final controller = SelectionController<int>(
       multiple: true,
       emptySelectionAllowed: true,
     );
@@ -33,10 +33,7 @@ void main() {
   });
 
   test('does not exceed max selected limit', () {
-    final controller = SelectionValueController<int>(
-      multiple: true,
-      maxSelected: 2,
-    );
+    final controller = SelectionController<int>(multiple: true, maxSelected: 2);
     addTearDown(controller.dispose);
 
     controller.select(1);

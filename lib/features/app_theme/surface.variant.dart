@@ -23,6 +23,8 @@ enum SurfaceShape {
   circle,
 }
 
+enum SurfaceBorderColor { inherit, selected }
+
 enum SurfacePadding { baseline, text, none, sm, scaffold, large }
 
 enum SurfaceBorder { baseline, sidebar, none, top, bottom }
@@ -30,17 +32,20 @@ enum SurfaceBorder { baseline, sidebar, none, top, bottom }
 enum SurfaceShadow { baseline, none, tactile }
 
 Set<StylePart<SurfaceStyle>> _surfacePalette({
-  required Color background,
-  required Color border,
-  required Color shadow,
+  Color? background,
+  Color? border,
+  Color? shadow,
   Color? foreground,
 }) {
   return {
-    SurfaceStylePart.decoration({
-      DecorationPart.color(background),
-      DecorationPart.borderParts({BorderPart.color(border)}),
-      DecorationPart.boxShadowParts({BoxShadowPart.color(shadow)}),
-    }),
+    if (background != null || border != null || shadow != null)
+      SurfaceStylePart.decoration({
+        if (background != null) DecorationPart.color(background),
+        if (border != null)
+          DecorationPart.borderParts({BorderPart.color(border)}),
+        if (shadow != null)
+          DecorationPart.boxShadowParts({BoxShadowPart.color(shadow)}),
+      }),
     if (foreground != null) ...[
       SurfaceStylePart.text({TextStylePart.color(foreground)}),
       SurfaceStylePart.icon({IconThemePart.color(foreground)}),
@@ -216,6 +221,9 @@ final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
       shadow: tokens.colorBorderNeutralSubtle.withValues(alpha: 0.30),
       foreground: tokens.colorTextBaseline,
     ),
+    SurfaceBorderColor.inherit: (_) => const <StylePart<SurfaceStyle>>{},
+    SurfaceBorderColor.selected: (tokens) =>
+        _surfacePalette(border: tokens.colorPrimary),
     SurfaceColor.primarySoft: (tokens) => {
       ..._surfacePalette(
         background: tokens.colorPrimarySoft,

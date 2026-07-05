@@ -2,7 +2,8 @@
 
 // Other files
 export 'app_page.dart';
-export 'dto.dart';
 export 'user_owned.entity.dart';
 export 'timestamped.entity.dart';
 export 'identifiable.entity.dart';
+export 'mutable_entity.dart';
+export 'immutable_entity.dart';
