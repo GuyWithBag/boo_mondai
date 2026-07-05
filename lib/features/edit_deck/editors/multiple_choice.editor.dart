@@ -10,14 +10,9 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 class MultipleChoiceEditor extends HookWidget {
-  const MultipleChoiceEditor({
-    required this.formState,
-    this.onMarkdownFieldFocused,
-    super.key,
-  });
+  const MultipleChoiceEditor({required this.formState, super.key});
 
   final CardTemplateFormState formState;
-  final ValueChanged<TextEditingController>? onMarkdownFieldFocused;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +26,6 @@ class MultipleChoiceEditor extends HookWidget {
           title: 'Front (Prompt)',
           placeholder: 'Type a question...',
           controller: editor.promptController,
-          onFocused: onMarkdownFieldFocused,
         ),
         MultipleChoiceOptionsPanel(controller: editor),
       ],

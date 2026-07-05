@@ -19,14 +19,9 @@ import 'package:theme_variants/theme_variants.dart'
     show ThemeVariantsContext, Surface;
 
 class FlashcardEditor extends HookWidget {
-  const FlashcardEditor({
-    required this.formState,
-    this.onMarkdownFieldFocused,
-    super.key,
-  });
+  const FlashcardEditor({required this.formState, super.key});
 
   final CardTemplateFormState formState;
-  final ValueChanged<TextEditingController>? onMarkdownFieldFocused;
 
   @override
   Widget build(BuildContext context) {
@@ -83,13 +78,11 @@ class FlashcardEditor extends HookWidget {
           title: 'Front (Prompt)',
           placeholder: 'Type a word...',
           controller: editor.frontController,
-          onFocused: onMarkdownFieldFocused,
         ),
         TextFieldCard(
           title: 'Back (Answer)',
           placeholder: 'Type the translation...',
           controller: editor.backController,
-          onFocused: onMarkdownFieldFocused,
         ),
       ],
     );

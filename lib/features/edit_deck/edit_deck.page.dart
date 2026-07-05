@@ -61,18 +61,6 @@ class EditDeckPage extends HookWidget {
     }
 
     final tokens = context.themeTokens<AppTokens>();
-    final canUseMarkdownActions = toolBarController.hasActiveTextController;
-
-    Button markdownAction({
-      required IconData icon,
-      required VoidCallback onPressed,
-    }) {
-      return Button.icon(
-        icon: icon,
-        onPressed: canUseMarkdownActions ? onPressed : null,
-        tokens: tokens,
-      );
-    }
 
     return Scaffold(
       controller: scaffoldController,
@@ -108,81 +96,14 @@ class EditDeckPage extends HookWidget {
       // resizeToAvoidBottomInset: false,
       resizeBodyForKeyboard: true,
       inheritMainBottomNavBarHeight: false,
-      toolBar: ToolBar(
-        actions: [
-          Button.icon(
-            icon: Icons.image_outlined,
-            onPressed: canUseMarkdownActions ? addImageAttachment : null,
-            tokens: tokens,
-          ),
-          markdownAction(
-            icon: Icons.title,
-            onPressed: () => toolBarController.insertHeading(1),
-          ),
-          markdownAction(
-            icon: Icons.format_size,
-            onPressed: () => toolBarController.insertHeading(2),
-          ),
-          markdownAction(
-            icon: Icons.format_bold,
-            onPressed: toolBarController.toggleBold,
-          ),
-          markdownAction(
-            icon: Icons.format_italic,
-            onPressed: toolBarController.toggleItalic,
-          ),
-          markdownAction(
-            icon: Icons.format_strikethrough,
-            onPressed: toolBarController.toggleStrikethrough,
-          ),
-          markdownAction(
-            icon: Icons.code,
-            onPressed: toolBarController.toggleInlineCode,
-          ),
-          markdownAction(
-            icon: Icons.data_object,
-            onPressed: toolBarController.insertCodeBlock,
-          ),
-          markdownAction(
-            icon: Icons.format_quote,
-            onPressed: toolBarController.insertBlockQuote,
-          ),
-          markdownAction(
-            icon: Icons.format_list_bulleted,
-            onPressed: toolBarController.insertUnorderedList,
-          ),
-          markdownAction(
-            icon: Icons.format_list_numbered,
-            onPressed: toolBarController.insertOrderedList,
-          ),
-          markdownAction(
-            icon: Icons.check_box_outlined,
-            onPressed: toolBarController.insertTaskList,
-          ),
-          markdownAction(
-            icon: Icons.link,
-            onPressed: toolBarController.insertLink,
-          ),
-          markdownAction(
-            icon: Icons.add_photo_alternate_outlined,
-            onPressed: toolBarController.insertImage,
-          ),
-          markdownAction(
-            icon: Icons.horizontal_rule,
-            onPressed: toolBarController.insertHorizontalRule,
-          ),
-          markdownAction(
-            icon: Icons.table_chart_outlined,
-            onPressed: toolBarController.insertTable,
-          ),
-        ],
+      toolBar: ToolBar.withActions(
+        controller: toolBarController,
+        useAttachments: true,
+        onAttachmentPressed: addImageAttachment,
       ),
       body: Form(
         key: formKey,
-        child: EditDeckEditorBody(
-          editor: controller,
-          onMarkdownFieldFocused: toolBarController.setActiveTextController,
-        ),
+        child: EditDeckEditorBody(editor: controller),
       ),
     );
   }
