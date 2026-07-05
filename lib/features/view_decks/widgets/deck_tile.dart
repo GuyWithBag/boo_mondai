@@ -8,6 +8,8 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         BackgroundImagePicked,
+        CardTemplate,
+        CardTemplateMapper,
         Deck,
         AppTokens,
         ImageHelper,
@@ -17,7 +19,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         PhysicalCardController,
         PhysicalCard,
         BackgroundImageSurface,
-        PhysicalDeck;
+        PhysicalDeck,
+        ViewCardsTile;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -39,22 +42,8 @@ class DeckTile extends HookWidget {
   /// Shows a spinner badge instead of the cloud icon while push is in progress.
   final bool isPushing;
 
-  /// Whether the grid is currently in multi-select mode.
-  final bool isSelecting;
-
   /// Whether this specific card is selected.
   final bool isSelected;
-
-  /// Called when the card is tapped in selection mode.
-  final VoidCallback? onSelect;
-
-  /// Called when the card is long-pressed (triggers selection mode entry).
-  final VoidCallback? onLongPress;
-
-  final VoidCallback? onPressed;
-
-  /// Reports pointer hover without changing the visual state.
-  final ValueChanged<bool>? onHover;
 
   /// Controls the deck tile layout. Hover does not mutate this state.
   final DeckTileState state;
@@ -74,12 +63,7 @@ class DeckTile extends HookWidget {
     this.onPush,
     this.isDirty = false,
     this.isPushing = false,
-    this.isSelecting = false,
     this.isSelected = false,
-    this.onSelect,
-    this.onLongPress,
-    this.onPressed,
-    this.onHover,
     this.state = DeckTileState.defaultView,
     this.hasTags = false,
     this.isImageEditable = false,
@@ -102,6 +86,7 @@ class DeckTile extends HookWidget {
       deck == null ? null : LocalImageResolverHelper.resolveDeckCover(deck!),
     );
     final effectiveOnImagePicked = isImageEditable ? onImagePicked : null;
+    final featuredCards = _featuredCardTemplates(deck).take(3).toList();
     // final scale = 1.3;
     final cardControllers = useMemoized(
       () => List.generate(
@@ -161,66 +146,79 @@ class DeckTile extends HookWidget {
       return null;
     }, [state, cardControllers, physicalDeckController, animationScale]);
 
-    return MouseRegion(
-      onEnter: (_) {
-        onHover?.call(true);
-      },
-      onExit: (_) {
-        onHover?.call(false);
-      },
-      child: GestureDetector(
-        onTap: isSelecting ? onSelect : onPressed,
-        onLongPress: onLongPress,
-        child: SizedBox(
-          width: cardWidth,
-          child: AspectRatio(
-            aspectRatio: studyCardAspectRatio,
-            child: Stack(
-              clipBehavior: Clip.none,
-              fit: StackFit.expand,
-              children: switch (state) {
-                DeckTileState.defaultView => [
-                  PhysicalDeck(
-                    deck: deck,
-                    controller: physicalDeckController,
-                    hasTags: hasTags,
-                    textScaleBaseWidth: cardWidth,
-                  ),
-                ],
-                DeckTileState.bare => [
-                  PhysicalDeck(
-                    deck: deck,
-                    controller: physicalDeckController,
-                    showInfoCover: false,
-                    isCoverImageEditable: effectiveOnImagePicked != null,
-                    onCoverImagePicked: effectiveOnImagePicked,
-                    textScaleBaseWidth: cardWidth,
-                  ),
-                ],
-                DeckTileState.spread => [
-                  for (final controller in cardControllers)
-                    PhysicalCard(
-                      controller: controller,
-                      front: PhysicalCard(
-                        front: BackgroundImageSurface(
-                          image: coverImage,
-                          isEditable: effectiveOnImagePicked != null,
-                          onImagePicked: effectiveOnImagePicked,
+    return SizedBox(
+      width: cardWidth,
+      child: AspectRatio(
+        aspectRatio: studyCardAspectRatio,
+        child: Stack(
+          clipBehavior: Clip.none,
+          fit: StackFit.expand,
+          children: switch (state) {
+            DeckTileState.defaultView => [
+              PhysicalDeck(
+                deck: deck,
+                controller: physicalDeckController,
+                hasTags: hasTags,
+                textScaleBaseWidth: cardWidth,
+                isSelected: isSelected,
+              ),
+            ],
+            DeckTileState.bare => [
+              PhysicalDeck(
+                deck: deck,
+                controller: physicalDeckController,
+                showInfoCover: false,
+                isCoverImageEditable: effectiveOnImagePicked != null,
+                onCoverImagePicked: effectiveOnImagePicked,
+                textScaleBaseWidth: cardWidth,
+                isSelected: isSelected,
+              ),
+            ],
+            DeckTileState.spread => [
+              for (var i = 0; i < cardControllers.length; i++)
+                PhysicalCard(
+                  controller: cardControllers[i],
+                  front: i < featuredCards.length
+                      ? ViewCardsTile.template(
+                          template: featuredCards[i],
+                          width: cardWidth,
+                          allowFlip: false,
+                        )
+                      : PhysicalCard(
+                          front: BackgroundImageSurface(
+                            image: coverImage,
+                            isEditable: effectiveOnImagePicked != null,
+                            onImagePicked: effectiveOnImagePicked,
+                          ),
                         ),
-                      ),
-                    ),
-                  PhysicalDeck(
-                    deck: deck,
-                    controller: physicalDeckController,
-                    showInfoCover: false,
-                    textScaleBaseWidth: cardWidth,
-                  ),
-                ],
-              },
-            ),
-          ),
+                ),
+              PhysicalDeck(
+                deck: deck,
+                controller: physicalDeckController,
+                showInfoCover: false,
+                textScaleBaseWidth: cardWidth,
+                isSelected: isSelected,
+              ),
+            ],
+          },
         ),
       ),
     );
+  }
+}
+
+List<CardTemplate> _featuredCardTemplates(Deck? deck) {
+  final featuredCards = deck?.listing?.featuredCards ?? const [];
+  return featuredCards
+      .map(_decodeFeaturedCard)
+      .nonNulls
+      .toList(growable: false);
+}
+
+CardTemplate? _decodeFeaturedCard(Map<String, dynamic> card) {
+  try {
+    return CardTemplateMapper.fromMap(card);
+  } catch (_) {
+    return null;
   }
 }

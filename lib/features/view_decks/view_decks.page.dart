@@ -7,35 +7,39 @@
 
 import 'package:boo_mondai/lib.barrel.dart'
     show
+        AppBar,
+        AppTokens,
+        AuthService,
         Button,
-        ChangeTrackerController,
+        ChangeTrackerStatus,
         CreateDeckTile,
         Deck,
         DeckListingTile,
         DeckSearchFilter,
         DeckTile,
         DeckTileState,
-        EmptyState,
         FilteredSearchBar,
-        ImportFileStatus,
         ImportExportController,
+        ImportFileStatus,
+        InteractionHandler,
         ListingStatesWrapper,
         LocalDB,
         RemoteDB,
+        Scaffold,
+        SegmentOption,
+        SegmentedControl,
+        SelectionController,
         SnackbarTone,
+        StatusLayoutState,
         SyncButton,
         SyncPage,
         ViewDecksHelper,
         ViewDecksLocalController,
         ViewDecksSearchScope,
-        AppTokens,
         showSnackbar,
+        useChangeTrackerController,
         useSyncController,
-        AuthService,
-        AppBar,
-        Scaffold,
-        SegmentOption,
-        SegmentedControl;
+        useSelectionController;
 import 'package:flutter/material.dart'
     show
         BuildContext,
@@ -63,7 +67,12 @@ class ViewDecksLocalPage extends HookWidget {
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
     final controller = context.watch<ViewDecksLocalController>();
-    final reviewController = context.watch<ChangeTrackerController>();
+    final changeTrackerController = useChangeTrackerController();
+    final selectionController = useSelectionController<String>(
+      multiple: true,
+      isEnabled: false,
+      emptySelectionAllowed: true,
+    );
     final importController = useMemoized(() => ImportExportController());
     final syncController = useSyncController<Deck>(
       localDb: LocalDB.deck,
@@ -107,19 +116,27 @@ class ViewDecksLocalPage extends HookWidget {
     }, [syncController.syncError]);
 
     useEffect(() {
-      final changePlan = syncController.changePlan;
-      if (changePlan == null) return null;
+      final syncEntry = syncController.currentEntry;
+      if (syncEntry == null) return null;
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!context.mounted) return;
-        showSnackbar(context, message: 'Everything is up to date!');
-        syncController.clearChangePreview();
+        switch (syncEntry.status) {
+          case ChangeTrackerStatus.alreadyUpToDate:
+            showSnackbar(context, message: 'Everything is already up to date!');
+            syncController.clearAlreadyUpToDate();
+          case ChangeTrackerStatus.reviewing:
+            showSnackbar(
+              context,
+              message: 'There are changes that need to be reviewed!',
+            );
+          case _:
+            break;
+        }
       });
 
       return null;
-    }, [syncController.changePlan]);
-
-    final syncPlan = ViewDecksHelper.currentSyncPlan(reviewController.entries);
+    }, [syncController.currentEntry?.id, syncController.currentEntry?.status]);
 
     Future<void> importDecksFromFile() async {
       final result = await importController.importDecksFromFile();
@@ -142,26 +159,12 @@ class ViewDecksLocalPage extends HookWidget {
       );
     }
 
-    // If there's an active sync plan, show SyncPage regardless of which
-    // tab the user navigated to and back from — the plan survives in
-    // ChangeTrackerController which lives above the ShellRoute.
-    if (AuthService.isAuthenticatedRemote && syncPlan != null) {
-      return SyncPage(
-        entry: syncPlan,
-        onViewChanges: () {
-          context.push('/change-review/${syncPlan.id}');
-        },
-        onApply: () {
-          syncController.clearSyncing();
-          context.read<ChangeTrackerController>().apply(syncPlan.id);
-        },
-        onDiscard: () {
-          syncController.dismissSyncReview(
-            context.read<ChangeTrackerController>(),
-            syncPlan.id,
-          );
-        },
-      );
+    // If there's an active sync plan, show SyncPage while this page-owned
+    // tracker service has reviewable sync work.
+    if (AuthService.isAuthenticatedRemote &&
+        !syncController.isAlreadyUpToDate &&
+        syncController.shouldShowSyncPage) {
+      return SyncPage<Deck>(syncController: syncController);
     }
 
     final searchState = controller.activeSearchState;
@@ -187,6 +190,9 @@ class ViewDecksLocalPage extends HookWidget {
     return Scaffold(
       appBar: AppBar(
         title: 'My Decks',
+        selectedActions: [
+          Button.icon(tokens: tokens, icon: Icons.import_export),
+        ],
         actions: [
           Button.icon(
             tokens: tokens,
@@ -201,11 +207,12 @@ class ViewDecksLocalPage extends HookWidget {
           SyncButton(
             isSyncing: syncController.isSyncing,
             isAuthenticated: AuthService.isAuthenticatedRemote,
-            onSync: () => syncController.sync(reviewController),
+            onSync: () => syncController.sync(changeTrackerController),
           ),
         ],
         header: searchBar,
         preferredBottomHeight: 70,
+        selectionController: selectionController,
         bottom: Padding(
           padding: EdgeInsets.only(
             left: tokens.spaceScaffoldPadding,
@@ -231,6 +238,7 @@ class ViewDecksLocalPage extends HookWidget {
               onCreate: () => controller.createDeck(context),
               decks: controller.visibleDecks,
               hasSearchQuery: controller.hasSearchQuery,
+              selectionController: selectionController,
             )
           : _DeckListingListView(
               error: controller.error,
@@ -253,6 +261,7 @@ class _DeckListView extends StatelessWidget {
     required this.onPressed,
     required this.onCreate,
     required this.hasSearchQuery,
+    required this.selectionController,
   });
 
   final bool isLoading;
@@ -262,6 +271,7 @@ class _DeckListView extends StatelessWidget {
   final Function(BuildContext context, Deck deck) onPressed;
   final VoidCallback onCreate;
   final bool hasSearchQuery;
+  final SelectionController<String> selectionController;
 
   @override
   Widget build(BuildContext context) {
@@ -275,22 +285,21 @@ class _DeckListView extends StatelessWidget {
       useParentScroll: true,
       onRetry: onRetry,
       skeletonTile: _GridTileMaxWidthConstraints(
-        builder: (width) => DeckTile(deck: null, width: width),
+        builder: (width) => DeckTile(deck: null, width: width, hasTags: true),
       ),
       emptyState: hasSearchQuery
-          ? const EmptyState(
+          ? const StatusLayoutState(
               icon: Icons.search_off,
               title: 'No decks found',
               message: 'Try another search or remove filters',
             )
-          : EmptyState(
+          : StatusLayoutState(
               icon: Icons.layers,
               title: 'No decks yet',
               message: 'Create your first deck to get started',
-              action: ElevatedButton(
-                onPressed: onCreate,
-                child: Text('Create Deck'),
-              ),
+              actions: [
+                ElevatedButton(onPressed: onCreate, child: Text('Create Deck')),
+              ],
             ),
       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
         maxCrossAxisExtent: tokens.studyCardWidth,
@@ -303,13 +312,19 @@ class _DeckListView extends StatelessWidget {
       ),
       itemBuilder: (_, _, deck) {
         return _GridTileMaxWidthConstraints(
-          builder: (width) => DeckTile(
-            deck: deck,
-            width: width,
-            state: DeckTileState.defaultView,
+          builder: (width) => InteractionHandler(
             onPressed: () {
               onPressed(context, deck);
             },
+            selectionController: selectionController,
+            selectionValue: deck.id,
+            child: DeckTile(
+              deck: deck,
+              width: width,
+              hasTags: true,
+              state: DeckTileState.defaultView,
+              isSelected: selectionController.isSelected(deck.id),
+            ),
           ),
         );
       },
@@ -353,12 +368,12 @@ class _DeckListingListView extends StatelessWidget {
         ),
       ),
       emptyState: hasSearchQuery
-          ? const EmptyState(
+          ? const StatusLayoutState(
               icon: Icons.search_off,
               title: 'No listings found',
               message: 'Try another search or remove filters',
             )
-          : const EmptyState(
+          : const StatusLayoutState(
               icon: Icons.public,
               title: 'No listings yet',
               message: 'Create a deck listing to manage it here',
