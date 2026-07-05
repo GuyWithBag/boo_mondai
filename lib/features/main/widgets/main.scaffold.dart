@@ -37,7 +37,7 @@ class MainScaffold extends HookWidget {
       padding: EdgeInsets.zero,
       scrollable: false,
       safeArea: false,
-      center: false,
+      centeredConstraint: false,
       haveBottomNavBarBottomGap: false,
       shouldConstrainWidth: false,
       inheritMainBottomNavBarHeight: false,

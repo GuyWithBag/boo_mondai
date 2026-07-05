@@ -13,6 +13,7 @@ class DrillAnswerMapper extends ClassMapperBase<DrillAnswer> {
   static DrillAnswerMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = DrillAnswerMapper._());
+      ImmutableEntityMapper.ensureInitialized();
       StudyRatingMapper.ensureInitialized();
       DrillSessionMapper.ensureInitialized();
       CardTemplateMapper.ensureInitialized();
@@ -121,9 +122,10 @@ extension DrillAnswerValueCopy<$R, $Out>
 }
 
 abstract class DrillAnswerCopyWith<$R, $In extends DrillAnswer, $Out>
-    implements ClassCopyWith<$R, $In, $Out> {
+    implements ImmutableEntityCopyWith<$R, $In, $Out> {
   DrillSessionCopyWith<$R, DrillSession, DrillSession>? get session;
   CardTemplateCopyWith<$R, CardTemplate, CardTemplate>? get cardTemplate;
+  @override
   $R call(
       {String? id,
       String? sessionId,

@@ -5,7 +5,26 @@
 
 import 'package:boo_mondai/lib.barrel.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_hooks/flutter_hooks.dart'
+    show useEffect, useListenable, useMemoized;
 import 'package:fsrs/fsrs.dart' as fsrs;
+
+ReviewSessionController useReviewSessionController({
+  required String? deckId,
+  required DueFilterThreshold filter,
+  bool realTime = false,
+}) {
+  final controller = useMemoized(() {
+    final controller = ReviewSessionController();
+    controller.startSession(deckId: deckId, filter: filter, realTime: realTime);
+    return controller;
+  }, [deckId, filter, realTime]);
+
+  useListenable(controller);
+  useEffect(() => controller.dispose, [controller]);
+
+  return controller;
+}
 
 class ReviewSessionController
     extends StudySessionController<FsrsCard, ReviewSession> {

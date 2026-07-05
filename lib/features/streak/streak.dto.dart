@@ -5,13 +5,14 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/core/models/dto.dart' show DTO;
+import 'package:boo_mondai/lib.barrel.dart'
+    show MutableEntity, MutableEntityCopyWith, MutableEntityMapper;
 import 'package:dart_mappable/dart_mappable.dart';
 
 part 'streak.dto.mapper.dart';
 
 @MappableClass()
-class Streak with StreakMappable implements DTO {
+class Streak with StreakMappable implements MutableEntity {
   @override
   final String id;
   @override

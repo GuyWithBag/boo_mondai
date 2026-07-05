@@ -5,13 +5,14 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/lib.barrel.dart' show DTO;
+import 'package:boo_mondai/lib.barrel.dart'
+    show MutableEntity, MutableEntityCopyWith, MutableEntityMapper;
 import 'package:dart_mappable/dart_mappable.dart';
 
 part 'profile.dto.mapper.dart';
 
 @MappableClass()
-class Profile with ProfileMappable implements DTO {
+class Profile with ProfileMappable implements MutableEntity {
   @override
   final String id;
   final String userId;

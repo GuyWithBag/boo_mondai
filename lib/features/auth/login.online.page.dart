@@ -13,10 +13,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         buttonStyle,
         ButtonVariant,
         TextFieldSize,
+        Scaffold,
+        AppBar,
         TextFieldFrame,
-        TextFieldColor,
         TextField;
-import 'package:flutter/material.dart' hide BackButton, TextField;
+import 'package:flutter/material.dart' hide TextField, Scaffold, AppBar;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -44,6 +45,7 @@ class LoginPage extends HookWidget {
     final emailError = useState<String?>(null);
     final passwordError = useState<String?>(null);
     final auth = context.watch<AuthController>();
+    final tokens = context.themeTokens<AppTokens>();
 
     // 1. Initial Focus Effect
     VoidCallback? handleInitFocus() {
@@ -75,73 +77,56 @@ class LoginPage extends HookWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(leading: const BackButton(), leadingWidth: 100),
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 400),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    'BooMondai',
-                    style: Theme.of(context).textTheme.displayLarge,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: AppSpacing.xxl),
-                  _AuthField(
-                    label: 'Email',
-                    controller: emailController,
-                    focusNode: emailFocus,
-                    placeholder: 'you@example.com',
-                    keyboardType: TextInputType.emailAddress,
-                    textInputAction: TextInputAction.next,
-                    error: emailError.value,
-                    onSubmitted: (_) => passwordFocus.requestFocus(),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  _AuthField(
-                    label: 'Password',
-                    controller: passwordController,
-                    focusNode: passwordFocus,
-                    placeholder: 'Password',
-                    obscureText: true,
-                    textInputAction: TextInputAction.done,
-                    error: passwordError.value,
-                    onSubmitted: (_) => performSignIn(),
-                  ),
-                  if (auth.error != null) ...[
-                    const SizedBox(height: AppSpacing.sm),
-                    ErrorText(auth.error),
-                  ],
-                  const SizedBox(height: AppSpacing.lg),
-                  Button(
-                    style: buttonStyle.resolve(
-                      context.themeTokens<AppTokens>(),
-                      const [ButtonColor.primary],
-                    ),
-                    onPressed: auth.isLoading ? null : performSignIn,
-                    child: auth.isLoading
-                        ? const LoadingIndicator()
-                        : const Text('Sign In'),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  Button(
-                    style: buttonStyle.resolve(
-                      context.themeTokens<AppTokens>(),
-                      const [ButtonColor.primary, ButtonVariant.flat],
-                    ),
-                    onPressed: navigateToRegister,
-                    child: const Text("Don't have an account? Sign Up"),
-                  ),
-                ],
-              ),
-            ),
+      appBar: AppBar(title: 'Login'),
+      body: Column(
+        mainAxisSize: MainAxisSize.min,
+        spacing: tokens.spaceLayoutGapMd,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            'BooMondai',
+            style: Theme.of(context).textTheme.displayLarge,
+            textAlign: TextAlign.center,
           ),
-        ),
+          _AuthField(
+            label: 'Email',
+            controller: emailController,
+            focusNode: emailFocus,
+            placeholder: 'you@example.com',
+            keyboardType: TextInputType.emailAddress,
+            textInputAction: TextInputAction.next,
+            error: emailError.value,
+            onSubmitted: (_) => passwordFocus.requestFocus(),
+          ),
+          _AuthField(
+            label: 'Password',
+            controller: passwordController,
+            focusNode: passwordFocus,
+            placeholder: 'Password',
+            obscureText: true,
+            textInputAction: TextInputAction.done,
+            error: passwordError.value,
+            onSubmitted: (_) => performSignIn(),
+          ),
+          if (auth.error != null) ...[ErrorText(auth.error)],
+          Button(
+            style: buttonStyle.resolve(context.themeTokens<AppTokens>(), const [
+              ButtonColor.primary,
+            ]),
+            onPressed: auth.isLoading ? null : performSignIn,
+            child: auth.isLoading
+                ? const LoadingIndicator()
+                : const Text('Sign In'),
+          ),
+          Button(
+            style: buttonStyle.resolve(context.themeTokens<AppTokens>(), const [
+              ButtonColor.primary,
+              ButtonVariant.flat,
+            ]),
+            onPressed: navigateToRegister,
+            child: const Text("Don't have an account? Sign Up"),
+          ),
+        ],
       ),
     );
   }

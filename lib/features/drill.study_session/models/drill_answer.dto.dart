@@ -8,14 +8,15 @@
 import 'package:boo_mondai/features/cards/models/card_template.dto.dart';
 import 'package:boo_mondai/features/drill.study_session/models/drill.study_session.dto.dart';
 import 'package:boo_mondai/features/study_session/models/study_rating.dto.dart';
-import 'package:boo_mondai/lib.barrel.dart' show WriteOnceDTO, uuid;
+import 'package:boo_mondai/lib.barrel.dart'
+    show ImmutableEntity, ImmutableEntityCopyWith, ImmutableEntityMapper, uuid;
 import 'package:dart_mappable/dart_mappable.dart';
 
 part 'drill_answer.dto.mapper.dart';
 
 /// For showing to logs and showing the end results after a drill
 @MappableClass()
-class DrillAnswer with DrillAnswerMappable implements WriteOnceDTO {
+class DrillAnswer with DrillAnswerMappable implements ImmutableEntity {
   @override
   final String id;
   final String sessionId;

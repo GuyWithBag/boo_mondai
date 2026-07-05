@@ -13,6 +13,7 @@ class ProfileMapper extends ClassMapperBase<Profile> {
   static ProfileMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = ProfileMapper._());
+      MutableEntityMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -122,7 +123,8 @@ extension ProfileValueCopy<$R, $Out> on ObjectCopyWith<$R, Profile, $Out> {
 }
 
 abstract class ProfileCopyWith<$R, $In extends Profile, $Out>
-    implements ClassCopyWith<$R, $In, $Out> {
+    implements MutableEntityCopyWith<$R, $In, $Out> {
+  @override
   $R call(
       {String? id,
       String? username,

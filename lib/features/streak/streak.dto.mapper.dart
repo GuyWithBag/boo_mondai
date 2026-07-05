@@ -13,6 +13,7 @@ class StreakMapper extends ClassMapperBase<Streak> {
   static StreakMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = StreakMapper._());
+      MutableEntityMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -109,7 +110,8 @@ extension StreakValueCopy<$R, $Out> on ObjectCopyWith<$R, Streak, $Out> {
 }
 
 abstract class StreakCopyWith<$R, $In extends Streak, $Out>
-    implements ClassCopyWith<$R, $In, $Out> {
+    implements MutableEntityCopyWith<$R, $In, $Out> {
+  @override
   $R call(
       {String? id,
       DateTime? createdAt,

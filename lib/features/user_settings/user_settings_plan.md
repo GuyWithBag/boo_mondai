@@ -144,9 +144,9 @@ Known invalid values should still be rejected or ignored with a warning. Example
 
 Local-first is the initial behavior.
 
-Later, a sync button can call a user settings sync method. The current generic `SyncService` may work if `UserSettings` extends `DTO` and has `id`, `createdAt`, and `updatedAt`, but there are concerns:
+Later, a sync button can call a user settings sync method. The current generic `SyncService` may work if `UserSettings` extends `MutableEntity` and has `id`, `createdAt`, and `updatedAt`, but there are concerns:
 
-- `SyncService` filters remote records by `user_id`; the settings DTO/table must use that column name or the generic service needs a filter override.
+- `SyncService` filters remote records by `user_id`; the settings MutableEntity/table must use that column name or the generic service needs a filter override.
 - Settings are single-row-per-profile data, while the generic service is list-oriented. It can still work, but a settings-specific wrapper should enforce one settings row per profile.
 - Conflict resolution is newest `updatedAt` wins. That is acceptable for first sync, but it may overwrite one device's theme edits if another device updated later.
 
@@ -156,7 +156,7 @@ Recommended service method:
 Future<UserSettings> syncSettings({required String profileId})
 ```
 
-Internally, it can use `SyncService` if the DTO/table matches its assumptions. Otherwise, create a settings-specific sync path that pulls the one remote row, compares `updatedAt`, and upserts the winner.
+Internally, it can use `SyncService` if the MutableEntity/table matches its assumptions. Otherwise, create a settings-specific sync path that pulls the one remote row, compares `updatedAt`, and upserts the winner.
 
 ## Service Responsibilities
 

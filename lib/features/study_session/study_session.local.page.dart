@@ -10,13 +10,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         BottomNavBar,
         Button,
-        DrillSessionController,
         ErrorState,
         ErrorText,
         FlashcardTemplate,
         ProgressBar,
         RatingArea,
-        ReviewSessionController,
         Scaffold,
         SessionException,
         SessionMode,
@@ -28,11 +26,13 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextWeight,
         ViewStudyCardsController,
         textStyle,
+        useDrillSessionController,
+        useReviewSessionController,
         useStudySessionCardStageController;
 import 'package:flutter/material.dart' hide AppBar, Scaffold;
 import 'package:flutter_hooks/flutter_hooks.dart' show useEffect, HookWidget;
 import 'package:go_router/go_router.dart' show GoRouterHelper;
-import 'package:provider/provider.dart' show WatchContext, ReadContext;
+import 'package:provider/provider.dart' show ReadContext;
 import 'package:theme_variants/theme_variants.dart';
 
 class StudySessionPage extends HookWidget {
@@ -49,36 +49,21 @@ class StudySessionPage extends HookWidget {
       throw SessionException;
     }
 
+    final ViewStudyCardsController? dashboardController =
+        mode == SessionMode.review
+        ? context.read<ViewStudyCardsController>()
+        : null;
     final StudySessionController controller;
-    final ViewStudyCardsController? dashboardController;
     final tokens = context.themeTokens<AppTokens>();
 
     if (mode == SessionMode.drill) {
-      controller = context.watch<DrillSessionController>();
-      dashboardController = null;
+      controller = useDrillSessionController(deckId: deckId!);
     } else {
-      controller = context.watch<ReviewSessionController>();
-      dashboardController = context.read<ViewStudyCardsController>();
+      controller = useReviewSessionController(
+        deckId: deckId,
+        filter: dashboardController!.dueFilter,
+      );
     }
-
-    // ── KICK OFF THE SESSION ──────────────────────────────
-    useEffect(() {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mode == SessionMode.drill) {
-          final drillCtrl = controller as DrillSessionController;
-          if (drillCtrl.session == null) {
-            drillCtrl.startSession(deckId!);
-          }
-        } else {
-          final reviewCtrl = controller as ReviewSessionController;
-          reviewCtrl.startSession(
-            deckId: deckId,
-            filter: dashboardController!.dueFilter,
-          );
-        }
-      });
-      return null;
-    }, [deckId, mode]);
 
     // ── RECORD STREAK ON REVIEW COMPLETION ───────────────
     useEffect(() {
@@ -98,10 +83,9 @@ class StudySessionPage extends HookWidget {
     // 3. Handle Completion
     if (controller.isComplete) {
       if (mode == SessionMode.drill) {
-        final drillCtrl = controller as DrillSessionController;
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!context.mounted) return;
-          context.go('/drill/${drillCtrl.session?.id}/result');
+          context.go('/drill/${controller.session?.id}/result');
         });
         return const Scaffold(body: SizedBox.shrink());
       } else {

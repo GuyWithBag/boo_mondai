@@ -1,13 +1,13 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/pages/quiz_result_page.dart
 // PURPOSE: Display quiz results with score animation and FSRS review prompt
-// PROVIDERS: DrillSessionController
 // HOOKS: useAnimationController, useEffect
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        DrillSessionController,
+        ErrorText,
+        LocalDB,
         StudyRating,
         AppSpacing,
         ScoreReveal,
@@ -16,7 +16,6 @@ import 'package:boo_mondai/lib.barrel.dart'
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 
 class ViewDrillResultPage extends HookWidget {
   const ViewDrillResultPage({super.key, required this.sessionId});
@@ -25,8 +24,17 @@ class ViewDrillResultPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = context.watch<DrillSessionController>();
-    final session = controller.session!;
+    final session = LocalDB.drillSession.selectByPk({'id': sessionId});
+
+    if (session == null) {
+      return Scaffold(
+        body: Center(
+          child: ErrorText(Exception('Drill session result was not found.')),
+        ),
+      );
+    }
+
+    final answers = LocalDB.drillAnswer.getBySessionId(sessionId);
 
     final scoreAnim = useAnimationController(
       duration: const Duration(milliseconds: 600),
@@ -38,12 +46,11 @@ class ViewDrillResultPage extends HookWidget {
     }, const []);
 
     void goHome() {
-      controller.reset();
       context.go('/');
     }
 
     // 1. Enrolled Count: FSRS now takes everything except auto-graded typos
-    final enrolledCount = controller.answers
+    final enrolledCount = answers
         .where((a) => a.type != StudyRating.incorrect)
         .length;
 
@@ -51,7 +58,7 @@ class ViewDrillResultPage extends HookWidget {
     final breakdown = <StudyRating, int>{
       for (final type in StudyRating.values) type: 0,
     };
-    for (final a in controller.answers) {
+    for (final a in answers) {
       breakdown[a.type] = (breakdown[a.type] ?? 0) + 1;
     }
 
@@ -80,14 +87,14 @@ class ViewDrillResultPage extends HookWidget {
                   const SizedBox(height: AppSpacing.lg),
 
                   // The list of individual answers
-                  if (controller.answers.isNotEmpty)
+                  if (answers.isNotEmpty)
                     Expanded(
                       child: ListView.separated(
-                        itemCount: controller.answers.length,
+                        itemCount: answers.length,
                         separatorBuilder: (context, i) =>
                             const SizedBox(height: AppSpacing.sm),
                         itemBuilder: (context, i) {
-                          final a = controller.answers[i];
+                          final a = answers[i];
 
                           return AnswerResultTile(
                             userAnswer: a.userAnswer,

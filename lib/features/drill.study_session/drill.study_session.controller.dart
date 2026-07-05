@@ -18,7 +18,32 @@ import 'package:boo_mondai/lib.barrel.dart'
         Services,
         StudySessionService;
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart'
+    show useEffect, useListenable, useMemoized;
 import 'package:fsrs/fsrs.dart' as fsrs;
+
+DrillSessionController useDrillSessionController({
+  required String deckId,
+  bool previewed = false,
+  int? batchSize,
+  bool realTime = false,
+}) {
+  final controller = useMemoized(() {
+    final controller = DrillSessionController();
+    controller.startSession(
+      deckId,
+      previewed: previewed,
+      batchSize: batchSize,
+      realTime: realTime,
+    );
+    return controller;
+  }, [deckId, previewed, batchSize, realTime]);
+
+  useListenable(controller);
+  useEffect(() => controller.dispose, [controller]);
+
+  return controller;
+}
 
 class DrillSessionController
     extends StudySessionController<StudyCard, DrillSession> {

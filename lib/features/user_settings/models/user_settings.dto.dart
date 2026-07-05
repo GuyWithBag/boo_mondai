@@ -1,4 +1,4 @@
-// import 'package:boo_mondai/lib.barrel.dart' show DTO;
+// import 'package:boo_mondai/lib.barrel.dart' show MutableEntity;
 // import 'package:dart_mappable/dart_mappable.dart';
 // import 'package:flutter/material.dart' show ThemeMode;
 
@@ -9,7 +9,7 @@
 
 // /// One latest-state settings document for a profile/user.
 // @MappableClass()
-// class UserSettings extends DTO with UserSettingsMappable {
+// class UserSettings extends MutableEntity with UserSettingsMappable {
 //   /// Creates a persisted user settings row.
 //   const UserSettings({
 //     required super.id,
