@@ -2,17 +2,29 @@
 // PATH: lib/models/dtos/deck.dto.dart
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/features/deck_listings/models/deck_listing.dto.dart';
-import 'package:boo_mondai/features/decks/models/visibility_state.dto.dart';
-import 'package:boo_mondai/features/profile/models/cached_profile.dart';
-import 'package:boo_mondai/features/tags/models/tag.dto.dart';
-import 'package:boo_mondai/lib.barrel.dart' show DTO, uuid;
+import 'package:boo_mondai/lib.barrel.dart'
+    show
+        CachedProfile,
+        MutableEntity,
+        DeckListing,
+        Tag,
+        VisibilityState,
+        uuid,
+        VisibilityStateMapper,
+        MutableEntityMapper,
+        CachedProfileMapper,
+        TagMapper,
+        DeckListingMapper,
+        MutableEntityCopyWith,
+        TagCopyWith,
+        CachedProfileCopyWith,
+        DeckListingCopyWith;
 import 'package:dart_mappable/dart_mappable.dart';
 
 part 'deck.dto.mapper.dart';
 
 @MappableClass()
-class Deck with DeckMappable implements DTO {
+class Deck with DeckMappable implements MutableEntity {
   @override
   final String id;
   @override
@@ -58,7 +70,7 @@ class Deck with DeckMappable implements DTO {
     required this.isPublished,
     this.isEditable = true,
     required this.cardCount,
-    this.version = '1.0.0',
+    this.version = '0.1.0+1',
     this.buildNumber = 1,
     required this.createdAt,
     required this.updatedAt,
@@ -75,10 +87,10 @@ class Deck with DeckMappable implements DTO {
     String? coverImageUrl,
     String? sourceDeckId,
     VisibilityState visibilityState = VisibilityState.private,
-    required bool isPublished,
-    bool? isPremade,
-    bool? isEditable,
-    String? version,
+    bool isPublished = false,
+    bool isPremade = false,
+    bool isEditable = true,
+    String version = '0.1.0+1',
     List<Tag>? tags,
   }) {
     final now = DateTime.now();
@@ -92,10 +104,10 @@ class Deck with DeckMappable implements DTO {
       sourceDeckId: sourceDeckId,
       visibilityState: visibilityState,
       isPublished: isPublished,
-      isPremade: isPremade ?? false,
-      isEditable: isEditable ?? true,
+      isPremade: isPremade,
+      isEditable: isEditable,
       cardCount: 0,
-      version: version ?? '1.0.0',
+      version: version,
       buildNumber: 1,
       createdAt: now,
       updatedAt: now,

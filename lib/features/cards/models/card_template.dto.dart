@@ -2,16 +2,30 @@
 // PATH: lib/models/templates/card_template.dart
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/core/models/dto.dart';
-import 'package:boo_mondai/features/card_attachments/helpers/attachment_uri.helper.dart';
-import 'package:boo_mondai/features/card_attachments/models/card_media_attachment.dto.dart';
-import 'package:boo_mondai/features/cards/models/fill_in_the_blanks_template.dto.dart';
-import 'package:boo_mondai/features/cards/models/flashcard_template.dto.dart';
-import 'package:boo_mondai/features/cards/models/identification_template.dto.dart';
-import 'package:boo_mondai/features/cards/models/match_madness_template.dto.dart';
-import 'package:boo_mondai/features/cards/models/multiple_choice_template.dto.dart';
-import 'package:boo_mondai/features/cards/models/word_scramble_template.dart';
-import 'package:boo_mondai/features/tags/models/tag.dto.dart';
+import 'package:boo_mondai/lib.barrel.dart'
+    show
+        MutableEntity,
+        WordScrambleTemplate,
+        Tag,
+        CardAttachment,
+        FlashcardTemplate,
+        IdentificationTemplate,
+        MultipleChoiceTemplate,
+        FillInTheBlanksTemplate,
+        MatchMadnessTemplate,
+        TagMapper,
+        CardAttachmentMapper,
+        FlashcardTemplateMapper,
+        IdentificationTemplateMapper,
+        MultipleChoiceTemplateMapper,
+        FillInTheBlanksTemplateMapper,
+        MatchMadnessTemplateMapper,
+        MutableEntityMapper,
+        WordScrambleTemplateMapper,
+        AttachmentUriHelper,
+        MutableEntityCopyWith,
+        TagCopyWith,
+        CardAttachmentCopyWith;
 import 'package:dart_mappable/dart_mappable.dart';
 
 part 'card_template.dto.mapper.dart';
@@ -27,7 +41,7 @@ part 'card_template.dto.mapper.dart';
     WordScrambleTemplate,
   ],
 )
-abstract class CardTemplate with CardTemplateMappable implements DTO {
+abstract class CardTemplate with CardTemplateMappable implements MutableEntity {
   @override
   final String id;
   @override

@@ -40,7 +40,7 @@ class DeckListingsRemoteDB extends SupabaseRemoteDB<DeckListing> {
   /// Updates the Listing.
   /// RLS ensures only the deck owner can successfully execute this.
   Future<DeckListing> updateListing(DeckListing listing) => guard(() async {
-    // Convert the entire DTO to a map
+    // Convert the entire MutableEntity to a map
     final updates = toMap(listing);
 
     // Ensure the timestamp is fresh

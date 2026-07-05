@@ -13,6 +13,7 @@ class FsrsReviewLogMapper extends ClassMapperBase<FsrsReviewLog> {
   static FsrsReviewLogMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = FsrsReviewLogMapper._());
+      ImmutableEntityMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -99,7 +100,8 @@ extension FsrsReviewLogValueCopy<$R, $Out>
 }
 
 abstract class FsrsReviewLogCopyWith<$R, $In extends FsrsReviewLog, $Out>
-    implements ClassCopyWith<$R, $In, $Out> {
+    implements ImmutableEntityCopyWith<$R, $In, $Out> {
+  @override
   $R call(
       {String? id, DateTime? createdAt, String? fsrsCardId, ReviewLog? log});
   FsrsReviewLogCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);

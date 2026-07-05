@@ -202,35 +202,35 @@ abstract final class DecksService {
       return null;
     }
 
+    final now = DateTime.now();
+    final listing =
+        deck.listing ??
+        DeckListing(deckId: deck.id, createdAt: now, updatedAt: now);
+    final featuredImages = listing.featuredImages.toList();
+    final targetIndex = index <= featuredImages.length
+        ? index
+        : featuredImages.length;
+
     final localPath = await LocalImageCacheService.savePickedImage(
       cacheKey: LocalImageCacheKeysHelper.deckListingFeaturedImage(
         deck.id,
-        index,
+        targetIndex,
       ),
       file: file,
-      remotePath: index < (deck.listing?.featuredImages.length ?? 0)
-          ? deck.listing?.featuredImages[index]
+      remotePath: targetIndex < featuredImages.length
+          ? featuredImages[targetIndex]
           : null,
     );
     if (localPath == null) {
       return null;
     }
 
-    final now = DateTime.now();
-    final listing =
-        deck.listing ??
-        DeckListing(deckId: deck.id, createdAt: now, updatedAt: now);
-    final featuredImages = listing.featuredImages.toList();
-
-    if (index < featuredImages.length) {
-      featuredImages[index] =
-          LocalImagePathHelper.isRemotePath(featuredImages[index])
-          ? featuredImages[index]
+    if (targetIndex < featuredImages.length) {
+      featuredImages[targetIndex] =
+          LocalImagePathHelper.isRemotePath(featuredImages[targetIndex])
+          ? featuredImages[targetIndex]
           : '';
     } else {
-      while (featuredImages.length < index) {
-        featuredImages.add('');
-      }
       featuredImages.add('');
     }
 

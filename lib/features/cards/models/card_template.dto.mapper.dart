@@ -6,13 +6,14 @@
 
 part of 'card_template.dto.dart';
 
-class CardTemplateMapper extends ClassMapperBase<CardTemplate> {
+class CardTemplateMapper extends SubClassMapperBase<CardTemplate> {
   CardTemplateMapper._();
 
   static CardTemplateMapper? _instance;
   static CardTemplateMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = CardTemplateMapper._());
+      MutableEntityMapper.ensureInitialized().addSubMapper(_instance!);
       FlashcardTemplateMapper.ensureInitialized();
       IdentificationTemplateMapper.ensureInitialized();
       MultipleChoiceTemplateMapper.ensureInitialized();
@@ -65,6 +66,14 @@ class CardTemplateMapper extends ClassMapperBase<CardTemplate> {
     #attachments: _f$attachments,
   };
 
+  @override
+  final String discriminatorKey = 'type';
+  @override
+  final dynamic discriminatorValue = 'CardTemplate';
+  @override
+  late final ClassMapperBase superMapper =
+      MutableEntityMapper.ensureInitialized();
+
   static CardTemplate _instantiate(DecodingData data) {
     throw MapperException.missingSubclass(
         'CardTemplate', 'type', '${data.value['type']}');
@@ -89,11 +98,12 @@ mixin CardTemplateMappable {
 }
 
 abstract class CardTemplateCopyWith<$R, $In extends CardTemplate, $Out>
-    implements ClassCopyWith<$R, $In, $Out> {
+    implements MutableEntityCopyWith<$R, $In, $Out> {
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags;
   ListCopyWith<$R, CardAttachment,
           CardAttachmentCopyWith<$R, CardAttachment, CardAttachment>>
       get attachments;
+  @override
   $R call(
       {String? id,
       String? deckId,

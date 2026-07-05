@@ -3,14 +3,15 @@
 // PURPOSE: Tracks a specific user's spaced-repetition progress for a StudyCard
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 import 'package:boo_mondai/features/study_session/models/study_card.dto.dart';
-import 'package:boo_mondai/lib.barrel.dart' show DTO, uuid;
+import 'package:boo_mondai/lib.barrel.dart'
+    show MutableEntity, uuid, MutableEntityMapper, MutableEntityCopyWith;
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:fsrs/fsrs.dart';
 
 part 'fsrs_card.dto.mapper.dart';
 
 @MappableClass()
-class FsrsCard with FsrsCardMappable implements DTO {
+class FsrsCard with FsrsCardMappable implements MutableEntity {
   @override
   final String id;
   @override

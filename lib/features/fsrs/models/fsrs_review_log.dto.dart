@@ -10,7 +10,7 @@ import 'package:fsrs/fsrs.dart';
 part 'fsrs_review_log.dto.mapper.dart';
 
 @MappableClass()
-class FsrsReviewLog with FsrsReviewLogMappable implements WriteOnceDTO {
+class FsrsReviewLog with FsrsReviewLogMappable implements ImmutableEntity {
   @override
   final String id;
   @override

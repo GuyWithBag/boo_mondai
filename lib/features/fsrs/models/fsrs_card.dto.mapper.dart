@@ -13,6 +13,7 @@ class FsrsCardMapper extends ClassMapperBase<FsrsCard> {
   static FsrsCardMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = FsrsCardMapper._());
+      MutableEntityMapper.ensureInitialized();
       StudyCardMapper.ensureInitialized();
     }
     return _instance!;
@@ -112,8 +113,9 @@ extension FsrsCardValueCopy<$R, $Out> on ObjectCopyWith<$R, FsrsCard, $Out> {
 }
 
 abstract class FsrsCardCopyWith<$R, $In extends FsrsCard, $Out>
-    implements ClassCopyWith<$R, $In, $Out> {
+    implements MutableEntityCopyWith<$R, $In, $Out> {
   StudyCardCopyWith<$R, StudyCard, StudyCard>? get studyCard;
+  @override
   $R call(
       {String? id,
       DateTime? createdAt,

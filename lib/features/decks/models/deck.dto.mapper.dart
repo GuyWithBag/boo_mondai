@@ -13,6 +13,7 @@ class DeckMapper extends ClassMapperBase<Deck> {
   static DeckMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = DeckMapper._());
+      MutableEntityMapper.ensureInitialized();
       VisibilityStateMapper.ensureInitialized();
       TagMapper.ensureInitialized();
       CachedProfileMapper.ensureInitialized();
@@ -64,7 +65,7 @@ class DeckMapper extends ClassMapperBase<Deck> {
       Field('cardCount', _$cardCount, key: r'card_count');
   static String _$version(Deck v) => v.version;
   static const Field<Deck, String> _f$version =
-      Field('version', _$version, opt: true, def: '1.0.0');
+      Field('version', _$version, opt: true, def: '0.1.0+1');
   static int _$buildNumber(Deck v) => v.buildNumber;
   static const Field<Deck, int> _f$buildNumber = Field(
       'buildNumber', _$buildNumber,
@@ -176,10 +177,11 @@ extension DeckValueCopy<$R, $Out> on ObjectCopyWith<$R, Deck, $Out> {
 }
 
 abstract class DeckCopyWith<$R, $In extends Deck, $Out>
-    implements ClassCopyWith<$R, $In, $Out> {
+    implements MutableEntityCopyWith<$R, $In, $Out> {
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags;
   CachedProfileCopyWith<$R, CachedProfile, CachedProfile>? get userProfile;
   DeckListingCopyWith<$R, DeckListing, DeckListing>? get listing;
+  @override
   $R call(
       {String? id,
       String? userId,
