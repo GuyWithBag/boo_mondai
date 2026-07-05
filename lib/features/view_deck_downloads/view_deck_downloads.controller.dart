@@ -12,20 +12,21 @@ import 'package:boo_mondai/lib.barrel.dart'
         DeckDownloadsService,
         DownloadCheckpointLocalDB,
         LocalDB,
+        Services,
         Deck;
 
 class ViewDeckDownloadsController extends Controller {
   ViewDeckDownloadsController({
-    required this.reviewController,
+    required this.changeTrackerController,
     DeckDownloadsService? downloadsService,
     DownloadCheckpointLocalDB? checkpointDB,
-  }) : _downloadsService = downloadsService ?? DeckDownloadsService(),
+  }) : _downloadsService = downloadsService ?? Services.deckDownloads,
        _checkpointDB = checkpointDB ?? LocalDB.downloadCheckpoint {
-    reviewController.addListener(_onReviewChanged);
+    changeTrackerController.addListener(_onReviewChanged);
     _autoResumeInterruptedDownloads();
   }
 
-  final ChangeTrackerController reviewController;
+  final ChangeTrackerController changeTrackerController;
   final DeckDownloadsService _downloadsService;
   final DownloadCheckpointLocalDB _checkpointDB;
 
@@ -58,25 +59,23 @@ class ViewDeckDownloadsController extends Controller {
       if (localDeck == null) continue;
 
       // Create a fresh plan for this resumed download
-      final plan = reviewController.start(
-        source: ChangeSource.deckDownload,
-        title: checkpoint.deckTitle,
-        status: ChangeTrackerStatus.applying,
-        progress: checkpoint.progress,
+      final plan = changeTrackerController.start(
+        entry: ChangeTrackerEntry(
+          source: ChangeSource.deckDownload,
+          title: checkpoint.deckTitle,
+          status: ChangeTrackerStatus.applying,
+          progress: checkpoint.progress,
+        ),
       );
 
-      _downloadsService.downloadDeck(
-        localDeck,
-        reviewController,
-        resumeEntryId: plan.id,
-      );
+      _downloadsService.downloadDeck(localDeck, resumeEntryId: plan.id);
     }
   }
 
   // ── Plan list ─────────────────────────────────────────────────────────────
 
   void _onReviewChanged() {
-    final all = reviewController.entries
+    final all = changeTrackerController.entries
         .where((p) => p.source == ChangeSource.deckDownload)
         .toList();
 
@@ -88,7 +87,8 @@ class ViewDeckDownloadsController extends Controller {
   }
 
   static bool _isActive(ChangeTrackerStatus status) =>
-      status == ChangeTrackerStatus.previewing ||
+      status == ChangeTrackerStatus.planning ||
+      status == ChangeTrackerStatus.fetching ||
       status == ChangeTrackerStatus.applying ||
       status == ChangeTrackerStatus.paused ||
       status == ChangeTrackerStatus.reviewing;
@@ -97,11 +97,11 @@ class ViewDeckDownloadsController extends Controller {
 
   void pauseDownload(String entryId) {
     _downloadsService.pauseDownload(entryId);
-    reviewController.pause(entryId);
+    changeTrackerController.pause(entryId);
   }
 
   void resumeDownload(String entryId) {
-    final plan = reviewController.entryById(entryId);
+    final plan = changeTrackerController.entryById(entryId);
     if (plan == null) return;
 
     // Find the source deck via checkpoint
@@ -116,14 +116,14 @@ class ViewDeckDownloadsController extends Controller {
         .firstOrNull;
     if (localDeck == null) return;
 
-    reviewController.resume(entryId);
-    _downloadsService.resumeDownload(localDeck, reviewController, entryId);
+    changeTrackerController.resume(entryId);
+    _downloadsService.resumeDownload(localDeck, entryId);
   }
 
   void cancelDownload(String entryId) {
     _downloadsService.pauseDownload(entryId); // stop the loop first
-    reviewController.cancel(entryId);
-    reviewController.remove(entryId);
+    changeTrackerController.cancel(entryId);
+    changeTrackerController.remove(entryId);
 
     // Clean up checkpoint
     final checkpoint =
@@ -135,7 +135,7 @@ class ViewDeckDownloadsController extends Controller {
   }
 
   void dismissCompleted(String entryId) {
-    reviewController.remove(entryId);
+    changeTrackerController.remove(entryId);
   }
 
   /// Returns the local deck for a completed plan, found via sourceDeckId.
@@ -163,7 +163,7 @@ class ViewDeckDownloadsController extends Controller {
 
   @override
   void dispose() {
-    reviewController.removeListener(_onReviewChanged);
+    changeTrackerController.removeListener(_onReviewChanged);
     super.dispose();
   }
 }

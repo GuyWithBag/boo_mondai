@@ -2,7 +2,6 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         AuthService,
         CardTemplate,
-        ChangeTrackerController,
         Controller,
         Deck,
         DeckCommentsController,
@@ -27,7 +26,6 @@ ViewDeckListingSingleController useViewDeckListingSingleController({
   required Deck initialDeck,
   required DeckListingSheetState initialState,
   required ViewDeckListingsController controller,
-  required ChangeTrackerController changeTrackerController,
 }) {
   final sheetController = useMemoized(
     () => ViewDeckListingSingleController(
@@ -35,9 +33,8 @@ ViewDeckListingSingleController useViewDeckListingSingleController({
       initialDeck: initialDeck,
       initialState: initialState,
       parentController: controller,
-      changeTrackerController: changeTrackerController,
     ),
-    [deckId, controller, changeTrackerController],
+    [deckId, controller],
   );
 
   useListenable(sheetController);
@@ -67,12 +64,10 @@ class ViewDeckListingSingleController extends Controller {
     required Deck initialDeck,
     required DeckListingSheetState initialState,
     required ViewDeckListingsController parentController,
-    required ChangeTrackerController changeTrackerController,
   }) : _deckId = deckId,
        _deck = initialDeck,
        _state = initialState,
        _parentController = parentController,
-       _changeTrackerController = changeTrackerController,
        _interactionsController = DeckListingInteractionsController(
          deck: initialDeck,
        ) {
@@ -86,7 +81,6 @@ class ViewDeckListingSingleController extends Controller {
 
   final String _deckId;
   final ViewDeckListingsController _parentController;
-  final ChangeTrackerController _changeTrackerController;
   final DeckListingInteractionsController _interactionsController;
   final ViewDeckListingSingleHelper helper =
       const ViewDeckListingSingleHelper();
@@ -158,12 +152,8 @@ class ViewDeckListingSingleController extends Controller {
       _interactionsEnabled ? _interactionsController.toggleDownvote : null;
   Future<void> Function()? get onFavoritePressed =>
       _interactionsEnabled ? _interactionsController.toggleFavorite : null;
-  Future<void> Function()? get onDownloadPressed => _deck.isPublished
-      ? () => _parentController.downloadDeck(
-          _deck,
-          controller: _changeTrackerController,
-        )
-      : null;
+  Future<void> Function()? get onDownloadPressed =>
+      _deck.isPublished ? () => _parentController.downloadDeck(_deck) : null;
   ValueChanged<DeckListingSheetState> get onModeChanged => setState;
 
   List<DiscussionItem> reviewRepliesFor(String itemId) {

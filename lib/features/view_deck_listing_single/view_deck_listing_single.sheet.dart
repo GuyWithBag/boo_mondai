@@ -5,7 +5,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         Button,
         ButtonColor,
         CardTemplate,
-        ChangeTrackerController,
         ChipTone,
         DateHelper,
         Deck,
@@ -77,13 +76,11 @@ class ViewDeckListingSingleSheet extends HookWidget {
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
     final controller = context.read<ViewDeckListingsController>();
-    final changeTrackerController = context.read<ChangeTrackerController>();
     final sheet = useViewDeckListingSingleController(
       deckId: deck.id,
       initialDeck: deck,
       initialState: initialState,
       controller: controller,
-      changeTrackerController: changeTrackerController,
     );
     final isEditing = sheet.state == DeckListingSheetState.editor;
 

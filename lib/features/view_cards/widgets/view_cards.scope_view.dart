@@ -1,6 +1,6 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        EmptyState,
+        StatusLayoutState,
         CardTemplate,
         ViewCardsController,
         ViewCardsSearchScope,
@@ -66,13 +66,13 @@ class ViewCardsTemplateScopeView extends StatelessWidget {
     );
   }
 
-  EmptyState get _templateEmptyState => hasSearchQuery
-      ? const EmptyState(
+  StatusLayoutState get _templateEmptyState => hasSearchQuery
+      ? const StatusLayoutState(
           icon: Icons.search_off,
           title: 'No templates found',
           message: 'Try a different query or remove filters.',
         )
-      : const EmptyState(
+      : const StatusLayoutState(
           icon: Icons.view_carousel_outlined,
           title: 'No templates yet',
           message: 'Add card templates to your decks to browse them.',
@@ -145,13 +145,13 @@ class ViewCardsStudyCardScopeView extends StatelessWidget {
     );
   }
 
-  EmptyState get _studyCardEmptyState => hasSearchQuery
-      ? const EmptyState(
+  StatusLayoutState get _studyCardEmptyState => hasSearchQuery
+      ? const StatusLayoutState(
           icon: Icons.search_off,
           title: 'No cards found',
           message: 'Try a different query or remove filters.',
         )
-      : const EmptyState(
+      : const StatusLayoutState(
           icon: Icons.view_carousel_outlined,
           title: 'No cards yet',
           message: 'Add templates to your decks to generate study cards.',

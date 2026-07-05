@@ -34,7 +34,8 @@ class DownloadsTile extends StatelessWidget {
 
   String get _statusLabel {
     return switch (entry.status) {
-      ChangeTrackerStatus.previewing => 'Fetching deck info...',
+      ChangeTrackerStatus.planning => 'Fetching deck info...',
+      ChangeTrackerStatus.fetching => 'Fetching deck info...',
       ChangeTrackerStatus.applying => _applyingLabel,
       ChangeTrackerStatus.paused => 'Paused — $_percentLabel',
       ChangeTrackerStatus.completed => _completedLabel,
@@ -60,7 +61,8 @@ class DownloadsTile extends StatelessWidget {
   }
 
   bool get _isActive =>
-      entry.status == ChangeTrackerStatus.previewing ||
+      entry.status == ChangeTrackerStatus.planning ||
+      entry.status == ChangeTrackerStatus.fetching ||
       entry.status == ChangeTrackerStatus.applying ||
       entry.status == ChangeTrackerStatus.paused;
 

@@ -4,24 +4,36 @@
 
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        ChangeTrackerController,
         DownloadsTile,
-        EmptyState,
+        Services,
+        StatusLayoutState,
         ViewDeckDownloadsAppBar,
         Scaffold,
-        ViewDeckDownloadsController;
+        ViewDeckDownloadsController,
+        useChangeTrackerController;
 import 'package:flutter/material.dart' hide Scaffold;
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
 
-class ViewDeckDownloadsPage extends StatelessWidget {
+class ViewDeckDownloadsPage extends HookWidget {
   const ViewDeckDownloadsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => ViewDeckDownloadsController(
-        reviewController: context.read<ChangeTrackerController>(),
+    final changeTrackerController = useChangeTrackerController(
+      service: Services.deckDownloads.changeTrackerService,
+    );
+    final controller = useMemoized(
+      () => ViewDeckDownloadsController(
+        changeTrackerController: changeTrackerController,
+        downloadsService: Services.deckDownloads,
       ),
+      [changeTrackerController],
+    );
+    useEffect(() => controller.dispose, [controller]);
+
+    return ChangeNotifierProvider.value(
+      value: controller,
       child: const _ViewDeckDownloadsView(),
     );
   }
@@ -38,7 +50,7 @@ class _ViewDeckDownloadsView extends StatelessWidget {
       appBar: const ViewDeckDownloadsAppBar(),
       body: controller.isEmpty
           ? const Center(
-              child: EmptyState(
+              child: StatusLayoutState(
                 icon: Icons.download_done_rounded,
                 title: 'No downloads',
                 message: 'Downloaded decks will appear here.',

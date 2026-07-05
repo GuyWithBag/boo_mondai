@@ -5,7 +5,7 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppSpacing,
-        EmptyState,
+        StatusLayoutState,
         ListingStatesWrapper,
         ReviewAllCard,
         AppBar,
@@ -55,7 +55,7 @@ class ViewStudyCardsPage extends HookWidget {
       appBar: AppBar(title: 'FSRS Reviews', header: searchBar),
       scrollable: false,
       body: ListingStatesWrapper.list(
-        emptyState: EmptyState(
+        emptyState: StatusLayoutState(
           icon: Icons.abc,
           title: 'No Enrolled Cards Yet',
           message: 'Go take a drill!',

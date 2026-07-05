@@ -14,7 +14,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         DeckSearchFilter,
         DeckSearchFilterCodec,
         DeckSearchResults,
-        EmptyState,
+        StatusLayoutState,
         FilteredSearchBar,
         ListingStatesWrapper,
         Pages,
@@ -85,12 +85,12 @@ class _ViewDeckListingsView extends HookWidget {
         exception: controller.error,
         items: visibleDecks,
         emptyState: hasSearchQuery
-            ? const EmptyState(
+            ? const StatusLayoutState(
                 icon: Icons.search_off,
                 title: 'No decks found',
                 message: 'Try a different query or remove filters.',
               )
-            : const EmptyState(
+            : const StatusLayoutState(
                 icon: Icons.public,
                 title: 'No public decks yet',
                 message: 'Published community decks will appear here.',

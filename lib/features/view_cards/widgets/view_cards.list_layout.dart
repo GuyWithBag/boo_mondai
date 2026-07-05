@@ -1,5 +1,9 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, EmptyState, ListingStatesWrapper, ViewCardsLayoutMode;
+    show
+        AppTokens,
+        StatusLayoutState,
+        ListingStatesWrapper,
+        ViewCardsLayoutMode;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -18,7 +22,7 @@ class ViewCardsListLayout<TEntry> extends StatelessWidget {
   final bool isLoading;
   final Exception? exception;
   final List<TEntry> entries;
-  final EmptyState emptyState;
+  final StatusLayoutState emptyState;
   final VoidCallback onRetry;
   final ViewCardsLayoutMode layoutMode;
   final Widget Function(BuildContext context, int index, TEntry entry)

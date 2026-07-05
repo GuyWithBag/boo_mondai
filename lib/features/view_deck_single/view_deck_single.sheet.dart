@@ -78,7 +78,6 @@ class ViewDeckSingleSheet extends HookWidget {
             backgroundColor: Colors.transparent,
             bottomNavBar: ViewDeckSingleBottomNavBar(deck: activeDeck),
             scrollable: true,
-            center: false,
             shouldConstrainWidth: false,
             inheritMainBottomNavBarHeight: false,
             isFloatingAppBar: true,

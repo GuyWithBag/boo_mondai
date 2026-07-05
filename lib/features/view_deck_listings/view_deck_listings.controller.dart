@@ -3,7 +3,6 @@
 // PURPOSE: State and data fetching for the Online Deck Browser
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/features/change_tracker/change_tracker.controller.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         Controller,
@@ -11,11 +10,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         DeckDownloadsService,
         Deck,
         DeckSearchResults,
+        Services,
         Tag;
 
 class ViewDeckListingsController extends Controller {
   final DecksRemoteDB _deckRemoteDB = DecksRemoteDB();
-  final DeckDownloadsService _deckDownloadsService = DeckDownloadsService();
+  final DeckDownloadsService _deckDownloadsService = Services.deckDownloads;
 
   List<Deck> decks = [];
   List<Tag> availableTags = [];
@@ -52,16 +52,13 @@ class ViewDeckListingsController extends Controller {
     }
   }
 
-  Future<Deck?> downloadDeck(
-    Deck deck, {
-    required ChangeTrackerController controller,
-  }) async {
+  Future<Deck?> downloadDeck(Deck deck) async {
     downloadingDeckId = deck.id;
     error = null;
     notifyListeners();
 
     try {
-      final result = await _deckDownloadsService.downloadDeck(deck, controller);
+      final result = await _deckDownloadsService.downloadDeck(deck);
       return result.value.deck;
     } catch (e) {
       setError(e is Exception ? e : Exception(e.toString()));
