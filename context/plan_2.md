@@ -36,7 +36,7 @@ lib/features/change_review/
 
 Use names like:
 
-- `ChangeRecord`
+- `ChangedEntity`
 - `ChangeType`
 - `ChangeReviewPlan`
 - `ChangeReviewItem`
@@ -99,8 +99,8 @@ class ChangeFieldDiff {
   final Object? after;
 }
 
-class ChangeRecord {
-  const ChangeRecord({
+class ChangedEntity {
+  const ChangedEntity({
     required this.type,
     required this.source,
     required this.entityType,
@@ -138,7 +138,7 @@ class ChangeReviewPlan {
   final ChangeSource source;
   final String title;
   final ChangeReviewStatus status;
-  final List<ChangeRecord> changes;
+  final List<ChangedEntity> changes;
   final double? progress;
   final String? errorMessage;
 
@@ -180,10 +180,10 @@ Current files to change:
 Changes:
 
 1. Remove `SyncChangeRecord` and `SyncChangeType`.
-2. Make `SyncResult.changes` use `List<ChangeRecord>`.
+2. Make `SyncResult.changes` use `List<ChangedEntity>`.
 3. Make `SyncOperation` either disappear or become a thin wrapper around
    `ChangeReviewPlan`.
-4. Change `SyncService.pull` and `SyncService.push` to emit `ChangeRecord`.
+4. Change `SyncService.pull` and `SyncService.push` to emit `ChangedEntity`.
 5. Use `ChangeType.added` for remote/local records that did not exist.
 6. Use `ChangeType.modified` for newer records replacing older records.
 7. Use `ChangeType.skipped` only for records intentionally ignored.
@@ -210,7 +210,7 @@ Current files to change:
 
 Changes:
 
-1. Replace `List<SyncChangeRecord>` with `List<ChangeRecord>`.
+1. Replace `List<SyncChangeRecord>` with `List<ChangedEntity>`.
 2. Map download changes to `ChangeSource.deckDownload`.
 3. Emit `ChangeType.added` for a new local deck and copied card templates.
 4. Emit `ChangeType.modified` when the published deck/card is newer.
@@ -252,7 +252,7 @@ Changes:
 1. Delete `ImportExportChangeRecord` and `ImportExportChangeType`.
 2. Rename the file or move shared pieces into `change_review`.
 3. Change `ImportExportResult<T>` and `ImportExportBatchResult<T>` to use
-   `List<ChangeRecord> changes`.
+   `List<ChangedEntity> changes`.
 4. Replace controller state `latestChangeRecords` with `latestChanges`.
 5. Update backup JSON from old message logs to serialized generic change logs.
 6. For card import preview, emit structured changes before applying decisions.
@@ -390,9 +390,9 @@ Skipped changes can use neutral text/border tokens.
 
 1. Create `change_review` models and store.
 2. Remove `SyncChangeRecord` and `ImportExportChangeRecord`.
-3. Convert sync result models to generic `ChangeRecord`.
-4. Convert deck download entries/results to generic `ChangeRecord`.
-5. Convert import/export result and batch result to generic `ChangeRecord`.
+3. Convert sync result models to generic `ChangedEntity`.
+4. Convert deck download entries/results to generic `ChangedEntity`.
+5. Convert import/export result and batch result to generic `ChangedEntity`.
 6. Add `ChangeReviewDiffService` for deck/template/tag diffs.
 7. Build the three UI states from the design images.
 8. Add `/change-review/:planId` route.
@@ -411,7 +411,7 @@ Skipped changes can use neutral text/border tokens.
 
 - No `SyncChangeRecord` remains.
 - No `ImportExportChangeRecord` remains.
-- Sync, deck downloads, and import/export all produce `List<ChangeRecord>`.
+- Sync, deck downloads, and import/export all produce `List<ChangedEntity>`.
 - The change review page can render added, modified, and removed counts.
 - Added uses success colors.
 - Modified uses hard colors.

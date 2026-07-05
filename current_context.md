@@ -118,13 +118,13 @@ Do not add a new migration file yet unless the project starts treating migration
 
 ## 3. Model Refactor — Done
 
-Model work added the public deck browser/storefront model layer and fixed DTO assumptions that were wrong for composite keys.
+Model work added the public deck browser/storefront model layer and fixed MutableEntity assumptions that were wrong for composite keys.
 
-### 3a. Base DTO Changes
+### 3a. Base MutableEntity Changes
 
 File: `lib/models/dto.dart`
 
-The previous `DTO` / `WriteOnceDTO` base classes assumed every model has:
+The previous `MutableEntity` / `ImmutableEntity` base classes assumed every model has:
 
 - `id`
 - `createdAt`
@@ -132,7 +132,7 @@ The previous `DTO` / `WriteOnceDTO` base classes assumed every model has:
 
 That assumption is false. Some tables are join tables with composite keys, and some tables do not have all timestamp columns.
 
-The base DTO concept was reduced/removed from places where it forced the wrong shape. Models now own their actual schema instead of inheriting a fake universal primary key.
+The base MutableEntity concept was reduced/removed from places where it forced the wrong shape. Models now own their actual schema instead of inheriting a fake universal primary key.
 
 ### 3b. New / Expanded Models
 

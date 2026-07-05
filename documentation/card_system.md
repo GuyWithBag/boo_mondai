@@ -6,7 +6,7 @@
 
 ## The Three Layers
 
-| Layer | Table | Dart DTO | Role |
+| Layer | Table | Dart MutableEntity | Role |
 |---|---|---|---|
 | **Blueprint** | `card_templates` | `CardTemplate` subclasses | Stores the raw content and card type |
 | **Reviewable unit** | `study_cards` | `StudyCard` | One testable instance per direction (forward / reversed) |
@@ -246,6 +246,6 @@ Rating values: `1` = Again, `2` = Hard, `3` = Good, `4` = Easy.
 |---|---|---|
 | `card_templates.source_template_id` | `card_templates.id` | Tracks copied templates (e.g. Bob copied Alice's deck) |
 | `match_madness_pairs.source_template_id` | `card_templates.id` | Tracks which template a pair was auto-generated from |
-| `fill_in_the_blank_segments.card_id` | `card_templates.id` | Named `card_id` to match the `FillInTheBlankSegment` DTO field |
+| `fill_in_the_blank_segments.card_id` | `card_templates.id` | Named `card_id` to match the `FillInTheBlankSegment` MutableEntity field |
 | `fsrs_cards.user_id` | `auth.users.id` | Auth UUID directly — RLS uses `auth.uid()` with no detour through profiles |
 | `review_logs.fsrs_card_id` | `fsrs_cards.id` | No `user_id` on review_logs — derive ownership via this join |

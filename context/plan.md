@@ -2,7 +2,7 @@
 
 ## Goal
 
-Move BooMondai local persistence from Hive plus hand-written DTO repositories to Drift-backed SQLite, while keeping Supabase as the remote sync backend.
+Move BooMondai local persistence from Hive plus hand-written MutableEntity repositories to Drift-backed SQLite, while keeping Supabase as the remote sync backend.
 
 The app should use generated Drift table rows, companions, and typed queries for local data instead of maintaining parallel DTOs solely for local storage. Supabase remains Postgres and keeps its existing migrations, RLS policies, functions, and remote schema contract.
 
@@ -216,7 +216,7 @@ targets:
 Replace both:
 
 - Hive-backed local storage.
-- DTO classes that exist primarily to shuttle local database rows around.
+- MutableEntity classes that exist primarily to shuttle local database rows around.
 
 Do not remove all Dart models blindly. Keep domain/value objects where they express app behavior better than database rows, for example UI-only filters, computed session state, theme token objects, and external package models.
 
@@ -361,7 +361,7 @@ Feature service
 └── sync coordinator
 ```
 
-The current generic `SyncService<T extends DTO>` should be replaced because Drift rows and Supabase maps will not share a single DTO type cleanly.
+The current generic `SyncService<T extends MutableEntity>` should be replaced because Drift rows and Supabase maps will not share a single MutableEntity type cleanly.
 
 RLS policies remain entirely on Supabase. Drift/SQLite does not enforce Supabase RLS locally. Local DAOs should filter by active profile/deck ownership for user experience and data isolation, but the authoritative security check happens when PostgREST/Supabase receives the insert, update, delete, or select. If a local row violates RLS, the push fails and the sync adapter must surface or record that failure.
 
@@ -412,7 +412,7 @@ Keep mappers small and directional:
 - `domainToCompanion`
 - `joinedRowsToDomain`
 
-Avoid rebuilding one large app-wide DTO mapper layer. Keep mappers beside the DAO/sync adapter for the table group they serve.
+Avoid rebuilding one large app-wide MutableEntity mapper layer. Keep mappers beside the DAO/sync adapter for the table group they serve.
 
 ## DAO Naming
 
@@ -472,12 +472,12 @@ Use feature-specific words only after the SQL command. For example, prefer `sele
 - Provide the database through the existing provider/service registration pattern.
 - Stop registering Hive adapters.
 
-### Phase 5: Replace DTO-Dependent Sync
+### Phase 5: Replace MutableEntity-Dependent Sync
 
-- Replace `SyncService<T extends DTO>` with table-specific sync adapters.
+- Replace `SyncService<T extends MutableEntity>` with table-specific sync adapters.
 - Keep Supabase remote repositories initially if that lowers risk.
 - Convert remote maps directly into Drift companions or sync payload objects.
-- Remove DTO mappers only after their callers are gone.
+- Remove MutableEntity mappers only after their callers are gone.
 
 ### Phase 6: Port Remaining Tables
 
@@ -490,7 +490,7 @@ Use feature-specific words only after the SQL command. For example, prefer `sele
 - Remove Hive dependencies and generated adapters.
 - Remove obsolete local DB classes.
 - Remove DTOs that no longer have app/domain value.
-- Remove generic DTO base classes if no longer used.
+- Remove generic MutableEntity base classes if no longer used.
 - Update docs and context files.
 
 ## Testing Plan

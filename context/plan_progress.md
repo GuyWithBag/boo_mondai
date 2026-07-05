@@ -38,7 +38,7 @@
 
 ## Sync Work
 
-- [ ] Replace generic `SyncService<T extends DTO>` for the first migrated table group.
+- [ ] Replace generic `SyncService<T extends MutableEntity>` for the first migrated table group.
 - [ ] Add table-specific pull from Supabase into Drift companions.
 - [ ] Add table-specific push from dirty Drift rows to Supabase maps.
 - [ ] Handle Supabase RLS failures during push.
