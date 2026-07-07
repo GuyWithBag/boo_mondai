@@ -32,7 +32,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         showModal,
         surfaceStyle,
         useViewDeckListingSingleController,
-        SectionEyebrow;
+        SectionEyebrow,
+        ViewPaddingSizedBox,
+        Side;
 import 'package:flutter/material.dart' hide Scaffold, AppBar, showBottomSheet;
 import 'package:flutter_hooks/flutter_hooks.dart' show HookWidget, useEffect;
 
@@ -161,6 +163,8 @@ class ViewDeckListingSingleSheet extends HookWidget {
             scrollable: true,
             scrollController: scrollController,
             isFloatingAppBar: true,
+            inheritMainBottomNavBarHeight: false,
+            showViewPaddingBottom: false,
             padding: EdgeInsets.zero,
             appBar: appBar,
             body: _Body(controller: sheet, appBarHeight: appBarHeight),
@@ -218,7 +222,7 @@ class _Body extends StatelessWidget {
             SurfaceColor.muted,
             SurfaceBorder.top,
             SurfaceShadow.none,
-            SurfacePadding.scaffold,
+            SurfacePadding.scaffoldX,
           ]),
           child: Column(
             spacing: tokens.spaceLayoutGapMd,
@@ -367,6 +371,7 @@ class _Body extends StatelessWidget {
                 maxCardCount: 3,
               ),
               if (!isEditing) ...[DiscussionSection(sheet: controller)],
+              ViewPaddingSizedBox(side: Side.bottom),
             ],
           ),
         ),
