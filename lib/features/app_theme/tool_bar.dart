@@ -64,7 +64,6 @@ class ToolBar extends StatelessWidget implements PreferredSizeWidget {
     this.actions = const [],
     this.preferredHeight = ToolBar.preferredHeightDefault,
     this.controller,
-    this.showUnfocusButton = true,
   });
 
   ToolBar.withActions({
@@ -73,13 +72,11 @@ class ToolBar extends StatelessWidget implements PreferredSizeWidget {
     bool useAttachments = false,
     Future<void> Function()? onAttachmentPressed,
     double preferredHeight = ToolBar.preferredHeightDefault,
-    bool showUnfocusButton = true,
     Key? key,
   }) : this(
          key: key,
          controller: controller,
          preferredHeight: preferredHeight,
-         showUnfocusButton: showUnfocusButton,
          actions: [
            for (final action in ToolBarAction.values)
              if ((useAttachments || action != ToolBarAction.attachment) &&
@@ -95,58 +92,41 @@ class ToolBar extends StatelessWidget implements PreferredSizeWidget {
   final List<Widget> actions;
   final double preferredHeight;
   final ToolBarController? controller;
-  final bool showUnfocusButton;
 
-  static const double preferredHeightDefault = 72;
+  static const double preferredHeightDefault = 82;
   static const double unfocusButtonHeight = 48;
-  static const double unfocusButtonGap = 8;
 
   @override
   Size get preferredSize {
-    final height = showUnfocusButton
-        ? preferredHeight + unfocusButtonHeight + unfocusButtonGap
-        : preferredHeight;
-    return Size(0, height);
+    return Size(0, preferredHeight);
   }
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final shouldShowUnfocusButton =
-        showUnfocusButton && MediaQuery.viewInsetsOf(context).bottom > 0;
-
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        if (shouldShowUnfocusButton) ...[
-          SizedBox(
-            height: unfocusButtonHeight,
-            child: Center(
-              child: Button.iconOnly(
-                icon: Icons.keyboard_hide,
-                tokens: tokens,
-                onPressed: FocusManager.instance.primaryFocus?.unfocus,
-              ),
-            ),
-          ),
-          SizedBox(height: tokens.spaceLayoutGapSm),
-        ],
-        Surface(
-          style: surfaceStyle.resolve(tokens, [
-            SurfaceBorder.top,
-            // SurfaceShape.topRounded,
-            SurfacePadding.sm,
-            SurfaceShape.roundedXsm,
-          ]),
-          child: SafeArea(
-            top: false,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(spacing: tokens.spaceLayoutGapSm, children: actions),
+    // FocusManager.instance.primaryFocus?.unfocus
+    return Surface(
+      style: surfaceStyle.resolve(tokens, [
+        SurfaceBorder.top,
+        SurfacePadding.none,
+        SurfaceShape.roundedXsm,
+      ]),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: tokens.spaceLayoutPaddingSm),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                SizedBox(width: tokens.spaceLayoutGapSm),
+                Row(spacing: tokens.spaceLayoutGapSm, children: [...actions]),
+                SizedBox(width: tokens.spaceLayoutGapSm),
+              ],
             ),
           ),
         ),
-      ],
+      ),
     );
   }
 }

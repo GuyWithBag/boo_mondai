@@ -2,14 +2,16 @@ import 'package:boo_mondai/core/theme/app_tokens.model.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         Button,
+        ButtonColor,
+        SelectionController,
         SurfaceBorder,
         SurfaceColor,
         SurfaceShape,
+        TextColor,
         TextSize,
         TextWeight,
         surfaceStyle,
-        textStyle,
-        SelectionController;
+        textStyle;
 import 'package:flutter/material.dart' hide AppBar;
 import 'package:go_router/go_router.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -38,6 +40,8 @@ class AppBar extends StatelessWidget implements PreferredSizeWidget {
     this.selectionController,
     this.onSelectedDelete,
     this.selectedActions = const [],
+    this.subTitle,
+    this.leading,
   });
 
   final String? title;
@@ -58,6 +62,8 @@ class AppBar extends StatelessWidget implements PreferredSizeWidget {
   final SelectionController? selectionController;
   final VoidCallback? onSelectedDelete;
   final List<Widget> selectedActions;
+  final String? subTitle;
+  final Widget? leading;
 
   /// This is the preferredHeight required. This is needed for scrolling purposes for Scaffold.
   final double preferredHeight;
@@ -105,6 +111,7 @@ class AppBar extends StatelessWidget implements PreferredSizeWidget {
       if (onSelectedDelete != null)
         Button.icon(
           icon: Icons.delete,
+          color: ButtonColor.error,
           onPressed: onSelectedDelete,
           tokens: tokens,
         ),
@@ -167,13 +174,29 @@ class AppBar extends StatelessWidget implements PreferredSizeWidget {
                               )
                             else
                               ?effectivePopButton,
+                            ?leading,
                             if (isSelectionState || title != null)
-                              Text(
-                                isSelectionState ? 'Selecting' : title!,
-                                style: textStyle.resolve(tokens, const [
-                                  TextSize.header,
-                                  TextWeight.heavy,
-                                ]),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    isSelectionState ? 'Selecting' : title!,
+                                    style: textStyle.resolve(tokens, const [
+                                      TextSize.header,
+                                      TextWeight.heavy,
+                                    ]),
+                                  ),
+                                  if (subTitle != null)
+                                    // TODO: Add styling where the characters are fare apart
+                                    Text(
+                                      subTitle!,
+                                      style: textStyle.resolve(tokens, const [
+                                        TextSize.label,
+                                        TextColor.muted,
+                                      ]),
+                                    ),
+                                ],
                               ),
                           ],
                         ),

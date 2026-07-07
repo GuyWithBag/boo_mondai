@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:boo_mondai/lib.barrel.dart'
     show Breakpoints, PlatformService, AppTokens, MainController;
 import 'package:flutter/material.dart';
+import 'package:unite_keyboard_visibility/unite_keyboard_visibility.dart';
 
 class ScaffoldHelper {
   const ScaffoldHelper({
@@ -87,8 +88,10 @@ class ScaffoldHelper {
   }
 
   double get trueToolBarHeight {
+    final isKeyboardOpen = mediaQuery.viewInsets.bottom > 50;
     if (shouldHaveToolBar) {
-      return toolBar!.preferredSize.height + mediaQuery.viewPadding.bottom;
+      return toolBar!.preferredSize.height +
+          (isKeyboardOpen ? 0 : mediaQuery.viewPadding.bottom);
     }
     return 0;
   }

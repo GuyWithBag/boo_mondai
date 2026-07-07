@@ -7,3 +7,5 @@ export 'timestamped.entity.dart';
 export 'identifiable.entity.dart';
 export 'mutable_entity.dart';
 export 'immutable_entity.dart';
+export 'side.dart';
+

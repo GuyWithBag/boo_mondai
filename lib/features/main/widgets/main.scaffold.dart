@@ -41,6 +41,8 @@ class MainScaffold extends HookWidget {
       haveBottomNavBarBottomGap: false,
       shouldConstrainWidth: false,
       inheritMainBottomNavBarHeight: false,
+      showViewPaddingTop: false,
+      showViewPaddingBottom: false,
     );
   }
 }

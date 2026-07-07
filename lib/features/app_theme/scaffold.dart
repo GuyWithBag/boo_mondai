@@ -8,7 +8,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         ScaffoldHelper,
         ToolBar,
         ToolBarScope,
-        useScaffoldController;
+        useScaffoldController,
+        ViewPaddingSizedBox,
+        Side;
 import 'package:flutter/material.dart' hide Scaffold;
 import 'package:flutter/material.dart' as material show Scaffold;
 import 'package:flutter_animate/flutter_animate.dart';
@@ -47,6 +49,9 @@ class Scaffold extends HookWidget {
     this.resizeToAvoidBottomInset = false,
     this.resizeBodyForKeyboard = false,
     this.centeredBody = false,
+    this.showUnfocusButton = true,
+    this.showViewPaddingBottom = true,
+    this.showViewPaddingTop = true,
   }) : assert(sidebarWidth >= 0, 'sidebarWidth cannot be negative.');
 
   final Widget body;
@@ -78,6 +83,9 @@ class Scaffold extends HookWidget {
   final ScrollController? scrollController;
   final bool resizeToAvoidBottomInset;
   final bool resizeBodyForKeyboard;
+  final bool showUnfocusButton;
+  final bool showViewPaddingBottom;
+  final bool showViewPaddingTop;
 
   static const _animationDuration = Duration(milliseconds: 220);
 
@@ -166,6 +174,8 @@ class Scaffold extends HookWidget {
     final scopedBody = toolBarController == null
         ? body
         : ToolBarScope(controller: toolBarController, child: body);
+    final shouldShowUnfocusButton =
+        showUnfocusButton && MediaQuery.viewInsetsOf(context).bottom <= 0;
 
     Widget innerBody = scopedBody;
 
@@ -192,7 +202,10 @@ class Scaffold extends HookWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: scrollable ? MainAxisSize.min : MainAxisSize.max,
       children: [
-        if (shouldHaveAppBar) SizedBox(height: effectiveAppBarHeight),
+        if (shouldHaveAppBar)
+          SizedBox(height: effectiveAppBarHeight)
+        else if (showViewPaddingTop)
+          ViewPaddingSizedBox(side: Side.top),
         if (shouldHaveFloatingAppBar)
           Stack(
             children: [
@@ -215,7 +228,9 @@ class Scaffold extends HookWidget {
         else
           Flexible(child: paddedBody),
         if (shouldBodyHaveBottomScaffoldSafeArea)
-          SizedBox(height: effectiveBottomScaffoldSafeAreaHeight),
+          SizedBox(height: effectiveBottomScaffoldSafeAreaHeight)
+        else if (showViewPaddingBottom)
+          ViewPaddingSizedBox(side: Side.bottom),
       ],
     );
 
@@ -292,17 +307,39 @@ class Scaffold extends HookWidget {
             ),
           ),
         ),
-      if (shouldHaveToolBar)
+      if (shouldHaveToolBar) ...[
         Positioned(
           left: 0,
           right: 0,
           bottom: mediaQuery.viewInsets.bottom,
-          child: _AnimatedOverlay(
-            visible: controller.isUserInputFocusing,
-            hiddenOffset: const Offset(0, 1),
-            child: SizedBox(height: effectiveToolBarHeight, child: toolBar!),
+          child: Column(
+            spacing: tokens.spaceLayoutGapSm,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              if (shouldShowUnfocusButton)
+                Padding(
+                  padding: EdgeInsets.only(right: tokens.spaceLayoutPaddingSm),
+                  child: _AnimatedOverlay(
+                    visible: controller.isUserInputFocusing,
+                    hiddenOffset: const Offset(0, 1),
+                    child: Button(
+                      onPressed: FocusManager.instance.primaryFocus?.unfocus,
+                      child: const Text('Unfocus Keyboard'),
+                    ),
+                  ),
+                ),
+              _AnimatedOverlay(
+                visible: controller.isUserInputFocusing,
+                hiddenOffset: const Offset(0, 1),
+                child: SizedBox(
+                  height: effectiveToolBarHeight,
+                  child: toolBar!,
+                ),
+              ),
+            ],
           ),
         ),
+      ],
       if (showFloatingSideBar)
         Positioned.fill(
           child: IgnorePointer(
