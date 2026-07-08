@@ -86,5 +86,5 @@ class ChangeTrackerEntry<T> with ChangeTrackerEntryMappable<T> {
   int get removedCount => _count(ChangeType.removed);
 
   int _count(ChangeType type) =>
-      changes.where((change) => change.type == type).length;
+      changes.where((change) => change.changeType == type).length;
 }

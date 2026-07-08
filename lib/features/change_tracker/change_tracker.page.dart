@@ -1,15 +1,22 @@
+import 'package:boo_mondai/features/app_theme/button.variant.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppBar,
         AppTokens,
         BottomNavBar,
-        ChangedEntitySection,
+        Button,
         ChangeTrackerService,
+        ChangeTrackerStatus,
         ChangeTrackerSummaryChips,
+        ChangeType,
+        ChangedEntityBlock,
+        ChangedEntitySection,
+        Deck,
+        DeckTile,
+        DeckTileState,
         Scaffold,
         ServiceRegistry,
-        useChangeTrackerController,
-        Button;
+        useChangeTrackerController;
 import 'package:flutter/material.dart' hide Scaffold, AppBar;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -57,62 +64,104 @@ class ChangeTrackerPage extends HookWidget {
     final controller = useChangeTrackerController(service: service);
     final entry = controller.entryById(args.entryId);
 
+    void popToFirstRoute() {
+      while (context.canPop()) {
+        context.pop();
+      }
+    }
+
     if (entry == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (context.canPop()) context.pop();
+        popToFirstRoute();
       });
       return Scaffold(
         backgroundColor: tokens.colorScaffoldBackground,
+        inheritMainBottomNavBarHeight: false,
+
         body: Container(color: Colors.red),
       );
     }
 
+    final canReviewChanges = entry.status == ChangeTrackerStatus.reviewing;
+
     return Scaffold(
-      appBar: AppBar(title: 'Sync', automaticallyImplyPopButton: false),
+      appBar: AppBar(
+        title: 'Sync',
+        subTitle: 'Review changes before applying',
+        automaticallyImplyPopButton: false,
+      ),
+      inheritMainBottomNavBarHeight: false,
       bottomNavBar: BottomNavBar(
-        preferredHeight: 130,
+        preferredHeight: canReviewChanges ? 200 : 100,
         child: Column(
-          spacing: tokens.spaceLayoutGapMd,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          spacing: tokens.spaceLayoutGapSm,
           children: [
-            Row(
-              spacing: tokens.spaceLayoutGapSm,
-              children: [
-                Button(
-                  onPressed: () {
-                    controller.cancel(entry.id);
-                    context.pop();
-                  },
-                  child: const Text('Discard'),
-                ),
-                Button(
-                  onPressed: () {
-                    controller.apply(entry.id);
-                    context.pop();
-                  },
-                  child: const Text('Looks Good'),
-                ),
-              ],
-            ),
-            Button(onPressed: () => context.pop(), child: const Text('Back')),
+            if (canReviewChanges)
+              Row(
+                spacing: tokens.spaceLayoutGapSm,
+                children: [
+                  Expanded(
+                    child: Button(
+                      onPressed: () {
+                        controller.cancel(entry.id);
+                        popToFirstRoute();
+                      },
+                      child: const Text('Discard'),
+                    ),
+                  ),
+                  Expanded(
+                    child: Button(
+                      style: buttonStyle.resolve(tokens, const [
+                        ButtonColor.primary,
+                      ]),
+                      onPressed: () {
+                        controller.apply(entry.id);
+                        popToFirstRoute();
+                      },
+                      child: const Text('Looks Good'),
+                    ),
+                  ),
+                ],
+              ),
+            Button(onPressed: popToFirstRoute, child: const Text('Back')),
           ],
         ),
       ),
       body: Column(
         spacing: tokens.spaceLayoutGapMd,
         children: [
-          Column(
-            spacing: tokens.spaceLayoutGapMd,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Review changes before applying'),
-              ChangeTrackerSummaryChips(entry: entry),
-            ],
-          ),
+          ChangeTrackerSummaryChips(entry: entry),
           ListView.separated(
+            shrinkWrap: true,
+            padding: EdgeInsets.zero,
+            physics: const NeverScrollableScrollPhysics(),
             itemCount: entry.changes.length,
             separatorBuilder: (_, _) =>
                 SizedBox(height: tokens.spaceLayoutGapMd.h),
             itemBuilder: (context, index) {
+              final changedEntity = entry.changes[index];
+              if (changedEntity.changeType == ChangeType.added ||
+                  changedEntity.changeType == ChangeType.removed) {
+                final entity = changedEntity.afterChange;
+                final isDeck = entity is Deck;
+                return ChangedEntityBlock(
+                  changedEntity: changedEntity,
+                  name: isDeck ? entity.title : null,
+                  child: isDeck
+                      ? SizedBox(
+                          height: 180.h,
+                          child: Center(
+                            child: DeckTile(
+                              state: DeckTileState.spread,
+                              deck: entity,
+                              width: 100,
+                            ),
+                          ),
+                        )
+                      : null,
+                );
+              }
               return ChangedEntitySection(entity: entry.changes[index]);
             },
           ),

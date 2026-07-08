@@ -29,7 +29,7 @@ class ChangeTrackerSummaryChips extends StatelessWidget {
         ])
           _SummaryChip(
             type: type,
-            count: ChangeTrackerHelper.typeCount(entry, type),
+            count: ChangeTrackerHelper.getTypeCount(entry, type),
           ),
       ],
     );
@@ -45,9 +45,9 @@ class _SummaryChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final colors = ChangeTrackerHelper.typeChipColors(tokens, type);
-    final prefix = ChangeTrackerHelper.typePrefix(type);
-    final label = ChangeTrackerHelper.typeLabel(type);
+    final colors = ChangeTrackerHelper.getTypeChipColors(tokens, type);
+    final prefix = ChangeTrackerHelper.getTypePrefix(type);
+    final label = ChangeTrackerHelper.getTypeLabel(type);
 
     return DecoratedBox(
       decoration: BoxDecoration(

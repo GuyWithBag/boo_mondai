@@ -16,14 +16,11 @@ part 'changed_entity.mapper.dart';
 class ChangedEntity<T> with ChangedEntityMappable<T> {
   /// Creates a record for one entity-level operation.
   const ChangedEntity({
-    required this.type,
     required this.source,
-    required this.entityType,
-    required this.entityId,
-    required this.title,
-    this.subtitle,
+    required this.changeType,
+    required this.id,
     this.beforeChange,
-    this.afterChange,
+    required this.afterChange,
     this.changedProperties = const [],
     this.localId,
     this.remoteId,
@@ -32,22 +29,17 @@ class ChangedEntity<T> with ChangedEntityMappable<T> {
   });
 
   /// Operation type: added, modified, removed, or skipped.
-  final ChangeType type;
+  final ChangeType changeType;
 
   /// Workflow that produced the change.
   final ChangeSource source;
 
   /// Storage or domain entity name, such as `deck` or `card_template`.
-  final String entityType;
+  String get typeName =>
+      (afterChange ?? beforeChange)?.runtimeType.toString() ?? 'unknown';
 
   /// Identifier of the affected entity in the source workflow.
-  final String entityId;
-
-  /// Primary text shown in review lists.
-  final String title;
-
-  /// Optional explanatory text shown under [title].
-  final String? subtitle;
+  final String id;
 
   /// Entity snapshot before the change.
   ///
@@ -57,7 +49,7 @@ class ChangedEntity<T> with ChangedEntityMappable<T> {
   /// Entity snapshot after the change.
   ///
   /// Usually present for added or modified records.
-  final T? afterChange;
+  final T afterChange;
 
   /// Property-level diffs for modified entities.
   final List<ChangedProperty<Object?>> changedProperties;

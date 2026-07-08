@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 /// All methods are pure and stateless.
 abstract final class ChangeTrackerHelper {
   /// Returns the compact symbol prefix for a change type row (`+`, `~`, `-`).
-  static String typePrefix(ChangeType type) {
+  static String getTypePrefix(ChangeType type) {
     return switch (type) {
       ChangeType.added => '+',
       ChangeType.modified => '~',
@@ -17,8 +17,18 @@ abstract final class ChangeTrackerHelper {
     };
   }
 
+  static IconData getTypeIcon(ChangeType type) {
+    final icon = switch (type) {
+      ChangeType.added => Icons.add,
+      ChangeType.removed => Icons.remove,
+      ChangeType.modified => Icons.change_circle,
+      ChangeType.skipped => Icons.skip_next,
+    };
+    return icon;
+  }
+
   /// Returns the human-readable label for a change type (`Added`, `Modified`, etc.).
-  static String typeLabel(ChangeType type) {
+  static String getTypeLabel(ChangeType type) {
     return switch (type) {
       ChangeType.added => 'Added',
       ChangeType.modified => 'Modified',
@@ -28,7 +38,7 @@ abstract final class ChangeTrackerHelper {
   }
 
   /// Returns the count of [type] changes in [entry].
-  static int typeCount(ChangeTrackerEntry<Object?> entry, ChangeType type) {
+  static int getTypeCount(ChangeTrackerEntry<Object?> entry, ChangeType type) {
     return switch (type) {
       ChangeType.added => entry.addedCount,
       ChangeType.modified => entry.modifiedCount,
@@ -38,7 +48,7 @@ abstract final class ChangeTrackerHelper {
   }
 
   /// Returns the foreground color for inline change type text.
-  static Color typeForeground(AppTokens tokens, ChangeType type) {
+  static Color getTypeForeground(AppTokens tokens, ChangeType type) {
     return switch (type) {
       ChangeType.added => tokens.colorActionSuccess,
       ChangeType.modified => tokens.colorRatingHardText,
@@ -49,7 +59,7 @@ abstract final class ChangeTrackerHelper {
 
   /// Returns the foreground, background, and border colors for a chip
   /// representing [type].
-  static ({Color foreground, Color background, Color border}) typeChipColors(
+  static ({Color foreground, Color background, Color border}) getTypeChipColors(
     AppTokens tokens,
     ChangeType type,
   ) {

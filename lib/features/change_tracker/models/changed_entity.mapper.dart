@@ -22,22 +22,14 @@ class ChangedEntityMapper extends ClassMapperBase<ChangedEntity> {
   @override
   Function get typeFactory => <T>(f) => f<ChangedEntity<T>>();
 
-  static ChangeType _$type(ChangedEntity v) => v.type;
-  static const Field<ChangedEntity, ChangeType> _f$type = Field('type', _$type);
   static ChangeSource _$source(ChangedEntity v) => v.source;
   static const Field<ChangedEntity, ChangeSource> _f$source =
       Field('source', _$source);
-  static String _$entityType(ChangedEntity v) => v.entityType;
-  static const Field<ChangedEntity, String> _f$entityType =
-      Field('entityType', _$entityType, key: r'entity_type');
-  static String _$entityId(ChangedEntity v) => v.entityId;
-  static const Field<ChangedEntity, String> _f$entityId =
-      Field('entityId', _$entityId, key: r'entity_id');
-  static String _$title(ChangedEntity v) => v.title;
-  static const Field<ChangedEntity, String> _f$title = Field('title', _$title);
-  static String? _$subtitle(ChangedEntity v) => v.subtitle;
-  static const Field<ChangedEntity, String> _f$subtitle =
-      Field('subtitle', _$subtitle, opt: true);
+  static ChangeType _$changeType(ChangedEntity v) => v.changeType;
+  static const Field<ChangedEntity, ChangeType> _f$changeType =
+      Field('changeType', _$changeType, key: r'change_type');
+  static String _$id(ChangedEntity v) => v.id;
+  static const Field<ChangedEntity, String> _f$id = Field('id', _$id);
   static dynamic _$beforeChange(ChangedEntity v) => v.beforeChange;
   static dynamic _arg$beforeChange<T>(f) => f<T>();
   static const Field<ChangedEntity, dynamic> _f$beforeChange = Field(
@@ -47,7 +39,7 @@ class ChangedEntityMapper extends ClassMapperBase<ChangedEntity> {
   static dynamic _arg$afterChange<T>(f) => f<T>();
   static const Field<ChangedEntity, dynamic> _f$afterChange = Field(
       'afterChange', _$afterChange,
-      key: r'after_change', opt: true, arg: _arg$afterChange);
+      key: r'after_change', arg: _arg$afterChange);
   static List<ChangedProperty<Object?>> _$changedProperties(ChangedEntity v) =>
       v.changedProperties;
   static const Field<ChangedEntity, List<ChangedProperty<Object?>>>
@@ -70,12 +62,9 @@ class ChangedEntityMapper extends ClassMapperBase<ChangedEntity> {
 
   @override
   final MappableFields<ChangedEntity> fields = const {
-    #type: _f$type,
     #source: _f$source,
-    #entityType: _f$entityType,
-    #entityId: _f$entityId,
-    #title: _f$title,
-    #subtitle: _f$subtitle,
+    #changeType: _f$changeType,
+    #id: _f$id,
     #beforeChange: _f$beforeChange,
     #afterChange: _f$afterChange,
     #changedProperties: _f$changedProperties,
@@ -87,12 +76,9 @@ class ChangedEntityMapper extends ClassMapperBase<ChangedEntity> {
 
   static ChangedEntity<T> _instantiate<T>(DecodingData data) {
     return ChangedEntity(
-        type: data.dec(_f$type),
         source: data.dec(_f$source),
-        entityType: data.dec(_f$entityType),
-        entityId: data.dec(_f$entityId),
-        title: data.dec(_f$title),
-        subtitle: data.dec(_f$subtitle),
+        changeType: data.dec(_f$changeType),
+        id: data.dec(_f$id),
         beforeChange: data.dec(_f$beforeChange),
         afterChange: data.dec(_f$afterChange),
         changedProperties: data.dec(_f$changedProperties),
@@ -162,12 +148,9 @@ abstract class ChangedEntityCopyWith<$R, $In extends ChangedEntity<T>, $Out, T>
       ObjectCopyWith<$R, ChangedProperty<Object?>,
           ChangedProperty<Object?>>> get changedProperties;
   $R call(
-      {ChangeType? type,
-      ChangeSource? source,
-      String? entityType,
-      String? entityId,
-      String? title,
-      String? subtitle,
+      {ChangeSource? source,
+      ChangeType? changeType,
+      String? id,
       T? beforeChange,
       T? afterChange,
       List<ChangedProperty<Object?>>? changedProperties,
@@ -198,12 +181,9 @@ class _ChangedEntityCopyWithImpl<$R, $Out, T>
       (v) => call(changedProperties: v));
   @override
   $R call(
-          {ChangeType? type,
-          ChangeSource? source,
-          String? entityType,
-          String? entityId,
-          String? title,
-          Object? subtitle = $none,
+          {ChangeSource? source,
+          ChangeType? changeType,
+          String? id,
           Object? beforeChange = $none,
           Object? afterChange = $none,
           List<ChangedProperty<Object?>>? changedProperties,
@@ -212,12 +192,9 @@ class _ChangedEntityCopyWithImpl<$R, $Out, T>
           Object? localUpdatedAt = $none,
           Object? remoteUpdatedAt = $none}) =>
       $apply(FieldCopyWithData({
-        if (type != null) #type: type,
         if (source != null) #source: source,
-        if (entityType != null) #entityType: entityType,
-        if (entityId != null) #entityId: entityId,
-        if (title != null) #title: title,
-        if (subtitle != $none) #subtitle: subtitle,
+        if (changeType != null) #changeType: changeType,
+        if (id != null) #id: id,
         if (beforeChange != $none) #beforeChange: beforeChange,
         if (afterChange != $none) #afterChange: afterChange,
         if (changedProperties != null) #changedProperties: changedProperties,
@@ -228,12 +205,9 @@ class _ChangedEntityCopyWithImpl<$R, $Out, T>
       }));
   @override
   ChangedEntity<T> $make(CopyWithData data) => ChangedEntity(
-      type: data.get(#type, or: $value.type),
       source: data.get(#source, or: $value.source),
-      entityType: data.get(#entityType, or: $value.entityType),
-      entityId: data.get(#entityId, or: $value.entityId),
-      title: data.get(#title, or: $value.title),
-      subtitle: data.get(#subtitle, or: $value.subtitle),
+      changeType: data.get(#changeType, or: $value.changeType),
+      id: data.get(#id, or: $value.id),
       beforeChange: data.get(#beforeChange, or: $value.beforeChange),
       afterChange: data.get(#afterChange, or: $value.afterChange),
       changedProperties:

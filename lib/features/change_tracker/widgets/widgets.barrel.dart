@@ -4,3 +4,4 @@
 export 'change_tracker_summary_chips.dart';
 export 'changed_property.block.dart';
 export 'changed_entity.section.dart';
+export 'changed_entity.block.dart';

@@ -1,5 +1,5 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, ChangedProperty, ChangeType, textStyle;
+    show AppTokens, ChangedProperty, ChangeType, textStyle, ChangeTrackerHelper;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -22,12 +22,6 @@ class ChangedPropertyBlock extends StatelessWidget {
       return SizedBox.shrink();
     }
     final tokens = context.themeTokens<AppTokens>();
-    final icon = switch (type) {
-      ChangeType.added => Icons.add,
-      ChangeType.removed => Icons.remove,
-      ChangeType.modified => Icons.change_circle,
-      ChangeType.skipped => Icons.skip_next,
-    };
 
     final propertyTextStyle = textStyle.resolve(tokens);
 
@@ -50,20 +44,18 @@ class ChangedPropertyBlock extends StatelessWidget {
       _ => throw UnimplementedError(),
     };
 
-    final actionBasedOnType = switch (type) {
-      ChangeType.added => '${property.propertyLabel} Added',
-      ChangeType.removed => '${property.propertyLabel} Removed',
-      ChangeType.modified => '${property.propertyLabel} Modified',
-      _ => throw UnimplementedError(),
-    };
-
     return Row(
       children: [
-        Icon(icon),
+        Icon(ChangeTrackerHelper.getTypeIcon(type)),
         Column(
           spacing: tokens.spaceLayoutGapMd,
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [...bodyBasedOnType, Text(actionBasedOnType)],
+          children: [
+            ...bodyBasedOnType,
+            Text(
+              '${property.propertyLabel} ${ChangeTrackerHelper.getTypeLabel(type)}',
+            ),
+          ],
         ),
       ],
     );
