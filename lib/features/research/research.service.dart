@@ -9,9 +9,13 @@ import 'package:boo_mondai/lib.barrel.dart'
         SurveyResponse,
         VocabularyTestResult,
         ResearchCode,
-        ResearchProfile;
+        ResearchProfile,
+        Service;
 
-class ResearchService {
+class ResearchService extends Service {
+  @override
+  String get name => 'ResearchService';
+
   String generateCode() {
     return uuid.v4().replaceAll('-', '').substring(0, 8).toUpperCase();
   }
@@ -39,10 +43,7 @@ class ResearchService {
     required Map<String, int> responses,
     Map<String, dynamic>? extras,
   }) {
-    final fullResponses = <String, dynamic>{
-      ...responses,
-      if (extras != null) ...extras,
-    };
+    final fullResponses = <String, dynamic>{...responses, ...?extras};
 
     double? computedScore;
     if (surveyType == 'sus') {

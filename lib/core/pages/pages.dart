@@ -219,7 +219,7 @@ class Pages {
   );
 
   static final changeReview = AppPage(
-    url: '/change-review/:entryId',
+    url: '/change-review/:serviceId/:entryId',
     name: 'Change Review',
     builder:
         (
@@ -234,6 +234,7 @@ class Pages {
                 ? args
                 : ChangeTrackerRouteArgs.missing(
                     entryId: pathParameters['entryId']!,
+                    serviceId: pathParameters['serviceId'],
                   ),
           );
         },

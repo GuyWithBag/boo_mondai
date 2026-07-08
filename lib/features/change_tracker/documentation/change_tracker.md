@@ -25,9 +25,9 @@ download, and import/export change descriptions.
 - `ChangeTrackerController` adapts a `ChangeTrackerService` for UI listeners.
   `useChangeTrackerController()` creates this adapter around either a default
   in-memory service or a feature-owned service.
-- `ChangeTrackerRouteArgs` carries the routed entry id plus the owning
-  `ChangeTrackerService` through `go_router` `extra` so `ChangeTrackerPage`
-  resolves live entries from the correct service.
+- `ChangeTrackerRouteArgs` carries the routed entry id plus the registered
+  `ChangeTrackerService.id` so `ChangeTrackerPage` resolves live entries from
+  the correct service through `ServiceRegistry`.
 
 ## Component Map
 
@@ -50,6 +50,7 @@ flowchart LR
     end
 
     subgraph Tracker[Change tracker runtime]
+        Registry[ServiceRegistry]
         ServiceRuntime[ChangeTrackerService]
         Controller[ChangeTrackerController]
         Hook[useChangeTrackerController]
@@ -76,6 +77,7 @@ flowchart LR
     Sync --> Controller
     AppServices --> DeckDownloads
     DeckDownloads --> ServiceRuntime
+    Registry --> ServiceRuntime
     Controller --> ServiceRuntime
     Hook --> Controller
     ServiceRuntime --> Entry
@@ -121,8 +123,9 @@ starts an explicit `ChangeTrackerEntry` with an `onApply` callback, builds a
 `ChangePlan<SyncPlanPayload<T>, T>`, then moves the entry into review when
 changes exist. `SyncController` keeps track of the bound
 `ChangeTrackerController`, and `SyncPage` owns the user actions: it routes to
-the change-review page with `ChangeTrackerRouteArgs`, applies the entry, or
-discards it. The callback closes over the completed plan and calls
+the change-review page with the registered tracker service id and entry id,
+applies the entry, or discards it. The callback closes over the completed plan
+and calls
 `applySync()` only after the user confirms.
 
 ```mermaid
@@ -150,7 +153,8 @@ sequenceDiagram
         Service->>Controller: update(status: reviewing, changes, progress: 1)
         Controller-->>SyncController: notifyListeners()
         SyncController-->>SyncPage: currentEntry + changeTrackerService
-        SyncPage->>ReviewPage: context.push('/change-review/:entryId', extra: ChangeTrackerRouteArgs)
+        SyncPage->>ReviewPage: context.push('/change-review/:serviceId/:entryId')
+        ReviewPage->>Controller: ServiceRegistry.maybeById(serviceId)
         ReviewPage->>Controller: useChangeTrackerController(service)
         ReviewPage->>Controller: entryById(entryId)
         ReviewPage->>Controller: apply(entryId)
@@ -214,21 +218,22 @@ controller around a fresh in-memory `ChangeTrackerService`. Feature-owned
 trackers, such as deck downloads, pass their long-lived service into the hook
 with `useChangeTrackerController(service: featureService.changeTrackerService)`.
 
-Review routes keep only the entry id in the URL. The owning service is passed
-through `ChangeTrackerRouteArgs` in `go_router` `extra`, and
-`ChangeTrackerPage` wraps that service with the hook before resolving
-`entryById(entryId)`. If the route is opened without args or the entry has been
-removed, the page treats it as missing and returns to the previous route.
+Review routes keep the tracker service id and entry id in the URL. The owning
+service is resolved through `ServiceRegistry`, and `ChangeTrackerPage` wraps
+that service with the hook before resolving `entryById(entryId)`. If the route
+is opened without a registered in-memory service or the entry has been removed,
+the page treats it as missing and returns to the previous route.
 
 ```mermaid
 flowchart TD
     DefaultHook[useChangeTrackerController()]
     FeatureService[Feature service-owned<br/>ChangeTrackerService]
+    Registry[ServiceRegistry]
     FeatureHook[useChangeTrackerController(service)]
     Controller[ChangeTrackerController]
     EntryList[entries / activeEntries]
     Entry[entryById(entryId)]
-    RouteArgs[ChangeTrackerRouteArgs<br/>entryId + service]
+    RouteArgs[ChangeTrackerRouteArgs<br/>serviceId + entryId]
     Page[ChangeTrackerPage]
     Summary[ChangeTrackerSummaryChips]
     Section[ChangedEntitySection]
@@ -237,6 +242,8 @@ flowchart TD
 
     DefaultHook --> Controller
     FeatureService --> FeatureHook
+    FeatureService --> Registry
+    Registry --> Page
     FeatureHook --> Controller
     Controller --> EntryList
     Controller --> Entry
@@ -254,7 +261,8 @@ flowchart TD
 ## Implementation Notes
 
 - Entries are immutable snapshots. Service mutations replace entries and invoke
-  `onChanged`; controllers bridge that into `notifyListeners()`.
+  registered change listeners; controllers bridge that into
+  `notifyListeners()`.
 - Entries are newest-first in `ChangeTrackerService.entries` and
   `ChangeTrackerController.entries`.
 - Entries record `startedAt` when constructed and `finishedAt` when completed,

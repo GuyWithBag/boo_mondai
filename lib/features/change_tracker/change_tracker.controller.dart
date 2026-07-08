@@ -6,6 +6,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         ChangeTrackerService,
         ChangeTrackerStatus,
         Controller;
+import 'package:boo_mondai/core/services/service_registry.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
 /// Flutter-facing adapter for [ChangeTrackerService].
@@ -21,8 +22,8 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 class ChangeTrackerController extends Controller {
   /// Creates a UI adapter around [service].
   ChangeTrackerController({ChangeTrackerService? service})
-    : _service = service ?? ChangeTrackerService() {
-    _service.onChanged = notifyListeners;
+    : _service = ServiceRegistry.add(service ?? ChangeTrackerService()) {
+    _service.addOnChangedListener(notifyListeners);
   }
 
   final ChangeTrackerService _service;
@@ -121,6 +122,12 @@ class ChangeTrackerController extends Controller {
   void clearFinished() {
     _service.clearFinished();
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _service.removeOnChangedListener(notifyListeners);
+    super.dispose();
   }
 }
 

@@ -1,5 +1,5 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show ChangedEntity, ChangeTrackerEntry, ChangeTrackerStatus;
+    show ChangedEntity, ChangeTrackerEntry, ChangeTrackerStatus, Service;
 
 /// Callback registered by a workflow to apply a reviewed operation.
 ///
@@ -14,16 +14,27 @@ typedef ChangeTrackerApply<T> = Future<List<ChangedEntity<T>>> Function();
 /// The service owns entry state and deferred apply callbacks without depending
 /// on Flutter notification APIs. [ChangeTrackerController] wraps this service
 /// for Provider/UI consumption.
-class ChangeTrackerService {
-  /// Called after the service mutates entry state.
-  ///
-  /// UI adapters can bridge this into their own notification mechanism without
-  /// making the service depend on Flutter.
-  void Function()? onChanged;
+class ChangeTrackerService extends Service {
+  @override
+  String get name => 'ChangeTrackerService';
 
+  final Set<void Function()> _onChangedListeners = {};
   final List<ChangeTrackerEntry<Object?>> _entries = [];
   final Map<String, Future<List<ChangedEntity<Object?>>> Function()>
   _applyByEntryId = {};
+
+  /// Registers a callback that runs after the service mutates entry state.
+  ///
+  /// UI adapters can bridge this into their own notification mechanism without
+  /// making the service depend on Flutter.
+  void addOnChangedListener(void Function() listener) {
+    _onChangedListeners.add(listener);
+  }
+
+  /// Removes a previously registered mutation callback.
+  void removeOnChangedListener(void Function() listener) {
+    _onChangedListeners.remove(listener);
+  }
 
   /// All known entries, newest first.
   List<ChangeTrackerEntry<Object?>> get entries => List.unmodifiable(_entries);
@@ -200,7 +211,9 @@ class ChangeTrackerService {
   }
 
   void _emitChanged() {
-    onChanged?.call();
+    for (final listener in List.of(_onChangedListeners)) {
+      listener();
+    }
   }
 
   ChangeTrackerEntry<Object?> _eraseEntryType<T>(ChangeTrackerEntry<T> entry) {

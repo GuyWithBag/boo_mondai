@@ -3,3 +3,5 @@
 // Other files
 export 'uuid.dart';
 export 'platform.service.dart';
+export 'service.dart';
+export 'service_registry.dart';

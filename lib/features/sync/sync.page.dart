@@ -32,8 +32,8 @@ class SyncPage<T extends MutableEntity> extends StatelessWidget {
     if (service == null) return;
 
     context.push(
-      '/change-review/${entry.id}',
-      extra: ChangeTrackerRouteArgs(entryId: entry.id, service: service),
+      '/change-review/${service.id}/${entry.id}',
+      extra: ChangeTrackerRouteArgs(entryId: entry.id, serviceId: service.id),
     );
   }
 

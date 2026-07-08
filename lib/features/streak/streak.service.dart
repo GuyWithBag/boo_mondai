@@ -1,10 +1,14 @@
 import 'package:boo_mondai/core/database/localdbs.dart';
 import 'package:boo_mondai/core/database/remotedbs.dart';
+import 'package:boo_mondai/core/services/service.dart';
 import 'package:boo_mondai/core/services/uuid.dart';
 import 'package:boo_mondai/features/streak/streak.dto.dart';
 import 'package:boo_mondai/features/streak/streak.helper.dart';
 
-class StreakService {
+class StreakService extends Service {
+  @override
+  String get name => 'StreakService';
+
   Future<Streak> refreshFromReviewLogs({bool syncRemote = false}) async {
     final now = DateTime.now();
     final existing = LocalDB.streak.retrieve();

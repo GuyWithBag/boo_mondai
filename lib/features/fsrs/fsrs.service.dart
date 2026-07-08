@@ -13,12 +13,16 @@ import 'package:boo_mondai/lib.barrel.dart'
         DeckDueStats,
         DeckHistoricalStats,
         LocalDB,
+        Service,
         Services,
         DueFilterExtension;
 import 'package:fsrs/fsrs.dart';
 import 'package:fsrs/fsrs.dart' as fsrs;
 
-class FsrsService {
+class FsrsService extends Service {
+  @override
+  String get name => 'FsrsService';
+
   final Scheduler scheduler = Scheduler();
 
   // Reviews card and puts it in the Repository

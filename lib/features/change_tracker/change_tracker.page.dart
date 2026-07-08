@@ -7,6 +7,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         ChangeTrackerService,
         ChangeTrackerSummaryChips,
         Scaffold,
+        ServiceRegistry,
         useChangeTrackerController,
         Button;
 import 'package:flutter/material.dart' hide Scaffold, AppBar;
@@ -17,28 +18,29 @@ import 'package:theme_variants/theme_variants.dart';
 
 /// Route data required to review a tracked change entry.
 ///
-/// The id stays in the URL, but the service is passed through go_router
-/// `extra` so the page reads from the feature-owned tracker instead of a
-/// global Provider controller.
+/// The entry id and service id stay in the URL so the page can recover the
+/// tracker from [ServiceRegistry] when go_router `extra` is unavailable.
 class ChangeTrackerRouteArgs {
   /// Creates route data for a real change tracker entry.
-  const ChangeTrackerRouteArgs({required this.entryId, required this.service});
+  const ChangeTrackerRouteArgs({
+    required this.entryId,
+    required this.serviceId,
+  });
 
-  const ChangeTrackerRouteArgs.missing({required this.entryId})
-    : service = null;
+  const ChangeTrackerRouteArgs.missing({required this.entryId, this.serviceId});
 
-  /// Id of the entry managed by [service].
+  /// Id of the entry managed by the registered service.
   final String entryId;
 
-  /// Feature-owned tracker service that stores the live entry.
-  final ChangeTrackerService? service;
+  /// Id of the registered tracker service that stores the live entry.
+  final String? serviceId;
 }
 
 /// Full-page UI for reviewing a pending tracked change entry.
 ///
-/// The route receives [ChangeTrackerRouteArgs] through go_router `extra`, then
-/// resolves the live entry from the passed [ChangeTrackerService] so status and
-/// change records stay current while the user reviews the plan.
+/// The route receives [ChangeTrackerRouteArgs] through go_router `extra` or
+/// path parameters, then resolves the live entry from [ServiceRegistry] so
+/// status and change records stay current while the user reviews the plan.
 class ChangeTrackerPage extends HookWidget {
   /// Creates a page that resolves and displays the route entry.
   const ChangeTrackerPage({super.key, required this.args});
@@ -49,7 +51,10 @@ class ChangeTrackerPage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final controller = useChangeTrackerController(service: args.service);
+    final service = args.serviceId == null
+        ? null
+        : ServiceRegistry.maybeById<ChangeTrackerService>(args.serviceId!);
+    final controller = useChangeTrackerController(service: service);
     final entry = controller.entryById(args.entryId);
 
     if (entry == null) {

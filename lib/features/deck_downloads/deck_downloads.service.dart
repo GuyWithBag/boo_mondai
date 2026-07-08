@@ -36,20 +36,27 @@ import 'package:boo_mondai/lib.barrel.dart'
         MultipleChoiceOption,
         MultipleChoiceTemplate,
         RemoteDB,
+        Service,
         StudyCardService,
         VisibilityState,
         WordScrambleTemplate,
         uuid,
         ChangeTrackerEntry;
+import 'package:boo_mondai/core/services/service_registry.dart';
 import 'package:boo_mondai/features/card_attachments/media_storage.service.dart';
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart' show CountOption;
 
 const _kPageSize = 20;
 
-class DeckDownloadsService {
+class DeckDownloadsService extends Service {
   DeckDownloadsService({ChangeTrackerService? changeTrackerService})
-    : changeTrackerService = changeTrackerService ?? ChangeTrackerService();
+    : changeTrackerService = ServiceRegistry.add(
+        changeTrackerService ?? ChangeTrackerService(),
+      );
+
+  @override
+  String get name => 'DeckDownloadsService';
 
   final ChangeTrackerService changeTrackerService;
 
