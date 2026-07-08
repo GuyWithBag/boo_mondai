@@ -15,6 +15,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         ChangeType,
         MutableEntity,
         HiveLocalDB,
+        ProgressCheckpointService,
+        ProgressCheckpointType,
         SupabaseRemoteDB,
         SyncException,
         SyncPlanPayload,
@@ -26,6 +28,8 @@ import 'package:boo_mondai/lib.barrel.dart'
 bool _isStrictlyAfterMs(DateTime a, DateTime b) {
   return a.toUtc().millisecondsSinceEpoch > b.toUtc().millisecondsSinceEpoch;
 }
+
+const _kSyncPageSize = 100;
 
 class SyncService {
   static void _ensureAuthenticated({required String userId}) {
@@ -93,6 +97,7 @@ class SyncService {
     required SupabaseRemoteDB<T> remoteDb,
     required String userId,
     required ChangeTrackerController changeTrackerController,
+    ProgressCheckpointService? progressCheckpointService,
     bool Function(T item)? localWhere,
   }) async {
     late final ChangePlan<SyncPlanPayload<T>, T> syncPlan;
@@ -111,6 +116,7 @@ class SyncService {
           plan: syncPlan,
           localDb: localDb,
           remoteDb: remoteDb,
+          progressCheckpointService: progressCheckpointService,
         );
         return result.changes;
       },
@@ -144,6 +150,7 @@ class SyncService {
         syncPlan = ChangePlan(
           payload: SyncPlanPayload<T>(
             tableName: remoteDb.tableName,
+            checkpointTargetId: _syncTargetId(userId, remoteDb.tableName),
             pullItems: const [],
             pushItems: const [],
             skipped: 0,
@@ -164,6 +171,7 @@ class SyncService {
         localDb: localDb,
         remoteDb: remoteDb,
         userId: userId,
+        progressCheckpointService: progressCheckpointService,
         localWhere: localWhere,
       );
 
@@ -203,18 +211,54 @@ class SyncService {
     required HiveLocalDB<T> localDb,
     required SupabaseRemoteDB<T> remoteDb,
     required String userId,
+    ProgressCheckpointService? progressCheckpointService,
     bool Function(T item)? localWhere,
   }) async {
     try {
       _ensureAuthenticated(userId: userId);
+      final checkpointService =
+          progressCheckpointService ?? ProgressCheckpointService();
+      final checkpointTargetId = _syncTargetId(userId, remoteDb.tableName);
       final changes = <ChangedEntity<T>>[];
       final pullItems = <T>[];
       final pushItems = <T>[];
       var skipped = 0;
 
-      final remoteData = await remoteDb.selectMany(
-        filters: {'user_id': userId},
+      final remoteFilters = {'user_id': userId};
+      final remoteTotal = await remoteDb.count(filters: remoteFilters);
+      var fetchCheckpoint = checkpointService.start(
+        type: ProgressCheckpointType.syncFetch,
+        targetId: checkpointTargetId,
+        operationDescription: 'Fetching sync data for ${remoteDb.tableName}',
+        totalItems: remoteTotal,
+        preserveCompletedItems: false,
       );
+      final remoteData = <T>[];
+      var remoteOffset = 0;
+      final fetchedRemoteIds = fetchCheckpoint.completedTargetItemIds.toSet();
+
+      while (remoteOffset < remoteTotal) {
+        final page = await remoteDb.selectManyPaged(
+          filters: remoteFilters,
+          orderBy: 'id',
+          offset: remoteOffset,
+          pageSize: _kSyncPageSize,
+        );
+        if (page.isEmpty) break;
+
+        remoteData.addAll(page);
+        final pageIds = page
+            .map((item) => item.id)
+            .where((id) => fetchedRemoteIds.add(id))
+            .toList();
+        fetchCheckpoint = checkpointService.markItemsCompleted(
+          checkpointId: fetchCheckpoint.id,
+          itemIds: pageIds,
+        );
+        remoteOffset = fetchCheckpoint.completedTargetItemIds.length;
+      }
+      checkpointService.complete(fetchCheckpoint.id);
+
       final localData = localDb.selectMany(where: localWhere);
       final remoteMap = {for (final remote in remoteData) remote.id: remote};
       final localMap = {for (final local in localData) local.id: local};
@@ -225,11 +269,10 @@ class SyncService {
           pullItems.add(remote);
           changes.add(
             ChangedEntity(
-              type: ChangeType.added,
+              changeType: ChangeType.added,
               source: ChangeSource.sync,
-              entityType: remoteDb.tableName,
-              entityId: remote.id,
-              title: 'Pull new ${remoteDb.tableName} record',
+              id: remote.id,
+              afterChange: remote,
               remoteId: remote.id,
               remoteUpdatedAt: remote.updatedAt,
             ),
@@ -241,11 +284,11 @@ class SyncService {
           pullItems.add(remote);
           changes.add(
             ChangedEntity(
-              type: ChangeType.modified,
+              changeType: ChangeType.modified,
               source: ChangeSource.sync,
-              entityType: remoteDb.tableName,
-              entityId: remote.id,
-              title: 'Pull newer ${remoteDb.tableName} record',
+              id: remote.id,
+              beforeChange: local,
+              afterChange: remote,
               localId: local.id,
               remoteId: remote.id,
               localUpdatedAt: local.updatedAt,
@@ -263,11 +306,10 @@ class SyncService {
           pushItems.add(local);
           changes.add(
             ChangedEntity(
-              type: ChangeType.added,
+              changeType: ChangeType.added,
               source: ChangeSource.sync,
-              entityType: remoteDb.tableName,
-              entityId: local.id,
-              title: 'Push new ${remoteDb.tableName} record',
+              id: local.id,
+              afterChange: local,
               localId: local.id,
               localUpdatedAt: local.updatedAt,
             ),
@@ -279,11 +321,11 @@ class SyncService {
           pushItems.add(local);
           changes.add(
             ChangedEntity(
-              type: ChangeType.modified,
+              changeType: ChangeType.modified,
               source: ChangeSource.sync,
-              entityType: remoteDb.tableName,
-              entityId: local.id,
-              title: 'Push newer ${remoteDb.tableName} record',
+              id: local.id,
+              beforeChange: remote,
+              afterChange: local,
               localId: local.id,
               remoteId: remote.id,
               localUpdatedAt: local.updatedAt,
@@ -296,6 +338,7 @@ class SyncService {
       return ChangePlan<SyncPlanPayload<T>, T>(
         payload: SyncPlanPayload<T>(
           tableName: remoteDb.tableName,
+          checkpointTargetId: checkpointTargetId,
           pullItems: pullItems,
           pushItems: pushItems,
           skipped: skipped,
@@ -316,16 +359,60 @@ class SyncService {
     required ChangePlan<SyncPlanPayload<T>, T> plan,
     required HiveLocalDB<T> localDb,
     required SupabaseRemoteDB<T> remoteDb,
+    ProgressCheckpointService? progressCheckpointService,
   }) async {
+    final checkpointService =
+        progressCheckpointService ?? ProgressCheckpointService();
+    final checkpoint = checkpointService.start(
+      type: ProgressCheckpointType.syncApply,
+      targetId: plan.payload.checkpointTargetId,
+      operationDescription: 'Applying sync for ${plan.payload.tableName}',
+      totalItems: plan.payload.pullItems.length + plan.payload.pushItems.length,
+    );
+    final completed = checkpoint.completedTargetItemIds.toSet();
+
     try {
-      for (final remote in plan.payload.pullItems) {
-        await localDb.upsert(remote);
+      var currentCheckpoint = checkpoint;
+      for (
+        var offset = 0;
+        offset < plan.payload.pullItems.length;
+        offset += _kSyncPageSize
+      ) {
+        final page = plan.payload.pullItems.skip(offset).take(_kSyncPageSize);
+        final completedPageIds = <String>[];
+        for (final remote in page) {
+          if (completed.contains(remote.id)) continue;
+          await localDb.upsert(remote);
+          completed.add(remote.id);
+          completedPageIds.add(remote.id);
+        }
+        currentCheckpoint = checkpointService.markItemsCompleted(
+          checkpointId: currentCheckpoint.id,
+          itemIds: completedPageIds,
+        );
       }
-      for (final local in plan.payload.pushItems) {
-        await remoteDb.upsert(local);
+      for (
+        var offset = 0;
+        offset < plan.payload.pushItems.length;
+        offset += _kSyncPageSize
+      ) {
+        final page = plan.payload.pushItems.skip(offset).take(_kSyncPageSize);
+        final completedPageIds = <String>[];
+        for (final local in page) {
+          if (completed.contains(local.id)) continue;
+          await remoteDb.upsert(local);
+          completed.add(local.id);
+          completedPageIds.add(local.id);
+        }
+        currentCheckpoint = checkpointService.markItemsCompleted(
+          checkpointId: currentCheckpoint.id,
+          itemIds: completedPageIds,
+        );
       }
+      checkpointService.complete(currentCheckpoint.id);
       return ChangeResult(value: plan.payload.summary, changes: plan.changes);
     } catch (e) {
+      checkpointService.fail(checkpoint.id);
       throw SyncException(
         'Failed to apply sync data: $e',
         code: 'SYNC_APPLY_FAILED',
@@ -363,4 +450,7 @@ class SyncService {
     );
     return applySync(plan: plan, localDb: localDb, remoteDb: remoteDb);
   }
+
+  static String _syncTargetId(String userId, String tableName) =>
+      '$userId:$tableName';
 }

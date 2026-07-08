@@ -39,7 +39,7 @@ class StatusLayoutState extends StatelessWidget {
 
     return Column(
       spacing: tokens.spaceLayoutGapMd,
-      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         if (icon != null) Icon(icon, size: 56.r, color: tokens.colorTextMuted),
@@ -66,9 +66,10 @@ class StatusLayoutState extends StatelessWidget {
           Row(spacing: tokens.spaceLayoutGapSm, children: [...actions]),
         if (actions.isNotEmpty && extraAction != null)
           Column(
-            spacing: tokens.spaceLayoutGapMd,
+            spacing: tokens.spaceLayoutGapSm,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Row(spacing: tokens.spaceLayoutGapSm, children: [...actions]),
+              Row(spacing: tokens.spaceLayoutGapSm, children: actions),
               ?extraAction,
             ],
           ),

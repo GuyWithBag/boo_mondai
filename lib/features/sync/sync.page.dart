@@ -87,6 +87,7 @@ class SyncPage<T extends MutableEntity> extends StatelessWidget {
         entry.status == ChangeTrackerStatus.reviewing ||
         entry.status == ChangeTrackerStatus.completed;
     final canApply = entry.status == ChangeTrackerStatus.reviewing;
+    final isCompleted = entry.status == ChangeTrackerStatus.completed;
     final icon = entry.status == ChangeTrackerStatus.alreadyUpToDate
         ? Icons.check_circle_outline_rounded
         : Icons.sync_rounded;
@@ -103,22 +104,29 @@ class SyncPage<T extends MutableEntity> extends StatelessWidget {
           if (canApply)
             Expanded(
               child: Button(
-                style: buttonStyle.resolve(tokens, const [ButtonColor.primary]),
+                style: buttonStyle.resolve(tokens, const []),
                 onPressed: _apply,
-                child: const Text('APPLY'),
+                child: const Text('Apply'),
               ),
             ),
           if (canViewChanges)
             Expanded(
               child: Button(
+                style: buttonStyle.resolve(tokens, [
+                  if (canApply) ButtonColor.primary,
+                ]),
                 onPressed: () => _viewChanges(context),
-                child: const Text('VIEW CHANGES'),
+                child: const Text('View Changes'),
               ),
             ),
         ],
         extraAction: Button(
+          style: buttonStyle.resolve(
+            tokens,
+            isCompleted ? const [ButtonColor.primary] : const [],
+          ),
           onPressed: _discard,
-          child: Text(canApply ? 'Discard' : 'Cancel'),
+          child: Text(isCompleted ? 'Back' : 'Cancel'),
         ),
         child: isDoneFetching ? ChangeTrackerSummaryChips(entry: entry) : null,
       ),
