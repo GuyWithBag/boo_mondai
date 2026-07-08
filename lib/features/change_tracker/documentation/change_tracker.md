@@ -7,20 +7,27 @@ download, and import/export change descriptions.
 
 ## Responsibilities
 
-- `ChangedEntity` describes one entity-level change, such as adding a deck,
-  modifying a card template, or pulling a newer sync row.
-- `ChangedProperty` describes field-level before/after detail for modified
-  records.
-- `ChangePlan<TPayload>` pairs display-ready change records with the
-  workflow payload needed to apply the plan later.
-- `ChangeResult<TValue>` reports the domain result and the records that were
-  actually applied.
+- `ChangedEntity<TEntity>` describes one typed entity-level change, such as
+  adding a deck, modifying a card template, or pulling a newer sync row. Its
+  `beforeChange` and `afterChange` snapshots use `TEntity`.
+- `ChangedProperty<TValue>` describes field-level before/after detail for one
+  typed property value.
+- `ChangePlan<TPayload, TEntity>` pairs display-ready change records with the
+  typed workflow payload needed to apply the plan later.
+- `ChangeResult<TValue, TEntity>` reports the domain result and the typed
+  records that were actually applied.
+- `ChangeBatchResult<TValue>` reports partial success for batch import/export
+  operations, including successful values, human-readable failures, and change
+  records from successful items.
 - `ChangeTrackerEntry` is the live state for one tracked operation.
 - `ChangeTrackerService` owns entries and deferred apply callbacks without
   depending on Flutter UI notification APIs.
 - `ChangeTrackerController` adapts a `ChangeTrackerService` for UI listeners.
-  It can be provided globally for routed review flows or created locally with
-  `useChangeTrackerController()` around a feature-owned service.
+  `useChangeTrackerController()` creates this adapter around either a default
+  in-memory service or a feature-owned service.
+- `ChangeTrackerRouteArgs` carries the routed entry id plus the owning
+  `ChangeTrackerService` through `go_router` `extra` so `ChangeTrackerPage`
+  resolves live entries from the correct service.
 
 ## Component Map
 
@@ -34,16 +41,16 @@ flowchart LR
     end
 
     subgraph DataModels[Change data models]
-        Preview["ChangePlan&lt;TPayload&gt;"]
-        Result["ChangeResult&lt;TValue&gt;"]
-        Record[ChangedEntity]
-        Property[ChangedProperty]
+        Preview["ChangePlan&lt;TPayload, TEntity&gt;"]
+        Result["ChangeResult&lt;TValue, TEntity&gt;"]
+        BatchResult["ChangeBatchResult&lt;TValue&gt;"]
+        Record["ChangedEntity&lt;TEntity&gt;"]
+        Property["ChangedProperty&lt;TValue&gt;"]
         Comparer[ChangeDifferenceHelper]
     end
 
     subgraph Tracker[Change tracker runtime]
         ServiceRuntime[ChangeTrackerService]
-        DownloadServiceRuntime[Deck download ChangeTrackerService]
         Controller[ChangeTrackerController]
         Hook[useChangeTrackerController]
         Entry[ChangeTrackerEntry]
@@ -51,6 +58,7 @@ flowchart LR
     end
 
     subgraph UI[UI surfaces]
+        RouteArgs[ChangeTrackerRouteArgs]
         ReviewPage[ChangeTrackerPage]
         SyncPage[SyncPage]
         Downloads[Deck downloads UI]
@@ -64,17 +72,17 @@ flowchart LR
     Property --> Record
     Preview --> Record
     Result --> Record
+    BatchResult --> Record
     Sync --> Controller
     AppServices --> DeckDownloads
-    DeckDownloads --> DownloadServiceRuntime
+    DeckDownloads --> ServiceRuntime
     Controller --> ServiceRuntime
     Hook --> Controller
-    Hook --> DownloadServiceRuntime
     ServiceRuntime --> Entry
-    DownloadServiceRuntime --> Entry
     Entry --> Status
     Entry --> Record
-    UI --> Controller
+    SyncPage --> RouteArgs
+    RouteArgs --> ReviewPage
     ReviewPage --> Widgets
     SyncPage --> Widgets
     Downloads --> Entry
@@ -109,22 +117,27 @@ stateDiagram-v2
 ## Sync Sequence
 
 Sync is the clearest review-first user of the tracker. `SyncService.sync()`
-starts an explicit `ChangeTrackerEntry` with an `onApply` callback, builds
-`syncPlan`, then moves the entry into review when changes exist. `SyncPage`
-owns the user actions: it routes to the change-review page, applies the entry,
-or discards it. The callback closes over the completed plan and calls
+starts an explicit `ChangeTrackerEntry` with an `onApply` callback, builds a
+`ChangePlan<SyncPlanPayload<T>, T>`, then moves the entry into review when
+changes exist. `SyncController` keeps track of the bound
+`ChangeTrackerController`, and `SyncPage` owns the user actions: it routes to
+the change-review page with `ChangeTrackerRouteArgs`, applies the entry, or
+discards it. The callback closes over the completed plan and calls
 `applySync()` only after the user confirms.
 
 ```mermaid
 sequenceDiagram
     participant UI as View decks / sync UI
+    participant SyncController as SyncController
     participant SyncPage as SyncPage
     participant Controller as ChangeTrackerController
+    participant ReviewPage as ChangeTrackerPage
     participant Service as SyncService
     participant Local as HiveLocalDB
     participant Remote as SupabaseRemoteDB
 
-    UI->>Service: sync(localDb, remoteDb, userId, changeTrackerController)
+    UI->>SyncController: sync(changeTrackerController)
+    SyncController->>Service: sync(localDb, remoteDb, userId, changeTrackerController)
     Service->>Controller: start(entry: ChangeTrackerEntry(sync, planning), onApply)
     Service->>Controller: update(status: fetching, progress)
     Service->>Remote: selectMany(user_id)
@@ -135,9 +148,12 @@ sequenceDiagram
         Service->>Controller: update(status: alreadyUpToDate, progress: 1)
     else differences found
         Service->>Controller: update(status: reviewing, changes, progress: 1)
-        UI->>SyncPage: render current sync entry
-        SyncPage->>UI: context.push('/change-review/:entryId')
-        SyncPage->>Controller: apply(entryId)
+        Controller-->>SyncController: notifyListeners()
+        SyncController-->>SyncPage: currentEntry + changeTrackerService
+        SyncPage->>ReviewPage: context.push('/change-review/:entryId', extra: ChangeTrackerRouteArgs)
+        ReviewPage->>Controller: useChangeTrackerController(service)
+        ReviewPage->>Controller: entryById(entryId)
+        ReviewPage->>Controller: apply(entryId)
         Controller->>Service: onApply()
         Service->>Local: upsert pulled records
         Service->>Remote: upsert pushed records
@@ -192,34 +208,44 @@ sequenceDiagram
 
 ## UI Consumption
 
-Some feature screens read the shared controller from Provider. Review routes
-resolve an entry by id so they always render the latest immutable entry
-instance. Feature-owned trackers, such as deck downloads, create a local
-controller with `useChangeTrackerController(service: featureService.tracker)`.
+Feature screens create a `ChangeTrackerController` with
+`useChangeTrackerController()`. When no service is supplied, the hook creates a
+controller around a fresh in-memory `ChangeTrackerService`. Feature-owned
+trackers, such as deck downloads, pass their long-lived service into the hook
+with `useChangeTrackerController(service: featureService.changeTrackerService)`.
+
+Review routes keep only the entry id in the URL. The owning service is passed
+through `ChangeTrackerRouteArgs` in `go_router` `extra`, and
+`ChangeTrackerPage` wraps that service with the hook before resolving
+`entryById(entryId)`. If the route is opened without args or the entry has been
+removed, the page treats it as missing and returns to the previous route.
 
 ```mermaid
 flowchart TD
-    Provider[ChangeNotifierProvider<br/>in main.dart]
+    DefaultHook[useChangeTrackerController()]
     FeatureService[Feature service-owned<br/>ChangeTrackerService]
-    Hook[useChangeTrackerController]
+    FeatureHook[useChangeTrackerController(service)]
     Controller[ChangeTrackerController]
     EntryList[entries / activeEntries]
     Entry[entryById(entryId)]
+    RouteArgs[ChangeTrackerRouteArgs<br/>entryId + service]
     Page[ChangeTrackerPage]
     Summary[ChangeTrackerSummaryChips]
-    Card[ChangeTrackerCard]
+    Section[ChangedEntitySection]
     Diff[ChangedPropertyBlock]
-    Actions[ChangeTrackerActions]
+    Actions[Discard / Looks Good / Back]
 
-    Provider --> Controller
-    FeatureService --> Hook
-    Hook --> Controller
+    DefaultHook --> Controller
+    FeatureService --> FeatureHook
+    FeatureHook --> Controller
     Controller --> EntryList
     Controller --> Entry
+    RouteArgs --> Page
+    Page --> Controller
     Entry --> Page
     Page --> Summary
-    Page --> Card
-    Card --> Diff
+    Page --> Section
+    Section --> Diff
     Page --> Actions
     Actions -->|DISCARD| Controller
     Actions -->|LOOKS GOOD| Controller
@@ -229,15 +255,32 @@ flowchart TD
 
 - Entries are immutable snapshots. Service mutations replace entries and invoke
   `onChanged`; controllers bridge that into `notifyListeners()`.
-- Entries are newest-first in `ChangeTrackerController.entries`.
+- Entries are newest-first in `ChangeTrackerService.entries` and
+  `ChangeTrackerController.entries`.
+- Entries record `startedAt` when constructed and `finishedAt` when completed,
+  failed, or canceled.
 - `start()` takes an explicit `ChangeTrackerEntry`; callers construct the entry
   so the service only registers and tracks it.
+- `start()` type-erases stored entries to `Object?` internally while preserving
+  the typed entry returned to the caller.
+- `ChangedEntity.changedProperties` stores `List<ChangedProperty<Object?>>`
+  because a single entity diff can contain heterogeneous field values, such as a
+  `String` title, `DateTime` update timestamp, `bool` flag, or list field.
+- `apply()` moves the entry to `applying`, runs the registered callback when one
+  exists, completes with the callback's applied changes, removes the callback,
+  and returns an error object to the controller if the callback fails.
+- If no apply callback is registered, `apply()` simply completes the entry. This
+  supports workflows like deck download that mutate while reporting progress.
 - `activeEntries` includes `planning`, `fetching`, `reviewing`, `applying`, and
   `paused`.
 - `clearFinished()` removes terminal entries and any stale apply callbacks.
+- `remove()` deletes an entry from memory and removes its pending apply
+  callback.
 - `cancel()` removes a pending apply callback before marking the entry canceled.
 - `fail()` stores user-visible error text and calls the base controller error
   hook through `setError`.
+- `pause()` and `resume()` only update tracker state. The owning workflow must
+  implement the real pause signal and resume behavior.
 - The tracker is not durable storage. If a workflow needs resume behavior, it
   must persist its own checkpoint and then report resumed state back through the
   tracker.
