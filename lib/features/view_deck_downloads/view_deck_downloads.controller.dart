@@ -10,8 +10,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         ChangeTrackerStatus,
         ChangeSource,
         DeckDownloadsService,
-        DownloadCheckpointLocalDB,
         LocalDB,
+        ProgressCheckpointLocalDB,
+        ProgressCheckpointType,
         Services,
         Deck;
 
@@ -19,16 +20,16 @@ class ViewDeckDownloadsController extends Controller {
   ViewDeckDownloadsController({
     required this.changeTrackerController,
     DeckDownloadsService? downloadsService,
-    DownloadCheckpointLocalDB? checkpointDB,
+    ProgressCheckpointLocalDB? checkpointDB,
   }) : _downloadsService = downloadsService ?? Services.deckDownloads,
-       _checkpointDB = checkpointDB ?? LocalDB.downloadCheckpoint {
+       _checkpointDB = checkpointDB ?? LocalDB.progressCheckpoint {
     changeTrackerController.addListener(_onReviewChanged);
     _autoResumeInterruptedDownloads();
   }
 
   final ChangeTrackerController changeTrackerController;
   final DeckDownloadsService _downloadsService;
-  final DownloadCheckpointLocalDB _checkpointDB;
+  final ProgressCheckpointLocalDB _checkpointDB;
 
   List<ChangeTrackerEntry> _activeEntries = [];
   List<ChangeTrackerEntry> _completedPlans = [];
@@ -42,16 +43,15 @@ class ViewDeckDownloadsController extends Controller {
   /// On init, finds any checkpoints that were mid-download when the app was
   /// killed and resumes them automatically.
   void _autoResumeInterruptedDownloads() {
-    final interrupted = [
-      ..._checkpointDB.getDownloading(),
-      ..._checkpointDB.getPaused(),
-    ];
+    final interrupted = _checkpointDB.getActiveByType(
+      ProgressCheckpointType.deckDownloadFetch,
+    );
 
     for (final checkpoint in interrupted) {
       // Find the local deck so we can pass it as sourceDeck
       final localDeck = LocalDB.deck
           .selectMany(
-            where: (d) => d.sourceDeckId == checkpoint.deckId,
+            where: (d) => d.sourceDeckId == checkpoint.targetId,
             limit: 1,
           )
           .firstOrNull;
@@ -62,7 +62,7 @@ class ViewDeckDownloadsController extends Controller {
       final plan = changeTrackerController.start(
         entry: ChangeTrackerEntry(
           source: ChangeSource.deckDownload,
-          title: checkpoint.deckTitle,
+          title: localDeck.title,
           status: ChangeTrackerStatus.applying,
           progress: checkpoint.progress,
         ),
@@ -106,13 +106,15 @@ class ViewDeckDownloadsController extends Controller {
 
     // Find the source deck via checkpoint
     final checkpoint = _checkpointDB
-        .getPaused()
-        .where((c) => true) // all paused ones are candidates
+        .getActiveByType(ProgressCheckpointType.deckDownloadFetch)
         .firstOrNull;
     if (checkpoint == null) return;
 
     final localDeck = LocalDB.deck
-        .selectMany(where: (d) => d.sourceDeckId == checkpoint.deckId, limit: 1)
+        .selectMany(
+          where: (d) => d.sourceDeckId == checkpoint.targetId,
+          limit: 1,
+        )
         .firstOrNull;
     if (localDeck == null) return;
 
@@ -126,11 +128,11 @@ class ViewDeckDownloadsController extends Controller {
     changeTrackerController.remove(entryId);
 
     // Clean up checkpoint
-    final checkpoint =
-        _checkpointDB.getPaused().firstOrNull ??
-        _checkpointDB.getDownloading().firstOrNull;
+    final checkpoint = _checkpointDB
+        .getActiveByType(ProgressCheckpointType.deckDownloadFetch)
+        .firstOrNull;
     if (checkpoint != null) {
-      _checkpointDB.deleteByPk({'deck_id': checkpoint.deckId});
+      _checkpointDB.deleteByPk({'id': checkpoint.id});
     }
   }
 
@@ -141,7 +143,7 @@ class ViewDeckDownloadsController extends Controller {
   /// Returns the local deck for a completed plan, found via sourceDeckId.
   Deck? localDeckForPlan(ChangeTrackerEntry entry) {
     final deckChange = entry.changes
-        .where((c) => c.entityType == 'deck')
+        .where((c) => c.typeName == 'deck')
         .firstOrNull;
     final remoteId = deckChange?.remoteId;
     if (remoteId == null) return null;
@@ -154,11 +156,17 @@ class ViewDeckDownloadsController extends Controller {
   double progressForPlan(ChangeTrackerEntry entry) {
     if ((entry.progress ?? 0) > 0) return entry.progress!;
     final deckChange = entry.changes
-        .where((c) => c.entityType == 'deck')
+        .where((c) => c.typeName == 'deck')
         .firstOrNull;
     final remoteId = deckChange?.remoteId;
     if (remoteId == null) return 0;
-    return _checkpointDB.getByDeckId(remoteId)?.progress ?? 0;
+    return _checkpointDB
+            .getByTypeAndTargetId(
+              ProgressCheckpointType.deckDownloadFetch,
+              remoteId,
+            )
+            ?.progress ??
+        0;
   }
 
   @override

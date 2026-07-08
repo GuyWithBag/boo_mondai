@@ -3,5 +3,4 @@
 // Barrel files
 export 'models/models.barrel.dart';
 // Other files
-export 'download_checkpoint.local.db.dart';
 export 'deck_downloads.service.dart';

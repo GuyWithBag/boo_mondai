@@ -20,9 +20,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         Deck,
         DeckDownloadPayload,
         DecksRemoteDB,
-        DownloadCheckpoint,
-        DownloadCheckpointLocalDB,
-        DownloadCheckpointStatus,
         FillInTheBlankSegment,
         FillInTheBlanksTemplate,
         FlashcardTemplate,
@@ -35,6 +32,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         MatchMadnessTemplate,
         MultipleChoiceOption,
         MultipleChoiceTemplate,
+        ProgressCheckpoint,
+        ProgressCheckpointService,
+        ProgressCheckpointType,
         RemoteDB,
         Service,
         StudyCardService,
@@ -50,20 +50,23 @@ import 'package:supabase_flutter/supabase_flutter.dart' show CountOption;
 const _kPageSize = 20;
 
 class DeckDownloadsService extends Service {
-  DeckDownloadsService({ChangeTrackerService? changeTrackerService})
-    : changeTrackerService = ServiceRegistry.add(
-        changeTrackerService ?? ChangeTrackerService(),
-      );
+  DeckDownloadsService({
+    ChangeTrackerService? changeTrackerService,
+    ProgressCheckpointService? progressCheckpointService,
+  }) : progressCheckpointService =
+           progressCheckpointService ?? ProgressCheckpointService(),
+       changeTrackerService = ServiceRegistry.add(
+         changeTrackerService ?? ChangeTrackerService(),
+       );
 
   @override
   String get name => 'DeckDownloadsService';
 
   final ChangeTrackerService changeTrackerService;
+  final ProgressCheckpointService progressCheckpointService;
 
   final DecksRemoteDB _decks = RemoteDB.deck;
   final CardTemplatesRemoteDB _cardTemplates = RemoteDB.card;
-  final DownloadCheckpointLocalDB _downloadCheckpoints =
-      LocalDB.downloadCheckpoint;
 
   final Set<String> _pausedEntryIds = {};
 
@@ -105,24 +108,23 @@ class DeckDownloadsService extends Service {
       }
 
       // 4. Load or create a checkpoint — existing is nullable, checkpoint is not
-      final existing = _downloadCheckpoints.getByDeckId(remoteDeck.id);
+      final existing = progressCheckpointService.getByTypeAndTargetId(
+        ProgressCheckpointType.deckDownloadFetch,
+        remoteDeck.id,
+      );
       final alreadyFetchedIds =
-          existing?.fetchedTemplateIds.toSet() ?? <String>{};
+          existing?.completedTargetItemIds.toSet() ?? <String>{};
 
       final totalCount =
-          existing?.totalTemplates ??
-          await _fetchTotalTemplateCount(remoteDeck.id);
+          existing?.totalItems ?? await _fetchTotalTemplateCount(remoteDeck.id);
 
-      var checkpoint = DownloadCheckpoint(
-        deckId: remoteDeck.id,
-        deckTitle: remoteDeck.title,
-        totalTemplates: totalCount,
-        fetchedTemplateIds: alreadyFetchedIds.toList(),
-        status: DownloadCheckpointStatus.downloading,
-        createdAt: existing?.createdAt ?? DateTime.now(),
-        updatedAt: DateTime.now(),
+      var checkpoint = progressCheckpointService.start(
+        type: ProgressCheckpointType.deckDownloadFetch,
+        targetId: remoteDeck.id,
+        operationDescription: 'Fetching deck templates',
+        totalItems: totalCount,
+        completedTargetItemIds: alreadyFetchedIds,
       );
-      await _downloadCheckpoints.upsert(checkpoint);
 
       // 5. Stream templates in pages
       final allFetchedTemplates = <CardTemplate>[];
@@ -137,12 +139,7 @@ class DeckDownloadsService extends Service {
       while (offset < totalCount) {
         // Check if paused between pages
         if (_pausedEntryIds.contains(entry.id)) {
-          await _downloadCheckpoints.upsert(
-            checkpoint.copyWith(
-              status: DownloadCheckpointStatus.paused,
-              updatedAt: DateTime.now(),
-            ),
-          );
+          progressCheckpointService.pause(checkpoint.id);
           changeTrackerService.update(
             entry.id,
             status: ChangeTrackerStatus.paused,
@@ -154,7 +151,8 @@ class DeckDownloadsService extends Service {
         }
 
         final page = await _cardTemplates.selectManyPaged(
-          deckId: remoteDeck.id,
+          filters: {'deck_id': remoteDeck.id},
+          orderBy: 'sort_order',
           offset: offset,
           pageSize: _kPageSize,
         );
@@ -165,14 +163,13 @@ class DeckDownloadsService extends Service {
             .where((t) => !alreadyFetchedIds.contains(t.id))
             .toList();
         allFetchedTemplates.addAll(newTemplates);
-        alreadyFetchedIds.addAll(newTemplates.map((t) => t.id));
-        offset = alreadyFetchedIds.length;
-
-        checkpoint = checkpoint.copyWith(
-          fetchedTemplateIds: alreadyFetchedIds.toList(),
-          updatedAt: DateTime.now(),
+        final pageIds = newTemplates.map((template) => template.id).toList();
+        alreadyFetchedIds.addAll(pageIds);
+        checkpoint = progressCheckpointService.markItemsCompleted(
+          checkpointId: checkpoint.id,
+          itemIds: pageIds,
         );
-        await _downloadCheckpoints.upsert(checkpoint);
+        offset = alreadyFetchedIds.length;
 
         changeTrackerService.update(
           entry.id,
@@ -233,10 +230,6 @@ class DeckDownloadsService extends Service {
         templates: localTemplates,
       );
 
-      checkpoint = checkpoint.copyWith(
-        downloadedAttachmentIds: existing?.downloadedAttachmentIds ?? const [],
-        updatedAt: DateTime.now(),
-      );
       await _downloadMediaPhase(
         entryId: entry.id,
         changeTrackerService: changeTrackerService,
@@ -245,7 +238,7 @@ class DeckDownloadsService extends Service {
       );
 
       // 7. Clean up checkpoint
-      await _downloadCheckpoints.deleteByPk({'deck_id': remoteDeck.id});
+      await progressCheckpointService.delete(checkpoint.id);
 
       final changes = _buildDownloadChanges(
         remoteDeck: remoteDeck,
@@ -350,12 +343,9 @@ class DeckDownloadsService extends Service {
     if (localDeck == null) {
       changes.add(
         ChangedEntity(
-          type: ChangeType.added,
+          changeType: ChangeType.added,
           source: ChangeSource.deckDownload,
-          entityType: 'deck',
-          entityId: remoteDeck.id,
-          title: remoteDeck.title,
-          subtitle: 'Deck will be added to your local library.',
+          id: remoteDeck.id,
           afterChange: remoteDeck,
           remoteId: remoteDeck.id,
           remoteUpdatedAt: remoteDeck.updatedAt,
@@ -364,12 +354,9 @@ class DeckDownloadsService extends Service {
       changes.addAll(
         remoteTemplates.map(
           (t) => ChangedEntity(
-            type: ChangeType.added,
+            changeType: ChangeType.added,
             source: ChangeSource.deckDownload,
-            entityType: 'card_template',
-            entityId: t.id,
-            title: ChangeDifferenceHelper.templateTitle(t),
-            subtitle: 'Card will be copied from the published deck.',
+            id: t.id,
             afterChange: t,
             remoteId: t.id,
             remoteUpdatedAt: t.updatedAt,
@@ -382,12 +369,9 @@ class DeckDownloadsService extends Service {
     if (remoteDeck.updatedAt.isAfter(localDeck.updatedAt)) {
       changes.add(
         ChangedEntity(
-          type: ChangeType.modified,
+          changeType: ChangeType.modified,
           source: ChangeSource.deckDownload,
-          entityType: 'deck',
-          entityId: localDeck.id,
-          title: localDeck.title,
-          subtitle: 'Published deck metadata is newer than your local copy.',
+          id: localDeck.id,
           beforeChange: localDeck,
           afterChange: remoteDeck,
           changedProperties: ChangeDifferenceHelper.decks(
@@ -413,12 +397,9 @@ class DeckDownloadsService extends Service {
       if (localTemplate == null) {
         changes.add(
           ChangedEntity(
-            type: ChangeType.added,
+            changeType: ChangeType.added,
             source: ChangeSource.deckDownload,
-            entityType: 'card_template',
-            entityId: remoteTemplate.id,
-            title: ChangeDifferenceHelper.templateTitle(remoteTemplate),
-            subtitle: 'Published deck has a card missing locally.',
+            id: remoteTemplate.id,
             afterChange: remoteTemplate,
             remoteId: remoteTemplate.id,
             remoteUpdatedAt: remoteTemplate.updatedAt,
@@ -427,12 +408,9 @@ class DeckDownloadsService extends Service {
       } else if (remoteTemplate.updatedAt.isAfter(localTemplate.updatedAt)) {
         changes.add(
           ChangedEntity(
-            type: ChangeType.modified,
+            changeType: ChangeType.modified,
             source: ChangeSource.deckDownload,
-            entityType: 'card_template',
-            entityId: localTemplate.id,
-            title: ChangeDifferenceHelper.templateTitle(localTemplate),
-            subtitle: 'Published card is newer than your local copy.',
+            id: localTemplate.id,
             beforeChange: localTemplate,
             afterChange: remoteTemplate,
             changedProperties: ChangeDifferenceHelper.templates(
@@ -453,14 +431,12 @@ class DeckDownloadsService extends Service {
       if (sourceId == null || remoteIds.contains(sourceId)) continue;
       changes.add(
         ChangedEntity(
-          type: ChangeType.removed,
+          changeType: ChangeType.removed,
+
           source: ChangeSource.deckDownload,
-          entityType: 'card_template',
-          entityId: localTemplate.id,
-          title: ChangeDifferenceHelper.templateTitle(localTemplate),
-          subtitle:
-              'Local card points to a published card that no longer exists.',
+          id: localTemplate.id,
           beforeChange: localTemplate,
+          afterChange: localTemplate,
           localId: localTemplate.id,
           remoteId: sourceId,
           localUpdatedAt: localTemplate.updatedAt,
@@ -640,10 +616,9 @@ class DeckDownloadsService extends Service {
   Future<void> _downloadMediaPhase({
     required String entryId,
     required ChangeTrackerService changeTrackerService,
-    required DownloadCheckpoint checkpoint,
+    required ProgressCheckpoint checkpoint,
     required List<CardTemplate> localTemplates,
   }) async {
-    final completed = checkpoint.downloadedAttachmentIds.toSet();
     final mediaAttachments = [
       for (final template in localTemplates)
         for (final attachment in template.attachments)
@@ -651,15 +626,9 @@ class DeckDownloadsService extends Service {
     ];
     if (mediaAttachments.isEmpty) return;
 
-    var currentCheckpoint = checkpoint;
     for (var i = 0; i < mediaAttachments.length; i++) {
       if (_pausedEntryIds.contains(entryId)) {
-        await _downloadCheckpoints.upsert(
-          currentCheckpoint.copyWith(
-            status: DownloadCheckpointStatus.paused,
-            updatedAt: DateTime.now(),
-          ),
-        );
+        progressCheckpointService.pause(checkpoint.id);
         changeTrackerService.update(
           entryId,
           status: ChangeTrackerStatus.paused,
@@ -668,7 +637,7 @@ class DeckDownloadsService extends Service {
       }
 
       final attachment = mediaAttachments[i];
-      if (completed.contains(attachment.id) || attachment.publicUrl == null) {
+      if (attachment.publicUrl == null) {
         continue;
       }
 
@@ -687,12 +656,6 @@ class DeckDownloadsService extends Service {
         localPath: localPath,
       );
 
-      completed.add(attachment.id);
-      currentCheckpoint = currentCheckpoint.copyWith(
-        downloadedAttachmentIds: completed.toList(),
-        updatedAt: DateTime.now(),
-      );
-      await _downloadCheckpoints.upsert(currentCheckpoint);
       changeTrackerService.update(
         entryId,
         progress: 0.9 + ((i + 1) / mediaAttachments.length) * 0.1,

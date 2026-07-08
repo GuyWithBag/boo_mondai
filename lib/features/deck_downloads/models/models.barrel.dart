@@ -2,4 +2,3 @@
 
 // Other files
 export 'deck_download_payload.dart';
-export 'download_checkpoint.dto.dart';
