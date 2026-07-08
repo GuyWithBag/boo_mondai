@@ -1,7 +1,6 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, ChangedProperty, ChangeType;
+    show AppTokens, ChangedProperty, ChangeType, textStyle;
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 /// Renders a field-level before/after diff.
@@ -11,23 +10,18 @@ import 'package:theme_variants/theme_variants.dart';
 /// the parent [ChangeType] for visual treatment.
 class ChangedPropertyBlock extends StatelessWidget {
   /// Creates a diff view for [diff], styled according to [type].
-  const ChangedPropertyBlock({
-    super.key,
-    required this.property,
-    required this.type,
-  });
+  const ChangedPropertyBlock({super.key, required this.property});
 
   /// Field diff to render.
   final ChangedProperty property;
 
-  /// Parent change type used to choose visual treatment.
-  final ChangeType type;
-
   @override
   Widget build(BuildContext context) {
+    final type = property.type;
+    if (type == ChangeType.skipped) {
+      return SizedBox.shrink();
+    }
     final tokens = context.themeTokens<AppTokens>();
-    final before = property.before;
-    final after = property.after;
     final icon = switch (type) {
       ChangeType.added => Icons.add,
       ChangeType.removed => Icons.remove,
@@ -35,16 +29,32 @@ class ChangedPropertyBlock extends StatelessWidget {
       ChangeType.skipped => Icons.skip_next,
     };
 
+    final propertyTextStyle = textStyle.resolve(tokens);
+
     final List<Widget> bodyBasedOnType = switch (type) {
-      ChangeType.added => [Text('Front'), Divider(), Text('"asd"')],
+      ChangeType.added => [
+        Text('${property.propertyLabel}: ${property.after}'),
+      ],
+      ChangeType.removed => [
+        Text('${property.propertyLabel}: ${property.before}'),
+      ],
+      ChangeType.modified => [
+        Text(
+          '${property.propertyLabel}: ${property.before}',
+          style: propertyTextStyle.copyWith(
+            decoration: TextDecoration.lineThrough,
+          ),
+        ),
+        Text('${property.propertyLabel}: ${property.after}'),
+      ],
       _ => throw UnimplementedError(),
     };
 
     final actionBasedOnType = switch (type) {
-      ChangeType.added => Text('New Card Added'),
-      ChangeType.removed => Text('Card Removed'),
-      ChangeType.modified => Text('Card Modified'),
-      ChangeType.skipped => Text('Card Skipped'),
+      ChangeType.added => '${property.propertyLabel} Added',
+      ChangeType.removed => '${property.propertyLabel} Removed',
+      ChangeType.modified => '${property.propertyLabel} Modified',
+      _ => throw UnimplementedError(),
     };
 
     return Row(
@@ -53,7 +63,7 @@ class ChangedPropertyBlock extends StatelessWidget {
         Column(
           spacing: tokens.spaceLayoutGapMd,
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [...bodyBasedOnType],
+          children: [...bodyBasedOnType, Text(actionBasedOnType)],
         ),
       ],
     );

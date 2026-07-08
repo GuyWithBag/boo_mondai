@@ -65,6 +65,7 @@ class ChangeTrackerPage extends HookWidget {
     return Scaffold(
       appBar: AppBar(title: 'Sync', automaticallyImplyPopButton: false),
       bottomNavBar: BottomNavBar(
+        preferredHeight: 130,
         child: Column(
           spacing: tokens.spaceLayoutGapMd,
           children: [
@@ -105,9 +106,9 @@ class ChangeTrackerPage extends HookWidget {
           ListView.separated(
             itemCount: entry.changes.length,
             separatorBuilder: (_, _) =>
-                SizedBox(height: tokens.spaceLayoutGapSm.h),
+                SizedBox(height: tokens.spaceLayoutGapMd.h),
             itemBuilder: (context, index) {
-              return ChangedEntitySection(change: entry.changes[index]);
+              return ChangedEntitySection(entity: entry.changes[index]);
             },
           ),
         ],
