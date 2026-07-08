@@ -210,6 +210,31 @@ abstract class SupabaseRemoteDB<T> {
     ).map(fromJoinedMap).toList();
   }, action: 'selectMany');
 
+  Future<List<T>> selectManyPaged({
+    String? select,
+    Map<String, Object?> filters = const {},
+    String? orderBy,
+    bool ascending = true,
+    required int offset,
+    required int pageSize,
+  }) => selectMany(
+    select: select,
+    filters: filters,
+    orderBy: orderBy,
+    ascending: ascending,
+    limit: pageSize,
+    offset: offset,
+  );
+
+  Future<int> count({Map<String, Object?> filters = const {}}) =>
+      guard(() async {
+        dynamic query = client.from(tableName).count(CountOption.exact);
+        if (filters.isNotEmpty) {
+          query = applyFilters(query, filters);
+        }
+        return await query;
+      }, action: 'count');
+
   Future<T?> selectOne({
     String? select,
     required Map<String, Object?> filters,

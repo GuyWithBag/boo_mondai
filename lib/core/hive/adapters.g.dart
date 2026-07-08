@@ -195,9 +195,122 @@ class DeckAdapter extends TypeAdapter<Deck> {
           typeId == other.typeId;
 }
 
-class MultipleChoiceOptionAdapter extends TypeAdapter<MultipleChoiceOption> {
+class CardMediaAttachmentAdapter extends TypeAdapter<CardMediaAttachment> {
   @override
   final typeId = 3;
+
+  @override
+  CardMediaAttachment read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return CardMediaAttachment(
+      id: fields[0] as String,
+      templateId: fields[1] as String,
+      type: fields[2] as AttachmentType,
+      label: fields[3] as String,
+      storagePath: fields[4] as String,
+      publicUrl: fields[5] as String?,
+      localPath: fields[6] as String?,
+      mimeType: fields[7] as String,
+      altText: fields[8] as String?,
+      createdAt: fields[9] as DateTime,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, CardMediaAttachment obj) {
+    writer
+      ..writeByte(10)
+      ..writeByte(0)
+      ..write(obj.id)
+      ..writeByte(1)
+      ..write(obj.templateId)
+      ..writeByte(2)
+      ..write(obj.type)
+      ..writeByte(3)
+      ..write(obj.label)
+      ..writeByte(4)
+      ..write(obj.storagePath)
+      ..writeByte(5)
+      ..write(obj.publicUrl)
+      ..writeByte(6)
+      ..write(obj.localPath)
+      ..writeByte(7)
+      ..write(obj.mimeType)
+      ..writeByte(8)
+      ..write(obj.altText)
+      ..writeByte(9)
+      ..write(obj.createdAt);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CardMediaAttachmentAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class CardLinkAttachmentAdapter extends TypeAdapter<CardLinkAttachment> {
+  @override
+  final typeId = 4;
+
+  @override
+  CardLinkAttachment read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return CardLinkAttachment(
+      id: fields[0] as String,
+      templateId: fields[1] as String,
+      type: fields[2] as AttachmentType,
+      label: fields[3] as String,
+      url: fields[4] as String,
+      altText: fields[5] as String?,
+      createdAt: fields[6] as DateTime,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, CardLinkAttachment obj) {
+    writer
+      ..writeByte(7)
+      ..writeByte(0)
+      ..write(obj.id)
+      ..writeByte(1)
+      ..write(obj.templateId)
+      ..writeByte(2)
+      ..write(obj.type)
+      ..writeByte(3)
+      ..write(obj.label)
+      ..writeByte(4)
+      ..write(obj.url)
+      ..writeByte(5)
+      ..write(obj.altText)
+      ..writeByte(6)
+      ..write(obj.createdAt);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CardLinkAttachmentAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class MultipleChoiceOptionAdapter extends TypeAdapter<MultipleChoiceOption> {
+  @override
+  final typeId = 5;
 
   @override
   MultipleChoiceOption read(BinaryReader reader) {
@@ -244,7 +357,7 @@ class MultipleChoiceOptionAdapter extends TypeAdapter<MultipleChoiceOption> {
 class FillInTheBlanksTemplateAdapter
     extends TypeAdapter<FillInTheBlanksTemplate> {
   @override
-  final typeId = 4;
+  final typeId = 6;
 
   @override
   FillInTheBlanksTemplate read(BinaryReader reader) {
@@ -305,7 +418,7 @@ class FillInTheBlanksTemplateAdapter
 class MultipleChoiceTemplateAdapter
     extends TypeAdapter<MultipleChoiceTemplate> {
   @override
-  final typeId = 5;
+  final typeId = 7;
 
   @override
   MultipleChoiceTemplate read(BinaryReader reader) {
@@ -374,7 +487,7 @@ class MultipleChoiceTemplateAdapter
 
 class FlashcardTemplateAdapter extends TypeAdapter<FlashcardTemplate> {
   @override
-  final typeId = 6;
+  final typeId = 8;
 
   @override
   FlashcardTemplate read(BinaryReader reader) {
@@ -452,7 +565,7 @@ class FlashcardTemplateAdapter extends TypeAdapter<FlashcardTemplate> {
 
 class MatchMadnessTemplateAdapter extends TypeAdapter<MatchMadnessTemplate> {
   @override
-  final typeId = 7;
+  final typeId = 9;
 
   @override
   MatchMadnessTemplate read(BinaryReader reader) {
@@ -513,7 +626,7 @@ class MatchMadnessTemplateAdapter extends TypeAdapter<MatchMadnessTemplate> {
 class IdentificationTemplateAdapter
     extends TypeAdapter<IdentificationTemplate> {
   @override
-  final typeId = 8;
+  final typeId = 10;
 
   @override
   IdentificationTemplate read(BinaryReader reader) {
@@ -582,7 +695,7 @@ class IdentificationTemplateAdapter
 
 class StudyCardAdapter extends TypeAdapter<StudyCard> {
   @override
-  final typeId = 9;
+  final typeId = 11;
 
   @override
   StudyCard read(BinaryReader reader) {
@@ -636,7 +749,7 @@ class StudyCardAdapter extends TypeAdapter<StudyCard> {
 
 class FillInTheBlankSegmentAdapter extends TypeAdapter<FillInTheBlankSegment> {
   @override
-  final typeId = 10;
+  final typeId = 12;
 
   @override
   FillInTheBlankSegment read(BinaryReader reader) {
@@ -685,7 +798,7 @@ class FillInTheBlankSegmentAdapter extends TypeAdapter<FillInTheBlankSegment> {
 
 class WordScrambleTemplateAdapter extends TypeAdapter<WordScrambleTemplate> {
   @override
-  final typeId = 11;
+  final typeId = 13;
 
   @override
   WordScrambleTemplate read(BinaryReader reader) {
@@ -751,7 +864,7 @@ class WordScrambleTemplateAdapter extends TypeAdapter<WordScrambleTemplate> {
 
 class MatchMadnessPairAdapter extends TypeAdapter<MatchMadnessPair> {
   @override
-  final typeId = 12;
+  final typeId = 14;
 
   @override
   MatchMadnessPair read(BinaryReader reader) {
@@ -803,7 +916,7 @@ class MatchMadnessPairAdapter extends TypeAdapter<MatchMadnessPair> {
 
 class DrillSessionAdapter extends TypeAdapter<DrillSession> {
   @override
-  final typeId = 13;
+  final typeId = 15;
 
   @override
   DrillSession read(BinaryReader reader) {
@@ -864,7 +977,7 @@ class DrillSessionAdapter extends TypeAdapter<DrillSession> {
 
 class DrillAnswerAdapter extends TypeAdapter<DrillAnswer> {
   @override
-  final typeId = 14;
+  final typeId = 16;
 
   @override
   DrillAnswer read(BinaryReader reader) {
@@ -919,7 +1032,7 @@ class DrillAnswerAdapter extends TypeAdapter<DrillAnswer> {
 
 class StudyRatingAdapter extends TypeAdapter<StudyRating> {
   @override
-  final typeId = 15;
+  final typeId = 17;
 
   @override
   StudyRating read(BinaryReader reader) {
@@ -968,7 +1081,7 @@ class StudyRatingAdapter extends TypeAdapter<StudyRating> {
 
 class CardAdapter extends TypeAdapter<Card> {
   @override
-  final typeId = 16;
+  final typeId = 18;
 
   @override
   Card read(BinaryReader reader) {
@@ -1020,7 +1133,7 @@ class CardAdapter extends TypeAdapter<Card> {
 
 class FsrsCardAdapter extends TypeAdapter<FsrsCard> {
   @override
-  final typeId = 17;
+  final typeId = 19;
 
   @override
   FsrsCard read(BinaryReader reader) {
@@ -1072,7 +1185,7 @@ class FsrsCardAdapter extends TypeAdapter<FsrsCard> {
 
 class ReviewLogAdapter extends TypeAdapter<ReviewLog> {
   @override
-  final typeId = 18;
+  final typeId = 20;
 
   @override
   ReviewLog read(BinaryReader reader) {
@@ -1115,7 +1228,7 @@ class ReviewLogAdapter extends TypeAdapter<ReviewLog> {
 
 class ReviewSessionAdapter extends TypeAdapter<ReviewSession> {
   @override
-  final typeId = 19;
+  final typeId = 21;
 
   @override
   ReviewSession read(BinaryReader reader) {
@@ -1173,7 +1286,7 @@ class ReviewSessionAdapter extends TypeAdapter<ReviewSession> {
 
 class FsrsReviewLogAdapter extends TypeAdapter<FsrsReviewLog> {
   @override
-  final typeId = 20;
+  final typeId = 22;
 
   @override
   FsrsReviewLog read(BinaryReader reader) {
@@ -1216,7 +1329,7 @@ class FsrsReviewLogAdapter extends TypeAdapter<FsrsReviewLog> {
 
 class StateAdapter extends TypeAdapter<State> {
   @override
-  final typeId = 21;
+  final typeId = 23;
 
   @override
   State read(BinaryReader reader) {
@@ -1257,7 +1370,7 @@ class StateAdapter extends TypeAdapter<State> {
 
 class StreakAdapter extends TypeAdapter<Streak> {
   @override
-  final typeId = 22;
+  final typeId = 24;
 
   @override
   Streak read(BinaryReader reader) {
@@ -1309,7 +1422,7 @@ class StreakAdapter extends TypeAdapter<Streak> {
 
 class RatingAdapter extends TypeAdapter<Rating> {
   @override
-  final typeId = 23;
+  final typeId = 25;
 
   @override
   Rating read(BinaryReader reader) {
@@ -1354,7 +1467,7 @@ class RatingAdapter extends TypeAdapter<Rating> {
 
 class CardTypeAdapter extends TypeAdapter<CardType> {
   @override
-  final typeId = 24;
+  final typeId = 26;
 
   @override
   CardType read(BinaryReader reader) {
@@ -1393,9 +1506,46 @@ class CardTypeAdapter extends TypeAdapter<CardType> {
           typeId == other.typeId;
 }
 
+class AttachmentTypeAdapter extends TypeAdapter<AttachmentType> {
+  @override
+  final typeId = 27;
+
+  @override
+  AttachmentType read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return AttachmentType.image;
+      case 1:
+        return AttachmentType.audio;
+      default:
+        return AttachmentType.image;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, AttachmentType obj) {
+    switch (obj) {
+      case AttachmentType.image:
+        writer.writeByte(0);
+      case AttachmentType.audio:
+        writer.writeByte(1);
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AttachmentTypeAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
 class QuestionTypeAdapter extends TypeAdapter<QuestionType> {
   @override
-  final typeId = 25;
+  final typeId = 28;
 
   @override
   QuestionType read(BinaryReader reader) {
@@ -1448,7 +1598,7 @@ class QuestionTypeAdapter extends TypeAdapter<QuestionType> {
 
 class UserAdapter extends TypeAdapter<User> {
   @override
-  final typeId = 26;
+  final typeId = 29;
 
   @override
   User read(BinaryReader reader) {
@@ -1545,7 +1695,7 @@ class UserAdapter extends TypeAdapter<User> {
 
 class VisibilityStateAdapter extends TypeAdapter<VisibilityState> {
   @override
-  final typeId = 27;
+  final typeId = 30;
 
   @override
   VisibilityState read(BinaryReader reader) {
@@ -1586,7 +1736,7 @@ class VisibilityStateAdapter extends TypeAdapter<VisibilityState> {
 
 class TagAdapter extends TypeAdapter<Tag> {
   @override
-  final typeId = 28;
+  final typeId = 31;
 
   @override
   Tag read(BinaryReader reader) {
@@ -1629,7 +1779,7 @@ class TagAdapter extends TypeAdapter<Tag> {
 
 class DeckListingAdapter extends TypeAdapter<DeckListing> {
   @override
-  final typeId = 29;
+  final typeId = 32;
 
   @override
   DeckListing read(BinaryReader reader) {
@@ -1705,7 +1855,7 @@ class DeckListingAdapter extends TypeAdapter<DeckListing> {
 
 class DeckTagAdapter extends TypeAdapter<DeckTag> {
   @override
-  final typeId = 30;
+  final typeId = 33;
 
   @override
   DeckTag read(BinaryReader reader) {
@@ -1739,7 +1889,7 @@ class DeckTagAdapter extends TypeAdapter<DeckTag> {
 
 class CardTemplateTagAdapter extends TypeAdapter<CardTemplateTag> {
   @override
-  final typeId = 31;
+  final typeId = 34;
 
   @override
   CardTemplateTag read(BinaryReader reader) {
@@ -1776,7 +1926,7 @@ class CardTemplateTagAdapter extends TypeAdapter<CardTemplateTag> {
 
 class UserStudyCardTagAdapter extends TypeAdapter<UserStudyCardTag> {
   @override
-  final typeId = 32;
+  final typeId = 35;
 
   @override
   UserStudyCardTag read(BinaryReader reader) {
@@ -1816,7 +1966,7 @@ class UserStudyCardTagAdapter extends TypeAdapter<UserStudyCardTag> {
 
 class ImportExportBackupAdapter extends TypeAdapter<ImportExportBackup> {
   @override
-  final typeId = 33;
+  final typeId = 36;
 
   @override
   ImportExportBackup read(BinaryReader reader) {
@@ -1827,7 +1977,7 @@ class ImportExportBackupAdapter extends TypeAdapter<ImportExportBackup> {
     return ImportExportBackup(
       id: fields[0] as String,
       operation: fields[1] as String,
-      entityType: fields[2] as String,
+      type: fields[2] as String,
       entityId: fields[3] as String?,
       title: fields[4] as String,
       payloadJson: fields[5] as String,
@@ -1845,7 +1995,7 @@ class ImportExportBackupAdapter extends TypeAdapter<ImportExportBackup> {
       ..writeByte(1)
       ..write(obj.operation)
       ..writeByte(2)
-      ..write(obj.entityType)
+      ..write(obj.type)
       ..writeByte(3)
       ..write(obj.entityId)
       ..writeByte(4)
@@ -1871,7 +2021,7 @@ class ImportExportBackupAdapter extends TypeAdapter<ImportExportBackup> {
 
 class UserSettingsAdapter extends TypeAdapter<UserSettings> {
   @override
-  final typeId = 34;
+  final typeId = 37;
 
   @override
   UserSettings read(BinaryReader reader) {
@@ -1880,11 +2030,11 @@ class UserSettingsAdapter extends TypeAdapter<UserSettings> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return UserSettings(
-      id: fields[6] as String,
-      userId: fields[0] as String,
-      preferences: (fields[9] as Map).cast<String, dynamic>(),
-      createdAt: fields[7] as DateTime,
-      updatedAt: fields[8] as DateTime,
+      id: fields[0] as String,
+      userId: fields[1] as String,
+      preferences: (fields[4] as Map).cast<String, dynamic>(),
+      createdAt: fields[2] as DateTime,
+      updatedAt: fields[3] as DateTime,
     );
   }
 
@@ -1893,14 +2043,14 @@ class UserSettingsAdapter extends TypeAdapter<UserSettings> {
     writer
       ..writeByte(5)
       ..writeByte(0)
-      ..write(obj.userId)
-      ..writeByte(6)
       ..write(obj.id)
-      ..writeByte(7)
+      ..writeByte(1)
+      ..write(obj.userId)
+      ..writeByte(2)
       ..write(obj.createdAt)
-      ..writeByte(8)
+      ..writeByte(3)
       ..write(obj.updatedAt)
-      ..writeByte(9)
+      ..writeByte(4)
       ..write(obj.preferences);
   }
 
@@ -1915,254 +2065,9 @@ class UserSettingsAdapter extends TypeAdapter<UserSettings> {
           typeId == other.typeId;
 }
 
-class DownloadCheckpointAdapter extends TypeAdapter<DownloadCheckpoint> {
-  @override
-  final typeId = 35;
-
-  @override
-  DownloadCheckpoint read(BinaryReader reader) {
-    final numOfFields = reader.readByte();
-    final fields = <int, dynamic>{
-      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
-    };
-    return DownloadCheckpoint(
-      deckId: fields[0] as String,
-      deckTitle: fields[1] as String,
-      totalTemplates: (fields[2] as num).toInt(),
-      fetchedTemplateIds: (fields[3] as List).cast<String>(),
-      downloadedAttachmentIds: fields[7] == null
-          ? const []
-          : (fields[7] as List).cast<String>(),
-      status: fields[4] as DownloadCheckpointStatus,
-      createdAt: fields[5] as DateTime,
-      updatedAt: fields[6] as DateTime,
-    );
-  }
-
-  @override
-  void write(BinaryWriter writer, DownloadCheckpoint obj) {
-    writer
-      ..writeByte(8)
-      ..writeByte(0)
-      ..write(obj.deckId)
-      ..writeByte(1)
-      ..write(obj.deckTitle)
-      ..writeByte(2)
-      ..write(obj.totalTemplates)
-      ..writeByte(3)
-      ..write(obj.fetchedTemplateIds)
-      ..writeByte(4)
-      ..write(obj.status)
-      ..writeByte(5)
-      ..write(obj.createdAt)
-      ..writeByte(6)
-      ..write(obj.updatedAt)
-      ..writeByte(7)
-      ..write(obj.downloadedAttachmentIds);
-  }
-
-  @override
-  int get hashCode => typeId.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is DownloadCheckpointAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
-}
-
-class DownloadCheckpointStatusAdapter
-    extends TypeAdapter<DownloadCheckpointStatus> {
-  @override
-  final typeId = 36;
-
-  @override
-  DownloadCheckpointStatus read(BinaryReader reader) {
-    switch (reader.readByte()) {
-      case 0:
-        return DownloadCheckpointStatus.downloading;
-      case 1:
-        return DownloadCheckpointStatus.paused;
-      default:
-        return DownloadCheckpointStatus.downloading;
-    }
-  }
-
-  @override
-  void write(BinaryWriter writer, DownloadCheckpointStatus obj) {
-    switch (obj) {
-      case DownloadCheckpointStatus.downloading:
-        writer.writeByte(0);
-      case DownloadCheckpointStatus.paused:
-        writer.writeByte(1);
-    }
-  }
-
-  @override
-  int get hashCode => typeId.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is DownloadCheckpointStatusAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
-}
-
-class CardMediaAttachmentAdapter extends TypeAdapter<CardMediaAttachment> {
-  @override
-  final typeId = 37;
-
-  @override
-  CardMediaAttachment read(BinaryReader reader) {
-    final numOfFields = reader.readByte();
-    final fields = <int, dynamic>{
-      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
-    };
-    return CardMediaAttachment(
-      id: fields[0] as String,
-      templateId: fields[1] as String,
-      type: fields[8] as AttachmentType,
-      label: fields[9] as String,
-      storagePath: fields[3] as String,
-      publicUrl: fields[4] as String?,
-      localPath: fields[10] as String?,
-      mimeType: fields[5] as String,
-      altText: fields[6] as String?,
-      createdAt: fields[7] as DateTime,
-    );
-  }
-
-  @override
-  void write(BinaryWriter writer, CardMediaAttachment obj) {
-    writer
-      ..writeByte(10)
-      ..writeByte(0)
-      ..write(obj.id)
-      ..writeByte(1)
-      ..write(obj.templateId)
-      ..writeByte(3)
-      ..write(obj.storagePath)
-      ..writeByte(4)
-      ..write(obj.publicUrl)
-      ..writeByte(5)
-      ..write(obj.mimeType)
-      ..writeByte(6)
-      ..write(obj.altText)
-      ..writeByte(7)
-      ..write(obj.createdAt)
-      ..writeByte(8)
-      ..write(obj.type)
-      ..writeByte(9)
-      ..write(obj.label)
-      ..writeByte(10)
-      ..write(obj.localPath);
-  }
-
-  @override
-  int get hashCode => typeId.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is CardMediaAttachmentAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
-}
-
-class CardLinkAttachmentAdapter extends TypeAdapter<CardLinkAttachment> {
-  @override
-  final typeId = 39;
-
-  @override
-  CardLinkAttachment read(BinaryReader reader) {
-    final numOfFields = reader.readByte();
-    final fields = <int, dynamic>{
-      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
-    };
-    return CardLinkAttachment(
-      id: fields[0] as String,
-      templateId: fields[1] as String,
-      type: fields[2] as AttachmentType,
-      label: fields[3] as String,
-      url: fields[4] as String,
-      altText: fields[5] as String?,
-      createdAt: fields[6] as DateTime,
-    );
-  }
-
-  @override
-  void write(BinaryWriter writer, CardLinkAttachment obj) {
-    writer
-      ..writeByte(7)
-      ..writeByte(0)
-      ..write(obj.id)
-      ..writeByte(1)
-      ..write(obj.templateId)
-      ..writeByte(2)
-      ..write(obj.type)
-      ..writeByte(3)
-      ..write(obj.label)
-      ..writeByte(4)
-      ..write(obj.url)
-      ..writeByte(5)
-      ..write(obj.altText)
-      ..writeByte(6)
-      ..write(obj.createdAt);
-  }
-
-  @override
-  int get hashCode => typeId.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is CardLinkAttachmentAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
-}
-
-class AttachmentTypeAdapter extends TypeAdapter<AttachmentType> {
-  @override
-  final typeId = 40;
-
-  @override
-  AttachmentType read(BinaryReader reader) {
-    switch (reader.readByte()) {
-      case 0:
-        return AttachmentType.image;
-      case 1:
-        return AttachmentType.audio;
-      default:
-        return AttachmentType.image;
-    }
-  }
-
-  @override
-  void write(BinaryWriter writer, AttachmentType obj) {
-    switch (obj) {
-      case AttachmentType.image:
-        writer.writeByte(0);
-      case AttachmentType.audio:
-        writer.writeByte(1);
-    }
-  }
-
-  @override
-  int get hashCode => typeId.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is AttachmentTypeAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
-}
-
 class LocalImageCacheEntryAdapter extends TypeAdapter<LocalImageCacheEntry> {
   @override
-  final typeId = 42;
+  final typeId = 40;
 
   @override
   LocalImageCacheEntry read(BinaryReader reader) {
@@ -2208,6 +2113,156 @@ class LocalImageCacheEntryAdapter extends TypeAdapter<LocalImageCacheEntry> {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is LocalImageCacheEntryAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class ProgressCheckpointAdapter extends TypeAdapter<ProgressCheckpoint> {
+  @override
+  final typeId = 41;
+
+  @override
+  ProgressCheckpoint read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return ProgressCheckpoint(
+      id: fields[0] as String,
+      type: fields[1] as ProgressCheckpointType,
+      targetId: fields[2] as String,
+      operationDescription: fields[8] as String,
+      totalItems: (fields[3] as num).toInt(),
+      completedTargetItemIds: (fields[4] as List).cast<String>(),
+      status: fields[5] as ProgressCheckpointStatus,
+      createdAt: fields[6] as DateTime,
+      updatedAt: fields[7] as DateTime,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, ProgressCheckpoint obj) {
+    writer
+      ..writeByte(9)
+      ..writeByte(0)
+      ..write(obj.id)
+      ..writeByte(1)
+      ..write(obj.type)
+      ..writeByte(2)
+      ..write(obj.targetId)
+      ..writeByte(3)
+      ..write(obj.totalItems)
+      ..writeByte(4)
+      ..write(obj.completedTargetItemIds)
+      ..writeByte(5)
+      ..write(obj.status)
+      ..writeByte(6)
+      ..write(obj.createdAt)
+      ..writeByte(7)
+      ..write(obj.updatedAt)
+      ..writeByte(8)
+      ..write(obj.operationDescription);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ProgressCheckpointAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class ProgressCheckpointTypeAdapter
+    extends TypeAdapter<ProgressCheckpointType> {
+  @override
+  final typeId = 42;
+
+  @override
+  ProgressCheckpointType read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 4:
+        return ProgressCheckpointType.deckDownloadFetch;
+      case 5:
+        return ProgressCheckpointType.syncFetch;
+      case 6:
+        return ProgressCheckpointType.syncApply;
+      default:
+        return ProgressCheckpointType.deckDownloadFetch;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, ProgressCheckpointType obj) {
+    switch (obj) {
+      case ProgressCheckpointType.deckDownloadFetch:
+        writer.writeByte(4);
+      case ProgressCheckpointType.syncFetch:
+        writer.writeByte(5);
+      case ProgressCheckpointType.syncApply:
+        writer.writeByte(6);
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ProgressCheckpointTypeAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class ProgressCheckpointStatusAdapter
+    extends TypeAdapter<ProgressCheckpointStatus> {
+  @override
+  final typeId = 43;
+
+  @override
+  ProgressCheckpointStatus read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return ProgressCheckpointStatus.started;
+      case 1:
+        return ProgressCheckpointStatus.paused;
+      case 2:
+        return ProgressCheckpointStatus.completed;
+      case 3:
+        return ProgressCheckpointStatus.failed;
+      case 4:
+        return ProgressCheckpointStatus.cancelled;
+      default:
+        return ProgressCheckpointStatus.started;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, ProgressCheckpointStatus obj) {
+    switch (obj) {
+      case ProgressCheckpointStatus.started:
+        writer.writeByte(0);
+      case ProgressCheckpointStatus.paused:
+        writer.writeByte(1);
+      case ProgressCheckpointStatus.completed:
+        writer.writeByte(2);
+      case ProgressCheckpointStatus.failed:
+        writer.writeByte(3);
+      case ProgressCheckpointStatus.cancelled:
+        writer.writeByte(4);
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ProgressCheckpointStatusAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

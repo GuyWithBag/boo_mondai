@@ -17,8 +17,6 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(DeckAdapter());
     registerAdapter(DeckListingAdapter());
     registerAdapter(DeckTagAdapter());
-    registerAdapter(DownloadCheckpointAdapter());
-    registerAdapter(DownloadCheckpointStatusAdapter());
     registerAdapter(DrillAnswerAdapter());
     registerAdapter(DrillSessionAdapter());
     registerAdapter(FillInTheBlankSegmentAdapter());
@@ -34,6 +32,9 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(MultipleChoiceOptionAdapter());
     registerAdapter(MultipleChoiceTemplateAdapter());
     registerAdapter(ProfileAdapter());
+    registerAdapter(ProgressCheckpointAdapter());
+    registerAdapter(ProgressCheckpointStatusAdapter());
+    registerAdapter(ProgressCheckpointTypeAdapter());
     registerAdapter(QuestionTypeAdapter());
     registerAdapter(RatingAdapter());
     registerAdapter(ReviewLogAdapter());
@@ -63,8 +64,6 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(DeckAdapter());
     registerAdapter(DeckListingAdapter());
     registerAdapter(DeckTagAdapter());
-    registerAdapter(DownloadCheckpointAdapter());
-    registerAdapter(DownloadCheckpointStatusAdapter());
     registerAdapter(DrillAnswerAdapter());
     registerAdapter(DrillSessionAdapter());
     registerAdapter(FillInTheBlankSegmentAdapter());
@@ -80,6 +79,9 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(MultipleChoiceOptionAdapter());
     registerAdapter(MultipleChoiceTemplateAdapter());
     registerAdapter(ProfileAdapter());
+    registerAdapter(ProgressCheckpointAdapter());
+    registerAdapter(ProgressCheckpointStatusAdapter());
+    registerAdapter(ProgressCheckpointTypeAdapter());
     registerAdapter(QuestionTypeAdapter());
     registerAdapter(RatingAdapter());
     registerAdapter(ReviewLogAdapter());

@@ -38,3 +38,4 @@ export 'view_discussion/view_discussion.barrel.dart';
 export 'view_study_cards/view_study_cards.barrel.dart';
 export 'card_attachments/card_attachments.barrel.dart';
 export 'local_images/local_images.barrel.dart';
+export 'progress_checkpoints/progress_checkpoints.barrel.dart';
