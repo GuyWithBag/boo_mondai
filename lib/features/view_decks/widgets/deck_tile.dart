@@ -148,59 +148,58 @@ class DeckTile extends HookWidget {
 
     return SizedBox(
       width: cardWidth,
-      child: AspectRatio(
-        aspectRatio: studyCardAspectRatio,
-        child: Stack(
-          clipBehavior: Clip.none,
-          fit: StackFit.expand,
-          children: switch (state) {
-            DeckTileState.defaultView => [
-              PhysicalDeck(
-                deck: deck,
-                controller: physicalDeckController,
-                hasTags: hasTags,
-                textScaleBaseWidth: cardWidth,
-                isSelected: isSelected,
-              ),
-            ],
-            DeckTileState.bare => [
-              PhysicalDeck(
-                deck: deck,
-                controller: physicalDeckController,
-                showInfoCover: false,
-                isCoverImageEditable: effectiveOnImagePicked != null,
-                onCoverImagePicked: effectiveOnImagePicked,
-                textScaleBaseWidth: cardWidth,
-                isSelected: isSelected,
-              ),
-            ],
-            DeckTileState.spread => [
-              for (var i = 0; i < cardControllers.length; i++)
-                PhysicalCard(
-                  controller: cardControllers[i],
-                  front: i < featuredCards.length
-                      ? ViewCardsTile.template(
-                          template: featuredCards[i],
-                          width: cardWidth,
-                          allowFlip: false,
-                        )
-                      : PhysicalCard(
-                          front: BackgroundImageSurface(
-                            image: coverImage,
-                            isEditable: effectiveOnImagePicked != null,
-                            onImagePicked: effectiveOnImagePicked,
-                          ),
-                        ),
+      child: Transform.translate(
+        offset: state == DeckTileState.spread
+            ? Offset(0, 30 * animationScale)
+            : Offset.zero,
+        child: AspectRatio(
+          aspectRatio: studyCardAspectRatio,
+          child: Stack(
+            clipBehavior: Clip.none,
+            fit: StackFit.expand,
+            children: switch (state) {
+              DeckTileState.defaultView => [
+                PhysicalDeck(
+                  deck: deck,
+                  controller: physicalDeckController,
+                  hasTags: hasTags,
+                  textScaleBaseWidth: cardWidth,
+                  isSelected: isSelected,
                 ),
-              PhysicalDeck(
-                deck: deck,
-                controller: physicalDeckController,
-                showInfoCover: false,
-                textScaleBaseWidth: cardWidth,
-                isSelected: isSelected,
-              ),
-            ],
-          },
+              ],
+              DeckTileState.bare => [
+                PhysicalDeck(
+                  deck: deck,
+                  controller: physicalDeckController,
+                  showInfoCover: false,
+                  isCoverImageEditable: effectiveOnImagePicked != null,
+                  onCoverImagePicked: effectiveOnImagePicked,
+                  textScaleBaseWidth: cardWidth,
+                  isSelected: isSelected,
+                ),
+              ],
+              DeckTileState.spread => [
+                for (var i = 0; i < cardControllers.length; i++)
+                  PhysicalCard(
+                    controller: cardControllers[i],
+                    front: i < featuredCards.length
+                        ? ViewCardsTile.template(
+                            template: featuredCards[i],
+                            width: cardWidth,
+                            allowFlip: false,
+                          )
+                        : PhysicalCard(front: BackgroundImageSurface()),
+                  ),
+                PhysicalDeck(
+                  deck: deck,
+                  controller: physicalDeckController,
+                  showInfoCover: false,
+                  textScaleBaseWidth: cardWidth,
+                  isSelected: isSelected,
+                ),
+              ],
+            },
+          ),
         ),
       ),
     );
