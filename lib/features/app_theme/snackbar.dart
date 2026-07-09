@@ -9,21 +9,25 @@ class Snackbar extends StatelessWidget {
     required this.message,
     this.leading,
     this.tone = SnackbarTone.surface,
-    this.maxWidth = 520,
+    this.minHeight = 60,
   });
 
   final String message;
   final Widget? leading;
   final SnackbarTone tone;
-  final double maxWidth;
+  final double minHeight;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
 
-    return Center(
+    return Padding(
+      padding: EdgeInsets.all(tokens.spaceLayoutPaddingSm),
       child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: maxWidth),
+        constraints: BoxConstraints(
+          minHeight: minHeight,
+          minWidth: double.infinity,
+        ),
         child: Surface(
           style: appSnackbarStyle.resolve(tokens, [tone]),
           child: Row(
