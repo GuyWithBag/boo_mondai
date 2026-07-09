@@ -57,21 +57,23 @@ class DiscussionTileController {
 
   void toggleReplying() => isReplying.value = !isReplying.value;
 
-  Future<void> submitEdit() async {
+  Future<bool> submitEdit() async {
     final saved = await onEdit!(
       item,
       editBody.value,
       title: item.isReview ? editTitleController.text : null,
     );
     if (saved) isEditing.value = false;
+    return saved;
   }
 
-  Future<void> submitReply() async {
+  Future<bool> submitReply() async {
     final posted = await onReply!(replyBody.value, parentCommentId: item.id);
     if (posted) {
       replyBody.value = '';
       isReplying.value = false;
     }
+    return posted;
   }
 
   Future<void> submitLike() async {

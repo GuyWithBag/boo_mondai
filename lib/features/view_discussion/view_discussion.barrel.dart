@@ -7,3 +7,4 @@ export 'view_discussion.section.dart';
 export 'discussion.tile.dart';
 export 'discussion_tile.controller.dart';
 export 'discussion_composer.tile.dart';
+export 'discussion_form.validator.dart';

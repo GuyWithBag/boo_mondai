@@ -3,7 +3,9 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
         Button,
+        DiscussionFormValidator,
         DiscussionType,
+        FormField,
         TextField,
         ToggleButton,
         surfaceStyle,
@@ -19,11 +21,14 @@ import 'package:flutter/material.dart'
         BuildContext,
         SizedBox,
         TextInputAction,
+        Form,
+        FormState,
+        GlobalKey,
         Expanded,
         Row,
         Column;
 import 'package:flutter_hooks/flutter_hooks.dart'
-    show HookWidget, useTextEditingController, useState;
+    show HookWidget, useMemoized, useTextEditingController, useState;
 import 'package:theme_variants/theme_variants.dart';
 
 class DiscussionComposerTile extends HookWidget {
@@ -56,6 +61,7 @@ class DiscussionComposerTile extends HookWidget {
     final titleController = useTextEditingController();
     final bodyController = useTextEditingController();
     final voteValue = useState(1);
+    final formKey = useMemoized(GlobalKey<FormState>.new);
     final tokens = context.themeTokens<AppTokens>();
     final isReview = type == DiscussionType.review;
     final isPositiveVote = voteValue.value > 0;
@@ -83,72 +89,106 @@ class DiscussionComposerTile extends HookWidget {
       bodyController.clear();
     }
 
-    return Surface(
-      style: surfaceStyle.resolve(tokens, const [
-        SurfaceBorder.none,
-        SurfaceShape.roundedSm,
-        SurfacePadding.sm,
-      ]),
-      child: Column(
-        spacing: tokens.spaceLayoutGapMd,
-        children: [
-          if (shouldDisplayReviewFields) ...[
-            Row(
+    return Form(
+      key: formKey,
+      child: Surface(
+        style: surfaceStyle.resolve(tokens, const [
+          SurfaceBorder.none,
+          SurfaceShape.roundedSm,
+          SurfacePadding.sm,
+        ]),
+        child: Column(
+          spacing: tokens.spaceLayoutGapMd,
+          children: [
+            if (shouldDisplayReviewFields) ...[
+              Row(
+                spacing: tokens.spaceLayoutGapSm,
+                children: [
+                  Expanded(
+                    child: FormField<String>(
+                      value: titleController.text,
+                      listenable: titleController,
+                      valueReader: () => titleController.text,
+                      validator: DiscussionFormValidator.title,
+                      builder: (_, field) => TextField(
+                        controller: titleController,
+                        minLines: 1,
+                        maxLines: 1,
+                        textInputAction: TextInputAction.next,
+                        placeholder: 'Review title',
+                        onChanged: field.didChange,
+                        variants: const [
+                          TextFieldFrame.underline,
+                          TextFieldColor.transparentBg,
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 140,
+                    child: FormField<int>(
+                      value: voteValue.value,
+                      listenable: voteValue,
+                      valueReader: () => voteValue.value,
+                      validator: DiscussionFormValidator.vote,
+                      builder: (_, field) => ToggleButton(
+                        variant: ButtonVariant.flat,
+                        value: isPositiveVote,
+                        onChanged: shouldEnableVoteToggle
+                            ? (value) {
+                                final vote = value ? 1 : -1;
+                                voteValue.value = vote;
+                                field.didChange(vote);
+                              }
+                            : null,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+            Column(
               spacing: tokens.spaceLayoutGapSm,
               children: [
-                Expanded(
-                  child: TextField(
-                    controller: titleController,
-                    minLines: 1,
-                    maxLines: 1,
-                    textInputAction: TextInputAction.next,
-                    placeholder: 'Review title',
-                    variants: const [
-                      TextFieldFrame.underline,
-                      TextFieldColor.transparentBg,
-                    ],
+                FormField<String>(
+                  value: bodyController.text,
+                  listenable: bodyController,
+                  valueReader: () => bodyController.text,
+                  validator: DiscussionFormValidator.body,
+                  builder: (_, field) => TextField(
+                    controller: bodyController,
+                    minLines: 4,
+                    maxLines: null,
+                    textInputAction: TextInputAction.newline,
+                    placeholder: bodyPlaceholder,
+                    onChanged: field.didChange,
                   ),
                 ),
-                ToggleButton(
-                  variant: ButtonVariant.flat,
-                  value: isPositiveVote,
-                  onChanged: shouldEnableVoteToggle
-                      ? (value) => voteValue.value = value ? 1 : -1
-                      : null,
+                SizedBox(
+                  width: double.infinity,
+                  child: Button(
+                    onPressed: shouldEnableSubmitAction
+                        ? () async {
+                            if (!formKey.currentState!.validate()) return;
+                            final posted = await submit();
+                            if (posted) {
+                              clearFields();
+                              formKey.currentState?.reset();
+                            }
+                          }
+                        : null,
+                    child: shouldDisplaySubmitProgress
+                        ? const SizedBox.square(
+                            dimension: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : Text(submitButtonLabel),
+                  ),
                 ),
               ],
             ),
           ],
-          Column(
-            spacing: tokens.spaceLayoutGapSm,
-            children: [
-              TextField(
-                controller: bodyController,
-                minLines: 4,
-                maxLines: null,
-                textInputAction: TextInputAction.newline,
-                placeholder: bodyPlaceholder,
-              ),
-              SizedBox(
-                width: double.infinity,
-                child: Button(
-                  onPressed: shouldEnableSubmitAction
-                      ? () async {
-                          final posted = await submit();
-                          if (posted) clearFields();
-                        }
-                      : null,
-                  child: shouldDisplaySubmitProgress
-                      ? const SizedBox.square(
-                          dimension: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : Text(submitButtonLabel),
-                ),
-              ),
-            ],
-          ),
-        ],
+        ),
       ),
     );
   }

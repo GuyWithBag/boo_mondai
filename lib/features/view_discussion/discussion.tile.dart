@@ -4,11 +4,13 @@ import 'package:boo_mondai/lib.barrel.dart'
         Button,
         ButtonVariant,
         DiscussionEditCallback,
+        DiscussionFormValidator,
         DiscussionItem,
         DiscussionLikeCallback,
         DiscussionPermission,
         DiscussionRepliesFor,
         DiscussionReplyCallback,
+        FormField,
         MarkdownText,
         MarkdownTextMode,
         MetaLabel,
@@ -29,6 +31,9 @@ import 'package:flutter/material.dart'
         ConstrainedBox,
         CrossAxisAlignment,
         EdgeInsets,
+        Form,
+        FormState,
+        GlobalKey,
         Icon,
         Icons,
         MainAxisAlignment,
@@ -39,7 +44,7 @@ import 'package:flutter/material.dart'
         Text,
         TextInputAction,
         Widget;
-import 'package:flutter_hooks/flutter_hooks.dart' show HookWidget;
+import 'package:flutter_hooks/flutter_hooks.dart' show HookWidget, useMemoized;
 import 'package:theme_variants/theme_variants.dart'
     show ThemeVariantsContext, Surface;
 
@@ -75,6 +80,8 @@ class DiscussionTile extends HookWidget {
       onLike: onLike,
       canEdit: canEdit,
     );
+    final editFormKey = useMemoized(GlobalKey<FormState>.new);
+    final replyFormKey = useMemoized(GlobalKey<FormState>.new);
 
     final tokens = context.themeTokens<AppTokens>();
     final isNested = depth > 0;
@@ -134,25 +141,45 @@ class DiscussionTile extends HookWidget {
 
           // Body: editable or display
           if (isEditingDiscussion.value)
-            Column(
-              spacing: tokens.spaceLayoutGapSm,
-              children: [
-                if (shouldDisplayEditTitleField)
-                  MarkdownText(
-                    data: controller.editTitleController.text,
-                    controller: controller.editTitleController,
-                    maxLines: 1,
-                    textInputAction: TextInputAction.next,
-                    placeholder: 'Review title',
+            Form(
+              key: editFormKey,
+              child: Column(
+                spacing: tokens.spaceLayoutGapSm,
+                children: [
+                  if (shouldDisplayEditTitleField)
+                    FormField<String>(
+                      value: controller.editTitleController.text,
+                      listenable: controller.editTitleController,
+                      valueReader: () => controller.editTitleController.text,
+                      validator: DiscussionFormValidator.title,
+                      builder: (_, field) => MarkdownText(
+                        data: controller.editTitleController.text,
+                        controller: controller.editTitleController,
+                        maxLines: 1,
+                        textInputAction: TextInputAction.next,
+                        placeholder: 'Review title',
+                        onChanged: field.didChange,
+                        mode: MarkdownTextMode.input,
+                      ),
+                    ),
+                  FormField<String>(
+                    value: controller.editBody.value,
+                    listenable: controller.editBody,
+                    valueReader: () => controller.editBody.value,
+                    validator: DiscussionFormValidator.body,
+                    builder: (_, field) => MarkdownText(
+                      data: controller.editBody.value,
+                      onChanged: (value) {
+                        controller.editBody.value = value;
+                        field.didChange(value);
+                      },
+                      mode: MarkdownTextMode.input,
+                      placeholder: editBodyPlaceholder,
+                      maxLines: null,
+                    ),
                   ),
-                MarkdownText(
-                  data: controller.editBody.value,
-                  onChanged: (value) => controller.editBody.value = value,
-                  mode: MarkdownTextMode.input,
-                  placeholder: editBodyPlaceholder,
-                  maxLines: null,
-                ),
-              ],
+                ],
+              ),
             )
           else
             Column(
@@ -203,7 +230,12 @@ class DiscussionTile extends HookWidget {
                   child: const Text('Cancel'),
                 ),
                 Button(
-                  onPressed: isSubmitting ? null : controller.submitEdit,
+                  onPressed: isSubmitting
+                      ? null
+                      : () async {
+                          if (!editFormKey.currentState!.validate()) return;
+                          await controller.submitEdit();
+                        },
                   leading: isSubmitting
                       ? const CircularProgressIndicator()
                       : const Icon(Icons.check),
@@ -239,27 +271,46 @@ class DiscussionTile extends HookWidget {
 
           // Reply composer
           if (isReplyingToDiscussion.value)
-            Column(
-              spacing: tokens.spaceLayoutGapMd,
-              children: [
-                MarkdownText(
-                  data: controller.replyBody.value,
-                  onChanged: (value) => controller.replyBody.value = value,
-                  mode: MarkdownTextMode.input,
-                  placeholder: 'Write a reply',
-                  maxLines: null,
-                ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Button(
-                    onPressed: isSubmitting ? null : controller.submitReply,
-                    leading: isSubmitting
-                        ? const CircularProgressIndicator()
-                        : const Icon(Icons.send_outlined),
-                    child: const Text('Post Reply'),
+            Form(
+              key: replyFormKey,
+              child: Column(
+                spacing: tokens.spaceLayoutGapMd,
+                children: [
+                  FormField<String>(
+                    value: controller.replyBody.value,
+                    listenable: controller.replyBody,
+                    valueReader: () => controller.replyBody.value,
+                    validator: DiscussionFormValidator.body,
+                    builder: (_, field) => MarkdownText(
+                      data: controller.replyBody.value,
+                      onChanged: (value) {
+                        controller.replyBody.value = value;
+                        field.didChange(value);
+                      },
+                      mode: MarkdownTextMode.input,
+                      placeholder: 'Write a reply',
+                      maxLines: null,
+                    ),
                   ),
-                ),
-              ],
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Button(
+                      onPressed: isSubmitting
+                          ? null
+                          : () async {
+                              if (!replyFormKey.currentState!.validate()) {
+                                return;
+                              }
+                              await controller.submitReply();
+                            },
+                      leading: isSubmitting
+                          ? const CircularProgressIndicator()
+                          : const Icon(Icons.send_outlined),
+                      child: const Text('Post Reply'),
+                    ),
+                  ),
+                ],
+              ),
             ),
 
           // Nested replies
