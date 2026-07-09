@@ -213,7 +213,7 @@ class AppTokens with AppTokensMappable {
   final double lineHeightTextDisplay = 1.05;
   final double lineHeightFieldDisplay = 1.15;
   final double lineHeightButton = 1.1;
-  final double letterSpacingTextEyebrow = 1.8;
+  final double letterSpacingTextEyebrow = 2;
 
   final double borderWidthDefault = 2;
 
@@ -247,6 +247,10 @@ class AppTokens with AppTokensMappable {
   final double sizeIconSm = 18;
   final double sizeIcon = 24;
   final double sizeIconLg = 30;
+  // final double bottomNavBarPreferredHeight = 90;
+  // final double appBarPreferredHeight = 90;
+  // final double preferredHeightDefault = 82;
+  // final double unfocusButtonHeight = 48;
 
   final double studyCardAspectRatio = 5 / 7;
   final double studyCardWidth = 300;
