@@ -8,6 +8,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         ChipTone,
         DateHelper,
         Deck,
+        DeckFormValidator,
         DeckDetails,
         DeckListingSheetState,
         DeckProfilesLabel,
@@ -16,6 +17,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         DiscussionSection,
         EditableCarousel,
         EditableFeaturedCardsColumn,
+        FormField,
         MetaLabel,
         NumberHelper,
         Scaffold,
@@ -35,8 +37,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         SectionEyebrow,
         ViewPaddingSizedBox,
         Side;
-import 'package:flutter/material.dart' hide Scaffold, AppBar, showBottomSheet;
-import 'package:flutter_hooks/flutter_hooks.dart' show HookWidget, useEffect;
+import 'package:flutter/material.dart'
+    hide FormField, Scaffold, AppBar, showBottomSheet;
+import 'package:flutter_hooks/flutter_hooks.dart'
+    show HookWidget, useEffect, useMemoized;
 
 import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
 import 'package:provider/provider.dart'
@@ -85,6 +89,7 @@ class ViewDeckListingSingleSheet extends HookWidget {
       controller: controller,
     );
     final isEditing = sheet.state == DeckListingSheetState.editor;
+    final formKey = useMemoized(GlobalKey<FormState>.new);
 
     useEffect(() {
       final error = sheet.error;
@@ -119,7 +124,12 @@ class ViewDeckListingSingleSheet extends HookWidget {
               icon: Icons.public_outlined,
               color: ButtonColor.success,
               tokens: tokens,
-              onPressed: sheet.canPublish ? sheet.publishDraft : null,
+              onPressed: sheet.canPublish
+                  ? () async {
+                      if (!(formKey.currentState?.validate() ?? false)) return;
+                      await sheet.publishDraft();
+                    }
+                  : null,
             ),
           );
         }
@@ -167,7 +177,12 @@ class ViewDeckListingSingleSheet extends HookWidget {
             showViewPaddingBottom: false,
             padding: EdgeInsets.zero,
             appBar: appBar,
-            body: _Body(controller: sheet, appBarHeight: appBarHeight),
+            body: isEditing
+                ? Form(
+                    key: formKey,
+                    child: _Body(controller: sheet, appBarHeight: appBarHeight),
+                  )
+                : _Body(controller: sheet, appBarHeight: appBarHeight),
           ),
         );
       },
@@ -206,12 +221,24 @@ class _Body extends StatelessWidget {
             child: Center(
               child: AspectRatio(
                 aspectRatio: tokens.deckListingFeaturedImagesAspectRatio,
-                child: EditableCarousel(
-                  imageSources: carouselImageUrls,
-                  maxImageCount: 5,
-                  isEditable: isEditing,
-                  onImagePicked: controller.updateListingFeaturedImage,
-                ),
+                child: isEditing
+                    ? FormField<List<String>>(
+                        value: carouselImageUrls,
+                        listenable: controller,
+                        valueReader: () {
+                          return controller.helper.carouselImageUrls(
+                            controller.deck,
+                          );
+                        },
+                        validator: DeckFormValidator.featuredImages,
+                        builder: (_, _) => EditableCarousel(
+                          imageSources: carouselImageUrls,
+                          maxImageCount: 5,
+                          isEditable: true,
+                          onImagePicked: controller.updateListingFeaturedImage,
+                        ),
+                      )
+                    : EditableCarousel(imageSources: carouselImageUrls),
               ),
             ),
           ),
@@ -314,12 +341,13 @@ class _Body extends StatelessWidget {
                 longDescription: helper.longDescription(deck),
                 isEditable: isEditing,
                 tags: tags,
-                areTagsEditable: deck.isEditable,
+                areTagsEditable: isEditing && deck.isEditable,
                 tagsPlaceholder: deck.isEditable ? 'Add tags' : 'No tags yet',
                 tagsTone: ChipTone.ghost,
                 onTitleChanged: controller.updateTitle,
                 onShortDescriptionChanged: controller.updateShortDescription,
                 onLongDescriptionChanged: controller.updateLongDescription,
+                onTagsChanged: controller.updateTags,
                 metaLabels: Column(
                   spacing: tokens.spaceLayoutGapSm,
                   children: [
@@ -364,12 +392,25 @@ class _Body extends StatelessWidget {
                 ),
               ),
               SectionEyebrow('Featured Cards'),
-              EditableFeaturedCardsColumn(
-                featuredCards: deck.listing?.featuredCards ?? const [],
-                isEditable: isEditing,
-                onAddPressed: () => _addFeaturedCard(context),
-                maxCardCount: 3,
-              ),
+              if (isEditing)
+                FormField<List<Map<String, dynamic>>>(
+                  value: deck.listing?.featuredCards ?? const [],
+                  listenable: controller,
+                  valueReader: () {
+                    return controller.deck.listing?.featuredCards ?? const [];
+                  },
+                  validator: DeckFormValidator.featuredCards,
+                  builder: (_, _) => EditableFeaturedCardsColumn(
+                    featuredCards: deck.listing?.featuredCards ?? const [],
+                    isEditable: true,
+                    onAddPressed: () => _addFeaturedCard(context),
+                    maxCardCount: 3,
+                  ),
+                )
+              else
+                EditableFeaturedCardsColumn(
+                  featuredCards: deck.listing?.featuredCards ?? const [],
+                ),
               if (!isEditing) ...[DiscussionSection(sheet: controller)],
               ViewPaddingSizedBox(side: Side.bottom),
             ],

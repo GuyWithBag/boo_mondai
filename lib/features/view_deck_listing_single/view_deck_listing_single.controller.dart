@@ -259,6 +259,14 @@ class ViewDeckListingSingleController extends Controller {
     _applyUpdatedDeck(updatedDeck);
   }
 
+  Future<void> updateTags(List<String> tagNames) async {
+    final updatedDeck = await DecksService.updateTags(
+      deck: _deck,
+      tagNames: tagNames,
+    );
+    _applyUpdatedDeck(updatedDeck);
+  }
+
   Future<void> updateListingFeaturedImage(int index, PlatformFile file) async {
     final updatedDeck = await DecksService.updateListingFeaturedImage(
       deck: _deck,
