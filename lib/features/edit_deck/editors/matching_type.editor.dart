@@ -3,6 +3,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         Button,
         CardTemplateFormState,
+        EditDeckFormValidator,
+        FormField,
         MatchPair,
         SectionEyebrow,
         SurfaceColor,
@@ -12,7 +14,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         surfaceStyle,
         textStyle,
         useMatchingTypeEditor;
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide FormField;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -27,62 +29,67 @@ class MatchingTypeEditor extends HookWidget {
     final editor = useMatchingTypeEditor(formState);
     final pairs = editor.pairs;
 
-    return Surface(
-      style: surfaceStyle.resolve(tokens, const [SurfaceColor.baseline]),
-      child: Column(
-        spacing: tokens.spaceLayoutGapMd,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          SectionEyebrow('Matching Pairs'.toUpperCase()),
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  'TERM',
-                  style: textStyle.resolve(tokens, [
-                    TextSize.labelSmall,
-                    TextWeight.heavy,
-                    TextColor.muted,
-                  ]),
+    return FormField(
+      value: pairs,
+      listenable: formState.matchPairs,
+      valueReader: () => formState.matchPairs.value,
+      validator: EditDeckFormValidator.matchingPairs,
+      builder: (_, _) => Surface(
+        style: surfaceStyle.resolve(tokens, const [SurfaceColor.baseline]),
+        child: Column(
+          spacing: tokens.spaceLayoutGapMd,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SectionEyebrow('Matching Pairs'.toUpperCase()),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'TERM',
+                    style: textStyle.resolve(tokens, [
+                      TextSize.labelSmall,
+                      TextWeight.heavy,
+                      TextColor.muted,
+                    ]),
+                  ),
                 ),
-              ),
-              Expanded(
-                child: Text(
-                  'MATCH',
-                  style: textStyle.resolve(tokens, [
-                    TextSize.labelSmall,
-                    TextWeight.heavy,
-                    TextColor.muted,
-                  ]),
-                ),
-              ),
-            ],
-          ),
-          Column(
-            spacing: tokens.spaceLayoutGapMd,
-            children: [
-              for (final entry in pairs.asMap().entries) ...[
-                MatchPair(
-                  term: entry.value.term,
-                  match: entry.value.match,
-                  canRemove: pairs.length > 2,
-                  onTermChanged: (value) =>
-                      editor.updatePairTerm(entry.key, value),
-                  onMatchChanged: (value) =>
-                      editor.updatePairMatch(entry.key, value),
-                  onRemove: () => editor.removePair(entry.key),
+                Expanded(
+                  child: Text(
+                    'MATCH',
+                    style: textStyle.resolve(tokens, [
+                      TextSize.labelSmall,
+                      TextWeight.heavy,
+                      TextColor.muted,
+                    ]),
+                  ),
                 ),
               ],
-            ],
-          ),
-
-          Button.dashed(
-            tokens: tokens,
-            leading: const Icon(Icons.add),
-            onPressed: editor.addPair,
-            child: const Text('Add Pair'),
-          ),
-        ],
+            ),
+            Column(
+              spacing: tokens.spaceLayoutGapMd,
+              children: [
+                for (final entry in pairs.asMap().entries) ...[
+                  MatchPair(
+                    term: entry.value.term,
+                    match: entry.value.match,
+                    canRemove: pairs.length > 2,
+                    onTermChanged: (value) =>
+                        editor.updatePairTerm(entry.key, value),
+                    onMatchChanged: (value) =>
+                        editor.updatePairMatch(entry.key, value),
+                    onRemove: () => editor.removePair(entry.key),
+                  ),
+                ],
+              ],
+            ),
+            Button.dashed(
+              tokens: tokens,
+              leading: const Icon(Icons.add),
+              onPressed: editor.addPair,
+              child: const Text('Add Pair'),
+            ),
+          ],
+        ),
       ),
     );
   }

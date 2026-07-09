@@ -1,6 +1,8 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         CardTemplateFormState,
+        EditDeckFormValidator,
+        FormField,
         TextFieldCard,
         useFlashcardEditor,
         AppTokens,
@@ -13,7 +15,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextColor,
         SegmentedControl,
         SegmentOption;
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide FormField;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:theme_variants/theme_variants.dart'
     show ThemeVariantsContext, Surface;
@@ -74,15 +76,29 @@ class FlashcardEditor extends HookWidget {
             ],
           ),
         ),
-        TextFieldCard(
-          title: 'Front (Prompt)',
-          placeholder: 'Type a word...',
-          controller: editor.frontController,
+        FormField<String>(
+          value: editor.frontController.text,
+          listenable: editor.frontController,
+          valueReader: () => editor.frontController.text,
+          validator: EditDeckFormValidator.prompt,
+          builder: (_, field) => TextFieldCard(
+            title: 'Front (Prompt)',
+            placeholder: 'Type a word...',
+            controller: editor.frontController,
+            onChanged: field.didChange,
+          ),
         ),
-        TextFieldCard(
-          title: 'Back (Answer)',
-          placeholder: 'Type the translation...',
-          controller: editor.backController,
+        FormField<String>(
+          value: editor.backController.text,
+          listenable: editor.backController,
+          valueReader: () => editor.backController.text,
+          validator: EditDeckFormValidator.answer,
+          builder: (_, field) => TextFieldCard(
+            title: 'Back (Answer)',
+            placeholder: 'Type the translation...',
+            controller: editor.backController,
+            onChanged: field.didChange,
+          ),
         ),
       ],
     );
