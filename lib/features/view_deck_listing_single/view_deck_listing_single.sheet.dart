@@ -18,6 +18,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         EditableCarousel,
         EditableFeaturedCardsColumn,
         FormField,
+        ImageHelper,
         MetaLabel,
         NumberHelper,
         Scaffold,
@@ -36,7 +37,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         useViewDeckListingSingleController,
         SectionEyebrow,
         ViewPaddingSizedBox,
-        Side;
+        Side,
+        ToolBar,
+        pickBackgroundImageFile,
+        useToolBarController;
 import 'package:flutter/material.dart'
     hide FormField, Scaffold, AppBar, showBottomSheet;
 import 'package:flutter_hooks/flutter_hooks.dart'
@@ -90,6 +94,18 @@ class ViewDeckListingSingleSheet extends HookWidget {
     );
     final isEditing = sheet.state == DeckListingSheetState.editor;
     final formKey = useMemoized(GlobalKey<FormState>.new);
+    final toolBarController = useToolBarController();
+
+    Future<void> addMarkdownAttachment() async {
+      final file = await pickBackgroundImageFile();
+      if (file == null) return;
+
+      final source = ImageHelper.getImageSourceFromPickedFile(file);
+      if (source == null) return;
+
+      final label = file.name.replaceAll(RegExp(r'[\]\r\n]'), ' ');
+      toolBarController.insertMarkdown('![$label]($source)');
+    }
 
     useEffect(() {
       final error = sheet.error;
@@ -177,6 +193,11 @@ class ViewDeckListingSingleSheet extends HookWidget {
             showViewPaddingBottom: false,
             padding: EdgeInsets.zero,
             appBar: appBar,
+            toolBar: ToolBar.withActions(
+              controller: toolBarController,
+              useAttachments: true,
+              onAttachmentPressed: addMarkdownAttachment,
+            ),
             body: isEditing
                 ? Form(
                     key: formKey,

@@ -169,6 +169,7 @@ class DiscussionTile extends HookWidget {
                     validator: DiscussionFormValidator.body,
                     builder: (_, field) => MarkdownText(
                       data: controller.editBody.value,
+                      allowAttachments: true,
                       onChanged: (value) {
                         controller.editBody.value = value;
                         field.didChange(value);
@@ -283,6 +284,7 @@ class DiscussionTile extends HookWidget {
                     validator: DiscussionFormValidator.body,
                     builder: (_, field) => MarkdownText(
                       data: controller.replyBody.value,
+                      allowAttachments: true,
                       onChanged: (value) {
                         controller.replyBody.value = value;
                         field.didChange(value);

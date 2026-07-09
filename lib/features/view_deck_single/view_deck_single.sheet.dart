@@ -31,6 +31,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         DateHelper,
         ImageHelper,
         FormField,
+        ToolBar,
+        pickBackgroundImageFile,
+        useToolBarController,
         showBottomSheet;
 import 'package:flutter/material.dart'
     hide AppBar, FormField, Scaffold, showBottomSheet;
@@ -62,10 +65,22 @@ class ViewDeckSingleSheet extends HookWidget {
       initialDeck: deck,
       controller: decksController,
     );
+    final toolBarController = useToolBarController();
     final activeDeck = sheet.deck;
     final publishChipStyle = chipStyle.resolve(tokens, [
       activeDeck.isPublished ? ChipTone.filled : ChipTone.hard,
     ]);
+
+    Future<void> addLongDescriptionAttachment() async {
+      final file = await pickBackgroundImageFile();
+      if (file == null) return;
+
+      final source = ImageHelper.getImageSourceFromPickedFile(file);
+      if (source == null) return;
+
+      final label = file.name.replaceAll(RegExp(r'[\]\r\n]'), ' ');
+      toolBarController.insertMarkdown('![$label]($source)');
+    }
 
     return DraggableScrollableSheet(
       expand: false,
@@ -85,6 +100,13 @@ class ViewDeckSingleSheet extends HookWidget {
             inheritMainBottomNavBarHeight: false,
             isFloatingAppBar: true,
             scrollController: scrollController,
+            toolBar: activeDeck.isEditable
+                ? ToolBar.withActions(
+                    controller: toolBarController,
+                    useAttachments: true,
+                    onAttachmentPressed: addLongDescriptionAttachment,
+                  )
+                : null,
             appBar: AppBar(
               transparentBackground: true,
               actions: [
@@ -177,18 +199,16 @@ class _Body extends StatelessWidget {
             ),
           ),
         ),
-        SingleChildScrollView(
-          child: Column(
-            children: [
-              SizedBox(height: headerHeight - deckFloatInset),
-              _BodySubSection(
-                sheet: sheet,
-                deckWidth: deckWidth,
-                collapseDistance: headerHeight * 0.55,
-                floatingHitInset: deckFloatInset,
-              ),
-            ],
-          ),
+        Column(
+          children: [
+            SizedBox(height: headerHeight - deckFloatInset),
+            _BodySubSection(
+              sheet: sheet,
+              deckWidth: deckWidth,
+              collapseDistance: headerHeight * 0.55,
+              floatingHitInset: deckFloatInset,
+            ),
+          ],
         ),
       ],
     );

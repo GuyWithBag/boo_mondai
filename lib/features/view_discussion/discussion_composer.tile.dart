@@ -6,6 +6,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         DiscussionFormValidator,
         DiscussionType,
         FormField,
+        MarkdownText,
+        MarkdownTextMode,
         TextField,
         ToggleButton,
         surfaceStyle,
@@ -155,13 +157,15 @@ class DiscussionComposerTile extends HookWidget {
                   listenable: bodyController,
                   valueReader: () => bodyController.text,
                   validator: DiscussionFormValidator.body,
-                  builder: (_, field) => TextField(
+                  builder: (_, field) => MarkdownText(
+                    data: bodyController.text,
                     controller: bodyController,
-                    minLines: 4,
+                    allowAttachments: true,
                     maxLines: null,
                     textInputAction: TextInputAction.newline,
                     placeholder: bodyPlaceholder,
                     onChanged: field.didChange,
+                    mode: MarkdownTextMode.input,
                   ),
                 ),
                 SizedBox(
