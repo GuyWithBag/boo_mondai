@@ -47,7 +47,7 @@ class Scaffold extends HookWidget {
     this.inheritMainBottomNavBarHeight = true,
     this.scrollController,
     this.resizeToAvoidBottomInset = false,
-    this.resizeBodyForKeyboard = false,
+    this.resizeBodyForKeyboard = true,
     this.centeredBody = false,
     this.showUnfocusButton = true,
     this.showViewPaddingBottom = true,
@@ -152,8 +152,6 @@ class Scaffold extends HookWidget {
         helper.shouldBodyHaveBottomScaffoldSafeArea;
     final effectiveBottomNavBarHeight = helper.trueBottomNavBarHeight;
     final effectiveToolBarHeight = helper.trueToolBarHeight;
-    final effectiveBottomScaffoldSafeAreaHeight =
-        helper.bottomScaffoldSafeAreaHeight;
     final effectiveAppBarHeight = helper.trueAppBarHeight;
     final showDockedSideBar = helper.shouldHaveDockedSideBar;
     final showFloatingSideBar = helper.shouldHaveFloatingSideBar;
@@ -165,8 +163,15 @@ class Scaffold extends HookWidget {
     final keyboardBottomInset = resizeBodyForKeyboard
         ? mediaQuery.viewInsets.bottom
         : 0.0;
-    final contentBottomInset =
-        keyboardBottomInset + (shouldHaveToolBar ? effectiveToolBarHeight : 0);
+    final isKeyboardOpen = keyboardBottomInset > 0;
+    final toolbarViewportInset = isKeyboardOpen && shouldHaveToolBar
+        ? effectiveToolBarHeight
+        : 0.0;
+    final contentBottomInset = keyboardBottomInset + toolbarViewportInset;
+    final effectiveBottomScaffoldSafeAreaHeight =
+        isKeyboardOpen && shouldHaveToolBar
+        ? 0.0
+        : helper.bottomScaffoldSafeAreaHeight;
 
     final toolBarController = toolBar is ToolBar
         ? (toolBar! as ToolBar).controller
