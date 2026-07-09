@@ -12,6 +12,7 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(CardAdapter());
     registerAdapter(CardLinkAttachmentAdapter());
     registerAdapter(CardMediaAttachmentAdapter());
+    registerAdapter(CardSessionStepAdapter());
     registerAdapter(CardTemplateTagAdapter());
     registerAdapter(CardTypeAdapter());
     registerAdapter(DeckAdapter());
@@ -29,8 +30,10 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(LocalImageCacheEntryAdapter());
     registerAdapter(MatchMadnessPairAdapter());
     registerAdapter(MatchMadnessTemplateAdapter());
+    registerAdapter(MessageSessionStepAdapter());
     registerAdapter(MultipleChoiceOptionAdapter());
     registerAdapter(MultipleChoiceTemplateAdapter());
+    registerAdapter(PendingStepSubmissionAdapter());
     registerAdapter(ProfileAdapter());
     registerAdapter(ProgressCheckpointAdapter());
     registerAdapter(ProgressCheckpointStatusAdapter());
@@ -39,10 +42,13 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(RatingAdapter());
     registerAdapter(ReviewLogAdapter());
     registerAdapter(ReviewSessionAdapter());
+    registerAdapter(SessionFlowSnapshotAdapter());
     registerAdapter(StateAdapter());
     registerAdapter(StreakAdapter());
     registerAdapter(StudyCardAdapter());
     registerAdapter(StudyRatingAdapter());
+    registerAdapter(StudySessionStepRecordAdapter());
+    registerAdapter(SummarySessionStepAdapter());
     registerAdapter(TagAdapter());
     registerAdapter(UserAdapter());
     registerAdapter(UserSettingsAdapter());
@@ -59,6 +65,7 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(CardAdapter());
     registerAdapter(CardLinkAttachmentAdapter());
     registerAdapter(CardMediaAttachmentAdapter());
+    registerAdapter(CardSessionStepAdapter());
     registerAdapter(CardTemplateTagAdapter());
     registerAdapter(CardTypeAdapter());
     registerAdapter(DeckAdapter());
@@ -76,8 +83,10 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(LocalImageCacheEntryAdapter());
     registerAdapter(MatchMadnessPairAdapter());
     registerAdapter(MatchMadnessTemplateAdapter());
+    registerAdapter(MessageSessionStepAdapter());
     registerAdapter(MultipleChoiceOptionAdapter());
     registerAdapter(MultipleChoiceTemplateAdapter());
+    registerAdapter(PendingStepSubmissionAdapter());
     registerAdapter(ProfileAdapter());
     registerAdapter(ProgressCheckpointAdapter());
     registerAdapter(ProgressCheckpointStatusAdapter());
@@ -86,10 +95,13 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(RatingAdapter());
     registerAdapter(ReviewLogAdapter());
     registerAdapter(ReviewSessionAdapter());
+    registerAdapter(SessionFlowSnapshotAdapter());
     registerAdapter(StateAdapter());
     registerAdapter(StreakAdapter());
     registerAdapter(StudyCardAdapter());
     registerAdapter(StudyRatingAdapter());
+    registerAdapter(StudySessionStepRecordAdapter());
+    registerAdapter(SummarySessionStepAdapter());
     registerAdapter(TagAdapter());
     registerAdapter(UserAdapter());
     registerAdapter(UserSettingsAdapter());

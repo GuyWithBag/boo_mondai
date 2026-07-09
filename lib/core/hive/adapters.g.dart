@@ -2266,3 +2266,300 @@ class ProgressCheckpointStatusAdapter
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
+
+class SessionFlowSnapshotAdapter extends TypeAdapter<SessionFlowSnapshot> {
+  @override
+  final typeId = 44;
+
+  @override
+  SessionFlowSnapshot read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return SessionFlowSnapshot(
+      sessionId: fields[0] as String,
+      currentStepId: fields[1] as String?,
+      steps: (fields[2] as List).cast<SessionStep>(),
+      firedRuleKeys: fields[3] == null
+          ? const {}
+          : (fields[3] as Set).cast<String>(),
+      pendingSubmission: fields[4] as PendingStepSubmission?,
+      updatedAt: fields[5] as DateTime,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, SessionFlowSnapshot obj) {
+    writer
+      ..writeByte(6)
+      ..writeByte(0)
+      ..write(obj.sessionId)
+      ..writeByte(1)
+      ..write(obj.currentStepId)
+      ..writeByte(2)
+      ..write(obj.steps)
+      ..writeByte(3)
+      ..write(obj.firedRuleKeys)
+      ..writeByte(4)
+      ..write(obj.pendingSubmission)
+      ..writeByte(5)
+      ..write(obj.updatedAt);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SessionFlowSnapshotAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class PendingStepSubmissionAdapter extends TypeAdapter<PendingStepSubmission> {
+  @override
+  final typeId = 45;
+
+  @override
+  PendingStepSubmission read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return PendingStepSubmission(
+      stepId: fields[0] as String,
+      userAnswer: fields[1] as String,
+      rating: fields[2] as StudyRating,
+      submittedAt: fields[3] as DateTime,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, PendingStepSubmission obj) {
+    writer
+      ..writeByte(4)
+      ..writeByte(0)
+      ..write(obj.stepId)
+      ..writeByte(1)
+      ..write(obj.userAnswer)
+      ..writeByte(2)
+      ..write(obj.rating)
+      ..writeByte(3)
+      ..write(obj.submittedAt);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PendingStepSubmissionAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class CardSessionStepAdapter extends TypeAdapter<CardSessionStep> {
+  @override
+  final typeId = 47;
+
+  @override
+  CardSessionStep read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return CardSessionStep(
+      id: fields[2] as String,
+      studyCardId: fields[0] as String,
+      attemptNumber: fields[1] == null ? 1 : (fields[1] as num).toInt(),
+      insertedByRuleId: fields[3] as String?,
+      insertionReason: fields[4] as String?,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, CardSessionStep obj) {
+    writer
+      ..writeByte(5)
+      ..writeByte(0)
+      ..write(obj.studyCardId)
+      ..writeByte(1)
+      ..write(obj.attemptNumber)
+      ..writeByte(2)
+      ..write(obj.id)
+      ..writeByte(3)
+      ..write(obj.insertedByRuleId)
+      ..writeByte(4)
+      ..write(obj.insertionReason);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CardSessionStepAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class MessageSessionStepAdapter extends TypeAdapter<MessageSessionStep> {
+  @override
+  final typeId = 48;
+
+  @override
+  MessageSessionStep read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return MessageSessionStep(
+      id: fields[3] as String,
+      messageDefinitionId: fields[0] as String,
+      title: fields[1] as String,
+      message: fields[2] as String,
+      insertedByRuleId: fields[4] as String?,
+      insertionReason: fields[5] as String?,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, MessageSessionStep obj) {
+    writer
+      ..writeByte(6)
+      ..writeByte(0)
+      ..write(obj.messageDefinitionId)
+      ..writeByte(1)
+      ..write(obj.title)
+      ..writeByte(2)
+      ..write(obj.message)
+      ..writeByte(3)
+      ..write(obj.id)
+      ..writeByte(4)
+      ..write(obj.insertedByRuleId)
+      ..writeByte(5)
+      ..write(obj.insertionReason);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MessageSessionStepAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class SummarySessionStepAdapter extends TypeAdapter<SummarySessionStep> {
+  @override
+  final typeId = 49;
+
+  @override
+  SummarySessionStep read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return SummarySessionStep(
+      id: fields[0] as String,
+      insertedByRuleId: fields[1] as String?,
+      insertionReason: fields[2] as String?,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, SummarySessionStep obj) {
+    writer
+      ..writeByte(3)
+      ..writeByte(0)
+      ..write(obj.id)
+      ..writeByte(1)
+      ..write(obj.insertedByRuleId)
+      ..writeByte(2)
+      ..write(obj.insertionReason);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SummarySessionStepAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class StudySessionStepRecordAdapter
+    extends TypeAdapter<StudySessionStepRecord> {
+  @override
+  final typeId = 50;
+
+  @override
+  StudySessionStepRecord read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return StudySessionStepRecord(
+      id: fields[0] as String,
+      sessionId: fields[1] as String,
+      stepId: fields[2] as String,
+      studyCardId: fields[3] as String,
+      sequenceNumber: (fields[4] as num).toInt(),
+      attemptNumber: (fields[5] as num).toInt(),
+      userAnswer: fields[6] as String,
+      rating: fields[7] as StudyRating,
+      enteredAt: fields[8] as DateTime,
+      completedAt: fields[9] as DateTime,
+      drillAnswerId: fields[10] as String?,
+      fsrsReviewLogId: fields[11] as String?,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, StudySessionStepRecord obj) {
+    writer
+      ..writeByte(12)
+      ..writeByte(0)
+      ..write(obj.id)
+      ..writeByte(1)
+      ..write(obj.sessionId)
+      ..writeByte(2)
+      ..write(obj.stepId)
+      ..writeByte(3)
+      ..write(obj.studyCardId)
+      ..writeByte(4)
+      ..write(obj.sequenceNumber)
+      ..writeByte(5)
+      ..write(obj.attemptNumber)
+      ..writeByte(6)
+      ..write(obj.userAnswer)
+      ..writeByte(7)
+      ..write(obj.rating)
+      ..writeByte(8)
+      ..write(obj.enteredAt)
+      ..writeByte(9)
+      ..write(obj.completedAt)
+      ..writeByte(10)
+      ..write(obj.drillAnswerId)
+      ..writeByte(11)
+      ..write(obj.fsrsReviewLogId);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is StudySessionStepRecordAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}

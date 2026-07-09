@@ -7,7 +7,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         Button,
         ButtonColor,
         Deck,
-        DrillService,
+        DrillStudySessionHelper,
         LocalDB,
         Scaffold,
         buttonStyle;
@@ -43,7 +43,10 @@ class ViewDeckSingleBottomNavBar extends StatelessWidget
     final tokens = context.themeTokens<AppTokens>();
 
     final userId = LocalDB.profile.getOrCreate().id;
-    final eligibleCards = DrillService.getEligibleDrillCards(deck.id, userId);
+    final eligibleCards = DrillStudySessionHelper.getEligibleDrillCards(
+      deck.id,
+      userId,
+    );
     final canDrill = eligibleCards.isNotEmpty;
 
     return BottomNavBar(

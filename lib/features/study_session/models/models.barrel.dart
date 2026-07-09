@@ -5,3 +5,6 @@ export 'due_filter_threshold.dart';
 export 'study_rating.dto.dart';
 export 'study_session.dto.dart';
 export 'study_card.dto.dart';
+export 'session_step.dto.dart';
+export 'session_flow_snapshot.dto.dart';
+export 'study_session_step_record.dto.dart';

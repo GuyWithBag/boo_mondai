@@ -1,23 +1,20 @@
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// PATH: lib/controllers/drill_session_page_controller.dart
-// PURPOSE: Orchestrates an active drill session using the new architecture
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import 'dart:async';
 
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        StudyCard,
-        DrillSession,
-        StudySessionController,
         DrillAnswer,
-        SessionException,
-        StudyRating,
+        DrillSession,
+        DrillSessionPolicy,
+        CardSessionStep,
         LocalDB,
-        DrillService,
-        uuid,
-        FsrsCard,
-        Services,
-        StudySessionService;
-import 'package:flutter/material.dart';
+        SessionException,
+        SessionMode,
+        StudyCard,
+        StudyRating,
+        StudySessionController,
+        StudySessionHelper,
+        uuid;
+import 'package:flutter/material.dart' show protected;
 import 'package:flutter_hooks/flutter_hooks.dart'
     show useEffect, useListenable, useMemoized;
 import 'package:fsrs/fsrs.dart' as fsrs;
@@ -26,184 +23,179 @@ DrillSessionController useDrillSessionController({
   required String deckId,
   bool previewed = false,
   int? batchSize,
-  bool realTime = false,
 }) {
-  final controller = useMemoized(() {
-    final controller = DrillSessionController();
-    controller.startSession(
-      deckId,
-      previewed: previewed,
-      batchSize: batchSize,
-      realTime: realTime,
-    );
-    return controller;
-  }, [deckId, previewed, batchSize, realTime]);
-
+  final controller = useMemoized(DrillSessionController.new);
   useListenable(controller);
-  useEffect(() => controller.dispose, [controller]);
-
+  useEffect(() {
+    unawaited(
+      controller.startSession(
+        deckId,
+        previewed: previewed,
+        batchSize: batchSize,
+      ),
+    );
+    return controller.dispose;
+  }, [controller, deckId, previewed, batchSize]);
   return controller;
 }
 
-class DrillSessionController
-    extends StudySessionController<StudyCard, DrillSession> {
+final class DrillSessionController
+    extends StudySessionController<DrillSession> {
   static const int defaultBatchSize = 20;
 
-  final List<DrillAnswer> _currentAnswers = [];
-
-  bool _isComplete = false;
-
-  final Map<String, int> _strikes = {};
+  final Map<String, StudyCard> _cards = {};
+  final List<DrillAnswer> _answers = [];
 
   @override
-  bool get isComplete => _isComplete;
+  SessionMode get mode => SessionMode.drill;
 
   @override
-  StudyCard? get currentStudyCard =>
-      queue.isNotEmpty && currentIndex < queue.length
-      ? queue[currentIndex]
-      : null;
-
-  List<DrillAnswer> get answers => List.unmodifiable(_currentAnswers);
-
-  bool get lastAnswerWrong {
-    if (_currentAnswers.isEmpty) return false;
-    final lastType = _currentAnswers.last.type;
-    return lastType == StudyRating.incorrect || lastType == StudyRating.again;
+  StudyCard? get currentStudyCard {
+    final step = currentCardStep;
+    return step == null ? null : _cards[step.studyCardId];
   }
 
-  int get correctCount {
-    return _currentAnswers.where((a) {
-      return a.type != StudyRating.incorrect && a.type != StudyRating.again;
-    }).length;
-  }
+  List<DrillAnswer> get answers => List.unmodifiable(_answers);
 
-  // ── Session Lifecycle ──
-  void startSession(
+  @override
+  List<StudyRating> get submittedRatings => [
+    for (final answer in _answers) answer.type,
+  ];
+
+  int get correctCount => _answers
+      .where(
+        (answer) =>
+            answer.type != StudyRating.incorrect &&
+            answer.type != StudyRating.again,
+      )
+      .length;
+
+  Future<void> startSession(
     String deckId, {
     bool previewed = false,
     int? batchSize,
-    bool realTime = false,
-  }) {
-    setError(null);
-    _currentAnswers.clear();
-    realTimeSaving = realTime; // Set the toggle
-
+  }) async {
+    reset(notify: false);
     try {
       final userId = LocalDB.profile.getOrCreate().id;
+      final resumable = LocalDB.drillSession.selectMany(
+        where: (value) =>
+            value.userId == userId &&
+            value.deckId == deckId &&
+            !value.isComplete,
+      );
+      if (resumable.isNotEmpty && restoreFlow(resumable.last.id)) {
+        session = resumable.last;
+        _loadReferencedCards();
+        _answers.addAll(LocalDB.drillAnswer.getBySessionId(session!.id));
+        final pending = runtime!.snapshot.pendingSubmission;
+        if (pending != null) {
+          await submitAnswer(pending.userAnswer, pending.rating);
+        }
+        notifyListeners();
+        return;
+      }
 
-      final allTemplates = LocalDB.cardTemplate.getByDeckId(deckId);
-      templates = {for (final t in allTemplates) t.id: t};
-
-      final allStudyCards = LocalDB.studyCard.getByDeckId(deckId);
-      final eligibleCards = DrillService.getEligibleDrillCards(deckId, userId);
-
-      if (eligibleCards.isEmpty) {
+      templates = {
+        for (final template in LocalDB.cardTemplate.getByDeckId(deckId))
+          template.id: template,
+      };
+      final allCards = LocalDB.studyCard.getByDeckId(deckId);
+      final eligible = DrillSessionPolicy.selectCards(
+        deckId: deckId,
+        userId: userId,
+        limit: batchSize ?? defaultBatchSize,
+      );
+      if (eligible.isEmpty) {
         throw SessionException(
-          allStudyCards.isEmpty
+          allCards.isEmpty
               ? 'No reviewable cards found in this deck.'
-              : 'You have already drillzed all the cards in this deck! Head to FSRS Reviews to practice them.',
+              : 'All cards in this deck are already enrolled in review.',
           code: 'DRILL_NO_ELIGIBLE_CARDS',
         );
       }
 
-      final limit = batchSize ?? defaultBatchSize;
-      final batch = (eligibleCards..shuffle()).take(limit).toList();
+      final cards = eligible;
+      _cards.addEntries(cards.map((card) => MapEntry(card.id, card)));
+      final now = DateTime.now();
       session = DrillSession(
         id: uuid.v7(),
         userId: userId,
         deckId: deckId,
         previewed: previewed,
-        totalQuestions: batch.length,
-        correctCount: 0,
-        startedAt: DateTime.now(),
+        totalQuestions: cards.length,
+        startedAt: now,
       );
-
-      queue = batch;
-      currentIndex = 0;
-      _strikes.clear();
-      nextIntervals.clear();
-      _isComplete = false;
-    } on SessionException catch (e) {
-      setError(e);
-    } on Exception catch (e, stackTrace) {
+      await LocalDB.drillSession.upsert(session!);
+      await createFlow(sessionId: session!.id, cards: cards, now: now);
+      notifyListeners();
+    } catch (error, stackTrace) {
       setError(
-        SessionException(
-          'Failed to start drill session: $e',
-          code: 'DRILL_INIT_FAILED',
-          originalError: e,
-          stackTrace: stackTrace,
-        ),
+        error is SessionException
+            ? error
+            : SessionException(
+                'Failed to start drill session.',
+                code: 'DRILL_INIT_FAILED',
+                originalError: error,
+                stackTrace: stackTrace,
+              ),
       );
     }
   }
 
-  void _createStrike(StudyCard studyCard) {
-    _strikes[studyCard.id] = (_strikes[studyCard.id] ?? 0) + 1;
+  void _loadReferencedCards() {
+    final ids = runtime!.snapshot.steps
+        .whereType<CardSessionStep>()
+        .map((step) => step.studyCardId)
+        .toSet();
+    final cards = LocalDB.studyCard.selectMany(
+      where: (card) => ids.contains(card.id),
+    );
+    _cards.addEntries(cards.map((card) => MapEntry(card.id, card)));
+    templates = {
+      for (final template in LocalDB.cardTemplate.selectMany())
+        template.id: template,
+    };
   }
 
   @override
-  Future<void> submitAnswer(String userAnswer, StudyRating type) async {
-    final studyCard = currentStudyCard;
-    if (studyCard == null) {
-      failSession(
-        'Cannot submit a drill answer without a current review card.',
-        code: 'DRILL_CARD_MISSING',
-      );
-    }
-    if (session == null) {
-      failSession(
-        'Cannot submit a drill answer before the session has started.',
-        code: 'DRILL_SESSION_MISSING',
-      );
+  Future<void> submitAnswer(String userAnswer, StudyRating rating) async {
+    final card = currentStudyCard;
+    final step = currentCardStep;
+    final activeSession = session;
+    if (card == null || step == null || activeSession == null) {
+      failSession('No drill card is active.', code: 'DRILL_CARD_MISSING');
     }
 
-    _createStrike(studyCard);
-
-    final newAnswer = DrillAnswer.create(
-      sessionId: session!.id,
-      cardId: studyCard.id,
+    final now = DateTime.now();
+    await beginSubmission(userAnswer, rating, now);
+    final outcome = await DrillSessionPolicy.processSubmission(
+      session: activeSession,
+      step: step,
+      card: card,
       userAnswer: userAnswer,
-      type: type,
+      rating: rating,
+      sequenceNumber: currentIndex,
+      now: now,
     );
-
-    _currentAnswers.add(newAnswer);
-
-    // ── THE TOGGLE (REAL-TIME) ──
-    if (realTimeSaving) {
-      await LocalDB.drillAnswer.upsert(newAnswer);
-
-      session = session!.copyWith(correctCount: correctCount);
-      await LocalDB.drillSession.upsert(session!);
-
-      // Real-time FSRS enrollment for correct answers
-      if (type != StudyRating.incorrect) {
-        // SAFETY CHECK: Ensure it isn't already enrolled
-        final existing = LocalDB.fsrsCard.getByStudyCardId(studyCard.id);
-
-        if (existing == null) {
-          final fsrsCard = await FsrsCard.create(
-            studyCardId: studyCard.id,
-            userId: session!.userId,
-          );
-          // Make sure to await this so the Hive box finishes writing!
-          await Services.fsrs.enrollCard(
-            card: fsrsCard,
-            rating: StudySessionService.studyRatingToFSRSRating(type),
-          );
-        }
-      }
+    await finishSubmission(
+      rating: rating,
+      startedAt: activeSession.startedAt,
+      policyCommands: outcome.commands,
+      now: now,
+    );
+    if (!_answers.any((answer) => answer.id == outcome.answer.id)) {
+      _answers.add(outcome.answer);
     }
-
-    if (type == StudyRating.incorrect) {
-      queue.add(studyCard);
-      session = session!.copyWith(totalQuestions: queue.length);
-    }
-
-    currentIndex++;
+    session = activeSession.copyWith(
+      correctCount: correctCount,
+      totalQuestions: runtime!.snapshot.steps
+          .whereType<CardSessionStep>()
+          .length,
+    );
+    await LocalDB.drillSession.upsert(session!);
     nextIntervals.clear();
-
-    if (currentIndex >= queue.length) {
+    if (isComplete) {
       await completeSession();
     } else {
       notifyListeners();
@@ -212,89 +204,33 @@ class DrillSessionController
 
   @override
   Future<void> calculateNextIntervals() async {
-    // Generate a brand new default state for an un-enrolled card
-    final newFsrsState = await fsrs.Card.create();
-
-    nextIntervals.clear();
-    nextIntervals = StudySessionService.generateIntervalsForState(newFsrsState);
+    final state = await fsrs.Card.create();
+    nextIntervals = StudySessionHelper.generateIntervalsForState(state);
+    notifyListeners();
   }
 
   @override
   @protected
   Future<void> completeSession() async {
-    if (session == null) {
-      failSession(
-        'Cannot complete a drill session before it has started.',
-        code: 'DRILL_SESSION_MISSING',
-      );
-    }
-
-    try {
-      session = session!.copyWith(
-        completedAt: DateTime.now(),
-        correctCount: correctCount,
-        totalQuestions: queue.length,
-      );
-      _isComplete = true;
-
-      if (realTimeSaving) {
-        await LocalDB.drillSession.upsert(session!);
-      } else {
-        // ── BATCH SAVE ──
-        await LocalDB.drillSession.upsert(session!);
-        await LocalDB.drillAnswer.upsertMany(_currentAnswers);
-
-        // 1. Deduplicate: Get only the final correct answer for each card
-        final eligibleAnswersMap = <String, DrillAnswer>{};
-        for (final a in _currentAnswers) {
-          if (a.type != StudyRating.incorrect) {
-            eligibleAnswersMap[a.cardId] = a;
-          }
-        }
-
-        // 2. Process enrollments safely
-        for (final answer in eligibleAnswersMap.values) {
-          // SAFETY CHECK: Ensure it isn't already enrolled
-          final existing = LocalDB.fsrsCard.getByStudyCardId(answer.cardId);
-          if (existing != null) continue;
-
-          final fsrsCard = await FsrsCard.create(
-            studyCardId: answer.cardId,
-            userId: session!.userId,
-          );
-
-          await Services.fsrs.enrollCard(
-            card: fsrsCard,
-            rating: StudySessionService.studyRatingToFSRSRating(answer.type),
-          );
-        }
-      }
-      notifyListeners();
-    } on SessionException catch (e) {
-      setError(e);
-    } on Exception catch (e, stackTrace) {
-      setError(
-        SessionException(
-          'Failed to complete drill session: $e',
-          code: 'DRILL_COMPLETE_FAILED',
-          originalError: e,
-          stackTrace: stackTrace,
-        ),
-      );
-    }
+    final activeSession = session;
+    if (activeSession == null) return;
+    session = activeSession.copyWith(
+      completedAt: DateTime.now(),
+      correctCount: correctCount,
+    );
+    await LocalDB.drillSession.upsert(session!);
+    notifyListeners();
   }
 
   @override
-  void reset() {
+  void reset({bool notify = true}) {
     session = null;
-    queue = [];
+    runtime = null;
     templates.clear();
-    _currentAnswers.clear();
-    currentIndex = 0;
-    _strikes.clear();
+    _cards.clear();
+    _answers.clear();
     nextIntervals.clear();
-    _isComplete = false;
     setError(null);
-    notifyListeners();
+    if (notify) notifyListeners();
   }
 }

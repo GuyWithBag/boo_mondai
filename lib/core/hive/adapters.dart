@@ -4,6 +4,7 @@
 // PROVIDERS: none
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ignore_for_file: non_type_as_type_argument
 
 library;
 
@@ -40,6 +41,13 @@ import 'package:boo_mondai/lib.barrel.dart'
         Profile,
         QuestionType,
         ReviewSession,
+        SessionFlowSnapshot,
+        PendingStepSubmission,
+        SessionStep,
+        CardSessionStep,
+        MessageSessionStep,
+        SummarySessionStep,
+        StudySessionStepRecord,
         Streak,
         StudyCard,
         StudyRating,
@@ -75,6 +83,12 @@ import 'package:supabase_flutter/supabase_flutter.dart';
   AdapterSpec<FsrsCard>(),
   AdapterSpec<ReviewLog>(),
   AdapterSpec<ReviewSession>(),
+  AdapterSpec<SessionFlowSnapshot>(),
+  AdapterSpec<PendingStepSubmission>(),
+  AdapterSpec<CardSessionStep>(),
+  AdapterSpec<MessageSessionStep>(),
+  AdapterSpec<SummarySessionStep>(),
+  AdapterSpec<StudySessionStepRecord>(),
   AdapterSpec<FsrsReviewLog>(),
   AdapterSpec<State>(),
   AdapterSpec<Streak>(),

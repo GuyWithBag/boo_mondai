@@ -12,15 +12,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         StudySessionController,
         StudySessionCardStageController,
         AppTokens,
-        StudySessionService,
-        Button, buttonStyle,
+        StudySessionHelper,
+        Button,
+        buttonStyle,
         ButtonColor,
-        textStyle,
-        TextSize,
-        TextWeight,
-        TextColor,
-        RatingButton,
-        AppSpacing;
+        RatingButton;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -51,7 +47,7 @@ class RatingArea extends HookWidget {
 
     final bool isRevealed = interactionsController.isRevealed;
     final SubmissionStyle submissionStyle =
-        StudySessionService.getSubmissionStyle(
+        StudySessionHelper.getSubmissionStyle(
           studySessionController.currentTemplate!,
         );
     final String? answer = interactionsController.answer;
@@ -63,8 +59,8 @@ class RatingArea extends HookWidget {
 
       final template = studySessionController.currentTemplate!;
       if (answer != null &&
-          StudySessionService.isAutoGraded(template) &&
-          !StudySessionService.isAnswerCorrect(template, answer)) {
+          StudySessionHelper.isAutoGraded(template) &&
+          !StudySessionHelper.isAnswerCorrect(template, answer)) {
         interactionsController.reveal(
           studySessionController,
           pendingRating: StudyRating.incorrect,
@@ -91,8 +87,8 @@ class RatingArea extends HookWidget {
 
       final template = studySessionController.currentTemplate!;
       final effectiveType =
-          StudySessionService.isAutoGraded(template) &&
-              !StudySessionService.isAnswerCorrect(template, answer)
+          StudySessionHelper.isAutoGraded(template) &&
+              !StudySessionHelper.isAnswerCorrect(template, answer)
           ? StudyRating.incorrect
           : type;
 
@@ -114,29 +110,28 @@ class RatingArea extends HookWidget {
                 },
               ),
             },
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: submissionStyle == SubmissionStyle.none
-                        ? const SizedBox(height: 54)
-                        : submissionStyle == SubmissionStyle.showAnswer
-                        ? Button(
-                            onPressed: interactionsController.canReveal
-                                ? onSubmit
-                                : null,
-                            leading: const Icon(Icons.visibility_outlined),
-                            child: const Text('Show Answer'),
-                          )
-                        : Button(
-                            onPressed: interactionsController.canReveal
-                                ? onSubmit
-                                : null,
-                            leading: const Icon(Icons.check),
-                            style: buttonStyle.resolve(
-                              tokens,
-                              const [ButtonColor.primary],
-                            ),
-                            child: const Text('Submit'),
-                          ),
+            child: SizedBox(
+              width: double.infinity,
+              child: submissionStyle == SubmissionStyle.none
+                  ? const SizedBox(height: 54)
+                  : submissionStyle == SubmissionStyle.showAnswer
+                  ? Button(
+                      onPressed: interactionsController.canReveal
+                          ? onSubmit
+                          : null,
+                      leading: const Icon(Icons.visibility_outlined),
+                      child: const Text('Show Answer'),
+                    )
+                  : Button(
+                      onPressed: interactionsController.canReveal
+                          ? onSubmit
+                          : null,
+                      leading: const Icon(Icons.check),
+                      style: buttonStyle.resolve(tokens, const [
+                        ButtonColor.primary,
+                      ]),
+                      child: const Text('Submit'),
+                    ),
             ),
           ),
         );

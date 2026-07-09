@@ -5,7 +5,7 @@
 
 import 'package:boo_mondai/lib.barrel.dart' show StudyCard, LocalDB;
 
-class DrillService {
+abstract final class DrillStudySessionHelper {
   /// Returns only StudyCards that have NEVER been enrolled in FSRS for this user.
   static List<StudyCard> getEligibleDrillCards(String deckId, String userId) {
     // 1. Get all base cards for this deck

@@ -1,221 +1,208 @@
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// PATH: lib/controllers/review_session_controller.dart
-// PURPOSE: Orchestrates an interactive FSRS review session
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import 'dart:async';
 
 import 'package:boo_mondai/lib.barrel.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/cupertino.dart' show protected;
 import 'package:flutter_hooks/flutter_hooks.dart'
     show useEffect, useListenable, useMemoized;
-import 'package:fsrs/fsrs.dart' as fsrs;
 
 ReviewSessionController useReviewSessionController({
   required String? deckId,
   required DueFilterThreshold filter,
-  bool realTime = false,
 }) {
-  final controller = useMemoized(() {
-    final controller = ReviewSessionController();
-    controller.startSession(deckId: deckId, filter: filter, realTime: realTime);
-    return controller;
-  }, [deckId, filter, realTime]);
-
+  final controller = useMemoized(ReviewSessionController.new);
   useListenable(controller);
-  useEffect(() => controller.dispose, [controller]);
-
+  useEffect(() {
+    unawaited(controller.startSession(deckId: deckId, filter: filter));
+    return controller.dispose;
+  }, [controller, deckId, filter]);
   return controller;
 }
 
-class ReviewSessionController
-    extends StudySessionController<FsrsCard, ReviewSession> {
-  // ── Specific State ──
+final class ReviewSessionController
+    extends StudySessionController<ReviewSession> {
   final Map<String, StudyCard> _studyCards = {};
-  late DueFilterThreshold dueFilter;
-
-  // ── BATCH SAVING STATE ──
-  final List<FsrsReviewLog> _pendingLogs = [];
-  final Map<String, FsrsCard> _pendingCards = {};
-
-  int get remainingCount =>
-      (queue.length - currentIndex).clamp(0, queue.length);
+  final Map<String, FsrsCard> _fsrsCards = {};
+  final List<StudyRating> _ratings = [];
 
   @override
-  bool get isComplete => queue.isEmpty || currentIndex >= queue.length;
-
-  FsrsCard? get currentFsrsCard =>
-      (queue.isNotEmpty && currentIndex < queue.length)
-      ? queue[currentIndex]
-      : null;
+  SessionMode get mode => SessionMode.review;
 
   @override
-  StudyCard? get currentStudyCard => currentFsrsCard != null
-      ? _studyCards[currentFsrsCard!.studyCardId]
-      : null;
+  List<StudyRating> get submittedRatings => List.unmodifiable(_ratings);
 
-  // ── Initialization ──
-  void startSession({
+  @override
+  StudyCard? get currentStudyCard {
+    final step = currentCardStep;
+    return step == null ? null : _studyCards[step.studyCardId];
+  }
+
+  FsrsCard? get currentFsrsCard {
+    final step = currentCardStep;
+    return step == null ? null : _fsrsCards[step.studyCardId];
+  }
+
+  int get remainingCount {
+    final activeRuntime = runtime;
+    if (activeRuntime == null) return 0;
+    return activeRuntime.snapshot.steps
+        .skip(activeRuntime.currentStepIndex)
+        .whereType<CardSessionStep>()
+        .length;
+  }
+
+  Future<void> startSession({
     String? deckId,
-    bool realTime = false,
     required DueFilterThreshold filter,
-  }) {
-    // 1. Reset session state
-    setError(null);
-    dueFilter = filter;
-    session = null;
-    queue.clear();
-    templates.clear();
-    _studyCards.clear();
-    _pendingCards.clear();
-    _pendingLogs.clear();
-    nextIntervals.clear();
-    currentIndex = 0;
-    realTimeSaving = realTime;
-
-    notifyListeners();
-
+  }) async {
+    reset(notify: false);
     try {
       final userId = LocalDB.profile.getOrCreate().id;
+      final resumable = LocalDB.reviewSession.selectMany(
+        where: (value) =>
+            value.userId == userId &&
+            value.deckId == deckId &&
+            !value.isComplete,
+      );
+      if (resumable.isNotEmpty && restoreFlow(resumable.last.id)) {
+        session = resumable.last;
+        _loadReferencedCards();
+        _ratings.addAll(
+          LocalDB.studySessionStepRecord
+              .getBySessionId(session!.id)
+              .map((record) => record.rating),
+        );
+        final pending = runtime!.snapshot.pendingSubmission;
+        if (pending != null) {
+          await submitAnswer(pending.userAnswer, pending.rating);
+        }
+        notifyListeners();
+        return;
+      }
+
       final now = DateTime.now();
-
-      final allFsrsCards = LocalDB.fsrsCard.getByUserId(userId);
-      final allStudyCards = LocalDB.studyCard.selectMany();
-
-      // Fetch and populate templates
-      final allTemplates = LocalDB.cardTemplate.selectMany();
-      for (final t in allTemplates) {
-        templates[t.id] = t;
-      }
-
-      final rcToDeck = {for (final rc in allStudyCards) rc.id: rc.deckId};
-
-      // Populate review cards map
-      for (final rc in allStudyCards) {
-        _studyCards[rc.id] = rc;
-      }
-
-      var targetCards = allFsrsCards;
-      if (deckId != null) {
-        targetCards = targetCards.where((c) {
-          return rcToDeck[c.studyCardId] == deckId;
-        }).toList();
-      }
-
-      var dueCards = targetCards.where((c) {
-        return filter.isCardDue(c.state.due, now);
-      }).toList();
-
-      dueCards.shuffle();
-      queue.addAll(dueCards);
-
-      // ── NEW: Initialize the ReviewSession ──
+      final studyCards = LocalDB.studyCard.selectMany();
+      _studyCards.addEntries(studyCards.map((card) => MapEntry(card.id, card)));
+      templates = {
+        for (final template in LocalDB.cardTemplate.selectMany())
+          template.id: template,
+      };
+      final cardDecks = {for (final card in studyCards) card.id: card.deckId};
+      final dueCards =
+          LocalDB.fsrsCard
+              .getByUserId(userId)
+              .where(
+                (card) =>
+                    (deckId == null || cardDecks[card.studyCardId] == deckId) &&
+                    filter.isCardDue(card.state.due, now),
+              )
+              .toList()
+            ..shuffle();
+      _fsrsCards.addEntries(
+        dueCards.map((card) => MapEntry(card.studyCardId, card)),
+      );
+      final cards = dueCards
+          .map((card) => _studyCards[card.studyCardId])
+          .whereType<StudyCard>()
+          .toList();
       session = ReviewSession(
         id: uuid.v7(),
         userId: userId,
         deckId: deckId,
-        totalCards: queue.length,
+        totalCards: cards.length,
         startedAt: now,
       );
-    } on SessionException catch (e) {
-      setError(e);
-    } catch (e, stackTrace) {
+      await LocalDB.reviewSession.upsert(session!);
+      await createFlow(sessionId: session!.id, cards: cards, now: now);
+      if (isComplete) await completeSession();
+      notifyListeners();
+    } catch (error, stackTrace) {
       setError(
-        SessionException(
-          'Failed to load session data: $e',
-          code: 'SESSION_INIT_FAILED',
-          originalError: e,
-          stackTrace: stackTrace,
-        ),
+        error is SessionException
+            ? error
+            : SessionException(
+                'Failed to start review session.',
+                code: 'REVIEW_INIT_FAILED',
+                originalError: error,
+                stackTrace: stackTrace,
+              ),
       );
     }
+  }
+
+  void _loadReferencedCards() {
+    final ids = runtime!.snapshot.steps
+        .whereType<CardSessionStep>()
+        .map((step) => step.studyCardId)
+        .toSet();
+    final cards = LocalDB.studyCard.selectMany(
+      where: (card) => ids.contains(card.id),
+    );
+    _studyCards.addEntries(cards.map((card) => MapEntry(card.id, card)));
+    final fsrsCards = LocalDB.fsrsCard.selectMany(
+      where: (card) => ids.contains(card.studyCardId),
+    );
+    _fsrsCards.addEntries(
+      fsrsCards.map((card) => MapEntry(card.studyCardId, card)),
+    );
+    templates = {
+      for (final template in LocalDB.cardTemplate.selectMany())
+        template.id: template,
+    };
   }
 
   @override
   Future<void> calculateNextIntervals() async {
-    final currentFsrs = currentFsrsCard;
-    if (currentFsrs == null) {
-      failSession(
-        'Cannot calculate review intervals without a current FSRS card.',
-        code: 'REVIEW_CARD_MISSING',
-      );
-    }
-
-    // Pass the existing card's memory state
-    nextIntervals.clear();
-    nextIntervals = StudySessionService.generateIntervalsForState(
-      currentFsrs.state,
-    );
+    final card = currentFsrsCard;
+    if (card == null) return;
+    nextIntervals = StudySessionHelper.generateIntervalsForState(card.state);
     notifyListeners();
   }
 
-  // ── The Single Submit Logic ──
   @override
   Future<void> submitAnswer(String userAnswer, StudyRating rating) async {
+    final card = currentStudyCard;
     final fsrsCard = currentFsrsCard;
-    if (fsrsCard == null) {
-      failSession(
-        'Cannot submit a review answer without a current FSRS card.',
-        code: 'REVIEW_CARD_MISSING',
-      );
-    }
-    if (session == null) {
-      failSession(
-        'Cannot submit a review answer before the session has started.',
-        code: 'REVIEW_SESSION_MISSING',
-      );
+    final step = currentCardStep;
+    final activeSession = session;
+    if (card == null ||
+        fsrsCard == null ||
+        step == null ||
+        activeSession == null) {
+      failSession('No review card is active.', code: 'REVIEW_CARD_MISSING');
     }
 
-    final fsrsRating = StudySessionService.studyRatingToFSRSRating(rating);
     final now = DateTime.now();
-
-    // The time travel trick for future look-ahead reviews
-    DateTime? customReviewTime;
-    if (fsrsCard.state.due.isAfter(now)) {
-      customReviewTime = fsrsCard.state.due;
-    }
-
-    final scheduler = fsrs.Scheduler();
-    final utcReviewTime = customReviewTime?.toUtc() ?? now.toUtc();
-    final result = scheduler.reviewCard(
-      fsrsCard.state,
-      fsrsRating,
-      reviewDateTime: utcReviewTime,
+    await beginSubmission(userAnswer, rating, now);
+    final wasRecorded =
+        LocalDB.studySessionStepRecord.getByStepId(activeSession.id, step.id) !=
+        null;
+    final outcome = await ReviewSessionPolicy.processSubmission(
+      session: activeSession,
+      step: step,
+      card: card,
+      fsrsCard: fsrsCard,
+      userAnswer: userAnswer,
+      rating: rating,
+      sequenceNumber: currentIndex,
+      now: now,
     );
-
-    final updatedCard = fsrsCard.copyWith(state: result.card);
-
-    final log = FsrsReviewLog(
-      id: uuid.v7(),
-      createdAt: DateTime.now(),
-      fsrsCardId: fsrsCard.id,
-      log: result.reviewLog,
+    _fsrsCards[card.id] = outcome.updatedCard;
+    await finishSubmission(
+      rating: rating,
+      startedAt: activeSession.startedAt,
+      policyCommands: outcome.commands,
+      now: now,
     );
-
-    // Requeue failed answers for another pass in the same session.
-    if (rating == StudyRating.incorrect || rating == StudyRating.again) {
-      queue.add(updatedCard);
+    if (!wasRecorded) {
+      _ratings.add(rating);
     }
-
-    // ── NEW: Update session progress ──
-    // Note: If cards get added back to the queue, totalCards updates so progress bars stay accurate
-    session = session!.copyWith(
-      cardsReviewed: session!.cardsReviewed + 1,
-      totalCards: queue.length,
+    session = activeSession.copyWith(
+      cardsReviewed: activeSession.cardsReviewed + 1,
+      totalCards: runtime!.snapshot.steps.whereType<CardSessionStep>().length,
     );
-
-    // ── THE TOGGLE ──
-    if (realTimeSaving) {
-      await LocalDB.fsrsCard.upsert(updatedCard);
-      await LocalDB.reviewLog.upsert(log);
-      await Services.streak.refreshFromReviewLogs();
-      await LocalDB.reviewSession.upsert(session!); // Assumes repo exists
-    } else {
-      _pendingCards[updatedCard.id] = updatedCard;
-      _pendingLogs.add(log);
-    }
-
-    currentIndex++;
+    await LocalDB.reviewSession.upsert(session!);
+    await Services.streak.refreshFromReviewLogs();
     nextIntervals.clear();
-
     if (isComplete) {
       await completeSession();
     } else {
@@ -223,61 +210,26 @@ class ReviewSessionController
     }
   }
 
-  // ── Session Completion ──
   @override
   @protected
   Future<void> completeSession() async {
-    if (session == null) {
-      failSession(
-        'Cannot complete a review session before it has started.',
-        code: 'REVIEW_SESSION_MISSING',
-      );
-    }
-
-    try {
-      // ── NEW: Finalize session ──
-      session = session!.copyWith(completedAt: DateTime.now());
-
-      if (realTimeSaving) {
-        // Just put the final session state
-        await LocalDB.reviewSession.upsert(session!);
-      } else {
-        // Batch Save everything
-        if (_pendingCards.isNotEmpty) {
-          await LocalDB.fsrsCard.upsertMany(_pendingCards.values.toList());
-        }
-        if (_pendingLogs.isNotEmpty) {
-          await LocalDB.reviewLog.upsertMany(_pendingLogs);
-        }
-        await Services.streak.refreshFromReviewLogs();
-        await LocalDB.reviewSession.upsert(session!);
-      }
-      notifyListeners();
-    } on SessionException catch (e) {
-      setError(e);
-    } on Exception catch (e, stackTrace) {
-      setError(
-        SessionException(
-          'Failed to save session data: $e',
-          code: 'SESSION_COMPLETE_FAILED',
-          originalError: e,
-          stackTrace: stackTrace,
-        ),
-      );
-    }
+    final activeSession = session;
+    if (activeSession == null) return;
+    session = activeSession.copyWith(completedAt: DateTime.now());
+    await LocalDB.reviewSession.upsert(session!);
+    notifyListeners();
   }
 
   @override
-  void reset() {
+  void reset({bool notify = true}) {
     session = null;
-    queue.clear();
-    _pendingLogs.clear();
-    _pendingCards.clear();
-    _studyCards.clear();
+    runtime = null;
     templates.clear();
+    _studyCards.clear();
+    _fsrsCards.clear();
+    _ratings.clear();
     nextIntervals.clear();
-    currentIndex = 0;
     setError(null);
-    notifyListeners();
+    if (notify) notifyListeners();
   }
 }

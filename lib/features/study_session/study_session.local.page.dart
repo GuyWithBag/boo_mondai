@@ -15,6 +15,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         FlashcardTemplate,
         ProgressBar,
         RatingArea,
+        MessageSessionStep,
         Scaffold,
         SessionException,
         SessionMode,
@@ -114,6 +115,41 @@ class StudySessionPage extends HookWidget {
       }
     }
 
+    final step = controller.currentStep;
+    if (step is MessageSessionStep) {
+      return Scaffold(
+        scrollable: false,
+        appBar: AppBar(
+          onPop: () {
+            if (mode == SessionMode.review) dashboardController?.load();
+            context.pop();
+          },
+          child: ProgressBar(value: controller.getProgressPercentage()),
+        ),
+        bottomNavBar: BottomNavBar(
+          child: Button(
+            onPressed: controller.advancePresentationStep,
+            child: const Text('Continue'),
+          ),
+        ),
+        inheritMainBottomNavBarHeight: false,
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                step.title,
+                style: Theme.of(context).textTheme.headlineMedium,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Text(step.message, textAlign: TextAlign.center),
+            ],
+          ),
+        ),
+      );
+    }
+
     // 4. Extract card data
     final template = controller.currentTemplate;
     final studyCard = controller.currentStudyCard;
@@ -149,7 +185,7 @@ class StudySessionPage extends HookWidget {
               child: ProgressBar(value: controller.getProgressPercentage()),
             ),
             Text(
-              '${controller.currentIndex} / ${controller.queue.length}',
+              '${controller.currentIndex + 1} / ${controller.totalStepCount}',
               style: textStyle.resolve(tokens, [
                 TextSize.labelSmall,
                 TextWeight.heavy,

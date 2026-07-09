@@ -8,3 +8,4 @@ export 'scale.helper.dart';
 export 'text.helper.dart';
 export 'list.helper.dart';
 export 'image.helper.dart';
+export 'fsrs.helper.dart';
