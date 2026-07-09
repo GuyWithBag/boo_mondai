@@ -4,12 +4,14 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         ChipInput,
         ChipTone,
+        DeckFormValidator,
         EditableTextValue,
+        FormField,
         SectionEyebrow,
         TextSize,
         textStyle,
         TextWeight;
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide FormField;
 import 'package:theme_variants/theme_variants.dart';
 
 class DeckDetails extends StatelessWidget {
@@ -51,45 +53,108 @@ class DeckDetails extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        EditableTextValue(
-          value: title,
-          enabled: isEditable,
-          placeholder: 'Deck title',
-          onSave: onTitleChanged,
-          textStyle: textStyle.resolve(tokens, const [
-            TextSize.header,
-            TextWeight.heavy,
-          ]),
-        ),
+        if (isEditable)
+          FormField<String>(
+            value: title,
+            validator: DeckFormValidator.title,
+            builder: (_, field) => EditableTextValue(
+              value: title,
+              placeholder: 'Deck title',
+              onSave: (value) async {
+                field.didChange(value);
+                if (field.validate()) {
+                  await onTitleChanged?.call(value);
+                }
+              },
+              textStyle: textStyle.resolve(tokens, const [
+                TextSize.header,
+                TextWeight.heavy,
+              ]),
+            ),
+          )
+        else
+          EditableTextValue(
+            value: title,
+            enabled: false,
+            placeholder: 'Deck title',
+            onSave: null,
+            textStyle: textStyle.resolve(tokens, const [
+              TextSize.header,
+              TextWeight.heavy,
+            ]),
+          ),
         SizedBox(height: tokens.spaceLayoutGapSm),
         if (metaLabels != null) ...[
           metaLabels!,
           SizedBox(height: tokens.spaceLayoutGapMd),
         ],
-        EditableTextValue(
-          value: shortDescription,
-          enabled: isEditable,
-          placeholder: 'Short description',
-          isMarkdown: true,
-          onSave: onShortDescriptionChanged,
-          textStyle: textStyle.resolve(tokens, const [
-            TextSize.labelSmall,
-            TextWeight.body,
-          ]),
-        ),
+        if (isEditable)
+          FormField<String>(
+            value: shortDescription,
+            validator: DeckFormValidator.optionalText,
+            builder: (_, field) => EditableTextValue(
+              value: shortDescription,
+              placeholder: 'Short description',
+              isMarkdown: true,
+              onSave: (value) async {
+                field.didChange(value);
+                if (field.validate()) {
+                  await onShortDescriptionChanged?.call(value);
+                }
+              },
+              textStyle: textStyle.resolve(tokens, const [
+                TextSize.labelSmall,
+                TextWeight.body,
+              ]),
+            ),
+          )
+        else
+          EditableTextValue(
+            value: shortDescription,
+            enabled: false,
+            placeholder: 'Short description',
+            isMarkdown: true,
+            onSave: null,
+            textStyle: textStyle.resolve(tokens, const [
+              TextSize.labelSmall,
+              TextWeight.body,
+            ]),
+          ),
         SizedBox(height: tokens.spaceLayoutGapSm),
-        EditableTextValue(
-          value: longDescription,
-          enabled: isEditable,
-          placeholder: 'Long description',
-          maxLines: null,
-          isMarkdown: true,
-          onSave: onLongDescriptionChanged,
-          textStyle: textStyle.resolve(tokens, const [
-            TextSize.body,
-            TextWeight.body,
-          ]),
-        ),
+        if (isEditable)
+          FormField<String>(
+            value: longDescription,
+            validator: DeckFormValidator.optionalText,
+            builder: (_, field) => EditableTextValue(
+              value: longDescription,
+              placeholder: 'Long description',
+              maxLines: null,
+              isMarkdown: true,
+              onSave: (value) async {
+                field.didChange(value);
+                if (field.validate()) {
+                  await onLongDescriptionChanged?.call(value);
+                }
+              },
+              textStyle: textStyle.resolve(tokens, const [
+                TextSize.body,
+                TextWeight.body,
+              ]),
+            ),
+          )
+        else
+          EditableTextValue(
+            value: longDescription,
+            enabled: false,
+            placeholder: 'Long description',
+            maxLines: null,
+            isMarkdown: true,
+            onSave: null,
+            textStyle: textStyle.resolve(tokens, const [
+              TextSize.body,
+              TextWeight.body,
+            ]),
+          ),
         SizedBox(height: tokens.spaceLayoutGapLg),
         Surface(
           style: surfaceStyle.resolve(tokens, const [
@@ -101,13 +166,31 @@ class DeckDetails extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SectionEyebrow('Tags'),
-              ChipInput(
-                values: tags,
-                onChanged: onTagsChanged ?? (_) {},
-                placeholder: tagsPlaceholder ?? 'No tags yet',
-                isEditable: areTagsEditable,
-                chipTone: tagsTone,
-              ),
+              if (areTagsEditable)
+                FormField<List<String>>(
+                  value: tags,
+                  validator: DeckFormValidator.tags,
+                  builder: (_, field) => ChipInput(
+                    values: tags,
+                    onChanged: (values) {
+                      field.didChange(values);
+                      if (field.validate()) {
+                        onTagsChanged?.call(values);
+                      }
+                    },
+                    placeholder: tagsPlaceholder ?? 'No tags yet',
+                    isEditable: true,
+                    chipTone: tagsTone,
+                  ),
+                )
+              else
+                ChipInput(
+                  values: tags,
+                  onChanged: (_) {},
+                  placeholder: tagsPlaceholder ?? 'No tags yet',
+                  isEditable: false,
+                  chipTone: tagsTone,
+                ),
             ],
           ),
         ),

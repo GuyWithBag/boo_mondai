@@ -7,3 +7,4 @@ export 'widgets/widgets.barrel.dart';
 export 'decks.remote.db.dart';
 export 'decks.local.db.dart';
 export 'decks.service.dart';
+export 'deck_form.validator.dart';
