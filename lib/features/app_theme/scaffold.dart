@@ -46,6 +46,7 @@ class Scaffold extends HookWidget {
     this.isFloatingAppBar = false,
     this.inheritMainBottomNavBarHeight = true,
     this.scrollController,
+    this.scrollStartAtTheBottom = false,
     this.resizeToAvoidBottomInset = false,
     this.resizeBodyForKeyboard = true,
     this.centeredBody = false,
@@ -81,6 +82,7 @@ class Scaffold extends HookWidget {
   final bool haveBottomNavBarBottomGap;
   final bool inheritMainBottomNavBarHeight;
   final ScrollController? scrollController;
+  final bool scrollStartAtTheBottom;
   final bool resizeToAvoidBottomInset;
   final bool resizeBodyForKeyboard;
   final bool showUnfocusButton;
@@ -243,6 +245,7 @@ class Scaffold extends HookWidget {
       content = SingleChildScrollView(
         padding: EdgeInsets.zero,
         controller: scrollController,
+        reverse: scrollStartAtTheBottom,
         child: content,
       );
     }

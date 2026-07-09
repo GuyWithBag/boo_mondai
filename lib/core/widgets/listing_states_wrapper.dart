@@ -37,11 +37,13 @@ class ListingStatesWrapper<T> extends StatelessWidget {
     this.header,
     this.showHeaderWhenEmpty = false,
     bool useParentScroll = false,
+    bool reverse = false,
   }) : layoutBuilder = ((context, itemCount, builder) {
          final showLeading =
              leadingItem != null && (showLeadingItemAlways || items.isNotEmpty);
          return ListView.separated(
            padding: padding,
+           reverse: reverse,
            shrinkWrap: useParentScroll,
            physics: useParentScroll
                ? const NeverScrollableScrollPhysics()
@@ -72,21 +74,28 @@ class ListingStatesWrapper<T> extends StatelessWidget {
     required SliverGridDelegate gridDelegate,
     EdgeInsetsGeometry padding = EdgeInsets.zero,
     bool useParentScroll = false,
+    bool reverse = false,
+    TextDirection textDirection = TextDirection.ltr,
   }) : layoutBuilder = ((context, itemCount, builder) {
          final showLeading =
              leadingItem != null && (showLeadingItemAlways || items.isNotEmpty);
-         return GridView.builder(
-           padding: padding,
-           shrinkWrap: useParentScroll,
-           physics: useParentScroll
-               ? const NeverScrollableScrollPhysics()
-               : null,
-           gridDelegate: gridDelegate,
-           itemCount: itemCount + (showLeading ? 1 : 0),
-           itemBuilder: (context, index) {
-             if (showLeading && index == 0) return leadingItem;
-             return builder(context, showLeading ? index - 1 : index);
-           },
+         return Directionality(
+           textDirection: textDirection,
+           child: GridView.builder(
+             padding: padding,
+             reverse: reverse,
+             shrinkWrap: useParentScroll,
+
+             physics: useParentScroll
+                 ? const NeverScrollableScrollPhysics()
+                 : null,
+             gridDelegate: gridDelegate,
+             itemCount: itemCount + (showLeading ? 1 : 0),
+             itemBuilder: (context, index) {
+               if (showLeading && index == 0) return leadingItem;
+               return builder(context, showLeading ? index - 1 : index);
+             },
+           ),
          );
        });
 
@@ -107,17 +116,19 @@ class ListingStatesWrapper<T> extends StatelessWidget {
     double spacing = 8.0,
     double runSpacing = 8.0,
     WrapAlignment alignment = WrapAlignment.start,
+    bool reverse = false,
   }) : layoutBuilder = ((context, itemCount, builder) {
          final showLeading =
              leadingItem != null && (showLeadingItemAlways || items.isNotEmpty);
+         final children = <Widget>[
+           if (showLeading) leadingItem,
+           ...List.generate(itemCount, (index) => builder(context, index)),
+         ];
          return Wrap(
            spacing: spacing,
            runSpacing: runSpacing,
            alignment: alignment,
-           children: [
-             if (showLeading) leadingItem,
-             ...List.generate(itemCount, (index) => builder(context, index)),
-           ],
+           children: reverse ? children.reversed.toList() : children,
          );
        });
 

@@ -40,21 +40,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         useChangeTrackerController,
         useSyncController,
         useSelectionController;
-import 'package:flutter/material.dart'
-    show
-        BuildContext,
-        Widget,
-        Icon,
-        Text,
-        StatelessWidget,
-        VoidCallback,
-        WidgetsBinding,
-        Icons,
-        ElevatedButton,
-        EdgeInsets,
-        LayoutBuilder,
-        Padding,
-        SliverGridDelegateWithMaxCrossAxisExtent;
+import 'package:flutter/material.dart' hide AppBar, Scaffold;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -188,6 +174,7 @@ class ViewDecksLocalPage extends HookWidget {
     );
 
     return Scaffold(
+      scrollStartAtTheBottom: true,
       appBar: AppBar(
         title: 'My Decks',
         selectedActions: [
@@ -282,7 +269,9 @@ class _DeckListView extends StatelessWidget {
       isLoading: isLoading,
       exception: error,
       items: decks,
+      reverse: true,
       useParentScroll: true,
+      textDirection: TextDirection.rtl,
       onRetry: onRetry,
       skeletonTile: _GridTileMaxWidthConstraints(
         builder: (width) => DeckTile(deck: null, width: width, hasTags: true),
@@ -357,6 +346,7 @@ class _DeckListingListView extends StatelessWidget {
       isLoading: isLoading,
       exception: error,
       items: decks,
+      reverse: true,
       useParentScroll: true,
       onRetry: onRetry,
       skeletonTile: DeckListingTile(
