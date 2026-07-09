@@ -5,6 +5,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         ButtonColor,
         ChipTone,
         DeckDetails,
+        DeckFormValidator,
         Deck,
         DeckProfilesLabel,
         DeckTile,
@@ -29,8 +30,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         ViewDeckSingleHelper,
         DateHelper,
         ImageHelper,
+        FormField,
         showBottomSheet;
-import 'package:flutter/material.dart' hide AppBar, Scaffold, showBottomSheet;
+import 'package:flutter/material.dart'
+    hide AppBar, FormField, Scaffold, showBottomSheet;
 import 'package:flutter_hooks/flutter_hooks.dart' show HookWidget;
 import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
 import 'package:go_router/go_router.dart' show GoRouterHelper;
@@ -134,7 +137,9 @@ class ViewDeckSingleSheet extends HookWidget {
               ),
             ),
             padding: EdgeInsets.zero,
-            body: _Body(sheet: sheet),
+            body: activeDeck.isEditable
+                ? Form(child: _Body(sheet: sheet))
+                : _Body(sheet: sheet),
           ),
         );
       },
@@ -281,13 +286,29 @@ class _BodySubSection extends StatelessWidget {
           Positioned(
             left: tokens.spaceLayoutPadding,
             top: 0,
-            child: DeckTile(
-              deck: deck,
-              width: deckWidth,
-              state: DeckTileState.bare,
-              isImageEditable: deck.isEditable,
-              onImagePicked: sheet.updateCoverImage,
-            ),
+            child: deck.isEditable
+                ? FormField<String?>(
+                    value: LocalImageResolverHelper.resolveDeckCover(deck),
+                    listenable: sheet,
+                    valueReader: () {
+                      return LocalImageResolverHelper.resolveDeckCover(
+                        sheet.deck,
+                      );
+                    },
+                    validator: DeckFormValidator.optionalImage,
+                    builder: (_, _) => DeckTile(
+                      deck: deck,
+                      width: deckWidth,
+                      state: DeckTileState.bare,
+                      isImageEditable: true,
+                      onImagePicked: sheet.updateCoverImage,
+                    ),
+                  )
+                : DeckTile(
+                    deck: deck,
+                    width: deckWidth,
+                    state: DeckTileState.bare,
+                  ),
           ),
           Positioned(
             right: tokens.spaceLayoutPadding,
