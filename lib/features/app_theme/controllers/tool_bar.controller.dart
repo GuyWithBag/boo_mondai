@@ -13,13 +13,31 @@ ToolBarController useToolBarController() {
 
 class ToolBarController extends Controller {
   TextEditingController? _activeTextController;
+  bool _activeTextAllowsAttachments = false;
 
   TextEditingController? get activeTextController => _activeTextController;
   bool get hasActiveTextController => _activeTextController != null;
+  bool get activeTextAllowsAttachments =>
+      hasActiveTextController && _activeTextAllowsAttachments;
 
-  void setActiveTextController(TextEditingController controller) {
-    if (_activeTextController == controller) return;
+  void setActiveTextController(
+    TextEditingController controller, {
+    bool allowAttachments = false,
+  }) {
+    if (_activeTextController == controller &&
+        _activeTextAllowsAttachments == allowAttachments) {
+      return;
+    }
     _activeTextController = controller;
+    _activeTextAllowsAttachments = allowAttachments;
+    notifyListeners();
+  }
+
+  void clearActiveTextController(TextEditingController controller) {
+    if (_activeTextController != controller) return;
+
+    _activeTextController = null;
+    _activeTextAllowsAttachments = false;
     notifyListeners();
   }
 

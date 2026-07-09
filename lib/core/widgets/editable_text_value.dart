@@ -3,8 +3,6 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
         Button,
-        buttonStyle,
-        ButtonVariant,
         ButtonColor,
         MarkdownText,
         MarkdownTextMode,
@@ -20,17 +18,18 @@ import 'package:flutter/material.dart'
         Widget,
         BuildContext,
         WidgetsBinding,
+        EdgeInsets,
         TextSelection,
         CrossAxisAlignment,
         TextInputAction,
         MainAxisAlignment,
         Icons,
-        Icon,
         Column,
         TextOverflow,
         Text,
         Flexible;
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
 import 'package:theme_variants/theme_variants.dart';
 
 class EditableTextValue extends HookWidget {
@@ -42,6 +41,8 @@ class EditableTextValue extends HookWidget {
     this.textStyle,
     this.maxLines = 1,
     this.isMarkdown = false,
+    this.allowMarkdownAttachments = false,
+    this.ensureEditActionsAreVisibleWhenKeyboardVisible = true,
     this.fieldVariants = const [TextFieldSize.normal, TextFieldFrame.underline],
     super.key,
     this.textAlign,
@@ -56,6 +57,8 @@ class EditableTextValue extends HookWidget {
   final TextStyle? placeholderTextStyle;
   final int? maxLines;
   final bool isMarkdown;
+  final bool allowMarkdownAttachments;
+  final bool ensureEditActionsAreVisibleWhenKeyboardVisible;
   final Iterable<Object> fieldVariants;
   final TextAlign? textAlign;
 
@@ -67,6 +70,13 @@ class EditableTextValue extends HookWidget {
     final controller = useTextEditingController(text: value);
     final markdownValue = useState(value);
     final focusNode = useFocusNode();
+    final editActionsScrollPadding = EdgeInsets.all(20).copyWith(
+      bottom:
+          20 +
+          (ensureEditActionsAreVisibleWhenKeyboardVisible
+              ? 48.h + tokens.spaceLayoutGapSm
+              : 0),
+    );
 
     useEffect(() {
       if (!isEditing.value) {
@@ -130,6 +140,8 @@ class EditableTextValue extends HookWidget {
                   ? TextInputAction.done
                   : TextInputAction.newline,
               variants: fieldVariants,
+              allowAttachments: allowMarkdownAttachments,
+              scrollPadding: editActionsScrollPadding,
             )
           else
             TextField(
@@ -144,6 +156,7 @@ class EditableTextValue extends HookWidget {
                   : TextInputAction.newline,
               onSubmitted: maxLines == 1 ? (_) => save() : null,
               variants: fieldVariants,
+              scrollPadding: editActionsScrollPadding,
             ),
           SizedBox(height: tokens.spaceLayoutGapSm),
           Row(

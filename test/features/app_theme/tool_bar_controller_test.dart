@@ -4,6 +4,53 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('ToolBarController', () {
+    test('tracks attachment capability for the active text field', () {
+      final controller = ToolBarController();
+      final titleController = TextEditingController();
+      final descriptionController = TextEditingController();
+
+      controller.setActiveTextController(titleController);
+      expect(controller.activeTextAllowsAttachments, isFalse);
+
+      controller.setActiveTextController(
+        descriptionController,
+        allowAttachments: true,
+      );
+      expect(controller.activeTextAllowsAttachments, isTrue);
+
+      controller.setActiveTextController(titleController);
+      expect(controller.activeTextAllowsAttachments, isFalse);
+
+      controller.dispose();
+      titleController.dispose();
+      descriptionController.dispose();
+    });
+
+    test('only clears the controller that currently owns the toolbar', () {
+      final controller = ToolBarController();
+      final firstController = TextEditingController();
+      final secondController = TextEditingController();
+
+      controller.setActiveTextController(firstController);
+      controller.setActiveTextController(
+        secondController,
+        allowAttachments: true,
+      );
+      controller.clearActiveTextController(firstController);
+
+      expect(controller.activeTextController, same(secondController));
+      expect(controller.activeTextAllowsAttachments, isTrue);
+
+      controller.clearActiveTextController(secondController);
+
+      expect(controller.activeTextController, isNull);
+      expect(controller.activeTextAllowsAttachments, isFalse);
+
+      controller.dispose();
+      firstController.dispose();
+      secondController.dispose();
+    });
+
     test('block quote prefixes the whole list line at the cursor', () {
       final controller = ToolBarController();
       final textController = TextEditingController(text: '- List item');

@@ -37,6 +37,7 @@ class MatchPair extends StatelessWidget {
       children: [
         Expanded(
           child: MarkdownText(
+            allowAttachments: true,
             data: term,
             onChanged: onTermChanged,
             mode: MarkdownTextMode.input,
@@ -46,6 +47,7 @@ class MatchPair extends StatelessWidget {
         Icon(Icons.compare_arrows, color: tokens.colorTextMuted),
         Expanded(
           child: MarkdownText(
+            allowAttachments: true,
             data: match,
             onChanged: onMatchChanged,
             mode: MarkdownTextMode.input,

@@ -89,6 +89,7 @@ class EditMultipleChoiceOption extends HookWidget {
     );
     final optionText = isEditable
         ? MarkdownText(
+            allowAttachments: true,
             data: value,
             controller: controller,
             onChanged: onTextChanged,

@@ -68,6 +68,7 @@ class EditDeckAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ],
       child: MarkdownText(
+        allowAttachments: true,
         data: titleController.text,
         controller: titleController,
         placeholder: 'Deck Title...',

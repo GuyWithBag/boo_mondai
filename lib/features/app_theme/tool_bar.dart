@@ -150,9 +150,11 @@ class ToolBarActionButton extends StatelessWidget {
     return ListenableBuilder(
       listenable: controller,
       builder: (context, _) {
-        final onPressed = controller.hasActiveTextController
-            ? _onPressed()
-            : null;
+        final hasSupportedTarget =
+            controller.hasActiveTextController &&
+            (action != ToolBarAction.attachment ||
+                controller.activeTextAllowsAttachments);
+        final onPressed = hasSupportedTarget ? _onPressed() : null;
 
         return Button.icon(icon: _icon, onPressed: onPressed, tokens: tokens);
       },

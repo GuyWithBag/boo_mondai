@@ -130,6 +130,7 @@ class DeckDetails extends StatelessWidget {
               placeholder: 'Long description',
               maxLines: null,
               isMarkdown: true,
+              allowMarkdownAttachments: true,
               onSave: (value) async {
                 field.didChange(value);
                 if (field.validate()) {

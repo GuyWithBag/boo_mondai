@@ -58,12 +58,14 @@ class MarkdownText extends HookWidget {
     this.maxLines = 1,
     this.expands = false,
     this.textAlignVertical,
+    this.scrollPadding = const EdgeInsets.all(20),
     this.variants = const [TextFieldSize.normal, TextFieldFrame.outline],
     this.mode = MarkdownTextMode.raw,
     this.onTapLink,
     this.resolveAttachmentUrl,
     this.baseTextStyle,
     this.useToolBar = true,
+    this.allowAttachments = false,
     super.key,
     this.placeholderTextStyle,
   });
@@ -83,9 +85,11 @@ class MarkdownText extends HookWidget {
   final int? maxLines;
   final bool expands;
   final TextAlignVertical? textAlignVertical;
+  final EdgeInsets scrollPadding;
   final Iterable<Object> variants;
   final MarkdownTextMode mode;
   final bool useToolBar;
+  final bool allowAttachments;
 
   /// Called when a link is tapped in preview modes. When null, links are
   /// opened via [url_launcher] automatically.
@@ -135,8 +139,10 @@ class MarkdownText extends HookWidget {
         maxLines: maxLines,
         expands: expands,
         textAlignVertical: textAlignVertical,
+        scrollPadding: scrollPadding,
         variants: variants,
         useToolBar: useToolBar,
+        allowAttachments: allowAttachments,
       ),
       MarkdownTextMode.inputPreview => _InputPreviewField(
         data: data,
@@ -153,11 +159,13 @@ class MarkdownText extends HookWidget {
         maxLines: maxLines,
         expands: expands,
         textAlignVertical: textAlignVertical,
+        scrollPadding: scrollPadding,
         variants: variants,
         onTapLink: onTapLink,
         resolveAttachmentUrl: resolveAttachmentUrl,
         tokens: tokens,
         useToolBar: useToolBar,
+        allowAttachments: allowAttachments,
       ),
     };
   }
@@ -242,8 +250,6 @@ MarkdownImageBuilder? _buildImageBuilder(
   AppTokens tokens,
   MarkdownAttachmentUrlResolver? resolveAttachmentUrl,
 ) {
-  if (resolveAttachmentUrl == null) return null;
-
   return (Uri uri, String? title, String? alt) {
     final src = _resolveAttachmentHref(uri, resolveAttachmentUrl);
     if (src == null) return const SizedBox.shrink();
@@ -292,8 +298,10 @@ class _InputField extends HookWidget {
     this.maxLines,
     this.expands = false,
     this.textAlignVertical,
+    required this.scrollPadding,
     required this.placeholderTextStyle,
     required this.useToolBar,
+    required this.allowAttachments,
   });
 
   final String data;
@@ -311,8 +319,10 @@ class _InputField extends HookWidget {
   final int? maxLines;
   final bool expands;
   final TextAlignVertical? textAlignVertical;
+  final EdgeInsets scrollPadding;
   final Iterable<Object> variants;
   final bool useToolBar;
+  final bool allowAttachments;
 
   @override
   Widget build(BuildContext context) {
@@ -329,19 +339,35 @@ class _InputField extends HookWidget {
       return null;
     }, [data, effectiveController]);
 
-    useEffect(() {
-      if (toolBarController == null) return null;
+    useEffect(
+      () {
+        if (toolBarController == null) return null;
 
-      void listener() {
-        if (effectiveFocusNode.hasFocus) {
-          toolBarController.setActiveTextController(effectiveController);
+        void listener() {
+          if (effectiveFocusNode.hasFocus) {
+            toolBarController.setActiveTextController(
+              effectiveController,
+              allowAttachments: allowAttachments,
+            );
+          } else {
+            toolBarController.clearActiveTextController(effectiveController);
+          }
         }
-      }
 
-      effectiveFocusNode.addListener(listener);
-      listener();
-      return () => effectiveFocusNode.removeListener(listener);
-    }, [effectiveFocusNode, effectiveController, toolBarController]);
+        effectiveFocusNode.addListener(listener);
+        listener();
+        return () {
+          effectiveFocusNode.removeListener(listener);
+          toolBarController.clearActiveTextController(effectiveController);
+        };
+      },
+      [
+        effectiveFocusNode,
+        effectiveController,
+        toolBarController,
+        allowAttachments,
+      ],
+    );
 
     return TextField(
       variants: variants,
@@ -359,6 +385,7 @@ class _InputField extends HookWidget {
       maxLines: maxLines,
       expands: expands,
       textAlignVertical: textAlignVertical,
+      scrollPadding: scrollPadding,
     );
   }
 }
@@ -385,9 +412,11 @@ class _InputPreviewField extends HookWidget {
     this.maxLines,
     this.expands = false,
     this.textAlignVertical,
+    required this.scrollPadding,
     this.onTapLink,
     this.resolveAttachmentUrl,
     required this.useToolBar,
+    required this.allowAttachments,
   });
 
   final String data;
@@ -404,11 +433,13 @@ class _InputPreviewField extends HookWidget {
   final int? maxLines;
   final bool expands;
   final TextAlignVertical? textAlignVertical;
+  final EdgeInsets scrollPadding;
   final Iterable<Object> variants;
   final MarkdownTapLinkCallback? onTapLink;
   final MarkdownAttachmentUrlResolver? resolveAttachmentUrl;
   final AppTokens tokens;
   final bool useToolBar;
+  final bool allowAttachments;
 
   @override
   Widget build(BuildContext context) {
@@ -434,19 +465,35 @@ class _InputPreviewField extends HookWidget {
       return () => effectiveFocusNode.removeListener(listener);
     }, [effectiveFocusNode]);
 
-    useEffect(() {
-      if (toolBarController == null) return null;
+    useEffect(
+      () {
+        if (toolBarController == null) return null;
 
-      void listener() {
-        if (effectiveFocusNode.hasFocus) {
-          toolBarController.setActiveTextController(effectiveController);
+        void listener() {
+          if (effectiveFocusNode.hasFocus) {
+            toolBarController.setActiveTextController(
+              effectiveController,
+              allowAttachments: allowAttachments,
+            );
+          } else {
+            toolBarController.clearActiveTextController(effectiveController);
+          }
         }
-      }
 
-      effectiveFocusNode.addListener(listener);
-      listener();
-      return () => effectiveFocusNode.removeListener(listener);
-    }, [effectiveFocusNode, effectiveController, toolBarController]);
+        effectiveFocusNode.addListener(listener);
+        listener();
+        return () {
+          effectiveFocusNode.removeListener(listener);
+          toolBarController.clearActiveTextController(effectiveController);
+        };
+      },
+      [
+        effectiveFocusNode,
+        effectiveController,
+        toolBarController,
+        allowAttachments,
+      ],
+    );
 
     if (isEditing.value) {
       return TextField(
@@ -464,6 +511,7 @@ class _InputPreviewField extends HookWidget {
         maxLines: maxLines,
         expands: expands,
         textAlignVertical: textAlignVertical,
+        scrollPadding: scrollPadding,
         autofocus: true,
       );
     }
