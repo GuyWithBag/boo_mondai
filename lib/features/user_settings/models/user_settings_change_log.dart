@@ -6,8 +6,8 @@
 //   /// Creates a user settings change log row.
 //   const UserSettingsChangeRecord({
 //     required this.type,
-//     required this.entityType,
-//     required this.entityId,
+//     required this.type,
+//     required this.id,
 //     required this.message,
 //   });
 
@@ -15,10 +15,10 @@
 //   final UserSettingsChangeType type;
 
 //   /// Domain entity type, such as `user_settings` or `custom_theme_preset`.
-//   final String entityType;
+//   final String type;
 
 //   /// Identifier of the changed entity.
-//   final String entityId;
+//   final String id;
 
 //   /// Human-readable description of the applied change.
 //   final String message;

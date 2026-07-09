@@ -193,8 +193,8 @@ Recommended local model:
 - `ImportExportBackup`
 - `id`
 - `operation`
-- `entityType`
-- `entityId`
+- `type`
+- `id`
 - `title`
 - `payload`
 - `changeLogs`

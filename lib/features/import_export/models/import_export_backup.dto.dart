@@ -9,7 +9,7 @@ class ImportExportBackup with ImportExportBackupMappable {
   const ImportExportBackup({
     required this.id,
     required this.operation,
-    required this.entityType,
+    required this.type,
     this.entityId,
     required this.title,
     required this.payloadJson,
@@ -24,7 +24,7 @@ class ImportExportBackup with ImportExportBackupMappable {
   final String operation;
 
   /// Target entity type such as `deck`, `decks`, or `card_templates`.
-  final String entityType;
+  final String type;
 
   /// Optional local entity id.
   final String? entityId;

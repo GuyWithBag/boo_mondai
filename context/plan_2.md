@@ -103,8 +103,8 @@ class ChangedEntity {
   const ChangedEntity({
     required this.type,
     required this.source,
-    required this.entityType,
-    required this.entityId,
+    required this.type,
+    required this.id,
     required this.title,
     this.subtitle,
     this.before,
@@ -114,8 +114,8 @@ class ChangedEntity {
 
   final ChangeType type;
   final ChangeSource source;
-  final String entityType;
-  final String entityId;
+  final String type;
+  final String id;
   final String title;
   final String? subtitle;
   final Object? before;

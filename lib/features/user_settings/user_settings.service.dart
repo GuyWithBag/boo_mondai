@@ -179,8 +179,8 @@
 //       changeLogs: [
 //         UserSettingsChangeRecord(
 //           type: UserSettingsChangeType.created,
-//           entityType: 'user_settings',
-//           entityId: settings.id,
+//           type: 'user_settings',
+//           id: settings.id,
 //           message: 'Exported user settings for profile $userId.',
 //         ),
 //       ],
@@ -231,8 +231,8 @@
 //       logs.add(
 //         UserSettingsChangeRecord(
 //           type: UserSettingsChangeType.updated,
-//           entityType: 'user_settings',
-//           entityId: current.id,
+//           type: 'user_settings',
+//           id: current.id,
 //           message: 'Updated theme mode to $rawThemeMode.',
 //         ),
 //       );
@@ -244,8 +244,8 @@
 //       logs.add(
 //         UserSettingsChangeRecord(
 //           type: UserSettingsChangeType.updated,
-//           entityType: 'user_settings',
-//           entityId: current.id,
+//           type: 'user_settings',
+//           id: current.id,
 //           message: 'Updated light preset to $lightThemePresetId.',
 //         ),
 //       );
@@ -257,8 +257,8 @@
 //       logs.add(
 //         UserSettingsChangeRecord(
 //           type: UserSettingsChangeType.updated,
-//           entityType: 'user_settings',
-//           entityId: current.id,
+//           type: 'user_settings',
+//           id: current.id,
 //           message: 'Updated dark preset to $darkThemePresetId.',
 //         ),
 //       );
@@ -270,8 +270,8 @@
 //       logs.add(
 //         UserSettingsChangeRecord(
 //           type: UserSettingsChangeType.updated,
-//           entityType: 'theme_override',
-//           entityId: current.id,
+//           type: 'theme_override',
+//           id: current.id,
 //           message: 'Updated theme override payload.',
 //         ),
 //       );
@@ -282,8 +282,8 @@
 //       logs.add(
 //         UserSettingsChangeRecord(
 //           type: UserSettingsChangeType.updated,
-//           entityType: 'theme_override',
-//           entityId: current.id,
+//           type: 'theme_override',
+//           id: current.id,
 //           message: 'Updated theme override payload.',
 //         ),
 //       );
@@ -322,8 +322,8 @@
 //       logs.add(
 //         UserSettingsChangeRecord(
 //           type: UserSettingsChangeType.updated,
-//           entityType: 'custom_theme_preset',
-//           entityId: current.id,
+//           type: 'custom_theme_preset',
+//           id: current.id,
 //           message: 'Imported ${imported.length} custom theme presets.',
 //         ),
 //       );

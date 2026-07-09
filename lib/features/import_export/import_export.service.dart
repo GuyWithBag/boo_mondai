@@ -95,19 +95,16 @@ class ImportExportService {
     final payload = _buildDeckPayload(deck: deck, templates: templates);
     final logs = <ChangedEntity<Object?>>[
       ChangedEntity<Object?>(
-        type: ChangeType.added,
+        changeType: ChangeType.added,
         source: ChangeSource.importExport,
-        entityType: 'deck',
-        entityId: deck.id,
-        title: 'Exported ${deck.title}',
-        subtitle: '${templates.length} cards',
+        id: deck.id,
         afterChange: deck,
       ),
     ];
     await _storeBackup(
       operation: 'export_deck',
-      entityType: 'deck',
-      entityId: deck.id,
+      type: 'deck',
+      id: deck.id,
       title: 'Export deck ${deck.title}',
       payload: payload,
       logs: logs,
@@ -461,20 +458,19 @@ class ImportExportService {
     };
 
     final logs = <ChangedEntity<CardTemplate>>[
-      ChangedEntity<CardTemplate>(
-        type: ChangeType.added,
-        source: ChangeSource.importExport,
-        entityType: 'card_templates',
-        entityId: deckId,
-        title: 'Exported cards from ${deck.title}',
-        subtitle: '${selected.length} cards',
-      ),
+      for (final template in selected)
+        ChangedEntity<CardTemplate>(
+          changeType: ChangeType.added,
+          source: ChangeSource.importExport,
+          id: template.id,
+          afterChange: template,
+        ),
     ];
 
     await _storeBackup(
       operation: 'export_cards',
-      entityType: 'card_templates',
-      entityId: deckId,
+      type: 'card_templates',
+      id: deckId,
       title: 'Export cards from ${deck.title}',
       payload: payload,
       logs: logs,
@@ -500,11 +496,9 @@ class ImportExportService {
     if (mode == DeckImportMode.skip) {
       logs.add(
         ChangedEntity(
-          type: ChangeType.skipped,
+          changeType: ChangeType.skipped,
           source: ChangeSource.importExport,
-          entityType: 'deck',
-          entityId: incomingDeck.id,
-          title: 'Skipped ${incomingDeck.title}',
+          id: incomingDeck.id,
           afterChange: incomingDeck,
         ),
       );
@@ -544,12 +538,9 @@ class ImportExportService {
 
       logs.add(
         ChangedEntity(
-          type: ChangeType.modified,
+          changeType: ChangeType.modified,
           source: ChangeSource.importExport,
-          entityType: 'deck',
-          entityId: target.id,
-          title: 'Updated ${target.title}',
-          subtitle: '${copiedTemplates.length} imported cards',
+          id: target.id,
           beforeChange: target,
           afterChange: updatedDeck,
           changedProperties: ChangeDifferenceHelper.decks(target, updatedDeck),
@@ -558,8 +549,8 @@ class ImportExportService {
 
       await _storeBackup(
         operation: 'import_deck',
-        entityType: 'deck',
-        entityId: target.id,
+        type: 'deck',
+        id: target.id,
         title: 'Import deck update ${updatedDeck.title}',
         payload: payload,
         logs: logs,
@@ -595,20 +586,17 @@ class ImportExportService {
 
     logs.add(
       ChangedEntity(
-        type: ChangeType.added,
+        changeType: ChangeType.added,
         source: ChangeSource.importExport,
-        entityType: 'deck',
-        entityId: createdDeck.id,
-        title: createdDeck.title,
-        subtitle: '${copiedTemplates.length} imported cards',
+        id: createdDeck.id,
         afterChange: createdDeck,
       ),
     );
 
     await _storeBackup(
       operation: 'import_deck',
-      entityType: 'deck',
-      entityId: createdDeck.id,
+      type: 'deck',
+      id: createdDeck.id,
       title: 'Import new deck ${createdDeck.title}',
       payload: payload,
       logs: logs,
@@ -736,12 +724,9 @@ class ImportExportService {
         );
         changes.add(
           ChangedEntity(
-            type: ChangeType.modified,
+            changeType: ChangeType.modified,
             source: ChangeSource.importExport,
-            entityType: 'card_template',
-            entityId: local.id,
-            title: ChangeDifferenceHelper.templateTitle(local),
-            subtitle: 'Likely imported card update',
+            id: local.id,
             beforeChange: local,
             afterChange: template,
             changedProperties: ChangeDifferenceHelper.templates(
@@ -753,12 +738,9 @@ class ImportExportService {
       } else {
         changes.add(
           ChangedEntity(
-            type: ChangeType.added,
+            changeType: ChangeType.added,
             source: ChangeSource.importExport,
-            entityType: 'card_template',
-            entityId: template.id,
-            title: ChangeDifferenceHelper.templateTitle(template),
-            subtitle: 'Imported card will be added',
+            id: template.id,
             afterChange: template,
           ),
         );
@@ -824,12 +806,9 @@ class ImportExportService {
       if (decision?.action == CardImportAction.skip) {
         logs.add(
           ChangedEntity(
-            type: ChangeType.skipped,
+            changeType: ChangeType.skipped,
             source: ChangeSource.importExport,
-            entityType: 'card_template',
-            entityId: template.id,
-            title: ChangeDifferenceHelper.templateTitle(template),
-            subtitle: 'Skipped imported card',
+            id: template.id,
             afterChange: template,
           ),
         );
@@ -844,12 +823,10 @@ class ImportExportService {
         if (existing == null) {
           logs.add(
             ChangedEntity(
-              type: ChangeType.skipped,
+              changeType: ChangeType.skipped,
               source: ChangeSource.importExport,
-              entityType: 'card_template',
-              entityId: decision.targetTemplateId!,
-              title: 'Skipped card update',
-              subtitle: 'Target template was not found locally.',
+              id: decision.targetTemplateId!,
+              afterChange: template,
             ),
           );
           continue;
@@ -865,12 +842,9 @@ class ImportExportService {
         written.add(updated);
         logs.add(
           ChangedEntity(
-            type: ChangeType.modified,
+            changeType: ChangeType.modified,
             source: ChangeSource.importExport,
-            entityType: 'card_template',
-            entityId: existing.id,
-            title: ChangeDifferenceHelper.templateTitle(updated),
-            subtitle: 'Updated imported card',
+            id: existing.id,
             beforeChange: existing,
             afterChange: updated,
             changedProperties: ChangeDifferenceHelper.templates(
@@ -892,12 +866,9 @@ class ImportExportService {
       written.add(created);
       logs.add(
         ChangedEntity(
-          type: ChangeType.added,
+          changeType: ChangeType.added,
           source: ChangeSource.importExport,
-          entityType: 'card_template',
-          entityId: created.id,
-          title: ChangeDifferenceHelper.templateTitle(created),
-          subtitle: 'Imported new card',
+          id: created.id,
           afterChange: created,
         ),
       );
@@ -911,8 +882,8 @@ class ImportExportService {
 
     await _storeBackup(
       operation: 'import_cards',
-      entityType: 'card_templates',
-      entityId: payload.deckId,
+      type: 'card_templates',
+      id: payload.deckId,
       title: 'Import cards into ${payload.deckId}',
       payload: {
         'deck_id': payload.deckId,
@@ -1339,8 +1310,8 @@ class ImportExportService {
 
   static Future<void> _storeBackup({
     required String operation,
-    required String entityType,
-    required String? entityId,
+    required String type,
+    required String? id,
     required String title,
     required Map<String, dynamic> payload,
     required List<ChangedEntity> logs,
@@ -1348,8 +1319,8 @@ class ImportExportService {
     final backup = ImportExportBackup(
       id: uuid.v7(),
       operation: operation,
-      entityType: entityType,
-      entityId: entityId,
+      type: type,
+      entityId: id,
       title: title,
       payloadJson: jsonEncode(payload),
       changeLogsJson: jsonEncode([for (final log in logs) log.toJson()]),

@@ -72,60 +72,32 @@ class CardMediaAttachmentMapper
   static String _$id(CardMediaAttachment v) => v.id;
   static const Field<CardMediaAttachment, String> _f$id = Field('id', _$id);
   static String _$templateId(CardMediaAttachment v) => v.templateId;
-  static const Field<CardMediaAttachment, String> _f$templateId = Field(
-    'templateId',
-    _$templateId,
-    key: r'template_id',
-  );
+  static const Field<CardMediaAttachment, String> _f$templateId =
+      Field('templateId', _$templateId, key: r'template_id');
   static AttachmentType _$type(CardMediaAttachment v) => v.type;
-  static const Field<CardMediaAttachment, AttachmentType> _f$type = Field(
-    'type',
-    _$type,
-  );
+  static const Field<CardMediaAttachment, AttachmentType> _f$type =
+      Field('type', _$type);
   static String _$label(CardMediaAttachment v) => v.label;
-  static const Field<CardMediaAttachment, String> _f$label = Field(
-    'label',
-    _$label,
-  );
+  static const Field<CardMediaAttachment, String> _f$label =
+      Field('label', _$label);
   static String _$storagePath(CardMediaAttachment v) => v.storagePath;
-  static const Field<CardMediaAttachment, String> _f$storagePath = Field(
-    'storagePath',
-    _$storagePath,
-    key: r'storage_path',
-  );
+  static const Field<CardMediaAttachment, String> _f$storagePath =
+      Field('storagePath', _$storagePath, key: r'storage_path');
   static String? _$publicUrl(CardMediaAttachment v) => v.publicUrl;
-  static const Field<CardMediaAttachment, String> _f$publicUrl = Field(
-    'publicUrl',
-    _$publicUrl,
-    key: r'public_url',
-    opt: true,
-  );
+  static const Field<CardMediaAttachment, String> _f$publicUrl =
+      Field('publicUrl', _$publicUrl, key: r'public_url', opt: true);
   static String? _$localPath(CardMediaAttachment v) => v.localPath;
-  static const Field<CardMediaAttachment, String> _f$localPath = Field(
-    'localPath',
-    _$localPath,
-    key: r'local_path',
-    opt: true,
-  );
+  static const Field<CardMediaAttachment, String> _f$localPath =
+      Field('localPath', _$localPath, key: r'local_path', opt: true);
   static String _$mimeType(CardMediaAttachment v) => v.mimeType;
-  static const Field<CardMediaAttachment, String> _f$mimeType = Field(
-    'mimeType',
-    _$mimeType,
-    key: r'mime_type',
-  );
+  static const Field<CardMediaAttachment, String> _f$mimeType =
+      Field('mimeType', _$mimeType, key: r'mime_type');
   static String? _$altText(CardMediaAttachment v) => v.altText;
-  static const Field<CardMediaAttachment, String> _f$altText = Field(
-    'altText',
-    _$altText,
-    key: r'alt_text',
-    opt: true,
-  );
+  static const Field<CardMediaAttachment, String> _f$altText =
+      Field('altText', _$altText, key: r'alt_text', opt: true);
   static DateTime _$createdAt(CardMediaAttachment v) => v.createdAt;
-  static const Field<CardMediaAttachment, DateTime> _f$createdAt = Field(
-    'createdAt',
-    _$createdAt,
-    key: r'created_at',
-  );
+  static const Field<CardMediaAttachment, DateTime> _f$createdAt =
+      Field('createdAt', _$createdAt, key: r'created_at');
 
   @override
   final MappableFields<CardMediaAttachment> fields = const {
@@ -151,17 +123,16 @@ class CardMediaAttachmentMapper
 
   static CardMediaAttachment _instantiate(DecodingData data) {
     return CardMediaAttachment(
-      id: data.dec(_f$id),
-      templateId: data.dec(_f$templateId),
-      type: data.dec(_f$type),
-      label: data.dec(_f$label),
-      storagePath: data.dec(_f$storagePath),
-      publicUrl: data.dec(_f$publicUrl),
-      localPath: data.dec(_f$localPath),
-      mimeType: data.dec(_f$mimeType),
-      altText: data.dec(_f$altText),
-      createdAt: data.dec(_f$createdAt),
-    );
+        id: data.dec(_f$id),
+        templateId: data.dec(_f$templateId),
+        type: data.dec(_f$type),
+        label: data.dec(_f$label),
+        storagePath: data.dec(_f$storagePath),
+        publicUrl: data.dec(_f$publicUrl),
+        localPath: data.dec(_f$localPath),
+        mimeType: data.dec(_f$mimeType),
+        altText: data.dec(_f$altText),
+        createdAt: data.dec(_f$createdAt));
   }
 
   @override
@@ -187,69 +158,52 @@ mixin CardMediaAttachmentMappable {
         .encodeMap<CardMediaAttachment>(this as CardMediaAttachment);
   }
 
-  CardMediaAttachmentCopyWith<
-    CardMediaAttachment,
-    CardMediaAttachment,
-    CardMediaAttachment
-  >
-  get copyWith =>
-      _CardMediaAttachmentCopyWithImpl<
-        CardMediaAttachment,
-        CardMediaAttachment
-      >(this as CardMediaAttachment, $identity, $identity);
+  CardMediaAttachmentCopyWith<CardMediaAttachment, CardMediaAttachment,
+      CardMediaAttachment> get copyWith => _CardMediaAttachmentCopyWithImpl<
+          CardMediaAttachment, CardMediaAttachment>(
+      this as CardMediaAttachment, $identity, $identity);
   @override
   String toString() {
-    return CardMediaAttachmentMapper.ensureInitialized().stringifyValue(
-      this as CardMediaAttachment,
-    );
+    return CardMediaAttachmentMapper.ensureInitialized()
+        .stringifyValue(this as CardMediaAttachment);
   }
 
   @override
   bool operator ==(Object other) {
-    return CardMediaAttachmentMapper.ensureInitialized().equalsValue(
-      this as CardMediaAttachment,
-      other,
-    );
+    return CardMediaAttachmentMapper.ensureInitialized()
+        .equalsValue(this as CardMediaAttachment, other);
   }
 
   @override
   int get hashCode {
-    return CardMediaAttachmentMapper.ensureInitialized().hashValue(
-      this as CardMediaAttachment,
-    );
+    return CardMediaAttachmentMapper.ensureInitialized()
+        .hashValue(this as CardMediaAttachment);
   }
 }
 
 extension CardMediaAttachmentValueCopy<$R, $Out>
     on ObjectCopyWith<$R, CardMediaAttachment, $Out> {
   CardMediaAttachmentCopyWith<$R, CardMediaAttachment, $Out>
-  get $asCardMediaAttachment => $base.as(
-    (v, t, t2) => _CardMediaAttachmentCopyWithImpl<$R, $Out>(v, t, t2),
-  );
+      get $asCardMediaAttachment => $base.as(
+          (v, t, t2) => _CardMediaAttachmentCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
-abstract class CardMediaAttachmentCopyWith<
-  $R,
-  $In extends CardMediaAttachment,
-  $Out
->
-    implements CardAttachmentCopyWith<$R, $In, $Out> {
+abstract class CardMediaAttachmentCopyWith<$R, $In extends CardMediaAttachment,
+    $Out> implements CardAttachmentCopyWith<$R, $In, $Out> {
   @override
-  $R call({
-    String? id,
-    String? templateId,
-    AttachmentType? type,
-    String? label,
-    String? storagePath,
-    String? publicUrl,
-    String? localPath,
-    String? mimeType,
-    String? altText,
-    DateTime? createdAt,
-  });
+  $R call(
+      {String? id,
+      String? templateId,
+      AttachmentType? type,
+      String? label,
+      String? storagePath,
+      String? publicUrl,
+      String? localPath,
+      String? mimeType,
+      String? altText,
+      DateTime? createdAt});
   CardMediaAttachmentCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-    Then<$Out2, $R2> t,
-  );
+      Then<$Out2, $R2> t);
 }
 
 class _CardMediaAttachmentCopyWithImpl<$R, $Out>
@@ -261,49 +215,46 @@ class _CardMediaAttachmentCopyWithImpl<$R, $Out>
   late final ClassMapperBase<CardMediaAttachment> $mapper =
       CardMediaAttachmentMapper.ensureInitialized();
   @override
-  $R call({
-    String? id,
-    String? templateId,
-    AttachmentType? type,
-    String? label,
-    String? storagePath,
-    Object? publicUrl = $none,
-    Object? localPath = $none,
-    String? mimeType,
-    Object? altText = $none,
-    DateTime? createdAt,
-  }) => $apply(
-    FieldCopyWithData({
-      if (id != null) #id: id,
-      if (templateId != null) #templateId: templateId,
-      if (type != null) #type: type,
-      if (label != null) #label: label,
-      if (storagePath != null) #storagePath: storagePath,
-      if (publicUrl != $none) #publicUrl: publicUrl,
-      if (localPath != $none) #localPath: localPath,
-      if (mimeType != null) #mimeType: mimeType,
-      if (altText != $none) #altText: altText,
-      if (createdAt != null) #createdAt: createdAt,
-    }),
-  );
+  $R call(
+          {String? id,
+          String? templateId,
+          AttachmentType? type,
+          String? label,
+          String? storagePath,
+          Object? publicUrl = $none,
+          Object? localPath = $none,
+          String? mimeType,
+          Object? altText = $none,
+          DateTime? createdAt}) =>
+      $apply(FieldCopyWithData({
+        if (id != null) #id: id,
+        if (templateId != null) #templateId: templateId,
+        if (type != null) #type: type,
+        if (label != null) #label: label,
+        if (storagePath != null) #storagePath: storagePath,
+        if (publicUrl != $none) #publicUrl: publicUrl,
+        if (localPath != $none) #localPath: localPath,
+        if (mimeType != null) #mimeType: mimeType,
+        if (altText != $none) #altText: altText,
+        if (createdAt != null) #createdAt: createdAt
+      }));
   @override
   CardMediaAttachment $make(CopyWithData data) => CardMediaAttachment(
-    id: data.get(#id, or: $value.id),
-    templateId: data.get(#templateId, or: $value.templateId),
-    type: data.get(#type, or: $value.type),
-    label: data.get(#label, or: $value.label),
-    storagePath: data.get(#storagePath, or: $value.storagePath),
-    publicUrl: data.get(#publicUrl, or: $value.publicUrl),
-    localPath: data.get(#localPath, or: $value.localPath),
-    mimeType: data.get(#mimeType, or: $value.mimeType),
-    altText: data.get(#altText, or: $value.altText),
-    createdAt: data.get(#createdAt, or: $value.createdAt),
-  );
+      id: data.get(#id, or: $value.id),
+      templateId: data.get(#templateId, or: $value.templateId),
+      type: data.get(#type, or: $value.type),
+      label: data.get(#label, or: $value.label),
+      storagePath: data.get(#storagePath, or: $value.storagePath),
+      publicUrl: data.get(#publicUrl, or: $value.publicUrl),
+      localPath: data.get(#localPath, or: $value.localPath),
+      mimeType: data.get(#mimeType, or: $value.mimeType),
+      altText: data.get(#altText, or: $value.altText),
+      createdAt: data.get(#createdAt, or: $value.createdAt));
 
   @override
   CardMediaAttachmentCopyWith<$R2, CardMediaAttachment, $Out2>
-  $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-      _CardMediaAttachmentCopyWithImpl<$R2, $Out2>($value, $cast, t);
+      $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+          _CardMediaAttachmentCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
 class CardAttachmentMapper extends ClassMapperBase<CardAttachment> {
@@ -326,11 +277,8 @@ class CardAttachmentMapper extends ClassMapperBase<CardAttachment> {
   final MappableFields<CardAttachment> fields = const {};
 
   static CardAttachment _instantiate(DecodingData data) {
-    throw MapperException.missingSubclass(
-      'CardAttachment',
-      'attachment_source',
-      '${data.value['attachment_source']}',
-    );
+    throw MapperException.missingSubclass('CardAttachment', 'attachment_source',
+        '${data.value['attachment_source']}');
   }
 
   @override
@@ -349,15 +297,14 @@ mixin CardAttachmentMappable {
   String toJson();
   Map<String, dynamic> toMap();
   CardAttachmentCopyWith<CardAttachment, CardAttachment, CardAttachment>
-  get copyWith;
+      get copyWith;
 }
 
 abstract class CardAttachmentCopyWith<$R, $In extends CardAttachment, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   $R call();
   CardAttachmentCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-    Then<$Out2, $R2> t,
-  );
+      Then<$Out2, $R2> t);
 }
 
 class CardLinkAttachmentMapper extends SubClassMapperBase<CardLinkAttachment> {
@@ -379,36 +326,22 @@ class CardLinkAttachmentMapper extends SubClassMapperBase<CardLinkAttachment> {
   static String _$id(CardLinkAttachment v) => v.id;
   static const Field<CardLinkAttachment, String> _f$id = Field('id', _$id);
   static String _$templateId(CardLinkAttachment v) => v.templateId;
-  static const Field<CardLinkAttachment, String> _f$templateId = Field(
-    'templateId',
-    _$templateId,
-    key: r'template_id',
-  );
+  static const Field<CardLinkAttachment, String> _f$templateId =
+      Field('templateId', _$templateId, key: r'template_id');
   static AttachmentType _$type(CardLinkAttachment v) => v.type;
-  static const Field<CardLinkAttachment, AttachmentType> _f$type = Field(
-    'type',
-    _$type,
-  );
+  static const Field<CardLinkAttachment, AttachmentType> _f$type =
+      Field('type', _$type);
   static String _$label(CardLinkAttachment v) => v.label;
-  static const Field<CardLinkAttachment, String> _f$label = Field(
-    'label',
-    _$label,
-  );
+  static const Field<CardLinkAttachment, String> _f$label =
+      Field('label', _$label);
   static String _$url(CardLinkAttachment v) => v.url;
   static const Field<CardLinkAttachment, String> _f$url = Field('url', _$url);
   static String? _$altText(CardLinkAttachment v) => v.altText;
-  static const Field<CardLinkAttachment, String> _f$altText = Field(
-    'altText',
-    _$altText,
-    key: r'alt_text',
-    opt: true,
-  );
+  static const Field<CardLinkAttachment, String> _f$altText =
+      Field('altText', _$altText, key: r'alt_text', opt: true);
   static DateTime _$createdAt(CardLinkAttachment v) => v.createdAt;
-  static const Field<CardLinkAttachment, DateTime> _f$createdAt = Field(
-    'createdAt',
-    _$createdAt,
-    key: r'created_at',
-  );
+  static const Field<CardLinkAttachment, DateTime> _f$createdAt =
+      Field('createdAt', _$createdAt, key: r'created_at');
 
   @override
   final MappableFields<CardLinkAttachment> fields = const {
@@ -431,14 +364,13 @@ class CardLinkAttachmentMapper extends SubClassMapperBase<CardLinkAttachment> {
 
   static CardLinkAttachment _instantiate(DecodingData data) {
     return CardLinkAttachment(
-      id: data.dec(_f$id),
-      templateId: data.dec(_f$templateId),
-      type: data.dec(_f$type),
-      label: data.dec(_f$label),
-      url: data.dec(_f$url),
-      altText: data.dec(_f$altText),
-      createdAt: data.dec(_f$createdAt),
-    );
+        id: data.dec(_f$id),
+        templateId: data.dec(_f$templateId),
+        type: data.dec(_f$type),
+        label: data.dec(_f$label),
+        url: data.dec(_f$url),
+        altText: data.dec(_f$altText),
+        createdAt: data.dec(_f$createdAt));
   }
 
   @override
@@ -464,67 +396,49 @@ mixin CardLinkAttachmentMappable {
         .encodeMap<CardLinkAttachment>(this as CardLinkAttachment);
   }
 
-  CardLinkAttachmentCopyWith<
-    CardLinkAttachment,
-    CardLinkAttachment,
-    CardLinkAttachment
-  >
-  get copyWith =>
-      _CardLinkAttachmentCopyWithImpl<CardLinkAttachment, CardLinkAttachment>(
-        this as CardLinkAttachment,
-        $identity,
-        $identity,
-      );
+  CardLinkAttachmentCopyWith<CardLinkAttachment, CardLinkAttachment,
+          CardLinkAttachment>
+      get copyWith => _CardLinkAttachmentCopyWithImpl<CardLinkAttachment,
+          CardLinkAttachment>(this as CardLinkAttachment, $identity, $identity);
   @override
   String toString() {
-    return CardLinkAttachmentMapper.ensureInitialized().stringifyValue(
-      this as CardLinkAttachment,
-    );
+    return CardLinkAttachmentMapper.ensureInitialized()
+        .stringifyValue(this as CardLinkAttachment);
   }
 
   @override
   bool operator ==(Object other) {
-    return CardLinkAttachmentMapper.ensureInitialized().equalsValue(
-      this as CardLinkAttachment,
-      other,
-    );
+    return CardLinkAttachmentMapper.ensureInitialized()
+        .equalsValue(this as CardLinkAttachment, other);
   }
 
   @override
   int get hashCode {
-    return CardLinkAttachmentMapper.ensureInitialized().hashValue(
-      this as CardLinkAttachment,
-    );
+    return CardLinkAttachmentMapper.ensureInitialized()
+        .hashValue(this as CardLinkAttachment);
   }
 }
 
 extension CardLinkAttachmentValueCopy<$R, $Out>
     on ObjectCopyWith<$R, CardLinkAttachment, $Out> {
   CardLinkAttachmentCopyWith<$R, CardLinkAttachment, $Out>
-  get $asCardLinkAttachment => $base.as(
-    (v, t, t2) => _CardLinkAttachmentCopyWithImpl<$R, $Out>(v, t, t2),
-  );
+      get $asCardLinkAttachment => $base.as(
+          (v, t, t2) => _CardLinkAttachmentCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
-abstract class CardLinkAttachmentCopyWith<
-  $R,
-  $In extends CardLinkAttachment,
-  $Out
->
-    implements CardAttachmentCopyWith<$R, $In, $Out> {
+abstract class CardLinkAttachmentCopyWith<$R, $In extends CardLinkAttachment,
+    $Out> implements CardAttachmentCopyWith<$R, $In, $Out> {
   @override
-  $R call({
-    String? id,
-    String? templateId,
-    AttachmentType? type,
-    String? label,
-    String? url,
-    String? altText,
-    DateTime? createdAt,
-  });
+  $R call(
+      {String? id,
+      String? templateId,
+      AttachmentType? type,
+      String? label,
+      String? url,
+      String? altText,
+      DateTime? createdAt});
   CardLinkAttachmentCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-    Then<$Out2, $R2> t,
-  );
+      Then<$Out2, $R2> t);
 }
 
 class _CardLinkAttachmentCopyWithImpl<$R, $Out>
@@ -536,38 +450,35 @@ class _CardLinkAttachmentCopyWithImpl<$R, $Out>
   late final ClassMapperBase<CardLinkAttachment> $mapper =
       CardLinkAttachmentMapper.ensureInitialized();
   @override
-  $R call({
-    String? id,
-    String? templateId,
-    AttachmentType? type,
-    String? label,
-    String? url,
-    Object? altText = $none,
-    DateTime? createdAt,
-  }) => $apply(
-    FieldCopyWithData({
-      if (id != null) #id: id,
-      if (templateId != null) #templateId: templateId,
-      if (type != null) #type: type,
-      if (label != null) #label: label,
-      if (url != null) #url: url,
-      if (altText != $none) #altText: altText,
-      if (createdAt != null) #createdAt: createdAt,
-    }),
-  );
+  $R call(
+          {String? id,
+          String? templateId,
+          AttachmentType? type,
+          String? label,
+          String? url,
+          Object? altText = $none,
+          DateTime? createdAt}) =>
+      $apply(FieldCopyWithData({
+        if (id != null) #id: id,
+        if (templateId != null) #templateId: templateId,
+        if (type != null) #type: type,
+        if (label != null) #label: label,
+        if (url != null) #url: url,
+        if (altText != $none) #altText: altText,
+        if (createdAt != null) #createdAt: createdAt
+      }));
   @override
   CardLinkAttachment $make(CopyWithData data) => CardLinkAttachment(
-    id: data.get(#id, or: $value.id),
-    templateId: data.get(#templateId, or: $value.templateId),
-    type: data.get(#type, or: $value.type),
-    label: data.get(#label, or: $value.label),
-    url: data.get(#url, or: $value.url),
-    altText: data.get(#altText, or: $value.altText),
-    createdAt: data.get(#createdAt, or: $value.createdAt),
-  );
+      id: data.get(#id, or: $value.id),
+      templateId: data.get(#templateId, or: $value.templateId),
+      type: data.get(#type, or: $value.type),
+      label: data.get(#label, or: $value.label),
+      url: data.get(#url, or: $value.url),
+      altText: data.get(#altText, or: $value.altText),
+      createdAt: data.get(#createdAt, or: $value.createdAt));
 
   @override
   CardLinkAttachmentCopyWith<$R2, CardLinkAttachment, $Out2> $chain<$R2, $Out2>(
-    Then<$Out2, $R2> t,
-  ) => _CardLinkAttachmentCopyWithImpl<$R2, $Out2>($value, $cast, t);
+          Then<$Out2, $R2> t) =>
+      _CardLinkAttachmentCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
