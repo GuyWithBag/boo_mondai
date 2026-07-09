@@ -5,3 +5,4 @@ export 'auth.controller.dart';
 export 'auth.service.dart';
 export 'login.online.page.dart';
 export 'register.online.page.dart';
+export 'auth.validators.dart';

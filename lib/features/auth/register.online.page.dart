@@ -8,21 +8,22 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AuthController,
+        AuthValidators,
         showGuestMergeDialog,
-        AppSpacing,
         ErrorText,
         AppTokens,
         ButtonColor,
         Button,
         buttonStyle,
         ButtonVariant,
-        TextFieldSize,
-        TextFieldFrame,
+        FormField,
         Scaffold,
         AppBar,
+        TextFieldFrame,
+        TextFieldSize,
         TextField;
 import 'package:flutter/material.dart'
-    hide BackButton, TextField, Scaffold, AppBar;
+    hide BackButton, FormField, TextField, Scaffold, AppBar;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -39,9 +40,7 @@ class RegisterPage extends HookWidget {
     final emailFocus = useFocusNode();
     final nameFocus = useFocusNode();
     final passwordFocus = useFocusNode();
-    final nameError = useState<String?>(null);
-    final emailError = useState<String?>(null);
-    final passwordError = useState<String?>(null);
+    final formKey = useMemoized(GlobalKey<FormState>.new);
     final tokens = context.themeTokens<AppTokens>();
 
     final auth = context.watch<AuthController>();
@@ -52,21 +51,7 @@ class RegisterPage extends HookWidget {
     }, const []);
 
     Future<void> signUp() async {
-      nameError.value = nameController.text.trim().isNotEmpty
-          ? null
-          : 'Enter a display name';
-      emailError.value = emailController.text.contains('@')
-          ? null
-          : 'Enter a valid email';
-      passwordError.value = passwordController.text.length >= 6
-          ? null
-          : 'Password must be at least 6 characters';
-
-      if (nameError.value != null ||
-          emailError.value != null ||
-          passwordError.value != null) {
-        return;
-      }
+      if (!(formKey.currentState?.validate() ?? false)) return;
 
       await auth.signUp(
         emailController.text.trim(),
@@ -83,118 +68,121 @@ class RegisterPage extends HookWidget {
 
     return Scaffold(
       appBar: AppBar(title: 'Create an Account'),
-      body: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        spacing: tokens.spaceLayoutGapMd,
-        children: [
-          Text(
-            'Create Account',
-            style: Theme.of(context).textTheme.headlineMedium,
-            textAlign: TextAlign.center,
-          ),
-          _RegisterField(
-            label: 'Display Name',
-            controller: nameController,
-            focusNode: nameFocus,
-            placeholder: 'Display name',
-            textInputAction: TextInputAction.next,
-            error: nameError.value,
-            onSubmitted: (_) => emailFocus.requestFocus(),
-          ),
-          _RegisterField(
-            label: 'Email',
-            controller: emailController,
-            focusNode: emailFocus,
-            placeholder: 'you@example.com',
-            keyboardType: TextInputType.emailAddress,
-            textInputAction: TextInputAction.next,
-            error: emailError.value,
-            onSubmitted: (_) => passwordFocus.requestFocus(),
-          ),
-          _RegisterField(
-            label: 'Password',
-            controller: passwordController,
-            focusNode: passwordFocus,
-            placeholder: 'Password',
-            obscureText: true,
-            textInputAction: TextInputAction.done,
-            error: passwordError.value,
-            onSubmitted: (_) => signUp(),
-          ),
-          if (auth.error != null) ...[ErrorText(auth.error)],
-          Button(
-            style: buttonStyle.resolve(context.themeTokens<AppTokens>(), const [
-              ButtonColor.primary,
-            ]),
-            onPressed: auth.isLoading ? null : signUp,
-            child: auth.isLoading
-                ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Text('Sign Up'),
-          ),
-          Button(
-            style: buttonStyle.resolve(context.themeTokens<AppTokens>(), const [
-              ButtonColor.primary,
-              ButtonVariant.flat,
-            ]),
-            onPressed: () => context.push('/login'),
-            child: const Text('Already have an account? Sign In'),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _RegisterField extends StatelessWidget {
-  const _RegisterField({
-    required this.label,
-    required this.controller,
-    this.focusNode,
-    this.placeholder,
-    this.keyboardType,
-    this.textInputAction,
-    this.obscureText = false,
-    this.error,
-    this.onSubmitted,
-  });
-
-  final String label;
-  final TextEditingController controller;
-  final FocusNode? focusNode;
-  final String? placeholder;
-  final TextInputType? keyboardType;
-  final TextInputAction? textInputAction;
-  final bool obscureText;
-  final String? error;
-  final ValueChanged<String>? onSubmitted;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(label),
-        const SizedBox(height: AppSpacing.xs),
-        TextField(
-          controller: controller,
-          focusNode: focusNode,
-          placeholder: placeholder,
-          keyboardType: keyboardType,
-          textInputAction: textInputAction,
-          obscureText: obscureText,
-          onSubmitted: onSubmitted,
-          variants: const [TextFieldSize.normal, TextFieldFrame.outline],
+      body: Form(
+        key: formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          spacing: tokens.spaceLayoutGapMd,
+          children: [
+            Text(
+              'Create Account',
+              style: Theme.of(context).textTheme.headlineMedium,
+              textAlign: TextAlign.center,
+            ),
+            FormField<String>(
+              value: nameController.text,
+              listenable: nameController,
+              valueReader: () => nameController.text,
+              validator: AuthValidators.displayName,
+              builder: (context, field) => Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Text('Display Name'),
+                  SizedBox(height: tokens.spaceLayoutGapXsm),
+                  TextField(
+                    controller: nameController,
+                    focusNode: nameFocus,
+                    placeholder: 'Display name',
+                    textInputAction: TextInputAction.next,
+                    variants: const [
+                      TextFieldSize.normal,
+                      TextFieldFrame.outline,
+                    ],
+                    onChanged: field.didChange,
+                    onSubmitted: (_) => emailFocus.requestFocus(),
+                  ),
+                ],
+              ),
+            ),
+            FormField<String>(
+              value: emailController.text,
+              listenable: emailController,
+              valueReader: () => emailController.text,
+              validator: AuthValidators.email,
+              builder: (context, field) => Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Text('Email'),
+                  SizedBox(height: tokens.spaceLayoutGapXsm),
+                  TextField(
+                    controller: emailController,
+                    focusNode: emailFocus,
+                    placeholder: 'you@example.com',
+                    keyboardType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.next,
+                    variants: const [
+                      TextFieldSize.normal,
+                      TextFieldFrame.outline,
+                    ],
+                    onChanged: field.didChange,
+                    onSubmitted: (_) => passwordFocus.requestFocus(),
+                  ),
+                ],
+              ),
+            ),
+            FormField<String>(
+              value: passwordController.text,
+              listenable: passwordController,
+              valueReader: () => passwordController.text,
+              validator: AuthValidators.password,
+              builder: (context, field) => Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Text('Password'),
+                  SizedBox(height: tokens.spaceLayoutGapXsm),
+                  TextField(
+                    controller: passwordController,
+                    focusNode: passwordFocus,
+                    placeholder: 'Password',
+                    obscureText: true,
+                    textInputAction: TextInputAction.done,
+                    variants: const [
+                      TextFieldSize.normal,
+                      TextFieldFrame.outline,
+                    ],
+                    onChanged: field.didChange,
+                    onSubmitted: (_) => signUp(),
+                  ),
+                ],
+              ),
+            ),
+            if (auth.error != null) ...[ErrorText(auth.error)],
+            Button(
+              style: buttonStyle.resolve(
+                context.themeTokens<AppTokens>(),
+                const [ButtonColor.primary],
+              ),
+              onPressed: auth.isLoading ? null : signUp,
+              child: auth.isLoading
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text('Sign Up'),
+            ),
+            Button(
+              style: buttonStyle.resolve(
+                context.themeTokens<AppTokens>(),
+                const [ButtonColor.primary, ButtonVariant.flat],
+              ),
+              onPressed: () => context.push('/login'),
+              child: const Text('Already have an account? Sign In'),
+            ),
+          ],
         ),
-        if (error != null) ...[
-          const SizedBox(height: AppSpacing.xs),
-          Text(error!, style: const TextStyle(color: Colors.red)),
-        ],
-      ],
+      ),
     );
   }
 }

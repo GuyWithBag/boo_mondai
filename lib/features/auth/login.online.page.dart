@@ -1,23 +1,25 @@
 import 'package:boo_mondai/features/auth/auth.controller.dart'
     show AuthController;
+import 'package:boo_mondai/features/auth/auth.validators.dart'
+    show AuthValidators;
 import 'package:boo_mondai/lib.barrel.dart'
     show
         showGuestMergeDialog,
-        BackButton,
         LoadingIndicator,
-        AppSpacing,
         ErrorText,
         AppTokens,
         ButtonColor,
         Button,
         buttonStyle,
         ButtonVariant,
-        TextFieldSize,
+        FormField,
         Scaffold,
         AppBar,
         TextFieldFrame,
+        TextFieldSize,
         TextField;
-import 'package:flutter/material.dart' hide TextField, Scaffold, AppBar;
+import 'package:flutter/material.dart'
+    hide FormField, TextField, Scaffold, AppBar;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -26,24 +28,13 @@ import 'package:theme_variants/theme_variants.dart';
 class LoginPage extends HookWidget {
   const LoginPage({super.key});
 
-  static String? _validateEmail(String? value) {
-    if (value != null && value.contains('@')) return null;
-    return 'Enter a valid email';
-  }
-
-  static String? _validatePassword(String? value) {
-    if (value != null && value.length >= 6) return null;
-    return 'Password must be at least 6 characters';
-  }
-
   @override
   Widget build(BuildContext context) {
     final emailController = useTextEditingController();
     final passwordController = useTextEditingController();
     final emailFocus = useFocusNode();
     final passwordFocus = useFocusNode();
-    final emailError = useState<String?>(null);
-    final passwordError = useState<String?>(null);
+    final formKey = useMemoized(GlobalKey<FormState>.new);
     final auth = context.watch<AuthController>();
     final tokens = context.themeTokens<AppTokens>();
 
@@ -57,9 +48,7 @@ class LoginPage extends HookWidget {
 
     // 2. Action-Driven Sign In (Navigation is handled entirely by routes.dart!)
     Future<void> performSignIn() async {
-      emailError.value = _validateEmail(emailController.text);
-      passwordError.value = _validatePassword(passwordController.text);
-      if (emailError.value != null || passwordError.value != null) return;
+      if (!(formKey.currentState?.validate() ?? false)) return;
 
       await auth.signIn(emailController.text.trim(), passwordController.text);
 
@@ -78,107 +67,92 @@ class LoginPage extends HookWidget {
 
     return Scaffold(
       appBar: AppBar(title: 'Login'),
-      body: Column(
-        mainAxisSize: MainAxisSize.min,
-        spacing: tokens.spaceLayoutGapMd,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            'BooMondai',
-            style: Theme.of(context).textTheme.displayLarge,
-            textAlign: TextAlign.center,
-          ),
-          _AuthField(
-            label: 'Email',
-            controller: emailController,
-            focusNode: emailFocus,
-            placeholder: 'you@example.com',
-            keyboardType: TextInputType.emailAddress,
-            textInputAction: TextInputAction.next,
-            error: emailError.value,
-            onSubmitted: (_) => passwordFocus.requestFocus(),
-          ),
-          _AuthField(
-            label: 'Password',
-            controller: passwordController,
-            focusNode: passwordFocus,
-            placeholder: 'Password',
-            obscureText: true,
-            textInputAction: TextInputAction.done,
-            error: passwordError.value,
-            onSubmitted: (_) => performSignIn(),
-          ),
-          if (auth.error != null) ...[ErrorText(auth.error)],
-          Button(
-            style: buttonStyle.resolve(context.themeTokens<AppTokens>(), const [
-              ButtonColor.primary,
-            ]),
-            onPressed: auth.isLoading ? null : performSignIn,
-            child: auth.isLoading
-                ? const LoadingIndicator()
-                : const Text('Sign In'),
-          ),
-          Button(
-            style: buttonStyle.resolve(context.themeTokens<AppTokens>(), const [
-              ButtonColor.primary,
-              ButtonVariant.flat,
-            ]),
-            onPressed: navigateToRegister,
-            child: const Text("Don't have an account? Sign Up"),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ── Screen-local widgets ─────────────────────────────────────────────────────
-
-class _AuthField extends StatelessWidget {
-  const _AuthField({
-    required this.label,
-    required this.controller,
-    this.focusNode,
-    this.placeholder,
-    this.keyboardType,
-    this.textInputAction,
-    this.obscureText = false,
-    this.error,
-    this.onSubmitted,
-  });
-
-  final String label;
-  final TextEditingController controller;
-  final FocusNode? focusNode;
-  final String? placeholder;
-  final TextInputType? keyboardType;
-  final TextInputAction? textInputAction;
-  final bool obscureText;
-  final String? error;
-  final ValueChanged<String>? onSubmitted;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(label),
-        const SizedBox(height: AppSpacing.xs),
-        TextField(
-          controller: controller,
-          focusNode: focusNode,
-          placeholder: placeholder,
-          keyboardType: keyboardType,
-          textInputAction: textInputAction,
-          obscureText: obscureText,
-          onSubmitted: onSubmitted,
-          variants: const [TextFieldSize.normal, TextFieldFrame.outline],
+      body: Form(
+        key: formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          spacing: tokens.spaceLayoutGapMd,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              'BooMondai',
+              style: Theme.of(context).textTheme.displayLarge,
+              textAlign: TextAlign.center,
+            ),
+            FormField<String>(
+              value: emailController.text,
+              listenable: emailController,
+              valueReader: () => emailController.text,
+              validator: AuthValidators.email,
+              builder: (context, field) => Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Text('Email'),
+                  SizedBox(height: tokens.spaceLayoutGapXsm),
+                  TextField(
+                    controller: emailController,
+                    focusNode: emailFocus,
+                    placeholder: 'you@example.com',
+                    keyboardType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.next,
+                    variants: const [
+                      TextFieldSize.normal,
+                      TextFieldFrame.outline,
+                    ],
+                    onChanged: field.didChange,
+                    onSubmitted: (_) => passwordFocus.requestFocus(),
+                  ),
+                ],
+              ),
+            ),
+            FormField<String>(
+              value: passwordController.text,
+              listenable: passwordController,
+              valueReader: () => passwordController.text,
+              validator: AuthValidators.password,
+              builder: (context, field) => Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Text('Password'),
+                  SizedBox(height: tokens.spaceLayoutGapXsm),
+                  TextField(
+                    controller: passwordController,
+                    focusNode: passwordFocus,
+                    placeholder: 'Password',
+                    obscureText: true,
+                    textInputAction: TextInputAction.done,
+                    variants: const [
+                      TextFieldSize.normal,
+                      TextFieldFrame.outline,
+                    ],
+                    onChanged: field.didChange,
+                    onSubmitted: (_) => performSignIn(),
+                  ),
+                ],
+              ),
+            ),
+            if (auth.error != null) ...[ErrorText(auth.error)],
+            Button(
+              style: buttonStyle.resolve(
+                context.themeTokens<AppTokens>(),
+                const [ButtonColor.primary],
+              ),
+              onPressed: auth.isLoading ? null : performSignIn,
+              child: auth.isLoading
+                  ? const LoadingIndicator()
+                  : const Text('Sign In'),
+            ),
+            Button(
+              style: buttonStyle.resolve(
+                context.themeTokens<AppTokens>(),
+                const [ButtonColor.primary, ButtonVariant.flat],
+              ),
+              onPressed: navigateToRegister,
+              child: const Text("Don't have an account? Sign Up"),
+            ),
+          ],
         ),
-        if (error != null) ...[
-          const SizedBox(height: AppSpacing.xs),
-          Text(error!, style: const TextStyle(color: Colors.red)),
-        ],
-      ],
+      ),
     );
   }
 }
