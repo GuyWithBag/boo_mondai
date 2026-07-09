@@ -6,17 +6,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         CardTemplate,
         CardTemplateMapper,
         CreateDeckTile,
-        ViewCardsTile;
-import 'package:flutter/material.dart'
-    show
-        BuildContext,
-        Column,
-        CrossAxisAlignment,
-        LayoutBuilder,
-        MainAxisSize,
-        StatelessWidget,
-        VoidCallback,
-        Widget;
+        ViewCardsTile,
+        surfaceStyle,
+        SurfaceShape,
+        SurfaceBorder;
+import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 class EditableFeaturedCardsColumn extends StatelessWidget {
@@ -45,26 +39,38 @@ class EditableFeaturedCardsColumn extends StatelessWidget {
         onAddPressed != null &&
         (maxCardCount == null || featuredCards.length < maxCardCount!);
 
-    if (templates.isEmpty && !canAddCard) {
-      return const Column(mainAxisSize: MainAxisSize.min);
-    }
+    final body = templates.isEmpty && !canAddCard
+        ? const Text('This deck contains no cards featured.')
+        : LayoutBuilder(
+            builder: (context, constraints) {
+              final tileWidth = math.min(
+                constraints.maxWidth,
+                tokens.studyCardWidth,
+              );
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final tileWidth = math.min(constraints.maxWidth, tokens.studyCardWidth);
+              return Column(
+                spacing: tokens.spaceLayoutGapMd,
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  for (final template in templates)
+                    ViewCardsTile.template(
+                      template: template,
+                      width: tileWidth,
+                    ),
+                  if (canAddCard)
+                    CreateDeckTile(width: tileWidth, onPressed: onAddPressed!),
+                ],
+              );
+            },
+          );
 
-        return Column(
-          spacing: tokens.spaceLayoutGapMd,
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            for (final template in templates)
-              ViewCardsTile.template(template: template, width: tileWidth),
-            if (canAddCard)
-              CreateDeckTile(width: tileWidth, onPressed: onAddPressed!),
-          ],
-        );
-      },
+    return Surface(
+      style: surfaceStyle.resolve(tokens, const [
+        SurfaceShape.roundedSm,
+        SurfaceBorder.none,
+      ]),
+      child: body,
     );
   }
 

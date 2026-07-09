@@ -208,7 +208,7 @@ class _Body extends StatelessWidget {
 
     return Column(
       spacing: tokens.spaceLayoutGapXsm,
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         SizedBox(
           height: headerHeight,
@@ -253,7 +253,7 @@ class _Body extends StatelessWidget {
           ]),
           child: Column(
             spacing: tokens.spaceLayoutGapMd,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Row(
                 spacing: tokens.spaceLayoutGapSm,
