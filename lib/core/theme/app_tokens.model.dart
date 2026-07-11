@@ -247,6 +247,10 @@ class AppTokens with AppTokensMappable {
   final double sizeIconSm = 18;
   final double sizeIcon = 24;
   final double sizeIconLg = 30;
+
+  final double sizeButtonIcon = 48;
+  final double sizeButtonIconSm = 38;
+  final double radiusButtonIconSm = 14;
   // final double bottomNavBarPreferredHeight = 90;
   // final double appBarPreferredHeight = 90;
   // final double preferredHeightDefault = 82;

@@ -8,8 +8,9 @@ enum ButtonSize {
   md,
   lg,
   icon,
-  smallIcon,
-  largeIcon,
+  iconSmall,
+  iconOnlySmall,
+  iconOnly,
   iconWithLabel,
   fab,
   extendedFab,
@@ -187,16 +188,27 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
     ButtonSize.icon: (tokens) => {
       SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIcon.sp)}),
       SurfaceStylePart.text({TextStylePart.fontSize(tokens.textSizeLabel.sp)}),
-      SurfaceStylePart.height(48.h),
-      SurfaceStylePart.width(48.w),
+      SurfaceStylePart.height(tokens.sizeButtonIcon.h),
+      SurfaceStylePart.width(tokens.sizeButtonIcon.w),
     },
-    ButtonSize.smallIcon: (tokens) => {
+    ButtonSize.iconSmall: (tokens) => {
+      SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconSm.sp)}),
+      SurfaceStylePart.text({TextStylePart.fontSize(tokens.textSizeLabel.sp)}),
+      SurfaceStylePart.height(tokens.sizeButtonIconSm.h),
+      SurfaceStylePart.width(tokens.sizeButtonIconSm.w),
+      SurfaceStylePart.decoration({
+        DecorationPart.borderRadius(
+          BorderRadius.circular(tokens.radiusButtonIconSm.r),
+        ),
+      }),
+    },
+    ButtonSize.iconOnlySmall: (tokens) => {
       SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconSm.sp)}),
       SurfaceStylePart.text({TextStylePart.fontSize(tokens.textSizeLabel.sp)}),
       SurfaceStylePart.height(tokens.sizeIconSm.h),
       SurfaceStylePart.width(tokens.sizeIconSm.w),
     },
-    ButtonSize.largeIcon: (tokens) => {
+    ButtonSize.iconOnly: (tokens) => {
       SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconLg.sp)}),
       SurfaceStylePart.text({TextStylePart.fontSize(tokens.textSizeLabel.sp)}),
       SurfaceStylePart.height(tokens.sizeIconLg.h),

@@ -58,6 +58,28 @@ class Button extends HookWidget {
     );
   }
 
+  static Button iconSmall({
+    VoidCallback? onPressed,
+    IconData? icon,
+    ButtonColor color = ButtonColor.baseline,
+    ButtonVariant variant = ButtonVariant.elevated,
+    bool selected = false,
+    required AppTokens tokens,
+  }) {
+    return Button(
+      onPressed: onPressed,
+      leading: icon == null ? null : Icon(icon),
+      selected: selected,
+      dashed: variant == ButtonVariant.dashed,
+      style: buttonStyle.resolve(tokens, [
+        color,
+        ButtonSize.iconSmall,
+        ButtonPadding.none,
+        variant,
+      ]),
+    );
+  }
+
   static Button dashed({
     required AppTokens tokens,
     VoidCallback? onPressed,
@@ -99,7 +121,7 @@ class Button extends HookWidget {
       dashed: variant == ButtonVariant.dashed,
       style: buttonStyle.resolve(tokens, [
         color,
-        ButtonSize.largeIcon,
+        ButtonSize.iconOnly,
         ButtonPadding.none,
         variant,
       ]),
@@ -121,7 +143,7 @@ class Button extends HookWidget {
       dashed: variant == ButtonVariant.dashed,
       style: buttonStyle.resolve(tokens, [
         color,
-        ButtonSize.smallIcon,
+        ButtonSize.iconOnlySmall,
         ButtonPadding.none,
         variant,
       ]),
