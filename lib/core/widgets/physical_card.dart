@@ -5,18 +5,17 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         ScaleHelper,
         surfaceStyle,
-        SurfaceShape,
         usePhysicalCardController;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:theme_variants/theme_variants.dart'
-    show ThemeVariantsContext, Surface, SurfaceStyle;
+    show ThemeVariantsContext, Surface;
 
 class PhysicalCard extends HookWidget {
   const PhysicalCard({
     super.key,
     this.controller,
-    required this.front,
+    this.front,
     this.back,
     this.tapToFlip = false,
     this.onTap,
@@ -26,7 +25,7 @@ class PhysicalCard extends HookWidget {
   });
 
   final PhysicalCardController? controller;
-  final Widget front;
+  final Widget? front;
   final Widget? back;
   final List<Object> frontVariants;
   final List<Object> backVariants;
