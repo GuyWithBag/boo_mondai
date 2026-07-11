@@ -44,7 +44,7 @@ class StatusLayoutState extends StatelessWidget {
       children: [
         if (icon != null) Icon(icon, size: 56.r, color: tokens.colorTextMuted),
         ?leading,
-        Text(
+        SelectableText(
           title,
           style: textStyle.resolve(tokens, const [
             TextSize.header2,
@@ -52,7 +52,7 @@ class StatusLayoutState extends StatelessWidget {
           ]),
           textAlign: TextAlign.center,
         ),
-        Text(
+        SelectableText(
           message,
           style: textStyle.resolve(tokens, const [
             TextSize.label,
@@ -63,13 +63,21 @@ class StatusLayoutState extends StatelessWidget {
         if (progressValue != null) ProgressBar(value: progressValue!),
         ?child,
         if (actions.isNotEmpty && extraAction == null)
-          Row(spacing: tokens.spaceLayoutGapSm, children: [...actions]),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            spacing: tokens.spaceLayoutGapSm,
+            children: [...actions],
+          ),
         if (actions.isNotEmpty && extraAction != null)
           Column(
             spacing: tokens.spaceLayoutGapSm,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Row(spacing: tokens.spaceLayoutGapSm, children: actions),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                spacing: tokens.spaceLayoutGapSm,
+                children: actions,
+              ),
               ?extraAction,
             ],
           ),
