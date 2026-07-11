@@ -162,13 +162,13 @@ class EditableTextValue extends HookWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Button.icon(
+              Button.iconSmall(
                 icon: Icons.close,
                 onPressed: isSaving.value ? null : cancel,
                 tokens: tokens,
               ),
               SizedBox(width: tokens.spaceLayoutGapSm),
-              Button.icon(
+              Button.iconSmall(
                 color: ButtonColor.success,
                 icon: Icons.check,
                 onPressed: isSaving.value ? null : save,
