@@ -29,15 +29,13 @@ import 'package:boo_mondai/lib.barrel.dart'
         ViewDeckSingleHelper,
         DateHelper,
         DecksService,
+        FileHelper,
         ImageHelper,
-        MarkdownHelper,
-        StoredMediaHelper,
-        StoredMediaService,
         FormField,
+        StoredMediaPath,
         ToolBar,
         useToolBarController,
-        showBottomSheet,
-        uuid;
+        showBottomSheet;
 import 'package:flutter/material.dart'
     hide AppBar, FormField, Scaffold, showBottomSheet;
 import 'package:flutter_hooks/flutter_hooks.dart' show HookWidget;
@@ -74,24 +72,6 @@ class ViewDeckSingleSheet extends HookWidget {
       activeDeck.isPublished ? ChipTone.filled : ChipTone.hard,
     ]);
 
-    Future<void> addLongDescriptionAttachment() async {
-      final file = await StoredMediaService.pickSupportedFile();
-      if (file == null) return;
-
-      final attachment = await MarkdownHelper.toPickedFileMediaMarkdownFormat(
-        id: StoredMediaHelper.getSemanticId(
-          'deck',
-          activeDeck.id,
-          'long_description',
-          uuid.v7(),
-        ),
-        file: file,
-      );
-      if (attachment == null) return;
-
-      toolBarController.insertMarkdown(attachment);
-    }
-
     return DraggableScrollableSheet(
       expand: false,
       initialChildSize: 1,
@@ -114,7 +94,10 @@ class ViewDeckSingleSheet extends HookWidget {
                 ? ToolBar.withActions(
                     controller: toolBarController,
                     useAttachments: true,
-                    onAttachmentPressed: addLongDescriptionAttachment,
+                    createAttachmentPath: (file) => StoredMediaPath.folder(
+                      folderPath: '${activeDeck.title}/media',
+                      name: FileHelper.fileNameWithoutExtension(file.name),
+                    ),
                   )
                 : null,
             appBar: AppBar(

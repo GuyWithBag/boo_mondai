@@ -4,8 +4,8 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         AuthController,
         EditableTextValue,
-        StoredMediaHelper,
         StoredMediaService,
+        StoredMediaPath,
         ProfileAvatar;
 import 'package:flutter/material.dart'
     show
@@ -49,13 +49,9 @@ class ProfileCard extends StatelessWidget {
           ProfileAvatar(
             displayName: displayName,
             avatarUrl:
-                StoredMediaService.getLocalPath(
-                  StoredMediaHelper.getSemanticId(
-                    'profile',
-                    profile.id,
-                    'avatar',
-                  ),
-                ) ??
+                StoredMediaService.getFileByPath(
+                  const StoredMediaPath.app(name: 'profileAvatar'),
+                )?.path ??
                 profile.avatarUrl,
             radius: 66,
             onImagePicked: auth.updateAvatarImage,

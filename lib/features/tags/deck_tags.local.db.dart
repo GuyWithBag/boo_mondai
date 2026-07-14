@@ -19,4 +19,17 @@ class DeckTagsLocalDB extends HiveLocalDB<DeckTag> {
     () => box.values.where((item) => item.deckId == deckId).toList(),
     action: 'getTagsForDeck($deckId)',
   );
+
+  Future<void> deleteByDeckId(String deckId) => guard(() async {
+    final keys = box.values
+        .where((item) => item.deckId == deckId)
+        .map(primaryKeyFromItem)
+        .toList();
+    await box.deleteAll(keys.map(encodePrimaryKey));
+  }, action: 'deleteByDeckId($deckId)');
+
+  bool isTagReferenced(String tagId) => guardSync(
+    () => box.values.any((item) => item.tagId == tagId),
+    action: 'isTagReferenced($tagId)',
+  );
 }

@@ -1,6 +1,5 @@
-import 'package:boo_mondai/features/search/filters/study_card.search_filter.dart';
-import 'package:boo_mondai/features/search/results/search_results.dart';
-import 'package:boo_mondai/features/study_session/models/study_card.dto.dart';
+import 'package:boo_mondai/lib.barrel.dart'
+    show SearchResults, StudyCard, StudyCardSearchFilter;
 import 'package:fuzzywuzzy/fuzzywuzzy.dart';
 
 final class StudyCardSearchResults

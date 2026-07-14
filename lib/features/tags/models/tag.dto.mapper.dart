@@ -23,13 +23,20 @@ class TagMapper extends ClassMapperBase<Tag> {
   static String _$id(Tag v) => v.id;
   static const Field<Tag, String> _f$id = Field('id', _$id);
   static String? _$userId(Tag v) => v.userId;
-  static const Field<Tag, String> _f$userId =
-      Field('userId', _$userId, key: r'user_id', opt: true);
+  static const Field<Tag, String> _f$userId = Field(
+    'userId',
+    _$userId,
+    key: r'user_id',
+    opt: true,
+  );
   static String _$name(Tag v) => v.name;
   static const Field<Tag, String> _f$name = Field('name', _$name);
   static DateTime _$createdAt(Tag v) => v.createdAt;
-  static const Field<Tag, DateTime> _f$createdAt =
-      Field('createdAt', _$createdAt, key: r'created_at');
+  static const Field<Tag, DateTime> _f$createdAt = Field(
+    'createdAt',
+    _$createdAt,
+    key: r'created_at',
+  );
 
   @override
   final MappableFields<Tag> fields = const {
@@ -41,10 +48,11 @@ class TagMapper extends ClassMapperBase<Tag> {
 
   static Tag _instantiate(DecodingData data) {
     return Tag(
-        id: data.dec(_f$id),
-        userId: data.dec(_f$userId),
-        name: data.dec(_f$name),
-        createdAt: data.dec(_f$createdAt));
+      id: data.dec(_f$id),
+      userId: data.dec(_f$userId),
+      name: data.dec(_f$name),
+      createdAt: data.dec(_f$createdAt),
+    );
   }
 
   @override
@@ -104,23 +112,26 @@ class _TagCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Tag, $Out>
   @override
   late final ClassMapperBase<Tag> $mapper = TagMapper.ensureInitialized();
   @override
-  $R call(
-          {String? id,
-          Object? userId = $none,
-          String? name,
-          DateTime? createdAt}) =>
-      $apply(FieldCopyWithData({
-        if (id != null) #id: id,
-        if (userId != $none) #userId: userId,
-        if (name != null) #name: name,
-        if (createdAt != null) #createdAt: createdAt
-      }));
+  $R call({
+    String? id,
+    Object? userId = $none,
+    String? name,
+    DateTime? createdAt,
+  }) => $apply(
+    FieldCopyWithData({
+      if (id != null) #id: id,
+      if (userId != $none) #userId: userId,
+      if (name != null) #name: name,
+      if (createdAt != null) #createdAt: createdAt,
+    }),
+  );
   @override
   Tag $make(CopyWithData data) => Tag(
-      id: data.get(#id, or: $value.id),
-      userId: data.get(#userId, or: $value.userId),
-      name: data.get(#name, or: $value.name),
-      createdAt: data.get(#createdAt, or: $value.createdAt));
+    id: data.get(#id, or: $value.id),
+    userId: data.get(#userId, or: $value.userId),
+    name: data.get(#name, or: $value.name),
+    createdAt: data.get(#createdAt, or: $value.createdAt),
+  );
 
   @override
   TagCopyWith<$R2, Tag, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>

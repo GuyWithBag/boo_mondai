@@ -46,6 +46,7 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(StudyRatingAdapter());
     registerAdapter(StudySessionStepRecordAdapter());
     registerAdapter(SummarySessionStepAdapter());
+    registerAdapter(SyncDeletionAdapter());
     registerAdapter(TagAdapter());
     registerAdapter(UserAdapter());
     registerAdapter(UserSettingsAdapter());
@@ -96,6 +97,7 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(StudyRatingAdapter());
     registerAdapter(StudySessionStepRecordAdapter());
     registerAdapter(SummarySessionStepAdapter());
+    registerAdapter(SyncDeletionAdapter());
     registerAdapter(TagAdapter());
     registerAdapter(UserAdapter());
     registerAdapter(UserSettingsAdapter());

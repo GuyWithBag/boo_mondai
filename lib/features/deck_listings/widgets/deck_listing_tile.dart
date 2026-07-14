@@ -8,8 +8,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         DeckTileState,
         HeaderBadge,
         ImageHelper,
-        StoredMediaHelper,
         StoredMediaService,
+        StoredMediaPath,
         MetaLabel,
         NumberHelper,
         ProfileLabel,
@@ -134,13 +134,11 @@ class DeckListingTile extends HookWidget {
                         facingLeft: true,
                         avatarUrl: deck.userProfile == null
                             ? null
-                            : StoredMediaService.getLocalPath(
-                                    StoredMediaHelper.getSemanticId(
-                                      'profile',
-                                      deck.userProfile!.id,
-                                      'avatar',
+                            : StoredMediaService.getFileByPath(
+                                    const StoredMediaPath.app(
+                                      name: 'profileAvatar',
                                     ),
-                                  ) ??
+                                  )?.path ??
                                   deck.userProfile!.avatarUrl,
                       ),
                     ),

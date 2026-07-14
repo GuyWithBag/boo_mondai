@@ -7,5 +7,5 @@ export 'sync/sync.barrel.dart';
 // Other files
 export 'decks.local.db.dart';
 export 'deck_form.validator.dart';
-export 'decks.service.dart';
 export 'decks.remote.db.dart';
+export 'decks.service.dart';

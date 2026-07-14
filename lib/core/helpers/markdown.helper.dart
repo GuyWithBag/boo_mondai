@@ -1,5 +1,11 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, ImageHelper, MediaHelper, StoredMediaService, StringHelper;
+    show
+        AppTokens,
+        ImageHelper,
+        MediaHelper,
+        StoredMediaPath,
+        StoredMediaService,
+        StringHelper;
 import 'package:file_picker/file_picker.dart' show PlatformFile;
 import 'package:flutter/material.dart'
     show
@@ -24,12 +30,12 @@ abstract class MarkdownHelper {
 
     if (uri.scheme == 'local') {
       final id = uri.path.isNotEmpty ? uri.path : uri.host;
-      return StoredMediaService.getLocalPath(id);
+      return StoredMediaService.getFileById(id)?.path;
     }
 
     final normalizedSource = normalizeMediaSource(source);
     if (ImageHelper.isRemoteUrl(normalizedSource)) {
-      return StoredMediaService.getLocalPathForRemoteUrl(normalizedSource) ??
+      return StoredMediaService.getFileByRemoteUrl(normalizedSource)?.path ??
           normalizedSource;
     }
 
@@ -52,30 +58,30 @@ abstract class MarkdownHelper {
   }
 
   static Future<String?> toPickedFileImageAttachmentFormat({
-    required String id,
+    required StoredMediaPath path,
     required PlatformFile file,
     String? remoteUrl,
   }) {
     return toPickedFileMediaMarkdownFormat(
-      id: id,
+      path: path,
       file: file,
       remoteUrl: remoteUrl,
     );
   }
 
   static Future<String?> toPickedFileMediaMarkdownFormat({
-    required String id,
+    required StoredMediaPath path,
     required PlatformFile file,
     String? remoteUrl,
   }) async {
-    final localPath = await StoredMediaService.writePickedFileToLocal(
-      id: id,
+    final storedMedia = await StoredMediaService.storeFile(
+      path: path,
       file: file,
       remoteUrl: remoteUrl,
     );
-    if (localPath == null) return null;
+    if (storedMedia == null) return null;
 
-    final source = 'local:$id';
+    final source = 'local:${storedMedia.id}';
     final mimeType = MediaHelper.mimeTypeFromExtension(file.extension);
     return MediaHelper.isImageMimeType(mimeType)
         ? toImageAttachmentFormat(label: file.name, source: source)

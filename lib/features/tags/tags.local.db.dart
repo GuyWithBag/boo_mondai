@@ -18,6 +18,11 @@ class TagLocalDB extends HiveLocalDB<Tag> {
     action: 'getByCurrentUser($currentUserId)',
   );
 
+  List<Tag> selectManyByIds(Set<String> ids) => guardSync(
+    () => box.values.where((tag) => ids.contains(tag.id)).toList(),
+    action: 'selectManyByIds(${ids.length} ids)',
+  );
+
   List<Tag> filterTags({
     String query = '',
     String? userId,

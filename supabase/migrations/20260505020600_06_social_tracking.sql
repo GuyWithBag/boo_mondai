@@ -14,7 +14,7 @@ ALTER TABLE deck_votes ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "deck_votes: read all" ON deck_votes FOR SELECT USING (true);
 CREATE POLICY "deck_votes: manage own" ON deck_votes FOR ALL USING (user_id = current_profile_id()) WITH CHECK (user_id = current_profile_id());
 CREATE INDEX ON deck_votes (user_id);
-CREATE TRIGGER set_updated_at BEFORE UPDATE ON deck_votes FOR EACH ROW EXECUTE FUNCTION moddatetime(updated_at);
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON deck_votes FOR EACH ROW EXECUTE FUNCTION extensions.moddatetime(updated_at);
 
 CREATE TABLE deck_vote_events (
   id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -53,7 +53,7 @@ CREATE POLICY "deck_vote_reviews: update own" ON deck_vote_reviews FOR UPDATE
   WITH CHECK (user_id = current_profile_id());
 CREATE INDEX ON deck_vote_reviews (deck_id, created_at DESC) WHERE is_deleted = false;
 CREATE INDEX ON deck_vote_reviews (user_id, created_at DESC);
-CREATE TRIGGER set_updated_at BEFORE UPDATE ON deck_vote_reviews FOR EACH ROW EXECUTE FUNCTION moddatetime(updated_at);
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON deck_vote_reviews FOR EACH ROW EXECUTE FUNCTION extensions.moddatetime(updated_at);
 
 CREATE TABLE deck_vote_review_edit_logs (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -116,7 +116,7 @@ CREATE POLICY "deck_vote_review_comments: update own" ON deck_vote_review_commen
 CREATE INDEX ON deck_vote_review_comments (review_id, created_at) WHERE parent_comment_id IS NULL;
 CREATE INDEX ON deck_vote_review_comments (parent_comment_id, created_at);
 CREATE INDEX ON deck_vote_review_comments (user_id, created_at DESC);
-CREATE TRIGGER set_updated_at BEFORE UPDATE ON deck_vote_review_comments FOR EACH ROW EXECUTE FUNCTION moddatetime(updated_at);
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON deck_vote_review_comments FOR EACH ROW EXECUTE FUNCTION extensions.moddatetime(updated_at);
 
 CREATE TABLE deck_vote_review_comment_edit_logs (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -163,7 +163,7 @@ CREATE POLICY "deck_comments: update own" ON deck_comments FOR UPDATE
 CREATE INDEX ON deck_comments (deck_id, created_at DESC) WHERE parent_comment_id IS NULL;
 CREATE INDEX ON deck_comments (parent_comment_id, created_at);
 CREATE INDEX ON deck_comments (user_id, created_at DESC);
-CREATE TRIGGER set_updated_at BEFORE UPDATE ON deck_comments FOR EACH ROW EXECUTE FUNCTION moddatetime(updated_at);
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON deck_comments FOR EACH ROW EXECUTE FUNCTION extensions.moddatetime(updated_at);
 
 CREATE TABLE deck_comment_edit_logs (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),

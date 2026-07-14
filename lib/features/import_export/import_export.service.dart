@@ -20,8 +20,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         ImportCardsPayload,
         ImportExportBackup,
         DecksService,
-        StoredMediaHelper,
         StoredMediaService,
+        StoredMediaPath,
         ImageHelper,
         ChangeBatchResult,
         ChangedEntity,
@@ -279,7 +279,10 @@ class ImportExportService {
       await _restoreBundledImage(
         tempDir: tempDir,
         contentPath: coverImageContentPath,
-        id: StoredMediaHelper.getSemanticId('deck', deck.id, 'cover'),
+        path: StoredMediaPath.folder(
+          folderPath: '${deck.title}/media',
+          name: 'coverImage',
+        ),
         remoteUrl: _remoteUrlOrNull(incomingDeck.coverImageUrl),
       );
 
@@ -290,11 +293,9 @@ class ImportExportService {
           final localPath = await _restoreBundledImage(
             tempDir: tempDir,
             contentPath: featuredImageContentPaths[index],
-            id: StoredMediaHelper.getSemanticId(
-              'deck_listing',
-              deck.id,
-              'featured',
-              index,
+            path: StoredMediaPath.folder(
+              folderPath: '${deck.title}/media/featuredImages',
+              name: 'image$index',
             ),
             remoteUrl: index < listing.featuredImages.length
                 ? _remoteUrlOrNull(listing.featuredImages[index])
@@ -863,7 +864,7 @@ class ImportExportService {
   static Future<String?> _restoreBundledImage({
     required Directory tempDir,
     required String? contentPath,
-    required String id,
+    required StoredMediaPath path,
     required String? remoteUrl,
   }) async {
     if (contentPath == null || contentPath.trim().isEmpty) return null;
@@ -871,12 +872,13 @@ class ImportExportService {
     final file = File('${tempDir.path}/$contentPath');
     if (!await file.exists()) return null;
 
-    return StoredMediaService.writeToLocal(
-      id: id,
+    final storedMedia = await StoredMediaService.storeBytes(
+      path: path,
       bytes: await file.readAsBytes(),
       mimeType: 'image/png',
       remoteUrl: remoteUrl,
     );
+    return storedMedia.localPath;
   }
 
   static String? _remoteUrlOrNull(String? value) {

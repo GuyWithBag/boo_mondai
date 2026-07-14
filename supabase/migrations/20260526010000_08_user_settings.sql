@@ -36,4 +36,4 @@ CREATE INDEX idx_user_settings_user_id ON user_settings (user_id);
 CREATE TRIGGER set_updated_at
   BEFORE UPDATE ON user_settings
   FOR EACH ROW
-  EXECUTE FUNCTION moddatetime(updated_at);
+  EXECUTE FUNCTION extensions.moddatetime(updated_at);

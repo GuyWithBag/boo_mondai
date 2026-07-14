@@ -35,7 +35,7 @@ CREATE POLICY "card_templates: owner insert" ON card_templates FOR INSERT WITH C
 CREATE POLICY "card_templates: owner update" ON card_templates FOR UPDATE USING (EXISTS (SELECT 1 FROM decks d WHERE d.id = card_templates.deck_id AND d.user_id = current_profile_id())) WITH CHECK (EXISTS (SELECT 1 FROM decks d WHERE d.id = card_templates.deck_id AND d.user_id = current_profile_id()));
 CREATE POLICY "card_templates: owner delete" ON card_templates FOR DELETE USING (EXISTS (SELECT 1 FROM decks d WHERE d.id = card_templates.deck_id AND d.user_id = current_profile_id()));
 CREATE INDEX ON card_templates (deck_id);
-CREATE TRIGGER set_updated_at BEFORE UPDATE ON card_templates FOR EACH ROW EXECUTE FUNCTION moddatetime(updated_at);
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON card_templates FOR EACH ROW EXECUTE FUNCTION extensions.moddatetime(updated_at);
 
 -- ── card_template_tags ────────────────────────────────
 CREATE TABLE card_template_tags (

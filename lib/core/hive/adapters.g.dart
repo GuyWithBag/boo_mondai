@@ -2407,3 +2407,58 @@ class StoredMediaAdapter extends TypeAdapter<StoredMedia> {
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
+
+class SyncDeletionAdapter extends TypeAdapter<SyncDeletion> {
+  @override
+  final typeId = 52;
+
+  @override
+  SyncDeletion read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return SyncDeletion(
+      id: fields[0] as String,
+      entityType: fields[1] as String,
+      entityId: fields[2] as String,
+      userId: fields[5] as String,
+      deletedAt: fields[6] as DateTime,
+      createdAt: fields[7] as DateTime,
+      scopeType: fields[3] as String?,
+      scopeId: fields[4] as String?,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, SyncDeletion obj) {
+    writer
+      ..writeByte(8)
+      ..writeByte(0)
+      ..write(obj.id)
+      ..writeByte(1)
+      ..write(obj.entityType)
+      ..writeByte(2)
+      ..write(obj.entityId)
+      ..writeByte(3)
+      ..write(obj.scopeType)
+      ..writeByte(4)
+      ..write(obj.scopeId)
+      ..writeByte(5)
+      ..write(obj.userId)
+      ..writeByte(6)
+      ..write(obj.deletedAt)
+      ..writeByte(7)
+      ..write(obj.createdAt);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SyncDeletionAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}

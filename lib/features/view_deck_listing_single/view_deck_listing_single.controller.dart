@@ -239,7 +239,10 @@ class ViewDeckListingSingleController extends Controller {
   }
 
   Future<void> updateTitle(String value) async {
-    final updatedDeck = await DecksService.update(deck: _deck, title: value);
+    final updatedDeck = await DecksService.updateTitle(
+      deck: _deck,
+      title: value,
+    );
     _applyUpdatedDeck(updatedDeck);
   }
 

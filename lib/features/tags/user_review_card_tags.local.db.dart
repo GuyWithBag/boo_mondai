@@ -16,4 +16,25 @@ class UserStudyCardTagsLocalDB extends HiveLocalDB<UserStudyCardTag> {
     () => box.values.where((item) => item.studyCardId == studyCardId).toList(),
     action: 'getTagsForCard($studyCardId)',
   );
+
+  List<UserStudyCardTag> getTagsForCards(Set<String> studyCardIds) => guardSync(
+    () => box.values
+        .where((item) => studyCardIds.contains(item.studyCardId))
+        .toList(),
+    action: 'getTagsForCards(${studyCardIds.length} studyCardIds)',
+  );
+
+  Future<void> deleteByStudyCardIds(Set<String> studyCardIds) =>
+      guard(() async {
+        final keys = box.values
+            .where((item) => studyCardIds.contains(item.studyCardId))
+            .map(primaryKeyFromItem)
+            .toList();
+        await box.deleteAll(keys.map(encodePrimaryKey));
+      }, action: 'deleteByStudyCardIds(${studyCardIds.length} studyCardIds)');
+
+  bool isTagReferenced(String tagId) => guardSync(
+    () => box.values.any((item) => item.tagId == tagId),
+    action: 'isTagReferenced($tagId)',
+  );
 }

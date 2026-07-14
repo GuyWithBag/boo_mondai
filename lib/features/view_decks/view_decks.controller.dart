@@ -11,8 +11,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         LocalDB,
         Controller,
         Deck,
+        DecksService,
         DeckSearchFilter,
-        FsrsCard,
         SearchScopeOption,
         SearchState,
         buildViewDecksDeckScope,
@@ -174,25 +174,35 @@ class ViewDecksLocalController extends Controller {
     setLoading(true);
     setError(null);
     try {
-      final studyCards = LocalDB.studyCard.getByDeckId(id);
-      final studyCardIds = studyCards.map((card) => card.id).toSet();
-      final fsrsCards = LocalDB.fsrsCard.selectMany(
-        where: (card) => studyCardIds.contains(card.studyCardId),
-      );
-      final fsrsCardIds = fsrsCards.map((card) => card.id).toSet();
-      final reviewLogs = LocalDB.reviewLog.selectMany(
-        where: (log) => fsrsCardIds.contains(log.fsrsCardId),
-      );
+      final deck = _deckDB.selectByPk({'id': id});
+      if (deck == null) {
+        setLoading(false);
+        notifyListeners();
+        return;
+      }
 
-      await LocalDB.reviewLog.deleteManyByPk([
-        for (final log in reviewLogs) {'id': log.id},
-      ]);
-      await LocalDB.fsrsCard.deleteManyByPk([
-        for (final FsrsCard card in fsrsCards) {'id': card.id},
-      ]);
-      await LocalDB.studyCard.deleteByDeckId(id);
-      await LocalDB.cardTemplate.deleteByDeckId(id);
-      await _deckDB.deleteByPk({'id': id});
+      await DecksService.deleteDeckCascade(deck: deck);
+      load();
+    } on Exception catch (e) {
+      setError(e);
+      setLoading(false);
+      notifyListeners();
+    }
+  }
+
+  Future<void> deleteDecks(Iterable<String> ids) async {
+    final deckIds = ids.toSet();
+    if (deckIds.isEmpty) return;
+
+    setLoading(true);
+    setError(null);
+    try {
+      for (final id in deckIds) {
+        final deck = _deckDB.selectByPk({'id': id});
+        if (deck == null) continue;
+
+        await DecksService.deleteDeckCascade(deck: deck);
+      }
       load();
     } on Exception catch (e) {
       setError(e);

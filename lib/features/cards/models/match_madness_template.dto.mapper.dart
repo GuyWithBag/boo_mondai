@@ -27,30 +27,53 @@ class MatchMadnessTemplateMapper
   static String _$id(MatchMadnessTemplate v) => v.id;
   static const Field<MatchMadnessTemplate, String> _f$id = Field('id', _$id);
   static String _$deckId(MatchMadnessTemplate v) => v.deckId;
-  static const Field<MatchMadnessTemplate, String> _f$deckId =
-      Field('deckId', _$deckId, key: r'deck_id');
+  static const Field<MatchMadnessTemplate, String> _f$deckId = Field(
+    'deckId',
+    _$deckId,
+    key: r'deck_id',
+  );
   static int _$sortOrder(MatchMadnessTemplate v) => v.sortOrder;
-  static const Field<MatchMadnessTemplate, int> _f$sortOrder =
-      Field('sortOrder', _$sortOrder, key: r'sort_order');
+  static const Field<MatchMadnessTemplate, int> _f$sortOrder = Field(
+    'sortOrder',
+    _$sortOrder,
+    key: r'sort_order',
+  );
   static DateTime _$createdAt(MatchMadnessTemplate v) => v.createdAt;
-  static const Field<MatchMadnessTemplate, DateTime> _f$createdAt =
-      Field('createdAt', _$createdAt, key: r'created_at');
+  static const Field<MatchMadnessTemplate, DateTime> _f$createdAt = Field(
+    'createdAt',
+    _$createdAt,
+    key: r'created_at',
+  );
   static DateTime _$updatedAt(MatchMadnessTemplate v) => v.updatedAt;
-  static const Field<MatchMadnessTemplate, DateTime> _f$updatedAt =
-      Field('updatedAt', _$updatedAt, key: r'updated_at');
+  static const Field<MatchMadnessTemplate, DateTime> _f$updatedAt = Field(
+    'updatedAt',
+    _$updatedAt,
+    key: r'updated_at',
+  );
   static String? _$sourceTemplateId(MatchMadnessTemplate v) =>
       v.sourceTemplateId;
   static const Field<MatchMadnessTemplate, String> _f$sourceTemplateId = Field(
-      'sourceTemplateId', _$sourceTemplateId,
-      key: r'source_template_id', opt: true);
+    'sourceTemplateId',
+    _$sourceTemplateId,
+    key: r'source_template_id',
+    opt: true,
+  );
   static List<Tag> _$tags(MatchMadnessTemplate v) => v.tags;
-  static const Field<MatchMadnessTemplate, List<Tag>> _f$tags =
-      Field('tags', _$tags, opt: true, def: const []);
+  static const Field<MatchMadnessTemplate, List<Tag>> _f$tags = Field(
+    'tags',
+    _$tags,
+    opt: true,
+    def: const [],
+  );
   static bool _$verticallyCentered(MatchMadnessTemplate v) =>
       v.verticallyCentered;
   static const Field<MatchMadnessTemplate, bool> _f$verticallyCentered = Field(
-      'verticallyCentered', _$verticallyCentered,
-      key: r'vertically_centered', opt: true, def: true);
+    'verticallyCentered',
+    _$verticallyCentered,
+    key: r'vertically_centered',
+    opt: true,
+    def: true,
+  );
   static List<MatchMadnessPair> _$pairs(MatchMadnessTemplate v) => v.pairs;
   static const Field<MatchMadnessTemplate, List<MatchMadnessPair>> _f$pairs =
       Field('pairs', _$pairs);
@@ -78,15 +101,16 @@ class MatchMadnessTemplateMapper
 
   static MatchMadnessTemplate _instantiate(DecodingData data) {
     return MatchMadnessTemplate(
-        id: data.dec(_f$id),
-        deckId: data.dec(_f$deckId),
-        sortOrder: data.dec(_f$sortOrder),
-        createdAt: data.dec(_f$createdAt),
-        updatedAt: data.dec(_f$updatedAt),
-        sourceTemplateId: data.dec(_f$sourceTemplateId),
-        tags: data.dec(_f$tags),
-        verticallyCentered: data.dec(_f$verticallyCentered),
-        pairs: data.dec(_f$pairs));
+      id: data.dec(_f$id),
+      deckId: data.dec(_f$deckId),
+      sortOrder: data.dec(_f$sortOrder),
+      createdAt: data.dec(_f$createdAt),
+      updatedAt: data.dec(_f$updatedAt),
+      sourceTemplateId: data.dec(_f$sourceTemplateId),
+      tags: data.dec(_f$tags),
+      verticallyCentered: data.dec(_f$verticallyCentered),
+      pairs: data.dec(_f$pairs),
+    );
   }
 
   @override
@@ -112,58 +136,76 @@ mixin MatchMadnessTemplateMappable {
         .encodeMap<MatchMadnessTemplate>(this as MatchMadnessTemplate);
   }
 
-  MatchMadnessTemplateCopyWith<MatchMadnessTemplate, MatchMadnessTemplate,
-      MatchMadnessTemplate> get copyWith => _MatchMadnessTemplateCopyWithImpl<
-          MatchMadnessTemplate, MatchMadnessTemplate>(
-      this as MatchMadnessTemplate, $identity, $identity);
+  MatchMadnessTemplateCopyWith<
+    MatchMadnessTemplate,
+    MatchMadnessTemplate,
+    MatchMadnessTemplate
+  >
+  get copyWith =>
+      _MatchMadnessTemplateCopyWithImpl<
+        MatchMadnessTemplate,
+        MatchMadnessTemplate
+      >(this as MatchMadnessTemplate, $identity, $identity);
   @override
   String toString() {
-    return MatchMadnessTemplateMapper.ensureInitialized()
-        .stringifyValue(this as MatchMadnessTemplate);
+    return MatchMadnessTemplateMapper.ensureInitialized().stringifyValue(
+      this as MatchMadnessTemplate,
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return MatchMadnessTemplateMapper.ensureInitialized()
-        .equalsValue(this as MatchMadnessTemplate, other);
+    return MatchMadnessTemplateMapper.ensureInitialized().equalsValue(
+      this as MatchMadnessTemplate,
+      other,
+    );
   }
 
   @override
   int get hashCode {
-    return MatchMadnessTemplateMapper.ensureInitialized()
-        .hashValue(this as MatchMadnessTemplate);
+    return MatchMadnessTemplateMapper.ensureInitialized().hashValue(
+      this as MatchMadnessTemplate,
+    );
   }
 }
 
 extension MatchMadnessTemplateValueCopy<$R, $Out>
     on ObjectCopyWith<$R, MatchMadnessTemplate, $Out> {
   MatchMadnessTemplateCopyWith<$R, MatchMadnessTemplate, $Out>
-      get $asMatchMadnessTemplate => $base.as(
-          (v, t, t2) => _MatchMadnessTemplateCopyWithImpl<$R, $Out>(v, t, t2));
+  get $asMatchMadnessTemplate => $base.as(
+    (v, t, t2) => _MatchMadnessTemplateCopyWithImpl<$R, $Out>(v, t, t2),
+  );
 }
 
 abstract class MatchMadnessTemplateCopyWith<
-    $R,
-    $In extends MatchMadnessTemplate,
-    $Out> implements CardTemplateCopyWith<$R, $In, $Out> {
+  $R,
+  $In extends MatchMadnessTemplate,
+  $Out
+>
+    implements CardTemplateCopyWith<$R, $In, $Out> {
   @override
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags;
-  ListCopyWith<$R, MatchMadnessPair,
-          MatchMadnessPairCopyWith<$R, MatchMadnessPair, MatchMadnessPair>>
-      get pairs;
+  ListCopyWith<
+    $R,
+    MatchMadnessPair,
+    MatchMadnessPairCopyWith<$R, MatchMadnessPair, MatchMadnessPair>
+  >
+  get pairs;
   @override
-  $R call(
-      {String? id,
-      String? deckId,
-      int? sortOrder,
-      DateTime? createdAt,
-      DateTime? updatedAt,
-      String? sourceTemplateId,
-      List<Tag>? tags,
-      bool? verticallyCentered,
-      List<MatchMadnessPair>? pairs});
+  $R call({
+    String? id,
+    String? deckId,
+    int? sortOrder,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    String? sourceTemplateId,
+    List<Tag>? tags,
+    bool? verticallyCentered,
+    List<MatchMadnessPair>? pairs,
+  });
   MatchMadnessTemplateCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-      Then<$Out2, $R2> t);
+    Then<$Out2, $R2> t,
+  );
 }
 
 class _MatchMadnessTemplateCopyWithImpl<$R, $Out>
@@ -176,50 +218,63 @@ class _MatchMadnessTemplateCopyWithImpl<$R, $Out>
       MatchMadnessTemplateMapper.ensureInitialized();
   @override
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags => ListCopyWith(
-      $value.tags, (v, t) => v.copyWith.$chain(t), (v) => call(tags: v));
+    $value.tags,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(tags: v),
+  );
   @override
-  ListCopyWith<$R, MatchMadnessPair,
-          MatchMadnessPairCopyWith<$R, MatchMadnessPair, MatchMadnessPair>>
-      get pairs => ListCopyWith(
-          $value.pairs, (v, t) => v.copyWith.$chain(t), (v) => call(pairs: v));
+  ListCopyWith<
+    $R,
+    MatchMadnessPair,
+    MatchMadnessPairCopyWith<$R, MatchMadnessPair, MatchMadnessPair>
+  >
+  get pairs => ListCopyWith(
+    $value.pairs,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(pairs: v),
+  );
   @override
-  $R call(
-          {String? id,
-          String? deckId,
-          int? sortOrder,
-          DateTime? createdAt,
-          DateTime? updatedAt,
-          Object? sourceTemplateId = $none,
-          List<Tag>? tags,
-          bool? verticallyCentered,
-          List<MatchMadnessPair>? pairs}) =>
-      $apply(FieldCopyWithData({
-        if (id != null) #id: id,
-        if (deckId != null) #deckId: deckId,
-        if (sortOrder != null) #sortOrder: sortOrder,
-        if (createdAt != null) #createdAt: createdAt,
-        if (updatedAt != null) #updatedAt: updatedAt,
-        if (sourceTemplateId != $none) #sourceTemplateId: sourceTemplateId,
-        if (tags != null) #tags: tags,
-        if (verticallyCentered != null) #verticallyCentered: verticallyCentered,
-        if (pairs != null) #pairs: pairs
-      }));
+  $R call({
+    String? id,
+    String? deckId,
+    int? sortOrder,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Object? sourceTemplateId = $none,
+    List<Tag>? tags,
+    bool? verticallyCentered,
+    List<MatchMadnessPair>? pairs,
+  }) => $apply(
+    FieldCopyWithData({
+      if (id != null) #id: id,
+      if (deckId != null) #deckId: deckId,
+      if (sortOrder != null) #sortOrder: sortOrder,
+      if (createdAt != null) #createdAt: createdAt,
+      if (updatedAt != null) #updatedAt: updatedAt,
+      if (sourceTemplateId != $none) #sourceTemplateId: sourceTemplateId,
+      if (tags != null) #tags: tags,
+      if (verticallyCentered != null) #verticallyCentered: verticallyCentered,
+      if (pairs != null) #pairs: pairs,
+    }),
+  );
   @override
   MatchMadnessTemplate $make(CopyWithData data) => MatchMadnessTemplate(
-      id: data.get(#id, or: $value.id),
-      deckId: data.get(#deckId, or: $value.deckId),
-      sortOrder: data.get(#sortOrder, or: $value.sortOrder),
-      createdAt: data.get(#createdAt, or: $value.createdAt),
-      updatedAt: data.get(#updatedAt, or: $value.updatedAt),
-      sourceTemplateId:
-          data.get(#sourceTemplateId, or: $value.sourceTemplateId),
-      tags: data.get(#tags, or: $value.tags),
-      verticallyCentered:
-          data.get(#verticallyCentered, or: $value.verticallyCentered),
-      pairs: data.get(#pairs, or: $value.pairs));
+    id: data.get(#id, or: $value.id),
+    deckId: data.get(#deckId, or: $value.deckId),
+    sortOrder: data.get(#sortOrder, or: $value.sortOrder),
+    createdAt: data.get(#createdAt, or: $value.createdAt),
+    updatedAt: data.get(#updatedAt, or: $value.updatedAt),
+    sourceTemplateId: data.get(#sourceTemplateId, or: $value.sourceTemplateId),
+    tags: data.get(#tags, or: $value.tags),
+    verticallyCentered: data.get(
+      #verticallyCentered,
+      or: $value.verticallyCentered,
+    ),
+    pairs: data.get(#pairs, or: $value.pairs),
+  );
 
   @override
   MatchMadnessTemplateCopyWith<$R2, MatchMadnessTemplate, $Out2>
-      $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-          _MatchMadnessTemplateCopyWithImpl<$R2, $Out2>($value, $cast, t);
+  $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _MatchMadnessTemplateCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }

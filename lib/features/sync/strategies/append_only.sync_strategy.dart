@@ -21,6 +21,7 @@ class AppendOnlySyncStrategy<T> implements SyncStrategy<T> {
     required this.localItemsByIds,
     required this.remoteItemsByIds,
     required this.itemId,
+    this.changeType = ChangeType.added,
   });
 
   @override
@@ -32,6 +33,7 @@ class AppendOnlySyncStrategy<T> implements SyncStrategy<T> {
   final DeckSyncItemsByIdsLoader<T> localItemsByIds;
   final DeckSyncItemsByIdsLoader<T> remoteItemsByIds;
   final String Function(T item) itemId;
+  final ChangeType changeType;
 
   @override
   Future<bool> doesItNeedSync(DeckSyncSession context) async {
@@ -53,7 +55,7 @@ class AppendOnlySyncStrategy<T> implements SyncStrategy<T> {
       changes.add(
         ChangedEntity<T>(
           source: ChangeSource.sync,
-          changeType: ChangeType.added,
+          changeType: changeType,
           id: '$name:$id',
           afterChange: remote,
           remoteId: id,
@@ -66,7 +68,7 @@ class AppendOnlySyncStrategy<T> implements SyncStrategy<T> {
       changes.add(
         ChangedEntity<T>(
           source: ChangeSource.sync,
-          changeType: ChangeType.added,
+          changeType: changeType,
           id: '$name:$id',
           afterChange: local,
           localId: id,

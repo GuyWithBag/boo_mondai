@@ -71,7 +71,7 @@ CREATE TABLE fsrs_cards (
 );
 ALTER TABLE fsrs_cards ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "fsrs_cards: owner manages" ON fsrs_cards FOR ALL USING (user_id = current_profile_id());
-CREATE TRIGGER set_updated_at BEFORE UPDATE ON fsrs_cards FOR EACH ROW EXECUTE FUNCTION moddatetime(updated_at);
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON fsrs_cards FOR EACH ROW EXECUTE FUNCTION extensions.moddatetime(updated_at);
 
 CREATE TABLE review_logs (
   id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -93,7 +93,7 @@ CREATE TABLE streaks (
 );
 ALTER TABLE streaks ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "streaks: owner manages" ON streaks FOR ALL USING (user_id = current_profile_id());
-CREATE TRIGGER set_updated_at BEFORE UPDATE ON streaks FOR EACH ROW EXECUTE FUNCTION moddatetime(updated_at);
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON streaks FOR EACH ROW EXECUTE FUNCTION extensions.moddatetime(updated_at);
 
 CREATE VIEW leaderboard_entries WITH (security_invoker = true) AS
 SELECT

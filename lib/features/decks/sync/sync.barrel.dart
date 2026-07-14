@@ -2,9 +2,9 @@
 
 // Other files
 export 'deck.sync_plan_payload.dart';
-export 'deck.sync_service.dart';
 export 'sync.plan_step.dart';
 export 'typed_sync.plan_step.dart';
 export 'deck.sync_controller.dart';
-export 'deck.sync_session.dart';
 export 'deck.sync_availability_snapshot.dart';
+export 'deck.sync_session.dart';
+export 'deck.sync_service.dart';

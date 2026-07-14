@@ -2,3 +2,4 @@
 
 // Other files
 export 'stored_media.dto.dart';
+export 'stored_media_path.dart';

@@ -10,15 +10,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         Deck,
         CardTemplateFormState,
         LocalDB,
-        MarkdownHelper,
         QuestionType,
         EditDeckQuestionTypeHelper,
         CardTemplateDraftFormAdapter,
         DraftFormSession,
-        EditDeckService,
-        StoredMediaHelper,
-        StoredMediaService,
-        uuid;
+        EditDeckService;
 import 'package:flutter/material.dart' show TextEditingController;
 
 import 'package:flutter_hooks/flutter_hooks.dart'
@@ -106,6 +102,13 @@ class EditDeckController extends Controller {
     notifyListeners();
   }
 
+  void markDirty() {
+    if (_isDirty) return;
+
+    _isDirty = true;
+    notifyListeners();
+  }
+
   @override
   void dispose() {
     titleController.dispose();
@@ -171,34 +174,6 @@ class EditDeckController extends Controller {
     _draftSession.addDraft(newTemplate);
     _isDirty = true;
     notifyListeners();
-  }
-
-  Future<String?> pickAndAddMediaMarkdownToActiveTemplate() async {
-    final templateId = activeTemplateId;
-    if (templateId == null) return null;
-
-    final file = await StoredMediaService.pickSupportedFile();
-    if (file == null) return null;
-
-    final markdown = await MarkdownHelper.toPickedFileMediaMarkdownFormat(
-      id: StoredMediaHelper.getSemanticId(
-        'card_template',
-        templateId,
-        'markdown',
-        uuid.v7(),
-      ),
-      file: file,
-    );
-
-    if (markdown != null) {
-      _isDirty = true;
-      notifyListeners();
-    }
-    return markdown;
-  }
-
-  Future<String?> pickAndAddImageAttachmentMarkdownToActiveTemplate() {
-    return pickAndAddMediaMarkdownToActiveTemplate();
   }
 
   // ── Deck Persistence ───────────────────────────────

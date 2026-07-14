@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:boo_mondai/core/theme/app_tokens.model.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
@@ -16,7 +18,8 @@ import 'package:flutter/material.dart' hide AppBar;
 import 'package:go_router/go_router.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-class AppBar extends StatelessWidget implements PreferredSizeWidget {
+class AppBar<TSelectedType> extends StatelessWidget
+    implements PreferredSizeWidget {
   const AppBar({
     super.key,
     this.title,
@@ -59,8 +62,11 @@ class AppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool collapsible;
   final ScrollController? scrollController;
   final double collapseDistance;
-  final SelectionController? selectionController;
-  final VoidCallback? onSelectedDelete;
+  final SelectionController<TSelectedType>? selectionController;
+  final FutureOr<void> Function(
+    SelectionController<TSelectedType> selectionController,
+  )?
+  onSelectedDelete;
   final List<Widget> selectedActions;
   final String? subTitle;
   final Widget? leading;
@@ -108,11 +114,11 @@ class AppBar extends StatelessWidget implements PreferredSizeWidget {
     final isSelectionState = selectionController?.isEnabled ?? false;
     final effectiveActions = [for (final action in actions) action];
     final effectiveSelectionActions = <Widget>[
-      if (onSelectedDelete != null)
+      if (onSelectedDelete != null && selectionController != null)
         Button.icon(
           icon: Icons.delete,
           color: ButtonColor.error,
-          onPressed: onSelectedDelete,
+          onPressed: () => onSelectedDelete!(selectionController!),
           tokens: tokens,
         ),
       if (isSelectionState) ...selectedActions,

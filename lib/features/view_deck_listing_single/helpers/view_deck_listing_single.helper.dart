@@ -1,5 +1,5 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show TextHelper, Deck, DecksService, StoredMediaService, StoredMediaHelper;
+    show TextHelper, Deck, DecksService, StoredMediaService, StoredMediaPath;
 
 final class ViewDeckListingSingleHelper {
   const ViewDeckListingSingleHelper();
@@ -41,9 +41,9 @@ final class ViewDeckListingSingleHelper {
     final profile = deck.userProfile;
     if (profile == null) return null;
     return TextHelper.getTrimmedTextOrNull(
-      StoredMediaService.getLocalPath(
-            StoredMediaHelper.getSemanticId('profile', profile.id, 'avatar'),
-          ) ??
+      StoredMediaService.getFileByPath(
+            const StoredMediaPath.app(name: 'profileAvatar'),
+          )?.path ??
           profile.avatarUrl,
     );
   }

@@ -17,6 +17,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         Service,
         Services,
         StudyCardService,
+        SyncDeletionService,
         SyncIndexEntry,
         DueFilterExtension;
 import 'package:fsrs/fsrs.dart';
@@ -34,9 +35,17 @@ class FsrsService extends Service {
     final studyCardIds = (await StudyCardService.loadStudyCardIdsForSyncSession(
       session,
     )).toSet();
-    return session.fsrsCards.selectManyByUserIdAndStudyCardIds(
-      userId: session.userId,
-      studyCardIds: studyCardIds,
+    final deletedIds = await SyncDeletionService.loadDeletedEntityIds(
+      session: session,
+      entityType: SyncDeletionService.fsrsCards,
+    );
+    return SyncDeletionService.withoutDeletedItems(
+      session.fsrsCards.selectManyByUserIdAndStudyCardIds(
+        userId: session.userId,
+        studyCardIds: studyCardIds,
+      ),
+      deletedIds,
+      (card) => card.id,
     );
   }
 
@@ -46,9 +55,19 @@ class FsrsService extends Service {
     final studyCardIds = (await StudyCardService.loadStudyCardIdsForSyncSession(
       session,
     )).toSet();
-    return session.remoteFsrsCards.selectManyByUserIdAndStudyCardIds(
-      userId: session.userId,
-      studyCardIds: studyCardIds,
+    final deletedIds = await SyncDeletionService.loadDeletedEntityIds(
+      session: session,
+      entityType: SyncDeletionService.fsrsCards,
+    );
+    final cards = await session.remoteFsrsCards
+        .selectManyByUserIdAndStudyCardIds(
+          userId: session.userId,
+          studyCardIds: studyCardIds,
+        );
+    return SyncDeletionService.withoutDeletedItems(
+      cards,
+      deletedIds,
+      (card) => card.id,
     );
   }
 
@@ -58,9 +77,16 @@ class FsrsService extends Service {
     final studyCardIds = (await StudyCardService.loadStudyCardIdsForSyncSession(
       session,
     )).toSet();
-    return session.fsrsCards.selectSyncIndexByUserIdAndStudyCardIds(
-      userId: session.userId,
-      studyCardIds: studyCardIds,
+    final deletedIds = await SyncDeletionService.loadDeletedEntityIds(
+      session: session,
+      entityType: SyncDeletionService.fsrsCards,
+    );
+    return SyncDeletionService.withoutDeletedIndexEntries(
+      session.fsrsCards.selectSyncIndexByUserIdAndStudyCardIds(
+        userId: session.userId,
+        studyCardIds: studyCardIds,
+      ),
+      deletedIds,
     );
   }
 
@@ -70,24 +96,47 @@ class FsrsService extends Service {
     final studyCardIds = (await StudyCardService.loadStudyCardIdsForSyncSession(
       session,
     )).toSet();
-    return session.remoteFsrsCards.selectSyncIndexByUserIdAndStudyCardIds(
-      userId: session.userId,
-      studyCardIds: studyCardIds,
+    final deletedIds = await SyncDeletionService.loadDeletedEntityIds(
+      session: session,
+      entityType: SyncDeletionService.fsrsCards,
     );
+    final entries = await session.remoteFsrsCards
+        .selectSyncIndexByUserIdAndStudyCardIds(
+          userId: session.userId,
+          studyCardIds: studyCardIds,
+        );
+    return SyncDeletionService.withoutDeletedIndexEntries(entries, deletedIds);
   }
 
   static Future<List<FsrsCard>> loadLocalFsrsCardsByIdsForSyncSession(
     DeckSyncSession session,
     List<String> ids,
   ) async {
-    return session.fsrsCards.selectManyByIds(ids);
+    final deletedIds = await SyncDeletionService.loadDeletedEntityIds(
+      session: session,
+      entityType: SyncDeletionService.fsrsCards,
+    );
+    return SyncDeletionService.withoutDeletedItems(
+      session.fsrsCards.selectManyByIds(ids),
+      deletedIds,
+      (card) => card.id,
+    );
   }
 
   static Future<List<FsrsCard>> loadRemoteFsrsCardsByIdsForSyncSession(
     DeckSyncSession session,
     List<String> ids,
   ) async {
-    return session.remoteFsrsCards.selectManyByIds(ids);
+    final deletedIds = await SyncDeletionService.loadDeletedEntityIds(
+      session: session,
+      entityType: SyncDeletionService.fsrsCards,
+    );
+    final cards = await session.remoteFsrsCards.selectManyByIds(ids);
+    return SyncDeletionService.withoutDeletedItems(
+      cards,
+      deletedIds,
+      (card) => card.id,
+    );
   }
 
   static Future<List<String>> loadFsrsCardIdsForSyncSession(

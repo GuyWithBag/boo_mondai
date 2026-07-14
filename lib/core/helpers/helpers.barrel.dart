@@ -13,3 +13,5 @@ export 'time.helper.dart';
 export 'file.helper.dart';
 export 'string.helper.dart';
 export 'media.helper.dart';
+export 'markdown_format.helper.dart';
+export 'folder_paths.helper.dart';

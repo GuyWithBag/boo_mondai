@@ -2,7 +2,6 @@
 
 // Barrel files
 export 'models/models.barrel.dart';
-export 'helpers/helpers.barrel.dart';
 // Other files
 export 'stored_medias.local.db.dart';
 export 'stored_media.service.dart';

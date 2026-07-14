@@ -4,6 +4,7 @@
 export 'models/models.barrel.dart';
 export 'controllers/controllers.barrel.dart';
 export 'helpers/helpers.barrel.dart';
+export 'tool_bar/tool_bar.barrel.dart';
 // Other files
 export 'back_button.dart';
 export 'chip.variant.dart';
@@ -39,7 +40,6 @@ export 'text_field.dart';
 export 'chip_input.controller.dart';
 export 'toggle_button.dart';
 export 'bottom_nav_bar.dart';
-export 'tool_bar.dart';
 export 'show_snackbar.dart';
 export 'interaction_handler.dart';
 export 'view_padding_sized_box.dart';

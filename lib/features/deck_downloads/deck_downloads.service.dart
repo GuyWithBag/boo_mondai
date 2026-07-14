@@ -21,8 +21,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         FillInTheBlanksTemplate,
         FlashcardTemplate,
         IdentificationTemplate,
-        StoredMediaHelper,
         StoredMediaService,
+        StoredMediaPath,
         ImageHelper,
         LocalDB,
         MatchMadnessPair,
@@ -204,8 +204,11 @@ class DeckDownloadsService extends Service {
       await LocalDB.deck.upsert(newLocalDeck);
       final coverRemotePath = remoteDeck.coverImageUrl;
       if (coverRemotePath != null && ImageHelper.isRemoteUrl(coverRemotePath)) {
-        final coverLocalPath = await StoredMediaService.downloadToLocal(
-          id: StoredMediaHelper.getSemanticId('deck', localDeckId, 'cover'),
+        final coverLocalPath = await StoredMediaService.remoteToLocal(
+          path: StoredMediaPath.folder(
+            folderPath: '${newLocalDeck.title}/media',
+            name: 'coverImage',
+          ),
           remoteUrl: coverRemotePath,
         );
         if (coverLocalPath != null) {

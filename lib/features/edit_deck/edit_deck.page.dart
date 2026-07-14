@@ -10,7 +10,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         EditDeckBottomNavBar,
         EditDeckEditorBody,
         EditDeckSideBar,
+        FileHelper,
         Scaffold,
+        StoredMediaPath,
         ToolBar,
         showSnackbar,
         useEditDeckController,
@@ -52,14 +54,6 @@ class EditDeckPage extends HookWidget {
       controller.selectTemplate(templateId);
     }
 
-    Future<void> addImageAttachment() async {
-      final markdown = await controller
-          .pickAndAddImageAttachmentMarkdownToActiveTemplate();
-      if (markdown == null) return;
-
-      toolBarController.insertMarkdown(markdown);
-    }
-
     final tokens = context.themeTokens<AppTokens>();
 
     return Scaffold(
@@ -99,7 +93,16 @@ class EditDeckPage extends HookWidget {
       toolBar: ToolBar.withActions(
         controller: toolBarController,
         useAttachments: true,
-        onAttachmentPressed: addImageAttachment,
+        createAttachmentPath: (file) {
+          final deck = controller.deck;
+          if (deck == null || controller.activeTemplateId == null) return null;
+
+          return StoredMediaPath.folder(
+            folderPath: '${deck.title}/media',
+            name: FileHelper.fileNameWithoutExtension(file.name),
+          );
+        },
+        onAttachmentInserted: controller.markDirty,
       ),
       body: Form(
         key: formKey,

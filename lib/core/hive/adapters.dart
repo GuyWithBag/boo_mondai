@@ -27,6 +27,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         IdentificationTemplate,
         ImportExportBackup,
         StoredMedia,
+        SyncDeletion,
         MatchMadnessPair,
         MatchMadnessTemplate,
         MultipleChoiceOption,
@@ -102,6 +103,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
   AdapterSpec<ProgressCheckpointType>(),
   AdapterSpec<ProgressCheckpointStatus>(),
   AdapterSpec<StoredMedia>(),
+  AdapterSpec<SyncDeletion>(),
 ])
 // ignore: unused_element
 part 'adapters.g.dart';

@@ -206,6 +206,17 @@ class ViewDecksLocalPage extends HookWidget {
       );
     }
 
+    Future<void> deleteSelectedDecks(
+      SelectionController<String> selection,
+    ) async {
+      final selectedDeckIds = selection.selectedValues;
+      if (selectedDeckIds.isEmpty) return;
+
+      await controller.deleteDecks(selectedDeckIds);
+      selection.clear();
+      selection.isEnabled = false;
+    }
+
     // If there's an active sync plan, show SyncPage while this page-owned
     // tracker service has reviewable sync work.
     if (AuthService.isAuthenticatedRemote &&
@@ -236,7 +247,7 @@ class ViewDecksLocalPage extends HookWidget {
 
     return Scaffold(
       scrollStartAtTheBottom: true,
-      appBar: AppBar(
+      appBar: AppBar<String>(
         title: 'My Decks',
         selectedActions: [
           Button.icon(tokens: tokens, icon: Icons.import_export),
@@ -260,6 +271,7 @@ class ViewDecksLocalPage extends HookWidget {
         ],
         header: searchBar,
         preferredBottomHeight: 70,
+        onSelectedDelete: deleteSelectedDecks,
         selectionController: selectionController,
         bottom: Padding(
           padding: EdgeInsets.only(

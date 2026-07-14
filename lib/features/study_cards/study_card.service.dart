@@ -6,6 +6,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         DeckSyncSession,
         FlashcardTemplate,
         LocalDB,
+        SyncDeletionService,
         SyncIndexEntry,
         StudyCard,
         uuid;
@@ -19,14 +20,31 @@ class StudyCardService {
     final deckIds = (await DecksService.loadDeckIdsForSyncSession(
       session,
     )).toSet();
-    return session.studyCards.selectManyByDeckIds(deckIds);
+    final deletedIds = await SyncDeletionService.loadDeletedEntityIds(
+      session: session,
+      entityType: SyncDeletionService.studyCards,
+    );
+    return SyncDeletionService.withoutDeletedItems(
+      session.studyCards.selectManyByDeckIds(deckIds),
+      deletedIds,
+      (card) => card.id,
+    );
   }
 
   static Future<List<StudyCard>> loadRemoteStudyCardsForSyncSession(
     DeckSyncSession session,
   ) async {
     final deckIds = await DecksService.loadDeckIdsForSyncSession(session);
-    return session.remoteStudyCards.selectManyByDeckIds(deckIds);
+    final deletedIds = await SyncDeletionService.loadDeletedEntityIds(
+      session: session,
+      entityType: SyncDeletionService.studyCards,
+    );
+    final cards = await session.remoteStudyCards.selectManyByDeckIds(deckIds);
+    return SyncDeletionService.withoutDeletedItems(
+      cards,
+      deletedIds,
+      (card) => card.id,
+    );
   }
 
   static Future<List<String>> loadStudyCardIdsForSyncSession(
@@ -48,27 +66,58 @@ class StudyCardService {
     final deckIds = (await DecksService.loadDeckIdsForSyncSession(
       session,
     )).toSet();
-    return session.studyCards.selectSyncIndexByDeckIds(deckIds);
+    final deletedIds = await SyncDeletionService.loadDeletedEntityIds(
+      session: session,
+      entityType: SyncDeletionService.studyCards,
+    );
+    return SyncDeletionService.withoutDeletedIndexEntries(
+      session.studyCards.selectSyncIndexByDeckIds(deckIds),
+      deletedIds,
+    );
   }
 
   static Future<List<SyncIndexEntry>>
   loadRemoteStudyCardSyncIndexForSyncSession(DeckSyncSession session) async {
     final deckIds = await DecksService.loadDeckIdsForSyncSession(session);
-    return session.remoteStudyCards.selectSyncIndexByDeckIds(deckIds);
+    final deletedIds = await SyncDeletionService.loadDeletedEntityIds(
+      session: session,
+      entityType: SyncDeletionService.studyCards,
+    );
+    final entries = await session.remoteStudyCards.selectSyncIndexByDeckIds(
+      deckIds,
+    );
+    return SyncDeletionService.withoutDeletedIndexEntries(entries, deletedIds);
   }
 
   static Future<List<StudyCard>> loadLocalStudyCardsByIdsForSyncSession(
     DeckSyncSession session,
     List<String> ids,
   ) async {
-    return session.studyCards.selectManyByIds(ids);
+    final deletedIds = await SyncDeletionService.loadDeletedEntityIds(
+      session: session,
+      entityType: SyncDeletionService.studyCards,
+    );
+    return SyncDeletionService.withoutDeletedItems(
+      session.studyCards.selectManyByIds(ids),
+      deletedIds,
+      (card) => card.id,
+    );
   }
 
   static Future<List<StudyCard>> loadRemoteStudyCardsByIdsForSyncSession(
     DeckSyncSession session,
     List<String> ids,
   ) async {
-    return session.remoteStudyCards.selectManyByIds(ids);
+    final deletedIds = await SyncDeletionService.loadDeletedEntityIds(
+      session: session,
+      entityType: SyncDeletionService.studyCards,
+    );
+    final cards = await session.remoteStudyCards.selectManyByIds(ids);
+    return SyncDeletionService.withoutDeletedItems(
+      cards,
+      deletedIds,
+      (card) => card.id,
+    );
   }
 
   /// Reconciles the personal local StudyCards for [deckId] against the current

@@ -16,6 +16,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         UserSettingsLocalDB,
         ProgressCheckpointLocalDB,
         StoredMediasLocalDB,
+        SyncDeletionLocalDB,
+        TagLocalDB,
+        DeckTagsLocalDB,
+        CardTemplateTagsLocalDB,
+        UserStudyCardTagsLocalDB,
         StudySessionFlowsLocalDB,
         StudySessionStepRecordsLocalDB;
 
@@ -37,6 +42,11 @@ class LocalDB {
   static late final UserSettingsLocalDB userSettings;
   static late final ProgressCheckpointLocalDB progressCheckpoint;
   static late final StoredMediasLocalDB storedMedia;
+  static late final SyncDeletionLocalDB syncDeletion;
+  static late final TagLocalDB tag;
+  static late final DeckTagsLocalDB deckTag;
+  static late final CardTemplateTagsLocalDB cardTemplateTag;
+  static late final UserStudyCardTagsLocalDB userStudyCardTag;
   static late final StudySessionFlowsLocalDB studySessionFlow;
   static late final StudySessionStepRecordsLocalDB studySessionStepRecord;
 
@@ -60,6 +70,13 @@ class LocalDB {
     progressCheckpoint =
         await ProgressCheckpointLocalDB().init() as ProgressCheckpointLocalDB;
     storedMedia = await StoredMediasLocalDB().init() as StoredMediasLocalDB;
+    syncDeletion = await SyncDeletionLocalDB().init() as SyncDeletionLocalDB;
+    tag = await TagLocalDB().init() as TagLocalDB;
+    deckTag = await DeckTagsLocalDB().init() as DeckTagsLocalDB;
+    cardTemplateTag =
+        await CardTemplateTagsLocalDB().init() as CardTemplateTagsLocalDB;
+    userStudyCardTag =
+        await UserStudyCardTagsLocalDB().init() as UserStudyCardTagsLocalDB;
     studySessionFlow =
         await StudySessionFlowsLocalDB().init() as StudySessionFlowsLocalDB;
     studySessionStepRecord =
@@ -81,6 +98,11 @@ class LocalDB {
     await userSettings.clear();
     await progressCheckpoint.clear();
     await storedMedia.clear();
+    await syncDeletion.clear();
+    await tag.clear();
+    await deckTag.clear();
+    await cardTemplateTag.clear();
+    await userStudyCardTag.clear();
     await studySessionFlow.clear();
     await studySessionStepRecord.clear();
     await cachedProfile.clear();

@@ -17,15 +17,14 @@ import 'package:boo_mondai/lib.barrel.dart'
         DiscussionSection,
         EditableCarousel,
         EditableFeaturedCardsColumn,
+        FileHelper,
         FormField,
-        MarkdownHelper,
         MetaLabel,
         NumberHelper,
         Scaffold,
         SectionEyebrow,
         Side,
-        StoredMediaHelper,
-        StoredMediaService,
+        StoredMediaPath,
         SurfaceBorder,
         SurfaceColor,
         SurfacePadding,
@@ -42,8 +41,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         showSnackbar,
         surfaceStyle,
         useToolBarController,
-        useViewDeckListingSingleController,
-        uuid;
+        useViewDeckListingSingleController;
 import 'package:flutter/material.dart'
     hide FormField, Scaffold, AppBar, showBottomSheet;
 import 'package:flutter_hooks/flutter_hooks.dart'
@@ -98,24 +96,6 @@ class ViewDeckListingSingleSheet extends HookWidget {
     final isEditing = sheet.state == DeckListingSheetState.editor;
     final formKey = useMemoized(GlobalKey<FormState>.new);
     final toolBarController = useToolBarController();
-
-    Future<void> addMarkdownAttachment() async {
-      final file = await StoredMediaService.pickSupportedFile();
-      if (file == null) return;
-
-      final attachment = await MarkdownHelper.toPickedFileMediaMarkdownFormat(
-        id: StoredMediaHelper.getSemanticId(
-          'deck_listing',
-          sheet.deck.id,
-          'long_description',
-          uuid.v7(),
-        ),
-        file: file,
-      );
-      if (attachment == null) return;
-
-      toolBarController.insertMarkdown(attachment);
-    }
 
     useEffect(() {
       final error = sheet.error;
@@ -206,7 +186,10 @@ class ViewDeckListingSingleSheet extends HookWidget {
             toolBar: ToolBar.withActions(
               controller: toolBarController,
               useAttachments: true,
-              onAttachmentPressed: addMarkdownAttachment,
+              createAttachmentPath: (file) => StoredMediaPath.folder(
+                folderPath: '${sheet.deck.title}/media',
+                name: FileHelper.fileNameWithoutExtension(file.name),
+              ),
             ),
             body: isEditing
                 ? Form(

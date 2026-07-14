@@ -2,9 +2,14 @@
 // PATH: lib/models/fsrs_card.dart
 // PURPOSE: Tracks a specific user's spaced-repetition progress for a StudyCard
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-import 'package:boo_mondai/features/study_session/models/study_card.dto.dart';
+import 'package:boo_mondai/features/study_cards/study_card.dto.dart';
 import 'package:boo_mondai/lib.barrel.dart'
-    show MutableEntity, uuid, MutableEntityMapper, MutableEntityCopyWith;
+    show
+        MutableEntity,
+        uuid,
+        MutableEntityMapper,
+        MutableEntityCopyWith,
+        StudyCard;
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:fsrs/fsrs.dart';
 

@@ -35,7 +35,7 @@ CREATE POLICY "decks: owner delete" ON decks FOR DELETE USING (user_id = current
 CREATE INDEX ON decks (user_id);
 CREATE INDEX ON decks (visibility_state);
 CREATE INDEX ON decks (source_deck_id);
-CREATE TRIGGER set_updated_at BEFORE UPDATE ON decks FOR EACH ROW EXECUTE FUNCTION moddatetime(updated_at);
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON decks FOR EACH ROW EXECUTE FUNCTION extensions.moddatetime(updated_at);
 
 -- ── DECK LISTINGS (The Storefront Metadata) ───────────
 CREATE TABLE deck_listings (

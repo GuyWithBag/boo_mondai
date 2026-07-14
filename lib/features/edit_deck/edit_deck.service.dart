@@ -1,7 +1,5 @@
-import 'package:boo_mondai/features/cards/models/card_template.dto.dart';
-import 'package:boo_mondai/features/decks/models/deck.dto.dart';
-import 'package:boo_mondai/features/study_session/study_card.service.dart';
-import 'package:boo_mondai/lib.barrel.dart' show LocalDB;
+import 'package:boo_mondai/lib.barrel.dart'
+    show LocalDB, StudyCardService, Deck, CardTemplate;
 
 abstract final class EditDeckService {
   static Future<Deck> saveDeck({
