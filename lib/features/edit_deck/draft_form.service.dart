@@ -1,6 +1,5 @@
 import 'package:boo_mondai/core/services/uuid.dart';
 import 'package:boo_mondai/core/helpers/text.helper.dart';
-import 'package:boo_mondai/features/card_attachments/models/card_media_attachment.dto.dart';
 import 'package:boo_mondai/features/cards/models/card_template.dto.dart';
 import 'package:boo_mondai/features/cards/models/card_type.dto.dart';
 import 'package:boo_mondai/features/cards/models/fill_in_the_blank_segment.dto.dart';
@@ -107,6 +106,7 @@ class CardTemplateDraftFormAdapter implements DraftFormAdapter<CardTemplate> {
   @override
   void populateFormFromDraft(CardTemplate draft) {
     formState.cardType.value = CardType.normal;
+    formState.verticallyCentered.value = true;
     formState.frontController.clear();
     formState.backController.clear();
     formState.identificationAnswerController.clear();
@@ -117,6 +117,7 @@ class CardTemplateDraftFormAdapter implements DraftFormAdapter<CardTemplate> {
       case FlashcardTemplate f:
         formState.questionType.value = QuestionType.flashcard;
         formState.cardType.value = f.cardType;
+        formState.verticallyCentered.value = f.verticallyCentered;
         formState.frontController.text = f.frontText;
         formState.backController.text = f.backText;
         break;
@@ -129,6 +130,7 @@ class CardTemplateDraftFormAdapter implements DraftFormAdapter<CardTemplate> {
 
       case MultipleChoiceTemplate m:
         formState.questionType.value = QuestionType.multipleChoice;
+        formState.verticallyCentered.value = m.verticallyCentered;
         formState.frontController.text = m.questionPrompt;
         formState.multipleChoiceOptions.value = m.options.isNotEmpty
             ? m.options
@@ -144,6 +146,7 @@ class CardTemplateDraftFormAdapter implements DraftFormAdapter<CardTemplate> {
 
       case FillInTheBlanksTemplate fb:
         formState.questionType.value = QuestionType.fillInTheBlanks;
+        formState.verticallyCentered.value = fb.verticallyCentered;
         if (fb.segments.isNotEmpty) {
           formState.fillInTheBlankSentenceController.text =
               fb.segments.first.fullText;
@@ -183,6 +186,7 @@ class CardTemplateDraftFormAdapter implements DraftFormAdapter<CardTemplate> {
 
     formState.questionType.value = QuestionType.flashcard;
     formState.cardType.value = CardType.normal;
+    formState.verticallyCentered.value = true;
   }
 
   @override
@@ -195,7 +199,6 @@ class CardTemplateDraftFormAdapter implements DraftFormAdapter<CardTemplate> {
     final sortOrder = draft.sortOrder;
     final createdAt = draft.createdAt;
     final sourceId = draft.sourceTemplateId;
-    final attachments = draft.attachments;
     final updatedAt = DateTime.now();
 
     return switch (questionType) {
@@ -206,7 +209,7 @@ class CardTemplateDraftFormAdapter implements DraftFormAdapter<CardTemplate> {
         createdAt: createdAt,
         updatedAt: updatedAt,
         sourceTemplateId: sourceId,
-        attachments: attachments,
+        verticallyCentered: formState.verticallyCentered.value,
         frontText: formState.frontController.text.trim(),
         backText: formState.backController.text.trim(),
         cardType: formState.cardType.value,
@@ -218,7 +221,6 @@ class CardTemplateDraftFormAdapter implements DraftFormAdapter<CardTemplate> {
         createdAt: createdAt,
         updatedAt: updatedAt,
         sourceTemplateId: sourceId,
-        attachments: attachments,
         promptText: formState.frontController.text.trim(),
         acceptedAnswers: formState.identificationAnswerController.text.trim(),
       ),
@@ -229,7 +231,7 @@ class CardTemplateDraftFormAdapter implements DraftFormAdapter<CardTemplate> {
         createdAt: createdAt,
         updatedAt: updatedAt,
         sourceTemplateId: sourceId,
-        attachments: attachments,
+        verticallyCentered: formState.verticallyCentered.value,
         questionPrompt: formState.frontController.text.trim(),
         options: _buildOptions(id),
       ),
@@ -240,7 +242,7 @@ class CardTemplateDraftFormAdapter implements DraftFormAdapter<CardTemplate> {
         createdAt: createdAt,
         updatedAt: updatedAt,
         sourceTemplateId: sourceId,
-        attachments: attachments,
+        verticallyCentered: formState.verticallyCentered.value,
         segments: _buildSegments(id),
       ),
       QuestionType.wordScramble => WordScrambleTemplate(
@@ -250,7 +252,6 @@ class CardTemplateDraftFormAdapter implements DraftFormAdapter<CardTemplate> {
         createdAt: createdAt,
         updatedAt: updatedAt,
         sourceTemplateId: sourceId,
-        attachments: attachments,
         sentenceToScramble: formState.frontController.text.trim(),
       ),
       QuestionType.matchMadness => MatchMadnessTemplate(
@@ -260,7 +261,6 @@ class CardTemplateDraftFormAdapter implements DraftFormAdapter<CardTemplate> {
         createdAt: createdAt,
         updatedAt: updatedAt,
         sourceTemplateId: sourceId,
-        attachments: attachments,
         pairs: _buildPairs(id),
       ),
     };
@@ -285,6 +285,7 @@ class CardTemplateDraftFormAdapter implements DraftFormAdapter<CardTemplate> {
         frontText: '',
         backText: '',
         cardType: cardType,
+        verticallyCentered: formState.verticallyCentered.value,
       ),
       QuestionType.multipleChoice => MultipleChoiceTemplate(
         id: id,
@@ -293,6 +294,7 @@ class CardTemplateDraftFormAdapter implements DraftFormAdapter<CardTemplate> {
         createdAt: now,
         updatedAt: now,
         questionPrompt: '',
+        verticallyCentered: formState.verticallyCentered.value,
         options: [
           for (
             var index = 0;
@@ -314,6 +316,7 @@ class CardTemplateDraftFormAdapter implements DraftFormAdapter<CardTemplate> {
         sortOrder: sortOrder,
         createdAt: now,
         updatedAt: now,
+        verticallyCentered: formState.verticallyCentered.value,
         segments: const [],
       ),
       QuestionType.matchMadness => MatchMadnessTemplate(
@@ -350,21 +353,6 @@ class CardTemplateDraftFormAdapter implements DraftFormAdapter<CardTemplate> {
         updatedAt: now,
         sentenceToScramble: '',
       ),
-    };
-  }
-
-  CardTemplate copyDraftWithAttachments({
-    required CardTemplate draft,
-    required List<CardAttachment> attachments,
-  }) {
-    return switch (draft) {
-      FlashcardTemplate t => t.copyWith(attachments: attachments),
-      IdentificationTemplate t => t.copyWith(attachments: attachments),
-      MultipleChoiceTemplate t => t.copyWith(attachments: attachments),
-      FillInTheBlanksTemplate t => t.copyWith(attachments: attachments),
-      WordScrambleTemplate t => t.copyWith(attachments: attachments),
-      MatchMadnessTemplate t => t.copyWith(attachments: attachments),
-      _ => draft,
     };
   }
 

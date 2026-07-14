@@ -8,8 +8,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         ChipTone,
         DateHelper,
         Deck,
-        DeckFormValidator,
         DeckDetails,
+        DeckFormValidator,
         DeckListingSheetState,
         DeckProfilesLabel,
         DeckTile,
@@ -18,29 +18,32 @@ import 'package:boo_mondai/lib.barrel.dart'
         EditableCarousel,
         EditableFeaturedCardsColumn,
         FormField,
-        ImageHelper,
+        MarkdownHelper,
         MetaLabel,
         NumberHelper,
         Scaffold,
+        SectionEyebrow,
+        Side,
+        StoredMediaHelper,
+        StoredMediaService,
         SurfaceBorder,
         SurfaceColor,
         SurfacePadding,
         SurfaceShadow,
         SurfaceShape,
+        ToolBar,
         ViewCardsTile,
         ViewDeckListingSingleController,
         ViewDeckListingsController,
         ViewDeckSingleHelper,
+        ViewPaddingSizedBox,
         showBottomSheet,
         showModal,
+        showSnackbar,
         surfaceStyle,
+        useToolBarController,
         useViewDeckListingSingleController,
-        SectionEyebrow,
-        ViewPaddingSizedBox,
-        Side,
-        ToolBar,
-        pickBackgroundImageFile,
-        useToolBarController;
+        uuid;
 import 'package:flutter/material.dart'
     hide FormField, Scaffold, AppBar, showBottomSheet;
 import 'package:flutter_hooks/flutter_hooks.dart'
@@ -97,14 +100,21 @@ class ViewDeckListingSingleSheet extends HookWidget {
     final toolBarController = useToolBarController();
 
     Future<void> addMarkdownAttachment() async {
-      final file = await pickBackgroundImageFile();
+      final file = await StoredMediaService.pickSupportedFile();
       if (file == null) return;
 
-      final source = ImageHelper.getImageSourceFromPickedFile(file);
-      if (source == null) return;
+      final attachment = await MarkdownHelper.toPickedFileMediaMarkdownFormat(
+        id: StoredMediaHelper.getSemanticId(
+          'deck_listing',
+          sheet.deck.id,
+          'long_description',
+          uuid.v7(),
+        ),
+        file: file,
+      );
+      if (attachment == null) return;
 
-      final label = file.name.replaceAll(RegExp(r'[\]\r\n]'), ' ');
-      toolBarController.insertMarkdown('![$label]($source)');
+      toolBarController.insertMarkdown(attachment);
     }
 
     useEffect(() {
@@ -240,26 +250,29 @@ class _Body extends StatelessWidget {
               right: tokens.spaceScaffoldPaddingXsm,
             ),
             child: Center(
-              child: AspectRatio(
-                aspectRatio: tokens.deckListingFeaturedImagesAspectRatio,
-                child: isEditing
-                    ? FormField<List<String>>(
-                        value: carouselImageUrls,
-                        listenable: controller,
-                        valueReader: () {
-                          return controller.helper.carouselImageUrls(
-                            controller.deck,
-                          );
-                        },
-                        validator: DeckFormValidator.featuredImages,
-                        builder: (_, _) => EditableCarousel(
-                          imageSources: carouselImageUrls,
-                          maxImageCount: 5,
-                          isEditable: true,
-                          onImagePicked: controller.updateListingFeaturedImage,
-                        ),
-                      )
-                    : EditableCarousel(imageSources: carouselImageUrls),
+              child: FormField<List<String>>(
+                value: carouselImageUrls,
+                listenable: controller,
+                enabled: isEditing,
+                valueReader: () {
+                  return controller.helper.carouselImageUrls(controller.deck);
+                },
+                validator: DeckFormValidator.featuredImages,
+                builder: (_, _) {
+                  return AspectRatio(
+                    aspectRatio: tokens.deckListingFeaturedImagesAspectRatio,
+                    child: EditableCarousel(
+                      imageSources: carouselImageUrls,
+                      maxImageCount: 5,
+                      isEditable: isEditing,
+                      onImagePicked: controller.updateListingFeaturedImage,
+                      shouldLoop: true,
+                      autoScrollInterval: isEditing
+                          ? null
+                          : Duration(seconds: 3),
+                    ),
+                  );
+                },
               ),
             ),
           ),
@@ -270,7 +283,7 @@ class _Body extends StatelessWidget {
             SurfaceColor.muted,
             SurfaceBorder.top,
             SurfaceShadow.none,
-            SurfacePadding.scaffoldX,
+            SurfacePadding.scaffoldButBottom,
           ]),
           child: Column(
             spacing: tokens.spaceLayoutGapMd,
@@ -322,6 +335,7 @@ class _Body extends StatelessWidget {
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
+                spacing: tokens.spaceLayoutGapSm,
                 children: [
                   MetaLabel(
                     label: NumberHelper.formatAbbreviatedCount(
@@ -349,11 +363,14 @@ class _Body extends StatelessWidget {
                   ),
                 ],
               ),
-              Center(
-                child: DeckTile(
-                  deck: deck,
-                  state: DeckTileState.spread,
-                  width: 190,
+              SizedBox(
+                height: 300.h,
+                child: Center(
+                  child: DeckTile(
+                    deck: deck,
+                    state: DeckTileState.spread,
+                    width: 180.w,
+                  ),
                 ),
               ),
               DeckDetails(
@@ -443,7 +460,13 @@ class _Body extends StatelessWidget {
 
   Future<void> _addFeaturedCard(BuildContext context) async {
     final templates = controller.availableFeaturedCardTemplates();
-    if (templates.isEmpty) return;
+    if (templates.isEmpty) {
+      showSnackbar(
+        context,
+        message: 'You do not have any templates available for selection.',
+      );
+      return;
+    }
 
     final selected = await showModal<CardTemplate>(
       context: context,

@@ -14,7 +14,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextWeight,
         TextColor,
         SegmentedControl,
-        SegmentOption;
+        SegmentOption,
+        CardVerticalAlignmentControl;
 import 'package:flutter/material.dart' hide FormField;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:theme_variants/theme_variants.dart'
@@ -76,6 +77,7 @@ class FlashcardEditor extends HookWidget {
             ],
           ),
         ),
+        CardVerticalAlignmentControl(formState: formState),
         FormField<String>(
           value: editor.frontController.text,
           listenable: editor.frontController,

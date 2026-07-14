@@ -6,18 +6,19 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         Controller,
-        CardAttachment,
-        CardAttachmentService,
         CardTemplate,
         Deck,
         CardTemplateFormState,
         LocalDB,
+        MarkdownHelper,
         QuestionType,
         EditDeckQuestionTypeHelper,
         CardTemplateDraftFormAdapter,
         DraftFormSession,
-        EditDeckService;
-import 'package:file_picker/file_picker.dart';
+        EditDeckService,
+        StoredMediaHelper,
+        StoredMediaService,
+        uuid;
 import 'package:flutter/material.dart' show TextEditingController;
 
 import 'package:flutter_hooks/flutter_hooks.dart'
@@ -68,8 +69,6 @@ class EditDeckController extends Controller {
   bool get isDirty => _isDirty;
   String? get activeTemplateId => _draftSession.activeDraftId;
   CardTemplate? get activeTemplate => _draftSession.activeDraft;
-  List<CardAttachment> get activeTemplateAttachments =>
-      activeTemplate?.attachments ?? const [];
   bool get hasActiveTemplate => activeTemplateId != null;
   QuestionType get questionType => formState.questionType.value;
   int get selectedFormatIndex =>
@@ -174,49 +173,32 @@ class EditDeckController extends Controller {
     notifyListeners();
   }
 
-  void addAttachmentToActiveTemplate(CardAttachment attachment) {
-    if (activeTemplateId == null) return;
-
-    saveActiveTemplateToDraft();
-
-    final template = activeTemplate;
-    if (template == null) return;
-
-    final updated = _draftAdapter.copyDraftWithAttachments(
-      draft: template,
-      attachments: [...template.attachments, attachment],
-    );
-    _draftSession.replaceDraft(updated);
-    _isDirty = true;
-    notifyListeners();
-  }
-
-  Future<CardAttachment?> pickAndAddImageAttachmentToActiveTemplate() async {
+  Future<String?> pickAndAddMediaMarkdownToActiveTemplate() async {
     final templateId = activeTemplateId;
     if (templateId == null) return null;
 
-    final result = await FilePicker.pickFiles(
-      type: FileType.image,
-      allowMultiple: false,
-      withData: true,
-    );
-    final file = result?.files.firstOrNull;
+    final file = await StoredMediaService.pickSupportedFile();
     if (file == null) return null;
 
-    final attachment = await CardAttachmentService.createLocalImageAttachment(
-      templateId: templateId,
+    final markdown = await MarkdownHelper.toPickedFileMediaMarkdownFormat(
+      id: StoredMediaHelper.getSemanticId(
+        'card_template',
+        templateId,
+        'markdown',
+        uuid.v7(),
+      ),
       file: file,
-      existingAttachments: activeTemplateAttachments,
     );
-    addAttachmentToActiveTemplate(attachment);
-    return attachment;
+
+    if (markdown != null) {
+      _isDirty = true;
+      notifyListeners();
+    }
+    return markdown;
   }
 
-  Future<String?> pickAndAddImageAttachmentMarkdownToActiveTemplate() async {
-    final attachment = await pickAndAddImageAttachmentToActiveTemplate();
-    if (attachment == null) return null;
-
-    return CardAttachmentService.markdownImageReference(attachment);
+  Future<String?> pickAndAddImageAttachmentMarkdownToActiveTemplate() {
+    return pickAndAddMediaMarkdownToActiveTemplate();
   }
 
   // ── Deck Persistence ───────────────────────────────

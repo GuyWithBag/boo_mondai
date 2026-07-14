@@ -4,16 +4,10 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
-import 'package:boo_mondai/features/card_attachments/helpers/attachment_label.helper.dart';
-import 'package:boo_mondai/features/card_attachments/helpers/mime.helper.dart';
-import 'package:boo_mondai/features/card_attachments/media_storage.service.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         CardTemplate,
         CardTemplateMapper,
-        CardAttachment,
-        CardLinkAttachment,
-        CardMediaAttachment,
         Deck,
         DeckMapper,
         DeckImportMode,
@@ -22,16 +16,16 @@ import 'package:boo_mondai/lib.barrel.dart'
         FlashcardTemplate,
         IdentificationTemplate,
         ImportCardMatchCandidate,
-        ChangePlan,
+        PreviewedChangePlan,
         ImportCardsPayload,
         ImportExportBackup,
-        LocalImageCacheKeysHelper,
-        LocalImageCacheService,
-        LocalImagePathHelper,
-        LocalImageResolverHelper,
+        DecksService,
+        StoredMediaHelper,
+        StoredMediaService,
+        ImageHelper,
         ChangeBatchResult,
         ChangedEntity,
-        ChangeDifferenceHelper,
+        ChangedEntityHelper,
         ChangeSource,
         ChangeType,
         ChangeResult,
@@ -144,7 +138,7 @@ class ImportExportService {
     final templateEntries = <Map<String, dynamic>>[];
     final deckMap = Map<String, dynamic>.from(deck.toMap());
 
-    final coverImageSource = LocalImageResolverHelper.resolveDeckCover(deck);
+    final coverImageSource = DecksService.getCoverImageSource(deck);
     final coverImageBytes = await _resolveImageBytes(coverImageSource);
     if (coverImageBytes == null) {
       deckMap['cover_image_content_path'] = null;
@@ -161,11 +155,10 @@ class ImportExportService {
     final featuredImageContentPaths = <String?>[];
     final featuredImages = deck.listing?.featuredImages ?? const <String>[];
     for (var index = 0; index < featuredImages.length; index++) {
-      final imageSource =
-          LocalImageResolverHelper.resolveDeckListingFeaturedImage(
-            deck: deck,
-            index: index,
-          );
+      final imageSource = DecksService.getListingFeaturedImageSource(
+        deck: deck,
+        index: index,
+      );
       final imageBytes = await _resolveImageBytes(imageSource);
       if (imageBytes == null) {
         featuredImageContentPaths.add(null);
@@ -180,49 +173,6 @@ class ImportExportService {
 
     for (final template in templates) {
       final templateMap = Map<String, dynamic>.from(template.toMap());
-      final attachmentEntries = <Map<String, dynamic>>[];
-      for (final attachment in template.attachments) {
-        switch (attachment) {
-          case CardMediaAttachment a:
-            final extension = MimeHelper.extensionFromMimeType(a.mimeType);
-            final contentPath = 'media/${a.id}.$extension';
-            final bytes = await _resolveMediaBytes(a);
-            attachmentEntries.add({
-              'attachment_source': 'media',
-              'id': a.id,
-              'template_id': a.templateId,
-              'type': a.type.name,
-              'label': a.label,
-              'storage_path': a.storagePath,
-              'public_url': a.publicUrl,
-              'mime_type': a.mimeType,
-              'alt_text': a.altText,
-              'created_at': a.createdAt.toIso8601String(),
-              'content_path': bytes == null ? null : contentPath,
-              'byte_size': bytes?.length,
-            });
-            if (bytes == null) {
-              developer.log(
-                'Skipped missing media attachment ${a.id}',
-                name: 'ImportExportService',
-              );
-            } else {
-              archive.addFile(ArchiveFile.bytes(contentPath, bytes));
-            }
-          case CardLinkAttachment a:
-            attachmentEntries.add({
-              'attachment_source': 'link',
-              'id': a.id,
-              'template_id': a.templateId,
-              'type': a.type.name,
-              'label': a.label,
-              'url': a.url,
-              'alt_text': a.altText,
-              'created_at': a.createdAt.toIso8601String(),
-            });
-        }
-      }
-      templateMap['attachments'] = attachmentEntries;
       templateEntries.add(templateMap);
     }
 
@@ -306,61 +256,12 @@ class ImportExportService {
         for (final map in templateMaps)
           (map['id'] as String): ownBackup ? map['id'] as String : uuid.v7(),
       };
-      final attachmentIdMap = {
-        for (final template in templateMaps)
-          for (final raw in (template['attachments'] as List? ?? const []))
-            if (raw is Map)
-              (raw['id'] as String): ownBackup
-                  ? raw['id'] as String
-                  : uuid.v7(),
-      };
-
       final rewrittenTemplateMaps = <Map<String, dynamic>>[];
-      final labels = <String>[];
       for (final templateMap in templateMaps) {
         final oldTemplateId = templateMap['id'] as String;
         final rewritten = Map<String, dynamic>.from(templateMap)
           ..['id'] = templateIdMap[oldTemplateId]
           ..['deck_id'] = targetDeckId;
-        final attachments = <Map<String, dynamic>>[];
-        for (final raw in (templateMap['attachments'] as List? ?? const [])) {
-          if (raw is! Map) continue;
-          final attachment = Map<String, dynamic>.from(raw);
-          final sanitized = AttachmentLabelHelper.sanitizeLabel(
-            (attachment['label'] ?? '').toString(),
-          );
-          final label =
-              AttachmentLabelHelper.validateAttachmentLabel(
-                    sanitized,
-                    labels,
-                  ) ==
-                  null
-              ? sanitized
-              : AttachmentLabelHelper.generateFallbackLabel(labels);
-          labels.add(label);
-          attachment
-            ..['id'] = attachmentIdMap[raw['id']]
-            ..['template_id'] = templateIdMap[oldTemplateId]
-            ..['label'] = label
-            ..['type'] ??= raw['kind'];
-
-          if (attachment['attachment_source'] == 'media' &&
-              attachment['content_path'] != null) {
-            final mediaFile = File(
-              '${tempDir.path}/${attachment['content_path']}',
-            );
-            if (await mediaFile.exists()) {
-              attachment['localPath'] =
-                  await MediaStorageService.saveMediaLocally(
-                    attachmentId: attachment['id'] as String,
-                    bytes: await mediaFile.readAsBytes(),
-                    mimeType: attachment['mime_type'] as String,
-                  );
-            }
-          }
-          attachments.add(attachment);
-        }
-        rewritten['attachments'] = attachments;
         rewrittenTemplateMaps.add(rewritten);
       }
 
@@ -378,8 +279,8 @@ class ImportExportService {
       await _restoreBundledImage(
         tempDir: tempDir,
         contentPath: coverImageContentPath,
-        cacheKey: LocalImageCacheKeysHelper.deckCover(deck.id),
-        remotePath: _remotePathOrNull(incomingDeck.coverImageUrl),
+        id: StoredMediaHelper.getSemanticId('deck', deck.id, 'cover'),
+        remoteUrl: _remoteUrlOrNull(incomingDeck.coverImageUrl),
       );
 
       final listing = incomingDeck.listing;
@@ -389,18 +290,20 @@ class ImportExportService {
           final localPath = await _restoreBundledImage(
             tempDir: tempDir,
             contentPath: featuredImageContentPaths[index],
-            cacheKey: LocalImageCacheKeysHelper.deckListingFeaturedImage(
+            id: StoredMediaHelper.getSemanticId(
+              'deck_listing',
               deck.id,
+              'featured',
               index,
             ),
-            remotePath: index < listing.featuredImages.length
-                ? _remotePathOrNull(listing.featuredImages[index])
+            remoteUrl: index < listing.featuredImages.length
+                ? _remoteUrlOrNull(listing.featuredImages[index])
                 : null,
           );
           if (localPath == null) continue;
           if (index < featuredImages.length) {
             featuredImages[index] =
-                _remotePathOrNull(featuredImages[index]) ?? '';
+                _remoteUrlOrNull(featuredImages[index]) ?? '';
           } else {
             while (featuredImages.length < index) {
               featuredImages.add('');
@@ -543,7 +446,10 @@ class ImportExportService {
           id: target.id,
           beforeChange: target,
           afterChange: updatedDeck,
-          changedProperties: ChangeDifferenceHelper.decks(target, updatedDeck),
+          changedProperties: ChangedEntityHelper.getChangedProperties(
+            before: target.toMap(),
+            after: updatedDeck.toMap(),
+          ),
         ),
       );
 
@@ -674,7 +580,7 @@ class ImportExportService {
   }
 
   /// Previews card import and detects likely update candidates.
-  static Future<ChangePlan<ImportCardsPayload, CardTemplate>>
+  static Future<PreviewedChangePlan<ImportCardsPayload, CardTemplate>>
   previewCardImport({
     required String deckId,
     required List<Map<String, dynamic>> incomingTemplateMaps,
@@ -729,9 +635,9 @@ class ImportExportService {
             id: local.id,
             beforeChange: local,
             afterChange: template,
-            changedProperties: ChangeDifferenceHelper.templates(
-              local,
-              template,
+            changedProperties: ChangedEntityHelper.getChangedProperties(
+              before: local.toMap(),
+              after: template.toMap(),
             ),
           ),
         );
@@ -747,7 +653,7 @@ class ImportExportService {
       }
     }
 
-    return ChangePlan<ImportCardsPayload, CardTemplate>(
+    return PreviewedChangePlan<ImportCardsPayload, CardTemplate>(
       payload: ImportCardsPayload(
         deckId: deckId,
         incomingTemplates: incomingTemplateMaps,
@@ -758,7 +664,7 @@ class ImportExportService {
   }
 
   /// JSON helper for [previewCardImport].
-  static Future<ChangePlan<ImportCardsPayload, CardTemplate>>
+  static Future<PreviewedChangePlan<ImportCardsPayload, CardTemplate>>
   previewCardImportJson({
     required String deckId,
     required String rawJson,
@@ -790,7 +696,7 @@ class ImportExportService {
   /// Applies card import decisions and returns detailed change logs.
   static Future<ChangeResult<List<CardTemplate>, CardTemplate>>
   applyCardImportPlan({
-    required ChangePlan<ImportCardsPayload, CardTemplate> plan,
+    required PreviewedChangePlan<ImportCardsPayload, CardTemplate> plan,
     required List<CardImportDecision> decisions,
   }) async {
     final logs = <ChangedEntity<CardTemplate>>[];
@@ -847,9 +753,9 @@ class ImportExportService {
             id: existing.id,
             beforeChange: existing,
             afterChange: updated,
-            changedProperties: ChangeDifferenceHelper.templates(
-              existing,
-              updated,
+            changedProperties: ChangedEntityHelper.getChangedProperties(
+              before: existing.toMap(),
+              after: updated.toMap(),
             ),
           ),
         );
@@ -923,34 +829,6 @@ class ImportExportService {
     return maps.map(CardTemplateMapper.fromMap).toList(growable: false);
   }
 
-  static Future<Uint8List?> _resolveMediaBytes(
-    CardMediaAttachment attachment,
-  ) async {
-    final localPath = attachment.localPath;
-    if (localPath != null) {
-      final file = File(localPath);
-      if (await file.exists()) {
-        return file.readAsBytes();
-      }
-    }
-
-    final publicUrl = attachment.publicUrl;
-    if (publicUrl == null || publicUrl.isEmpty) return null;
-    try {
-      final response = await http.get(Uri.parse(publicUrl));
-      if (response.statusCode >= 200 && response.statusCode < 300) {
-        return response.bodyBytes;
-      }
-    } on Exception catch (e) {
-      developer.log(
-        'Failed to download media attachment ${attachment.id}',
-        name: 'ImportExportService',
-        error: e,
-      );
-    }
-    return null;
-  }
-
   static Future<Uint8List?> _resolveImageBytes(String? source) async {
     final value = source?.trim();
     if (value == null || value.isEmpty) return null;
@@ -959,7 +837,7 @@ class ImportExportService {
       return base64Decode(value.substring(value.indexOf(',') + 1));
     }
 
-    if (LocalImagePathHelper.isRemotePath(value)) {
+    if (ImageHelper.isRemoteUrl(value)) {
       try {
         final response = await http.get(Uri.parse(value));
         if (response.statusCode >= 200 && response.statusCode < 300) {
@@ -985,24 +863,24 @@ class ImportExportService {
   static Future<String?> _restoreBundledImage({
     required Directory tempDir,
     required String? contentPath,
-    required String cacheKey,
-    required String? remotePath,
+    required String id,
+    required String? remoteUrl,
   }) async {
     if (contentPath == null || contentPath.trim().isEmpty) return null;
 
     final file = File('${tempDir.path}/$contentPath');
     if (!await file.exists()) return null;
 
-    return LocalImageCacheService.saveBytes(
-      cacheKey: cacheKey,
+    return StoredMediaService.writeToLocal(
+      id: id,
       bytes: await file.readAsBytes(),
       mimeType: 'image/png',
-      remotePath: remotePath,
+      remoteUrl: remoteUrl,
     );
   }
 
-  static String? _remotePathOrNull(String? value) {
-    if (value == null || !LocalImagePathHelper.isRemotePath(value)) {
+  static String? _remoteUrlOrNull(String? value) {
+    if (value == null || !ImageHelper.isRemoteUrl(value)) {
       return null;
     }
     return value;
@@ -1020,9 +898,10 @@ class ImportExportService {
   }
 
   static String _safeBundleFileName(String title) {
-    final sanitized = AttachmentLabelHelper.sanitizeLabel(
-      title,
-    ).replaceAll(RegExp(r'\s+'), '_');
+    final sanitized = title
+        .trim()
+        .replaceAll(RegExp(r'[^\w\s-]'), '')
+        .replaceAll(RegExp(r'\s+'), '_');
     return sanitized.isEmpty ? 'deck' : sanitized;
   }
 
@@ -1031,10 +910,6 @@ class ImportExportService {
     required String deckId,
   }) {
     final idMap = {for (final template in templates) template.id: uuid.v7()};
-    final attachmentIdMap = {
-      for (final template in templates)
-        for (final attachment in template.attachments) attachment.id: uuid.v7(),
-    };
     final now = DateTime.now();
     return [
       for (final template in templates)
@@ -1043,7 +918,6 @@ class ImportExportService {
           targetDeckId: deckId,
           targetId: idMap[template.id]!,
           idMap: idMap,
-          attachmentIdMap: attachmentIdMap,
           createdAt: now,
         ),
     ];
@@ -1061,9 +935,6 @@ class ImportExportService {
       targetDeckId: deckId,
       targetId: targetId,
       idMap: idMap,
-      attachmentIdMap: {
-        for (final attachment in source.attachments) attachment.id: uuid.v7(),
-      },
       createdAt: createdAt,
     );
   }
@@ -1073,15 +944,9 @@ class ImportExportService {
     required String targetDeckId,
     required String targetId,
     required Map<String, String> idMap,
-    required Map<String, String> attachmentIdMap,
     required DateTime createdAt,
   }) {
     final now = DateTime.now();
-    final attachments = _copyAttachments(
-      source.attachments,
-      targetTemplateId: targetId,
-      attachmentIdMap: attachmentIdMap,
-    );
     return switch (source) {
       FlashcardTemplate t => FlashcardTemplate(
         id: targetId,
@@ -1091,7 +956,6 @@ class ImportExportService {
         updatedAt: now,
         sourceTemplateId: t.sourceTemplateId ?? t.id,
         tags: t.tags,
-        attachments: attachments,
         frontText: t.frontText,
         backText: t.backText,
         frontImageUrl: t.frontImageUrl,
@@ -1108,7 +972,6 @@ class ImportExportService {
         updatedAt: now,
         sourceTemplateId: t.sourceTemplateId ?? t.id,
         tags: t.tags,
-        attachments: attachments,
         promptText: t.promptText,
         acceptedAnswers: t.acceptedAnswers,
         imageUrl: t.imageUrl,
@@ -1122,7 +985,6 @@ class ImportExportService {
         updatedAt: now,
         sourceTemplateId: t.sourceTemplateId ?? t.id,
         tags: t.tags,
-        attachments: attachments,
         questionPrompt: t.questionPrompt,
         options: [
           for (final option in t.options)
@@ -1145,7 +1007,6 @@ class ImportExportService {
         updatedAt: now,
         sourceTemplateId: t.sourceTemplateId ?? t.id,
         tags: t.tags,
-        attachments: attachments,
         segments: [
           for (final segment in t.segments)
             FillInTheBlankSegment(
@@ -1166,7 +1027,6 @@ class ImportExportService {
         updatedAt: now,
         sourceTemplateId: t.sourceTemplateId ?? t.id,
         tags: t.tags,
-        attachments: attachments,
         pairs: [
           for (final pair in t.pairs)
             MatchMadnessPair(
@@ -1190,7 +1050,6 @@ class ImportExportService {
         updatedAt: now,
         sourceTemplateId: t.sourceTemplateId ?? t.id,
         tags: t.tags,
-        attachments: attachments,
         sentenceToScramble: t.sentenceToScramble,
         imageUrl: t.imageUrl,
         audioUrl: t.audioUrl,
@@ -1199,39 +1058,6 @@ class ImportExportService {
         'Unsupported card template type: ${source.runtimeType}',
       ),
     };
-  }
-
-  static List<CardAttachment> _copyAttachments(
-    List<CardAttachment> attachments, {
-    required String targetTemplateId,
-    required Map<String, String> attachmentIdMap,
-  }) {
-    return [
-      for (final attachment in attachments)
-        switch (attachment) {
-          CardMediaAttachment a => CardMediaAttachment(
-            id: attachmentIdMap[a.id] ?? uuid.v7(),
-            templateId: targetTemplateId,
-            type: a.type,
-            label: a.label,
-            storagePath: a.storagePath,
-            publicUrl: a.publicUrl,
-            localPath: a.localPath,
-            mimeType: a.mimeType,
-            altText: a.altText,
-            createdAt: a.createdAt,
-          ),
-          CardLinkAttachment a => CardLinkAttachment(
-            id: attachmentIdMap[a.id] ?? uuid.v7(),
-            templateId: targetTemplateId,
-            type: a.type,
-            label: a.label,
-            url: a.url,
-            altText: a.altText,
-            createdAt: a.createdAt,
-          ),
-        },
-    ];
   }
 
   static int _similarityScore({

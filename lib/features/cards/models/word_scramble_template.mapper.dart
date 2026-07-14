@@ -16,7 +16,6 @@ class WordScrambleTemplateMapper
       MapperContainer.globals.use(_instance = WordScrambleTemplateMapper._());
       CardTemplateMapper.ensureInitialized().addSubMapper(_instance!);
       TagMapper.ensureInitialized();
-      CardAttachmentMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -46,11 +45,11 @@ class WordScrambleTemplateMapper
   static List<Tag> _$tags(WordScrambleTemplate v) => v.tags;
   static const Field<WordScrambleTemplate, List<Tag>> _f$tags =
       Field('tags', _$tags, opt: true, def: const []);
-  static List<CardAttachment> _$attachments(WordScrambleTemplate v) =>
-      v.attachments;
-  static const Field<WordScrambleTemplate, List<CardAttachment>>
-      _f$attachments =
-      Field('attachments', _$attachments, opt: true, def: const []);
+  static bool _$verticallyCentered(WordScrambleTemplate v) =>
+      v.verticallyCentered;
+  static const Field<WordScrambleTemplate, bool> _f$verticallyCentered = Field(
+      'verticallyCentered', _$verticallyCentered,
+      key: r'vertically_centered', opt: true, def: true);
   static String _$sentenceToScramble(WordScrambleTemplate v) =>
       v.sentenceToScramble;
   static const Field<WordScrambleTemplate, String> _f$sentenceToScramble =
@@ -72,7 +71,7 @@ class WordScrambleTemplateMapper
     #updatedAt: _f$updatedAt,
     #sourceTemplateId: _f$sourceTemplateId,
     #tags: _f$tags,
-    #attachments: _f$attachments,
+    #verticallyCentered: _f$verticallyCentered,
     #sentenceToScramble: _f$sentenceToScramble,
     #imageUrl: _f$imageUrl,
     #audioUrl: _f$audioUrl,
@@ -95,7 +94,7 @@ class WordScrambleTemplateMapper
         updatedAt: data.dec(_f$updatedAt),
         sourceTemplateId: data.dec(_f$sourceTemplateId),
         tags: data.dec(_f$tags),
-        attachments: data.dec(_f$attachments),
+        verticallyCentered: data.dec(_f$verticallyCentered),
         sentenceToScramble: data.dec(_f$sentenceToScramble),
         imageUrl: data.dec(_f$imageUrl),
         audioUrl: data.dec(_f$audioUrl));
@@ -161,10 +160,6 @@ abstract class WordScrambleTemplateCopyWith<
   @override
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags;
   @override
-  ListCopyWith<$R, CardAttachment,
-          CardAttachmentCopyWith<$R, CardAttachment, CardAttachment>>
-      get attachments;
-  @override
   $R call(
       {String? id,
       String? deckId,
@@ -173,7 +168,7 @@ abstract class WordScrambleTemplateCopyWith<
       DateTime? updatedAt,
       String? sourceTemplateId,
       List<Tag>? tags,
-      List<CardAttachment>? attachments,
+      bool? verticallyCentered,
       String? sentenceToScramble,
       String? imageUrl,
       String? audioUrl});
@@ -193,11 +188,6 @@ class _WordScrambleTemplateCopyWithImpl<$R, $Out>
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags => ListCopyWith(
       $value.tags, (v, t) => v.copyWith.$chain(t), (v) => call(tags: v));
   @override
-  ListCopyWith<$R, CardAttachment,
-          CardAttachmentCopyWith<$R, CardAttachment, CardAttachment>>
-      get attachments => ListCopyWith($value.attachments,
-          (v, t) => v.copyWith.$chain(t), (v) => call(attachments: v));
-  @override
   $R call(
           {String? id,
           String? deckId,
@@ -206,7 +196,7 @@ class _WordScrambleTemplateCopyWithImpl<$R, $Out>
           DateTime? updatedAt,
           Object? sourceTemplateId = $none,
           List<Tag>? tags,
-          List<CardAttachment>? attachments,
+          bool? verticallyCentered,
           String? sentenceToScramble,
           Object? imageUrl = $none,
           Object? audioUrl = $none}) =>
@@ -218,7 +208,7 @@ class _WordScrambleTemplateCopyWithImpl<$R, $Out>
         if (updatedAt != null) #updatedAt: updatedAt,
         if (sourceTemplateId != $none) #sourceTemplateId: sourceTemplateId,
         if (tags != null) #tags: tags,
-        if (attachments != null) #attachments: attachments,
+        if (verticallyCentered != null) #verticallyCentered: verticallyCentered,
         if (sentenceToScramble != null) #sentenceToScramble: sentenceToScramble,
         if (imageUrl != $none) #imageUrl: imageUrl,
         if (audioUrl != $none) #audioUrl: audioUrl
@@ -233,7 +223,8 @@ class _WordScrambleTemplateCopyWithImpl<$R, $Out>
       sourceTemplateId:
           data.get(#sourceTemplateId, or: $value.sourceTemplateId),
       tags: data.get(#tags, or: $value.tags),
-      attachments: data.get(#attachments, or: $value.attachments),
+      verticallyCentered:
+          data.get(#verticallyCentered, or: $value.verticallyCentered),
       sentenceToScramble:
           data.get(#sentenceToScramble, or: $value.sentenceToScramble),
       imageUrl: data.get(#imageUrl, or: $value.imageUrl),

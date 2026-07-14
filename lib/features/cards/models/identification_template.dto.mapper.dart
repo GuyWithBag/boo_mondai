@@ -16,7 +16,6 @@ class IdentificationTemplateMapper
       MapperContainer.globals.use(_instance = IdentificationTemplateMapper._());
       CardTemplateMapper.ensureInitialized().addSubMapper(_instance!);
       TagMapper.ensureInitialized();
-      CardAttachmentMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -46,11 +45,11 @@ class IdentificationTemplateMapper
   static List<Tag> _$tags(IdentificationTemplate v) => v.tags;
   static const Field<IdentificationTemplate, List<Tag>> _f$tags =
       Field('tags', _$tags, opt: true, def: const []);
-  static List<CardAttachment> _$attachments(IdentificationTemplate v) =>
-      v.attachments;
-  static const Field<IdentificationTemplate, List<CardAttachment>>
-      _f$attachments =
-      Field('attachments', _$attachments, opt: true, def: const []);
+  static bool _$verticallyCentered(IdentificationTemplate v) =>
+      v.verticallyCentered;
+  static const Field<IdentificationTemplate, bool> _f$verticallyCentered =
+      Field('verticallyCentered', _$verticallyCentered,
+          key: r'vertically_centered', opt: true, def: true);
   static String _$promptText(IdentificationTemplate v) => v.promptText;
   static const Field<IdentificationTemplate, String> _f$promptText =
       Field('promptText', _$promptText, key: r'prompt_text');
@@ -74,7 +73,7 @@ class IdentificationTemplateMapper
     #updatedAt: _f$updatedAt,
     #sourceTemplateId: _f$sourceTemplateId,
     #tags: _f$tags,
-    #attachments: _f$attachments,
+    #verticallyCentered: _f$verticallyCentered,
     #promptText: _f$promptText,
     #acceptedAnswers: _f$acceptedAnswers,
     #imageUrl: _f$imageUrl,
@@ -98,7 +97,7 @@ class IdentificationTemplateMapper
         updatedAt: data.dec(_f$updatedAt),
         sourceTemplateId: data.dec(_f$sourceTemplateId),
         tags: data.dec(_f$tags),
-        attachments: data.dec(_f$attachments),
+        verticallyCentered: data.dec(_f$verticallyCentered),
         promptText: data.dec(_f$promptText),
         acceptedAnswers: data.dec(_f$acceptedAnswers),
         imageUrl: data.dec(_f$imageUrl),
@@ -166,10 +165,6 @@ abstract class IdentificationTemplateCopyWith<
   @override
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags;
   @override
-  ListCopyWith<$R, CardAttachment,
-          CardAttachmentCopyWith<$R, CardAttachment, CardAttachment>>
-      get attachments;
-  @override
   $R call(
       {String? id,
       String? deckId,
@@ -178,7 +173,7 @@ abstract class IdentificationTemplateCopyWith<
       DateTime? updatedAt,
       String? sourceTemplateId,
       List<Tag>? tags,
-      List<CardAttachment>? attachments,
+      bool? verticallyCentered,
       String? promptText,
       String? acceptedAnswers,
       String? imageUrl,
@@ -200,11 +195,6 @@ class _IdentificationTemplateCopyWithImpl<$R, $Out>
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags => ListCopyWith(
       $value.tags, (v, t) => v.copyWith.$chain(t), (v) => call(tags: v));
   @override
-  ListCopyWith<$R, CardAttachment,
-          CardAttachmentCopyWith<$R, CardAttachment, CardAttachment>>
-      get attachments => ListCopyWith($value.attachments,
-          (v, t) => v.copyWith.$chain(t), (v) => call(attachments: v));
-  @override
   $R call(
           {String? id,
           String? deckId,
@@ -213,7 +203,7 @@ class _IdentificationTemplateCopyWithImpl<$R, $Out>
           DateTime? updatedAt,
           Object? sourceTemplateId = $none,
           List<Tag>? tags,
-          List<CardAttachment>? attachments,
+          bool? verticallyCentered,
           String? promptText,
           String? acceptedAnswers,
           Object? imageUrl = $none,
@@ -226,7 +216,7 @@ class _IdentificationTemplateCopyWithImpl<$R, $Out>
         if (updatedAt != null) #updatedAt: updatedAt,
         if (sourceTemplateId != $none) #sourceTemplateId: sourceTemplateId,
         if (tags != null) #tags: tags,
-        if (attachments != null) #attachments: attachments,
+        if (verticallyCentered != null) #verticallyCentered: verticallyCentered,
         if (promptText != null) #promptText: promptText,
         if (acceptedAnswers != null) #acceptedAnswers: acceptedAnswers,
         if (imageUrl != $none) #imageUrl: imageUrl,
@@ -242,7 +232,8 @@ class _IdentificationTemplateCopyWithImpl<$R, $Out>
       sourceTemplateId:
           data.get(#sourceTemplateId, or: $value.sourceTemplateId),
       tags: data.get(#tags, or: $value.tags),
-      attachments: data.get(#attachments, or: $value.attachments),
+      verticallyCentered:
+          data.get(#verticallyCentered, or: $value.verticallyCentered),
       promptText: data.get(#promptText, or: $value.promptText),
       acceptedAnswers: data.get(#acceptedAnswers, or: $value.acceptedAnswers),
       imageUrl: data.get(#imageUrl, or: $value.imageUrl),

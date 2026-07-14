@@ -16,7 +16,6 @@ class MultipleChoiceTemplateMapper
       MapperContainer.globals.use(_instance = MultipleChoiceTemplateMapper._());
       CardTemplateMapper.ensureInitialized().addSubMapper(_instance!);
       TagMapper.ensureInitialized();
-      CardAttachmentMapper.ensureInitialized();
       MultipleChoiceOptionMapper.ensureInitialized();
     }
     return _instance!;
@@ -47,11 +46,11 @@ class MultipleChoiceTemplateMapper
   static List<Tag> _$tags(MultipleChoiceTemplate v) => v.tags;
   static const Field<MultipleChoiceTemplate, List<Tag>> _f$tags =
       Field('tags', _$tags, opt: true, def: const []);
-  static List<CardAttachment> _$attachments(MultipleChoiceTemplate v) =>
-      v.attachments;
-  static const Field<MultipleChoiceTemplate, List<CardAttachment>>
-      _f$attachments =
-      Field('attachments', _$attachments, opt: true, def: const []);
+  static bool _$verticallyCentered(MultipleChoiceTemplate v) =>
+      v.verticallyCentered;
+  static const Field<MultipleChoiceTemplate, bool> _f$verticallyCentered =
+      Field('verticallyCentered', _$verticallyCentered,
+          key: r'vertically_centered', opt: true, def: true);
   static String _$questionPrompt(MultipleChoiceTemplate v) => v.questionPrompt;
   static const Field<MultipleChoiceTemplate, String> _f$questionPrompt =
       Field('questionPrompt', _$questionPrompt, key: r'question_prompt');
@@ -75,7 +74,7 @@ class MultipleChoiceTemplateMapper
     #updatedAt: _f$updatedAt,
     #sourceTemplateId: _f$sourceTemplateId,
     #tags: _f$tags,
-    #attachments: _f$attachments,
+    #verticallyCentered: _f$verticallyCentered,
     #questionPrompt: _f$questionPrompt,
     #options: _f$options,
     #imageUrl: _f$imageUrl,
@@ -99,7 +98,7 @@ class MultipleChoiceTemplateMapper
         updatedAt: data.dec(_f$updatedAt),
         sourceTemplateId: data.dec(_f$sourceTemplateId),
         tags: data.dec(_f$tags),
-        attachments: data.dec(_f$attachments),
+        verticallyCentered: data.dec(_f$verticallyCentered),
         questionPrompt: data.dec(_f$questionPrompt),
         options: data.dec(_f$options),
         imageUrl: data.dec(_f$imageUrl),
@@ -166,10 +165,6 @@ abstract class MultipleChoiceTemplateCopyWith<
     $Out> implements CardTemplateCopyWith<$R, $In, $Out> {
   @override
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags;
-  @override
-  ListCopyWith<$R, CardAttachment,
-          CardAttachmentCopyWith<$R, CardAttachment, CardAttachment>>
-      get attachments;
   ListCopyWith<
       $R,
       MultipleChoiceOption,
@@ -184,7 +179,7 @@ abstract class MultipleChoiceTemplateCopyWith<
       DateTime? updatedAt,
       String? sourceTemplateId,
       List<Tag>? tags,
-      List<CardAttachment>? attachments,
+      bool? verticallyCentered,
       String? questionPrompt,
       List<MultipleChoiceOption>? options,
       String? imageUrl,
@@ -206,11 +201,6 @@ class _MultipleChoiceTemplateCopyWithImpl<$R, $Out>
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags => ListCopyWith(
       $value.tags, (v, t) => v.copyWith.$chain(t), (v) => call(tags: v));
   @override
-  ListCopyWith<$R, CardAttachment,
-          CardAttachmentCopyWith<$R, CardAttachment, CardAttachment>>
-      get attachments => ListCopyWith($value.attachments,
-          (v, t) => v.copyWith.$chain(t), (v) => call(attachments: v));
-  @override
   ListCopyWith<
       $R,
       MultipleChoiceOption,
@@ -226,7 +216,7 @@ class _MultipleChoiceTemplateCopyWithImpl<$R, $Out>
           DateTime? updatedAt,
           Object? sourceTemplateId = $none,
           List<Tag>? tags,
-          List<CardAttachment>? attachments,
+          bool? verticallyCentered,
           String? questionPrompt,
           List<MultipleChoiceOption>? options,
           Object? imageUrl = $none,
@@ -239,7 +229,7 @@ class _MultipleChoiceTemplateCopyWithImpl<$R, $Out>
         if (updatedAt != null) #updatedAt: updatedAt,
         if (sourceTemplateId != $none) #sourceTemplateId: sourceTemplateId,
         if (tags != null) #tags: tags,
-        if (attachments != null) #attachments: attachments,
+        if (verticallyCentered != null) #verticallyCentered: verticallyCentered,
         if (questionPrompt != null) #questionPrompt: questionPrompt,
         if (options != null) #options: options,
         if (imageUrl != $none) #imageUrl: imageUrl,
@@ -255,7 +245,8 @@ class _MultipleChoiceTemplateCopyWithImpl<$R, $Out>
       sourceTemplateId:
           data.get(#sourceTemplateId, or: $value.sourceTemplateId),
       tags: data.get(#tags, or: $value.tags),
-      attachments: data.get(#attachments, or: $value.attachments),
+      verticallyCentered:
+          data.get(#verticallyCentered, or: $value.verticallyCentered),
       questionPrompt: data.get(#questionPrompt, or: $value.questionPrompt),
       options: data.get(#options, or: $value.options),
       imageUrl: data.get(#imageUrl, or: $value.imageUrl),

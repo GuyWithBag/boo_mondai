@@ -148,7 +148,7 @@ class ViewDeckSingleSheetController extends Controller {
     _applyUpdatedDeck(updatedDeck);
   }
 
-  Future<void> updateCoverImage(PlatformFile file) async {
+  Future<void> onCoverImagePicked(PlatformFile file) async {
     final updatedDeck = await DecksService.updateCoverImage(
       deck: _deck,
       file: file,

@@ -16,7 +16,6 @@ class MatchMadnessTemplateMapper
       MapperContainer.globals.use(_instance = MatchMadnessTemplateMapper._());
       CardTemplateMapper.ensureInitialized().addSubMapper(_instance!);
       TagMapper.ensureInitialized();
-      CardAttachmentMapper.ensureInitialized();
       MatchMadnessPairMapper.ensureInitialized();
     }
     return _instance!;
@@ -47,11 +46,11 @@ class MatchMadnessTemplateMapper
   static List<Tag> _$tags(MatchMadnessTemplate v) => v.tags;
   static const Field<MatchMadnessTemplate, List<Tag>> _f$tags =
       Field('tags', _$tags, opt: true, def: const []);
-  static List<CardAttachment> _$attachments(MatchMadnessTemplate v) =>
-      v.attachments;
-  static const Field<MatchMadnessTemplate, List<CardAttachment>>
-      _f$attachments =
-      Field('attachments', _$attachments, opt: true, def: const []);
+  static bool _$verticallyCentered(MatchMadnessTemplate v) =>
+      v.verticallyCentered;
+  static const Field<MatchMadnessTemplate, bool> _f$verticallyCentered = Field(
+      'verticallyCentered', _$verticallyCentered,
+      key: r'vertically_centered', opt: true, def: true);
   static List<MatchMadnessPair> _$pairs(MatchMadnessTemplate v) => v.pairs;
   static const Field<MatchMadnessTemplate, List<MatchMadnessPair>> _f$pairs =
       Field('pairs', _$pairs);
@@ -65,7 +64,7 @@ class MatchMadnessTemplateMapper
     #updatedAt: _f$updatedAt,
     #sourceTemplateId: _f$sourceTemplateId,
     #tags: _f$tags,
-    #attachments: _f$attachments,
+    #verticallyCentered: _f$verticallyCentered,
     #pairs: _f$pairs,
   };
 
@@ -86,7 +85,7 @@ class MatchMadnessTemplateMapper
         updatedAt: data.dec(_f$updatedAt),
         sourceTemplateId: data.dec(_f$sourceTemplateId),
         tags: data.dec(_f$tags),
-        attachments: data.dec(_f$attachments),
+        verticallyCentered: data.dec(_f$verticallyCentered),
         pairs: data.dec(_f$pairs));
   }
 
@@ -149,10 +148,6 @@ abstract class MatchMadnessTemplateCopyWith<
     $Out> implements CardTemplateCopyWith<$R, $In, $Out> {
   @override
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags;
-  @override
-  ListCopyWith<$R, CardAttachment,
-          CardAttachmentCopyWith<$R, CardAttachment, CardAttachment>>
-      get attachments;
   ListCopyWith<$R, MatchMadnessPair,
           MatchMadnessPairCopyWith<$R, MatchMadnessPair, MatchMadnessPair>>
       get pairs;
@@ -165,7 +160,7 @@ abstract class MatchMadnessTemplateCopyWith<
       DateTime? updatedAt,
       String? sourceTemplateId,
       List<Tag>? tags,
-      List<CardAttachment>? attachments,
+      bool? verticallyCentered,
       List<MatchMadnessPair>? pairs});
   MatchMadnessTemplateCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
       Then<$Out2, $R2> t);
@@ -183,11 +178,6 @@ class _MatchMadnessTemplateCopyWithImpl<$R, $Out>
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags => ListCopyWith(
       $value.tags, (v, t) => v.copyWith.$chain(t), (v) => call(tags: v));
   @override
-  ListCopyWith<$R, CardAttachment,
-          CardAttachmentCopyWith<$R, CardAttachment, CardAttachment>>
-      get attachments => ListCopyWith($value.attachments,
-          (v, t) => v.copyWith.$chain(t), (v) => call(attachments: v));
-  @override
   ListCopyWith<$R, MatchMadnessPair,
           MatchMadnessPairCopyWith<$R, MatchMadnessPair, MatchMadnessPair>>
       get pairs => ListCopyWith(
@@ -201,7 +191,7 @@ class _MatchMadnessTemplateCopyWithImpl<$R, $Out>
           DateTime? updatedAt,
           Object? sourceTemplateId = $none,
           List<Tag>? tags,
-          List<CardAttachment>? attachments,
+          bool? verticallyCentered,
           List<MatchMadnessPair>? pairs}) =>
       $apply(FieldCopyWithData({
         if (id != null) #id: id,
@@ -211,7 +201,7 @@ class _MatchMadnessTemplateCopyWithImpl<$R, $Out>
         if (updatedAt != null) #updatedAt: updatedAt,
         if (sourceTemplateId != $none) #sourceTemplateId: sourceTemplateId,
         if (tags != null) #tags: tags,
-        if (attachments != null) #attachments: attachments,
+        if (verticallyCentered != null) #verticallyCentered: verticallyCentered,
         if (pairs != null) #pairs: pairs
       }));
   @override
@@ -224,7 +214,8 @@ class _MatchMadnessTemplateCopyWithImpl<$R, $Out>
       sourceTemplateId:
           data.get(#sourceTemplateId, or: $value.sourceTemplateId),
       tags: data.get(#tags, or: $value.tags),
-      attachments: data.get(#attachments, or: $value.attachments),
+      verticallyCentered:
+          data.get(#verticallyCentered, or: $value.verticallyCentered),
       pairs: data.get(#pairs, or: $value.pairs));
 
   @override

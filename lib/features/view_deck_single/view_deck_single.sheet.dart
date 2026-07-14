@@ -10,7 +10,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         DeckProfilesLabel,
         DeckTile,
         HeaderBadge,
-        LocalImageResolverHelper,
         MetaLabel,
         DeckTileState,
         SurfacePadding,
@@ -29,12 +28,16 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppBar,
         ViewDeckSingleHelper,
         DateHelper,
+        DecksService,
         ImageHelper,
+        MarkdownHelper,
+        StoredMediaHelper,
+        StoredMediaService,
         FormField,
         ToolBar,
-        pickBackgroundImageFile,
         useToolBarController,
-        showBottomSheet;
+        showBottomSheet,
+        uuid;
 import 'package:flutter/material.dart'
     hide AppBar, FormField, Scaffold, showBottomSheet;
 import 'package:flutter_hooks/flutter_hooks.dart' show HookWidget;
@@ -72,14 +75,21 @@ class ViewDeckSingleSheet extends HookWidget {
     ]);
 
     Future<void> addLongDescriptionAttachment() async {
-      final file = await pickBackgroundImageFile();
+      final file = await StoredMediaService.pickSupportedFile();
       if (file == null) return;
 
-      final source = ImageHelper.getImageSourceFromPickedFile(file);
-      if (source == null) return;
+      final attachment = await MarkdownHelper.toPickedFileMediaMarkdownFormat(
+        id: StoredMediaHelper.getSemanticId(
+          'deck',
+          activeDeck.id,
+          'long_description',
+          uuid.v7(),
+        ),
+        file: file,
+      );
+      if (attachment == null) return;
 
-      final label = file.name.replaceAll(RegExp(r'[\]\r\n]'), ' ');
-      toolBarController.insertMarkdown('![$label]($source)');
+      toolBarController.insertMarkdown(attachment);
     }
 
     return DraggableScrollableSheet(
@@ -195,7 +205,7 @@ class _Body extends StatelessWidget {
           height: headerHeight + tokens.radiusSurfaceLg,
           child: BackgroundImageSurface(
             image: ImageHelper.getImageProviderFromSource(
-              LocalImageResolverHelper.resolveDeckCover(deck),
+              DecksService.getCoverImageSource(deck),
             ),
           ),
         ),
@@ -308,12 +318,10 @@ class _BodySubSection extends StatelessWidget {
             top: 0,
             child: deck.isEditable
                 ? FormField<String?>(
-                    value: LocalImageResolverHelper.resolveDeckCover(deck),
+                    value: DecksService.getCoverImageSource(deck),
                     listenable: sheet,
                     valueReader: () {
-                      return LocalImageResolverHelper.resolveDeckCover(
-                        sheet.deck,
-                      );
+                      return DecksService.getCoverImageSource(sheet.deck);
                     },
                     validator: DeckFormValidator.optionalImage,
                     builder: (_, _) => DeckTile(
@@ -321,7 +329,7 @@ class _BodySubSection extends StatelessWidget {
                       width: deckWidth,
                       state: DeckTileState.bare,
                       isImageEditable: true,
-                      onImagePicked: sheet.updateCoverImage,
+                      onImagePicked: sheet.onCoverImagePicked,
                     ),
                   )
                 : DeckTile(

@@ -7,14 +7,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         MutableEntity,
         WordScrambleTemplate,
         Tag,
-        CardAttachment,
         FlashcardTemplate,
         IdentificationTemplate,
         MultipleChoiceTemplate,
         FillInTheBlanksTemplate,
         MatchMadnessTemplate,
         TagMapper,
-        CardAttachmentMapper,
         FlashcardTemplateMapper,
         IdentificationTemplateMapper,
         MultipleChoiceTemplateMapper,
@@ -22,10 +20,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         MatchMadnessTemplateMapper,
         MutableEntityMapper,
         WordScrambleTemplateMapper,
-        AttachmentUriHelper,
+        MarkdownHelper,
         MutableEntityCopyWith,
-        TagCopyWith,
-        CardAttachmentCopyWith;
+        TagCopyWith;
 import 'package:dart_mappable/dart_mappable.dart';
 
 part 'card_template.dto.mapper.dart';
@@ -58,8 +55,7 @@ abstract class CardTemplate with CardTemplateMappable implements MutableEntity {
   // Joined from card_template_tags
   final List<Tag> tags;
 
-  // Joined from card_template_attachments
-  final List<CardAttachment> attachments;
+  final bool verticallyCentered;
 
   const CardTemplate({
     required this.id,
@@ -69,19 +65,11 @@ abstract class CardTemplate with CardTemplateMappable implements MutableEntity {
     required this.updatedAt,
     this.sourceTemplateId,
     this.tags = const [],
-    this.attachments = const [],
+    this.verticallyCentered = true,
   });
 
   String? resolveAttachmentUrl(Uri uri) {
-    if (uri.scheme != 'attachment') return uri.toString();
-
-    final attachmentId = uri.path.isNotEmpty ? uri.path : uri.host;
-    for (final attachment in attachments) {
-      if (attachment.id == attachmentId) {
-        return AttachmentUriHelper.resolveAttachmentUri(attachment);
-      }
-    }
-    return null;
+    return MarkdownHelper.resolveMediaSourceUri(uri);
   }
 
   bool checkAnswer(String userAnswer, {bool isReversed = false});

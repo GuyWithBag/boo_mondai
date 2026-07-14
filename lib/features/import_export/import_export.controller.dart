@@ -9,7 +9,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         Controller,
         Deck,
         DeckImportMode,
-        ChangePlan,
+        PreviewedChangePlan,
         ImportCardsPayload,
         ImportFailure,
         ImportOptions,
@@ -43,7 +43,7 @@ class ImportFileResult<T> {
 
 /// UI-facing state holder for import/export workflows.
 class ImportExportController extends Controller {
-  ChangePlan<ImportCardsPayload, CardTemplate>? currentPlan;
+  PreviewedChangePlan<ImportCardsPayload, CardTemplate>? currentPlan;
   List<ChangedEntity<Object?>> latestChanges = const [];
   List<String> latestFailures = const [];
 
@@ -297,7 +297,8 @@ class ImportExportController extends Controller {
   }
 
   /// Builds a similarity plan for importing cards into one deck.
-  Future<ChangePlan<ImportCardsPayload, CardTemplate>?> previewCardImport({
+  Future<PreviewedChangePlan<ImportCardsPayload, CardTemplate>?>
+  previewCardImport({
     required String deckId,
     required List<Map<String, dynamic>> incomingTemplateMaps,
     CardSimilarityConfig similarity = const CardSimilarityConfig(),
@@ -322,7 +323,8 @@ class ImportExportController extends Controller {
   }
 
   /// Builds a similarity plan from raw JSON.
-  Future<ChangePlan<ImportCardsPayload, CardTemplate>?> previewCardImportJson({
+  Future<PreviewedChangePlan<ImportCardsPayload, CardTemplate>?>
+  previewCardImportJson({
     required String deckId,
     required String rawJson,
     CardSimilarityConfig similarity = const CardSimilarityConfig(),

@@ -16,7 +16,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextFieldSize,
         TextFieldFrame,
         Button,
-        BlankChip;
+        BlankChip,
+        CardVerticalAlignmentControl;
 import 'package:flutter/material.dart' hide FormField, TextField;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -68,93 +69,104 @@ class FillInTheBlanksEditor extends HookWidget {
       TextColor.baseline,
     ]);
 
-    return FormField<List<String>>(
-      value: spanController.blanks,
-      listenable: spanController,
-      valueReader: () => spanController.blanks,
-      validator: EditDeckFormValidator.fillInTheBlankAnswers,
-      builder: (_, _) => Surface(
-        style: surfaceStyle.resolve(tokens, const [SurfaceColor.baseline]),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Sentence Builder'.toUpperCase(),
-              style: textStyle.resolve(tokens, [
-                TextSize.labelSmall,
-                TextWeight.heavy,
-                TextColor.muted,
-              ]),
-            ),
-            const SizedBox(height: 14),
-            Text(
-              'Type your full sentence. Highlight the words you want the '
-              'user to guess, then tap "Create Blank".',
-              style: textStyle
-                  .resolve(tokens, [
-                    TextSize.label,
-                    TextWeight.body,
+    return Column(
+      spacing: tokens.spaceLayoutGapMd,
+      children: [
+        CardVerticalAlignmentControl(formState: formState),
+        FormField<List<String>>(
+          value: spanController.blanks,
+          listenable: spanController,
+          valueReader: () => spanController.blanks,
+          validator: EditDeckFormValidator.fillInTheBlankAnswers,
+          builder: (_, _) => Surface(
+            style: surfaceStyle.resolve(tokens, const [SurfaceColor.baseline]),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Sentence Builder'.toUpperCase(),
+                  style: textStyle.resolve(tokens, [
+                    TextSize.labelSmall,
+                    TextWeight.heavy,
                     TextColor.muted,
-                  ])
-                  .copyWith(fontSize: 17),
-            ),
-            const SizedBox(height: 28),
+                  ]),
+                ),
+                const SizedBox(height: 14),
+                Text(
+                  'Type your full sentence. Highlight the words you want the '
+                  'user to guess, then tap "Create Blank".',
+                  style: textStyle
+                      .resolve(tokens, [
+                        TextSize.label,
+                        TextWeight.body,
+                        TextColor.muted,
+                      ])
+                      .copyWith(fontSize: 17),
+                ),
+                const SizedBox(height: 28),
 
-            // ── Sentence field ────────────────────────────────────────────────
-            // Uses the span controller directly — chips appear inline where
-            // the selection was made.
-            TextField(
-              variants: const [TextFieldSize.normal, TextFieldFrame.outline],
-              controller: spanController,
-              style: resolvedTextStyle,
-              placeholder: 'Type the full sentence…',
-              minLines: 6,
-              maxLines: null,
-              keyboardType: TextInputType.multiline,
-              textInputAction: TextInputAction.newline,
-            ),
+                // ── Sentence field ────────────────────────────────────────────────
+                // Uses the span controller directly — chips appear inline where
+                // the selection was made.
+                TextField(
+                  variants: const [
+                    TextFieldSize.normal,
+                    TextFieldFrame.outline,
+                  ],
+                  controller: spanController,
+                  style: resolvedTextStyle,
+                  placeholder: 'Type the full sentence…',
+                  minLines: 6,
+                  maxLines: null,
+                  keyboardType: TextInputType.multiline,
+                  textInputAction: TextInputAction.newline,
+                ),
 
-            const SizedBox(height: 14),
-            Align(
-              alignment: Alignment.centerRight,
-              child: Button(
-                leading: const Icon(Icons.add),
-                onPressed: spanController.canCreateBlank
-                    ? () {
-                        final created = spanController
-                            .createBlankFromSelection();
-                        if (created) {
-                          writeBlanksToFormState(spanController.blanks);
-                        }
-                      }
-                    : null,
-                child: const Text('Create Blank'),
-              ),
-            ),
-
-            // ── Preview ───────────────────────────────────────────────────────
-            if (spanController.rawTextOnly.trim().isNotEmpty ||
-                blanks.value.isNotEmpty) ...[
-              const SizedBox(height: 18),
-              Surface(
-                style: surfaceStyle.resolve(tokens, const [SurfaceColor.muted]),
-                child: Text(
-                  _buildPreviewSentence(
-                    spanController.value.text,
-                    spanController.entries,
-                  ),
-                  style: TextStyle(
-                    color: tokens.colorTextBaseline,
-                    fontSize: 26,
-                    fontWeight: FontWeight.w800,
-                    height: 1.5,
+                const SizedBox(height: 14),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Button(
+                    leading: const Icon(Icons.add),
+                    onPressed: spanController.canCreateBlank
+                        ? () {
+                            final created = spanController
+                                .createBlankFromSelection();
+                            if (created) {
+                              writeBlanksToFormState(spanController.blanks);
+                            }
+                          }
+                        : null,
+                    child: const Text('Create Blank'),
                   ),
                 ),
-              ),
-            ],
-          ],
+
+                // ── Preview ───────────────────────────────────────────────────────
+                if (spanController.rawTextOnly.trim().isNotEmpty ||
+                    blanks.value.isNotEmpty) ...[
+                  const SizedBox(height: 18),
+                  Surface(
+                    style: surfaceStyle.resolve(tokens, const [
+                      SurfaceColor.muted,
+                    ]),
+                    child: Text(
+                      _buildPreviewSentence(
+                        spanController.value.text,
+                        spanController.entries,
+                      ),
+                      style: TextStyle(
+                        color: tokens.colorTextBaseline,
+                        fontSize: 26,
+                        fontWeight: FontWeight.w800,
+                        height: 1.5,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
         ),
-      ),
+      ],
     );
   }
 

@@ -1,6 +1,5 @@
-import 'package:boo_mondai/core/helpers/text.helper.dart';
-import 'package:boo_mondai/features/decks/models/deck.dto.dart';
-import 'package:boo_mondai/features/local_images/helpers/local_image_resolver.helper.dart';
+import 'package:boo_mondai/lib.barrel.dart'
+    show TextHelper, Deck, DecksService, StoredMediaService, StoredMediaHelper;
 
 final class ViewDeckListingSingleHelper {
   const ViewDeckListingSingleHelper();
@@ -24,7 +23,7 @@ final class ViewDeckListingSingleHelper {
   }
 
   List<String> carouselImageUrls(Deck deck) {
-    return LocalImageResolverHelper.resolveDeckListingCarouselImages(deck)
+    return DecksService.getListingCarouselImageSources(deck)
         .map((value) => value.trim())
         .where((value) => value.isNotEmpty)
         .toSet()
@@ -42,7 +41,10 @@ final class ViewDeckListingSingleHelper {
     final profile = deck.userProfile;
     if (profile == null) return null;
     return TextHelper.getTrimmedTextOrNull(
-      LocalImageResolverHelper.resolveCachedProfileAvatar(profile),
+      StoredMediaService.getLocalPath(
+            StoredMediaHelper.getSemanticId('profile', profile.id, 'avatar'),
+          ) ??
+          profile.avatarUrl,
     );
   }
 

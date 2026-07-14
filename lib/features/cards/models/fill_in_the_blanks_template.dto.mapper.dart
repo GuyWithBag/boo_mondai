@@ -17,7 +17,6 @@ class FillInTheBlanksTemplateMapper
           .use(_instance = FillInTheBlanksTemplateMapper._());
       CardTemplateMapper.ensureInitialized().addSubMapper(_instance!);
       TagMapper.ensureInitialized();
-      CardAttachmentMapper.ensureInitialized();
       FillInTheBlankSegmentMapper.ensureInitialized();
     }
     return _instance!;
@@ -48,11 +47,11 @@ class FillInTheBlanksTemplateMapper
   static List<Tag> _$tags(FillInTheBlanksTemplate v) => v.tags;
   static const Field<FillInTheBlanksTemplate, List<Tag>> _f$tags =
       Field('tags', _$tags, opt: true, def: const []);
-  static List<CardAttachment> _$attachments(FillInTheBlanksTemplate v) =>
-      v.attachments;
-  static const Field<FillInTheBlanksTemplate, List<CardAttachment>>
-      _f$attachments =
-      Field('attachments', _$attachments, opt: true, def: const []);
+  static bool _$verticallyCentered(FillInTheBlanksTemplate v) =>
+      v.verticallyCentered;
+  static const Field<FillInTheBlanksTemplate, bool> _f$verticallyCentered =
+      Field('verticallyCentered', _$verticallyCentered,
+          key: r'vertically_centered', opt: true, def: true);
   static List<FillInTheBlankSegment> _$segments(FillInTheBlanksTemplate v) =>
       v.segments;
   static const Field<FillInTheBlanksTemplate, List<FillInTheBlankSegment>>
@@ -67,7 +66,7 @@ class FillInTheBlanksTemplateMapper
     #updatedAt: _f$updatedAt,
     #sourceTemplateId: _f$sourceTemplateId,
     #tags: _f$tags,
-    #attachments: _f$attachments,
+    #verticallyCentered: _f$verticallyCentered,
     #segments: _f$segments,
   };
 
@@ -88,7 +87,7 @@ class FillInTheBlanksTemplateMapper
         updatedAt: data.dec(_f$updatedAt),
         sourceTemplateId: data.dec(_f$sourceTemplateId),
         tags: data.dec(_f$tags),
-        attachments: data.dec(_f$attachments),
+        verticallyCentered: data.dec(_f$verticallyCentered),
         segments: data.dec(_f$segments));
   }
 
@@ -152,10 +151,6 @@ abstract class FillInTheBlanksTemplateCopyWith<
     $Out> implements CardTemplateCopyWith<$R, $In, $Out> {
   @override
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags;
-  @override
-  ListCopyWith<$R, CardAttachment,
-          CardAttachmentCopyWith<$R, CardAttachment, CardAttachment>>
-      get attachments;
   ListCopyWith<
       $R,
       FillInTheBlankSegment,
@@ -170,7 +165,7 @@ abstract class FillInTheBlanksTemplateCopyWith<
       DateTime? updatedAt,
       String? sourceTemplateId,
       List<Tag>? tags,
-      List<CardAttachment>? attachments,
+      bool? verticallyCentered,
       List<FillInTheBlankSegment>? segments});
   FillInTheBlanksTemplateCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
       Then<$Out2, $R2> t);
@@ -189,11 +184,6 @@ class _FillInTheBlanksTemplateCopyWithImpl<$R, $Out>
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags => ListCopyWith(
       $value.tags, (v, t) => v.copyWith.$chain(t), (v) => call(tags: v));
   @override
-  ListCopyWith<$R, CardAttachment,
-          CardAttachmentCopyWith<$R, CardAttachment, CardAttachment>>
-      get attachments => ListCopyWith($value.attachments,
-          (v, t) => v.copyWith.$chain(t), (v) => call(attachments: v));
-  @override
   ListCopyWith<
       $R,
       FillInTheBlankSegment,
@@ -209,7 +199,7 @@ class _FillInTheBlanksTemplateCopyWithImpl<$R, $Out>
           DateTime? updatedAt,
           Object? sourceTemplateId = $none,
           List<Tag>? tags,
-          List<CardAttachment>? attachments,
+          bool? verticallyCentered,
           List<FillInTheBlankSegment>? segments}) =>
       $apply(FieldCopyWithData({
         if (id != null) #id: id,
@@ -219,7 +209,7 @@ class _FillInTheBlanksTemplateCopyWithImpl<$R, $Out>
         if (updatedAt != null) #updatedAt: updatedAt,
         if (sourceTemplateId != $none) #sourceTemplateId: sourceTemplateId,
         if (tags != null) #tags: tags,
-        if (attachments != null) #attachments: attachments,
+        if (verticallyCentered != null) #verticallyCentered: verticallyCentered,
         if (segments != null) #segments: segments
       }));
   @override
@@ -232,7 +222,8 @@ class _FillInTheBlanksTemplateCopyWithImpl<$R, $Out>
       sourceTemplateId:
           data.get(#sourceTemplateId, or: $value.sourceTemplateId),
       tags: data.get(#tags, or: $value.tags),
-      attachments: data.get(#attachments, or: $value.attachments),
+      verticallyCentered:
+          data.get(#verticallyCentered, or: $value.verticallyCentered),
       segments: data.get(#segments, or: $value.segments));
 
   @override

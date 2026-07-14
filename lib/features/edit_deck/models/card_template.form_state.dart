@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 class CardTemplateFormState {
   final ValueNotifier<QuestionType> questionType;
   final ValueNotifier<CardType> cardType;
+  final ValueNotifier<bool> verticallyCentered;
   final TextEditingController frontController;
   final TextEditingController backController;
   final TextEditingController identificationAnswerController;
@@ -26,6 +27,7 @@ class CardTemplateFormState {
   CardTemplateFormState({
     required this.questionType,
     required this.cardType,
+    required this.verticallyCentered,
     required this.frontController,
     required this.backController,
     required this.identificationAnswerController,
@@ -38,10 +40,12 @@ class CardTemplateFormState {
   factory CardTemplateFormState.empty({
     QuestionType questionType = QuestionType.flashcard,
     CardType cardType = CardType.normal,
+    bool verticallyCentered = true,
   }) {
     return CardTemplateFormState(
       questionType: ValueNotifier(questionType),
       cardType: ValueNotifier(cardType),
+      verticallyCentered: ValueNotifier(verticallyCentered),
       frontController: TextEditingController(),
       backController: TextEditingController(),
       identificationAnswerController: TextEditingController(),
@@ -56,6 +60,7 @@ class CardTemplateFormState {
   void dispose() {
     questionType.dispose();
     cardType.dispose();
+    verticallyCentered.dispose();
     frontController.dispose();
     backController.dispose();
     identificationAnswerController.dispose();

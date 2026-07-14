@@ -21,7 +21,6 @@ class CardTemplateMapper extends SubClassMapperBase<CardTemplate> {
       MatchMadnessTemplateMapper.ensureInitialized();
       WordScrambleTemplateMapper.ensureInitialized();
       TagMapper.ensureInitialized();
-      CardAttachmentMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -50,9 +49,10 @@ class CardTemplateMapper extends SubClassMapperBase<CardTemplate> {
   static List<Tag> _$tags(CardTemplate v) => v.tags;
   static const Field<CardTemplate, List<Tag>> _f$tags =
       Field('tags', _$tags, opt: true, def: const []);
-  static List<CardAttachment> _$attachments(CardTemplate v) => v.attachments;
-  static const Field<CardTemplate, List<CardAttachment>> _f$attachments =
-      Field('attachments', _$attachments, opt: true, def: const []);
+  static bool _$verticallyCentered(CardTemplate v) => v.verticallyCentered;
+  static const Field<CardTemplate, bool> _f$verticallyCentered = Field(
+      'verticallyCentered', _$verticallyCentered,
+      key: r'vertically_centered', opt: true, def: true);
 
   @override
   final MappableFields<CardTemplate> fields = const {
@@ -63,7 +63,7 @@ class CardTemplateMapper extends SubClassMapperBase<CardTemplate> {
     #updatedAt: _f$updatedAt,
     #sourceTemplateId: _f$sourceTemplateId,
     #tags: _f$tags,
-    #attachments: _f$attachments,
+    #verticallyCentered: _f$verticallyCentered,
   };
 
   @override
@@ -100,9 +100,6 @@ mixin CardTemplateMappable {
 abstract class CardTemplateCopyWith<$R, $In extends CardTemplate, $Out>
     implements MutableEntityCopyWith<$R, $In, $Out> {
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags;
-  ListCopyWith<$R, CardAttachment,
-          CardAttachmentCopyWith<$R, CardAttachment, CardAttachment>>
-      get attachments;
   @override
   $R call(
       {String? id,
@@ -112,6 +109,6 @@ abstract class CardTemplateCopyWith<$R, $In extends CardTemplate, $Out>
       DateTime? updatedAt,
       String? sourceTemplateId,
       List<Tag>? tags,
-      List<CardAttachment>? attachments});
+      bool? verticallyCentered});
   CardTemplateCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }

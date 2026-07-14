@@ -9,3 +9,4 @@ export 'multiple_choice_option.dart';
 export 'fill_in_the_blank.chip.dart';
 export 'matching_type.pair.dart';
 export 'edit_deck.bottom_navbar.dart';
+export 'card_vertical_alignment.control.dart';

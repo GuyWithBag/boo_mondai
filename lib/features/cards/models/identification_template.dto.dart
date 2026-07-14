@@ -1,7 +1,6 @@
 import 'package:boo_mondai/features/cards/models/card_template.dto.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:boo_mondai/features/tags/models/tag.dto.dart';
-import 'package:boo_mondai/features/card_attachments/models/card_media_attachment.dto.dart';
 
 part 'identification_template.dto.mapper.dart';
 
@@ -21,7 +20,7 @@ class IdentificationTemplate extends CardTemplate
     required super.updatedAt,
     super.sourceTemplateId,
     super.tags,
-    super.attachments,
+    super.verticallyCentered,
     required this.promptText,
     required this.acceptedAnswers,
     this.imageUrl,

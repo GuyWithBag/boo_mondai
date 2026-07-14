@@ -1,7 +1,6 @@
 import 'package:boo_mondai/features/cards/models/card_template.dto.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:boo_mondai/features/tags/models/tag.dto.dart';
-import 'package:boo_mondai/features/card_attachments/models/card_media_attachment.dto.dart';
 
 part 'word_scramble_template.mapper.dart';
 
@@ -20,7 +19,7 @@ class WordScrambleTemplate extends CardTemplate
     required super.updatedAt,
     super.sourceTemplateId,
     super.tags,
-    super.attachments,
+    super.verticallyCentered,
     required this.sentenceToScramble,
     this.imageUrl,
     this.audioUrl,
