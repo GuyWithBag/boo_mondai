@@ -7,5 +7,5 @@ export 'change_type.dart';
 export 'changed_property.dart';
 export 'change_batch_result.dart';
 export 'change_tracker_status.dart';
-export 'change_plan.dart';
+export 'previewed_change_plan.dart';
 export 'changed_entity.dart';

@@ -42,6 +42,36 @@ class DecksLocalDB extends HiveLocalDB<Deck> {
     action: 'getByUserId($userId)',
   );
 
+  List<Deck> selectManyByUserIdAndOptionalDeckId({
+    required String userId,
+    String? deckId,
+  }) => guardSync(
+    () => selectMany(
+      where: (deck) {
+        if (deck.userId != userId) return false;
+        return deckId == null || deck.id == deckId;
+      },
+    ),
+    action: 'selectManyByUserIdAndOptionalDeckId($userId, $deckId)',
+  );
+
+  List<SyncIndexEntry> selectSyncIndexByUserIdAndOptionalDeckId({
+    required String userId,
+    String? deckId,
+  }) => guardSync(
+    () => selectManyByUserIdAndOptionalDeckId(userId: userId, deckId: deckId)
+        .map((deck) => SyncIndexEntry(id: deck.id, updatedAt: deck.updatedAt))
+        .toList(growable: false),
+    action: 'selectSyncIndexByUserIdAndOptionalDeckId($userId, $deckId)',
+  );
+
+  List<Deck> selectManyByIds(List<String> ids) => guardSync(
+    () => [
+      for (final id in ids) ?selectByPk({'id': id}),
+    ],
+    action: 'selectManyByIds(${ids.length} ids)',
+  );
+
   List<Deck> filterDecks({
     String query = '',
     DeckSortField sortField = DeckSortField.updatedAt,

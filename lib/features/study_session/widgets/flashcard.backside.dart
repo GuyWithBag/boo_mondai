@@ -3,6 +3,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         FlashcardTemplate,
         StudyCard,
         AppTokens,
+        AlignedScrollView,
         MarkdownText,
         MarkdownTextMode;
 import 'package:flutter/material.dart';
@@ -24,21 +25,26 @@ class FlashcardBackSide extends StatelessWidget {
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
 
-    return Center(
+    return AlignedScrollView(
+      verticallyCentered: template.verticallyCentered,
+      padding: EdgeInsets.all(tokens.spaceLayoutPaddingSm),
       child: Column(
         key: const ValueKey('flashcard-back'),
-        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisAlignment: MainAxisAlignment.center,
         spacing: tokens.spaceLayoutGapMd,
         children: [
           MarkdownText(
             mode: MarkdownTextMode.previewSelectable,
             data: template.getQuestion(isReversed: studyCard.isReversed),
             resolveAttachmentUrl: template.resolveAttachmentUrl,
+            defaultMarkdownAlignment: WrapAlignment.center,
           ),
           Divider(),
           MarkdownText(
             mode: MarkdownTextMode.previewSelectable,
             data: template.getAnswer(isReversed: studyCard.isReversed),
+            defaultMarkdownAlignment: WrapAlignment.center,
             resolveAttachmentUrl: template.resolveAttachmentUrl,
           ),
         ],

@@ -58,9 +58,11 @@ class BackgroundImageSurface extends StatelessWidget {
     this.missingImageIconSize = 40,
     this.isEditable = false,
     this.showCenteredEditButtonWhenChildPresent = false,
+    this.useAddIconWhenNoImage = false,
     this.editButtonPosition = BackgroundImageEditButtonPosition.bottomRight,
     this.onImagePicked,
     this.border = SurfaceBorder.none,
+    this.editIcon = Icons.edit,
   });
 
   final ImageProvider? image;
@@ -74,9 +76,11 @@ class BackgroundImageSurface extends StatelessWidget {
   final double missingImageIconSize;
   final bool isEditable;
   final bool showCenteredEditButtonWhenChildPresent;
+  final bool useAddIconWhenNoImage;
   final BackgroundImageEditButtonPosition editButtonPosition;
   final BackgroundImagePicked? onImagePicked;
   final SurfaceBorder border;
+  final IconData editIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +101,7 @@ class BackgroundImageSurface extends StatelessWidget {
           (child == null || showCenteredEditButtonWhenChildPresent)) {
         return Button.iconOnly(
           tokens: tokens,
-          icon: Icons.edit,
+          icon: image == null && useAddIconWhenNoImage ? Icons.add : editIcon,
           onPressed: _pickImage,
         );
       }
@@ -160,7 +164,7 @@ class BackgroundImageSurface extends StatelessWidget {
               ? editButtonPadding
               : null,
           child: Button.iconOnlySmall(
-            icon: Icons.edit,
+            icon: editIcon,
             tokens: tokens,
             onPressed: _pickImage,
           ),

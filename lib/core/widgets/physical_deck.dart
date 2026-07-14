@@ -4,9 +4,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         BackgroundImagePicked,
         CubeController,
         Deck,
+        DecksService,
         AppTokens,
         ImageHelper,
-        LocalImageResolverHelper,
         textStyle,
         TextSize,
         TextWeight,
@@ -67,7 +67,7 @@ class PhysicalDeck extends StatelessWidget {
       textScale,
     );
     final coverImage = ImageHelper.getImageProviderFromSource(
-      deck == null ? null : LocalImageResolverHelper.resolveDeckCover(deck!),
+      deck == null ? null : DecksService.getCoverImageSource(deck!),
     );
     final visibleTags = deck?.tags.take(8).toList() ?? const [];
 

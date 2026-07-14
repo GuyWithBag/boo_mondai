@@ -14,9 +14,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         buttonStyle,
         PhysicalCard,
         ScaleHelper,
+        AlignedScrollView,
         MarkdownText,
         MarkdownTextMode,
-        usePhysicalCardController;
+        usePhysicalCardController,
+        PhysicalCardController;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -28,12 +30,14 @@ class MultipleChoiceCard extends HookWidget {
     this.interactionsController,
     this.isRevealed = false,
     this.maxWidth,
+    this.controller,
   });
 
   final MultipleChoiceTemplate template;
   final StudySessionCardStageController? interactionsController;
   final bool isRevealed;
   final double? maxWidth;
+  final PhysicalCardController? controller;
 
   @override
   Widget build(BuildContext context) {
@@ -55,10 +59,11 @@ class MultipleChoiceCard extends HookWidget {
     final selectedOption = useState<String?>(null);
     final effectiveIsRevealed =
         isRevealed || interactionsController?.isRevealed == true;
-    final physicalCardController = usePhysicalCardController(
+    final fallbackPhysicalCardController = usePhysicalCardController(
       context,
       width: maxWidth,
     );
+    final physicalCardController = controller ?? fallbackPhysicalCardController;
 
     useEffect(() {
       selectedOption.value = null;
@@ -67,57 +72,61 @@ class MultipleChoiceCard extends HookWidget {
 
     return PhysicalCard(
       controller: physicalCardController,
-      front: Column(
-        spacing: tokens.spaceLayoutGapMd,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            spacing: tokens.spaceLayoutGapMd,
-            children: [
-              Text(
-                'Select Answer'.toUpperCase(),
-                textAlign: TextAlign.center,
-                style: eyebrowStyle,
-              ),
-              MarkdownText(
-                data: template.questionPrompt,
-                mode: MarkdownTextMode.previewSelectable,
-                resolveAttachmentUrl: template.resolveAttachmentUrl,
-              ),
-            ],
-          ),
-          Column(
-            children: [
-              for (final entry in template.options.asMap().entries) ...[
-                SizedBox(
-                  width: double.infinity,
-                  child: Button(
-                    style: buttonStyle.resolve(tokens, [
-                      ..._optionVariants(entry.value, effectiveIsRevealed),
-                      ButtonVariant.flat,
-                    ]),
-                    selected:
-                        !effectiveIsRevealed &&
-                        selectedOption.value == entry.value.id,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    onPressed: effectiveIsRevealed
-                        ? null
-                        : () {
-                            selectedOption.value = entry.value.id;
-                            interactionsController?.setAnswer(entry.value.id);
-                            interactionsController?.setCanReveal(true);
-                          },
-                    child: MarkdownText(
-                      data: _optionLabel(entry.value, entry.key),
-                      mode: MarkdownTextMode.previewSelectable,
-                      resolveAttachmentUrl: template.resolveAttachmentUrl,
-                    ),
-                  ),
+      front: AlignedScrollView(
+        verticallyCentered: template.verticallyCentered,
+        padding: EdgeInsets.all(tokens.spaceLayoutPaddingSm),
+        child: Column(
+          spacing: tokens.spaceLayoutGapMd,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              spacing: tokens.spaceLayoutGapMd,
+              children: [
+                Text(
+                  'Select Answer'.toUpperCase(),
+                  textAlign: TextAlign.center,
+                  style: eyebrowStyle,
+                ),
+                MarkdownText(
+                  data: template.questionPrompt,
+                  mode: MarkdownTextMode.previewSelectable,
+                  resolveAttachmentUrl: template.resolveAttachmentUrl,
                 ),
               ],
-            ],
-          ),
-        ],
+            ),
+            Column(
+              children: [
+                for (final entry in template.options.asMap().entries) ...[
+                  SizedBox(
+                    width: double.infinity,
+                    child: Button(
+                      style: buttonStyle.resolve(tokens, [
+                        ..._optionVariants(entry.value, effectiveIsRevealed),
+                        ButtonVariant.flat,
+                      ]),
+                      selected:
+                          !effectiveIsRevealed &&
+                          selectedOption.value == entry.value.id,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      onPressed: effectiveIsRevealed
+                          ? null
+                          : () {
+                              selectedOption.value = entry.value.id;
+                              interactionsController?.setAnswer(entry.value.id);
+                              interactionsController?.setCanReveal(true);
+                            },
+                      child: MarkdownText(
+                        data: _optionLabel(entry.value, entry.key),
+                        mode: MarkdownTextMode.previewSelectable,
+                        resolveAttachmentUrl: template.resolveAttachmentUrl,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

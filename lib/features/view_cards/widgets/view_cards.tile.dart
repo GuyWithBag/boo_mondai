@@ -14,6 +14,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         MultipleChoiceCard,
         MultipleChoiceTemplate,
         PhysicalCard,
+        PhysicalCardController,
         StudyCard,
         WordScrambleTemplate,
         MatchingTypeCard,
@@ -29,6 +30,7 @@ class ViewCardsTile extends StatelessWidget {
     this.width = 280,
     this.initialSide = ViewCardsTileSide.front,
     this.allowFlip = true,
+    this.controller,
     super.key,
   }) : studyCard = null,
        assert(width > 0);
@@ -38,6 +40,7 @@ class ViewCardsTile extends StatelessWidget {
     this.width = 280,
     this.initialSide = ViewCardsTileSide.front,
     this.allowFlip = true,
+    this.controller,
     super.key,
   }) : template = null,
        assert(width > 0);
@@ -47,6 +50,7 @@ class ViewCardsTile extends StatelessWidget {
   final double width;
   final ViewCardsTileSide initialSide;
   final bool allowFlip;
+  final PhysicalCardController? controller;
 
   @override
   Widget build(BuildContext context) {
@@ -75,6 +79,7 @@ class ViewCardsTile extends StatelessWidget {
                 width: width,
                 side: initialSide,
                 allowFlip: allowFlip,
+                controller: controller,
               ),
             ),
           ),
@@ -109,13 +114,18 @@ class ViewCardsTile extends StatelessWidget {
     required double width,
     required ViewCardsTileSide side,
     required bool allowFlip,
+    required PhysicalCardController? controller,
   }) {
     if (template == null) {
-      return const _UnknownTemplatePreview(label: 'Missing template');
+      return _UnknownTemplatePreview(
+        label: 'Missing template',
+        controller: controller,
+      );
     }
 
     return switch (template) {
       FlashcardTemplate t => FlashcardCard(
+        controller: controller,
         template: t,
         studyCard:
             studyCard ??
@@ -129,42 +139,56 @@ class ViewCardsTile extends StatelessWidget {
         showFlipButton: allowFlip,
       ),
       MultipleChoiceTemplate t => MultipleChoiceCard(
+        controller: controller,
         template: t,
         maxWidth: width,
         isRevealed: true,
       ),
       FillInTheBlanksTemplate t => FillInTheBlanksCard(
+        controller: controller,
         template: t,
         maxWidth: width,
         isRevealed: true,
       ),
       MatchMadnessTemplate t => MatchingTypeCard(
+        controller: controller,
         template: t,
         maxWidth: width,
         isRevealed: true,
       ),
       IdentificationTemplate t => _PromptPreview(
+        controller: controller,
         prompt: t.promptText,
         template: t,
       ),
       WordScrambleTemplate t => _PromptPreview(
+        controller: controller,
         prompt: t.sentenceToScramble,
         template: t,
       ),
-      _ => _UnknownTemplatePreview(label: template.runtimeType.toString()),
+      _ => _UnknownTemplatePreview(
+        label: template.runtimeType.toString(),
+        controller: controller,
+      ),
     };
   }
 }
 
 class _PromptPreview extends StatelessWidget {
-  const _PromptPreview({required this.prompt, required this.template});
+  const _PromptPreview({
+    required this.prompt,
+    required this.template,
+    this.controller,
+  });
 
   final String prompt;
   final CardTemplate template;
+  final PhysicalCardController? controller;
 
   @override
   Widget build(BuildContext context) {
     return PhysicalCard(
+      controller: controller,
       front: Center(
         child: Padding(
           padding: EdgeInsets.all(20.w),
@@ -180,13 +204,15 @@ class _PromptPreview extends StatelessWidget {
 }
 
 class _UnknownTemplatePreview extends StatelessWidget {
-  const _UnknownTemplatePreview({required this.label});
+  const _UnknownTemplatePreview({required this.label, this.controller});
 
   final String label;
+  final PhysicalCardController? controller;
 
   @override
   Widget build(BuildContext context) {
     return PhysicalCard(
+      controller: controller,
       front: Center(
         child: Padding(
           padding: EdgeInsets.all(20.w),
@@ -218,8 +244,11 @@ class _ScaledCardText extends StatelessWidget {
 }
 
 StudyCard _previewStudyCard(CardTemplate? template, {bool isReversed = false}) {
+  final now = DateTime.now();
   return StudyCard(
     id: '__view_cards_preview__${template?.id ?? 'unknown'}_$isReversed',
+    createdAt: now,
+    updatedAt: now,
     templateId: template?.id ?? 'unknown',
     deckId: template?.deckId ?? 'unknown',
     isReversed: isReversed,

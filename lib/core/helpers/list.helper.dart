@@ -12,4 +12,9 @@ abstract final class ListHelper {
         if (i != index) values[i],
     ];
   }
+
+  static T? getAtOrNull<T>(List<T> values, int index) {
+    if (index < 0 || index >= values.length) return null;
+    return values[index];
+  }
 }

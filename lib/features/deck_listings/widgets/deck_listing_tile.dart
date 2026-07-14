@@ -3,11 +3,13 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
         Deck,
+        DecksService,
         DeckTile,
         DeckTileState,
         HeaderBadge,
         ImageHelper,
-        LocalImageResolverHelper,
+        StoredMediaHelper,
+        StoredMediaService,
         MetaLabel,
         NumberHelper,
         ProfileLabel,
@@ -47,7 +49,7 @@ class DeckListingTile extends HookWidget {
         : deck.shortDescription;
     final version = deck.version.isEmpty ? '1.0.0' : deck.version;
     final backgroundImage = ImageHelper.getImageProviderFromSource(
-      LocalImageResolverHelper.resolveDeckListingFeaturedImage(deck: deck),
+      DecksService.getListingFeaturedImageSource(deck: deck),
     );
     final creatorName = deck.userProfile?.username ?? 'Unknown creator';
 
@@ -132,9 +134,14 @@ class DeckListingTile extends HookWidget {
                         facingLeft: true,
                         avatarUrl: deck.userProfile == null
                             ? null
-                            : LocalImageResolverHelper.resolveCachedProfileAvatar(
-                                deck.userProfile!,
-                              ),
+                            : StoredMediaService.getLocalPath(
+                                    StoredMediaHelper.getSemanticId(
+                                      'profile',
+                                      deck.userProfile!.id,
+                                      'avatar',
+                                    ),
+                                  ) ??
+                                  deck.userProfile!.avatarUrl,
                       ),
                     ),
                   ],

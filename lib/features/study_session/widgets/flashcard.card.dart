@@ -9,7 +9,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         StudySessionController,
         FlashcardFrontSide,
         FlashcardBackSide,
-        PhysicalCard;
+        PhysicalCard,
+        PhysicalCardController;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -25,6 +26,7 @@ class FlashcardCard extends HookWidget {
     this.showRevealButton = true,
     this.showFlipButton = false,
     this.maxWidth,
+    this.controller,
   });
 
   final FlashcardTemplate template;
@@ -35,15 +37,17 @@ class FlashcardCard extends HookWidget {
   final bool showRevealButton;
   final bool showFlipButton;
   final double? maxWidth;
+  final PhysicalCardController? controller;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final physicalCardController = usePhysicalCardController(
+    final fallbackPhysicalCardController = usePhysicalCardController(
       context,
       width: maxWidth,
       perspective: 0.001,
     );
+    final physicalCardController = controller ?? fallbackPhysicalCardController;
     final effectiveIsRevealed =
         isRevealed || interactionsController?.isRevealed == true;
 

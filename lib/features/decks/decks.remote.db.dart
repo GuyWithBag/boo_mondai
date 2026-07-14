@@ -7,10 +7,11 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         SupabaseRemoteDB,
         Deck,
+        SyncIndexEntry,
         DeckSortField,
         SearchSortDirection,
         DeckMapper,
-        LocalImagePathHelper;
+        ImageHelper;
 
 class DecksRemoteDB extends SupabaseRemoteDB<Deck> {
   @override
@@ -23,8 +24,7 @@ class DecksRemoteDB extends SupabaseRemoteDB<Deck> {
   Map<String, dynamic> toMap(Deck item) {
     final map = item.toMap();
     final coverImageUrl = item.coverImageUrl;
-    if (coverImageUrl != null &&
-        !LocalImagePathHelper.isRemotePath(coverImageUrl)) {
+    if (coverImageUrl != null && !ImageHelper.isRemoteUrl(coverImageUrl)) {
       map['cover_image_url'] = null;
     }
     return map;
@@ -74,11 +74,50 @@ class DecksRemoteDB extends SupabaseRemoteDB<Deck> {
 
   Future<Deck?> selectById(String deckId) => selectOne(filters: {'id': deckId});
 
+  Future<List<Deck>> selectManyByIds(List<String> ids) async {
+    final decks = <Deck>[];
+    for (final id in ids) {
+      final deck = await selectById(id);
+      if (deck != null) decks.add(deck);
+    }
+    return decks;
+  }
+
   Future<List<Deck>> selectManyByUserId(String profileId) => selectMany(
     filters: {'user_id': profileId},
     orderBy: 'updated_at',
     ascending: false,
   );
+
+  Future<List<Deck>> selectManyByUserIdAndOptionalDeckId({
+    required String userId,
+    String? deckId,
+  }) async {
+    if (deckId != null) {
+      final deck = await selectById(deckId);
+      return deck == null ? const [] : [deck];
+    }
+    return selectManyByUserId(userId);
+  }
+
+  Future<List<SyncIndexEntry>> selectSyncIndexByUserIdAndOptionalDeckId({
+    required String userId,
+    String? deckId,
+  }) => guard(() async {
+    dynamic query = client.from(tableName).select('id, updated_at');
+    final filters = {'user_id': userId, 'id': ?deckId};
+    query = applyFilters(query, filters);
+
+    final response = await query;
+    return List<Map<String, dynamic>>.from(response)
+        .map(
+          (row) => SyncIndexEntry(
+            id: row['id'] as String,
+            updatedAt: DateTime.parse(row['updated_at'] as String),
+          ),
+        )
+        .toList(growable: false);
+  }, action: 'selectSyncIndexByUserIdAndOptionalDeckId($userId, $deckId)');
 
   String _columnForSortField(DeckSortField field) {
     return switch (field) {

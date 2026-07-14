@@ -6,7 +6,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart'
-    show SupabaseRemoteDB, Profile, ProfileMapper, LocalImagePathHelper;
+    show SupabaseRemoteDB, Profile, ProfileMapper, ImageHelper;
 
 class ProfilesRemoteDB extends SupabaseRemoteDB<Profile> {
   @override
@@ -19,7 +19,7 @@ class ProfilesRemoteDB extends SupabaseRemoteDB<Profile> {
   Map<String, dynamic> toMap(Profile item) {
     final map = item.toMap();
     final avatarUrl = item.avatarUrl;
-    if (avatarUrl != null && !LocalImagePathHelper.isRemotePath(avatarUrl)) {
+    if (avatarUrl != null && !ImageHelper.isRemoteUrl(avatarUrl)) {
       map['avatar_url'] = null;
     }
     return map;

@@ -6,7 +6,7 @@ import 'package:dart_mappable/dart_mappable.dart';
 part 'changed_entity.mapper.dart';
 
 /// A single human-readable record of one entity-level change within a
-/// [ChangePlan] or a completed [ChangeTrackerEntry].
+/// [PreviewedChangePlan] or a completed [ChangeTrackerEntry].
 ///
 /// Each record describes what happened to one entity (a deck, a card template,
 /// etc.) and optionally holds [ChangedProperty] entries for field-level detail.

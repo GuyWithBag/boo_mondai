@@ -1,7 +1,8 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
-        AppleSignInButton, buttonStyle,
+        AppleSignInButton,
+        buttonStyle,
         AuthService,
         Button,
         ButtonColor,
@@ -99,7 +100,9 @@ class AuthCard extends StatelessWidget {
               ),
               Expanded(
                 child: Button(
-                  style: buttonStyle.resolve(tokens, const [ButtonColor.primary]),
+                  style: buttonStyle.resolve(tokens, const [
+                    ButtonColor.primary,
+                  ]),
                   onPressed: () => context.push(Pages.register.url),
                   child: const Text('REGISTER'),
                 ),

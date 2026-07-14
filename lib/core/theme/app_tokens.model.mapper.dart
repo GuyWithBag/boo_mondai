@@ -412,6 +412,18 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
   static const Field<AppTokens, double> _f$sizeIconLg = Field(
       'sizeIconLg', _$sizeIconLg,
       key: r'size_icon_lg', mode: FieldMode.member);
+  static double _$sizeButtonIcon(AppTokens v) => v.sizeButtonIcon;
+  static const Field<AppTokens, double> _f$sizeButtonIcon = Field(
+      'sizeButtonIcon', _$sizeButtonIcon,
+      key: r'size_button_icon', mode: FieldMode.member);
+  static double _$sizeButtonIconSm(AppTokens v) => v.sizeButtonIconSm;
+  static const Field<AppTokens, double> _f$sizeButtonIconSm = Field(
+      'sizeButtonIconSm', _$sizeButtonIconSm,
+      key: r'size_button_icon_sm', mode: FieldMode.member);
+  static double _$radiusButtonIconSm(AppTokens v) => v.radiusButtonIconSm;
+  static const Field<AppTokens, double> _f$radiusButtonIconSm = Field(
+      'radiusButtonIconSm', _$radiusButtonIconSm,
+      key: r'radius_button_icon_sm', mode: FieldMode.member);
   static double _$studyCardAspectRatio(AppTokens v) => v.studyCardAspectRatio;
   static const Field<AppTokens, double> _f$studyCardAspectRatio = Field(
       'studyCardAspectRatio', _$studyCardAspectRatio,
@@ -542,6 +554,9 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
     #sizeIconSm: _f$sizeIconSm,
     #sizeIcon: _f$sizeIcon,
     #sizeIconLg: _f$sizeIconLg,
+    #sizeButtonIcon: _f$sizeButtonIcon,
+    #sizeButtonIconSm: _f$sizeButtonIconSm,
+    #radiusButtonIconSm: _f$radiusButtonIconSm,
     #studyCardAspectRatio: _f$studyCardAspectRatio,
     #studyCardWidth: _f$studyCardWidth,
     #studyCardRadius: _f$studyCardRadius,

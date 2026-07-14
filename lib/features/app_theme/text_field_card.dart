@@ -54,6 +54,7 @@ class TextFieldCard extends HookWidget {
               focusNode: focusNode,
               onChanged: onChanged,
               maxLines: null,
+              allowAttachments: true,
               expands: false,
               textAlignVertical: TextAlignVertical.top,
               placeholder: placeholder,

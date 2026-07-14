@@ -21,6 +21,28 @@ class ReviewLogsLocalDB extends HiveLocalDB<FsrsReviewLog> {
     action: 'getByCardId($cardId)',
   );
 
+  List<FsrsReviewLog> selectManyByFsrsCardIds(Set<String> fsrsCardIds) =>
+      guardSync(
+        () => selectMany(where: (log) => fsrsCardIds.contains(log.fsrsCardId)),
+        action: 'selectManyByFsrsCardIds(${fsrsCardIds.length} fsrsCardIds)',
+      );
+
+  List<SyncIndexEntry> selectSyncIndexByFsrsCardIds(Set<String> fsrsCardIds) =>
+      guardSync(
+        () => selectManyByFsrsCardIds(fsrsCardIds)
+            .map((log) => SyncIndexEntry(id: log.id, updatedAt: log.createdAt))
+            .toList(growable: false),
+        action:
+            'selectSyncIndexByFsrsCardIds(${fsrsCardIds.length} fsrsCardIds)',
+      );
+
+  List<FsrsReviewLog> selectManyByIds(List<String> ids) => guardSync(
+    () => [
+      for (final id in ids) ?selectByPk({'id': id}),
+    ],
+    action: 'selectManyByIds(${ids.length} ids)',
+  );
+
   List<DateTime> activityDates() => guardSync(
     () => box.values.map((e) => e.createdAt).toList(),
     action: 'activityDates',

@@ -61,6 +61,8 @@ erDiagram
         int comments_count
         jsonb featured_cards
         text[] featured_images
+        timestamptz created_at
+        timestamptz updated_at
     }
 
     deck_tags {
@@ -98,6 +100,7 @@ erDiagram
         text type
         uuid source_template_id FK "For Forking"
         jsonb design_config
+        bool vertically_centered
     }
 
     multiple_choice_options {
@@ -129,9 +132,14 @@ erDiagram
     card_template_attachments {
         uuid id PK
         uuid template_id FK
-        text kind
+        text type
+        text attachment_source
+        text label
         text storage_path
         text public_url
+        text url
+        timestamptz created_at
+        timestamptz updated_at
     }
 
     decks ||--o{ card_templates : "contains"
@@ -164,6 +172,8 @@ erDiagram
         uuid template_id FK
         uuid deck_id FK
         bool is_reversed
+        timestamptz created_at
+        timestamptz updated_at
     }
 
     user_study_cards_tags {
@@ -177,12 +187,15 @@ erDiagram
         uuid user_id FK
         uuid study_cards_id FK
         jsonb state
+        timestamptz created_at
+        timestamptz updated_at
     }
 
     review_logs {
         uuid id PK
         uuid fsrs_card_id FK
         jsonb log
+        timestamptz created_at
     }
 
     drill_sessions {

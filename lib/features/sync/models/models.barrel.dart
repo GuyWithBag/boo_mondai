@@ -3,3 +3,7 @@
 // Other files
 export 'sync.summary.dart';
 export 'sync.plan_payload.dart';
+export 'sync.workflow_controller.dart';
+export 'sync.strategy.dart';
+export 'sync.strategy_pull_push_plan.dart';
+export 'sync.index_entry.dart';

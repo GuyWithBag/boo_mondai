@@ -32,6 +32,38 @@ CubeController useCubeController({
   );
 
   useListenable(controller);
+  useEffect(
+    () {
+      controller
+        ..setDimensions(
+          width: width ?? 0,
+          height: height ?? 0,
+          depth: depth ?? 0,
+        )
+        ..setRotation(pitch: pitch, yaw: yaw, roll: roll)
+        ..scale = scale
+        ..perspective = perspective
+        ..position = position
+        ..animationDuration = animationDuration
+        ..animationCurve = animationCurve;
+
+      return null;
+    },
+    [
+      controller,
+      width,
+      height,
+      depth,
+      pitch,
+      yaw,
+      roll,
+      scale,
+      perspective,
+      position,
+      animationDuration,
+      animationCurve,
+    ],
+  );
   useEffect(() => controller.dispose, [controller]);
 
   return controller;

@@ -22,6 +22,7 @@ class PhysicalCard extends HookWidget {
     this.animateChanges = true,
     this.frontVariants = const [],
     this.backVariants = const [],
+    this.padding,
   });
 
   final PhysicalCardController? controller;
@@ -32,6 +33,7 @@ class PhysicalCard extends HookWidget {
   final bool tapToFlip;
   final VoidCallback? onTap;
   final bool animateChanges;
+  final EdgeInsets? padding;
 
   @override
   Widget build(BuildContext context) {
@@ -61,8 +63,14 @@ class PhysicalCard extends HookWidget {
 
     final cube = Cube(
       controller: effectiveController.controller,
-      front: Surface(style: scaledFrontStyle, child: front),
-      back: Surface(style: scaledBackStyle, child: back),
+      front: Surface(
+        style: scaledFrontStyle.copyWith(padding: padding),
+        child: front,
+      ),
+      back: Surface(
+        style: scaledBackStyle.copyWith(padding: padding),
+        child: back,
+      ),
       depth: effectiveController.depth,
     );
 

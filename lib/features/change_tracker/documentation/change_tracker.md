@@ -12,7 +12,7 @@ download, and import/export change descriptions.
   `beforeChange` and `afterChange` snapshots use `TEntity`.
 - `ChangedProperty<TValue>` describes field-level before/after detail for one
   typed property value.
-- `ChangePlan<TPayload, TEntity>` pairs display-ready change records with the
+- `PreviewedChangePlan<TPayload, TEntity>` pairs display-ready change records with the
   typed workflow payload needed to apply the plan later.
 - `ChangeResult<TValue, TEntity>` reports the domain result and the typed
   records that were actually applied.
@@ -41,12 +41,12 @@ flowchart LR
     end
 
     subgraph DataModels[Change data models]
-        Preview["ChangePlan&lt;TPayload, TEntity&gt;"]
+        Preview["PreviewedChangePlan&lt;TPayload, TEntity&gt;"]
         Result["ChangeResult&lt;TValue, TEntity&gt;"]
         BatchResult["ChangeBatchResult&lt;TValue&gt;"]
         Record["ChangedEntity&lt;TEntity&gt;"]
         Property["ChangedProperty&lt;TValue&gt;"]
-        Comparer[ChangeDifferenceHelper]
+        Comparer[ChangedEntityHelper]
     end
 
     subgraph Tracker[Change tracker runtime]
@@ -120,7 +120,7 @@ stateDiagram-v2
 
 Sync is the clearest review-first user of the tracker. `SyncService.sync()`
 starts an explicit `ChangeTrackerEntry` with an `onApply` callback, builds a
-`ChangePlan<SyncPlanPayload<T>, T>`, then moves the entry into review when
+`PreviewedChangePlan<SyncPlanPayload<T>, T>`, then moves the entry into review when
 changes exist. `SyncController` keeps track of the bound
 `ChangeTrackerController`, and `SyncPage` owns the user actions: it routes to
 the change-review page with the registered tracker service id and entry id,
@@ -145,7 +145,7 @@ sequenceDiagram
     Service->>Controller: update(status: fetching, progress)
     Service->>Remote: selectMany(user_id)
     Service->>Local: selectMany()
-    Service->>Service: compare timestamps and build ChangePlan
+    Service->>Service: compare timestamps and build PreviewedChangePlan
 
     alt no differences
         Service->>Controller: update(status: alreadyUpToDate, progress: 1)

@@ -47,14 +47,34 @@ abstract final class ChangeTrackerHelper {
     };
   }
 
-  /// Returns the foreground color for inline change type text.
+  static Color getTypeBackground(AppTokens tokens, ChangeType type) {
+    final color = switch (type) {
+      ChangeType.added => tokens.colorActionSuccessBackground,
+      ChangeType.modified => tokens.colorRatingHardBackground,
+      ChangeType.removed => tokens.colorRatingAgainBackground,
+      ChangeType.skipped => tokens.colorTextMuted,
+    };
+    return color.withValues(alpha: 1);
+  }
+
   static Color getTypeForeground(AppTokens tokens, ChangeType type) {
-    return switch (type) {
+    final color = switch (type) {
       ChangeType.added => tokens.colorActionSuccess,
       ChangeType.modified => tokens.colorRatingHardText,
       ChangeType.removed => tokens.colorRatingAgainText,
       ChangeType.skipped => tokens.colorTextMuted,
     };
+    return color.withValues(alpha: 1);
+  }
+
+  static Color getTypeBorder(AppTokens tokens, ChangeType type) {
+    final color = switch (type) {
+      ChangeType.added => tokens.colorActionSuccessBorder,
+      ChangeType.modified => tokens.colorRatingHardBorder,
+      ChangeType.removed => tokens.colorRatingAgainBorder,
+      ChangeType.skipped => tokens.colorTextMuted,
+    };
+    return color.withValues(alpha: 1);
   }
 
   /// Returns the foreground, background, and border colors for a chip

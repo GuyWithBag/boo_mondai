@@ -5,6 +5,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         ButtonColor,
         ButtonVariant,
         FlashcardTemplate,
+        AlignedScrollView,
         MarkdownText,
         MarkdownTextMode,
         StudyCard,
@@ -37,10 +38,15 @@ class FlashcardFrontSide extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           Positioned.fill(
-            child: MarkdownText(
-              mode: MarkdownTextMode.previewSelectable,
-              data: template.getQuestion(isReversed: studyCard.isReversed),
-              resolveAttachmentUrl: template.resolveAttachmentUrl,
+            child: AlignedScrollView(
+              verticallyCentered: template.verticallyCentered,
+              padding: EdgeInsets.all(tokens.spaceLayoutPaddingSm),
+              child: MarkdownText(
+                mode: MarkdownTextMode.previewSelectable,
+                data: template.getQuestion(isReversed: studyCard.isReversed),
+                defaultMarkdownAlignment: WrapAlignment.center,
+                resolveAttachmentUrl: template.resolveAttachmentUrl,
+              ),
             ),
           ),
           if (showRevealButton)

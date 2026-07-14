@@ -25,7 +25,15 @@ enum SurfaceShape {
 
 enum SurfaceBorderColor { inherit, selected }
 
-enum SurfacePadding { baseline, text, none, sm, scaffold, scaffoldX, large }
+enum SurfacePadding {
+  baseline,
+  text,
+  none,
+  sm,
+  scaffold,
+  scaffoldButBottom,
+  large,
+}
 
 enum SurfaceBorder { baseline, sidebar, none, top, bottom }
 
@@ -195,9 +203,13 @@ final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
     SurfacePadding.scaffold: (tokens) => {
       SurfaceStylePart.padding(EdgeInsets.all(tokens.spaceScaffoldPadding)),
     },
-    SurfacePadding.scaffoldX: (tokens) => {
+    SurfacePadding.scaffoldButBottom: (tokens) => {
       SurfaceStylePart.padding(
-        EdgeInsets.symmetric(horizontal: tokens.spaceScaffoldPadding),
+        EdgeInsets.only(
+          left: tokens.spaceScaffoldPadding,
+          right: tokens.spaceScaffoldPadding,
+          top: tokens.spaceScaffoldPadding,
+        ),
       ),
     },
     SurfacePadding.none: (_) => {SurfaceStylePart.padding(EdgeInsets.all(0))},

@@ -1,5 +1,12 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, ChangedProperty, ChangeType, textStyle, ChangeTrackerHelper;
+    show
+        AppTokens,
+        ChangeTrackerHelper,
+        ChangeType,
+        ChangedProperty,
+        TextWeight,
+        textStyle,
+        TextSize;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -25,39 +32,86 @@ class ChangedPropertyBlock extends StatelessWidget {
 
     final propertyTextStyle = textStyle.resolve(tokens);
 
-    final List<Widget> bodyBasedOnType = switch (type) {
-      ChangeType.added => [
-        Text('${property.propertyLabel}: ${property.after}'),
-      ],
-      ChangeType.removed => [
-        Text('${property.propertyLabel}: ${property.before}'),
-      ],
-      ChangeType.modified => [
-        Text(
-          '${property.propertyLabel}: ${property.before}',
-          style: propertyTextStyle.copyWith(
-            decoration: TextDecoration.lineThrough,
-          ),
-        ),
-        Text('${property.propertyLabel}: ${property.after}'),
-      ],
-      _ => throw UnimplementedError(),
-    };
+    final iconWidth = tokens.sizeIcon;
 
-    return Row(
-      children: [
-        Icon(ChangeTrackerHelper.getTypeIcon(type)),
-        Column(
-          spacing: tokens.spaceLayoutGapMd,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ...bodyBasedOnType,
-            Text(
-              '${property.propertyLabel} ${ChangeTrackerHelper.getTypeLabel(type)}',
+    return Container(
+      padding: EdgeInsets.all(tokens.spaceLayoutPadding),
+      color: ChangeTrackerHelper.getTypeBackground(tokens, type),
+      child: Column(
+        spacing: tokens.spaceLayoutGapSm,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              SizedBox(
+                width: iconWidth,
+                child: IconTheme(
+                  data: IconThemeData(
+                    color: ChangeTrackerHelper.getTypeForeground(tokens, type),
+                  ),
+                  child: Icon(ChangeTrackerHelper.getTypeIcon(type)),
+                ),
+              ),
+              Text(
+                '${property.propertyLabel}: ',
+                style: textStyle
+                    .resolve(tokens, const [
+                      // TextWeight.strong,
+                      TextSize.body,
+                    ])
+                    .copyWith(
+                      color: ChangeTrackerHelper.getTypeForeground(
+                        tokens,
+                        type,
+                      ),
+                    ),
+              ),
+            ],
+          ),
+          if (type == ChangeType.modified) ...[
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(width: iconWidth),
+                Expanded(
+                  child: Text(
+                    '${property.before}',
+                    style:
+                        (type == ChangeType.modified
+                                ? propertyTextStyle.copyWith(
+                                    decoration: TextDecoration.lineThrough,
+                                  )
+                                : propertyTextStyle)
+                            .copyWith(
+                              color: ChangeTrackerHelper.getTypeBorder(
+                                tokens,
+                                type,
+                              ),
+                            ),
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(width: iconWidth),
+                Expanded(
+                  child: Text(
+                    '${property.after}',
+                    style: propertyTextStyle.copyWith(
+                      color: ChangeTrackerHelper.getTypeForeground(
+                        tokens,
+                        type,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

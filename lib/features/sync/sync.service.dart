@@ -5,7 +5,7 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AuthService,
-        ChangePlan,
+        PreviewedChangePlan,
         ChangedEntity,
         ChangeResult,
         ChangeSource,
@@ -91,7 +91,7 @@ class SyncService {
   }
 
   /// Builds a sync preview and registers its apply step with the ChangeTrackerController.
-  static Future<ChangePlan<SyncPlanPayload<T>, T>>
+  static Future<PreviewedChangePlan<SyncPlanPayload<T>, T>>
   sync<T extends MutableEntity>({
     required HiveLocalDB<T> localDb,
     required SupabaseRemoteDB<T> remoteDb,
@@ -100,7 +100,7 @@ class SyncService {
     ProgressCheckpointService? progressCheckpointService,
     bool Function(T item)? localWhere,
   }) async {
-    late final ChangePlan<SyncPlanPayload<T>, T> syncPlan;
+    late final PreviewedChangePlan<SyncPlanPayload<T>, T> syncPlan;
 
     // 1. Force the _SyncPage loading screen to appear immediately
     final entry = changeTrackerController.start<T>(
@@ -147,7 +147,7 @@ class SyncService {
         );
 
         // Initialize the late variable to an empty state
-        syncPlan = ChangePlan(
+        syncPlan = PreviewedChangePlan(
           payload: SyncPlanPayload<T>(
             tableName: remoteDb.tableName,
             checkpointTargetId: _syncTargetId(userId, remoteDb.tableName),
@@ -206,7 +206,7 @@ class SyncService {
   }
 
   /// Previews pull/push decisions without mutating local or remote data.
-  static Future<ChangePlan<SyncPlanPayload<T>, T>>
+  static Future<PreviewedChangePlan<SyncPlanPayload<T>, T>>
   previewSyncPlan<T extends MutableEntity>({
     required HiveLocalDB<T> localDb,
     required SupabaseRemoteDB<T> remoteDb,
@@ -335,7 +335,7 @@ class SyncService {
         }
       }
 
-      return ChangePlan<SyncPlanPayload<T>, T>(
+      return PreviewedChangePlan<SyncPlanPayload<T>, T>(
         payload: SyncPlanPayload<T>(
           tableName: remoteDb.tableName,
           checkpointTargetId: checkpointTargetId,
@@ -356,7 +356,7 @@ class SyncService {
   /// Applies a previously previewed sync plan.
   static Future<ChangeResult<SyncSummary, T>>
   applySync<T extends MutableEntity>({
-    required ChangePlan<SyncPlanPayload<T>, T> plan,
+    required PreviewedChangePlan<SyncPlanPayload<T>, T> plan,
     required HiveLocalDB<T> localDb,
     required SupabaseRemoteDB<T> remoteDb,
     ProgressCheckpointService? progressCheckpointService,

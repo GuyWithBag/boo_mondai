@@ -10,7 +10,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         PhysicalCard,
         ScaleHelper,
         Button,
-        usePhysicalCardController;
+        usePhysicalCardController,
+        PhysicalCardController;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -23,12 +24,14 @@ class MatchingTypeCard extends HookWidget {
     this.interactionsController,
     this.isRevealed = false,
     this.maxWidth,
+    this.controller,
   });
 
   final MatchMadnessTemplate template;
   final StudySessionCardStageController? interactionsController;
   final bool isRevealed;
   final double? maxWidth;
+  final PhysicalCardController? controller;
 
   @override
   Widget build(BuildContext context) {
@@ -53,10 +56,11 @@ class MatchingTypeCard extends HookWidget {
     final matchedItems = useState<Set<String>>({});
     final effectiveIsRevealed =
         isRevealed || interactionsController?.isRevealed == true;
-    final physicalCardController = usePhysicalCardController(
+    final fallbackPhysicalCardController = usePhysicalCardController(
       context,
       width: maxWidth,
     );
+    final physicalCardController = controller ?? fallbackPhysicalCardController;
 
     useEffect(() {
       selectedMatch.value = null;

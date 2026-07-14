@@ -1,5 +1,11 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, Button, ButtonColor, ButtonPadding, ButtonVariant, buttonStyle;
+    show
+        AppTokens,
+        Button,
+        ButtonColor,
+        ButtonPadding,
+        ButtonVariant,
+        buttonStyle;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 

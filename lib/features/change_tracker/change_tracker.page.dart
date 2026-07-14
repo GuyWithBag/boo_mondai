@@ -16,7 +16,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         DeckTileState,
         Scaffold,
         ServiceRegistry,
-        useChangeTrackerController;
+        useChangeTrackerController,
+        MetaLabel;
 import 'package:flutter/material.dart' hide Scaffold, AppBar;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -141,14 +142,15 @@ class ChangeTrackerPage extends HookWidget {
                 SizedBox(height: tokens.spaceLayoutGapMd.h),
             itemBuilder: (context, index) {
               final changedEntity = entry.changes[index];
+              final entity = changedEntity.afterChange;
+              final entityIsDeck = entity is Deck;
+
               if (changedEntity.changeType == ChangeType.added ||
                   changedEntity.changeType == ChangeType.removed) {
-                final entity = changedEntity.afterChange;
-                final isDeck = entity is Deck;
                 return ChangedEntityBlock(
                   changedEntity: changedEntity,
-                  name: isDeck ? entity.title : null,
-                  child: isDeck
+                  name: entityIsDeck ? entity.title : null,
+                  child: entityIsDeck
                       ? SizedBox(
                           height: 180.h,
                           child: Center(
@@ -160,6 +162,19 @@ class ChangeTrackerPage extends HookWidget {
                           ),
                         )
                       : null,
+                );
+              }
+              if (entityIsDeck) {
+                return ChangedEntitySection(
+                  leading: DeckTile(
+                    deck: entity,
+                    width: 80.w,
+                    state: DeckTileState.bare,
+                  ),
+                  metaLabels: [
+                    MetaLabel(icon: Icons.build, label: entity.version),
+                  ],
+                  entity: entry.changes[index],
                 );
               }
               return ChangedEntitySection(entity: entry.changes[index]);

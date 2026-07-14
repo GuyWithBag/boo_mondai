@@ -10,10 +10,9 @@ class AppleSignInButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Button(
-      style: buttonStyle.resolve(
-        context.themeTokens<AppTokens>(),
-        const [ButtonColor.mono],
-      ),
+      style: buttonStyle.resolve(context.themeTokens<AppTokens>(), const [
+        ButtonColor.mono,
+      ]),
       leading: const Icon(Icons.apple),
       onPressed: null,
       child: const Text('CONTINUE WITH APPLE'),

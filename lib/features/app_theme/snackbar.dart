@@ -8,12 +8,16 @@ class Snackbar extends StatelessWidget {
     super.key,
     required this.message,
     this.leading,
+    this.content,
+    this.child,
     this.tone = SnackbarTone.surface,
     this.minHeight = 60,
   });
 
   final String message;
   final Widget? leading;
+  final Widget? content;
+  final Widget? child;
   final SnackbarTone tone;
   final double minHeight;
 
@@ -30,16 +34,28 @@ class Snackbar extends StatelessWidget {
         ),
         child: Surface(
           style: appSnackbarStyle.resolve(tokens, [tone]),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (leading != null) ...[
-                leading!,
-                SizedBox(width: tokens.spaceLayoutGapSm),
-              ],
-              Flexible(child: SelectableText(message)),
-            ],
-          ),
+          child:
+              content ??
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (leading != null) ...[
+                        leading!,
+                        SizedBox(width: tokens.spaceLayoutGapSm),
+                      ],
+                      Flexible(child: SelectableText(message)),
+                    ],
+                  ),
+                  if (child != null) ...[
+                    SizedBox(height: tokens.spaceLayoutGapSm),
+                    child!,
+                  ],
+                ],
+              ),
         ),
       ),
     );

@@ -13,6 +13,7 @@ class StudyCardMapper extends ClassMapperBase<StudyCard> {
   static StudyCardMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = StudyCardMapper._());
+      MutableEntityMapper.ensureInitialized();
       TagMapper.ensureInitialized();
       CardTemplateMapper.ensureInitialized();
       DeckMapper.ensureInitialized();
@@ -25,6 +26,12 @@ class StudyCardMapper extends ClassMapperBase<StudyCard> {
 
   static String _$id(StudyCard v) => v.id;
   static const Field<StudyCard, String> _f$id = Field('id', _$id);
+  static DateTime _$createdAt(StudyCard v) => v.createdAt;
+  static const Field<StudyCard, DateTime> _f$createdAt =
+      Field('createdAt', _$createdAt, key: r'created_at');
+  static DateTime _$updatedAt(StudyCard v) => v.updatedAt;
+  static const Field<StudyCard, DateTime> _f$updatedAt =
+      Field('updatedAt', _$updatedAt, key: r'updated_at');
   static String _$templateId(StudyCard v) => v.templateId;
   static const Field<StudyCard, String> _f$templateId =
       Field('templateId', _$templateId, key: r'template_id');
@@ -49,6 +56,8 @@ class StudyCardMapper extends ClassMapperBase<StudyCard> {
   @override
   final MappableFields<StudyCard> fields = const {
     #id: _f$id,
+    #createdAt: _f$createdAt,
+    #updatedAt: _f$updatedAt,
     #templateId: _f$templateId,
     #isReversed: _f$isReversed,
     #deckId: _f$deckId,
@@ -60,6 +69,8 @@ class StudyCardMapper extends ClassMapperBase<StudyCard> {
   static StudyCard _instantiate(DecodingData data) {
     return StudyCard(
         id: data.dec(_f$id),
+        createdAt: data.dec(_f$createdAt),
+        updatedAt: data.dec(_f$updatedAt),
         templateId: data.dec(_f$templateId),
         isReversed: data.dec(_f$isReversed),
         deckId: data.dec(_f$deckId),
@@ -118,12 +129,15 @@ extension StudyCardValueCopy<$R, $Out> on ObjectCopyWith<$R, StudyCard, $Out> {
 }
 
 abstract class StudyCardCopyWith<$R, $In extends StudyCard, $Out>
-    implements ClassCopyWith<$R, $In, $Out> {
+    implements MutableEntityCopyWith<$R, $In, $Out> {
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get personalTags;
   CardTemplateCopyWith<$R, CardTemplate, CardTemplate>? get template;
   DeckCopyWith<$R, Deck, Deck>? get deck;
+  @override
   $R call(
       {String? id,
+      DateTime? createdAt,
+      DateTime? updatedAt,
       String? templateId,
       bool? isReversed,
       String? deckId,
@@ -154,6 +168,8 @@ class _StudyCardCopyWithImpl<$R, $Out>
   @override
   $R call(
           {String? id,
+          DateTime? createdAt,
+          DateTime? updatedAt,
           String? templateId,
           bool? isReversed,
           String? deckId,
@@ -162,6 +178,8 @@ class _StudyCardCopyWithImpl<$R, $Out>
           Object? deck = $none}) =>
       $apply(FieldCopyWithData({
         if (id != null) #id: id,
+        if (createdAt != null) #createdAt: createdAt,
+        if (updatedAt != null) #updatedAt: updatedAt,
         if (templateId != null) #templateId: templateId,
         if (isReversed != null) #isReversed: isReversed,
         if (deckId != null) #deckId: deckId,
@@ -172,6 +190,8 @@ class _StudyCardCopyWithImpl<$R, $Out>
   @override
   StudyCard $make(CopyWithData data) => StudyCard(
       id: data.get(#id, or: $value.id),
+      createdAt: data.get(#createdAt, or: $value.createdAt),
+      updatedAt: data.get(#updatedAt, or: $value.updatedAt),
       templateId: data.get(#templateId, or: $value.templateId),
       isReversed: data.get(#isReversed, or: $value.isReversed),
       deckId: data.get(#deckId, or: $value.deckId),

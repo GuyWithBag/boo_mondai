@@ -1,7 +1,8 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
-        Button, buttonStyle,
+        Button,
+        buttonStyle,
         ButtonSize,
         ButtonPadding,
         textStyle,
@@ -72,7 +73,10 @@ class ReviewAllCard extends StatelessWidget {
                   ? () => context.push('/review/session')
                   : null,
 
-              style: buttonStyle.resolve(tokens, const [ButtonSize.lg, ButtonPadding.lg]),
+              style: buttonStyle.resolve(tokens, const [
+                ButtonSize.lg,
+                ButtonPadding.lg,
+              ]),
               child: const Text('REVIEW ALL?'),
             ),
           ],

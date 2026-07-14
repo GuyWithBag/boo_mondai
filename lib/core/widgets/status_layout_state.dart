@@ -8,10 +8,31 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show AppTokens, textStyle, TextSize, TextWeight, ProgressBar;
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-class StatusLayoutState extends StatelessWidget {
+class ScaffoldScrollLockScope extends InheritedWidget {
+  const ScaffoldScrollLockScope({
+    super.key,
+    required this.setScrollLocked,
+    required super.child,
+  });
+
+  final void Function(Object key, bool value) setScrollLocked;
+
+  static ScaffoldScrollLockScope? maybeOf(BuildContext context) {
+    return context
+        .dependOnInheritedWidgetOfExactType<ScaffoldScrollLockScope>();
+  }
+
+  @override
+  bool updateShouldNotify(ScaffoldScrollLockScope oldWidget) {
+    return setScrollLocked != oldWidget.setScrollLocked;
+  }
+}
+
+class StatusLayoutState extends HookWidget {
   const StatusLayoutState({
     super.key,
     this.icon,
@@ -22,6 +43,7 @@ class StatusLayoutState extends StatelessWidget {
     this.child,
     this.progressValue,
     this.extraAction,
+    this.disableScaffoldScrollingWhenShown = false,
   });
 
   final IconData? icon;
@@ -32,13 +54,27 @@ class StatusLayoutState extends StatelessWidget {
   final Widget? extraAction;
   final Widget? child;
   final double? progressValue;
+  final bool disableScaffoldScrollingWhenShown;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
+    final scrollLockScope = ScaffoldScrollLockScope.maybeOf(context);
+    final scrollLockKey = useMemoized(Object.new);
+
+    useEffect(() {
+      if (!disableScaffoldScrollingWhenShown || scrollLockScope == null) {
+        return null;
+      }
+
+      scrollLockScope.setScrollLocked(scrollLockKey, true);
+      return () {
+        scrollLockScope.setScrollLocked(scrollLockKey, false);
+      };
+    }, [disableScaffoldScrollingWhenShown, scrollLockScope, scrollLockKey]);
 
     return Column(
-      spacing: tokens.spaceLayoutGapMd,
+      spacing: tokens.spaceLayoutGapSm,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -62,6 +98,8 @@ class StatusLayoutState extends StatelessWidget {
         ),
         if (progressValue != null) ProgressBar(value: progressValue!),
         ?child,
+        if (actions.isNotEmpty || extraAction != null)
+          SizedBox(height: tokens.spaceLayoutGapSm),
         if (actions.isNotEmpty && extraAction == null)
           Row(
             mainAxisAlignment: MainAxisAlignment.center,

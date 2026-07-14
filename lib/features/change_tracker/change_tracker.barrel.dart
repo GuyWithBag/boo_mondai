@@ -10,4 +10,4 @@ export 'change_tracker.controller.dart';
 export 'change_tracker.page.dart';
 export 'change_tracker.service.dart';
 export 'deck_added.block.dart';
-export 'change_difference.helper.dart';
+export 'changed_entity.helper.dart';

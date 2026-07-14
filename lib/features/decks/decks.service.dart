@@ -3,16 +3,88 @@ import 'package:boo_mondai/lib.barrel.dart'
         CardTemplate,
         Deck,
         DeckListing,
+        DeckSyncSession,
         LocalDB,
-        LocalImageCacheKeysHelper,
-        LocalImageCacheService,
-        LocalImagePathHelper,
+        StoredMediaHelper,
+        StoredMediaService,
+        ImageHelper,
         RemoteDB,
         Tag,
-        VisibilityState;
+        VisibilityState,
+        StringHelper,
+        ListHelper;
 import 'package:file_picker/file_picker.dart' show PlatformFile;
 
 abstract final class DecksService {
+  static String? getCoverImageSource(Deck deck) {
+    return StoredMediaService.getLocalPath(
+          StoredMediaHelper.getSemanticId('deck', deck.id, 'cover'),
+        ) ??
+        StringHelper.toTrimmedOrNull(deck.coverImageUrl);
+  }
+
+  static String? getListingFeaturedImageSource({
+    required Deck deck,
+    int index = 0,
+  }) {
+    final listing = deck.listing;
+    if (listing == null) return getCoverImageSource(deck);
+
+    return StoredMediaService.getLocalPath(
+          StoredMediaHelper.getSemanticId(
+            'deck_listing',
+            deck.id,
+            'featured',
+            index,
+          ),
+        ) ??
+        StringHelper.toTrimmedOrNull(
+          ListHelper.getAtOrNull(listing.featuredImages, index),
+        ) ??
+        getCoverImageSource(deck);
+  }
+
+  static List<String> getListingCarouselImageSources(Deck deck) {
+    final listingImages = deck.listing?.featuredImages ?? const <String>[];
+    final resolved = <String>[];
+
+    for (var index = 0; index < listingImages.length; index++) {
+      final image = getListingFeaturedImageSource(deck: deck, index: index);
+      if (image != null && !resolved.contains(image)) {
+        resolved.add(image);
+      }
+    }
+
+    final cover = getCoverImageSource(deck);
+    if (cover != null && !resolved.contains(cover)) {
+      resolved.add(cover);
+    }
+
+    return resolved;
+  }
+
+  static Future<List<String>> loadDeckIdsForSyncSession(
+    DeckSyncSession session,
+  ) async {
+    final explicitDeckId = session.deckId;
+    if (explicitDeckId != null) return [explicitDeckId];
+
+    final localDecks = session.decks.selectSyncIndexByUserIdAndOptionalDeckId(
+      userId: session.userId,
+      deckId: session.deckId,
+    );
+    final remoteDecks = await session.remoteDecks
+        .selectSyncIndexByUserIdAndOptionalDeckId(
+          userId: session.userId,
+          deckId: session.deckId,
+        );
+
+    return {
+      for (final deck in localDecks) deck.id,
+      for (final deck in remoteDecks) deck.id,
+    }.toList(growable: false);
+  }
+
   static Future<Deck> createListingDraft(Deck deck) async {
     final now = DateTime.now();
     final listing = DeckListing(
@@ -178,10 +250,10 @@ abstract final class DecksService {
       return null;
     }
 
-    final localPath = await LocalImageCacheService.savePickedImage(
-      cacheKey: LocalImageCacheKeysHelper.deckCover(deck.id),
+    final localPath = await StoredMediaService.writePickedFileToLocal(
+      id: StoredMediaHelper.getSemanticId('deck', deck.id, 'cover'),
       file: file,
-      remotePath: deck.coverImageUrl,
+      remoteUrl: deck.coverImageUrl,
     );
     if (localPath == null) {
       return null;
@@ -211,13 +283,15 @@ abstract final class DecksService {
         ? index
         : featuredImages.length;
 
-    final localPath = await LocalImageCacheService.savePickedImage(
-      cacheKey: LocalImageCacheKeysHelper.deckListingFeaturedImage(
+    final localPath = await StoredMediaService.writePickedFileToLocal(
+      id: StoredMediaHelper.getSemanticId(
+        'deck_listing',
         deck.id,
+        'featured',
         targetIndex,
       ),
       file: file,
-      remotePath: targetIndex < featuredImages.length
+      remoteUrl: targetIndex < featuredImages.length
           ? featuredImages[targetIndex]
           : null,
     );
@@ -227,7 +301,7 @@ abstract final class DecksService {
 
     if (targetIndex < featuredImages.length) {
       featuredImages[targetIndex] =
-          LocalImagePathHelper.isRemotePath(featuredImages[targetIndex])
+          ImageHelper.isRemoteUrl(featuredImages[targetIndex])
           ? featuredImages[targetIndex]
           : '';
     } else {

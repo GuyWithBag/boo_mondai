@@ -11,19 +11,18 @@ import 'package:boo_mondai/lib.barrel.dart'
         ChangeTrackerRouteArgs,
         ChangeTrackerStatus,
         ChangeTrackerSummaryChips,
-        MutableEntity,
         StatusLayoutState,
-        SyncController,
+        SyncWorkflowController,
         Scaffold,
         buttonStyle;
 import 'package:flutter/material.dart' hide Scaffold;
 import 'package:go_router/go_router.dart';
 import 'package:theme_variants/theme_variants.dart' show ThemeVariantsContext;
 
-class SyncPage<T extends MutableEntity> extends StatelessWidget {
+class SyncPage extends StatelessWidget {
   const SyncPage({super.key, required this.syncController});
 
-  final SyncController<T> syncController;
+  final SyncWorkflowController syncController;
 
   ChangeTrackerEntry get entry => syncController.currentEntry!;
 
@@ -95,41 +94,65 @@ class SyncPage<T extends MutableEntity> extends StatelessWidget {
     return Scaffold(
       centeredBody: true,
       scrollable: false,
-      body: StatusLayoutState(
-        icon: icon,
-        title: title,
-        message: message,
-        progressValue: progressValue,
-        actions: [
-          if (canApply)
-            Expanded(
-              child: Button(
-                style: buttonStyle.resolve(tokens, const []),
-                onPressed: _apply,
-                child: const Text('Apply'),
-              ),
-            ),
-          if (canViewChanges)
-            Expanded(
-              child: Button(
+      body: isCompleted
+          ? StatusLayoutState(
+              icon: icon,
+              title: title,
+              message: message,
+              progressValue: progressValue,
+              actions: [
+                Expanded(
+                  child: Button(
+                    style: buttonStyle.resolve(tokens, const [
+                      ButtonColor.primary,
+                    ]),
+                    onPressed: _discard,
+                    child: Text('Back'),
+                  ),
+                ),
+              ],
+              extraAction: Button(
                 style: buttonStyle.resolve(tokens, [
                   if (canApply) ButtonColor.primary,
                 ]),
                 onPressed: () => _viewChanges(context),
                 child: const Text('View Changes'),
               ),
+            )
+          : StatusLayoutState(
+              icon: icon,
+              title: title,
+              message: message,
+              progressValue: progressValue,
+              actions: [
+                if (canApply)
+                  Expanded(
+                    child: Button(
+                      style: buttonStyle.resolve(tokens, const []),
+                      onPressed: _apply,
+                      child: const Text('Apply'),
+                    ),
+                  ),
+                if (canViewChanges)
+                  Expanded(
+                    child: Button(
+                      style: buttonStyle.resolve(tokens, [
+                        if (canApply) ButtonColor.primary,
+                      ]),
+                      onPressed: () => _viewChanges(context),
+                      child: const Text('View Changes'),
+                    ),
+                  ),
+              ],
+              extraAction: Button(
+                style: buttonStyle.resolve(tokens, const []),
+                onPressed: _discard,
+                child: Text('Cancel'),
+              ),
+              child: isDoneFetching
+                  ? ChangeTrackerSummaryChips(entry: entry)
+                  : null,
             ),
-        ],
-        extraAction: Button(
-          style: buttonStyle.resolve(
-            tokens,
-            isCompleted ? const [ButtonColor.primary] : const [],
-          ),
-          onPressed: _discard,
-          child: Text(isCompleted ? 'Back' : 'Cancel'),
-        ),
-        child: isDoneFetching ? ChangeTrackerSummaryChips(entry: entry) : null,
-      ),
     );
   }
 }

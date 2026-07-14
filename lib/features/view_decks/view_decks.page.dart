@@ -11,6 +11,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         AuthService,
         Button,
+        ButtonColor,
         ChangeTrackerStatus,
         CreateDeckTile,
         Deck,
@@ -24,11 +25,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         InteractionHandler,
         ListingStatesWrapper,
         LocalDB,
-        RemoteDB,
+        ProgressBar,
         Scaffold,
         SegmentOption,
         SegmentedControl,
         SelectionController,
+        SnackbarHandle,
         SnackbarTone,
         StatusLayoutState,
         SyncButton,
@@ -36,9 +38,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         ViewDecksHelper,
         ViewDecksLocalController,
         ViewDecksSearchScope,
+        adoptLegacyDeckOwnerForSync,
+        buttonStyle,
         showSnackbar,
         useChangeTrackerController,
-        useSyncController,
+        useDeckSyncController,
         useSelectionController;
 import 'package:flutter/material.dart' hide AppBar, Scaffold;
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -60,20 +64,13 @@ class ViewDecksLocalPage extends HookWidget {
       emptySelectionAllowed: true,
     );
     final importController = useMemoized(() => ImportExportController());
-    final syncController = useSyncController<Deck>(
-      localDb: LocalDB.deck,
-      remoteDb: RemoteDB.deck,
+    final syncController = useDeckSyncController(
       userId: () => LocalDB.profile.getOrCreate().id,
-      localWhere: (deck) => deck.userId == LocalDB.profile.getOrCreate().id,
-      beforeSync: () async {
-        final profile = LocalDB.profile.getOrCreate();
-        await LocalDB.deck.adoptLegacyOwnerId(
-          legacyUserId: profile.userId,
-          currentProfileId: profile.id,
-        );
-      },
+      beforeSync: adoptLegacyDeckOwnerForSync,
       onSynced: controller.load,
     );
+    final syncSnackbarHandle = useRef<SnackbarHandle?>(null);
+    final syncProgress = useRef(ValueNotifier(0.0));
 
     useEffect(() {
       controller.loadOnNextFrame();
@@ -89,6 +86,8 @@ class ViewDecksLocalPage extends HookWidget {
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!context.mounted) return;
+        syncSnackbarHandle.value?.dismiss();
+        syncSnackbarHandle.value = null;
         showSnackbar(
           context,
           message: 'Sync failed: $err',
@@ -102,27 +101,89 @@ class ViewDecksLocalPage extends HookWidget {
     }, [syncController.syncError]);
 
     useEffect(() {
-      final syncEntry = syncController.currentEntry;
-      if (syncEntry == null) return null;
+      return () {
+        syncSnackbarHandle.value?.dismiss();
+        syncProgress.value.dispose();
+      };
+    }, const []);
 
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!context.mounted) return;
-        switch (syncEntry.status) {
-          case ChangeTrackerStatus.alreadyUpToDate:
-            showSnackbar(context, message: 'Everything is already up to date!');
-            syncController.clearAlreadyUpToDate();
-          case ChangeTrackerStatus.reviewing:
-            showSnackbar(
-              context,
-              message: 'There are changes that need to be reviewed!',
-            );
-          case _:
-            break;
-        }
-      });
+    useEffect(
+      () {
+        final syncEntry = syncController.currentEntry;
+        if (syncEntry == null) return null;
+        final progress = syncEntry.progress ?? 0;
 
-      return null;
-    }, [syncController.currentEntry?.id, syncController.currentEntry?.status]);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!context.mounted) return;
+          syncProgress.value.value = progress.clamp(0.0, 1.0);
+
+          switch (syncEntry.status) {
+            case ChangeTrackerStatus.fetching:
+              syncSnackbarHandle.value ??= showSnackbar(
+                context,
+                message: 'Checking if needs sync...',
+                leading: const Icon(Icons.sync_rounded),
+                child: ValueListenableBuilder<double>(
+                  valueListenable: syncProgress.value,
+                  builder: (context, progress, _) {
+                    return ProgressBar(value: progress);
+                  },
+                ),
+                duration: null,
+                tone: SnackbarTone.dashed,
+              );
+            case ChangeTrackerStatus.applying:
+              syncSnackbarHandle.value ??= showSnackbar(
+                context,
+                message: 'Syncing decks...',
+                leading: const Icon(Icons.sync_rounded),
+                child: ValueListenableBuilder<double>(
+                  valueListenable: syncProgress.value,
+                  builder: (context, progress, _) {
+                    return ProgressBar(value: progress);
+                  },
+                ),
+                duration: null,
+                tone: SnackbarTone.dashed,
+              );
+            case ChangeTrackerStatus.alreadyUpToDate:
+              syncSnackbarHandle.value?.dismiss();
+              syncSnackbarHandle.value = null;
+              showSnackbar(
+                context,
+                message: 'Everything is already up to date!',
+              );
+              syncController.clearAlreadyUpToDate();
+            case ChangeTrackerStatus.completed:
+              syncSnackbarHandle.value?.dismiss();
+              syncSnackbarHandle.value = null;
+              showSnackbar(
+                context,
+                message: 'Deck sync complete!',
+                leading: const Icon(Icons.cloud_done_outlined),
+                tone: SnackbarTone.success,
+              );
+              syncController.dismissCurrentEntry();
+            case ChangeTrackerStatus.reviewing:
+              syncSnackbarHandle.value?.dismiss();
+              syncSnackbarHandle.value = null;
+              showSnackbar(
+                context,
+                message: 'There are changes that need to be reviewed!',
+              );
+            case _:
+              break;
+          }
+        });
+
+        return null;
+      },
+      [
+        syncController.currentEntry?.id,
+        syncController.currentEntry?.status,
+        ((syncController.currentEntry?.progress ?? 0) * 100).round(),
+      ],
+    );
 
     Future<void> importDecksFromFile() async {
       final result = await importController.importDecksFromFile();
@@ -150,7 +211,7 @@ class ViewDecksLocalPage extends HookWidget {
     if (AuthService.isAuthenticatedRemote &&
         !syncController.isAlreadyUpToDate &&
         syncController.shouldShowSyncPage) {
-      return SyncPage<Deck>(syncController: syncController);
+      return SyncPage(syncController: syncController);
     }
 
     final searchState = controller.activeSearchState;
@@ -281,14 +342,22 @@ class _DeckListView extends StatelessWidget {
               icon: Icons.search_off,
               title: 'No decks found',
               message: 'Try another search or remove filters',
+              disableScaffoldScrollingWhenShown: true,
             )
           : StatusLayoutState(
               icon: Icons.layers,
               title: 'No decks yet',
               message: 'Create your first deck to get started',
               actions: [
-                ElevatedButton(onPressed: onCreate, child: Text('Create Deck')),
+                Button(
+                  onPressed: onCreate,
+                  style: buttonStyle.resolve(tokens, const [
+                    ButtonColor.primary,
+                  ]),
+                  child: Text('Create Deck'),
+                ),
               ],
+              disableScaffoldScrollingWhenShown: true,
             ),
       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
         maxCrossAxisExtent: tokens.studyCardWidth,

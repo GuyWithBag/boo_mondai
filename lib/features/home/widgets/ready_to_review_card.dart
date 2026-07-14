@@ -1,7 +1,8 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
-        Button, buttonStyle,
+        Button,
+        buttonStyle,
         ButtonSize,
         ButtonPadding,
         ButtonColor,

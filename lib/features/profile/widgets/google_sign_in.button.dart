@@ -14,10 +14,9 @@ class GoogleSignInButton extends StatelessWidget {
     final auth = context.read<AuthController>();
 
     return Button(
-      style: buttonStyle.resolve(
-        context.themeTokens<AppTokens>(),
-        const [ButtonColor.google],
-      ),
+      style: buttonStyle.resolve(context.themeTokens<AppTokens>(), const [
+        ButtonColor.google,
+      ]),
       leading: const Icon(Icons.g_mobiledata),
       child: const Text('CONTINUE WITH GOOGLE'),
       onPressed: () async {

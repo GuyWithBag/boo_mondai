@@ -3,7 +3,7 @@ import 'package:boo_mondai/lib.barrel.dart';
 /// The before and after value of a single labeled property within a
 /// [ChangedEntity] of type [ChangeType.modified].
 ///
-/// Used by [ChangeDifferenceHelper] to produce field-level diffs and rendered
+/// Used by [ChangedEntityHelper] to produce field-level diffs and rendered
 /// by [ChangedPropertyBlock] in the review UI.
 class ChangedProperty<T> {
   /// Creates a display-ready property diff.

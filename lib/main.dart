@@ -38,8 +38,6 @@ import 'package:unite_keyboard_visibility/unite_keyboard_visibility.dart'
     'lib/core/hive/hive.barrel.dart',
     'lib/core/helpers/image_file_provider_io.dart',
     'lib/core/helpers/image_file_provider_stub.dart',
-    'lib/features/card_attachments/models/card_attachment.dto.dart',
-    'lib/features/card_attachments/models/card_link_attachment.dto.dart',
     'lib/**/**/*.mapper.dart',
     'lib/**/*.mapper.dart',
     'lib/*.mapper.dart',

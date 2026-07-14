@@ -1,8 +1,75 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show CardTemplate, CardType, FlashcardTemplate, LocalDB, StudyCard, uuid;
+    show
+        CardTemplate,
+        CardType,
+        DecksService,
+        DeckSyncSession,
+        FlashcardTemplate,
+        LocalDB,
+        SyncIndexEntry,
+        StudyCard,
+        uuid;
 
 class StudyCardService {
   const StudyCardService._();
+
+  static Future<List<StudyCard>> loadLocalStudyCardsForSyncSession(
+    DeckSyncSession session,
+  ) async {
+    final deckIds = (await DecksService.loadDeckIdsForSyncSession(
+      session,
+    )).toSet();
+    return session.studyCards.selectManyByDeckIds(deckIds);
+  }
+
+  static Future<List<StudyCard>> loadRemoteStudyCardsForSyncSession(
+    DeckSyncSession session,
+  ) async {
+    final deckIds = await DecksService.loadDeckIdsForSyncSession(session);
+    return session.remoteStudyCards.selectManyByDeckIds(deckIds);
+  }
+
+  static Future<List<String>> loadStudyCardIdsForSyncSession(
+    DeckSyncSession session,
+  ) async {
+    final localCards = await loadLocalStudyCardSyncIndexForSyncSession(session);
+    final remoteCards = await loadRemoteStudyCardSyncIndexForSyncSession(
+      session,
+    );
+    return {
+      for (final card in localCards) card.id,
+      for (final card in remoteCards) card.id,
+    }.toList(growable: false);
+  }
+
+  static Future<List<SyncIndexEntry>> loadLocalStudyCardSyncIndexForSyncSession(
+    DeckSyncSession session,
+  ) async {
+    final deckIds = (await DecksService.loadDeckIdsForSyncSession(
+      session,
+    )).toSet();
+    return session.studyCards.selectSyncIndexByDeckIds(deckIds);
+  }
+
+  static Future<List<SyncIndexEntry>>
+  loadRemoteStudyCardSyncIndexForSyncSession(DeckSyncSession session) async {
+    final deckIds = await DecksService.loadDeckIdsForSyncSession(session);
+    return session.remoteStudyCards.selectSyncIndexByDeckIds(deckIds);
+  }
+
+  static Future<List<StudyCard>> loadLocalStudyCardsByIdsForSyncSession(
+    DeckSyncSession session,
+    List<String> ids,
+  ) async {
+    return session.studyCards.selectManyByIds(ids);
+  }
+
+  static Future<List<StudyCard>> loadRemoteStudyCardsByIdsForSyncSession(
+    DeckSyncSession session,
+    List<String> ids,
+  ) async {
+    return session.remoteStudyCards.selectManyByIds(ids);
+  }
 
   /// Reconciles the personal local StudyCards for [deckId] against the current
   /// template list.
@@ -30,10 +97,13 @@ class StudyCardService {
     final newStudyCards = <StudyCard>[];
     for (final key in expectedKeys) {
       if (existingByKey.containsKey(key)) continue;
+      final now = DateTime.now();
 
       newStudyCards.add(
         StudyCard(
           id: uuid.v7(),
+          createdAt: now,
+          updatedAt: now,
           deckId: deckId,
           templateId: key.templateId,
           isReversed: key.isReversed,

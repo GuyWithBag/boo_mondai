@@ -1,3 +1,4 @@
+import 'package:boo_mondai/features/app_theme/app_theme.barrel.dart';
 import 'package:boo_mondai/features/app_theme/surface.variant.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
@@ -5,7 +6,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         ChangedEntity,
         ChangedPropertyBlock,
         surfaceStyle,
-        MetaLabel;
+        MetaLabel,
+        ChangeTrackerHelper;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -30,31 +32,46 @@ class ChangedEntitySection<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    // final iconText = ChangeTrackerHelper.typePrefix(entity.type);
 
     return Column(
       spacing: tokens.spaceLayoutGapMd,
       children: [
         Row(
-          spacing: tokens.spaceLayoutGapSm,
-
+          spacing: tokens.spaceLayoutGapMd,
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             ?leading,
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [...metaLabels, Text(entity.typeName)],
+              children: [
+                ...metaLabels,
+                Text(
+                  entity.typeName,
+                  style: textStyle
+                      .resolve(tokens, const [TextSize.header2])
+                      .copyWith(
+                        color: ChangeTrackerHelper.getTypeForeground(
+                          tokens,
+                          entity.changeType,
+                        ),
+                      ),
+                ),
+              ],
             ),
           ],
         ),
         if (entity.changedProperties.isNotEmpty)
           Surface(
             style: surfaceStyle.resolve(tokens, const [
-              SurfaceShape.roundedSm,
+              SurfaceShape.roundedXsm,
               SurfaceBorder.none,
-              SurfacePadding.sm,
+              SurfacePadding.none,
+              SurfaceShadow.none,
             ]),
+            hasClipRRect: true,
             child: ListView.separated(
               shrinkWrap: true,
+              padding: EdgeInsets.zero,
               physics: const NeverScrollableScrollPhysics(),
               separatorBuilder: (_, _) =>
                   SizedBox(height: tokens.spaceLayoutGapSm),

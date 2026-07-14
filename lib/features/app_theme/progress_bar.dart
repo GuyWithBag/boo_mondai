@@ -4,9 +4,16 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 class ProgressBar extends StatelessWidget {
-  const ProgressBar({required this.value, super.key});
+  const ProgressBar({
+    required this.value,
+    this.duration = const Duration(milliseconds: 250),
+    this.curve = Curves.easeOutCubic,
+    super.key,
+  });
 
   final double value;
+  final Duration duration;
+  final Curve curve;
 
   @override
   Widget build(BuildContext context) {
@@ -21,9 +28,17 @@ class ProgressBar extends StatelessWidget {
           fit: StackFit.expand,
           children: [
             ColoredBox(color: tokens.colorMuted),
-            FractionallySizedBox(
-              alignment: Alignment.centerLeft,
-              widthFactor: clampedValue,
+            TweenAnimationBuilder<double>(
+              tween: Tween<double>(end: clampedValue),
+              duration: duration,
+              curve: curve,
+              builder: (context, animatedValue, child) {
+                return FractionallySizedBox(
+                  alignment: Alignment.centerLeft,
+                  widthFactor: animatedValue,
+                  child: child,
+                );
+              },
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   color: tokens.colorPrimary,

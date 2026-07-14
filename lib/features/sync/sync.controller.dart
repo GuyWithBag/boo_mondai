@@ -6,17 +6,19 @@ import 'package:boo_mondai/lib.barrel.dart'
         SupabaseRemoteDB,
         ChangeTrackerController,
         SyncPlanPayload,
-        ChangePlan,
+        PreviewedChangePlan,
         ChangeTrackerService,
         ChangeTrackerEntry,
         AppException,
         ChangeSource,
         ChangeTrackerStatus,
-        SyncService;
+        SyncService,
+        SyncWorkflowController;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
-class SyncController<T extends MutableEntity> extends Controller {
+class SyncController<T extends MutableEntity> extends Controller
+    implements SyncWorkflowController {
   SyncController({
     required this.localDb,
     required this.remoteDb,
@@ -36,13 +38,17 @@ class SyncController<T extends MutableEntity> extends Controller {
   bool _isSyncing = false;
   String? _syncError;
   ChangeTrackerController? _changeTrackerController;
-  ChangePlan<SyncPlanPayload<T>, T>? changePlan;
+  PreviewedChangePlan<SyncPlanPayload<T>, T>? changePlan;
 
+  @override
   bool get isSyncing => _isSyncing;
+  @override
   String? get syncError => _syncError;
+  @override
   ChangeTrackerService? get changeTrackerService =>
       _changeTrackerController?.service;
 
+  @override
   ChangeTrackerEntry? get currentEntry {
     final changeTrackerController = _changeTrackerController;
     if (changeTrackerController == null) return null;
@@ -58,9 +64,11 @@ class SyncController<T extends MutableEntity> extends Controller {
     return null;
   }
 
+  @override
   bool get isAlreadyUpToDate =>
       currentEntry?.status == ChangeTrackerStatus.alreadyUpToDate;
 
+  @override
   bool get shouldShowSyncPage {
     return switch (currentEntry?.status) {
       ChangeTrackerStatus.reviewing ||
@@ -83,6 +91,7 @@ class SyncController<T extends MutableEntity> extends Controller {
     notifyListeners();
   }
 
+  @override
   void clearSyncError() {
     _syncError = null;
     notifyListeners();
@@ -98,6 +107,7 @@ class SyncController<T extends MutableEntity> extends Controller {
     notifyListeners();
   }
 
+  @override
   void applyCurrentEntry() {
     final entry = currentEntry;
     final changeTrackerController = _changeTrackerController;
@@ -107,6 +117,7 @@ class SyncController<T extends MutableEntity> extends Controller {
     changeTrackerController.apply(entry.id);
   }
 
+  @override
   void dismissCurrentEntry() {
     final entry = currentEntry;
     final changeTrackerController = _changeTrackerController;
@@ -120,6 +131,7 @@ class SyncController<T extends MutableEntity> extends Controller {
     notifyListeners();
   }
 
+  @override
   void clearAlreadyUpToDate() {
     final entry = currentEntry;
     final changeTrackerController = _changeTrackerController;

@@ -12,13 +12,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         CardTemplateMapper,
         Deck,
         AppTokens,
-        ImageHelper,
-        LocalImageResolverHelper,
         ScaleHelper,
         useCubeController,
         PhysicalCardController,
         PhysicalCard,
-        BackgroundImageSurface,
         PhysicalDeck,
         ViewCardsTile;
 import 'package:flutter/material.dart';
@@ -82,9 +79,7 @@ class DeckTile extends HookWidget {
       aspectRatio: studyCardAspectRatio,
     ).height;
     final animationScale = cardWidth / tokens.studyCardWidth;
-    final coverImage = ImageHelper.getImageProviderFromSource(
-      deck == null ? null : LocalImageResolverHelper.resolveDeckCover(deck!),
-    );
+    final deckDepth = 50.0 * animationScale;
     final effectiveOnImagePicked = isImageEditable ? onImagePicked : null;
     final featuredCards = _featuredCardTemplates(deck).take(3).toList();
     // final scale = 1.3;
@@ -107,7 +102,7 @@ class DeckTile extends HookWidget {
     final physicalDeckController = useCubeController(
       width: cardWidth,
       height: cardHeight,
-      depth: 50,
+      depth: deckDepth,
       perspective: 0,
     );
 
@@ -180,16 +175,15 @@ class DeckTile extends HookWidget {
               ],
               DeckTileState.spread => [
                 for (var i = 0; i < cardControllers.length; i++)
-                  PhysicalCard(
-                    controller: cardControllers[i],
-                    front: i < featuredCards.length
-                        ? ViewCardsTile.template(
-                            template: featuredCards[i],
-                            width: cardWidth,
-                            allowFlip: false,
-                          )
-                        : PhysicalCard(front: BackgroundImageSurface()),
-                  ),
+                  if (i < featuredCards.length)
+                    ViewCardsTile.template(
+                      template: featuredCards[i],
+                      width: cardWidth,
+                      allowFlip: false,
+                      controller: cardControllers[i],
+                    )
+                  else
+                    PhysicalCard(controller: cardControllers[i]),
                 PhysicalDeck(
                   deck: deck,
                   controller: physicalDeckController,

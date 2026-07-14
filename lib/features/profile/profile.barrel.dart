@@ -4,8 +4,8 @@
 export 'models/models.barrel.dart';
 export 'widgets/widgets.barrel.dart';
 // Other files
-export 'profiles.remote.db.dart';
 export 'view_profile.controller.dart';
 export 'cached_profile.local.db.dart';
 export 'profiles.local.db.dart';
 export 'view_profile.page.dart';
+export 'profiles.remote.db.dart';

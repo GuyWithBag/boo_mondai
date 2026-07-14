@@ -6,6 +6,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         MainController,
         ScaffoldController,
         ScaffoldHelper,
+        ScaffoldScrollLockScope,
         ToolBar,
         ToolBarScope,
         useScaffoldController,
@@ -101,6 +102,15 @@ class Scaffold extends HookWidget {
       isSideBarVisible: floatingSideBarInitiallyOpen,
     );
     final controller = this.controller ?? internalController;
+    final scrollLockKeys = useState(<Object>{});
+
+    void setScrollLocked(Object key, bool value) {
+      final next = {...scrollLockKeys.value};
+      final didChange = value ? next.add(key) : next.remove(key);
+      if (didChange) {
+        scrollLockKeys.value = next;
+      }
+    }
 
     final helper = ScaffoldHelper(
       tokens: tokens,
@@ -178,11 +188,19 @@ class Scaffold extends HookWidget {
     final toolBarController = toolBar is ToolBar
         ? (toolBar! as ToolBar).controller
         : null;
+    final bodyWithScrollLockScope = ScaffoldScrollLockScope(
+      setScrollLocked: setScrollLocked,
+      child: body,
+    );
     final scopedBody = toolBarController == null
-        ? body
-        : ToolBarScope(controller: toolBarController, child: body);
+        ? bodyWithScrollLockScope
+        : ToolBarScope(
+            controller: toolBarController,
+            child: bodyWithScrollLockScope,
+          );
     final shouldShowUnfocusButton =
         showUnfocusButton && MediaQuery.viewInsetsOf(context).bottom <= 0;
+    final effectiveScrollable = scrollable && scrollLockKeys.value.isEmpty;
 
     Widget innerBody = scopedBody;
 
@@ -207,7 +225,7 @@ class Scaffold extends HookWidget {
 
     content = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      mainAxisSize: scrollable ? MainAxisSize.min : MainAxisSize.max,
+      mainAxisSize: effectiveScrollable ? MainAxisSize.min : MainAxisSize.max,
       children: [
         if (shouldHaveAppBar)
           SizedBox(height: effectiveAppBarHeight)
@@ -241,7 +259,7 @@ class Scaffold extends HookWidget {
       ],
     );
 
-    if (scrollable) {
+    if (effectiveScrollable) {
       content = SingleChildScrollView(
         padding: EdgeInsets.zero,
         controller: scrollController,

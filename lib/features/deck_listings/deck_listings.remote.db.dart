@@ -3,7 +3,12 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart'
-    show SupabaseRemoteDB, DeckListing, DeckListingMapper, LocalImagePathHelper;
+    show
+        SupabaseRemoteDB,
+        DeckListing,
+        DeckListingMapper,
+        ImageHelper,
+        SyncIndexEntry;
 
 class DeckListingsRemoteDB extends SupabaseRemoteDB<DeckListing> {
   @override
@@ -17,7 +22,7 @@ class DeckListingsRemoteDB extends SupabaseRemoteDB<DeckListing> {
   Map<String, dynamic> toMap(DeckListing item) {
     final map = item.toMap();
     map['featured_images'] = item.featuredImages
-        .where(LocalImagePathHelper.isRemotePath)
+        .where(ImageHelper.isRemoteUrl)
         .toList(growable: false);
     return map;
   }
@@ -36,6 +41,47 @@ class DeckListingsRemoteDB extends SupabaseRemoteDB<DeckListing> {
   /// (Overrides standard selectById since the column is 'deck_id')
   Future<DeckListing?> getByDeckId(String deckId) =>
       selectOne(filters: {'deck_id': deckId});
+
+  Future<List<DeckListing>> selectManyByDeckIds(List<String> deckIds) async {
+    final listings = <DeckListing>[];
+    for (final deckId in deckIds) {
+      final listing = await getByDeckId(deckId);
+      if (listing != null) listings.add(listing);
+    }
+    return listings;
+  }
+
+  Future<List<SyncIndexEntry>> selectSyncIndexByDeckIds(List<String> deckIds) =>
+      guard(() async {
+        if (deckIds.isEmpty) return const <SyncIndexEntry>[];
+
+        final response = await client
+            .from(tableName)
+            .select('deck_id, updated_at')
+            .inFilter('deck_id', deckIds);
+        return List<Map<String, dynamic>>.from(response)
+            .map(
+              (row) => SyncIndexEntry(
+                id: row['deck_id'] as String,
+                updatedAt: DateTime.parse(row['updated_at'] as String),
+              ),
+            )
+            .toList(growable: false);
+      }, action: 'selectSyncIndexByDeckIds(${deckIds.length} deckIds)');
+
+  Future<SyncIndexEntry?> selectSyncIndexByDeckId(String deckId) =>
+      guard(() async {
+        final row = await client
+            .from(tableName)
+            .select('deck_id, updated_at')
+            .eq('deck_id', deckId)
+            .maybeSingle();
+        if (row == null) return null;
+        return SyncIndexEntry(
+          id: row['deck_id'] as String,
+          updatedAt: DateTime.parse(row['updated_at'] as String),
+        );
+      }, action: 'selectSyncIndexByDeckId($deckId)');
 
   /// Updates the Listing.
   /// RLS ensures only the deck owner can successfully execute this.

@@ -5,5 +5,6 @@ export 'models/models.barrel.dart';
 export 'widgets/widgets.barrel.dart';
 // Other files
 export 'deck_interactions.remote.db.dart';
-export 'deck_listings.remote.db.dart';
 export 'deck_listings.local.db.dart';
+export 'deck_listings.service.dart';
+export 'deck_listings.remote.db.dart';
