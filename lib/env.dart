@@ -9,13 +9,14 @@ abstract final class Env {
   // Replace with your Supabase project credentials
   static const supabaseUrl = String.fromEnvironment(
     'SUPABASE_URL',
-    defaultValue: 'https://libppyuvpbjutvdmrpma.supabase.co',
+    defaultValue: 'https://auircyjdjlsrvfcnfwny.supabase.co',
   );
 
   static const supabaseAnonKey = String.fromEnvironment(
     'SUPABASE_ANON_KEY',
-    defaultValue: 'sb_publishable_VHL5Rr4h-7NOQeJ8C6HmPA_UdmUw6fP',
+    defaultValue: 'sb_publishable_BPJX6jV9oHx7hWsdXGGRmA_aRnlscTD',
   );
 
-  static const storageBucket = 'card-images';
+  static const publicMediaBucket = 'public-media';
+  static const privateMediaBucket = 'private-media';
 }

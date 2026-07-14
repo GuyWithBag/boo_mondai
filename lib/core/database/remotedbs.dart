@@ -18,10 +18,15 @@ import 'package:boo_mondai/lib.barrel.dart'
         FsrsCardsRemoteDB,
         LeaderboardEntriesRemoteDB,
         ResearchRemoteDB,
-        StorageRemoteDB,
-        StreaksRemoteDB;
-import 'package:boo_mondai/features/fsrs/review_logs.remote.db.dart';
-import 'package:boo_mondai/features/study_session/study_cards.remote.db.dart';
+        PublicBucketRemoteDB,
+        PrivateBucketRemoteDB,
+        StreaksRemoteDB,
+        StudyCardsRemoteDB,
+        TagsRemoteDB,
+        DeckTagsRemoteDB,
+        CardTemplateTagsRemoteDB,
+        UserStudyCardTagsRemoteDB,
+        ReviewLogsRemoteDB;
 
 class RemoteDB {
   // ── Remote Data Sources ──────────────────────────
@@ -46,8 +51,13 @@ class RemoteDB {
   static late final FsrsCardsRemoteDB fsrsSync;
   static late final LeaderboardEntriesRemoteDB leaderboard;
   static late final ResearchRemoteDB research;
-  static late final StorageRemoteDB storage;
+  static late final PublicBucketRemoteDB publicBucket;
+  static late final PrivateBucketRemoteDB privateBucket;
   static late final StreaksRemoteDB streak;
+  static late final TagsRemoteDB tag;
+  static late final DeckTagsRemoteDB deckTag;
+  static late final CardTemplateTagsRemoteDB cardTemplateTag;
+  static late final UserStudyCardTagsRemoteDB userStudyCardTag;
 
   static Future<void> init() async {
     profile = ProfilesRemoteDB();
@@ -70,7 +80,12 @@ class RemoteDB {
     fsrsSync = FsrsCardsRemoteDB();
     leaderboard = LeaderboardEntriesRemoteDB();
     research = ResearchRemoteDB();
-    storage = StorageRemoteDB();
+    publicBucket = PublicBucketRemoteDB();
+    privateBucket = PrivateBucketRemoteDB();
     streak = StreaksRemoteDB();
+    tag = TagsRemoteDB();
+    deckTag = DeckTagsRemoteDB();
+    cardTemplateTag = CardTemplateTagsRemoteDB();
+    userStudyCardTag = UserStudyCardTagsRemoteDB();
   }
 }

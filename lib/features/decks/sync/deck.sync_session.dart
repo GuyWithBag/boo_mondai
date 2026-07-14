@@ -11,7 +11,16 @@ import 'package:boo_mondai/lib.barrel.dart'
         FsrsCardsRemoteDB,
         ReviewLogsLocalDB,
         ReviewLogsRemoteDB,
-        StorageRemoteDB,
+        SyncDeletionLocalDB,
+        TagLocalDB,
+        TagsRemoteDB,
+        DeckTagsLocalDB,
+        DeckTagsRemoteDB,
+        CardTemplateTagsLocalDB,
+        CardTemplateTagsRemoteDB,
+        UserStudyCardTagsLocalDB,
+        UserStudyCardTagsRemoteDB,
+        PublicBucketRemoteDB,
         StudyCardsLocalDB,
         StudyCardsRemoteDB,
         SyncStrategy,
@@ -21,11 +30,20 @@ import 'package:boo_mondai/lib.barrel.dart'
         StudyCard,
         FsrsCard,
         FsrsReviewLog,
+        SyncDeletionService,
         NewestWinsSyncStrategy,
+        SyncMediaReference,
+        SyncMediaReferenceApplier,
+        FolderPaths,
+        FolderPathStoredMediaPath,
+        StoredMediaPath,
+        StoredMediaService,
+        ImageHelper,
         DeckListingsService,
         CardTemplatesService,
         StudyCardService,
         FsrsService,
+        DecksService,
         AppendOnlySyncStrategy;
 
 /// Runtime scope and dependencies for one deck sync operation.
@@ -49,6 +67,15 @@ class DeckSyncSession {
     required this.remoteFsrsCards,
     required this.reviewLogs,
     required this.remoteReviewLogs,
+    required this.syncDeletions,
+    required this.tags,
+    required this.remoteTags,
+    required this.deckTags,
+    required this.remoteDeckTags,
+    required this.cardTemplateTags,
+    required this.remoteCardTemplateTags,
+    required this.userStudyCardTags,
+    required this.remoteUserStudyCardTags,
     required this.remoteStorage,
     this.deckId,
   });
@@ -75,26 +102,35 @@ class DeckSyncSession {
   final ReviewLogsLocalDB reviewLogs;
   final ReviewLogsRemoteDB remoteReviewLogs;
 
-  final StorageRemoteDB remoteStorage;
+  final SyncDeletionLocalDB syncDeletions;
+
+  final TagLocalDB tags;
+  final TagsRemoteDB remoteTags;
+
+  final DeckTagsLocalDB deckTags;
+  final DeckTagsRemoteDB remoteDeckTags;
+
+  final CardTemplateTagsLocalDB cardTemplateTags;
+  final CardTemplateTagsRemoteDB remoteCardTemplateTags;
+
+  final UserStudyCardTagsLocalDB userStudyCardTags;
+  final UserStudyCardTagsRemoteDB remoteUserStudyCardTags;
+
+  final PublicBucketRemoteDB remoteStorage;
 
   List<SyncStrategy<dynamic>> getStrategies() {
     return <SyncStrategy<dynamic>>[
+      SyncDeletionService.createStrategy(this),
       NewestWinsSyncStrategy<Deck>(
         name: 'decks',
         localDb: decks,
         remoteDb: remoteDecks,
-        localIndex: (_) async => decks.selectSyncIndexByUserIdAndOptionalDeckId(
-          userId: userId,
-          deckId: deckId,
-        ),
-        remoteIndex: (_) =>
-            remoteDecks.selectSyncIndexByUserIdAndOptionalDeckId(
-              userId: userId,
-              deckId: deckId,
-            ),
-        localItemsByIds: (_, ids) async => decks.selectManyByIds(ids),
-        remoteItemsByIds: (_, ids) => remoteDecks.selectManyByIds(ids),
+        localIndex: DecksService.loadLocalDeckSyncIndexForSyncSession,
+        remoteIndex: DecksService.loadRemoteDeckSyncIndexForSyncSession,
+        localItemsByIds: DecksService.loadLocalDecksByIdsForSyncSession,
+        remoteItemsByIds: DecksService.loadRemoteDecksByIdsForSyncSession,
         itemId: (deck) => deck.id,
+        preprocessPushItem: _preprocessDeckPushItem,
         itemToChangeMap: remoteDecks.toMap,
       ),
       NewestWinsSyncStrategy<DeckListing>(
@@ -110,6 +146,7 @@ class DeckSyncSession {
         remoteItemsByIds:
             DeckListingsService.loadRemoteDeckListingsByIdsForSyncSession,
         itemId: (listing) => listing.deckId,
+        preprocessPushItem: _preprocessDeckListingPushItem,
         itemToChangeMap: remoteDeckListings.toMap,
       ),
       NewestWinsSyncStrategy<CardTemplate>(
@@ -163,5 +200,100 @@ class DeckSyncSession {
         itemId: (log) => log.id,
       ),
     ];
+  }
+
+  Future<Deck> _preprocessDeckPushItem(Deck deck, DeckSyncSession session) {
+    final localPath = FolderPaths.deckCoverImage(
+      deck.title,
+    ).toStoredMediaPath();
+
+    return SyncMediaReferenceApplier.apply<Deck>(
+      item: deck,
+      persistItem: decks.upsert,
+      references: [
+        SyncMediaReference<Deck>(
+          localPath: localPath,
+          remotePath: _deckCoverRemotePath(deck),
+          bucket: remoteStorage,
+          readValue: (deck) => deck.coverImageUrl,
+          shouldUpload: (_, currentValue) =>
+              _shouldUploadStoredMedia(localPath, currentValue),
+          writeValue: (deck, uploadedValue) =>
+              deck.copyWith(coverImageUrl: uploadedValue),
+        ),
+      ],
+    );
+  }
+
+  Future<DeckListing> _preprocessDeckListingPushItem(
+    DeckListing listing,
+    DeckSyncSession session,
+  ) async {
+    final deck = decks.selectByPk({'id': listing.deckId});
+    if (deck == null) return listing;
+
+    return SyncMediaReferenceApplier.apply<DeckListing>(
+      item: listing,
+      persistItem: deckListings.upsert,
+      references: [
+        for (var index = 0; index < listing.featuredImages.length; index++)
+          _deckListingFeaturedImageReference(
+            deck: deck,
+            listing: listing,
+            index: index,
+          ),
+      ],
+    );
+  }
+
+  SyncMediaReference<DeckListing> _deckListingFeaturedImageReference({
+    required Deck deck,
+    required DeckListing listing,
+    required int index,
+  }) {
+    final localPath = FolderPaths.deckListingFeaturedImage(
+      deck.title,
+      index,
+    ).toStoredMediaPath();
+
+    return SyncMediaReference<DeckListing>(
+      localPath: localPath,
+      remotePath: _deckListingFeaturedImageRemotePath(listing.deckId, index),
+      bucket: remoteStorage,
+      readValue: (listing) => listing.featuredImages[index],
+      shouldUpload: (_, currentValue) =>
+          _shouldUploadStoredMedia(localPath, currentValue),
+      writeValue: (listing, uploadedValue) {
+        final featuredImages = listing.featuredImages.toList();
+        featuredImages[index] = uploadedValue;
+        return listing.copyWith(featuredImages: featuredImages);
+      },
+    );
+  }
+
+  bool _shouldUploadStoredMedia(
+    StoredMediaPath localPath,
+    String? currentValue,
+  ) {
+    final storedMedia = StoredMediaService.getByPath(localPath);
+    if (storedMedia == null) return false;
+
+    final normalizedCurrentValue = currentValue?.trim();
+    if (normalizedCurrentValue == null || normalizedCurrentValue.isEmpty) {
+      return true;
+    }
+    if (!ImageHelper.isRemoteUrl(normalizedCurrentValue)) {
+      return true;
+    }
+
+    return storedMedia.remoteUrl?.trim() != normalizedCurrentValue;
+  }
+
+  String _deckCoverRemotePath(Deck deck) {
+    return 'users/$userId/decks/${deck.id}/cover';
+  }
+
+  String _deckListingFeaturedImageRemotePath(String deckId, int index) {
+    return 'users/$userId/decks/$deckId/featured/image$index';
   }
 }

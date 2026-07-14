@@ -17,6 +17,8 @@ typedef DeckSyncIndexLoader =
     Future<List<SyncIndexEntry>> Function(DeckSyncSession context);
 typedef DeckSyncItemsByIdsLoader<T> =
     Future<List<T>> Function(DeckSyncSession context, List<String> ids);
+typedef DeckSyncPushItemPreprocessor<T> =
+    Future<T> Function(T item, DeckSyncSession context);
 
 class NewestWinsSyncStrategy<T> implements SyncStrategy<T> {
   const NewestWinsSyncStrategy({
@@ -30,6 +32,7 @@ class NewestWinsSyncStrategy<T> implements SyncStrategy<T> {
     this.remoteDb,
     this.applyPullItem,
     this.applyPushItem,
+    this.preprocessPushItem,
     this.itemToChangeMap,
     this.ignoredChangeKeys = const {},
   });
@@ -45,6 +48,7 @@ class NewestWinsSyncStrategy<T> implements SyncStrategy<T> {
   final String Function(T item) itemId;
   final Future<void> Function(T item)? applyPullItem;
   final Future<void> Function(T item)? applyPushItem;
+  final DeckSyncPushItemPreprocessor<T>? preprocessPushItem;
   final Map<String, Object?> Function(T item)? itemToChangeMap;
   final Set<String> ignoredChangeKeys;
 
@@ -250,13 +254,21 @@ class NewestWinsSyncStrategy<T> implements SyncStrategy<T> {
       await applyPull(remote);
     }
     for (final local in plan.pushItems) {
+      final pushItem = await _preprocessPushItem(local, context);
       final applyPush = applyPushItem ?? remoteDb?.upsert;
       if (applyPush == null) {
         throw StateError('$name cannot apply pushed items.');
       }
-      await applyPush(local);
+      await applyPush(pushItem);
     }
     return plan.changes;
+  }
+
+  Future<T> _preprocessPushItem(T item, DeckSyncSession context) {
+    final preprocessor = preprocessPushItem;
+    return preprocessor == null
+        ? Future.value(item)
+        : preprocessor(item, context);
   }
 
   List<ChangedProperty<Object?>> _getChangedProperties({

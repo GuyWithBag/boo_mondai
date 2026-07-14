@@ -155,7 +155,16 @@ class DeckSyncController extends Controller implements SyncWorkflowController {
           remoteFsrsCards: RemoteDB.fsrsSync,
           reviewLogs: LocalDB.reviewLog,
           remoteReviewLogs: RemoteDB.reviewLog,
-          remoteStorage: RemoteDB.storage,
+          syncDeletions: LocalDB.syncDeletion,
+          tags: LocalDB.tag,
+          remoteTags: RemoteDB.tag,
+          deckTags: LocalDB.deckTag,
+          remoteDeckTags: RemoteDB.deckTag,
+          cardTemplateTags: LocalDB.cardTemplateTag,
+          remoteCardTemplateTags: RemoteDB.cardTemplateTag,
+          userStudyCardTags: LocalDB.userStudyCardTag,
+          remoteUserStudyCardTags: RemoteDB.userStudyCardTag,
+          remoteStorage: RemoteDB.publicBucket,
         ),
       );
       onSynced();
