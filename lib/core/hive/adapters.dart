@@ -11,10 +11,6 @@ library;
 import 'package:boo_mondai/lib.barrel.dart'
     show
         CachedProfile,
-        AttachmentType,
-        CardAttachment,
-        CardLinkAttachment,
-        CardMediaAttachment,
         CardTemplate,
         CardTemplateTag,
         CardType,
@@ -30,7 +26,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         FsrsReviewLog,
         IdentificationTemplate,
         ImportExportBackup,
-        LocalImageCacheEntry,
+        StoredMedia,
         MatchMadnessPair,
         MatchMadnessTemplate,
         MultipleChoiceOption,
@@ -64,8 +60,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
   AdapterSpec<Profile>(),
   AdapterSpec<CachedProfile>(),
   AdapterSpec<Deck>(),
-  AdapterSpec<CardMediaAttachment>(),
-  AdapterSpec<CardLinkAttachment>(),
   AdapterSpec<MultipleChoiceOption>(),
   AdapterSpec<FillInTheBlanksTemplate>(),
   AdapterSpec<MultipleChoiceTemplate>(),
@@ -94,7 +88,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
   AdapterSpec<Streak>(),
   AdapterSpec<Rating>(),
   AdapterSpec<CardType>(),
-  AdapterSpec<AttachmentType>(),
   AdapterSpec<QuestionType>(),
   AdapterSpec<User>(),
   AdapterSpec<VisibilityState>(),
@@ -108,7 +101,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
   AdapterSpec<ProgressCheckpoint>(),
   AdapterSpec<ProgressCheckpointType>(),
   AdapterSpec<ProgressCheckpointStatus>(),
-  AdapterSpec<LocalImageCacheEntry>(),
+  AdapterSpec<StoredMedia>(),
 ])
 // ignore: unused_element
 part 'adapters.g.dart';

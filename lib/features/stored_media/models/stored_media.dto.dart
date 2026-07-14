@@ -1,21 +1,21 @@
 import 'package:dart_mappable/dart_mappable.dart';
 
-part 'local_image_cache_entry.dto.mapper.dart';
+part 'stored_media.dto.mapper.dart';
 
 @MappableClass()
-class LocalImageCacheEntry with LocalImageCacheEntryMappable {
-  final String cacheKey;
+class StoredMedia with StoredMediaMappable {
+  final String id;
   final String localPath;
-  final String? remotePath;
+  final String? remoteUrl;
   final String? mimeType;
   final int? byteSize;
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  const LocalImageCacheEntry({
-    required this.cacheKey,
+  const StoredMedia({
+    required this.id,
     required this.localPath,
-    this.remotePath,
+    this.remoteUrl,
     this.mimeType,
     this.byteSize,
     required this.createdAt,

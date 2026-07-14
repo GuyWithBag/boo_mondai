@@ -7,11 +7,8 @@ import 'package:boo_mondai/core/hive/adapters.dart';
 
 extension HiveRegistrar on HiveInterface {
   void registerAdapters() {
-    registerAdapter(AttachmentTypeAdapter());
     registerAdapter(CachedProfileAdapter());
     registerAdapter(CardAdapter());
-    registerAdapter(CardLinkAttachmentAdapter());
-    registerAdapter(CardMediaAttachmentAdapter());
     registerAdapter(CardSessionStepAdapter());
     registerAdapter(CardTemplateTagAdapter());
     registerAdapter(CardTypeAdapter());
@@ -27,7 +24,6 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(FsrsReviewLogAdapter());
     registerAdapter(IdentificationTemplateAdapter());
     registerAdapter(ImportExportBackupAdapter());
-    registerAdapter(LocalImageCacheEntryAdapter());
     registerAdapter(MatchMadnessPairAdapter());
     registerAdapter(MatchMadnessTemplateAdapter());
     registerAdapter(MessageSessionStepAdapter());
@@ -44,6 +40,7 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(ReviewSessionAdapter());
     registerAdapter(SessionFlowSnapshotAdapter());
     registerAdapter(StateAdapter());
+    registerAdapter(StoredMediaAdapter());
     registerAdapter(StreakAdapter());
     registerAdapter(StudyCardAdapter());
     registerAdapter(StudyRatingAdapter());
@@ -60,11 +57,8 @@ extension HiveRegistrar on HiveInterface {
 
 extension IsolatedHiveRegistrar on IsolatedHiveInterface {
   void registerAdapters() {
-    registerAdapter(AttachmentTypeAdapter());
     registerAdapter(CachedProfileAdapter());
     registerAdapter(CardAdapter());
-    registerAdapter(CardLinkAttachmentAdapter());
-    registerAdapter(CardMediaAttachmentAdapter());
     registerAdapter(CardSessionStepAdapter());
     registerAdapter(CardTemplateTagAdapter());
     registerAdapter(CardTypeAdapter());
@@ -80,7 +74,6 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(FsrsReviewLogAdapter());
     registerAdapter(IdentificationTemplateAdapter());
     registerAdapter(ImportExportBackupAdapter());
-    registerAdapter(LocalImageCacheEntryAdapter());
     registerAdapter(MatchMadnessPairAdapter());
     registerAdapter(MatchMadnessTemplateAdapter());
     registerAdapter(MessageSessionStepAdapter());
@@ -97,6 +90,7 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(ReviewSessionAdapter());
     registerAdapter(SessionFlowSnapshotAdapter());
     registerAdapter(StateAdapter());
+    registerAdapter(StoredMediaAdapter());
     registerAdapter(StreakAdapter());
     registerAdapter(StudyCardAdapter());
     registerAdapter(StudyRatingAdapter());

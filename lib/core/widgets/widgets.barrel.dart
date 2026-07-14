@@ -20,3 +20,4 @@ export 'rating_button.dart';
 export 'physical_card.dart';
 export 'editable_carousel.dart';
 export 'status_layout_state.dart';
+export 'aligned_scroll_view.dart';

@@ -15,7 +15,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         ImportExportBackupsLocalDB,
         UserSettingsLocalDB,
         ProgressCheckpointLocalDB,
-        LocalImagesLocalDB,
+        StoredMediasLocalDB,
         StudySessionFlowsLocalDB,
         StudySessionStepRecordsLocalDB;
 
@@ -36,7 +36,7 @@ class LocalDB {
   static late final ImportExportBackupsLocalDB importExportBackup;
   static late final UserSettingsLocalDB userSettings;
   static late final ProgressCheckpointLocalDB progressCheckpoint;
-  static late final LocalImagesLocalDB localImage;
+  static late final StoredMediasLocalDB storedMedia;
   static late final StudySessionFlowsLocalDB studySessionFlow;
   static late final StudySessionStepRecordsLocalDB studySessionStepRecord;
 
@@ -59,7 +59,7 @@ class LocalDB {
     userSettings = await UserSettingsLocalDB().init() as UserSettingsLocalDB;
     progressCheckpoint =
         await ProgressCheckpointLocalDB().init() as ProgressCheckpointLocalDB;
-    localImage = await LocalImagesLocalDB().init() as LocalImagesLocalDB;
+    storedMedia = await StoredMediasLocalDB().init() as StoredMediasLocalDB;
     studySessionFlow =
         await StudySessionFlowsLocalDB().init() as StudySessionFlowsLocalDB;
     studySessionStepRecord =
@@ -80,7 +80,7 @@ class LocalDB {
     await importExportBackup.clear();
     await userSettings.clear();
     await progressCheckpoint.clear();
-    await localImage.clear();
+    await storedMedia.clear();
     await studySessionFlow.clear();
     await studySessionStepRecord.clear();
     await cachedProfile.clear();

@@ -10,6 +10,7 @@ import 'dart:typed_data';
 import 'package:boo_mondai/core/exceptions/app_exception.dart'
     show AppException;
 import 'package:boo_mondai/lib.barrel.dart' show SupabaseRemoteDB;
+import 'package:supabase_flutter/supabase_flutter.dart' show FileOptions;
 
 class StorageRemoteDB extends SupabaseRemoteDB<Never> {
   // Storage operates on buckets, not a DB table — these are never called.
@@ -29,10 +30,18 @@ class StorageRemoteDB extends SupabaseRemoteDB<Never> {
   Future<String> uploadImage(
     String bucket,
     String path,
-    Uint8List bytes,
-  ) async {
+    Uint8List bytes, {
+    String? contentType,
+    bool upsert = false,
+  }) async {
     try {
-      await client.storage.from(bucket).uploadBinary(path, bytes);
+      await client.storage
+          .from(bucket)
+          .uploadBinary(
+            path,
+            bytes,
+            fileOptions: FileOptions(contentType: contentType, upsert: upsert),
+          );
       return client.storage.from(bucket).getPublicUrl(path);
     } catch (e) {
       throw AppException('Failed to upload image: $e');

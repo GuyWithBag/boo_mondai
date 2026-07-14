@@ -4,6 +4,5 @@
 export 'models/models.barrel.dart';
 export 'helpers/helpers.barrel.dart';
 // Other files
-export 'card_attachments.remote.db.dart';
-export 'media_storage.service.dart';
-export 'card_attachment.service.dart';
+export 'stored_medias.local.db.dart';
+export 'stored_media.service.dart';

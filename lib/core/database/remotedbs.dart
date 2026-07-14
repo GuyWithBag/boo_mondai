@@ -1,7 +1,6 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         CardTemplatesRemoteDB,
-        CardMediaAttachmentsRemoteDB,
         DrillSessionsRemoteDB,
         ProfilesRemoteDB,
         DecksRemoteDB,
@@ -21,6 +20,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         ResearchRemoteDB,
         StorageRemoteDB,
         StreaksRemoteDB;
+import 'package:boo_mondai/features/fsrs/review_logs.remote.db.dart';
+import 'package:boo_mondai/features/study_session/study_cards.remote.db.dart';
 
 class RemoteDB {
   // ── Remote Data Sources ──────────────────────────
@@ -37,9 +38,10 @@ class RemoteDB {
   deckVoteReviewCommentEditLog;
   static late final UserSettingsRemoteDB userSettings;
   static late final CardTemplatesRemoteDB card;
-  static late final CardMediaAttachmentsRemoteDB cardMediaAttachment;
+  static late final StudyCardsRemoteDB studyCard;
   static late final DrillSessionsRemoteDB drill;
   static late final ReviewSessionsRemoteDB reviewSession;
+  static late final ReviewLogsRemoteDB reviewLog;
   static late final DrillAnswersRemoteDB drillAnswer;
   static late final FsrsCardsRemoteDB fsrsSync;
   static late final LeaderboardEntriesRemoteDB leaderboard;
@@ -60,9 +62,10 @@ class RemoteDB {
     deckVoteReviewCommentEditLog = DeckVoteReviewCommentEditLogsRemoteDB();
     userSettings = UserSettingsRemoteDB();
     card = CardTemplatesRemoteDB();
-    cardMediaAttachment = CardMediaAttachmentsRemoteDB();
+    studyCard = StudyCardsRemoteDB();
     drill = DrillSessionsRemoteDB();
     reviewSession = ReviewSessionsRemoteDB();
+    reviewLog = ReviewLogsRemoteDB();
     drillAnswer = DrillAnswersRemoteDB();
     fsrsSync = FsrsCardsRemoteDB();
     leaderboard = LeaderboardEntriesRemoteDB();

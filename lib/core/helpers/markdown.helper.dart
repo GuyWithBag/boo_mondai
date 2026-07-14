@@ -1,4 +1,6 @@
-import 'package:boo_mondai/lib.barrel.dart' show AppTokens;
+import 'package:boo_mondai/lib.barrel.dart'
+    show AppTokens, ImageHelper, MediaHelper, StoredMediaService, StringHelper;
+import 'package:file_picker/file_picker.dart' show PlatformFile;
 import 'package:flutter/material.dart'
     show
         TextStyle,
@@ -16,6 +18,83 @@ import 'package:flutter_markdown_plus/flutter_markdown_plus.dart'
 import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
 
 abstract class MarkdownHelper {
+  static String? resolveMediaSourceUri(Uri uri) {
+    final source = uri.toString().trim();
+    if (source.isEmpty) return null;
+
+    if (uri.scheme == 'local') {
+      final id = uri.path.isNotEmpty ? uri.path : uri.host;
+      return StoredMediaService.getLocalPath(id);
+    }
+
+    final normalizedSource = normalizeMediaSource(source);
+    if (ImageHelper.isRemoteUrl(normalizedSource)) {
+      return StoredMediaService.getLocalPathForRemoteUrl(normalizedSource) ??
+          normalizedSource;
+    }
+
+    return normalizedSource;
+  }
+
+  static String normalizeMediaSource(String source) {
+    if (ImageHelper.isRemoteUrl(source)) return source;
+
+    final trimmed = source.trim();
+    final uri = Uri.tryParse(trimmed);
+    if (uri == null || uri.scheme.isNotEmpty) return trimmed;
+
+    final maybeDomain = StringHelper.toTrimmedOrNull(trimmed);
+    if (maybeDomain != null && maybeDomain.contains('.')) {
+      return 'https://$maybeDomain';
+    }
+
+    return trimmed;
+  }
+
+  static Future<String?> toPickedFileImageAttachmentFormat({
+    required String id,
+    required PlatformFile file,
+    String? remoteUrl,
+  }) {
+    return toPickedFileMediaMarkdownFormat(
+      id: id,
+      file: file,
+      remoteUrl: remoteUrl,
+    );
+  }
+
+  static Future<String?> toPickedFileMediaMarkdownFormat({
+    required String id,
+    required PlatformFile file,
+    String? remoteUrl,
+  }) async {
+    final localPath = await StoredMediaService.writePickedFileToLocal(
+      id: id,
+      file: file,
+      remoteUrl: remoteUrl,
+    );
+    if (localPath == null) return null;
+
+    final source = 'local:$id';
+    final mimeType = MediaHelper.mimeTypeFromExtension(file.extension);
+    return MediaHelper.isImageMimeType(mimeType)
+        ? toImageAttachmentFormat(label: file.name, source: source)
+        : toLinkFormat(label: file.name, source: source);
+  }
+
+  static String toImageAttachmentFormat({
+    required String label,
+    required String source,
+  }) {
+    final safeLabel = label.replaceAll(RegExp(r'[\]\r\n]'), ' ');
+    return '![$safeLabel]($source)';
+  }
+
+  static String toLinkFormat({required String label, required String source}) {
+    final safeLabel = label.replaceAll(RegExp(r'[\]\r\n]'), ' ');
+    return '[$safeLabel]($source)';
+  }
+
   static MarkdownStyleSheet getMarkdownStyleSheet(
     AppTokens tokens,
     TextStyle body,
