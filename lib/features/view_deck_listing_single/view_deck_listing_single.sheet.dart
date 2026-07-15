@@ -17,14 +17,13 @@ import 'package:boo_mondai/lib.barrel.dart'
         DiscussionSection,
         EditableCarousel,
         EditableFeaturedCardsColumn,
-        FileHelper,
         FormField,
         MetaLabel,
         NumberHelper,
         Scaffold,
         SectionEyebrow,
         Side,
-        StoredMediaPath,
+        StoredMediaPathHelper,
         SurfaceBorder,
         SurfaceColor,
         SurfacePadding,
@@ -186,10 +185,11 @@ class ViewDeckListingSingleSheet extends HookWidget {
             toolBar: ToolBar.withActions(
               controller: toolBarController,
               useAttachments: true,
-              createAttachmentPath: (file) => StoredMediaPath.folder(
-                folderPath: '${sheet.deck.title}/media',
-                name: FileHelper.fileNameWithoutExtension(file.name),
-              ),
+              createAttachmentPath: (file) =>
+                  StoredMediaPathHelper.deckAttachment(
+                    deckTitle: sheet.deck.title,
+                    fileName: file.name,
+                  ),
             ),
             body: isEditing
                 ? Form(

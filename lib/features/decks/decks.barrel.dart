@@ -3,7 +3,6 @@
 // Barrel files
 export 'models/models.barrel.dart';
 export 'widgets/widgets.barrel.dart';
-export 'sync/sync.barrel.dart';
 // Other files
 export 'decks.local.db.dart';
 export 'deck_form.validator.dart';

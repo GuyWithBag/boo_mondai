@@ -22,7 +22,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         FlashcardTemplate,
         IdentificationTemplate,
         StoredMediaService,
-        StoredMediaPath,
+        StoredMediaPathHelper,
         ImageHelper,
         LocalDB,
         MatchMadnessPair,
@@ -205,9 +205,8 @@ class DeckDownloadsService extends Service {
       final coverRemotePath = remoteDeck.coverImageUrl;
       if (coverRemotePath != null && ImageHelper.isRemoteUrl(coverRemotePath)) {
         final coverLocalPath = await StoredMediaService.remoteToLocal(
-          path: StoredMediaPath.folder(
-            folderPath: '${newLocalDeck.title}/media',
-            name: 'coverImage',
+          path: StoredMediaPathHelper.deckCoverImage(
+            deckTitle: newLocalDeck.title,
           ),
           remoteUrl: coverRemotePath,
         );
@@ -449,10 +448,6 @@ class DeckDownloadsService extends Service {
         tags: t.tags,
         frontText: t.frontText,
         backText: t.backText,
-        frontImageUrl: t.frontImageUrl,
-        backImageUrl: t.backImageUrl,
-        frontAudioUrl: t.frontAudioUrl,
-        backAudioUrl: t.backAudioUrl,
         cardType: t.cardType,
       ),
       IdentificationTemplate t => IdentificationTemplate(
@@ -465,8 +460,6 @@ class DeckDownloadsService extends Service {
         tags: t.tags,
         promptText: t.promptText,
         acceptedAnswers: t.acceptedAnswers,
-        imageUrl: t.imageUrl,
-        audioUrl: t.audioUrl,
       ),
       MultipleChoiceTemplate t => MultipleChoiceTemplate(
         id: localTemplateId,
@@ -487,8 +480,6 @@ class DeckDownloadsService extends Service {
               displayOrder: option.displayOrder,
             ),
         ],
-        imageUrl: t.imageUrl,
-        audioUrl: t.audioUrl,
       ),
       FillInTheBlanksTemplate t => FillInTheBlanksTemplate(
         id: localTemplateId,
@@ -543,8 +534,6 @@ class DeckDownloadsService extends Service {
         sourceTemplateId: t.id,
         tags: t.tags,
         sentenceToScramble: t.sentenceToScramble,
-        imageUrl: t.imageUrl,
-        audioUrl: t.audioUrl,
       ),
       _ => throw UnsupportedError(
         'Unsupported card template type: ${template.runtimeType}',

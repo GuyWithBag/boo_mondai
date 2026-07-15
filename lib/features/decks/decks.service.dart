@@ -6,8 +6,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         DeckSyncSession,
         LocalDB,
         StoredMediaService,
-        FolderPaths,
-        FolderPathStoredMediaPath,
+        StoredMediaPathHelper,
         ImageHelper,
         RemoteDB,
         SyncDeletion,
@@ -23,7 +22,7 @@ abstract final class DecksService {
   static String? getCoverImageSource(Deck deck) {
     final remoteUrl = StringHelper.toTrimmedOrNull(deck.coverImageUrl);
     return StoredMediaService.getFileByPath(
-          FolderPaths.deckCoverImage(deck.title).toStoredMediaPath(),
+          StoredMediaPathHelper.deckCoverImage(deckTitle: deck.title),
         )?.path ??
         (remoteUrl == null
             ? null
@@ -43,10 +42,10 @@ abstract final class DecksService {
     );
 
     return StoredMediaService.getFileByPath(
-          FolderPaths.deckListingFeaturedImage(
-            deck.title,
-            index,
-          ).toStoredMediaPath(),
+          StoredMediaPathHelper.deckListingFeaturedImage(
+            deckTitle: deck.title,
+            index: index,
+          ),
         )?.path ??
         (remoteUrl == null
             ? null
@@ -573,7 +572,7 @@ abstract final class DecksService {
     }
 
     final localPath = await StoredMediaService.storeFile(
-      path: FolderPaths.deckCoverImage(deck.title).toStoredMediaPath(),
+      path: StoredMediaPathHelper.deckCoverImage(deckTitle: deck.title),
       file: file,
     );
     if (localPath == null) {
@@ -605,10 +604,10 @@ abstract final class DecksService {
         : featuredImages.length;
 
     final localPath = await StoredMediaService.storeFile(
-      path: FolderPaths.deckListingFeaturedImage(
-        deck.title,
-        targetIndex,
-      ).toStoredMediaPath(),
+      path: StoredMediaPathHelper.deckListingFeaturedImage(
+        deckTitle: deck.title,
+        index: targetIndex,
+      ),
       file: file,
     );
     if (localPath == null) {

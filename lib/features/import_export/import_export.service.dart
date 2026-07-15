@@ -22,6 +22,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         DecksService,
         StoredMediaService,
         StoredMediaPath,
+        StoredMediaPathHelper,
         ImageHelper,
         ChangeBatchResult,
         ChangedEntity,
@@ -279,10 +280,7 @@ class ImportExportService {
       await _restoreBundledImage(
         tempDir: tempDir,
         contentPath: coverImageContentPath,
-        path: StoredMediaPath.folder(
-          folderPath: '${deck.title}/media',
-          name: 'coverImage',
-        ),
+        path: StoredMediaPathHelper.deckCoverImage(deckTitle: deck.title),
         remoteUrl: _remoteUrlOrNull(incomingDeck.coverImageUrl),
       );
 
@@ -293,9 +291,9 @@ class ImportExportService {
           final localPath = await _restoreBundledImage(
             tempDir: tempDir,
             contentPath: featuredImageContentPaths[index],
-            path: StoredMediaPath.folder(
-              folderPath: '${deck.title}/media/featuredImages',
-              name: 'image$index',
+            path: StoredMediaPathHelper.deckListingFeaturedImage(
+              deckTitle: deck.title,
+              index: index,
             ),
             remoteUrl: index < listing.featuredImages.length
                 ? _remoteUrlOrNull(listing.featuredImages[index])
@@ -960,10 +958,6 @@ class ImportExportService {
         tags: t.tags,
         frontText: t.frontText,
         backText: t.backText,
-        frontImageUrl: t.frontImageUrl,
-        backImageUrl: t.backImageUrl,
-        frontAudioUrl: t.frontAudioUrl,
-        backAudioUrl: t.backAudioUrl,
         cardType: t.cardType,
       ),
       IdentificationTemplate t => IdentificationTemplate(
@@ -976,8 +970,6 @@ class ImportExportService {
         tags: t.tags,
         promptText: t.promptText,
         acceptedAnswers: t.acceptedAnswers,
-        imageUrl: t.imageUrl,
-        audioUrl: t.audioUrl,
       ),
       MultipleChoiceTemplate t => MultipleChoiceTemplate(
         id: targetId,
@@ -998,8 +990,6 @@ class ImportExportService {
               displayOrder: option.displayOrder,
             ),
         ],
-        imageUrl: t.imageUrl,
-        audioUrl: t.audioUrl,
       ),
       FillInTheBlanksTemplate t => FillInTheBlanksTemplate(
         id: targetId,
@@ -1053,8 +1043,6 @@ class ImportExportService {
         sourceTemplateId: t.sourceTemplateId ?? t.id,
         tags: t.tags,
         sentenceToScramble: t.sentenceToScramble,
-        imageUrl: t.imageUrl,
-        audioUrl: t.audioUrl,
       ),
       _ => throw UnsupportedError(
         'Unsupported card template type: ${source.runtimeType}',

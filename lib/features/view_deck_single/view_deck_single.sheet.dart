@@ -29,10 +29,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         ViewDeckSingleHelper,
         DateHelper,
         DecksService,
-        FileHelper,
         ImageHelper,
         FormField,
-        StoredMediaPath,
+        StoredMediaPathHelper,
         ToolBar,
         useToolBarController,
         showBottomSheet;
@@ -94,10 +93,11 @@ class ViewDeckSingleSheet extends HookWidget {
                 ? ToolBar.withActions(
                     controller: toolBarController,
                     useAttachments: true,
-                    createAttachmentPath: (file) => StoredMediaPath.folder(
-                      folderPath: '${activeDeck.title}/media',
-                      name: FileHelper.fileNameWithoutExtension(file.name),
-                    ),
+                    createAttachmentPath: (file) =>
+                        StoredMediaPathHelper.deckAttachment(
+                          deckTitle: activeDeck.title,
+                          fileName: file.name,
+                        ),
                   )
                 : null,
             appBar: AppBar(

@@ -1,5 +1,10 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show TextHelper, Deck, DecksService, StoredMediaService, StoredMediaPath;
+    show
+        TextHelper,
+        Deck,
+        DecksService,
+        StoredMediaService,
+        StoredMediaPathHelper;
 
 final class ViewDeckListingSingleHelper {
   const ViewDeckListingSingleHelper();
@@ -42,7 +47,7 @@ final class ViewDeckListingSingleHelper {
     if (profile == null) return null;
     return TextHelper.getTrimmedTextOrNull(
       StoredMediaService.getFileByPath(
-            const StoredMediaPath.app(name: 'profileAvatar'),
+            StoredMediaPathHelper.profileAvatar(),
           )?.path ??
           profile.avatarUrl,
     );

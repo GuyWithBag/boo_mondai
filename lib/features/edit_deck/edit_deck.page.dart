@@ -10,9 +10,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         EditDeckBottomNavBar,
         EditDeckEditorBody,
         EditDeckSideBar,
-        FileHelper,
         Scaffold,
-        StoredMediaPath,
+        StoredMediaPathHelper,
         ToolBar,
         showSnackbar,
         useEditDeckController,
@@ -97,9 +96,9 @@ class EditDeckPage extends HookWidget {
           final deck = controller.deck;
           if (deck == null || controller.activeTemplateId == null) return null;
 
-          return StoredMediaPath.folder(
-            folderPath: '${deck.title}/media',
-            name: FileHelper.fileNameWithoutExtension(file.name),
+          return StoredMediaPathHelper.deckAttachment(
+            deckTitle: deck.title,
+            fileName: file.name,
           );
         },
         onAttachmentInserted: controller.markDirty,
