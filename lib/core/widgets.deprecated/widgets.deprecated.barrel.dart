@@ -5,6 +5,5 @@ export 'deck_editor/deck_editor.barrel.dart';
 export 'drill_preview/drill_preview.barrel.dart';
 export 'drill_result/drill_result.barrel.dart';
 // Other files
-export 'drill_question_card.dart';
 export 'section_card.dart';
 export 'selectable_filter_chip.dart';

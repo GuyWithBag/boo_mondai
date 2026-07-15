@@ -1,4 +1,3 @@
-import 'package:boo_mondai/core/models/folder_path.dart';
 import 'package:boo_mondai/lib.barrel.dart' show FileHelper;
 
 final class StoredMediaPath {
@@ -44,18 +43,5 @@ final class StoredMediaPath {
     );
 
     return '${FileHelper.toAppropriateFileName(name)}.$normalizedExtension';
-  }
-}
-
-extension FolderPathStoredMediaPath on FolderPath {
-  StoredMediaPath toStoredMediaPath() {
-    return StoredMediaPath.folder(folderPath: folderPath, name: name);
-  }
-
-  String toStoredMediaFolderPrefix() {
-    return StoredMediaPath.folder(
-      folderPath: value,
-      name: '',
-    ).folderSegments.join('/');
   }
 }

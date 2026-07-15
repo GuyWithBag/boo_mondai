@@ -322,23 +322,17 @@ class MultipleChoiceTemplateAdapter
       verticallyCentered: fields[12] == null ? true : fields[12] as bool,
       questionPrompt: fields[0] as String,
       options: (fields[1] as List).cast<MultipleChoiceOption>(),
-      imageUrl: fields[2] as String?,
-      audioUrl: fields[3] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, MultipleChoiceTemplate obj) {
     writer
-      ..writeByte(12)
+      ..writeByte(10)
       ..writeByte(0)
       ..write(obj.questionPrompt)
       ..writeByte(1)
       ..write(obj.options)
-      ..writeByte(2)
-      ..write(obj.imageUrl)
-      ..writeByte(3)
-      ..write(obj.audioUrl)
       ..writeByte(4)
       ..write(obj.id)
       ..writeByte(5)
@@ -389,10 +383,6 @@ class FlashcardTemplateAdapter extends TypeAdapter<FlashcardTemplate> {
       verticallyCentered: fields[15] == null ? true : fields[15] as bool,
       frontText: fields[0] as String,
       backText: fields[1] as String,
-      frontImageUrl: fields[2] as String?,
-      backImageUrl: fields[3] as String?,
-      frontAudioUrl: fields[4] as String?,
-      backAudioUrl: fields[5] as String?,
       cardType: fields[6] == null ? CardType.normal : fields[6] as CardType,
     );
   }
@@ -400,19 +390,11 @@ class FlashcardTemplateAdapter extends TypeAdapter<FlashcardTemplate> {
   @override
   void write(BinaryWriter writer, FlashcardTemplate obj) {
     writer
-      ..writeByte(15)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.frontText)
       ..writeByte(1)
       ..write(obj.backText)
-      ..writeByte(2)
-      ..write(obj.frontImageUrl)
-      ..writeByte(3)
-      ..write(obj.backImageUrl)
-      ..writeByte(4)
-      ..write(obj.frontAudioUrl)
-      ..writeByte(5)
-      ..write(obj.backAudioUrl)
       ..writeByte(6)
       ..write(obj.cardType)
       ..writeByte(7)
@@ -524,23 +506,17 @@ class IdentificationTemplateAdapter
       verticallyCentered: fields[12] == null ? true : fields[12] as bool,
       promptText: fields[0] as String,
       acceptedAnswers: fields[1] as String,
-      imageUrl: fields[2] as String?,
-      audioUrl: fields[3] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, IdentificationTemplate obj) {
     writer
-      ..writeByte(12)
+      ..writeByte(10)
       ..writeByte(0)
       ..write(obj.promptText)
       ..writeByte(1)
       ..write(obj.acceptedAnswers)
-      ..writeByte(2)
-      ..write(obj.imageUrl)
-      ..writeByte(3)
-      ..write(obj.audioUrl)
       ..writeByte(4)
       ..write(obj.id)
       ..writeByte(5)
@@ -699,21 +675,15 @@ class WordScrambleTemplateAdapter extends TypeAdapter<WordScrambleTemplate> {
       tags: fields[9] == null ? const [] : (fields[9] as List).cast<Tag>(),
       verticallyCentered: fields[11] == null ? true : fields[11] as bool,
       sentenceToScramble: fields[0] as String,
-      imageUrl: fields[1] as String?,
-      audioUrl: fields[2] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, WordScrambleTemplate obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.sentenceToScramble)
-      ..writeByte(1)
-      ..write(obj.imageUrl)
-      ..writeByte(2)
-      ..write(obj.audioUrl)
       ..writeByte(3)
       ..write(obj.id)
       ..writeByte(4)

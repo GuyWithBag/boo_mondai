@@ -5,3 +5,4 @@ export 'uuid.dart';
 export 'platform.service.dart';
 export 'service.dart';
 export 'service_registry.dart';
+export 'stored_media_upload.service.dart';

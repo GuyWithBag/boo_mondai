@@ -14,4 +14,4 @@ export 'file.helper.dart';
 export 'string.helper.dart';
 export 'media.helper.dart';
 export 'markdown_format.helper.dart';
-export 'folder_paths.helper.dart';
+export 'media_remote_path.helper.dart';

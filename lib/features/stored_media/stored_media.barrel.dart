@@ -5,3 +5,4 @@ export 'models/models.barrel.dart';
 // Other files
 export 'stored_medias.local.db.dart';
 export 'stored_media.service.dart';
+export 'stored_media_path.helper.dart';

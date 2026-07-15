@@ -7,5 +7,5 @@ export 'hive_single_data_local_db.dart';
 export 'localdbs.dart';
 export 'remotedbs.dart';
 export 'bucket_supabase.remote.db.dart';
-export 'private_bucket.remote.db.dart';
 export 'public_bucket.remote.db.dart';
+export 'private_bucket.remote.db.dart';

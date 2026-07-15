@@ -123,10 +123,6 @@ types:
         index: 0
       options:
         index: 1
-      imageUrl:
-        index: 2
-      audioUrl:
-        index: 3
       id:
         index: 4
       createdAt:
@@ -151,14 +147,6 @@ types:
         index: 0
       backText:
         index: 1
-      frontImageUrl:
-        index: 2
-      backImageUrl:
-        index: 3
-      frontAudioUrl:
-        index: 4
-      backAudioUrl:
-        index: 5
       cardType:
         index: 6
       id:
@@ -207,10 +195,6 @@ types:
         index: 0
       acceptedAnswers:
         index: 1
-      imageUrl:
-        index: 2
-      audioUrl:
-        index: 3
       id:
         index: 4
       createdAt:
@@ -271,10 +255,6 @@ types:
     fields:
       sentenceToScramble:
         index: 0
-      imageUrl:
-        index: 1
-      audioUrl:
-        index: 2
       id:
         index: 3
       createdAt:

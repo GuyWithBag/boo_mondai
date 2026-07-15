@@ -154,6 +154,21 @@ abstract final class StoredMediaService {
         .firstOrNull;
   }
 
+  /// Records the remote value returned after a stored-media upload.
+  static Future<void> markUploaded(StoredMedia storedMedia, String remoteUrl) {
+    return LocalDB.storedMedia.upsert(
+      StoredMedia(
+        id: storedMedia.id,
+        localPath: storedMedia.localPath,
+        remoteUrl: remoteUrl,
+        mimeType: storedMedia.mimeType,
+        byteSize: storedMedia.byteSize,
+        createdAt: storedMedia.createdAt,
+        updatedAt: DateTime.now(),
+      ),
+    );
+  }
+
   static Future<void> renameFolderByPrefix({
     required String oldPrefix,
     required String newPrefix,
