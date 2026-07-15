@@ -6,7 +6,8 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart'
-    show SupabaseRemoteDB, FsrsCard, FsrsCardMapper, SyncIndexEntry;
+    show SupabaseRemoteDB, FsrsCard, StudyCardMapper, SyncIndexEntry;
+import 'package:fsrs/fsrs.dart' as fsrs;
 
 class FsrsCardsRemoteDB extends SupabaseRemoteDB<FsrsCard> {
   @override
@@ -17,9 +18,14 @@ class FsrsCardsRemoteDB extends SupabaseRemoteDB<FsrsCard> {
 
   @override
   Map<String, dynamic> toMap(FsrsCard item) {
-    final map = item.toMap();
-    map['study_cards_id'] = map.remove('study_card_id');
-    return map;
+    return {
+      'id': item.id,
+      'created_at': item.createdAt.toIso8601String(),
+      'updated_at': item.updatedAt.toIso8601String(),
+      'user_id': item.userId,
+      'study_cards_id': item.studyCardId,
+      'state': item.state.toMap(),
+    };
   }
 
   @override
@@ -79,10 +85,33 @@ class FsrsCardsRemoteDB extends SupabaseRemoteDB<FsrsCard> {
   );
 
   FsrsCard _fsrsCardFromMap(Map<String, dynamic> map) {
-    final values = Map<String, dynamic>.from(map);
-    values['study_card_id'] ??= values['study_cards_id'];
-    values['study_card'] ??= values['study_cards'];
-    return FsrsCardMapper.fromMap(values);
+    final studyCard = map['study_card'] ?? map['study_cards'];
+
+    return FsrsCard(
+      id: map['id'] as String,
+      createdAt: _dateTimeFromMap(map, 'created_at'),
+      updatedAt: _dateTimeFromMap(map, 'updated_at'),
+      userId: map['user_id'] as String,
+      studyCardId: (map['study_card_id'] ?? map['study_cards_id']) as String,
+      state: _stateFromMap(map['state']),
+      studyCard: studyCard == null
+          ? null
+          : StudyCardMapper.fromMap(
+              Map<String, dynamic>.from(studyCard as Map),
+            ),
+    );
+  }
+
+  DateTime _dateTimeFromMap(Map<String, dynamic> map, String key) {
+    final value = map[key];
+    if (value is DateTime) return value;
+    return DateTime.parse(value as String);
+  }
+
+  fsrs.Card _stateFromMap(Object? value) {
+    if (value is fsrs.Card) return value;
+    final map = Map<String, dynamic>.from(value as Map);
+    return fsrs.Card.fromMap(map);
   }
 }
 

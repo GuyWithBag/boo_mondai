@@ -1,5 +1,6 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show FsrsReviewLog, FsrsReviewLogMapper, SupabaseRemoteDB, SyncIndexEntry;
+    show FsrsReviewLog, SupabaseRemoteDB, SyncIndexEntry;
+import 'package:fsrs/fsrs.dart' as fsrs;
 
 class ReviewLogsRemoteDB extends SupabaseRemoteDB<FsrsReviewLog> {
   @override
@@ -7,10 +8,17 @@ class ReviewLogsRemoteDB extends SupabaseRemoteDB<FsrsReviewLog> {
 
   @override
   FsrsReviewLog Function(Map<String, dynamic>) get fromMap =>
-      FsrsReviewLogMapper.fromMap;
+      _fsrsReviewLogFromMap;
 
   @override
-  Map<String, dynamic> toMap(FsrsReviewLog item) => item.toMap();
+  Map<String, dynamic> toMap(FsrsReviewLog item) {
+    return {
+      'id': item.id,
+      'created_at': item.createdAt.toIso8601String(),
+      'fsrs_card_id': item.fsrsCardId,
+      'log': item.log.toMap(),
+    };
+  }
 
   @override
   Map<String, Object?> primaryKeyFromItem(FsrsReviewLog item) => {
@@ -76,4 +84,25 @@ class ReviewLogsRemoteDB extends SupabaseRemoteDB<FsrsReviewLog> {
             )
             .toList(growable: false);
       }, action: 'selectSyncIndexByFsrsCardId($fsrsCardId)');
+
+  FsrsReviewLog _fsrsReviewLogFromMap(Map<String, dynamic> map) {
+    return FsrsReviewLog(
+      id: map['id'] as String,
+      createdAt: _dateTimeFromMap(map, 'created_at'),
+      fsrsCardId: map['fsrs_card_id'] as String,
+      log: _logFromMap(map['log']),
+    );
+  }
+
+  DateTime _dateTimeFromMap(Map<String, dynamic> map, String key) {
+    final value = map[key];
+    if (value is DateTime) return value;
+    return DateTime.parse(value as String);
+  }
+
+  fsrs.ReviewLog _logFromMap(Object? value) {
+    if (value is fsrs.ReviewLog) return value;
+    final map = Map<String, dynamic>.from(value as Map);
+    return fsrs.ReviewLog.fromMap(map);
+  }
 }
