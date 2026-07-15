@@ -41,3 +41,4 @@ export 'stored_media/stored_media.barrel.dart';
 export 'markdown_audio_player/markdown_audio_player.barrel.dart';
 export 'study_cards/study_cards.barrel.dart';
 export 'sync_deletion/sync_deletion.barrel.dart';
+export 'sync_deck/sync_deck.barrel.dart';
