@@ -9,8 +9,6 @@ class IdentificationTemplate extends CardTemplate
     with IdentificationTemplateMappable {
   final String promptText;
   final String acceptedAnswers; // Comma-separated
-  final String? imageUrl;
-  final String? audioUrl;
 
   const IdentificationTemplate({
     required super.id,
@@ -23,8 +21,6 @@ class IdentificationTemplate extends CardTemplate
     super.verticallyCentered,
     required this.promptText,
     required this.acceptedAnswers,
-    this.imageUrl,
-    this.audioUrl,
   });
 
   @override

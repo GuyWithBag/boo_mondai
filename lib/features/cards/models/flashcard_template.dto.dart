@@ -9,10 +9,6 @@ part 'flashcard_template.dto.mapper.dart';
 class FlashcardTemplate extends CardTemplate with FlashcardTemplateMappable {
   final String frontText;
   final String backText;
-  final String? frontImageUrl;
-  final String? backImageUrl;
-  final String? frontAudioUrl;
-  final String? backAudioUrl;
 
   /// Controls how many StudyCards are generated for this template.
   /// - [CardType.normal]   → 1 StudyCard (isReversed: false)
@@ -31,10 +27,6 @@ class FlashcardTemplate extends CardTemplate with FlashcardTemplateMappable {
     super.verticallyCentered,
     required this.frontText,
     required this.backText,
-    this.frontImageUrl,
-    this.backImageUrl,
-    this.frontAudioUrl,
-    this.backAudioUrl,
     this.cardType = CardType.normal,
   });
 

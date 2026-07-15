@@ -8,8 +8,6 @@ part 'word_scramble_template.mapper.dart';
 class WordScrambleTemplate extends CardTemplate
     with WordScrambleTemplateMappable {
   final String sentenceToScramble;
-  final String? imageUrl;
-  final String? audioUrl;
 
   const WordScrambleTemplate({
     required super.id,
@@ -21,8 +19,6 @@ class WordScrambleTemplate extends CardTemplate
     super.tags,
     super.verticallyCentered,
     required this.sentenceToScramble,
-    this.imageUrl,
-    this.audioUrl,
   });
 
   @override

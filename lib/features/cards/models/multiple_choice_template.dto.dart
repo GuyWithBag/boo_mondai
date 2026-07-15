@@ -10,8 +10,6 @@ class MultipleChoiceTemplate extends CardTemplate
     with MultipleChoiceTemplateMappable {
   final String questionPrompt;
   final List<MultipleChoiceOption> options;
-  final String? imageUrl;
-  final String? audioUrl;
 
   const MultipleChoiceTemplate({
     required super.id,
@@ -24,8 +22,6 @@ class MultipleChoiceTemplate extends CardTemplate
     super.verticallyCentered,
     required this.questionPrompt,
     required this.options,
-    this.imageUrl,
-    this.audioUrl,
   });
 
   @override
