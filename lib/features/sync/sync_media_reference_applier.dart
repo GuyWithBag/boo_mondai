@@ -1,11 +1,8 @@
-import 'dart:io';
-
 import 'package:boo_mondai/lib.barrel.dart'
     show
         ImageHelper,
-        LocalDB,
-        StoredMedia,
         StoredMediaService,
+        StoredMediaUploadService,
         SyncMediaReference;
 
 abstract final class SyncMediaReferenceApplier {
@@ -27,18 +24,15 @@ abstract final class SyncMediaReferenceApplier {
       final storedMedia = StoredMediaService.getByPath(reference.localPath);
       if (storedMedia == null) continue;
 
-      final file = File(storedMedia.localPath);
-      if (!await file.exists()) continue;
-
-      final uploadedValue = await reference.bucket.uploadBytes(
-        reference.remotePath,
-        await file.readAsBytes(),
-        contentType: storedMedia.mimeType,
+      final uploadedValue = await StoredMediaUploadService.upload(
+        storedMedia: storedMedia,
+        bucket: reference.bucket,
+        remotePath: reference.remotePath,
         upsert: reference.upsert,
       );
+      if (uploadedValue == null) continue;
 
       updated = reference.writeValue(updated, uploadedValue);
-      await _updateStoredMediaRemoteUrl(storedMedia, uploadedValue);
       changed = true;
     }
 
@@ -52,22 +46,5 @@ abstract final class SyncMediaReferenceApplier {
   static bool _shouldUploadMediaReference(String? currentValue) {
     final value = currentValue?.trim();
     return value == null || value.isEmpty || !ImageHelper.isRemoteUrl(value);
-  }
-
-  static Future<void> _updateStoredMediaRemoteUrl(
-    StoredMedia storedMedia,
-    String remoteUrl,
-  ) {
-    return LocalDB.storedMedia.upsert(
-      StoredMedia(
-        id: storedMedia.id,
-        localPath: storedMedia.localPath,
-        remoteUrl: remoteUrl,
-        mimeType: storedMedia.mimeType,
-        byteSize: storedMedia.byteSize,
-        createdAt: storedMedia.createdAt,
-        updatedAt: DateTime.now(),
-      ),
-    );
   }
 }

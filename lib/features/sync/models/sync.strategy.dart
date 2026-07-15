@@ -1,17 +1,17 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show SyncStrategyPullPushPlan, ChangedEntity, DeckSyncSession;
+    show SyncStrategyPullPushPlan, ChangedEntity;
 
-abstract class SyncStrategy<T> {
+abstract class SyncStrategy<T, TContext> {
   String get name;
 
-  Future<bool> doesItNeedSync(DeckSyncSession context);
+  Future<bool> doesItNeedSync(TContext context);
 
   Future<SyncStrategyPullPushPlan<T>> getSyncStrategyPullPushPlan(
-    DeckSyncSession context,
+    TContext context,
   );
 
   Future<List<ChangedEntity<T>>> applySyncStrategyPullPushPlan(
     SyncStrategyPullPushPlan<T> plan,
-    DeckSyncSession context,
+    TContext context,
   );
 }

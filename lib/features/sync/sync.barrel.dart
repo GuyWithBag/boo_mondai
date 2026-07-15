@@ -11,3 +11,5 @@ export 'sync.page.dart';
 export 'sync.controller.dart';
 export 'sync.service.dart';
 export 'sync_media_reference_applier.dart';
+export 'sync_media_source_applier.dart';
+export 'sync_markdown_media_applier.dart';

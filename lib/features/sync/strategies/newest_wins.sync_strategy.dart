@@ -10,17 +10,16 @@ import 'package:boo_mondai/lib.barrel.dart'
         ChangedProperty,
         ChangeSource,
         ChangeType,
-        DeckSyncSession,
         TimeHelper;
 
-typedef DeckSyncIndexLoader =
-    Future<List<SyncIndexEntry>> Function(DeckSyncSession context);
-typedef DeckSyncItemsByIdsLoader<T> =
-    Future<List<T>> Function(DeckSyncSession context, List<String> ids);
-typedef DeckSyncPushItemPreprocessor<T> =
-    Future<T> Function(T item, DeckSyncSession context);
+typedef SyncIndexLoader<TContext> =
+    Future<List<SyncIndexEntry>> Function(TContext context);
+typedef SyncItemsByIdsLoader<T, TContext> =
+    Future<List<T>> Function(TContext context, List<String> ids);
+typedef SyncPushItemPreprocessor<T, TContext> =
+    Future<T> Function(T item, TContext context);
 
-class NewestWinsSyncStrategy<T> implements SyncStrategy<T> {
+class NewestWinsSyncStrategy<T, TContext> implements SyncStrategy<T, TContext> {
   const NewestWinsSyncStrategy({
     required this.name,
     required this.localIndex,
@@ -41,26 +40,26 @@ class NewestWinsSyncStrategy<T> implements SyncStrategy<T> {
   final String name;
   final HiveLocalDB<T>? localDb;
   final SupabaseRemoteDB<T>? remoteDb;
-  final DeckSyncIndexLoader localIndex;
-  final DeckSyncIndexLoader remoteIndex;
-  final DeckSyncItemsByIdsLoader<T> localItemsByIds;
-  final DeckSyncItemsByIdsLoader<T> remoteItemsByIds;
+  final SyncIndexLoader<TContext> localIndex;
+  final SyncIndexLoader<TContext> remoteIndex;
+  final SyncItemsByIdsLoader<T, TContext> localItemsByIds;
+  final SyncItemsByIdsLoader<T, TContext> remoteItemsByIds;
   final String Function(T item) itemId;
   final Future<void> Function(T item)? applyPullItem;
   final Future<void> Function(T item)? applyPushItem;
-  final DeckSyncPushItemPreprocessor<T>? preprocessPushItem;
+  final SyncPushItemPreprocessor<T, TContext>? preprocessPushItem;
   final Map<String, Object?> Function(T item)? itemToChangeMap;
   final Set<String> ignoredChangeKeys;
 
   @override
-  Future<bool> doesItNeedSync(DeckSyncSession context) async {
+  Future<bool> doesItNeedSync(TContext context) async {
     final comparison = await _compareIndexes(context);
     return comparison.hasChanges;
   }
 
   @override
   Future<SyncStrategyPullPushPlan<T>> getSyncStrategyPullPushPlan(
-    DeckSyncSession context,
+    TContext context,
   ) async {
     final comparison = await _compareIndexes(context);
     final localIndexById = comparison.localIndexById;
@@ -184,9 +183,7 @@ class NewestWinsSyncStrategy<T> implements SyncStrategy<T> {
     );
   }
 
-  Future<_NewestWinsIndexComparison> _compareIndexes(
-    DeckSyncSession context,
-  ) async {
+  Future<_NewestWinsIndexComparison> _compareIndexes(TContext context) async {
     final localIndexData = await localIndex(context);
     final remoteIndexData = await remoteIndex(context);
     final localIndexById = {
@@ -244,7 +241,7 @@ class NewestWinsSyncStrategy<T> implements SyncStrategy<T> {
   @override
   Future<List<ChangedEntity<T>>> applySyncStrategyPullPushPlan(
     SyncStrategyPullPushPlan<T> plan,
-    DeckSyncSession context,
+    TContext context,
   ) async {
     for (final remote in plan.pullItems) {
       final applyPull = applyPullItem ?? localDb?.upsert;
@@ -264,7 +261,7 @@ class NewestWinsSyncStrategy<T> implements SyncStrategy<T> {
     return plan.changes;
   }
 
-  Future<T> _preprocessPushItem(T item, DeckSyncSession context) {
+  Future<T> _preprocessPushItem(T item, TContext context) {
     final preprocessor = preprocessPushItem;
     return preprocessor == null
         ? Future.value(item)

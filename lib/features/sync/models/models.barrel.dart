@@ -8,3 +8,5 @@ export 'sync.strategy.dart';
 export 'sync.strategy_pull_push_plan.dart';
 export 'sync.index_entry.dart';
 export 'sync_media_reference.dart';
+export 'sync.plan_step.dart';
+export 'typed_sync.plan_step.dart';

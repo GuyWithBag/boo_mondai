@@ -3,15 +3,14 @@ import 'package:boo_mondai/lib.barrel.dart'
         SyncStrategy,
         HiveLocalDB,
         SupabaseRemoteDB,
-        DeckSyncIndexLoader,
-        DeckSyncItemsByIdsLoader,
-        DeckSyncSession,
+        SyncIndexLoader,
+        SyncItemsByIdsLoader,
         SyncStrategyPullPushPlan,
         ChangedEntity,
         ChangeSource,
         ChangeType;
 
-class AppendOnlySyncStrategy<T> implements SyncStrategy<T> {
+class AppendOnlySyncStrategy<T, TContext> implements SyncStrategy<T, TContext> {
   const AppendOnlySyncStrategy({
     required this.name,
     required this.localDb,
@@ -28,22 +27,22 @@ class AppendOnlySyncStrategy<T> implements SyncStrategy<T> {
   final String name;
   final HiveLocalDB<T> localDb;
   final SupabaseRemoteDB<T> remoteDb;
-  final DeckSyncIndexLoader localIndex;
-  final DeckSyncIndexLoader remoteIndex;
-  final DeckSyncItemsByIdsLoader<T> localItemsByIds;
-  final DeckSyncItemsByIdsLoader<T> remoteItemsByIds;
+  final SyncIndexLoader<TContext> localIndex;
+  final SyncIndexLoader<TContext> remoteIndex;
+  final SyncItemsByIdsLoader<T, TContext> localItemsByIds;
+  final SyncItemsByIdsLoader<T, TContext> remoteItemsByIds;
   final String Function(T item) itemId;
   final ChangeType changeType;
 
   @override
-  Future<bool> doesItNeedSync(DeckSyncSession context) async {
+  Future<bool> doesItNeedSync(TContext context) async {
     final comparison = await _compareIndexes(context);
     return comparison.hasChanges;
   }
 
   @override
   Future<SyncStrategyPullPushPlan<T>> getSyncStrategyPullPushPlan(
-    DeckSyncSession context,
+    TContext context,
   ) async {
     final comparison = await _compareIndexes(context);
     final pullItems = await remoteItemsByIds(context, comparison.pullIds);
@@ -84,9 +83,7 @@ class AppendOnlySyncStrategy<T> implements SyncStrategy<T> {
     );
   }
 
-  Future<_AppendOnlyIndexComparison> _compareIndexes(
-    DeckSyncSession context,
-  ) async {
+  Future<_AppendOnlyIndexComparison> _compareIndexes(TContext context) async {
     final localIndexData = await localIndex(context);
     final remoteIndexData = await remoteIndex(context);
     final localIds = {for (final item in localIndexData) item.id};
@@ -118,7 +115,7 @@ class AppendOnlySyncStrategy<T> implements SyncStrategy<T> {
   @override
   Future<List<ChangedEntity<T>>> applySyncStrategyPullPushPlan(
     SyncStrategyPullPushPlan<T> plan,
-    DeckSyncSession context,
+    TContext context,
   ) async {
     for (final remote in plan.pullItems) {
       await localDb.upsert(remote);
