@@ -5,7 +5,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         AuthController,
         EditableTextValue,
         StoredMediaService,
-        StoredMediaPath,
+        StoredMediaPathHelper,
         ProfileAvatar;
 import 'package:flutter/material.dart'
     show
@@ -50,7 +50,7 @@ class ProfileCard extends StatelessWidget {
             displayName: displayName,
             avatarUrl:
                 StoredMediaService.getFileByPath(
-                  const StoredMediaPath.app(name: 'profileAvatar'),
+                  StoredMediaPathHelper.profileAvatar(),
                 )?.path ??
                 profile.avatarUrl,
             radius: 66,

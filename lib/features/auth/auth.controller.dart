@@ -8,9 +8,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         Controller,
         AuthService,
         AuthServiceResponse,
-        StoredMediaService,
-        StoredMediaPath,
         Profile,
+        ProfileMediaService,
         RemoteDB,
         LocalDB;
 import 'package:file_picker/file_picker.dart' show PlatformFile;
@@ -114,21 +113,30 @@ class AuthController extends Controller {
     );
     await LocalDB.profile.upsert(updated);
     if (AuthService.isAuthenticatedRemote) {
-      await RemoteDB.profile.upsert(updated);
+      await RemoteDB.profile.upsert(
+        await ProfileMediaService.uploadAvatarIfNeeded(
+          profile: updated,
+          bucket: RemoteDB.publicBucket,
+        ),
+      );
     }
     notifyListeners();
   }
 
   Future<void> updateAvatarImage(PlatformFile file) async {
-    final profile = currentProfile;
-    final localPath = await StoredMediaService.storeFile(
-      path: const StoredMediaPath.app(name: 'profileAvatar'),
+    var updated = await ProfileMediaService.saveAvatarImage(
+      profile: currentProfile,
       file: file,
-      remoteUrl: profile.avatarUrl,
     );
-    if (localPath == null) return;
+    if (updated == null) return;
 
-    await LocalDB.profile.upsert(profile.copyWith(updatedAt: DateTime.now()));
+    if (AuthService.isAuthenticatedRemote) {
+      updated = await ProfileMediaService.uploadAvatarIfNeeded(
+        profile: updated,
+        bucket: RemoteDB.publicBucket,
+      );
+      await RemoteDB.profile.upsert(updated);
+    }
     notifyListeners();
   }
 
