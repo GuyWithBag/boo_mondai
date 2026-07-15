@@ -21,8 +21,9 @@ abstract final class SyncDeletionService {
   static const cardTemplateTags = 'card_template_tags';
   static const userStudyCardTags = 'user_study_cards_tags';
 
-  static SyncStrategy<SyncDeletion> createStrategy(DeckSyncSession session) =>
-      const _LocalSyncDeletionStrategy();
+  static SyncStrategy<SyncDeletion, DeckSyncSession> createStrategy(
+    DeckSyncSession session,
+  ) => const _LocalSyncDeletionStrategy();
 
   static SyncDeletion create({
     required String entityType,
@@ -173,7 +174,8 @@ abstract final class SyncDeletionService {
   }
 }
 
-class _LocalSyncDeletionStrategy implements SyncStrategy<SyncDeletion> {
+class _LocalSyncDeletionStrategy
+    implements SyncStrategy<SyncDeletion, DeckSyncSession> {
   const _LocalSyncDeletionStrategy();
 
   @override
