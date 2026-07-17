@@ -9,10 +9,13 @@ import 'package:boo_mondai/lib.barrel.dart'
         AuthService,
         AuthServiceResponse,
         Profile,
-        ProfileMediaService,
-        RemoteDB,
-        LocalDB;
-import 'package:file_picker/file_picker.dart' show PlatformFile;
+        LocalDB,
+        showModal,
+        ModalTone,
+        ModalAction,
+        ButtonColor,
+        SyncDeckService;
+import 'package:flutter/material.dart';
 
 class AuthController extends Controller {
   /// Holds the result of the latest auth action to drive UI logic (like merges)
@@ -23,6 +26,8 @@ class AuthController extends Controller {
   Profile get currentProfile => LocalDB.profile.getOrCreate();
 
   String? get currentEmail => AuthService.currentUser?.email;
+
+  bool get isAuthenticatedEither => AuthService.isAuthenticatedEither;
 
   /// Drives the UI prompt for merging guest data based on the latest auth response.
   bool get hasPendingGuestMerge => authServiceResponse?.needsMerge ?? false;
@@ -40,7 +45,11 @@ class AuthController extends Controller {
     }
   }
 
-  Future<void> signIn(String email, String password) async {
+  Future<void> signIn({
+    required BuildContext context,
+    required String email,
+    required String password,
+  }) async {
     setLoading(true);
     try {
       authServiceResponse = await AuthService.signIn(email, password);
@@ -49,6 +58,35 @@ class AuthController extends Controller {
     } finally {
       setLoading(false);
     }
+  }
+
+  Future<bool> showPendingGuestMerge({required BuildContext context}) async {
+    if (!hasPendingGuestMerge) return false;
+
+    final shouldMerge = await showModal<bool>(
+      context: context,
+      barrierDismissible: false,
+      title: 'You have local data',
+      subtitle:
+          'Merge your decks and study progress into this account, or discard the local data and load your account data instead.',
+      leading: const Icon(Icons.sync_alt),
+      actions: const [
+        ModalAction<bool>(
+          value: false,
+          label: 'Discard local data',
+          color: ButtonColor.error,
+        ),
+        ModalAction<bool>(
+          value: true,
+          label: 'Merge into account',
+          color: ButtonColor.error,
+        ),
+      ],
+    );
+
+    if (shouldMerge == null) return false;
+    await confirmMerge(shouldMerge);
+    return true;
   }
 
   Future<void> signInWithGoogle() async {
@@ -90,10 +128,80 @@ class AuthController extends Controller {
     }
   }
 
-  Future<void> signOut() async {
+  Future<bool> hasLocalSyncData() async {
+    final userId = currentProfile.id;
+    final decks = LocalDB.deck.getByCurrentUser();
+
+    if (decks.isEmpty) return false;
+
+    for (final deck in decks) {
+      final tables = SyncDeckService.getTables(deckId: deck.id);
+
+      for (final table in tables) {
+        final getLocalIndex = table.getLocalIndex;
+        if (getLocalIndex == null) continue;
+
+        final localIndex = await getLocalIndex(userId);
+        if (localIndex.isNotEmpty) return true;
+      }
+    }
+
+    return false;
+  }
+
+  Future<void> onSignOutPressed({required BuildContext context}) async {
     setLoading(true);
+    if (!await hasLocalSyncData()) {
+      if (!context.mounted) return;
+      showModal<void>(
+        context: context,
+        tone: ModalTone.error,
+        leading: const Icon(Icons.logout),
+        actionsMainAxisAlignment: MainAxisAlignment.spaceBetween,
+        title: 'Sign Out',
+        subtitle: 'Are you sure?',
+        actions: [
+          ModalAction(value: null, label: 'Cancel'),
+          ModalAction(value: null, label: 'Continue', onPressed: signOut),
+        ],
+      );
+      setLoading(false);
+      return;
+    }
+
+    if (!context.mounted) return;
+
+    showModal<void>(
+      context: context,
+      tone: ModalTone.error,
+      leading: const Icon(Icons.logout),
+      showCancelButton: true,
+      actionsMainAxisAlignment: MainAxisAlignment.spaceBetween,
+      title: 'Sign Out',
+      subtitle:
+          'Keep your local data on this device, or remove it after signing out.',
+      actions: [
+        ModalAction(value: null, label: 'Keep data', onPressed: signOut),
+        ModalAction(
+          value: null,
+          label: 'Remove data',
+          color: ButtonColor.hard,
+          onPressed: onRemoveDataPressed,
+        ),
+      ],
+    );
+    setLoading(false);
+  }
+
+  Future<void> signOut({bool removeLocalData = false}) async {
+    setLoading(true);
+
     try {
       await AuthService.signOut();
+      await LocalDB.cachedProfile.clear();
+      if (removeLocalData) {
+        await LocalDB.clearAll();
+      }
       authServiceResponse = null; // Reset auth state on sign out
     } on Exception catch (e) {
       setError(e);
@@ -102,42 +210,9 @@ class AuthController extends Controller {
     }
   }
 
-  Future<void> updateDisplayName(String displayName) async {
-    final trimmed = displayName.trim();
-    if (trimmed.isEmpty) return;
-
-    final profile = currentProfile;
-    final updated = profile.copyWith(
-      displayName: trimmed,
-      updatedAt: DateTime.now(),
-    );
-    await LocalDB.profile.upsert(updated);
-    if (AuthService.isAuthenticatedRemote) {
-      await RemoteDB.profile.upsert(
-        await ProfileMediaService.uploadAvatarIfNeeded(
-          profile: updated,
-          bucket: RemoteDB.publicBucket,
-        ),
-      );
-    }
-    notifyListeners();
-  }
-
-  Future<void> updateAvatarImage(PlatformFile file) async {
-    var updated = await ProfileMediaService.saveAvatarImage(
-      profile: currentProfile,
-      file: file,
-    );
-    if (updated == null) return;
-
-    if (AuthService.isAuthenticatedRemote) {
-      updated = await ProfileMediaService.uploadAvatarIfNeeded(
-        profile: updated,
-        bucket: RemoteDB.publicBucket,
-      );
-      await RemoteDB.profile.upsert(updated);
-    }
-    notifyListeners();
+  Future<void> onRemoveDataPressed() async {
+    await LocalDB.clearAll();
+    await signOut();
   }
 
   Future<void> manualDevSignIn(String url) async {

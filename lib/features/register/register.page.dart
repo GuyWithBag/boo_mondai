@@ -8,13 +8,12 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AuthController,
+        useRegisterController,
         AuthValidators,
-        showGuestMergeDialog,
         ErrorText,
         AppTokens,
         ButtonColor,
         Button,
-        buttonStyle,
         ButtonVariant,
         FormField,
         Scaffold,
@@ -26,7 +25,7 @@ import 'package:flutter/material.dart'
     hide BackButton, FormField, TextField, Scaffold, AppBar;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' show ReadContext;
 import 'package:theme_variants/theme_variants.dart';
 
 class RegisterPage extends HookWidget {
@@ -34,42 +33,17 @@ class RegisterPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final nameController = useTextEditingController();
-    final emailController = useTextEditingController();
-    final passwordController = useTextEditingController();
-    final emailFocus = useFocusNode();
-    final nameFocus = useFocusNode();
-    final passwordFocus = useFocusNode();
-    final formKey = useMemoized(GlobalKey<FormState>.new);
     final tokens = context.themeTokens<AppTokens>();
 
-    final auth = context.watch<AuthController>();
-
-    useEffect(() {
-      nameFocus.requestFocus();
-      return null;
-    }, const []);
-
-    Future<void> signUp() async {
-      if (!(formKey.currentState?.validate() ?? false)) return;
-
-      await auth.signUp(
-        emailController.text.trim(),
-        passwordController.text,
-        nameController.text.trim(),
-      );
-
-      if (!context.mounted) return;
-
-      if (auth.hasPendingGuestMerge) {
-        await showGuestMergeDialog(context: context, auth: auth);
-      }
-    }
+    final register = useRegisterController(
+      context: context,
+      authController: context.read<AuthController>(),
+    );
 
     return Scaffold(
       appBar: AppBar(title: 'Create an Account'),
       body: Form(
-        key: formKey,
+        key: register.formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -81,9 +55,9 @@ class RegisterPage extends HookWidget {
               textAlign: TextAlign.center,
             ),
             FormField<String>(
-              value: nameController.text,
-              listenable: nameController,
-              valueReader: () => nameController.text,
+              value: register.nameController.text,
+              listenable: register.nameController,
+              valueReader: () => register.nameController.text,
               validator: AuthValidators.displayName,
               builder: (context, field) => Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -91,8 +65,8 @@ class RegisterPage extends HookWidget {
                   const Text('Display Name'),
                   SizedBox(height: tokens.spaceLayoutGapXsm),
                   TextField(
-                    controller: nameController,
-                    focusNode: nameFocus,
+                    controller: register.nameController,
+                    focusNode: register.nameFocus,
                     placeholder: 'Display name',
                     textInputAction: TextInputAction.next,
                     variants: const [
@@ -100,15 +74,15 @@ class RegisterPage extends HookWidget {
                       TextFieldFrame.outline,
                     ],
                     onChanged: field.didChange,
-                    onSubmitted: (_) => emailFocus.requestFocus(),
+                    onSubmitted: (_) => register.emailFocus.requestFocus(),
                   ),
                 ],
               ),
             ),
             FormField<String>(
-              value: emailController.text,
-              listenable: emailController,
-              valueReader: () => emailController.text,
+              value: register.emailController.text,
+              listenable: register.emailController,
+              valueReader: () => register.emailController.text,
               validator: AuthValidators.email,
               builder: (context, field) => Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -116,8 +90,8 @@ class RegisterPage extends HookWidget {
                   const Text('Email'),
                   SizedBox(height: tokens.spaceLayoutGapXsm),
                   TextField(
-                    controller: emailController,
-                    focusNode: emailFocus,
+                    controller: register.emailController,
+                    focusNode: register.emailFocus,
                     placeholder: 'you@example.com',
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.next,
@@ -126,15 +100,15 @@ class RegisterPage extends HookWidget {
                       TextFieldFrame.outline,
                     ],
                     onChanged: field.didChange,
-                    onSubmitted: (_) => passwordFocus.requestFocus(),
+                    onSubmitted: (_) => register.passwordFocus.requestFocus(),
                   ),
                 ],
               ),
             ),
             FormField<String>(
-              value: passwordController.text,
-              listenable: passwordController,
-              valueReader: () => passwordController.text,
+              value: register.passwordController.text,
+              listenable: register.passwordController,
+              valueReader: () => register.passwordController.text,
               validator: AuthValidators.password,
               builder: (context, field) => Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -142,8 +116,8 @@ class RegisterPage extends HookWidget {
                   const Text('Password'),
                   SizedBox(height: tokens.spaceLayoutGapXsm),
                   TextField(
-                    controller: passwordController,
-                    focusNode: passwordFocus,
+                    controller: register.passwordController,
+                    focusNode: register.passwordFocus,
                     placeholder: 'Password',
                     obscureText: true,
                     textInputAction: TextInputAction.done,
@@ -152,19 +126,17 @@ class RegisterPage extends HookWidget {
                       TextFieldFrame.outline,
                     ],
                     onChanged: field.didChange,
-                    onSubmitted: (_) => signUp(),
+                    onSubmitted: (_) => register.signUp(),
                   ),
                 ],
               ),
             ),
-            if (auth.error != null) ...[ErrorText(auth.error)],
+            if (register.error != null) ...[ErrorText(register.error)],
             Button(
-              style: buttonStyle.resolve(
-                context.themeTokens<AppTokens>(),
-                const [ButtonColor.primary],
-              ),
-              onPressed: auth.isLoading ? null : signUp,
-              child: auth.isLoading
+              variants: [ButtonColor.primary],
+
+              onPressed: register.isLoading ? null : register.signUp,
+              child: register.isLoading
                   ? const SizedBox(
                       height: 20,
                       width: 20,
@@ -173,10 +145,8 @@ class RegisterPage extends HookWidget {
                   : const Text('Sign Up'),
             ),
             Button(
-              style: buttonStyle.resolve(
-                context.themeTokens<AppTokens>(),
-                const [ButtonColor.primary, ButtonVariant.flat],
-              ),
+              variants: const [ButtonColor.primary, ButtonVariant.flat],
+
               onPressed: () => context.push('/login'),
               child: const Text('Already have an account? Sign In'),
             ),
