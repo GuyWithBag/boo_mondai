@@ -23,4 +23,7 @@ class StreaksRemoteDB extends SupabaseRemoteDB<Streak> {
 
   @override
   String get upsertConflictTarget => 'id';
+
+  @override
+  bool get supportsSoftDelete => true;
 }

@@ -26,6 +26,9 @@ class StudyCardsRemoteDB extends SupabaseRemoteDB<StudyCard> {
   String get upsertConflictTarget => 'id';
 
   @override
+  bool get supportsSoftDelete => true;
+
+  @override
   String get defaultSelect => _studyCardWithRelationsSelect;
 
   @override
@@ -36,59 +39,53 @@ class StudyCardsRemoteDB extends SupabaseRemoteDB<StudyCard> {
     'personal_tags',
   };
 
-  Future<List<StudyCard>> selectManyByDeckId(String deckId) =>
-      selectMany(filters: {'deck_id': deckId});
+  Future<List<StudyCard>> selectManyByDeckId(
+    String deckId, {
+    bool includeDeleted = false,
+  }) =>
+      selectMany(filters: {'deck_id': deckId}, includeDeleted: includeDeleted);
 
-  Future<List<StudyCard>> selectManyByDeckIds(List<String> deckIds) async {
+  Future<List<StudyCard>> selectManyByDeckIds(
+    List<String> deckIds, {
+    bool includeDeleted = false,
+  }) async {
     final cards = <StudyCard>[];
     for (final deckId in deckIds) {
-      cards.addAll(await selectManyByDeckId(deckId));
+      cards.addAll(
+        await selectManyByDeckId(deckId, includeDeleted: includeDeleted),
+      );
     }
     return cards;
   }
 
-  Future<List<StudyCard>> selectManyByIds(List<String> ids) async {
+  Future<List<StudyCard>> selectManyByIds(
+    List<String> ids, {
+    bool includeDeleted = false,
+  }) async {
     final cards = <StudyCard>[];
     for (final id in ids) {
-      final card = await selectOne(filters: {'id': id});
+      final card = await selectOne(
+        filters: {'id': id},
+        includeDeleted: includeDeleted,
+      );
       if (card != null) cards.add(card);
     }
     return cards;
   }
 
   Future<List<SyncIndexEntry>> selectSyncIndexByDeckIds(List<String> deckIds) =>
-      guard(() async {
-        if (deckIds.isEmpty) return const <SyncIndexEntry>[];
-
-        final response = await client
-            .from(tableName)
-            .select('id, updated_at')
-            .inFilter('deck_id', deckIds);
-        return List<Map<String, dynamic>>.from(response)
-            .map(
-              (row) => SyncIndexEntry(
-                id: row['id'] as String,
-                updatedAt: DateTime.parse(row['updated_at'] as String),
-              ),
-            )
-            .toList(growable: false);
-      }, action: 'selectSyncIndexByDeckIds(${deckIds.length} deckIds)');
+      deckIds.isEmpty
+      ? Future.value(const <SyncIndexEntry>[])
+      : selectSyncIndex(
+          applyQuery: (query) => query.inFilter('deck_id', deckIds),
+          action: 'selectSyncIndexByDeckIds(${deckIds.length} deckIds)',
+        );
 
   Future<List<SyncIndexEntry>> selectSyncIndexByDeckId(String deckId) =>
-      guard(() async {
-        final response = await client
-            .from(tableName)
-            .select('id, updated_at')
-            .eq('deck_id', deckId);
-        return List<Map<String, dynamic>>.from(response)
-            .map(
-              (row) => SyncIndexEntry(
-                id: row['id'] as String,
-                updatedAt: DateTime.parse(row['updated_at'] as String),
-              ),
-            )
-            .toList(growable: false);
-      }, action: 'selectSyncIndexByDeckId($deckId)');
+      selectSyncIndex(
+        applyQuery: (query) => query.eq('deck_id', deckId),
+        action: 'selectSyncIndexByDeckId($deckId)',
+      );
 }
 
 const _studyCardWithRelationsSelect =

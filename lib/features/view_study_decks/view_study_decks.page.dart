@@ -4,29 +4,30 @@
 
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        AppSpacing,
         StatusLayoutState,
         ListingStatesWrapper,
-        ReviewAllCard,
+        StudyAllDecks,
         AppBar,
-        ReviewDeckTile,
+        StudyDeckTile,
         ViewStudyCardsController,
         StudyDeckEntry,
         StudyDeckSearchFilter,
         useFilteredSearchBarController,
         FilteredSearchBar,
-        Scaffold;
-import 'package:flutter/material.dart'
-    show BuildContext, Widget, EdgeInsets, Icons;
+        Scaffold,
+        AppTokens;
+import 'package:flutter/material.dart' hide Scaffold, AppBar;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
+import 'package:theme_variants/theme_variants.dart';
 
-class ViewStudyCardsPage extends HookWidget {
-  const ViewStudyCardsPage({super.key});
+class ViewStudyDecksPage extends HookWidget {
+  const ViewStudyDecksPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     final ctrl = context.watch<ViewStudyCardsController>();
+    final tokens = context.themeTokens<AppTokens>();
     final searchController =
         useFilteredSearchBarController<StudyDeckEntry, StudyDeckSearchFilter>(
           filterCodec: ViewStudyCardsController.reviewSearchFilterCodec,
@@ -64,11 +65,11 @@ class ViewStudyCardsPage extends HookWidget {
         items: searchController.results,
         onRetry: ctrl.load,
         useParentScroll: true,
-        skeletonTile: ReviewDeckTile(),
-        leadingItem: ReviewAllCard(dueCount: ctrl.totalDue),
-
+        skeletonTile: StudyDeckTile(),
+        separatorHeight: tokens.spaceLayoutGapMd,
+        leadingItem: StudyAllDecks(dueCount: ctrl.totalDue),
         itemBuilder: (_, _, StudyDeckEntry entry) {
-          return ReviewDeckTile(deck: entry.deck, stats: entry.stats);
+          return StudyDeckTile(deck: entry.deck, stats: entry.stats);
         },
       ),
     );

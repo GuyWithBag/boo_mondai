@@ -13,12 +13,15 @@ part 'study_card.dto.mapper.dart';
 
 @MappableClass()
 class StudyCard with StudyCardMappable implements MutableEntity {
-  @override
   final String id;
   @override
   final DateTime createdAt;
   @override
   final DateTime updatedAt;
+  @override
+  final DateTime? deletedAt;
+  @override
+  final DateTime? purgeAfter;
   final String templateId;
   final bool isReversed;
   final String deckId;
@@ -33,6 +36,8 @@ class StudyCard with StudyCardMappable implements MutableEntity {
     required this.id,
     required this.createdAt,
     required this.updatedAt,
+    this.deletedAt,
+    this.purgeAfter,
     required this.templateId,
     this.isReversed = false,
     required this.deckId,

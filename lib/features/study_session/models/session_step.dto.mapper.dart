@@ -27,12 +27,18 @@ class SessionStepMapper extends ClassMapperBase<SessionStep> {
   static const Field<SessionStep, String> _f$id = Field('id', _$id);
   static String? _$insertedByRuleId(SessionStep v) => v.insertedByRuleId;
   static const Field<SessionStep, String> _f$insertedByRuleId = Field(
-      'insertedByRuleId', _$insertedByRuleId,
-      key: r'inserted_by_rule_id', opt: true);
+    'insertedByRuleId',
+    _$insertedByRuleId,
+    key: r'inserted_by_rule_id',
+    opt: true,
+  );
   static String? _$insertionReason(SessionStep v) => v.insertionReason;
   static const Field<SessionStep, String> _f$insertionReason = Field(
-      'insertionReason', _$insertionReason,
-      key: r'insertion_reason', opt: true);
+    'insertionReason',
+    _$insertionReason,
+    key: r'insertion_reason',
+    opt: true,
+  );
 
   @override
   final MappableFields<SessionStep> fields = const {
@@ -43,7 +49,10 @@ class SessionStepMapper extends ClassMapperBase<SessionStep> {
 
   static SessionStep _instantiate(DecodingData data) {
     throw MapperException.missingSubclass(
-        'SessionStep', 'step_type', '${data.value['step_type']}');
+      'SessionStep',
+      'step_type',
+      '${data.value['step_type']}',
+    );
   }
 
   @override
@@ -88,20 +97,33 @@ class CardSessionStepMapper extends SubClassMapperBase<CardSessionStep> {
   static String _$id(CardSessionStep v) => v.id;
   static const Field<CardSessionStep, String> _f$id = Field('id', _$id);
   static String _$studyCardId(CardSessionStep v) => v.studyCardId;
-  static const Field<CardSessionStep, String> _f$studyCardId =
-      Field('studyCardId', _$studyCardId, key: r'study_card_id');
+  static const Field<CardSessionStep, String> _f$studyCardId = Field(
+    'studyCardId',
+    _$studyCardId,
+    key: r'study_card_id',
+  );
   static int _$attemptNumber(CardSessionStep v) => v.attemptNumber;
   static const Field<CardSessionStep, int> _f$attemptNumber = Field(
-      'attemptNumber', _$attemptNumber,
-      key: r'attempt_number', opt: true, def: 1);
+    'attemptNumber',
+    _$attemptNumber,
+    key: r'attempt_number',
+    opt: true,
+    def: 1,
+  );
   static String? _$insertedByRuleId(CardSessionStep v) => v.insertedByRuleId;
   static const Field<CardSessionStep, String> _f$insertedByRuleId = Field(
-      'insertedByRuleId', _$insertedByRuleId,
-      key: r'inserted_by_rule_id', opt: true);
+    'insertedByRuleId',
+    _$insertedByRuleId,
+    key: r'inserted_by_rule_id',
+    opt: true,
+  );
   static String? _$insertionReason(CardSessionStep v) => v.insertionReason;
   static const Field<CardSessionStep, String> _f$insertionReason = Field(
-      'insertionReason', _$insertionReason,
-      key: r'insertion_reason', opt: true);
+    'insertionReason',
+    _$insertionReason,
+    key: r'insertion_reason',
+    opt: true,
+  );
 
   @override
   final MappableFields<CardSessionStep> fields = const {
@@ -122,11 +144,12 @@ class CardSessionStepMapper extends SubClassMapperBase<CardSessionStep> {
 
   static CardSessionStep _instantiate(DecodingData data) {
     return CardSessionStep(
-        id: data.dec(_f$id),
-        studyCardId: data.dec(_f$studyCardId),
-        attemptNumber: data.dec(_f$attemptNumber),
-        insertedByRuleId: data.dec(_f$insertedByRuleId),
-        insertionReason: data.dec(_f$insertionReason));
+      id: data.dec(_f$id),
+      studyCardId: data.dec(_f$studyCardId),
+      attemptNumber: data.dec(_f$attemptNumber),
+      insertedByRuleId: data.dec(_f$insertedByRuleId),
+      insertionReason: data.dec(_f$insertionReason),
+    );
   }
 
   @override
@@ -148,30 +171,38 @@ mixin CardSessionStepMappable {
   }
 
   Map<String, dynamic> toMap() {
-    return CardSessionStepMapper.ensureInitialized()
-        .encodeMap<CardSessionStep>(this as CardSessionStep);
+    return CardSessionStepMapper.ensureInitialized().encodeMap<CardSessionStep>(
+      this as CardSessionStep,
+    );
   }
 
   CardSessionStepCopyWith<CardSessionStep, CardSessionStep, CardSessionStep>
-      get copyWith =>
-          _CardSessionStepCopyWithImpl<CardSessionStep, CardSessionStep>(
-              this as CardSessionStep, $identity, $identity);
+  get copyWith =>
+      _CardSessionStepCopyWithImpl<CardSessionStep, CardSessionStep>(
+        this as CardSessionStep,
+        $identity,
+        $identity,
+      );
   @override
   String toString() {
-    return CardSessionStepMapper.ensureInitialized()
-        .stringifyValue(this as CardSessionStep);
+    return CardSessionStepMapper.ensureInitialized().stringifyValue(
+      this as CardSessionStep,
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return CardSessionStepMapper.ensureInitialized()
-        .equalsValue(this as CardSessionStep, other);
+    return CardSessionStepMapper.ensureInitialized().equalsValue(
+      this as CardSessionStep,
+      other,
+    );
   }
 
   @override
   int get hashCode {
-    return CardSessionStepMapper.ensureInitialized()
-        .hashValue(this as CardSessionStep);
+    return CardSessionStepMapper.ensureInitialized().hashValue(
+      this as CardSessionStep,
+    );
   }
 }
 
@@ -184,14 +215,16 @@ extension CardSessionStepValueCopy<$R, $Out>
 abstract class CardSessionStepCopyWith<$R, $In extends CardSessionStep, $Out>
     implements SessionStepCopyWith<$R, $In, $Out> {
   @override
-  $R call(
-      {String? id,
-      String? studyCardId,
-      int? attemptNumber,
-      String? insertedByRuleId,
-      String? insertionReason});
+  $R call({
+    String? id,
+    String? studyCardId,
+    int? attemptNumber,
+    String? insertedByRuleId,
+    String? insertionReason,
+  });
   CardSessionStepCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-      Then<$Out2, $R2> t);
+    Then<$Out2, $R2> t,
+  );
 }
 
 class _CardSessionStepCopyWithImpl<$R, $Out>
@@ -203,32 +236,34 @@ class _CardSessionStepCopyWithImpl<$R, $Out>
   late final ClassMapperBase<CardSessionStep> $mapper =
       CardSessionStepMapper.ensureInitialized();
   @override
-  $R call(
-          {String? id,
-          String? studyCardId,
-          int? attemptNumber,
-          Object? insertedByRuleId = $none,
-          Object? insertionReason = $none}) =>
-      $apply(FieldCopyWithData({
-        if (id != null) #id: id,
-        if (studyCardId != null) #studyCardId: studyCardId,
-        if (attemptNumber != null) #attemptNumber: attemptNumber,
-        if (insertedByRuleId != $none) #insertedByRuleId: insertedByRuleId,
-        if (insertionReason != $none) #insertionReason: insertionReason
-      }));
+  $R call({
+    String? id,
+    String? studyCardId,
+    int? attemptNumber,
+    Object? insertedByRuleId = $none,
+    Object? insertionReason = $none,
+  }) => $apply(
+    FieldCopyWithData({
+      if (id != null) #id: id,
+      if (studyCardId != null) #studyCardId: studyCardId,
+      if (attemptNumber != null) #attemptNumber: attemptNumber,
+      if (insertedByRuleId != $none) #insertedByRuleId: insertedByRuleId,
+      if (insertionReason != $none) #insertionReason: insertionReason,
+    }),
+  );
   @override
   CardSessionStep $make(CopyWithData data) => CardSessionStep(
-      id: data.get(#id, or: $value.id),
-      studyCardId: data.get(#studyCardId, or: $value.studyCardId),
-      attemptNumber: data.get(#attemptNumber, or: $value.attemptNumber),
-      insertedByRuleId:
-          data.get(#insertedByRuleId, or: $value.insertedByRuleId),
-      insertionReason: data.get(#insertionReason, or: $value.insertionReason));
+    id: data.get(#id, or: $value.id),
+    studyCardId: data.get(#studyCardId, or: $value.studyCardId),
+    attemptNumber: data.get(#attemptNumber, or: $value.attemptNumber),
+    insertedByRuleId: data.get(#insertedByRuleId, or: $value.insertedByRuleId),
+    insertionReason: data.get(#insertionReason, or: $value.insertionReason),
+  );
 
   @override
   CardSessionStepCopyWith<$R2, CardSessionStep, $Out2> $chain<$R2, $Out2>(
-          Then<$Out2, $R2> t) =>
-      _CardSessionStepCopyWithImpl<$R2, $Out2>($value, $cast, t);
+    Then<$Out2, $R2> t,
+  ) => _CardSessionStepCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
 class MessageSessionStepMapper extends SubClassMapperBase<MessageSessionStep> {
@@ -251,22 +286,34 @@ class MessageSessionStepMapper extends SubClassMapperBase<MessageSessionStep> {
   static String _$messageDefinitionId(MessageSessionStep v) =>
       v.messageDefinitionId;
   static const Field<MessageSessionStep, String> _f$messageDefinitionId = Field(
-      'messageDefinitionId', _$messageDefinitionId,
-      key: r'message_definition_id');
+    'messageDefinitionId',
+    _$messageDefinitionId,
+    key: r'message_definition_id',
+  );
   static String _$title(MessageSessionStep v) => v.title;
-  static const Field<MessageSessionStep, String> _f$title =
-      Field('title', _$title);
+  static const Field<MessageSessionStep, String> _f$title = Field(
+    'title',
+    _$title,
+  );
   static String _$message(MessageSessionStep v) => v.message;
-  static const Field<MessageSessionStep, String> _f$message =
-      Field('message', _$message);
+  static const Field<MessageSessionStep, String> _f$message = Field(
+    'message',
+    _$message,
+  );
   static String? _$insertedByRuleId(MessageSessionStep v) => v.insertedByRuleId;
   static const Field<MessageSessionStep, String> _f$insertedByRuleId = Field(
-      'insertedByRuleId', _$insertedByRuleId,
-      key: r'inserted_by_rule_id', opt: true);
+    'insertedByRuleId',
+    _$insertedByRuleId,
+    key: r'inserted_by_rule_id',
+    opt: true,
+  );
   static String? _$insertionReason(MessageSessionStep v) => v.insertionReason;
   static const Field<MessageSessionStep, String> _f$insertionReason = Field(
-      'insertionReason', _$insertionReason,
-      key: r'insertion_reason', opt: true);
+    'insertionReason',
+    _$insertionReason,
+    key: r'insertion_reason',
+    opt: true,
+  );
 
   @override
   final MappableFields<MessageSessionStep> fields = const {
@@ -288,12 +335,13 @@ class MessageSessionStepMapper extends SubClassMapperBase<MessageSessionStep> {
 
   static MessageSessionStep _instantiate(DecodingData data) {
     return MessageSessionStep(
-        id: data.dec(_f$id),
-        messageDefinitionId: data.dec(_f$messageDefinitionId),
-        title: data.dec(_f$title),
-        message: data.dec(_f$message),
-        insertedByRuleId: data.dec(_f$insertedByRuleId),
-        insertionReason: data.dec(_f$insertionReason));
+      id: data.dec(_f$id),
+      messageDefinitionId: data.dec(_f$messageDefinitionId),
+      title: data.dec(_f$title),
+      message: data.dec(_f$message),
+      insertedByRuleId: data.dec(_f$insertedByRuleId),
+      insertionReason: data.dec(_f$insertionReason),
+    );
   }
 
   @override
@@ -319,48 +367,66 @@ mixin MessageSessionStepMappable {
         .encodeMap<MessageSessionStep>(this as MessageSessionStep);
   }
 
-  MessageSessionStepCopyWith<MessageSessionStep, MessageSessionStep,
-          MessageSessionStep>
-      get copyWith => _MessageSessionStepCopyWithImpl<MessageSessionStep,
-          MessageSessionStep>(this as MessageSessionStep, $identity, $identity);
+  MessageSessionStepCopyWith<
+    MessageSessionStep,
+    MessageSessionStep,
+    MessageSessionStep
+  >
+  get copyWith =>
+      _MessageSessionStepCopyWithImpl<MessageSessionStep, MessageSessionStep>(
+        this as MessageSessionStep,
+        $identity,
+        $identity,
+      );
   @override
   String toString() {
-    return MessageSessionStepMapper.ensureInitialized()
-        .stringifyValue(this as MessageSessionStep);
+    return MessageSessionStepMapper.ensureInitialized().stringifyValue(
+      this as MessageSessionStep,
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return MessageSessionStepMapper.ensureInitialized()
-        .equalsValue(this as MessageSessionStep, other);
+    return MessageSessionStepMapper.ensureInitialized().equalsValue(
+      this as MessageSessionStep,
+      other,
+    );
   }
 
   @override
   int get hashCode {
-    return MessageSessionStepMapper.ensureInitialized()
-        .hashValue(this as MessageSessionStep);
+    return MessageSessionStepMapper.ensureInitialized().hashValue(
+      this as MessageSessionStep,
+    );
   }
 }
 
 extension MessageSessionStepValueCopy<$R, $Out>
     on ObjectCopyWith<$R, MessageSessionStep, $Out> {
   MessageSessionStepCopyWith<$R, MessageSessionStep, $Out>
-      get $asMessageSessionStep => $base.as(
-          (v, t, t2) => _MessageSessionStepCopyWithImpl<$R, $Out>(v, t, t2));
+  get $asMessageSessionStep => $base.as(
+    (v, t, t2) => _MessageSessionStepCopyWithImpl<$R, $Out>(v, t, t2),
+  );
 }
 
-abstract class MessageSessionStepCopyWith<$R, $In extends MessageSessionStep,
-    $Out> implements SessionStepCopyWith<$R, $In, $Out> {
+abstract class MessageSessionStepCopyWith<
+  $R,
+  $In extends MessageSessionStep,
+  $Out
+>
+    implements SessionStepCopyWith<$R, $In, $Out> {
   @override
-  $R call(
-      {String? id,
-      String? messageDefinitionId,
-      String? title,
-      String? message,
-      String? insertedByRuleId,
-      String? insertionReason});
+  $R call({
+    String? id,
+    String? messageDefinitionId,
+    String? title,
+    String? message,
+    String? insertedByRuleId,
+    String? insertionReason,
+  });
   MessageSessionStepCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-      Then<$Out2, $R2> t);
+    Then<$Out2, $R2> t,
+  );
 }
 
 class _MessageSessionStepCopyWithImpl<$R, $Out>
@@ -372,37 +438,41 @@ class _MessageSessionStepCopyWithImpl<$R, $Out>
   late final ClassMapperBase<MessageSessionStep> $mapper =
       MessageSessionStepMapper.ensureInitialized();
   @override
-  $R call(
-          {String? id,
-          String? messageDefinitionId,
-          String? title,
-          String? message,
-          Object? insertedByRuleId = $none,
-          Object? insertionReason = $none}) =>
-      $apply(FieldCopyWithData({
-        if (id != null) #id: id,
-        if (messageDefinitionId != null)
-          #messageDefinitionId: messageDefinitionId,
-        if (title != null) #title: title,
-        if (message != null) #message: message,
-        if (insertedByRuleId != $none) #insertedByRuleId: insertedByRuleId,
-        if (insertionReason != $none) #insertionReason: insertionReason
-      }));
+  $R call({
+    String? id,
+    String? messageDefinitionId,
+    String? title,
+    String? message,
+    Object? insertedByRuleId = $none,
+    Object? insertionReason = $none,
+  }) => $apply(
+    FieldCopyWithData({
+      if (id != null) #id: id,
+      if (messageDefinitionId != null)
+        #messageDefinitionId: messageDefinitionId,
+      if (title != null) #title: title,
+      if (message != null) #message: message,
+      if (insertedByRuleId != $none) #insertedByRuleId: insertedByRuleId,
+      if (insertionReason != $none) #insertionReason: insertionReason,
+    }),
+  );
   @override
   MessageSessionStep $make(CopyWithData data) => MessageSessionStep(
-      id: data.get(#id, or: $value.id),
-      messageDefinitionId:
-          data.get(#messageDefinitionId, or: $value.messageDefinitionId),
-      title: data.get(#title, or: $value.title),
-      message: data.get(#message, or: $value.message),
-      insertedByRuleId:
-          data.get(#insertedByRuleId, or: $value.insertedByRuleId),
-      insertionReason: data.get(#insertionReason, or: $value.insertionReason));
+    id: data.get(#id, or: $value.id),
+    messageDefinitionId: data.get(
+      #messageDefinitionId,
+      or: $value.messageDefinitionId,
+    ),
+    title: data.get(#title, or: $value.title),
+    message: data.get(#message, or: $value.message),
+    insertedByRuleId: data.get(#insertedByRuleId, or: $value.insertedByRuleId),
+    insertionReason: data.get(#insertionReason, or: $value.insertionReason),
+  );
 
   @override
   MessageSessionStepCopyWith<$R2, MessageSessionStep, $Out2> $chain<$R2, $Out2>(
-          Then<$Out2, $R2> t) =>
-      _MessageSessionStepCopyWithImpl<$R2, $Out2>($value, $cast, t);
+    Then<$Out2, $R2> t,
+  ) => _MessageSessionStepCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
 class SummarySessionStepMapper extends SubClassMapperBase<SummarySessionStep> {
@@ -424,12 +494,18 @@ class SummarySessionStepMapper extends SubClassMapperBase<SummarySessionStep> {
   static const Field<SummarySessionStep, String> _f$id = Field('id', _$id);
   static String? _$insertedByRuleId(SummarySessionStep v) => v.insertedByRuleId;
   static const Field<SummarySessionStep, String> _f$insertedByRuleId = Field(
-      'insertedByRuleId', _$insertedByRuleId,
-      key: r'inserted_by_rule_id', opt: true);
+    'insertedByRuleId',
+    _$insertedByRuleId,
+    key: r'inserted_by_rule_id',
+    opt: true,
+  );
   static String? _$insertionReason(SummarySessionStep v) => v.insertionReason;
   static const Field<SummarySessionStep, String> _f$insertionReason = Field(
-      'insertionReason', _$insertionReason,
-      key: r'insertion_reason', opt: true);
+    'insertionReason',
+    _$insertionReason,
+    key: r'insertion_reason',
+    opt: true,
+  );
 
   @override
   final MappableFields<SummarySessionStep> fields = const {
@@ -448,9 +524,10 @@ class SummarySessionStepMapper extends SubClassMapperBase<SummarySessionStep> {
 
   static SummarySessionStep _instantiate(DecodingData data) {
     return SummarySessionStep(
-        id: data.dec(_f$id),
-        insertedByRuleId: data.dec(_f$insertedByRuleId),
-        insertionReason: data.dec(_f$insertionReason));
+      id: data.dec(_f$id),
+      insertedByRuleId: data.dec(_f$insertedByRuleId),
+      insertionReason: data.dec(_f$insertionReason),
+    );
   }
 
   @override
@@ -476,42 +553,59 @@ mixin SummarySessionStepMappable {
         .encodeMap<SummarySessionStep>(this as SummarySessionStep);
   }
 
-  SummarySessionStepCopyWith<SummarySessionStep, SummarySessionStep,
-          SummarySessionStep>
-      get copyWith => _SummarySessionStepCopyWithImpl<SummarySessionStep,
-          SummarySessionStep>(this as SummarySessionStep, $identity, $identity);
+  SummarySessionStepCopyWith<
+    SummarySessionStep,
+    SummarySessionStep,
+    SummarySessionStep
+  >
+  get copyWith =>
+      _SummarySessionStepCopyWithImpl<SummarySessionStep, SummarySessionStep>(
+        this as SummarySessionStep,
+        $identity,
+        $identity,
+      );
   @override
   String toString() {
-    return SummarySessionStepMapper.ensureInitialized()
-        .stringifyValue(this as SummarySessionStep);
+    return SummarySessionStepMapper.ensureInitialized().stringifyValue(
+      this as SummarySessionStep,
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return SummarySessionStepMapper.ensureInitialized()
-        .equalsValue(this as SummarySessionStep, other);
+    return SummarySessionStepMapper.ensureInitialized().equalsValue(
+      this as SummarySessionStep,
+      other,
+    );
   }
 
   @override
   int get hashCode {
-    return SummarySessionStepMapper.ensureInitialized()
-        .hashValue(this as SummarySessionStep);
+    return SummarySessionStepMapper.ensureInitialized().hashValue(
+      this as SummarySessionStep,
+    );
   }
 }
 
 extension SummarySessionStepValueCopy<$R, $Out>
     on ObjectCopyWith<$R, SummarySessionStep, $Out> {
   SummarySessionStepCopyWith<$R, SummarySessionStep, $Out>
-      get $asSummarySessionStep => $base.as(
-          (v, t, t2) => _SummarySessionStepCopyWithImpl<$R, $Out>(v, t, t2));
+  get $asSummarySessionStep => $base.as(
+    (v, t, t2) => _SummarySessionStepCopyWithImpl<$R, $Out>(v, t, t2),
+  );
 }
 
-abstract class SummarySessionStepCopyWith<$R, $In extends SummarySessionStep,
-    $Out> implements SessionStepCopyWith<$R, $In, $Out> {
+abstract class SummarySessionStepCopyWith<
+  $R,
+  $In extends SummarySessionStep,
+  $Out
+>
+    implements SessionStepCopyWith<$R, $In, $Out> {
   @override
   $R call({String? id, String? insertedByRuleId, String? insertionReason});
   SummarySessionStepCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-      Then<$Out2, $R2> t);
+    Then<$Out2, $R2> t,
+  );
 }
 
 class _SummarySessionStepCopyWithImpl<$R, $Out>
@@ -523,24 +617,26 @@ class _SummarySessionStepCopyWithImpl<$R, $Out>
   late final ClassMapperBase<SummarySessionStep> $mapper =
       SummarySessionStepMapper.ensureInitialized();
   @override
-  $R call(
-          {String? id,
-          Object? insertedByRuleId = $none,
-          Object? insertionReason = $none}) =>
-      $apply(FieldCopyWithData({
-        if (id != null) #id: id,
-        if (insertedByRuleId != $none) #insertedByRuleId: insertedByRuleId,
-        if (insertionReason != $none) #insertionReason: insertionReason
-      }));
+  $R call({
+    String? id,
+    Object? insertedByRuleId = $none,
+    Object? insertionReason = $none,
+  }) => $apply(
+    FieldCopyWithData({
+      if (id != null) #id: id,
+      if (insertedByRuleId != $none) #insertedByRuleId: insertedByRuleId,
+      if (insertionReason != $none) #insertionReason: insertionReason,
+    }),
+  );
   @override
   SummarySessionStep $make(CopyWithData data) => SummarySessionStep(
-      id: data.get(#id, or: $value.id),
-      insertedByRuleId:
-          data.get(#insertedByRuleId, or: $value.insertedByRuleId),
-      insertionReason: data.get(#insertionReason, or: $value.insertionReason));
+    id: data.get(#id, or: $value.id),
+    insertedByRuleId: data.get(#insertedByRuleId, or: $value.insertedByRuleId),
+    insertionReason: data.get(#insertionReason, or: $value.insertionReason),
+  );
 
   @override
   SummarySessionStepCopyWith<$R2, SummarySessionStep, $Out2> $chain<$R2, $Out2>(
-          Then<$Out2, $R2> t) =>
-      _SummarySessionStepCopyWithImpl<$R2, $Out2>($value, $cast, t);
+    Then<$Out2, $R2> t,
+  ) => _SummarySessionStepCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }

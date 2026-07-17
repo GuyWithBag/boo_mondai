@@ -32,6 +32,12 @@ class StudyCardMapper extends ClassMapperBase<StudyCard> {
   static DateTime _$updatedAt(StudyCard v) => v.updatedAt;
   static const Field<StudyCard, DateTime> _f$updatedAt =
       Field('updatedAt', _$updatedAt, key: r'updated_at');
+  static DateTime? _$deletedAt(StudyCard v) => v.deletedAt;
+  static const Field<StudyCard, DateTime> _f$deletedAt =
+      Field('deletedAt', _$deletedAt, key: r'deleted_at', opt: true);
+  static DateTime? _$purgeAfter(StudyCard v) => v.purgeAfter;
+  static const Field<StudyCard, DateTime> _f$purgeAfter =
+      Field('purgeAfter', _$purgeAfter, key: r'purge_after', opt: true);
   static String _$templateId(StudyCard v) => v.templateId;
   static const Field<StudyCard, String> _f$templateId =
       Field('templateId', _$templateId, key: r'template_id');
@@ -58,6 +64,8 @@ class StudyCardMapper extends ClassMapperBase<StudyCard> {
     #id: _f$id,
     #createdAt: _f$createdAt,
     #updatedAt: _f$updatedAt,
+    #deletedAt: _f$deletedAt,
+    #purgeAfter: _f$purgeAfter,
     #templateId: _f$templateId,
     #isReversed: _f$isReversed,
     #deckId: _f$deckId,
@@ -71,6 +79,8 @@ class StudyCardMapper extends ClassMapperBase<StudyCard> {
         id: data.dec(_f$id),
         createdAt: data.dec(_f$createdAt),
         updatedAt: data.dec(_f$updatedAt),
+        deletedAt: data.dec(_f$deletedAt),
+        purgeAfter: data.dec(_f$purgeAfter),
         templateId: data.dec(_f$templateId),
         isReversed: data.dec(_f$isReversed),
         deckId: data.dec(_f$deckId),
@@ -138,6 +148,8 @@ abstract class StudyCardCopyWith<$R, $In extends StudyCard, $Out>
       {String? id,
       DateTime? createdAt,
       DateTime? updatedAt,
+      DateTime? deletedAt,
+      DateTime? purgeAfter,
       String? templateId,
       bool? isReversed,
       String? deckId,
@@ -170,6 +182,8 @@ class _StudyCardCopyWithImpl<$R, $Out>
           {String? id,
           DateTime? createdAt,
           DateTime? updatedAt,
+          Object? deletedAt = $none,
+          Object? purgeAfter = $none,
           String? templateId,
           bool? isReversed,
           String? deckId,
@@ -180,6 +194,8 @@ class _StudyCardCopyWithImpl<$R, $Out>
         if (id != null) #id: id,
         if (createdAt != null) #createdAt: createdAt,
         if (updatedAt != null) #updatedAt: updatedAt,
+        if (deletedAt != $none) #deletedAt: deletedAt,
+        if (purgeAfter != $none) #purgeAfter: purgeAfter,
         if (templateId != null) #templateId: templateId,
         if (isReversed != null) #isReversed: isReversed,
         if (deckId != null) #deckId: deckId,
@@ -192,6 +208,8 @@ class _StudyCardCopyWithImpl<$R, $Out>
       id: data.get(#id, or: $value.id),
       createdAt: data.get(#createdAt, or: $value.createdAt),
       updatedAt: data.get(#updatedAt, or: $value.updatedAt),
+      deletedAt: data.get(#deletedAt, or: $value.deletedAt),
+      purgeAfter: data.get(#purgeAfter, or: $value.purgeAfter),
       templateId: data.get(#templateId, or: $value.templateId),
       isReversed: data.get(#isReversed, or: $value.isReversed),
       deckId: data.get(#deckId, or: $value.deckId),

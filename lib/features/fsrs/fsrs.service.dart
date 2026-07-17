@@ -9,16 +9,12 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         FsrsCard,
         FsrsReviewLog,
-        DeckSyncSession,
         DueFilterThreshold,
         DeckDueStats,
         DeckHistoricalStats,
         LocalDB,
         Service,
         Services,
-        StudyCardService,
-        SyncDeletionService,
-        SyncIndexEntry,
         DueFilterExtension;
 import 'package:fsrs/fsrs.dart';
 import 'package:fsrs/fsrs.dart' as fsrs;
@@ -28,170 +24,6 @@ class FsrsService extends Service {
   String get name => 'FsrsService';
 
   final Scheduler scheduler = Scheduler();
-
-  static Future<List<FsrsCard>> loadLocalFsrsCardsForSyncSession(
-    DeckSyncSession session,
-  ) async {
-    final studyCardIds = (await StudyCardService.loadStudyCardIdsForSyncSession(
-      session,
-    )).toSet();
-    final deletedIds = await SyncDeletionService.loadDeletedEntityIds(
-      session: session,
-      entityType: SyncDeletionService.fsrsCards,
-    );
-    return SyncDeletionService.withoutDeletedItems(
-      session.fsrsCards.selectManyByUserIdAndStudyCardIds(
-        userId: session.userId,
-        studyCardIds: studyCardIds,
-      ),
-      deletedIds,
-      (card) => card.id,
-    );
-  }
-
-  static Future<List<FsrsCard>> loadRemoteFsrsCardsForSyncSession(
-    DeckSyncSession session,
-  ) async {
-    final studyCardIds = (await StudyCardService.loadStudyCardIdsForSyncSession(
-      session,
-    )).toSet();
-    final deletedIds = await SyncDeletionService.loadDeletedEntityIds(
-      session: session,
-      entityType: SyncDeletionService.fsrsCards,
-    );
-    final cards = await session.remoteFsrsCards
-        .selectManyByUserIdAndStudyCardIds(
-          userId: session.userId,
-          studyCardIds: studyCardIds,
-        );
-    return SyncDeletionService.withoutDeletedItems(
-      cards,
-      deletedIds,
-      (card) => card.id,
-    );
-  }
-
-  static Future<List<SyncIndexEntry>> loadLocalFsrsCardSyncIndexForSyncSession(
-    DeckSyncSession session,
-  ) async {
-    final studyCardIds = (await StudyCardService.loadStudyCardIdsForSyncSession(
-      session,
-    )).toSet();
-    final deletedIds = await SyncDeletionService.loadDeletedEntityIds(
-      session: session,
-      entityType: SyncDeletionService.fsrsCards,
-    );
-    return SyncDeletionService.withoutDeletedIndexEntries(
-      session.fsrsCards.selectSyncIndexByUserIdAndStudyCardIds(
-        userId: session.userId,
-        studyCardIds: studyCardIds,
-      ),
-      deletedIds,
-    );
-  }
-
-  static Future<List<SyncIndexEntry>> loadRemoteFsrsCardSyncIndexForSyncSession(
-    DeckSyncSession session,
-  ) async {
-    final studyCardIds = (await StudyCardService.loadStudyCardIdsForSyncSession(
-      session,
-    )).toSet();
-    final deletedIds = await SyncDeletionService.loadDeletedEntityIds(
-      session: session,
-      entityType: SyncDeletionService.fsrsCards,
-    );
-    final entries = await session.remoteFsrsCards
-        .selectSyncIndexByUserIdAndStudyCardIds(
-          userId: session.userId,
-          studyCardIds: studyCardIds,
-        );
-    return SyncDeletionService.withoutDeletedIndexEntries(entries, deletedIds);
-  }
-
-  static Future<List<FsrsCard>> loadLocalFsrsCardsByIdsForSyncSession(
-    DeckSyncSession session,
-    List<String> ids,
-  ) async {
-    final deletedIds = await SyncDeletionService.loadDeletedEntityIds(
-      session: session,
-      entityType: SyncDeletionService.fsrsCards,
-    );
-    return SyncDeletionService.withoutDeletedItems(
-      session.fsrsCards.selectManyByIds(ids),
-      deletedIds,
-      (card) => card.id,
-    );
-  }
-
-  static Future<List<FsrsCard>> loadRemoteFsrsCardsByIdsForSyncSession(
-    DeckSyncSession session,
-    List<String> ids,
-  ) async {
-    final deletedIds = await SyncDeletionService.loadDeletedEntityIds(
-      session: session,
-      entityType: SyncDeletionService.fsrsCards,
-    );
-    final cards = await session.remoteFsrsCards.selectManyByIds(ids);
-    return SyncDeletionService.withoutDeletedItems(
-      cards,
-      deletedIds,
-      (card) => card.id,
-    );
-  }
-
-  static Future<List<String>> loadFsrsCardIdsForSyncSession(
-    DeckSyncSession session,
-  ) async {
-    final localCards = await loadLocalFsrsCardSyncIndexForSyncSession(session);
-    final remoteCards = await loadRemoteFsrsCardSyncIndexForSyncSession(
-      session,
-    );
-    return {
-      for (final card in localCards) card.id,
-      for (final card in remoteCards) card.id,
-    }.toList(growable: false);
-  }
-
-  static Future<List<FsrsReviewLog>> loadLocalReviewLogsForSyncSession(
-    DeckSyncSession session,
-  ) async {
-    final fsrsCardIds = (await loadFsrsCardIdsForSyncSession(session)).toSet();
-    return session.reviewLogs.selectManyByFsrsCardIds(fsrsCardIds);
-  }
-
-  static Future<List<FsrsReviewLog>> loadRemoteReviewLogsForSyncSession(
-    DeckSyncSession session,
-  ) async {
-    final fsrsCardIds = await loadFsrsCardIdsForSyncSession(session);
-    return session.remoteReviewLogs.selectManyByFsrsCardIds(fsrsCardIds);
-  }
-
-  static Future<List<SyncIndexEntry>> loadLocalReviewLogSyncIndexForSyncSession(
-    DeckSyncSession session,
-  ) async {
-    final fsrsCardIds = (await loadFsrsCardIdsForSyncSession(session)).toSet();
-    return session.reviewLogs.selectSyncIndexByFsrsCardIds(fsrsCardIds);
-  }
-
-  static Future<List<SyncIndexEntry>>
-  loadRemoteReviewLogSyncIndexForSyncSession(DeckSyncSession session) async {
-    final fsrsCardIds = await loadFsrsCardIdsForSyncSession(session);
-    return session.remoteReviewLogs.selectSyncIndexByFsrsCardIds(fsrsCardIds);
-  }
-
-  static Future<List<FsrsReviewLog>> loadLocalReviewLogsByIdsForSyncSession(
-    DeckSyncSession session,
-    List<String> ids,
-  ) async {
-    return session.reviewLogs.selectManyByIds(ids);
-  }
-
-  static Future<List<FsrsReviewLog>> loadRemoteReviewLogsByIdsForSyncSession(
-    DeckSyncSession session,
-    List<String> ids,
-  ) async {
-    return session.remoteReviewLogs.selectManyByIds(ids);
-  }
 
   // Reviews card and puts it in the Repository
   Future<void> enrollCard({

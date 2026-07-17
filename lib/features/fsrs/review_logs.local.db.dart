@@ -28,10 +28,10 @@ class ReviewLogsLocalDB extends HiveLocalDB<FsrsReviewLog> {
       );
 
   List<SyncIndexEntry> selectSyncIndexByFsrsCardIds(Set<String> fsrsCardIds) =>
-      guardSync(
-        () => selectManyByFsrsCardIds(fsrsCardIds)
-            .map((log) => SyncIndexEntry(id: log.id, updatedAt: log.createdAt))
-            .toList(growable: false),
+      selectSyncIndexWhere(
+        where: (log) => fsrsCardIds.contains(log.fsrsCardId),
+        getId: (log) => log.id,
+        getUpdatedAt: (log) => log.createdAt,
         action:
             'selectSyncIndexByFsrsCardIds(${fsrsCardIds.length} fsrsCardIds)',
       );

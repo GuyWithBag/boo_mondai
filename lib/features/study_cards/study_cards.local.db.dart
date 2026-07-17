@@ -15,8 +15,11 @@ class StudyCardsLocalDB extends HiveLocalDB<StudyCard> {
   @override
   Map<String, Object?> primaryKeyFromItem(StudyCard item) => {'id': item.id};
 
+  @override
+  DateTime? getDeletedAt(StudyCard item) => item.deletedAt;
+
   List<StudyCard> getByDeckId(String deckId) => guardSync(
-    () => box.values.where((c) => c.deckId == deckId).toList(),
+    () => selectMany(where: (c) => c.deckId == deckId),
     action: 'getByDeckId($deckId)',
   );
 
@@ -26,18 +29,16 @@ class StudyCardsLocalDB extends HiveLocalDB<StudyCard> {
   );
 
   List<SyncIndexEntry> selectSyncIndexByDeckIds(Set<String> deckIds) =>
-      guardSync(
-        () => selectManyByDeckIds(deckIds)
-            .map(
-              (card) => SyncIndexEntry(id: card.id, updatedAt: card.updatedAt),
-            )
-            .toList(growable: false),
+      selectSyncIndexWhere(
+        where: (card) => deckIds.contains(card.deckId),
+        getId: (card) => card.id,
+        getUpdatedAt: (card) => card.updatedAt,
         action: 'selectSyncIndexByDeckIds(${deckIds.length} deckIds)',
       );
 
   List<StudyCard> selectManyByIds(List<String> ids) => guardSync(
     () => [
-      for (final id in ids) ?selectByPk({'id': id}),
+      for (final id in ids) ?selectByPk({'id': id}, includeDeleted: true),
     ],
     action: 'selectManyByIds(${ids.length} ids)',
   );

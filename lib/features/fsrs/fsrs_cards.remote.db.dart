@@ -22,6 +22,8 @@ class FsrsCardsRemoteDB extends SupabaseRemoteDB<FsrsCard> {
       'id': item.id,
       'created_at': item.createdAt.toIso8601String(),
       'updated_at': item.updatedAt.toIso8601String(),
+      'deleted_at': item.deletedAt?.toIso8601String(),
+      'purge_after': item.purgeAfter?.toIso8601String(),
       'user_id': item.userId,
       'study_cards_id': item.studyCardId,
       'state': item.state.toMap(),
@@ -35,6 +37,9 @@ class FsrsCardsRemoteDB extends SupabaseRemoteDB<FsrsCard> {
   String get upsertConflictTarget => 'id';
 
   @override
+  bool get supportsSoftDelete => true;
+
+  @override
   String get defaultSelect => _fsrsCardWithRelationsSelect;
 
   @override
@@ -43,17 +48,27 @@ class FsrsCardsRemoteDB extends SupabaseRemoteDB<FsrsCard> {
   Future<List<FsrsCard>> selectManyByUserIdAndStudyCardIds({
     required String userId,
     required Set<String> studyCardIds,
+    bool includeDeleted = false,
   }) async {
-    final cards = await selectMany(filters: {'user_id': userId});
+    final cards = await selectMany(
+      filters: {'user_id': userId},
+      includeDeleted: includeDeleted,
+    );
     return cards
         .where((card) => studyCardIds.contains(card.studyCardId))
         .toList(growable: false);
   }
 
-  Future<List<FsrsCard>> selectManyByIds(List<String> ids) async {
+  Future<List<FsrsCard>> selectManyByIds(
+    List<String> ids, {
+    bool includeDeleted = false,
+  }) async {
     final cards = <FsrsCard>[];
     for (final id in ids) {
-      final card = await selectOne(filters: {'id': id});
+      final card = await selectOne(
+        filters: {'id': id},
+        includeDeleted: includeDeleted,
+      );
       if (card != null) cards.add(card);
     }
     return cards;
@@ -62,27 +77,15 @@ class FsrsCardsRemoteDB extends SupabaseRemoteDB<FsrsCard> {
   Future<List<SyncIndexEntry>> selectSyncIndexByUserIdAndStudyCardIds({
     required String userId,
     required Set<String> studyCardIds,
-  }) => guard(
-    () async {
-      final response = await client
-          .from(tableName)
-          .select('id, updated_at, study_cards_id')
-          .eq('user_id', userId);
-      return List<Map<String, dynamic>>.from(response)
-          .where(
-            (row) => studyCardIds.contains(row['study_cards_id'] as String?),
-          )
-          .map(
-            (row) => SyncIndexEntry(
-              id: row['id'] as String,
-              updatedAt: DateTime.parse(row['updated_at'] as String),
-            ),
-          )
-          .toList(growable: false);
-    },
-    action:
-        'selectSyncIndexByUserIdAndStudyCardIds($userId, ${studyCardIds.length} studyCardIds)',
-  );
+  }) => studyCardIds.isEmpty
+      ? Future.value(const <SyncIndexEntry>[])
+      : selectSyncIndex(
+          applyQuery: (query) => query
+              .eq('user_id', userId)
+              .inFilter('study_cards_id', studyCardIds.toList()),
+          action:
+              'selectSyncIndexByUserIdAndStudyCardIds($userId, ${studyCardIds.length} studyCardIds)',
+        );
 
   FsrsCard _fsrsCardFromMap(Map<String, dynamic> map) {
     final studyCard = map['study_card'] ?? map['study_cards'];
@@ -91,6 +94,8 @@ class FsrsCardsRemoteDB extends SupabaseRemoteDB<FsrsCard> {
       id: map['id'] as String,
       createdAt: _dateTimeFromMap(map, 'created_at'),
       updatedAt: _dateTimeFromMap(map, 'updated_at'),
+      deletedAt: _nullableDateTimeFromMap(map, 'deleted_at'),
+      purgeAfter: _nullableDateTimeFromMap(map, 'purge_after'),
       userId: map['user_id'] as String,
       studyCardId: (map['study_card_id'] ?? map['study_cards_id']) as String,
       state: _stateFromMap(map['state']),
@@ -104,6 +109,13 @@ class FsrsCardsRemoteDB extends SupabaseRemoteDB<FsrsCard> {
 
   DateTime _dateTimeFromMap(Map<String, dynamic> map, String key) {
     final value = map[key];
+    if (value is DateTime) return value;
+    return DateTime.parse(value as String);
+  }
+
+  DateTime? _nullableDateTimeFromMap(Map<String, dynamic> map, String key) {
+    final value = map[key];
+    if (value == null) return null;
     if (value is DateTime) return value;
     return DateTime.parse(value as String);
   }

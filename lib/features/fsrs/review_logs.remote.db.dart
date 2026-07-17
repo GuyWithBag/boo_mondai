@@ -52,38 +52,21 @@ class ReviewLogsRemoteDB extends SupabaseRemoteDB<FsrsReviewLog> {
 
   Future<List<SyncIndexEntry>> selectSyncIndexByFsrsCardIds(
     List<String> fsrsCardIds,
-  ) => guard(() async {
-    if (fsrsCardIds.isEmpty) return const <SyncIndexEntry>[];
-
-    final response = await client
-        .from(tableName)
-        .select('id, created_at')
-        .inFilter('fsrs_card_id', fsrsCardIds);
-    return List<Map<String, dynamic>>.from(response)
-        .map(
-          (row) => SyncIndexEntry(
-            id: row['id'] as String,
-            updatedAt: DateTime.parse(row['created_at'] as String),
-          ),
-        )
-        .toList(growable: false);
-  }, action: 'selectSyncIndexByFsrsCardIds(${fsrsCardIds.length} fsrsCardIds)');
+  ) => fsrsCardIds.isEmpty
+      ? Future.value(const <SyncIndexEntry>[])
+      : selectSyncIndex(
+          updatedAtColumn: 'created_at',
+          applyQuery: (query) => query.inFilter('fsrs_card_id', fsrsCardIds),
+          action:
+              'selectSyncIndexByFsrsCardIds(${fsrsCardIds.length} fsrsCardIds)',
+        );
 
   Future<List<SyncIndexEntry>> selectSyncIndexByFsrsCardId(String fsrsCardId) =>
-      guard(() async {
-        final response = await client
-            .from(tableName)
-            .select('id, created_at')
-            .eq('fsrs_card_id', fsrsCardId);
-        return List<Map<String, dynamic>>.from(response)
-            .map(
-              (row) => SyncIndexEntry(
-                id: row['id'] as String,
-                updatedAt: DateTime.parse(row['created_at'] as String),
-              ),
-            )
-            .toList(growable: false);
-      }, action: 'selectSyncIndexByFsrsCardId($fsrsCardId)');
+      selectSyncIndex(
+        updatedAtColumn: 'created_at',
+        applyQuery: (query) => query.eq('fsrs_card_id', fsrsCardId),
+        action: 'selectSyncIndexByFsrsCardId($fsrsCardId)',
+      );
 
   FsrsReviewLog _fsrsReviewLogFromMap(Map<String, dynamic> map) {
     return FsrsReviewLog(

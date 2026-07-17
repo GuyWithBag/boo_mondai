@@ -13,12 +13,15 @@ part 'streak.dto.mapper.dart';
 
 @MappableClass()
 class Streak with StreakMappable implements MutableEntity {
-  @override
   final String id;
   @override
   final DateTime createdAt;
   @override
   final DateTime updatedAt;
+  @override
+  final DateTime? deletedAt;
+  @override
+  final DateTime? purgeAfter;
   final String userId;
   final int currentStreak;
   final int longestStreak;
@@ -28,6 +31,8 @@ class Streak with StreakMappable implements MutableEntity {
     required this.id,
     required this.createdAt,
     required this.updatedAt,
+    this.deletedAt,
+    this.purgeAfter,
     required this.userId,
     required this.currentStreak,
     required this.longestStreak,

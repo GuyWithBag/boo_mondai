@@ -15,17 +15,20 @@ class FsrsCardsLocalDB extends HiveLocalDB<FsrsCard> {
   @override
   Map<String, Object?> primaryKeyFromItem(FsrsCard item) => {'id': item.id};
 
+  @override
+  DateTime? getDeletedAt(FsrsCard item) => item.deletedAt;
+
   // ── Domain Queries ──────────────────────────────────────
 
   /// Renamed to match the new StudyCard nomenclature
   FsrsCard? getByStudyCardId(String studyCardId) => guardSync(
-    () => box.values.where((s) => s.studyCardId == studyCardId).firstOrNull,
+    () => selectMany(where: (s) => s.studyCardId == studyCardId).firstOrNull,
     action: 'getByStudyCardId($studyCardId)',
   );
 
   /// Gets all cards for a specific user
   List<FsrsCard> getByUserId(String userId) => guardSync(
-    () => box.values.where((s) => s.userId == userId).toList(),
+    () => selectMany(where: (s) => s.userId == userId),
     action: 'getByUserId($userId)',
   );
 
@@ -44,23 +47,18 @@ class FsrsCardsLocalDB extends HiveLocalDB<FsrsCard> {
   List<SyncIndexEntry> selectSyncIndexByUserIdAndStudyCardIds({
     required String userId,
     required Set<String> studyCardIds,
-  }) => guardSync(
-    () =>
-        selectManyByUserIdAndStudyCardIds(
-              userId: userId,
-              studyCardIds: studyCardIds,
-            )
-            .map(
-              (card) => SyncIndexEntry(id: card.id, updatedAt: card.updatedAt),
-            )
-            .toList(growable: false),
+  }) => selectSyncIndexWhere(
+    where: (card) =>
+        card.userId == userId && studyCardIds.contains(card.studyCardId),
+    getId: (card) => card.id,
+    getUpdatedAt: (card) => card.updatedAt,
     action:
         'selectSyncIndexByUserIdAndStudyCardIds($userId, ${studyCardIds.length} studyCardIds)',
   );
 
   List<FsrsCard> selectManyByIds(List<String> ids) => guardSync(
     () => [
-      for (final id in ids) ?selectByPk({'id': id}),
+      for (final id in ids) ?selectByPk({'id': id}, includeDeleted: true),
     ],
     action: 'selectManyByIds(${ids.length} ids)',
   );
@@ -68,20 +66,18 @@ class FsrsCardsLocalDB extends HiveLocalDB<FsrsCard> {
   /// Highly optimized: Returns just a Set of IDs.
   /// Perfect for checking if a card is already enrolled!
   Set<String> getEnrolledStudyCardIds(String userId) => guardSync(
-    () => box.values
-        .where((s) => s.userId == userId)
-        .map((s) => s.studyCardId)
-        .toSet(),
+    () => selectMany(
+      where: (s) => s.userId == userId,
+    ).map((s) => s.studyCardId).toSet(),
     action: 'getEnrolledStudyCardIds($userId)',
   );
 
   /// Gets cards that are ready to be reviewed right now
   List<FsrsCard> getDueCards(DateTime now) => guardSync(
-    () => box.values
-        .where(
-          (s) => s.state.due.isBefore(now) || s.state.due.isAtSameMomentAs(now),
-        )
-        .toList(),
+    () => selectMany(
+      where: (s) =>
+          s.state.due.isBefore(now) || s.state.due.isAtSameMomentAs(now),
+    ),
     action: 'getDueCards',
   );
 }

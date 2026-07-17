@@ -6,5 +6,3 @@ export 'all_done_header.dart';
 export 'upcoming_card_tile.dart';
 export 'upcoming_count.dart';
 export 'upcoming_only_view.dart';
-export 'review_deck_tile.dart';
-export 'review_all.card.dart';

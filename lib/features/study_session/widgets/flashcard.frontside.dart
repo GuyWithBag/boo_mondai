@@ -8,8 +8,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         AlignedScrollView,
         MarkdownText,
         MarkdownTextMode,
-        StudyCard,
-        buttonStyle;
+        StudyCard;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -53,10 +52,7 @@ class FlashcardFrontSide extends StatelessWidget {
             Align(
               alignment: Alignment.bottomCenter,
               child: Button(
-                style: buttonStyle.resolve(tokens, const [
-                  ButtonVariant.text,
-                  ButtonColor.baseline,
-                ]),
+                variants: const [ButtonVariant.text, ButtonColor.baseline],
                 leading: const Icon(Icons.touch_app),
                 onPressed: onReveal,
                 child: const Text('Tap to reveal'),

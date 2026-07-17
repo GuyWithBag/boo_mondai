@@ -11,7 +11,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextColor,
         ButtonVariant,
         Button,
-        buttonStyle,
         PhysicalCard,
         ScaleHelper,
         AlignedScrollView,
@@ -100,10 +99,10 @@ class MultipleChoiceCard extends HookWidget {
                   SizedBox(
                     width: double.infinity,
                     child: Button(
-                      style: buttonStyle.resolve(tokens, [
+                      variants: [
                         ..._optionVariants(entry.value, effectiveIsRevealed),
                         ButtonVariant.flat,
-                      ]),
+                      ],
                       selected:
                           !effectiveIsRevealed &&
                           selectedOption.value == entry.value.id,

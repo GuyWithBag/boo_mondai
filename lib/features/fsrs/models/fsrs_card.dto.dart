@@ -17,12 +17,15 @@ part 'fsrs_card.dto.mapper.dart';
 
 @MappableClass()
 class FsrsCard with FsrsCardMappable implements MutableEntity {
-  @override
   final String id;
   @override
   final DateTime createdAt;
   @override
   final DateTime updatedAt;
+  @override
+  final DateTime? deletedAt;
+  @override
+  final DateTime? purgeAfter;
   final String userId;
 
   /// <-- CHANGED: Now points to the StudyCard (the testable instance)
@@ -36,6 +39,8 @@ class FsrsCard with FsrsCardMappable implements MutableEntity {
     required this.id,
     required this.createdAt,
     required this.updatedAt,
+    this.deletedAt,
+    this.purgeAfter,
     required this.userId,
     required this.studyCardId,
     required this.state,

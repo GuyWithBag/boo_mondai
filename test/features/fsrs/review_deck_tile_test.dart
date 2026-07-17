@@ -4,7 +4,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         DeckDueStats,
         DeckHistoricalStats,
         DeckReviewStats,
-        ReviewDeckTile,
+        StudyDeckTile,
         createAppThemeController;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -22,7 +22,7 @@ void main() {
           designSize: const Size(390, 844),
           builder: (_, _) => MaterialApp(
             home: Scaffold(
-              body: ReviewDeckTile(
+              body: StudyDeckTile(
                 stats: DeckReviewStats(
                   deckId: 'deck-1',
                   deckTitle: 'Japanese Basics',

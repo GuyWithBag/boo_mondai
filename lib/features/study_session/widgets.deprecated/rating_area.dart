@@ -14,7 +14,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         StudySessionHelper,
         Button,
-        buttonStyle,
         ButtonColor,
         RatingButton;
 import 'package:flutter/material.dart';
@@ -127,9 +126,7 @@ class RatingArea extends HookWidget {
                           ? onSubmit
                           : null,
                       leading: const Icon(Icons.check),
-                      style: buttonStyle.resolve(tokens, const [
-                        ButtonColor.primary,
-                      ]),
+                      variants: const [ButtonColor.primary],
                       child: const Text('Submit'),
                     ),
             ),
@@ -157,7 +154,7 @@ class RatingArea extends HookWidget {
               child: Button(
                 onPressed: onContinue,
                 leading: const Icon(Icons.arrow_forward),
-                style: buttonStyle.resolve(tokens, const [ButtonColor.primary]),
+                variants: [ButtonColor.primary],
                 child: const Text('Continue'),
               ),
             ),
