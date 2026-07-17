@@ -12,7 +12,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         ViewAccountPage,
         LoginPage,
         RegisterPage,
-        StudySessionPage,
+        ViewStudySessionPage,
         ResearcherDashboardPage,
         ViewLeaderboardPage,
         EditDeckPage,
@@ -173,7 +173,7 @@ class Pages {
           pathParameters = const {},
           queryParameters = const {},
           extra,
-        }) => StudySessionPage(
+        }) => ViewStudySessionPage(
           deckId: pathParameters['deckId'],
           mode: SessionMode.drill,
         ),
@@ -200,7 +200,8 @@ class Pages {
           pathParameters = const {},
           queryParameters = const {},
           extra,
-        }) => const StudySessionPage(deckId: null, mode: SessionMode.review),
+        }) =>
+            const ViewStudySessionPage(deckId: null, mode: SessionMode.review),
   );
 
   static final reviewDeckSession = AppPage(
@@ -212,7 +213,7 @@ class Pages {
           pathParameters = const {},
           queryParameters = const {},
           extra,
-        }) => StudySessionPage(
+        }) => ViewStudySessionPage(
           deckId: pathParameters['deckId'],
           mode: SessionMode.review,
         ),

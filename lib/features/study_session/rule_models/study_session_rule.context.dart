@@ -1,5 +1,4 @@
-import 'package:boo_mondai/features/study_session/models/study_rating.dto.dart';
-import 'package:boo_mondai/features/study_session/session_mode.dart';
+import 'package:boo_mondai/lib.barrel.dart' show StudyRating, SessionMode;
 
 final class StudySessionRuleContext {
   const StudySessionRuleContext({

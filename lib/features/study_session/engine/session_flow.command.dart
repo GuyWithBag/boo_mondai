@@ -1,4 +1,4 @@
-import 'package:boo_mondai/features/study_session/models/session_step.dto.dart';
+import 'package:boo_mondai/lib.barrel.dart' show SessionStep;
 
 sealed class SessionFlowCommand {
   const SessionFlowCommand({this.occurrenceKey});

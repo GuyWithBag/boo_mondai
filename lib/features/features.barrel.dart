@@ -46,3 +46,5 @@ export 'login/login.barrel.dart';
 export 'register/register.barrel.dart';
 export 'view_study_decks/view_study_decks.barrel.dart';
 export 'search_filter.modal/search_filter.modal.barrel.dart';
+export 'view_drill_result/view_drill_result.barrel.dart';
+export 'view_study_session/view_study_session.barrel.dart';

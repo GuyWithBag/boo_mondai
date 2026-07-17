@@ -7,6 +7,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextSize,
         TextWeight,
         TextColor,
+        MarkdownText,
+        MarkdownTextMode,
         PhysicalCard,
         ScaleHelper,
         Button,
@@ -24,6 +26,7 @@ class MatchingTypeCard extends HookWidget {
     this.interactionsController,
     this.isRevealed = false,
     this.maxWidth,
+    this.contentScale = 1,
     this.controller,
   });
 
@@ -31,23 +34,39 @@ class MatchingTypeCard extends HookWidget {
   final StudySessionCardStageController? interactionsController;
   final bool isRevealed;
   final double? maxWidth;
+  final double contentScale;
   final PhysicalCardController? controller;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final contentScale = ScaleHelper.getClampedSizeRatio(
-      current: maxWidth ?? tokens.studyCardWidth,
-      base: tokens.studyCardWidth,
-      min: 0.6,
-      max: 1.4,
-    );
     final eyebrowStyle = ScaleHelper.getTextStyleWithScaledFontSize(
       textStyle.resolve(tokens, const [
         TextSize.labelSmall,
         TextWeight.heavy,
         TextColor.muted,
       ]),
+      contentScale,
+    );
+    final itemTextStyle = ScaleHelper.getTextStyleWithScaledFontSize(
+      textStyle.resolve(tokens, const [
+        TextSize.label,
+        TextWeight.body,
+        TextColor.baseline,
+      ]),
+      contentScale,
+    );
+    final gap = ScaleHelper.getScaledValue(
+      tokens.spaceLayoutGapMd,
+      contentScale,
+    );
+    final columnGap = ScaleHelper.getScaledValue(
+      tokens.spaceLayoutGapSm,
+      contentScale,
+    );
+    final itemGap = ScaleHelper.getScaledValue(14.h, contentScale);
+    final padding = ScaleHelper.getScaledEdgeInsets(
+      EdgeInsets.all(tokens.spaceLayoutPaddingSm),
       contentScale,
     );
     final terms = template.pairs.map((pair) => pair.term).toList();
@@ -95,41 +114,51 @@ class MatchingTypeCard extends HookWidget {
 
     return PhysicalCard(
       controller: physicalCardController,
-      front: Column(
-        spacing: tokens.spaceLayoutGapMd,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            'Match the pairs'.toUpperCase(),
-            textAlign: TextAlign.center,
-            style: eyebrowStyle,
-          ),
+      padding: EdgeInsets.zero,
+      front: Padding(
+        padding: padding,
+        child: Column(
+          spacing: gap,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Match the pairs'.toUpperCase(),
+              textAlign: TextAlign.center,
+              style: eyebrowStyle,
+            ),
 
-          Row(
-            spacing: tokens.spaceLayoutGapSm,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: _MatchColumn(
-                  items: terms,
-                  selectedMatch: selectedMatch.value,
-                  matchedItems: matchedItems.value,
-                  isRevealed: effectiveIsRevealed,
-                  onItemPressed: handleMatchTap,
+            Row(
+              spacing: columnGap,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: _MatchColumn(
+                    items: terms,
+                    selectedMatch: selectedMatch.value,
+                    matchedItems: matchedItems.value,
+                    isRevealed: effectiveIsRevealed,
+                    textStyle: itemTextStyle,
+                    itemGap: itemGap,
+                    contentScale: contentScale,
+                    onItemPressed: handleMatchTap,
+                  ),
                 ),
-              ),
-              Expanded(
-                child: _MatchColumn(
-                  items: matches,
-                  selectedMatch: selectedMatch.value,
-                  matchedItems: matchedItems.value,
-                  isRevealed: effectiveIsRevealed,
-                  onItemPressed: handleMatchTap,
+                Expanded(
+                  child: _MatchColumn(
+                    items: matches,
+                    selectedMatch: selectedMatch.value,
+                    matchedItems: matchedItems.value,
+                    isRevealed: effectiveIsRevealed,
+                    textStyle: itemTextStyle,
+                    itemGap: itemGap,
+                    contentScale: contentScale,
+                    onItemPressed: handleMatchTap,
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -141,6 +170,9 @@ class _MatchColumn extends StatelessWidget {
     required this.selectedMatch,
     required this.matchedItems,
     required this.isRevealed,
+    required this.textStyle,
+    required this.itemGap,
+    required this.contentScale,
     required this.onItemPressed,
   });
 
@@ -148,6 +180,9 @@ class _MatchColumn extends StatelessWidget {
   final String? selectedMatch;
   final Set<String> matchedItems;
   final bool isRevealed;
+  final TextStyle textStyle;
+  final double itemGap;
+  final double contentScale;
   final ValueChanged<String>? onItemPressed;
 
   @override
@@ -159,11 +194,13 @@ class _MatchColumn extends StatelessWidget {
             value: item,
             selected: selectedMatch == item,
             matched: isRevealed ? false : matchedItems.contains(item),
+            textStyle: textStyle,
+            contentScale: contentScale,
             onPressed: isRevealed || onItemPressed == null
                 ? null
                 : () => onItemPressed!(item),
           ),
-          if (item != items.last) SizedBox(height: 14.h),
+          if (item != items.last) SizedBox(height: itemGap),
         ],
       ],
     );
@@ -175,12 +212,16 @@ class _MatchButton extends StatelessWidget {
     required this.value,
     required this.selected,
     required this.matched,
+    required this.textStyle,
+    required this.contentScale,
     required this.onPressed,
   });
 
   final String value;
   final bool selected;
   final bool matched;
+  final TextStyle textStyle;
+  final double contentScale;
   final VoidCallback? onPressed;
 
   @override
@@ -193,9 +234,15 @@ class _MatchButton extends StatelessWidget {
           width: double.infinity,
           child: Button(
             selected: selected,
+            contentScale: contentScale,
             mainAxisAlignment: MainAxisAlignment.center,
             onPressed: onPressed,
-            child: Text(value, textAlign: TextAlign.center),
+            child: MarkdownText(
+              data: value,
+              mode: MarkdownTextMode.preview,
+              baseTextStyle: textStyle,
+              contentScale: contentScale,
+            ),
           ),
         ),
       ),

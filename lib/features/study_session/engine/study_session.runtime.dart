@@ -1,5 +1,5 @@
-import 'package:boo_mondai/features/study_session/models/session_flow_snapshot.dto.dart';
-import 'package:boo_mondai/features/study_session/models/session_step.dto.dart';
+import 'package:boo_mondai/lib.barrel.dart'
+    show SessionStep, SessionFlowSnapshot, CardSessionStep;
 
 final class StudySessionRuntime {
   const StudySessionRuntime(this.snapshot);

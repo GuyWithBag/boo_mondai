@@ -2,12 +2,16 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
         Button,
-        ButtonColor,
         ButtonVariant,
         FlashcardTemplate,
         AlignedScrollView,
         MarkdownText,
         MarkdownTextMode,
+        ScaleHelper,
+        textStyle,
+        TextColor,
+        TextSize,
+        TextWeight,
         StudyCard;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -19,6 +23,7 @@ class FlashcardFrontSide extends StatelessWidget {
     this.onReveal,
     this.showRevealButton = true,
     this.maxWidth = 460,
+    this.contentScale = 1,
     super.key,
   });
 
@@ -27,10 +32,23 @@ class FlashcardFrontSide extends StatelessWidget {
   final VoidCallback? onReveal;
   final bool showRevealButton;
   final double maxWidth;
+  final double contentScale;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
+    final markdownTextStyle = ScaleHelper.getTextStyleWithScaledFontSize(
+      textStyle.resolve(tokens, const [
+        TextSize.label,
+        TextWeight.body,
+        TextColor.baseline,
+      ]),
+      contentScale,
+    );
+    final padding = ScaleHelper.getScaledEdgeInsets(
+      EdgeInsets.all(tokens.spaceLayoutPaddingSm),
+      contentScale,
+    );
 
     return SizedBox.expand(
       child: Stack(
@@ -39,10 +57,12 @@ class FlashcardFrontSide extends StatelessWidget {
           Positioned.fill(
             child: AlignedScrollView(
               verticallyCentered: template.verticallyCentered,
-              padding: EdgeInsets.all(tokens.spaceLayoutPaddingSm),
+              padding: padding,
               child: MarkdownText(
                 mode: MarkdownTextMode.previewSelectable,
                 data: template.getQuestion(isReversed: studyCard.isReversed),
+                baseTextStyle: markdownTextStyle,
+                contentScale: contentScale,
                 defaultMarkdownAlignment: WrapAlignment.center,
                 resolveAttachmentUrl: template.resolveAttachmentUrl,
               ),
@@ -52,8 +72,10 @@ class FlashcardFrontSide extends StatelessWidget {
             Align(
               alignment: Alignment.bottomCenter,
               child: Button(
-                variants: const [ButtonVariant.text, ButtonColor.baseline],
+                variants: const [ButtonVariant.text],
+                elevated: false,
                 leading: const Icon(Icons.touch_app),
+                contentScale: contentScale,
                 onPressed: onReveal,
                 child: const Text('Tap to reveal'),
               ),

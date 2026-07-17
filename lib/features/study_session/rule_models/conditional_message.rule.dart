@@ -1,7 +1,10 @@
-import 'package:boo_mondai/features/study_session/engine/session_flow.command.dart';
-import 'package:boo_mondai/features/study_session/models/session_step.dto.dart';
-import 'package:boo_mondai/features/study_session/rules/study_session_insertion.rule.dart';
-import 'package:boo_mondai/features/study_session/rules/study_session_rule.context.dart';
+import 'package:boo_mondai/lib.barrel.dart'
+    show
+        MessageSessionStep,
+        StudySessionRuleContext,
+        StudySessionInsertionRule,
+        SessionFlowCommand,
+        InsertAfterCurrent;
 
 typedef StudySessionRuleCondition =
     bool Function(StudySessionRuleContext context);

@@ -5,7 +5,6 @@ export 'models/models.barrel.dart';
 // Other files
 export 'drill_answers.remote.db.dart';
 export 'drill_sessions.remote.db.dart';
-export 'view_drill_result.local.page.dart';
 export 'drill_answers.local.db.dart';
 export 'drill_sessions.local.db.dart';
 export 'drill.study_session.controller.dart';

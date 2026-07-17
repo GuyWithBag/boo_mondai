@@ -1,5 +1,10 @@
-import 'package:boo_mondai/features/study_session/models/session_step.dto.dart';
-import 'package:boo_mondai/features/study_session/models/study_rating.dto.dart';
+import 'package:boo_mondai/lib.barrel.dart'
+    show
+        SessionStep,
+        SessionStepCopyWith,
+        SessionStepMapper,
+        StudyRating,
+        StudyRatingMapper;
 import 'package:dart_mappable/dart_mappable.dart';
 
 part 'session_flow_snapshot.dto.mapper.dart';

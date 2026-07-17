@@ -1,8 +1,6 @@
 import 'package:boo_mondai/core/core.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        AppTokens,
-        Button,
         FlashcardTemplate,
         StudyCard,
         StudySessionCardStageController,
@@ -13,7 +11,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         PhysicalCardController;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class FlashcardCard extends HookWidget {
   const FlashcardCard({
@@ -24,8 +21,8 @@ class FlashcardCard extends HookWidget {
     this.studySessionController,
     this.isRevealed = false,
     this.showRevealButton = true,
-    this.showFlipButton = false,
     this.maxWidth,
+    this.contentScale = 1,
     this.controller,
   });
 
@@ -35,13 +32,12 @@ class FlashcardCard extends HookWidget {
   final StudySessionController? studySessionController;
   final bool isRevealed;
   final bool showRevealButton;
-  final bool showFlipButton;
   final double? maxWidth;
+  final double contentScale;
   final PhysicalCardController? controller;
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
     final fallbackPhysicalCardController = usePhysicalCardController(
       context,
       width: maxWidth,
@@ -68,34 +64,22 @@ class FlashcardCard extends HookWidget {
       interactionsController.reveal(studySessionController);
     }
 
-    return Stack(
-      children: [
-        PhysicalCard(
-          controller: physicalCardController,
-          onTap: interactionsController == null ? null : reveal,
-          front: FlashcardFrontSide(
-            template: template,
-            studyCard: studyCard,
-            showRevealButton:
-                showRevealButton && interactionsController != null,
-            onReveal: reveal,
-          ),
-          back: FlashcardBackSide(template: template, studyCard: studyCard),
-        ),
-        if (showFlipButton)
-          Positioned(
-            right: 8,
-            bottom: 8,
-            child: Tooltip(
-              message: 'Flip card',
-              child: Button.iconOnlySmall(
-                icon: Icons.flip,
-                tokens: tokens,
-                onPressed: () => physicalCardController.flip(),
-              ),
-            ),
-          ),
-      ],
+    return PhysicalCard(
+      controller: physicalCardController,
+      padding: EdgeInsets.zero,
+      onTap: interactionsController == null ? null : reveal,
+      front: FlashcardFrontSide(
+        template: template,
+        studyCard: studyCard,
+        showRevealButton: showRevealButton && interactionsController != null,
+        contentScale: contentScale,
+        onReveal: reveal,
+      ),
+      back: FlashcardBackSide(
+        template: template,
+        studyCard: studyCard,
+        contentScale: contentScale,
+      ),
     );
   }
 }

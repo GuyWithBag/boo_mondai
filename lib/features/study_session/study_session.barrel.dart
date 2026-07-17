@@ -6,11 +6,12 @@ export 'widgets.deprecated/widgets.deprecated.barrel.dart';
 export 'widgets/widgets.barrel.dart';
 export 'controllers/controllers.barrel.dart';
 export 'engine/engine.barrel.dart';
-export 'rules/rules.barrel.dart';
+export 'rule_models/rule_models.barrel.dart';
 export 'persistence/persistence.barrel.dart';
+export 'session_steps/session_steps.barrel.dart';
 // Other files
 export 'preview_drill.local.page.dart';
 export 'session_mode.dart';
-export 'study_session.local.page.dart';
 export 'study_session.helper.dart';
 export 'study_session.coordinator.dart';
+export 'study_session.rules.dart';

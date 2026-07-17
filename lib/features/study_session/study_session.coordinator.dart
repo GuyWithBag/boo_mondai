@@ -1,12 +1,15 @@
-import 'package:boo_mondai/features/study_session/engine/session_flow.command.dart';
-import 'package:boo_mondai/features/study_session/engine/study_session.engine.dart';
-import 'package:boo_mondai/features/study_session/engine/study_session.runtime.dart';
-import 'package:boo_mondai/features/study_session/models/session_flow_snapshot.dto.dart';
-import 'package:boo_mondai/features/study_session/models/session_step.dto.dart';
-import 'package:boo_mondai/features/study_session/models/study_rating.dto.dart';
-import 'package:boo_mondai/features/study_session/persistence/study_session.local.store.dart';
-import 'package:boo_mondai/features/study_session/rules/study_session_rule.context.dart';
-import 'package:boo_mondai/features/study_session/rules/study_session_rule.registry.dart';
+import 'package:boo_mondai/lib.barrel.dart'
+    show
+        StudySessionRuleRegistry,
+        StudySessionEngine,
+        StudySessionLocalStore,
+        StudySessionRuntime,
+        StudyRating,
+        SessionFlowCommand,
+        StudySessionRuleContext,
+        PendingStepSubmission,
+        SessionStep,
+        CardSessionStep;
 
 final class StudySessionCoordinator {
   const StudySessionCoordinator({

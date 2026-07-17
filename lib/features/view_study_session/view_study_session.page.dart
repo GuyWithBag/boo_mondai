@@ -19,7 +19,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         Scaffold,
         SessionException,
         SessionMode,
-        StreakController,
         StudySessionCardStage,
         StudySessionController,
         TextColor,
@@ -29,15 +28,19 @@ import 'package:boo_mondai/lib.barrel.dart'
         textStyle,
         useDrillSessionController,
         useReviewSessionController,
+        useStudySessionPageController,
         useStudySessionCardStageController;
 import 'package:flutter/material.dart' hide AppBar, Scaffold;
 import 'package:flutter_hooks/flutter_hooks.dart' show useEffect, HookWidget;
-import 'package:go_router/go_router.dart' show GoRouterHelper;
 import 'package:provider/provider.dart' show ReadContext;
 import 'package:theme_variants/theme_variants.dart';
 
-class StudySessionPage extends HookWidget {
-  const StudySessionPage({super.key, required this.deckId, required this.mode});
+class ViewStudySessionPage extends HookWidget {
+  const ViewStudySessionPage({
+    super.key,
+    required this.deckId,
+    required this.mode,
+  });
 
   // Drill sessions always require a deckId
   // Nullable becauase: Review sessions can be global (null = all due cards)
@@ -66,13 +69,17 @@ class StudySessionPage extends HookWidget {
       );
     }
 
-    // ── RECORD STREAK ON REVIEW COMPLETION ───────────────
+    final studySessionPageController = useStudySessionPageController(
+      context: context,
+      mode: mode,
+      sessionController: controller,
+      dashboardController: dashboardController,
+    );
+
     useEffect(() {
-      if (controller.isComplete && mode == SessionMode.review) {
-        context.read<StreakController>().recordActivity(DateTime.now());
-      }
+      studySessionPageController.onCompletion();
       return null;
-    }, [controller.isComplete]);
+    }, [controller.isComplete, controller.session?.id]);
 
     // 1. Handle Loading (Review only has isLoading, Drill uses null session or missing template)
 
@@ -84,10 +91,6 @@ class StudySessionPage extends HookWidget {
     // 3. Handle Completion
     if (controller.isComplete) {
       if (mode == SessionMode.drill) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!context.mounted) return;
-          context.go('/drill/${controller.session?.id}/result');
-        });
         return const Scaffold(body: SizedBox.shrink());
       } else {
         return Scaffold(
@@ -100,11 +103,7 @@ class StudySessionPage extends HookWidget {
                 const Text('Deck Review Finished!'),
                 const SizedBox(height: AppSpacing.lg),
                 Button(
-                  onPressed: () {
-                    controller.reset();
-                    dashboardController?.load();
-                    context.pop();
-                  },
+                  onPressed: studySessionPageController.onReviewCompletePressed,
                   leading: const Icon(Icons.arrow_back),
                   child: const Text('Back to Dashboard'),
                 ),
@@ -120,10 +119,7 @@ class StudySessionPage extends HookWidget {
       return Scaffold(
         scrollable: false,
         appBar: AppBar(
-          onPop: () {
-            if (mode == SessionMode.review) dashboardController?.load();
-            context.pop();
-          },
+          onPop: studySessionPageController.onSessionPop,
           child: ProgressBar(value: controller.getProgressPercentage()),
         ),
         bottomNavBar: BottomNavBar(
@@ -158,13 +154,6 @@ class StudySessionPage extends HookWidget {
       return ErrorText(controller.error);
     }
 
-    void onPop() {
-      if (mode == SessionMode.review) {
-        dashboardController?.load();
-      }
-      context.pop();
-    }
-
     final interactionsController = useStudySessionCardStageController(
       cardId: studyCard.id,
       cardIndex: controller.currentIndex,
@@ -177,7 +166,7 @@ class StudySessionPage extends HookWidget {
     return Scaffold(
       scrollable: false,
       appBar: AppBar(
-        onPop: onPop,
+        onPop: studySessionPageController.onSessionPop,
         child: Row(
           spacing: tokens.spaceLayoutGapMd,
           children: [

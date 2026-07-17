@@ -54,7 +54,7 @@ event.
 
 ```mermaid
 flowchart TD
-    UI[StudySessionPage] --> Controller[StudySessionController]
+    UI[ViewStudySessionPage] --> Controller[StudySessionController]
     Controller --> Coordinator[StudySessionCoordinator]
     Coordinator --> Engine[StudySessionEngine]
     Coordinator --> Policy[Session Mode Policy]
@@ -385,7 +385,7 @@ is engine behavior.
 ```mermaid
 sequenceDiagram
     actor User
-    participant UI as StudySessionPage
+    participant UI as ViewStudySessionPage
     participant C as Controller
     participant O as Coordinator
     participant P as Mode Policy
@@ -608,7 +608,7 @@ Implement this incrementally:
 4. Move drill selection, grading, retry, and enrollment into a drill policy.
 5. Move due-card selection, FSRS scheduling, and review logging into a review
    policy.
-6. Update `StudySessionPage` to render the current step by sealed type.
+6. Update `ViewStudySessionPage` to render the current step by sealed type.
 7. Add resume and pending-submission recovery.
 8. Remove obsolete controller queues, direct `LocalDB` writes, and helper-like
    service classes.
@@ -631,4 +631,3 @@ The implementation must enforce:
 8. Completed sessions have no pending submission.
 9. Restarting during submission cannot create duplicate answers or logs.
 10. No runtime flow model contains Flutter objects.
-

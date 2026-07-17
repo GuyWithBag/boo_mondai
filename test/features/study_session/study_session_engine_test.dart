@@ -1,11 +1,16 @@
-import 'package:boo_mondai/features/study_session/engine/session_flow.command.dart';
-import 'package:boo_mondai/features/study_session/engine/study_session.engine.dart';
-import 'package:boo_mondai/features/study_session/models/session_flow_snapshot.dto.dart';
-import 'package:boo_mondai/features/study_session/models/session_step.dto.dart';
-import 'package:boo_mondai/features/study_session/models/study_rating.dto.dart';
-import 'package:boo_mondai/features/study_session/rules/conditional_message.rule.dart';
-import 'package:boo_mondai/features/study_session/rules/study_session_rule.context.dart';
-import 'package:boo_mondai/features/study_session/session_mode.dart';
+import 'package:boo_mondai/lib.barrel.dart'
+    show
+        StudySessionEngine,
+        CardSessionStep,
+        InsertAfterCurrent,
+        MessageSessionStep,
+        SummarySessionStep,
+        RequeueCard,
+        StudyRating,
+        PendingStepSubmission,
+        ConditionalMessageRule,
+        SessionMode,
+        StudySessionRuleContext;
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

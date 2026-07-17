@@ -27,6 +27,7 @@ class FillInTheBlanksCard extends HookWidget {
     this.interactionsController,
     this.isRevealed = false,
     this.maxWidth,
+    this.contentScale = 1,
     this.controller,
   });
 
@@ -34,6 +35,7 @@ class FillInTheBlanksCard extends HookWidget {
   final StudySessionCardStageController? interactionsController;
   final bool isRevealed;
   final double? maxWidth;
+  final double contentScale;
   final PhysicalCardController? controller;
 
   bool _isCorrect(int index, List<String> blankInputs) {
@@ -44,12 +46,6 @@ class FillInTheBlanksCard extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final contentScale = ScaleHelper.getClampedSizeRatio(
-      current: maxWidth ?? tokens.studyCardWidth,
-      base: tokens.studyCardWidth,
-      min: 0.6,
-      max: 1.4,
-    );
     final eyebrowStyle = ScaleHelper.getTextStyleWithScaledFontSize(
       textStyle.resolve(tokens, const [
         TextSize.labelSmall,
@@ -62,6 +58,21 @@ class FillInTheBlanksCard extends HookWidget {
       textStyle.resolve(tokens, const [TextSize.bodyLarge, TextWeight.heavy]),
       contentScale,
     );
+    final markdownTextStyle = ScaleHelper.getTextStyleWithScaledFontSize(
+      textStyle.resolve(tokens, const [
+        TextSize.label,
+        TextWeight.body,
+        TextColor.baseline,
+      ]),
+      contentScale,
+    );
+    final padding = ScaleHelper.getScaledEdgeInsets(
+      EdgeInsets.all(tokens.spaceLayoutPaddingSm),
+      contentScale,
+    );
+    final promptGap = ScaleHelper.getScaledValue(48.h, contentScale);
+    final segmentSpacing = ScaleHelper.getScaledValue(12.w, contentScale);
+    final segmentRunSpacing = ScaleHelper.getScaledValue(16.h, contentScale);
     final blankInputs = useState<List<String>>(
       List.filled(template.segments.length, ''),
     );
@@ -94,9 +105,10 @@ class FillInTheBlanksCard extends HookWidget {
 
     return PhysicalCard(
       controller: physicalCardController,
+      padding: EdgeInsets.zero,
       front: AlignedScrollView(
         verticallyCentered: template.verticallyCentered,
-        padding: EdgeInsets.all(tokens.spaceLayoutPaddingSm),
+        padding: padding,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -105,25 +117,27 @@ class FillInTheBlanksCard extends HookWidget {
               textAlign: TextAlign.center,
               style: eyebrowStyle,
             ),
-            SizedBox(height: 48.h),
+            SizedBox(height: promptGap),
             for (final entry in template.segments.asMap().entries) ...[
               Wrap(
                 alignment: WrapAlignment.center,
                 crossAxisAlignment: WrapCrossAlignment.center,
-                spacing: 12.w,
-                runSpacing: 16.h,
+                spacing: segmentSpacing,
+                runSpacing: segmentRunSpacing,
                 children: [
                   Text(entry.value.prefix, style: blankTextStyle),
                   effectiveIsRevealed
                       ? _PreviewAnswer(
                           label: entry.value.correctAnswer,
-                          scale: contentScale,
+                          contentScale: contentScale,
+                          textStyle: markdownTextStyle,
                         )
                       : FillInTheBlankAnswerInput(
                           revealed: interactionsController?.isRevealed ?? false,
                           correct: _isCorrect(entry.key, blankInputs.value),
                           correctAnswer: entry.value.correctAnswer,
-                          scale: contentScale,
+                          contentScale: contentScale,
+                          textStyle: markdownTextStyle,
                           onChanged: (value) =>
                               updateBlankInput(entry.key, value),
                         ),
@@ -139,23 +153,36 @@ class FillInTheBlanksCard extends HookWidget {
 }
 
 class _PreviewAnswer extends StatelessWidget {
-  const _PreviewAnswer({required this.label, required this.scale});
+  const _PreviewAnswer({
+    required this.label,
+    required this.contentScale,
+    required this.textStyle,
+  });
 
   final String label;
-  final double scale;
+  final double contentScale;
+  final TextStyle textStyle;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+      padding: ScaleHelper.getScaledEdgeInsets(
+        EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+        contentScale,
+      ),
       decoration: BoxDecoration(
         color: tokens.colorActionSuccess.withValues(alpha: 0.12),
         border: Border.all(color: tokens.colorActionSuccess),
-        borderRadius: BorderRadius.circular(10.r * scale),
+        borderRadius: BorderRadius.circular(10.r * contentScale),
       ),
-      child: MarkdownText(data: label, mode: MarkdownTextMode.preview),
+      child: MarkdownText(
+        data: label,
+        mode: MarkdownTextMode.preview,
+        baseTextStyle: textStyle,
+        contentScale: contentScale,
+      ),
     );
   }
 }

@@ -2,10 +2,8 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         CardSessionStep,
         CardTemplate,
-        ConditionalMessageRule,
         Controller,
         LocalDB,
-        MessageSessionStep,
         SessionException,
         SessionFlowCommand,
         SessionMode,
@@ -16,9 +14,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         StudySessionEngine,
         StudySessionLocalStore,
         StudySessionRuleContext,
-        StudySessionRuleRegistry,
         StudySessionRuntime,
-        uuid;
+        uuid,
+        StudySessionRules;
 import 'package:flutter/material.dart' show protected;
 
 abstract class StudySessionController<VSession> extends Controller {
@@ -29,37 +27,7 @@ abstract class StudySessionController<VSession> extends Controller {
         flows: LocalDB.studySessionFlow,
         records: LocalDB.studySessionStepRecord,
       ),
-      rules: StudySessionRuleRegistry([
-        ConditionalMessageRule(
-          id: 'three-incorrect-v1',
-          when: (context) => context.consecutiveIncorrectAnswers == 3,
-          occurrenceKey: (context) => 'after-step:${context.currentStepId}',
-          buildMessage: (context) => MessageSessionStep(
-            id: uuid.v7(),
-            messageDefinitionId: 'slow-down',
-            title: 'Take your time',
-            message:
-                'Read each prompt carefully. Accuracy matters more than speed.',
-            insertedByRuleId: 'three-incorrect-v1',
-            insertionReason: 'Three consecutive incorrect answers',
-          ),
-        ),
-        ConditionalMessageRule(
-          id: 'progress-encouragement-v1',
-          when: (context) =>
-              const {5, 10, 20}.contains(context.completedCardCount),
-          occurrenceKey: (context) => 'completed:${context.completedCardCount}',
-          buildMessage: (context) => MessageSessionStep(
-            id: uuid.v7(),
-            messageDefinitionId: 'progress-milestone',
-            title: 'Good progress',
-            message: '${context.completedCardCount} cards completed.',
-            insertedByRuleId: 'progress-encouragement-v1',
-            insertionReason:
-                'Completed ${context.completedCardCount} card steps',
-          ),
-        ),
-      ]),
+      rules: StudySessionRules.getRules(),
     );
   }
 

@@ -29,6 +29,7 @@ class MultipleChoiceCard extends HookWidget {
     this.interactionsController,
     this.isRevealed = false,
     this.maxWidth,
+    this.contentScale = 1,
     this.controller,
   });
 
@@ -36,23 +37,34 @@ class MultipleChoiceCard extends HookWidget {
   final StudySessionCardStageController? interactionsController;
   final bool isRevealed;
   final double? maxWidth;
+  final double contentScale;
   final PhysicalCardController? controller;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final contentScale = ScaleHelper.getClampedSizeRatio(
-      current: maxWidth ?? tokens.studyCardWidth,
-      base: tokens.studyCardWidth,
-      min: 0.6,
-      max: 1.4,
-    );
     final eyebrowStyle = ScaleHelper.getTextStyleWithScaledFontSize(
       textStyle.resolve(tokens, const [
         TextSize.labelSmall,
         TextWeight.heavy,
         TextColor.muted,
       ]),
+      contentScale,
+    );
+    final markdownTextStyle = ScaleHelper.getTextStyleWithScaledFontSize(
+      textStyle.resolve(tokens, const [
+        TextSize.label,
+        TextWeight.body,
+        TextColor.baseline,
+      ]),
+      contentScale,
+    );
+    final padding = ScaleHelper.getScaledEdgeInsets(
+      EdgeInsets.all(tokens.spaceLayoutPaddingSm),
+      contentScale,
+    );
+    final gap = ScaleHelper.getScaledValue(
+      tokens.spaceLayoutGapMd,
       contentScale,
     );
     final selectedOption = useState<String?>(null);
@@ -71,15 +83,16 @@ class MultipleChoiceCard extends HookWidget {
 
     return PhysicalCard(
       controller: physicalCardController,
+      padding: EdgeInsets.zero,
       front: AlignedScrollView(
         verticallyCentered: template.verticallyCentered,
-        padding: EdgeInsets.all(tokens.spaceLayoutPaddingSm),
+        padding: padding,
         child: Column(
-          spacing: tokens.spaceLayoutGapMd,
+          spacing: gap,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Column(
-              spacing: tokens.spaceLayoutGapMd,
+              spacing: gap,
               children: [
                 Text(
                   'Select Answer'.toUpperCase(),
@@ -89,6 +102,8 @@ class MultipleChoiceCard extends HookWidget {
                 MarkdownText(
                   data: template.questionPrompt,
                   mode: MarkdownTextMode.previewSelectable,
+                  baseTextStyle: markdownTextStyle,
+                  contentScale: contentScale,
                   resolveAttachmentUrl: template.resolveAttachmentUrl,
                 ),
               ],
@@ -99,6 +114,7 @@ class MultipleChoiceCard extends HookWidget {
                   SizedBox(
                     width: double.infinity,
                     child: Button(
+                      contentScale: contentScale,
                       variants: [
                         ..._optionVariants(entry.value, effectiveIsRevealed),
                         ButtonVariant.flat,
@@ -117,6 +133,8 @@ class MultipleChoiceCard extends HookWidget {
                       child: MarkdownText(
                         data: _optionLabel(entry.value, entry.key),
                         mode: MarkdownTextMode.previewSelectable,
+                        baseTextStyle: markdownTextStyle,
+                        contentScale: contentScale,
                         resolveAttachmentUrl: template.resolveAttachmentUrl,
                       ),
                     ),
