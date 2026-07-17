@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
@@ -6,6 +8,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         MainController,
         ScaffoldController,
         ScaffoldHelper,
+        ScaffoldOverlayGeometry,
         ScaffoldScrollLockScope,
         ToolBar,
         ToolBarScope,
@@ -182,6 +185,11 @@ class Scaffold extends HookWidget {
         isKeyboardOpen && shouldHaveToolBar
         ? 0.0
         : helper.bottomScaffoldSafeAreaHeight;
+    final scaffoldOverlayBottomInset = math.max(
+      helper.bottomScaffoldSafeAreaHeight,
+      contentBottomInset,
+    );
+    final scaffoldOverlayTopInset = effectiveAppBarHeight;
 
     final toolBarController = toolBar is ToolBar
         ? (toolBar! as ToolBar).controller
@@ -428,10 +436,14 @@ class Scaffold extends HookWidget {
         ),
     ];
 
-    return material.Scaffold(
-      resizeToAvoidBottomInset: false,
-      backgroundColor: backgroundColor ?? tokens.colorScaffoldBackground,
-      body: Stack(clipBehavior: Clip.none, children: stackChildren),
+    return ScaffoldOverlayGeometry(
+      topInset: scaffoldOverlayTopInset,
+      bottomInset: scaffoldOverlayBottomInset,
+      child: material.Scaffold(
+        resizeToAvoidBottomInset: false,
+        backgroundColor: backgroundColor ?? tokens.colorScaffoldBackground,
+        body: Stack(clipBehavior: Clip.none, children: stackChildren),
+      ),
     );
   }
 }

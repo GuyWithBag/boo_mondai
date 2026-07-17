@@ -34,6 +34,7 @@ export 'button.variant.dart';
 export 'button.dart';
 export 'app_bar.dart';
 export 'scaffold.dart';
+export 'scaffold_overlay_geometry.dart';
 export 'modal.dart';
 export 'show_bottom_sheet.dart';
 export 'text_field.dart';

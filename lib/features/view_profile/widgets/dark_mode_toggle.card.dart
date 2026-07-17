@@ -1,3 +1,4 @@
+import 'package:boo_mondai/features/ui_sounds/ui_sounds.service.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
@@ -74,9 +75,19 @@ class DarkModeToggleCard extends HookWidget {
 
         return GestureDetector(
           behavior: HitTestBehavior.opaque,
-          onTap: () async {
+          onTapDown: (_) async {
             final nextMode = isDark ? ThemeMode.light : ThemeMode.dark;
             controller.setThemeMode(nextMode);
+            await UiSoundsService.soloud.playSource(
+              asset: 'assets/ui/button_down/minimalist_3.wav',
+              volume: 2,
+            );
+          },
+          onTapUp: (_) async {
+            await UiSoundsService.soloud.playSource(
+              asset: 'assets/ui/button_up/minimalist_1.wav',
+              volume: 2,
+            );
           },
           child: Surface(
             style: style,

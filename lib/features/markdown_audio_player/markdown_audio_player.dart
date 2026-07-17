@@ -4,177 +4,197 @@ import 'package:boo_mondai/lib.barrel.dart'
         Button,
         ButtonColor,
         ButtonVariant,
-        SurfaceBorder,
-        SurfaceColor,
         SurfacePadding,
         SurfaceShadow,
         SurfaceShape,
         TextColor,
         TextSize,
         TextWeight,
+        ScaleHelper,
         surfaceStyle,
         textStyle;
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-class MarkdownAudioPlayer extends StatefulWidget {
+class MarkdownAudioPlayer extends HookWidget {
   const MarkdownAudioPlayer({
     required this.source,
     required this.label,
+    this.contentScale = 1,
     super.key,
   });
 
   final String source;
   final String label;
+  final double contentScale;
 
-  @override
-  State<MarkdownAudioPlayer> createState() => _MarkdownAudioPlayerState();
-}
-
-class _MarkdownAudioPlayerState extends State<MarkdownAudioPlayer> {
-  late final AudioPlayer _player;
-  bool _isLoading = true;
-  String? _error;
-
-  @override
-  void initState() {
-    super.initState();
-    _player = AudioPlayer();
-    _loadSource();
-  }
-
-  @override
-  void didUpdateWidget(MarkdownAudioPlayer oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.source != widget.source) {
-      _loadSource();
-    }
-  }
-
-  @override
-  void dispose() {
-    _player.dispose();
-    super.dispose();
-  }
-
-  Future<void> _loadSource() async {
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-
-    try {
-      if (_isRemoteSource(widget.source)) {
-        await _player.setUrl(widget.source);
-      } else {
-        await _player.setFilePath(widget.source);
-      }
-      if (!mounted) return;
-      setState(() => _isLoading = false);
-    } catch (_) {
-      if (!mounted) return;
-      setState(() {
-        _isLoading = false;
-        _error = 'Audio unavailable';
-      });
-    }
-  }
-
-  Future<void> _togglePlayback(PlayerState playerState) async {
-    if (_isLoading || _error != null) return;
+  Future<void> _togglePlayback({
+    required AudioPlayer player,
+    required PlayerState playerState,
+    required bool isLoading,
+    required String? error,
+  }) async {
+    if (isLoading || error != null) return;
 
     if (playerState.processingState == ProcessingState.completed) {
-      await _player.seek(Duration.zero);
-      await _player.play();
+      await player.seek(Duration.zero);
+      await player.play();
       return;
     }
 
     if (playerState.playing) {
-      await _player.pause();
+      await player.pause();
     } else {
-      await _player.play();
+      await player.play();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
-    final titleStyle = textStyle.resolve(tokens, const [
-      TextSize.label,
-      TextWeight.strong,
-      TextColor.baseline,
-    ]);
-    final timeStyle = textStyle.resolve(tokens, const [
-      TextSize.labelSmall,
-      TextWeight.body,
-      TextColor.muted,
-    ]);
-    final containerStyle = surfaceStyle.resolve(tokens, const [
-      SurfaceColor.baseline,
-      SurfaceShape.roundedXsm,
-      SurfaceBorder.baseline,
-      SurfaceShadow.none,
-      SurfacePadding.none,
-    ]);
+    final player = useMemoized(AudioPlayer.new);
+    final isLoading = useState(true);
+    final error = useState<String?>(null);
+    final playerStateSnapshot = useStream(
+      player.playerStateStream,
+      initialData: player.playerState,
+    );
 
-    return ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: tokens.spaceScaffoldMaxWidth.w),
-      child: Surface(
-        style: containerStyle,
-        child: Padding(
-          padding: EdgeInsets.all(tokens.spaceLayoutPaddingSm.w),
-          child: StreamBuilder<PlayerState>(
-            stream: _player.playerStateStream,
-            initialData: _player.playerState,
-            builder: (context, playerStateSnapshot) {
-              final playerState =
-                  playerStateSnapshot.data ?? _player.playerState;
-              return Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Button.iconSmall(
-                    onPressed: _error == null
-                        ? () => _togglePlayback(playerState)
-                        : null,
-                    icon: _iconFor(playerState),
-                    color: ButtonColor.baseline,
-                    variant: ButtonVariant.elevated,
-                    tokens: tokens,
-                  ),
-                  SizedBox(width: tokens.spaceLayoutGapSm.w),
-                  Expanded(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _error ?? widget.label,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: titleStyle,
-                        ),
-                        SizedBox(height: tokens.spaceLayoutGapXsm.h),
-                        _AudioProgress(
-                          player: _player,
-                          isEnabled: !_isLoading && _error == null,
-                          textStyle: timeStyle,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
+    useEffect(() {
+      var isDisposed = false;
+
+      Future<void> loadSource() async {
+        isLoading.value = true;
+        error.value = null;
+
+        try {
+          if (_isRemoteSource(source)) {
+            await player.setUrl(source);
+          } else {
+            await player.setFilePath(source);
+          }
+          if (isDisposed) return;
+          isLoading.value = false;
+        } catch (_) {
+          if (isDisposed) return;
+          isLoading.value = false;
+          error.value = 'Audio unavailable';
+        }
+      }
+
+      loadSource();
+
+      return () {
+        isDisposed = true;
+      };
+    }, [player, source]);
+
+    useEffect(() => player.dispose, [player]);
+
+    final tokens = context.themeTokens<AppTokens>();
+    final titleStyle = ScaleHelper.getTextStyleWithScaledFontSize(
+      textStyle.resolve(tokens, const [
+        TextSize.label,
+        TextWeight.strong,
+        TextColor.baseline,
+      ]),
+      contentScale,
+    );
+    final timeStyle = ScaleHelper.getTextStyleWithScaledFontSize(
+      textStyle.resolve(tokens, const [
+        TextSize.labelSmall,
+        TextWeight.body,
+        TextColor.muted,
+      ]),
+      contentScale,
+    );
+    final containerStyle = surfaceStyle.resolve(tokens, const [
+      // SurfaceColor.muted,
+      SurfaceShape.roundedXsm,
+      // SurfaceBorder.none,
+      SurfaceShadow.none,
+      SurfacePadding.sm,
+    ]);
+    final scaledContainerStyle = containerStyle.copyWith(
+      decoration: containerStyle.decoration.copyWith(
+        borderRadius: BorderRadius.circular(
+          tokens.radiusSurfaceXsm.r * contentScale,
         ),
+      ),
+      padding: containerStyle.padding is EdgeInsets
+          ? ScaleHelper.getScaledEdgeInsets(
+              containerStyle.padding! as EdgeInsets,
+              contentScale,
+            )
+          : containerStyle.padding,
+    );
+    final rowGap = ScaleHelper.getScaledValue(
+      tokens.spaceLayoutGapSm.w,
+      contentScale,
+    );
+    final progressGap = ScaleHelper.getScaledValue(
+      tokens.spaceLayoutGapXsm.h,
+      contentScale,
+    );
+
+    return Surface(
+      style: scaledContainerStyle,
+      child: Column(
+        children: [
+          Text(
+            error.value ?? label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: titleStyle,
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            spacing: rowGap,
+            children: [
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: progressGap),
+                    _AudioProgress(
+                      player: player,
+                      isEnabled: !isLoading.value && error.value == null,
+                      textStyle: timeStyle,
+                      contentScale: contentScale,
+                    ),
+                  ],
+                ),
+              ),
+              Button.iconSmall(
+                onPressed: error.value == null
+                    ? () => _togglePlayback(
+                        player: player,
+                        playerState:
+                            playerStateSnapshot.data ?? player.playerState,
+                        isLoading: isLoading.value,
+                        error: error.value,
+                      )
+                    : null,
+                icon: _iconFor(
+                  playerStateSnapshot.data ?? player.playerState,
+                  isLoading: isLoading.value,
+                ),
+                color: ButtonColor.baseline,
+                variant: ButtonVariant.elevated,
+                contentScale: contentScale,
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 
-  IconData _iconFor(PlayerState playerState) {
-    if (_isLoading ||
+  IconData _iconFor(PlayerState playerState, {required bool isLoading}) {
+    if (isLoading ||
         playerState.processingState == ProcessingState.loading ||
         playerState.processingState == ProcessingState.buffering) {
       return Icons.hourglass_empty;
@@ -197,11 +217,13 @@ class _AudioProgress extends StatelessWidget {
     required this.player,
     required this.isEnabled,
     required this.textStyle,
+    required this.contentScale,
   });
 
   final AudioPlayer player;
   final bool isEnabled;
   final TextStyle textStyle;
+  final double contentScale;
 
   @override
   Widget build(BuildContext context) {
@@ -231,7 +253,19 @@ class _AudioProgress extends StatelessWidget {
                     inactiveTrackColor: tokens.colorMuted,
                     thumbColor: tokens.colorPrimaryBright,
                     overlayColor: tokens.colorPrimarySoft,
-                    trackHeight: 4.h,
+                    trackHeight: ScaleHelper.getScaledValue(4.h, contentScale),
+                    thumbShape: RoundSliderThumbShape(
+                      enabledThumbRadius: ScaleHelper.getScaledValue(
+                        10.r,
+                        contentScale,
+                      ),
+                    ),
+                    overlayShape: RoundSliderOverlayShape(
+                      overlayRadius: ScaleHelper.getScaledValue(
+                        18.r,
+                        contentScale,
+                      ),
+                    ),
                   ),
                   child: Slider(
                     min: 0,

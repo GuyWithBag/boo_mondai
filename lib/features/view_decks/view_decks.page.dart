@@ -31,7 +31,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         SegmentedControl,
         SelectionController,
         SnackbarHandle,
-        SnackbarTone,
+        SnackbarColor,
+        SnackbarVariant,
         StatusLayoutState,
         SyncButton,
         SyncDeckService,
@@ -96,7 +97,7 @@ class ViewDecksLocalPage extends HookWidget {
           message: 'Sync failed: $err',
           leading: const Icon(Icons.sync_problem_outlined),
           duration: const Duration(seconds: 3),
-          tone: SnackbarTone.error,
+          color: SnackbarColor.error,
         );
         syncController.clearSyncError();
       });
@@ -133,7 +134,8 @@ class ViewDecksLocalPage extends HookWidget {
                   },
                 ),
                 duration: null,
-                tone: SnackbarTone.dashed,
+                color: SnackbarColor.muted,
+                variant: SnackbarVariant.dashed,
               );
             case ChangeTrackerStatus.applying:
               syncSnackbarHandle.value ??= showSnackbar(
@@ -147,7 +149,8 @@ class ViewDecksLocalPage extends HookWidget {
                   },
                 ),
                 duration: null,
-                tone: SnackbarTone.dashed,
+                color: SnackbarColor.muted,
+                variant: SnackbarVariant.dashed,
               );
             case ChangeTrackerStatus.alreadyUpToDate:
               syncSnackbarHandle.value?.dismiss();
@@ -164,7 +167,7 @@ class ViewDecksLocalPage extends HookWidget {
                 context,
                 message: 'Deck sync complete!',
                 leading: const Icon(Icons.cloud_done_outlined),
-                tone: SnackbarTone.success,
+                color: SnackbarColor.success,
               );
               syncController.dismissCurrentEntry();
             case ChangeTrackerStatus.reviewing:
@@ -203,9 +206,9 @@ class ViewDecksLocalPage extends HookWidget {
               ? Icons.error_outline
               : Icons.file_download_done_outlined,
         ),
-        tone: ViewDecksHelper.isImportFailure(result)
-            ? SnackbarTone.error
-            : SnackbarTone.success,
+        color: ViewDecksHelper.isImportFailure(result)
+            ? SnackbarColor.error
+            : SnackbarColor.success,
       );
     }
 

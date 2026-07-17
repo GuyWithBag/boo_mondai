@@ -5,7 +5,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         Button,
         ButtonColor,
         ButtonSize,
-        SnackbarTone,
+        SnackbarColor,
+        SnackbarVariant,
         showSnackbar,
         ButtonPadding;
 import 'package:flutter/material.dart';
@@ -38,7 +39,8 @@ class SyncButton extends StatelessWidget {
               context,
               message: 'Sign in to sync your decks.',
               leading: const Icon(Icons.lock_outline),
-              tone: SnackbarTone.dashed,
+              color: SnackbarColor.muted,
+              variant: SnackbarVariant.dashed,
             );
             return;
           }

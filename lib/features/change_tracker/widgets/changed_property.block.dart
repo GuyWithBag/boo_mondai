@@ -36,8 +36,6 @@ class ChangedPropertyBlock extends StatelessWidget {
     final doesBeforeFitBlock = property.before.toString().length < 7;
     final doesAfterFitBlock = property.after.toString().length < 7;
 
-    final doesPropertyFitBlock = doesBeforeFitBlock && doesAfterFitBlock;
-
     return Container(
       padding: EdgeInsets.all(tokens.spaceLayoutPadding),
       color: ChangeTrackerHelper.getTypeBackground(tokens, type),

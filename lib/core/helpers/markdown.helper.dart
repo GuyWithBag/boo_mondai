@@ -3,6 +3,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         ImageHelper,
         MediaHelper,
+        StoredMediaKind,
         StoredMediaPath,
         StoredMediaService,
         StringHelper;
@@ -57,18 +58,6 @@ abstract class MarkdownHelper {
     return trimmed;
   }
 
-  static Future<String?> toPickedFileImageAttachmentFormat({
-    required StoredMediaPath path,
-    required PlatformFile file,
-    String? remoteUrl,
-  }) {
-    return toPickedFileMediaMarkdownFormat(
-      path: path,
-      file: file,
-      remoteUrl: remoteUrl,
-    );
-  }
-
   static Future<String?> toPickedFileMediaMarkdownFormat({
     required StoredMediaPath path,
     required PlatformFile file,
@@ -83,12 +72,17 @@ abstract class MarkdownHelper {
 
     final source = 'local:${storedMedia.id}';
     final mimeType = MediaHelper.mimeTypeFromExtension(file.extension);
-    return MediaHelper.isImageMimeType(mimeType)
-        ? toImageAttachmentFormat(label: file.name, source: source)
-        : toLinkFormat(label: file.name, source: source);
+    final mediaKind = MediaHelper.kindFromMimeType(mimeType);
+    return switch (mediaKind) {
+      StoredMediaKind.image || StoredMediaKind.audio => toMediaAttachmentFormat(
+        label: file.name,
+        source: source,
+      ),
+      _ => toLinkFormat(label: file.name, source: source),
+    };
   }
 
-  static String toImageAttachmentFormat({
+  static String toMediaAttachmentFormat({
     required String label,
     required String source,
   }) {

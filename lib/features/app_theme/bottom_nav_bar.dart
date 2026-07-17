@@ -9,11 +9,13 @@ class BottomNavBar extends StatelessWidget implements PreferredSizeWidget {
     required this.child,
     this.variants = const [],
     this.preferredHeight = BottomNavBar.preferredHeightDefault,
+    this.padding,
   });
 
   final Widget child;
   final List<Object> variants;
   final double preferredHeight;
+  final EdgeInsets? padding;
 
   static const double preferredHeightDefault = 90;
 
@@ -25,7 +27,9 @@ class BottomNavBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
     return Surface(
-      style: surfaceStyle.resolve(tokens, [...variants, SurfaceBorder.top]),
+      style: surfaceStyle
+          .resolve(tokens, [...variants, SurfaceBorder.top])
+          .copyWith(padding: padding),
       child: SafeArea(top: false, child: child),
     );
   }

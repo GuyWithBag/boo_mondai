@@ -9,6 +9,7 @@ import 'package:app_links/app_links.dart';
 import 'package:barrel_annotation/barrel_annotation.dart';
 import 'package:boo_mondai/core/hive/hive_registrar.g.dart' show HiveRegistrar;
 import 'package:boo_mondai/env.dart' show Env;
+import 'package:boo_mondai/features/ui_sounds/ui_sounds.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         RemoteDB,
@@ -46,6 +47,9 @@ import 'package:unite_keyboard_visibility/unite_keyboard_visibility.dart'
 )
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await UiSoundsService.init();
+
   // ── Hive ────────────────────────────────────────────
   await Hive.initFlutter('boo_mondai');
   Hive.registerAdapters();

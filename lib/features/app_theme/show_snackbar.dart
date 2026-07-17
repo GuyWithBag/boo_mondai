@@ -1,11 +1,18 @@
 import 'dart:async';
 
-import 'package:boo_mondai/lib.barrel.dart' show Side, SnackbarTone, Snackbar;
+import 'package:boo_mondai/lib.barrel.dart'
+    show
+        ScaffoldOverlayGeometry,
+        Side,
+        Snackbar,
+        SnackbarColor,
+        SnackbarVariant;
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
-_TopSnackbarHandle? _activeTopSnackbar;
+_OverlaySnackbarHandle? _activeTopSnackbar;
+_OverlaySnackbarHandle? _activeBottomSnackbar;
 
 SnackbarHandle showSnackbar(
   BuildContext context, {
@@ -13,88 +20,77 @@ SnackbarHandle showSnackbar(
   Widget? leading,
   Widget? content,
   Widget? child,
-  SnackbarTone tone = SnackbarTone.surface,
-  Side side = Side.top,
+  SnackbarColor color = SnackbarColor.surface,
+  SnackbarVariant variant = SnackbarVariant.elevated,
+  List<Object> variants = const [],
+  Side side = Side.bottom,
   Duration? duration = const Duration(seconds: 3),
   bool clearCurrent = true,
 }) {
-  final messenger = ScaffoldMessenger.of(context);
-
   if (clearCurrent) {
-    messenger.clearSnackBars();
+    ScaffoldMessenger.maybeOf(context)?.clearSnackBars();
     _activeTopSnackbar?.dismiss();
+    _activeBottomSnackbar?.dismiss();
   }
 
-  if (side == Side.top) {
-    final overlay = Overlay.of(context, rootOverlay: true);
-    late final _TopSnackbarHandle handle;
-    late final OverlayEntry entry;
-    var removed = false;
+  final overlay = Overlay.of(context, rootOverlay: true);
+  final geometry = ScaffoldOverlayGeometry.maybeOf(context);
+  late final _OverlaySnackbarHandle handle;
+  late final OverlayEntry entry;
+  var removed = false;
 
-    entry = OverlayEntry(
-      builder: (context) => _TopSnackbarOverlay(
-        message: message,
-        leading: leading,
-        content: content,
-        tone: tone,
-        duration: duration,
-        isExiting: handle.isExiting,
-        child: child,
-        onRemoved: () {
-          if (removed) return;
-          removed = true;
-          if (_activeTopSnackbar == handle) {
-            _activeTopSnackbar = null;
-          }
-          if (entry.mounted) {
-            entry.remove();
-          }
-          WidgetsBinding.instance.addPostFrameCallback((_) => handle.dispose());
-        },
-      ),
-    );
-    handle = _TopSnackbarHandle(entry: entry);
-    _activeTopSnackbar = handle;
-    overlay.insert(entry);
-    return handle;
-  }
-
-  final scaffoldFeatureController = messenger.showSnackBar(
-    SnackBar(
-      content: Snackbar(
-        message: message,
-        leading: leading,
-        content: content,
-        tone: tone,
-        child: child,
-      ),
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      behavior: SnackBarBehavior.floating,
-      duration: duration ?? const Duration(days: 1),
-      padding: EdgeInsets.zero,
-      margin: EdgeInsets.zero,
-      dismissDirection: DismissDirection.horizontal,
+  entry = OverlayEntry(
+    builder: (context) => _SnackbarOverlay(
+      message: message,
+      leading: leading,
+      content: content,
+      color: color,
+      variant: variant,
+      variants: variants,
+      side: side,
+      bottomInset: geometry?.bottomInset ?? 0,
+      duration: duration,
+      isExiting: handle.isExiting,
+      child: child,
+      onRemoved: () {
+        if (removed) return;
+        removed = true;
+        switch (side) {
+          case Side.top:
+            if (_activeTopSnackbar == handle) {
+              _activeTopSnackbar = null;
+            }
+          case Side.bottom:
+            if (_activeBottomSnackbar == handle) {
+              _activeBottomSnackbar = null;
+            }
+        }
+        if (entry.mounted) {
+          entry.remove();
+        }
+        WidgetsBinding.instance.addPostFrameCallback((_) => handle.dispose());
+      },
     ),
   );
-  return _BottomSnackbarHandle(scaffoldFeatureController.close);
+  handle = _OverlaySnackbarHandle(entry: entry);
+  switch (side) {
+    case Side.top:
+      _activeTopSnackbar?.dismiss();
+      _activeTopSnackbar = handle;
+    case Side.bottom:
+      _activeBottomSnackbar?.dismiss();
+      _activeBottomSnackbar = handle;
+  }
+  overlay.insert(entry);
+  return handle;
 }
 
 abstract interface class SnackbarHandle {
   void dismiss();
 }
 
-class _BottomSnackbarHandle implements SnackbarHandle {
-  const _BottomSnackbarHandle(this._dismiss);
-
-  final VoidCallback _dismiss;
-
-  @override
-  void dismiss() => _dismiss();
-}
-
-class _TopSnackbarHandle implements SnackbarHandle {
-  _TopSnackbarHandle({required this.entry});
+class _OverlaySnackbarHandle implements SnackbarHandle {
+  _OverlaySnackbarHandle({required this.entry});
 
   final OverlayEntry entry;
   final ValueNotifier<bool> isExiting = ValueNotifier(false);
@@ -107,13 +103,17 @@ class _TopSnackbarHandle implements SnackbarHandle {
   void dispose() => isExiting.dispose();
 }
 
-class _TopSnackbarOverlay extends HookWidget {
-  const _TopSnackbarOverlay({
+class _SnackbarOverlay extends HookWidget {
+  const _SnackbarOverlay({
     required this.message,
     required this.leading,
     required this.content,
     required this.child,
-    required this.tone,
+    required this.color,
+    required this.variant,
+    required this.variants,
+    required this.side,
+    required this.bottomInset,
     required this.duration,
     required this.isExiting,
     required this.onRemoved,
@@ -123,7 +123,11 @@ class _TopSnackbarOverlay extends HookWidget {
   final Widget? leading;
   final Widget? content;
   final Widget? child;
-  final SnackbarTone tone;
+  final SnackbarColor color;
+  final SnackbarVariant variant;
+  final List<Object> variants;
+  final Side side;
+  final double bottomInset;
   final Duration? duration;
   final ValueNotifier<bool> isExiting;
   final VoidCallback onRemoved;
@@ -142,12 +146,15 @@ class _TopSnackbarOverlay extends HookWidget {
     }, [duration, isExiting]);
 
     return Positioned(
-      top: 0,
+      top: side == Side.top ? 0 : null,
+      bottom: side == Side.bottom ? bottomInset : null,
       left: 0,
       right: 0,
       child: SafeArea(
+        top: side == Side.top,
+        bottom: side == Side.bottom && bottomInset == 0,
         child: Dismissible(
-          key: const ValueKey('top-snackbar'),
+          key: ValueKey('${side.name}-snackbar'),
           direction: DismissDirection.horizontal,
           onDismissed: (_) => onRemoved(),
           child:
@@ -155,7 +162,9 @@ class _TopSnackbarOverlay extends HookWidget {
                     message: message,
                     leading: leading,
                     content: content,
-                    tone: tone,
+                    color: color,
+                    variant: variant,
+                    variants: variants,
                     child: child,
                   )
                   .animate(
@@ -173,7 +182,7 @@ class _TopSnackbarOverlay extends HookWidget {
                   .slideY(
                     duration: _animationDuration,
                     curve: Curves.easeOutCubic,
-                    begin: -1,
+                    begin: side == Side.top ? -1 : 1,
                     end: 0,
                   ),
         ),

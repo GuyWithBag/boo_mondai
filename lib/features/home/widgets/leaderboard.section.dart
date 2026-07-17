@@ -15,8 +15,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         LeaderboardTileWidget,
         SurfaceBorder,
         SurfaceShape,
-        surfaceStyle,
-        SurfaceShadow;
+        surfaceStyle;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -43,7 +42,6 @@ class LeaderboardSection extends StatelessWidget {
       style: surfaceStyle.resolve(tokens, const [
         SurfaceShape.roundedXsm,
         SurfaceBorder.none,
-        SurfaceShadow.none,
       ]),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

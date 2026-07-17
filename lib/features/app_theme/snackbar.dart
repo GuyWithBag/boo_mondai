@@ -1,6 +1,7 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show SnackbarTone, AppTokens, appSnackbarStyle;
+    show AppTokens, SnackbarColor, SnackbarVariant, snackbarStyle;
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 class Snackbar extends StatelessWidget {
@@ -10,7 +11,9 @@ class Snackbar extends StatelessWidget {
     this.leading,
     this.content,
     this.child,
-    this.tone = SnackbarTone.surface,
+    this.color = SnackbarColor.surface,
+    this.variant = SnackbarVariant.elevated,
+    this.variants = const [],
     this.minHeight = 60,
   });
 
@@ -18,14 +21,21 @@ class Snackbar extends StatelessWidget {
   final Widget? leading;
   final Widget? content;
   final Widget? child;
-  final SnackbarTone tone;
+  final SnackbarColor color;
+  final SnackbarVariant variant;
+  final List<Object> variants;
   final double minHeight;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
+    final resolvedStyle = snackbarStyle.resolve(tokens, [
+      color,
+      variant,
+      ...variants,
+    ]);
 
-    return Padding(
+    final snackbar = Padding(
       padding: EdgeInsets.all(tokens.spaceLayoutPaddingSm),
       child: ConstrainedBox(
         constraints: BoxConstraints(
@@ -33,7 +43,7 @@ class Snackbar extends StatelessWidget {
           minWidth: double.infinity,
         ),
         child: Surface(
-          style: appSnackbarStyle.resolve(tokens, [tone]),
+          style: resolvedStyle,
           child:
               content ??
               Column(
@@ -59,6 +69,13 @@ class Snackbar extends StatelessWidget {
               ),
         ),
       ),
+    );
+
+    return Padding(
+      padding: resolvedStyle.transform != null
+          ? EdgeInsets.only(top: tokens.modalShadowOffset.h)
+          : EdgeInsets.zero,
+      child: snackbar,
     );
   }
 }

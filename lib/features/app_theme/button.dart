@@ -1,3 +1,4 @@
+import 'package:boo_mondai/features/ui_sounds/ui_sounds.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         ButtonState,
@@ -6,7 +7,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         ButtonSize,
         ButtonPadding,
         ButtonVariant,
-        ButtonColor;
+        ButtonColor,
+        Elevated,
+        ScaleHelper;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -22,6 +25,7 @@ class Button extends HookWidget {
     this.mainAxisAlignment = MainAxisAlignment.center,
     this.axis = Axis.horizontal,
     this.variants = const [],
+    this.contentScale = 1,
     bool dashed = false,
     super.key,
     this.elevated = true,
@@ -35,6 +39,7 @@ class Button extends HookWidget {
   final MainAxisAlignment mainAxisAlignment;
   final Axis axis;
   final List<Object> variants;
+  final double contentScale;
   final bool elevated;
   final bool _isDashed;
 
@@ -44,12 +49,14 @@ class Button extends HookWidget {
     ButtonColor color = ButtonColor.baseline,
     ButtonVariant variant = ButtonVariant.elevated,
     bool selected = false,
+    double contentScale = 1,
     required AppTokens tokens,
   }) {
     return Button(
       onPressed: onPressed,
       leading: icon == null ? null : Icon(icon),
       selected: selected,
+      contentScale: contentScale,
       dashed: variant == ButtonVariant.dashed,
       variants: [color, ButtonSize.icon, ButtonPadding.none, variant],
     );
@@ -61,12 +68,13 @@ class Button extends HookWidget {
     ButtonColor color = ButtonColor.baseline,
     ButtonVariant variant = ButtonVariant.elevated,
     bool selected = false,
-    required AppTokens tokens,
+    double contentScale = 1,
   }) {
     return Button(
       onPressed: onPressed,
       leading: icon == null ? null : Icon(icon),
       selected: selected,
+      contentScale: contentScale,
       dashed: variant == ButtonVariant.dashed,
       variants: [color, ButtonSize.iconSmall, ButtonPadding.none, variant],
     );
@@ -79,6 +87,7 @@ class Button extends HookWidget {
     Widget? leading,
     Widget? trailing,
     bool selected = false,
+    double contentScale = 1,
     MainAxisAlignment mainAxisAlignment = MainAxisAlignment.center,
     Axis axis = Axis.horizontal,
   }) {
@@ -87,6 +96,7 @@ class Button extends HookWidget {
       leading: leading,
       trailing: trailing,
       selected: selected,
+      contentScale: contentScale,
       mainAxisAlignment: mainAxisAlignment,
       axis: axis,
       variants: const [ButtonVariant.dashed, ButtonColor.dashed],
@@ -101,12 +111,13 @@ class Button extends HookWidget {
     ButtonColor color = ButtonColor.muted,
     ButtonVariant variant = ButtonVariant.textShadowed,
     bool selected = false,
-    required AppTokens tokens,
+    double contentScale = 1,
   }) {
     return Button(
       onPressed: onPressed,
       leading: icon == null ? null : Icon(icon),
       selected: selected,
+      contentScale: contentScale,
       dashed: variant == ButtonVariant.dashed,
       variants: [color, ButtonSize.iconOnly, ButtonPadding.none, variant],
     );
@@ -118,12 +129,13 @@ class Button extends HookWidget {
     ButtonColor color = ButtonColor.muted,
     ButtonVariant variant = ButtonVariant.textShadowed,
     bool selected = false,
-    required AppTokens tokens,
+    double contentScale = 1,
   }) {
     return Button(
       onPressed: onPressed,
       leading: icon == null ? null : Icon(icon),
       selected: selected,
+      contentScale: contentScale,
       dashed: variant == ButtonVariant.dashed,
       variants: [color, ButtonSize.iconOnlySmall, ButtonPadding.none, variant],
     );
@@ -136,13 +148,16 @@ class Button extends HookWidget {
     ButtonColor color = ButtonColor.baseline,
     ButtonVariant variant = ButtonVariant.elevated,
     bool selected = false,
-    required AppTokens tokens,
+    bool elevated = false,
+    double contentScale = 1,
   }) {
     return Button(
       onPressed: onPressed,
       leading: icon == null ? null : Icon(icon),
       selected: selected,
       axis: Axis.vertical,
+      elevated: elevated,
+      contentScale: contentScale,
       dashed: variant == ButtonVariant.dashed,
       variants: [
         color,
@@ -152,7 +167,7 @@ class Button extends HookWidget {
       ],
       child: Text(
         label,
-        maxLines: 2,
+        maxLines: 1,
         overflow: TextOverflow.ellipsis,
         textAlign: TextAlign.center,
       ),
@@ -191,7 +206,10 @@ class Button extends HookWidget {
       ...variants,
       state.value,
     ]);
-    var resolvedStyle = effectiveStyle;
+    var resolvedStyle = _scaleSurfaceStyle(effectiveStyle, contentScale);
+    final hasSelectedElevatedTextVariant = variants.contains(
+      ButtonVariant.selectedElevatedText,
+    );
 
     final contentChild = switch (axis) {
       Axis.horizontal => Row(
@@ -200,11 +218,13 @@ class Button extends HookWidget {
         children: [
           if (leading != null) ...[
             leading!,
-            if (child != null) const SizedBox(width: 10),
+            if (child != null)
+              SizedBox(width: ScaleHelper.getScaledValue(10, contentScale)),
           ],
           if (child != null) Flexible(child: child!),
           if (trailing != null) ...[
-            if (child != null || leading != null) const SizedBox(width: 10),
+            if (child != null || leading != null)
+              SizedBox(width: ScaleHelper.getScaledValue(10, contentScale)),
             trailing!,
           ],
         ],
@@ -215,29 +235,25 @@ class Button extends HookWidget {
         children: [
           ...leading != null ? [leading!] : const [],
           if (child != null) ...[
-            if (leading != null) const SizedBox(height: 6),
+            if (leading != null)
+              SizedBox(height: ScaleHelper.getScaledValue(6, contentScale)),
             child!,
           ],
           if (trailing != null) ...[
-            if (child != null || leading != null) const SizedBox(height: 6),
+            if (child != null || leading != null)
+              SizedBox(height: ScaleHelper.getScaledValue(6, contentScale)),
             trailing!,
           ],
         ],
       ),
     };
 
-    final content = Container(
-      decoration: elevated
-          ? BoxDecoration(
-              boxShadow: [
-                BoxShadow(
-                  color: tokens.colorLayoutShadow,
-                  offset: Offset(0, 1),
-                  blurRadius: 10,
-                ),
-              ],
-            )
-          : null,
+    final content = Elevated(
+      enabled:
+          elevated ||
+          (hasSelectedElevatedTextVariant &&
+              state.value == ButtonState.selected),
+      contentScale: contentScale,
       child: Surface(
         style: resolvedStyle,
         duration: const Duration(milliseconds: 130),
@@ -275,15 +291,28 @@ class Button extends HookWidget {
         behavior: HitTestBehavior.opaque,
         onTapDown: state.value == ButtonState.disabled
             ? null
-            : (_) => state.value = ButtonState.pressed,
+            : (_) async {
+                state.value = selected
+                    ? ButtonState.selectedPressed
+                    : ButtonState.pressed;
+
+                await UiSoundsService.soloud.playSource(
+                  asset: 'assets/ui/button_down/minimalist_3.wav',
+                  volume: 2,
+                );
+              },
         onTapCancel: state.value == ButtonState.disabled
             ? null
             : () => state.value = getState(),
         onTapUp: state.value == ButtonState.disabled
             ? null
-            : (_) {
+            : (_) async {
                 onPressed?.call();
                 state.value = getHoverState();
+                await UiSoundsService.soloud.playSource(
+                  asset: 'assets/ui/button_up/minimalist_1.wav',
+                  volume: 2,
+                );
               },
         child: paintedContent,
       ),
@@ -291,9 +320,131 @@ class Button extends HookWidget {
 
     return Padding(
       padding: resolvedStyle.transform != null
-          ? EdgeInsets.only(top: tokens.buttonShadowOffset)
+          ? EdgeInsets.only(
+              top: ScaleHelper.getScaledValue(
+                tokens.buttonShadowOffset,
+                contentScale,
+              ),
+            )
           : EdgeInsets.zero,
       child: button,
+    );
+  }
+
+  SurfaceStyle _scaleSurfaceStyle(SurfaceStyle style, double scale) {
+    if (scale == 1) return style;
+
+    return style.copyWith(
+      decoration: _scaleBoxDecoration(style.decoration, scale),
+      foregroundDecoration: style.foregroundDecoration == null
+          ? null
+          : _scaleBoxDecoration(style.foregroundDecoration!, scale),
+      padding: _scaleEdgeInsetsGeometry(style.padding, scale),
+      margin: _scaleEdgeInsetsGeometry(style.margin, scale),
+      width: style.width == null
+          ? null
+          : ScaleHelper.getScaledValue(style.width!, scale),
+      height: style.height == null
+          ? null
+          : ScaleHelper.getScaledValue(style.height!, scale),
+      constraints: _scaleBoxConstraints(style.constraints, scale),
+      transform: _scaleMatrixTranslation(style.transform, scale),
+      contentStyle: style.contentStyle.copyWith(
+        textStyle: ScaleHelper.getTextStyleWithScaledFontSize(
+          style.contentStyle.textStyle,
+          scale,
+        ),
+        iconTheme: style.contentStyle.iconTheme.copyWith(
+          size: style.contentStyle.iconTheme.size == null
+              ? null
+              : ScaleHelper.getScaledValue(
+                  style.contentStyle.iconTheme.size!,
+                  scale,
+                ),
+        ),
+      ),
+    );
+  }
+
+  BoxDecoration _scaleBoxDecoration(BoxDecoration decoration, double scale) {
+    return decoration.copyWith(
+      borderRadius: decoration.borderRadius == null
+          ? null
+          : decoration.borderRadius! * scale,
+      border: _scaleBoxBorder(decoration.border, scale),
+      boxShadow: decoration.boxShadow
+          ?.map(
+            (shadow) => BoxShadow(
+              color: shadow.color,
+              offset: Offset(
+                ScaleHelper.getScaledValue(shadow.offset.dx, scale),
+                ScaleHelper.getScaledValue(shadow.offset.dy, scale),
+              ),
+              blurRadius: ScaleHelper.getScaledValue(shadow.blurRadius, scale),
+              spreadRadius: ScaleHelper.getScaledValue(
+                shadow.spreadRadius,
+                scale,
+              ),
+              blurStyle: shadow.blurStyle,
+            ),
+          )
+          .toList(),
+    );
+  }
+
+  BoxBorder? _scaleBoxBorder(BoxBorder? border, double scale) {
+    if (border is! Border) return border;
+
+    return Border(
+      top: _scaleBorderSide(border.top, scale),
+      right: _scaleBorderSide(border.right, scale),
+      bottom: _scaleBorderSide(border.bottom, scale),
+      left: _scaleBorderSide(border.left, scale),
+    );
+  }
+
+  BorderSide _scaleBorderSide(BorderSide side, double scale) {
+    if (side == BorderSide.none) return side;
+
+    return side.copyWith(width: ScaleHelper.getScaledValue(side.width, scale));
+  }
+
+  Matrix4? _scaleMatrixTranslation(Matrix4? transform, double scale) {
+    if (transform == null) return null;
+
+    final scaled = Matrix4.copy(transform);
+    scaled.storage[12] = ScaleHelper.getScaledValue(scaled.storage[12], scale);
+    scaled.storage[13] = ScaleHelper.getScaledValue(scaled.storage[13], scale);
+    scaled.storage[14] = ScaleHelper.getScaledValue(scaled.storage[14], scale);
+    return scaled;
+  }
+
+  EdgeInsetsGeometry? _scaleEdgeInsetsGeometry(
+    EdgeInsetsGeometry? insets,
+    double scale,
+  ) {
+    if (insets == null) return null;
+    if (insets is EdgeInsets) {
+      return ScaleHelper.getScaledEdgeInsets(insets, scale);
+    }
+    return insets;
+  }
+
+  BoxConstraints? _scaleBoxConstraints(
+    BoxConstraints? constraints,
+    double scale,
+  ) {
+    if (constraints == null) return null;
+
+    return BoxConstraints(
+      minWidth: ScaleHelper.getScaledValue(constraints.minWidth, scale),
+      maxWidth: constraints.maxWidth.isFinite
+          ? ScaleHelper.getScaledValue(constraints.maxWidth, scale)
+          : constraints.maxWidth,
+      minHeight: ScaleHelper.getScaledValue(constraints.minHeight, scale),
+      maxHeight: constraints.maxHeight.isFinite
+          ? ScaleHelper.getScaledValue(constraints.maxHeight, scale)
+          : constraints.maxHeight,
     );
   }
 }

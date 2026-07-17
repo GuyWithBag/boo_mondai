@@ -54,6 +54,21 @@ abstract final class ScaleHelper {
         );
   }
 
+  /// Returns [value] multiplied by [scale].
+  static double getScaledValue(double value, double scale) {
+    return value * scale;
+  }
+
+  /// Returns a copy of [insets] with every edge multiplied by [scale].
+  static EdgeInsets getScaledEdgeInsets(EdgeInsets insets, double scale) {
+    return EdgeInsets.fromLTRB(
+      insets.left * scale,
+      insets.top * scale,
+      insets.right * scale,
+      insets.bottom * scale,
+    );
+  }
+
   /// Returns a copy of [style] with its `fontSize` multiplied by [scale].
   ///
   /// If [style] has no explicit `fontSize`, it is returned unchanged because

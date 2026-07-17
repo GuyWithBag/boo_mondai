@@ -165,14 +165,12 @@ class EditableTextValue extends HookWidget {
               Button.iconSmall(
                 icon: Icons.close,
                 onPressed: isSaving.value ? null : cancel,
-                tokens: tokens,
               ),
               SizedBox(width: tokens.spaceLayoutGapSm),
               Button.iconSmall(
                 color: ButtonColor.success,
                 icon: Icons.check,
                 onPressed: isSaving.value ? null : save,
-                tokens: tokens,
               ),
             ],
           ),
@@ -201,12 +199,7 @@ class EditableTextValue extends HookWidget {
       mainAxisAlignment: TextHelper.getMainAxisAlignmentForTextAlign(textAlign),
       children: [
         Flexible(child: previewText),
-        if (enabled)
-          Button.iconOnlySmall(
-            icon: Icons.edit,
-            onPressed: edit,
-            tokens: tokens,
-          ),
+        if (enabled) Button.iconOnlySmall(icon: Icons.edit, onPressed: edit),
       ],
     );
   }

@@ -1,35 +1,29 @@
+import 'package:boo_mondai/features/view_cards/view_cards.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
+        Button,
         CardTemplate,
         ChipTone,
-        FillInTheBlanksCard,
-        FillInTheBlanksTemplate,
-        FlashcardCard,
         FlashcardTemplate,
-        IdentificationTemplate,
-        MatchMadnessTemplate,
-        MarkdownText,
-        MarkdownTextMode,
-        MultipleChoiceCard,
-        MultipleChoiceTemplate,
-        PhysicalCard,
         PhysicalCardController,
+        ScaleHelper,
         StudyCard,
-        WordScrambleTemplate,
-        MatchingTypeCard,
+        usePhysicalCardController,
         chipStyle,
         ViewCardsTileSide;
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-class ViewCardsTile extends StatelessWidget {
+class ViewCardsTile extends HookWidget {
   const ViewCardsTile.template({
     required this.template,
     this.width = 280,
     this.initialSide = ViewCardsTileSide.front,
-    this.allowFlip = true,
+    this.flippable = true,
+    this.editable = false,
     this.controller,
     super.key,
   }) : studyCard = null,
@@ -39,7 +33,8 @@ class ViewCardsTile extends StatelessWidget {
     required this.studyCard,
     this.width = 280,
     this.initialSide = ViewCardsTileSide.front,
-    this.allowFlip = true,
+    this.flippable = true,
+    this.editable = false,
     this.controller,
     super.key,
   }) : template = null,
@@ -49,20 +44,55 @@ class ViewCardsTile extends StatelessWidget {
   final StudyCard? studyCard;
   final double width;
   final ViewCardsTileSide initialSide;
-  final bool allowFlip;
+  final bool flippable;
+  final bool editable;
   final PhysicalCardController? controller;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
+    final fallbackController = usePhysicalCardController(
+      context,
+      width: width,
+      perspective: 0.001,
+    );
+    final effectiveController = controller ?? fallbackController;
+    final contentScale = ScaleHelper.getClampedSizeRatio(
+      current: width,
+      base: tokens.studyCardWidth,
+      min: 0.2,
+    );
     final resolvedTemplate = template ?? studyCard?.template;
-    final resolvedStudyCard = studyCard ?? _previewStudyCard(resolvedTemplate);
+    final resolvedStudyCard =
+        studyCard ?? ViewCardsHelper.getPreviewStudyCard(resolvedTemplate);
     final labels = _buildLabels(
       resolvedTemplate: resolvedTemplate,
       studyCard: resolvedStudyCard,
     );
+    final tileGap = ScaleHelper.getScaledValue(
+      tokens.spaceLayoutGapSm,
+      contentScale,
+    );
+    final chipSpacing = ScaleHelper.getScaledValue(8, contentScale);
+    final flipInset = ScaleHelper.getScaledValue(8, contentScale);
+    final chipTheme = chipStyle.resolve(tokens, const [ChipTone.ghost]);
+    final scaledChipLabelStyle = chipTheme.labelStyle == null
+        ? null
+        : ScaleHelper.getTextStyleWithScaledFontSize(
+            chipTheme.labelStyle!,
+            contentScale,
+          );
 
-    return SizedBox(
+    void onEditCardPressed(BuildContext context, CardTemplate template) {
+      context.push(
+        Uri(
+          path: '/decks-local/${template.deckId}/edit',
+          queryParameters: {'initialTemplateId': template.id},
+        ).toString(),
+      );
+    }
+
+    final tile = SizedBox(
       width: width,
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -70,31 +100,51 @@ class ViewCardsTile extends StatelessWidget {
         children: [
           AspectRatio(
             aspectRatio: tokens.studyCardAspectRatio,
-            child: _ScaledCardText(
-              width: width,
-              child: _buildPreview(
-                context,
-                template: resolvedTemplate,
-                studyCard: studyCard,
-                width: width,
-                side: initialSide,
-                allowFlip: allowFlip,
-                controller: controller,
-              ),
+            child: Stack(
+              children: [
+                ViewCardsHelper.getCorrespondingViewCard(
+                  tokens,
+                  template: resolvedTemplate,
+                  studyCard: studyCard,
+                  width: width,
+                  side: initialSide,
+                  controller: effectiveController,
+                  contentScale: contentScale,
+                ),
+                if (resolvedTemplate != null &&
+                    flippable &&
+                    resolvedTemplate is FlashcardTemplate)
+                  Positioned(
+                    right: flipInset,
+                    bottom: flipInset,
+                    child: Tooltip(
+                      message: 'Flip card',
+                      child: Button.iconSmall(
+                        icon: Icons.flip,
+                        onPressed: effectiveController.flip,
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ),
           if (labels.isNotEmpty) ...[
-            SizedBox(height: tokens.spaceLayoutGapSm),
+            SizedBox(height: tileGap),
             Wrap(
               alignment: WrapAlignment.center,
-              spacing: 8,
-              runSpacing: 8,
+              spacing: chipSpacing,
+              runSpacing: chipSpacing,
               children: [
                 for (final label in labels.take(3))
                   ChipTheme(
-                    data: chipStyle.resolve(tokens, const [ChipTone.ghost]),
+                    data: chipTheme,
                     child: Chip(
                       label: Text(label),
+                      labelStyle: scaledChipLabelStyle,
+                      labelPadding: ScaleHelper.getScaledEdgeInsets(
+                        const EdgeInsets.symmetric(horizontal: 4),
+                        contentScale,
+                      ),
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       visualDensity: VisualDensity.compact,
                     ),
@@ -105,155 +155,15 @@ class ViewCardsTile extends StatelessWidget {
         ],
       ),
     );
-  }
 
-  Widget _buildPreview(
-    BuildContext context, {
-    required CardTemplate? template,
-    required StudyCard? studyCard,
-    required double width,
-    required ViewCardsTileSide side,
-    required bool allowFlip,
-    required PhysicalCardController? controller,
-  }) {
-    if (template == null) {
-      return _UnknownTemplatePreview(
-        label: 'Missing template',
-        controller: controller,
-      );
-    }
+    if (!editable || resolvedTemplate == null) return tile;
 
-    return switch (template) {
-      FlashcardTemplate t => FlashcardCard(
-        controller: controller,
-        template: t,
-        studyCard:
-            studyCard ??
-            _previewStudyCard(
-              template,
-              isReversed: side == ViewCardsTileSide.back,
-            ),
-        maxWidth: width,
-        isRevealed: side == ViewCardsTileSide.back,
-        showRevealButton: false,
-        showFlipButton: allowFlip,
-      ),
-      MultipleChoiceTemplate t => MultipleChoiceCard(
-        controller: controller,
-        template: t,
-        maxWidth: width,
-        isRevealed: true,
-      ),
-      FillInTheBlanksTemplate t => FillInTheBlanksCard(
-        controller: controller,
-        template: t,
-        maxWidth: width,
-        isRevealed: true,
-      ),
-      MatchMadnessTemplate t => MatchingTypeCard(
-        controller: controller,
-        template: t,
-        maxWidth: width,
-        isRevealed: true,
-      ),
-      IdentificationTemplate t => _PromptPreview(
-        controller: controller,
-        prompt: t.promptText,
-        template: t,
-      ),
-      WordScrambleTemplate t => _PromptPreview(
-        controller: controller,
-        prompt: t.sentenceToScramble,
-        template: t,
-      ),
-      _ => _UnknownTemplatePreview(
-        label: template.runtimeType.toString(),
-        controller: controller,
-      ),
-    };
-  }
-}
-
-class _PromptPreview extends StatelessWidget {
-  const _PromptPreview({
-    required this.prompt,
-    required this.template,
-    this.controller,
-  });
-
-  final String prompt;
-  final CardTemplate template;
-  final PhysicalCardController? controller;
-
-  @override
-  Widget build(BuildContext context) {
-    return PhysicalCard(
-      controller: controller,
-      front: Center(
-        child: Padding(
-          padding: EdgeInsets.all(20.w),
-          child: MarkdownText(
-            data: prompt,
-            mode: MarkdownTextMode.previewSelectable,
-            resolveAttachmentUrl: template.resolveAttachmentUrl,
-          ),
-        ),
-      ),
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => onEditCardPressed(context, resolvedTemplate),
+      child: tile,
     );
   }
-}
-
-class _UnknownTemplatePreview extends StatelessWidget {
-  const _UnknownTemplatePreview({required this.label, this.controller});
-
-  final String label;
-  final PhysicalCardController? controller;
-
-  @override
-  Widget build(BuildContext context) {
-    return PhysicalCard(
-      controller: controller,
-      front: Center(
-        child: Padding(
-          padding: EdgeInsets.all(20.w),
-          child: Text(label, textAlign: TextAlign.center),
-        ),
-      ),
-    );
-  }
-}
-
-class _ScaledCardText extends StatelessWidget {
-  const _ScaledCardText({required this.width, required this.child});
-
-  final double width;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
-    final scale = (width / tokens.studyCardWidth).clamp(0.8, 1.15).toDouble();
-
-    return MediaQuery(
-      data: MediaQuery.of(
-        context,
-      ).copyWith(textScaler: TextScaler.linear(scale)),
-      child: child,
-    );
-  }
-}
-
-StudyCard _previewStudyCard(CardTemplate? template, {bool isReversed = false}) {
-  final now = DateTime.now();
-  return StudyCard(
-    id: '__view_cards_preview__${template?.id ?? 'unknown'}_$isReversed',
-    createdAt: now,
-    updatedAt: now,
-    templateId: template?.id ?? 'unknown',
-    deckId: template?.deckId ?? 'unknown',
-    isReversed: isReversed,
-    template: template,
-  );
 }
 
 List<String> _buildLabels({

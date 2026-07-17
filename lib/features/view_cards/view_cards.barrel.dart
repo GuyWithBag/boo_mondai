@@ -3,6 +3,7 @@
 // Barrel files
 export 'widgets/widgets.barrel.dart';
 export 'models/models.barrel.dart';
+export 'helpers/helpers.barrel.dart';
 // Other files
 export 'view_cards.controller.dart';
 export 'view_cards.query.dart';

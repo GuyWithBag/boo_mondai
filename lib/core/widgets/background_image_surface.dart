@@ -100,7 +100,6 @@ class BackgroundImageSurface extends StatelessWidget {
       if (isEditable &&
           (child == null || showCenteredEditButtonWhenChildPresent)) {
         return Button.iconOnly(
-          tokens: tokens,
           icon: image == null && useAddIconWhenNoImage ? Icons.add : editIcon,
           onPressed: _pickImage,
         );
@@ -163,11 +162,7 @@ class BackgroundImageSurface extends StatelessWidget {
                   BackgroundImageEditButtonPosition.bottomRight
               ? editButtonPadding
               : null,
-          child: Button.iconOnlySmall(
-            icon: editIcon,
-            tokens: tokens,
-            onPressed: _pickImage,
-          ),
+          child: Button.iconOnlySmall(icon: editIcon, onPressed: _pickImage),
         ),
       ],
     );

@@ -227,12 +227,6 @@ final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
         shadow: tokens.colorStreakDim,
         foreground: tokens.colorTextOnBrand,
       ),
-      SurfaceStylePart.decoration({
-        DecorationPart.boxShadowParts({
-          BoxShadowPart.offset(Offset(0, tokens.buttonShadowOffset.h)),
-          BoxShadowPart.blurRadius(0),
-        }),
-      }),
     },
     SurfaceColor.baseline: (tokens) => _surfacePalette(
       background: tokens.colorSurfaceBackground,
@@ -250,12 +244,6 @@ final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
         shadow: tokens.colorPrimaryBright,
         foreground: tokens.colorTextBaseline,
       ),
-      SurfaceStylePart.decoration({
-        DecorationPart.boxShadowParts({
-          BoxShadowPart.offset(Offset(0, tokens.buttonShadowOffset.h)),
-          BoxShadowPart.blurRadius(0),
-        }),
-      }),
     },
     SurfaceColor.header: (tokens) => _surfacePalette(
       background: tokens.colorMuted,
@@ -277,10 +265,6 @@ final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
       ),
       SurfaceStylePart.decoration({
         DecorationPart.radius(tokens.radiusSurface.r),
-        DecorationPart.boxShadowParts({
-          BoxShadowPart.offset(Offset(0, 8.h)),
-          BoxShadowPart.blurRadius(20.r),
-        }),
       }),
     },
     SurfaceColor.invisible: (tokens) => {

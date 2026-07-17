@@ -204,6 +204,8 @@ class AppTokens with AppTokensMappable {
   final double buttonPaddingHorizontalExtendedFab = 24;
   final double buttonPaddingVerticalExtendedFab = 0;
 
+  final double buttonIconSmallTactileShadowOffset = 5;
+  final double buttonTactileShadowOffset = 8;
   final double buttonShadowOffset = 8;
   final double modalShadowOffset = 10;
 
@@ -238,6 +240,10 @@ class AppTokens with AppTokensMappable {
   final double radiusSurfaceSm = 26;
   final double radiusSurfaceXsm = 16;
 
+  final double radiusButton = 16;
+  final double radiusButtonIcon = 16;
+  final double radiusButtonIconSm = 12;
+
   final double textSizeHeaderLarge = 36;
   final double textSizeHeader = 24;
   final double textSizeHeader2 = 30;
@@ -254,7 +260,6 @@ class AppTokens with AppTokensMappable {
 
   final double sizeButtonIcon = 48;
   final double sizeButtonIconSm = 38;
-  final double radiusButtonIconSm = 14;
   // final double bottomNavBarPreferredHeight = 90;
   // final double appBarPreferredHeight = 90;
   // final double preferredHeightDefault = 82;

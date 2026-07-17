@@ -179,7 +179,7 @@ class DeckTile extends HookWidget {
                     ViewCardsTile.template(
                       template: featuredCards[i],
                       width: cardWidth,
-                      allowFlip: false,
+                      flippable: false,
                       controller: cardControllers[i],
                     )
                   else

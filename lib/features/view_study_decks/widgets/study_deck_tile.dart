@@ -10,7 +10,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         ProgressBar,
         StudyRating,
         SurfaceBorder,
-        SurfaceShadow,
         SurfaceShape,
         TextSize,
         TextWeight,
@@ -77,7 +76,6 @@ class StudyDeckTile extends StatelessWidget {
     final tileStyle = surfaceStyle.resolve(tokens, const [
       SurfaceBorder.none,
       SurfaceShape.roundedSm,
-      SurfaceShadow.none,
     ]);
     final tilePadding = tileStyle.padding ?? EdgeInsets.zero;
     final tileSurfaceStyle = tileStyle.copyWith(

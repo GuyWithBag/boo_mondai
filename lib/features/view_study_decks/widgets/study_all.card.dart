@@ -3,17 +3,14 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         Button,
         ButtonColor,
-        ButtonPadding,
-        ButtonSize,
         SurfaceColor,
-        SurfacePadding,
+        SurfaceShadow,
         SurfaceShape,
         TextSize,
         TextWeight,
         surfaceStyle,
         textStyle;
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -31,6 +28,7 @@ class StudyAllDecks extends StatelessWidget {
       style: surfaceStyle.resolve(tokens, const [
         SurfaceColor.primarySoft,
         SurfaceShape.roundedSm,
+        SurfaceShadow.tactile,
       ]),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

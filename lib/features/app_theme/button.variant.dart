@@ -16,9 +16,16 @@ enum ButtonSize {
   extendedFab,
 }
 
-enum ButtonState { idle, hovered, selected, disabled, pressed }
+enum ButtonState { idle, hovered, selected, disabled, pressed, selectedPressed }
 
-enum ButtonVariant { flat, elevated, text, dashed, textShadowed }
+enum ButtonVariant {
+  flat,
+  elevated,
+  text,
+  dashed,
+  textShadowed,
+  selectedElevatedText,
+}
 
 enum ButtonColor {
   primary,
@@ -63,17 +70,7 @@ Set<StylePart<SurfaceStyle>> _buttonPalette({
 final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
   base: (tokens) => {
     SurfaceStylePart.decoration({
-      DecorationPart.borderRadius(
-        BorderRadius.circular(tokens.radiusSurfaceXsm.r),
-      ),
-      DecorationPart.borderParts({
-        BorderPart.width(tokens.borderWidthDefault.w),
-        BorderPart.style(BorderStyle.solid),
-      }),
-      DecorationPart.boxShadowParts({
-        BoxShadowPart.offset(Offset(0, tokens.buttonShadowOffset.h)),
-        BoxShadowPart.blurRadius(0),
-      }),
+      DecorationPart.borderRadius(BorderRadius.circular(tokens.radiusButton.r)),
     }),
     SurfaceStylePart.text({
       TextStylePart.fontWeight(tokens.fontWeightTextStrong),
@@ -173,6 +170,7 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
       shadow: tokens.colorTransparent,
       foreground: tokens.colorTextMuted,
     ),
+
     ButtonSize.sm: (tokens) => {
       SurfaceStylePart.text({TextStylePart.fontSize(tokens.textSizeLabel.sp)}),
       SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconSm.sp)}),
@@ -190,6 +188,11 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
       SurfaceStylePart.text({TextStylePart.fontSize(tokens.textSizeLabel.sp)}),
       SurfaceStylePart.height(tokens.sizeButtonIcon.h),
       SurfaceStylePart.width(tokens.sizeButtonIcon.w),
+      SurfaceStylePart.decoration({
+        DecorationPart.borderRadius(
+          BorderRadius.circular(tokens.radiusButtonIcon.r),
+        ),
+      }),
     },
     ButtonSize.iconSmall: (tokens) => {
       SurfaceStylePart.icon({IconThemePart.size(tokens.sizeIconSm.sp)}),
@@ -286,6 +289,7 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
       }),
       SurfaceStylePart.transform(Matrix4.translationValues(0, 4.h, 0)),
     },
+    ButtonState.selectedPressed: (_) => const <StylePart<SurfaceStyle>>{},
     ButtonState.selected: (tokens) => _buttonPalette(
       background: tokens.colorPrimarySoft,
       border: tokens.colorPrimaryBright,
@@ -299,12 +303,23 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
           BoxShadowPart.blurRadius(0),
         }),
       }),
+      SurfaceStylePart.transform(Matrix4.translationValues(0, 0, 0)),
     },
     ButtonVariant.dashed: (_) => const <StylePart<SurfaceStyle>>{},
     ButtonVariant.elevated: (tokens) => {
       SurfaceStylePart.transform(
-        Matrix4.translationValues(0, -tokens.buttonShadowOffset.h, 0),
+        Matrix4.translationValues(0, -tokens.buttonTactileShadowOffset.h, 0),
       ),
+      SurfaceStylePart.decoration({
+        DecorationPart.borderParts({
+          BorderPart.width(tokens.borderWidthDefault.w),
+          BorderPart.style(BorderStyle.solid),
+        }),
+        DecorationPart.boxShadowParts({
+          BoxShadowPart.offset(Offset(0, tokens.buttonTactileShadowOffset.h)),
+          BoxShadowPart.blurRadius(0),
+        }),
+      }),
     },
     ButtonVariant.flat: (_) => {
       SurfaceStylePart.decoration({
@@ -321,6 +336,21 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
           BoxShadowPart.blurRadius(0),
         }),
         DecorationPart.borderParts({
+          BorderPart.width(0),
+          BorderPart.style(BorderStyle.none),
+        }),
+      }),
+    },
+    ButtonVariant.selectedElevatedText: (tokens) => {
+      SurfaceStylePart.decoration({
+        DecorationPart.color(tokens.colorTransparent),
+        DecorationPart.boxShadowParts({
+          BoxShadowPart.color(tokens.colorTransparent),
+          BoxShadowPart.offset(Offset.zero),
+          BoxShadowPart.blurRadius(0),
+        }),
+        DecorationPart.borderParts({
+          BorderPart.color(tokens.colorTransparent),
           BorderPart.width(0),
           BorderPart.style(BorderStyle.none),
         }),
@@ -351,6 +381,77 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
 
   compoundVariants: [
     CompoundVariantParts<AppTokens, SurfaceStyle>(
+      when: const {ButtonVariant.selectedElevatedText, ButtonState.pressed},
+      build: (tokens) => {
+        ..._buttonPalette(
+          background: tokens.colorPrimarySoft,
+          border: tokens.colorPrimaryBright,
+          shadow: tokens.colorPrimaryBright,
+          foreground: tokens.colorPrimary,
+        ),
+        SurfaceStylePart.decoration({
+          DecorationPart.borderParts({
+            BorderPart.width(tokens.borderWidthDefault.w),
+            BorderPart.style(BorderStyle.solid),
+          }),
+          DecorationPart.boxShadowParts({
+            BoxShadowPart.offset(Offset.zero),
+            BoxShadowPart.blurRadius(0),
+          }),
+        }),
+        SurfaceStylePart.transform(Matrix4.translationValues(0, 0, 0)),
+      },
+    ),
+    CompoundVariantParts<AppTokens, SurfaceStyle>(
+      when: const {ButtonVariant.selectedElevatedText, ButtonState.selected},
+      build: (tokens) => {
+        ..._buttonPalette(
+          background: tokens.colorPrimarySoft,
+          border: tokens.colorPrimaryBright,
+          shadow: tokens.colorPrimaryBright,
+          foreground: tokens.colorPrimary,
+        ),
+        SurfaceStylePart.transform(
+          Matrix4.translationValues(0, -tokens.buttonShadowOffset.h, 0),
+        ),
+        SurfaceStylePart.decoration({
+          DecorationPart.borderParts({
+            BorderPart.width(tokens.borderWidthDefault.w),
+            BorderPart.style(BorderStyle.solid),
+          }),
+          DecorationPart.boxShadowParts({
+            BoxShadowPart.offset(Offset(0, tokens.buttonShadowOffset.h)),
+            BoxShadowPart.blurRadius(0),
+          }),
+        }),
+      },
+    ),
+    CompoundVariantParts<AppTokens, SurfaceStyle>(
+      when: const {
+        ButtonVariant.selectedElevatedText,
+        ButtonState.selectedPressed,
+      },
+      build: (tokens) => {
+        ..._buttonPalette(
+          background: tokens.colorPrimarySoft,
+          border: tokens.colorPrimaryBright,
+          shadow: tokens.colorPrimaryBright,
+          foreground: tokens.colorPrimary,
+        ),
+        SurfaceStylePart.decoration({
+          DecorationPart.borderParts({
+            BorderPart.width(tokens.borderWidthDefault.w),
+            BorderPart.style(BorderStyle.solid),
+          }),
+          DecorationPart.boxShadowParts({
+            BoxShadowPart.offset(Offset.zero),
+            BoxShadowPart.blurRadius(0),
+          }),
+        }),
+        SurfaceStylePart.transform(Matrix4.translationValues(0, 0, 0)),
+      },
+    ),
+    CompoundVariantParts<AppTokens, SurfaceStyle>(
       when: const {ButtonVariant.text, ButtonState.selected},
       build: (tokens) => _buttonPalette(
         background: tokens.colorPrimarySoft,
@@ -359,7 +460,18 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
         foreground: tokens.colorPrimary,
       ),
     ),
-
+    CompoundVariantParts<AppTokens, SurfaceStyle>(
+      when: const {ButtonSize.iconSmall, ButtonState.idle},
+      build: (tokens) => {
+        SurfaceStylePart.transform(
+          Matrix4.translationValues(
+            0,
+            -tokens.buttonIconSmallTactileShadowOffset.h,
+            0,
+          ),
+        ),
+      },
+    ),
     CompoundVariantParts<AppTokens, SurfaceStyle>(
       when: const {ButtonVariant.elevated, ButtonState.pressed},
       build: (_) => {
@@ -394,79 +506,12 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
       },
     ),
     CompoundVariantParts<AppTokens, SurfaceStyle>(
-      when: const {ButtonColor.baseline, ButtonState.selected},
-      build: (tokens) => _buttonPalette(
-        background: tokens.colorPrimarySoft,
-        border: tokens.colorPrimaryBright,
-        shadow: tokens.colorPrimaryBright,
-        foreground: tokens.colorPrimary,
-      ),
-    ),
-    CompoundVariantParts<AppTokens, SurfaceStyle>(
-      when: const {ButtonColor.again, ButtonState.hovered},
-      build: (tokens) => {
-        SurfaceStylePart.decoration({
-          DecorationPart.color(tokens.colorRatingAgainHoverBackground),
-        }),
-      },
-    ),
-    CompoundVariantParts<AppTokens, SurfaceStyle>(
-      when: const {ButtonColor.hard, ButtonState.hovered},
-      build: (tokens) => {
-        SurfaceStylePart.decoration({
-          DecorationPart.color(tokens.colorRatingHardHoverBackground),
-        }),
-      },
-    ),
-    CompoundVariantParts<AppTokens, SurfaceStyle>(
-      when: const {ButtonColor.good, ButtonState.hovered},
-      build: (tokens) => {
-        SurfaceStylePart.decoration({
-          DecorationPart.color(tokens.colorRatingGoodHoverBackground),
-        }),
-      },
-    ),
-    CompoundVariantParts<AppTokens, SurfaceStyle>(
-      when: const {ButtonColor.easy, ButtonState.hovered},
-      build: (tokens) => {
-        SurfaceStylePart.decoration({
-          DecorationPart.color(tokens.colorRatingEasyHoverBackground),
-        }),
-      },
-    ),
-    CompoundVariantParts<AppTokens, SurfaceStyle>(
       when: const {
         ButtonVariant.flat,
         ButtonState.disabled,
         ButtonColor.baseline,
       },
       build: (_) => {SurfaceStylePart.opacity(0.5)},
-    ),
-    CompoundVariantParts<AppTokens, SurfaceStyle>(
-      when: const {ButtonColor.success, ButtonState.disabled},
-      build: (tokens) => _buttonPalette(
-        background: tokens.colorActionSuccessBackground,
-        border: tokens.colorActionSuccessBorder,
-        shadow: tokens.colorActionSuccessBorder,
-        foreground: tokens.colorActionSuccess,
-      ),
-    ),
-    CompoundVariantParts<AppTokens, SurfaceStyle>(
-      when: const {ButtonColor.error, ButtonState.disabled},
-      build: (tokens) => {
-        ..._buttonPalette(
-          background: tokens.colorActionErrorBackground,
-          border: tokens.colorActionErrorBorder,
-          shadow: tokens.colorActionErrorBorder,
-          foreground: tokens.colorActionError,
-        ),
-        SurfaceStylePart.decoration({
-          DecorationPart.boxShadowParts({
-            BoxShadowPart.offset(Offset.zero),
-            BoxShadowPart.blurRadius(0),
-          }),
-        }),
-      },
     ),
   ],
 );

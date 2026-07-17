@@ -1,5 +1,5 @@
 import 'package:boo_mondai/lib.barrel.dart' show AppTokens, buildAppThemeData;
-import 'package:flutter/material.dart' show Color, Brightness, Colors;
+import 'package:flutter/material.dart' show Color, Brightness;
 import 'package:theme_variants/theme_variants.dart'
     show ThemeVariant, ThemeVariantBrightness;
 

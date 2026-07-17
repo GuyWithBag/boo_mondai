@@ -50,8 +50,11 @@ class ViewCardsTemplateScopeView extends StatelessWidget {
       }
 
       return GridTileMaxWidthConstraints(
-        builder: (width) =>
-            ViewCardsTile.template(template: template, width: width),
+        builder: (width) => ViewCardsTile.template(
+          template: template,
+          width: width,
+          editable: true,
+        ),
       );
     }
 
@@ -106,8 +109,11 @@ class ViewCardsStudyCardScopeView extends StatelessWidget {
         layoutMode: layoutMode,
         entryBuilder: (context, index, card) {
           return GridTileMaxWidthConstraints(
-            builder: (width) =>
-                ViewCardsTile.studyCard(studyCard: card, width: width),
+            builder: (width) => ViewCardsTile.studyCard(
+              studyCard: card,
+              width: width,
+              editable: true,
+            ),
           );
         },
       );
@@ -123,8 +129,11 @@ class ViewCardsStudyCardScopeView extends StatelessWidget {
       final card = entry.card;
       if (card != null) {
         return GridTileMaxWidthConstraints(
-          builder: (width) =>
-              ViewCardsTile.studyCard(studyCard: card, width: width),
+          builder: (width) => ViewCardsTile.studyCard(
+            studyCard: card,
+            width: width,
+            editable: true,
+          ),
         );
       }
 
