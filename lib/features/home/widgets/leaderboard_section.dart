@@ -9,7 +9,6 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
         Button,
-        buttonStyle,
         ButtonSize,
         ButtonPadding,
         LeaderboardEntry,
@@ -111,10 +110,7 @@ class LeaderboardSection extends StatelessWidget {
             child: Button(
               onPressed: () => context.push('/leaderboard'),
 
-              style: buttonStyle.resolve(tokens, const [
-                ButtonSize.lg,
-                ButtonPadding.lg,
-              ]),
+              variants: const [ButtonSize.lg, ButtonPadding.lg],
               child: const Text('SEE ALL RANKINGS'),
             ),
           ),

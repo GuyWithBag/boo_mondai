@@ -363,15 +363,4 @@
 //     );
 //   }
 
-//   /// Syncs local settings row for [userId] with remote settings table.
-//   static Future<UserSettings> syncForUser(String userId) async {
-//     await getOrCreateForUser(userId);
-//     await SyncService.syncImmediately<UserSettings>(
-//       localDb: LocalDB.userSettings,
-//       remoteDb: RemoteDB.userSettings,
-//       userId: userId,
-//       localWhere: (item) => item.userId == userId,
-//     );
-//     return getOrCreateForUser(userId);
-//   }
 // }

@@ -2,7 +2,6 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
         Button,
-        buttonStyle,
         ButtonSize,
         ButtonPadding,
         ButtonColor,
@@ -56,11 +55,11 @@ class ReadyToReviewCard extends StatelessWidget {
             alignment: Alignment.centerLeft,
             child: Button(
               onPressed: canStart ? onStartSession : null,
-              style: buttonStyle.resolve(tokens, const [
+              variants: const [
                 ButtonColor.primary,
                 ButtonSize.lg,
                 ButtonPadding.lg,
-              ]),
+              ],
               child: const Text('START SESSION'),
             ),
           ),

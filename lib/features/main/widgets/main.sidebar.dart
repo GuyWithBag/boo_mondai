@@ -6,7 +6,6 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         Button,
-        buttonStyle,
         ButtonColor,
         ButtonVariant,
         Pages,
@@ -58,10 +57,7 @@ class SideBar extends StatelessWidget {
                       : page.icon!,
                 ),
                 selected: isSelected,
-                style: buttonStyle.resolve(tokens, const [
-                  ButtonVariant.text,
-                  ButtonColor.baseline,
-                ]),
+                variants: const [ButtonVariant.text, ButtonColor.baseline],
                 mainAxisAlignment: MainAxisAlignment.start,
                 onPressed: () => context.go(page.url),
                 child: Text(page.name),

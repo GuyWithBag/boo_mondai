@@ -1,7 +1,6 @@
 import 'dart:convert';
 
-import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, Button, ButtonColor, buttonStyle, showModal;
+import 'package:boo_mondai/lib.barrel.dart' show Button, ButtonColor, showModal;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart'
     show
@@ -22,7 +21,6 @@ import 'package:flutter/material.dart'
         DecoratedBox,
         Builder;
 import 'package:flutter/services.dart' show Clipboard, ClipboardData;
-import 'package:theme_variants/theme_variants.dart';
 
 enum ExportPayloadModalResult { copied, savedToFile, dismissed }
 
@@ -89,9 +87,7 @@ Future<ExportPayloadModalResult?> showExportPayloadModal({
       ),
       Builder(
         builder: (context) => Button(
-          style: buttonStyle.resolve(context.themeTokens<AppTokens>(), const [
-            ButtonColor.primary,
-          ]),
+          variants: const [ButtonColor.primary],
           onPressed: () => copyPayload(context),
           child: const Text('Copy JSON'),
         ),

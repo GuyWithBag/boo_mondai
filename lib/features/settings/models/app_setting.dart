@@ -71,4 +71,21 @@ class AppSetting<T> {
     'theme/custom_presets',
     [],
   );
+
+  // ---------------------------------------------------------------------------
+  // Sync deletion
+  // ---------------------------------------------------------------------------
+
+  /// How many days soft-deleted synced rows remain recoverable after delete.
+  /// `0` means purge as soon as sync safety allows.
+  static const syncDeletionRetentionDays = AppSetting<int>._(
+    'sync/deletion_retention_days',
+    90,
+  );
+
+  /// How long a sync client remains active for tombstone cleanup safety.
+  static const syncActiveClientWindowDays = AppSetting<int>._(
+    'sync/active_client_window_days',
+    90,
+  );
 }

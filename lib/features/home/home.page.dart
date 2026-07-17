@@ -12,25 +12,15 @@ import 'package:boo_mondai/lib.barrel.dart'
         AuthController,
         LeaderboardSection,
         LocalDB,
-        MainController,
         ReadyToReviewCard,
         Scaffold,
         StreaksCard,
         ViewLeaderboardController,
         ViewStudyCardsController;
-import 'package:flutter/material.dart'
-    show
-        BuildContext,
-        Widget,
-        Column,
-        RefreshIndicator,
-        Expanded,
-        SizedBox,
-        Colors,
-        Container;
+import 'package:flutter/material.dart' hide Scaffold, AppBar;
 import 'package:flutter_hooks/flutter_hooks.dart' show HookWidget, useEffect;
 import 'package:go_router/go_router.dart' show GoRouterHelper;
-import 'package:provider/provider.dart' show WatchContext, ReadContext;
+import 'package:provider/provider.dart' show WatchContext;
 import 'package:theme_variants/theme_variants.dart' show ThemeVariantsContext;
 
 class HomePage extends HookWidget {

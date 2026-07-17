@@ -27,6 +27,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         ChangeBatchResult,
         ChangedEntity,
         ChangedEntityHelper,
+        ChangeDirection,
         ChangeSource,
         ChangeType,
         ChangeResult,
@@ -40,7 +41,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         CardSimilarityConfig,
         StudyCardService,
         WordScrambleTemplate,
-        uuid;
+        uuid,
+        DeckListingsService;
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
@@ -92,6 +94,7 @@ class ImportExportService {
       ChangedEntity<Object?>(
         changeType: ChangeType.added,
         source: ChangeSource.importExport,
+        direction: ChangeDirection.outbound,
         id: deck.id,
         afterChange: deck,
       ),
@@ -139,7 +142,7 @@ class ImportExportService {
     final templateEntries = <Map<String, dynamic>>[];
     final deckMap = Map<String, dynamic>.from(deck.toMap());
 
-    final coverImageSource = DecksService.getCoverImageSource(deck);
+    final coverImageSource = DecksService.getCoverImageUrl(deck);
     final coverImageBytes = await _resolveImageBytes(coverImageSource);
     if (coverImageBytes == null) {
       deckMap['cover_image_content_path'] = null;
@@ -156,7 +159,7 @@ class ImportExportService {
     final featuredImageContentPaths = <String?>[];
     final featuredImages = deck.listing?.featuredImages ?? const <String>[];
     for (var index = 0; index < featuredImages.length; index++) {
-      final imageSource = DecksService.getListingFeaturedImageSource(
+      final imageSource = DeckListingsService.getFeaturedImages(
         deck: deck,
         index: index,
       );
@@ -364,6 +367,7 @@ class ImportExportService {
         ChangedEntity<CardTemplate>(
           changeType: ChangeType.added,
           source: ChangeSource.importExport,
+          direction: ChangeDirection.outbound,
           id: template.id,
           afterChange: template,
         ),
@@ -400,6 +404,7 @@ class ImportExportService {
         ChangedEntity(
           changeType: ChangeType.skipped,
           source: ChangeSource.importExport,
+          direction: ChangeDirection.inbound,
           id: incomingDeck.id,
           afterChange: incomingDeck,
         ),
@@ -442,6 +447,7 @@ class ImportExportService {
         ChangedEntity(
           changeType: ChangeType.modified,
           source: ChangeSource.importExport,
+          direction: ChangeDirection.inbound,
           id: target.id,
           beforeChange: target,
           afterChange: updatedDeck,
@@ -493,6 +499,7 @@ class ImportExportService {
       ChangedEntity(
         changeType: ChangeType.added,
         source: ChangeSource.importExport,
+        direction: ChangeDirection.inbound,
         id: createdDeck.id,
         afterChange: createdDeck,
       ),
@@ -631,6 +638,7 @@ class ImportExportService {
           ChangedEntity(
             changeType: ChangeType.modified,
             source: ChangeSource.importExport,
+            direction: ChangeDirection.inbound,
             id: local.id,
             beforeChange: local,
             afterChange: template,
@@ -645,6 +653,7 @@ class ImportExportService {
           ChangedEntity(
             changeType: ChangeType.added,
             source: ChangeSource.importExport,
+            direction: ChangeDirection.inbound,
             id: template.id,
             afterChange: template,
           ),
@@ -713,6 +722,7 @@ class ImportExportService {
           ChangedEntity(
             changeType: ChangeType.skipped,
             source: ChangeSource.importExport,
+            direction: ChangeDirection.inbound,
             id: template.id,
             afterChange: template,
           ),
@@ -730,6 +740,7 @@ class ImportExportService {
             ChangedEntity(
               changeType: ChangeType.skipped,
               source: ChangeSource.importExport,
+              direction: ChangeDirection.inbound,
               id: decision.targetTemplateId!,
               afterChange: template,
             ),
@@ -749,6 +760,7 @@ class ImportExportService {
           ChangedEntity(
             changeType: ChangeType.modified,
             source: ChangeSource.importExport,
+            direction: ChangeDirection.inbound,
             id: existing.id,
             beforeChange: existing,
             afterChange: updated,
@@ -773,6 +785,7 @@ class ImportExportService {
         ChangedEntity(
           changeType: ChangeType.added,
           source: ChangeSource.importExport,
+          direction: ChangeDirection.inbound,
           id: created.id,
           afterChange: created,
         ),
