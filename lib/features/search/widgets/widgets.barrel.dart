@@ -4,5 +4,3 @@
 export 'filtered_search_bar.controller.dart';
 export 'filtered_search_bar.hook.dart';
 export 'filtered_search_bar.dart';
-export 'search_filter_modal_field.dart';
-export 'search_filter_modal.dart';

@@ -4,35 +4,13 @@ import 'package:boo_mondai/lib.barrel.dart'
         ChipInput,
         SegmentOption,
         SegmentedControl,
+        TextField,
         TextFieldFrame,
         TextFieldSize,
-        TextFieldColor,
-        TextField,
-        textFieldStyle,
-        SearchFilter,
-        SearchFilterDirective;
+        textFieldStyle;
 import 'package:flutter/material.dart' hide TextField;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
-
-typedef SearchFilterFieldBuilder<TFilter extends SearchFilter> =
-    Widget Function(
-      BuildContext context,
-      TFilter filter,
-      ValueChanged<TFilter>,
-    );
-
-final class SearchFilterModalField<TFilter extends SearchFilter> {
-  const SearchFilterModalField({
-    required this.directive,
-    required this.label,
-    required this.buildEditor,
-  });
-
-  final SearchFilterDirective directive;
-  final String label;
-  final SearchFilterFieldBuilder<TFilter> buildEditor;
-}
 
 class SearchFilterTextEditor extends HookWidget {
   const SearchFilterTextEditor({
@@ -141,6 +119,7 @@ class SearchFilterEnumEditor<TEnum> extends StatelessWidget {
       value: value,
       onChanged: onChanged,
       options: options,
+      isScrollable: true,
     );
   }
 }
