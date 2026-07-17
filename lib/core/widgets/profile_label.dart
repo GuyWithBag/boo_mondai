@@ -7,7 +7,7 @@
 
 import 'package:boo_mondai/core/theme/app_tokens.model.dart';
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppSpacing, AppColors, ProfileAvatar;
+    show ProfileAvatar, TextColor, TextSize, textStyle;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -29,14 +29,13 @@ class ProfileLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final name = displayName.trim().isEmpty ? '...' : displayName.trim();
     final imageUrl = avatarUrl?.trim();
     final tokens = context.themeTokens<AppTokens>();
 
     return Row(
       textDirection: facingLeft ? TextDirection.rtl : TextDirection.ltr,
-      spacing: tokens.spaceLayoutGapSm,
+      spacing: tokens.spaceLayoutGapXsm,
       children: [
         ProfileAvatar(
           displayName: name,
@@ -51,15 +50,17 @@ class ProfileLabel extends StatelessWidget {
           children: [
             Text(
               label,
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: AppColors.colorTextSecondary,
-              ),
+              style: textStyle.resolve(tokens, const [
+                TextColor.muted,
+                TextSize.labelSmall,
+              ]),
             ),
             Text(
               name,
-              style: theme.textTheme.bodySmall?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+              style: textStyle.resolve(tokens, const [
+                TextColor.muted,
+                TextSize.labelSmall,
+              ]),
             ),
           ],
         ),

@@ -2,36 +2,22 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
         AppleSignInButton,
-        buttonStyle,
-        AuthService,
+        AuthController,
         Button,
         ButtonColor,
         GoogleSignInButton,
         LabeledDivider,
-        LocalDB,
         Pages,
-        showSignOutDialog,
         surfaceStyle,
         textStyle,
         TextSize,
+        ViewProfileController,
         SurfaceBorder,
-        SurfaceShape;
-import 'package:flutter/material.dart'
-    show
-        BuildContext,
-        Column,
-        CrossAxisAlignment,
-        Expanded,
-        Icon,
-        Icons,
-        MainAxisAlignment,
-        Row,
-        SizedBox,
-        StatelessWidget,
-        Text,
-        Widget,
-        TextAlign;
+        SurfaceShape,
+        SurfaceShadow;
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart' show GoRouterHelper;
+import 'package:provider/provider.dart' show WatchContext;
 import 'package:theme_variants/theme_variants.dart'
     show Surface, ThemeVariantsContext;
 
@@ -41,11 +27,13 @@ class AuthCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final profile = LocalDB.profile.getOrCreate();
+    final auth = context.watch<AuthController>();
+    final viewProfile = context.watch<ViewProfileController>();
+    final profile = viewProfile.currentProfile;
 
-    if (AuthService.isAuthenticatedEither) {
+    if (auth.isAuthenticatedEither) {
       return Column(
-        spacing: tokens.spaceLayoutGapMd,
+        spacing: tokens.spaceLayoutGapSm,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           if (profile.role != 'researcher') ...[
@@ -56,10 +44,12 @@ class AuthCard extends StatelessWidget {
             ),
           ],
           Button(
-            style: buttonStyle.resolve(tokens, const [ButtonColor.error]),
-            onPressed: () => showSignOutDialog(context),
-            leading: const Icon(Icons.logout),
-            child: const Text('Sign Out'),
+            variants: [ButtonColor.error],
+            onPressed: () => auth.onSignOutPressed(context: context),
+            leading: auth.isLoading
+                ? CircularProgressIndicator()
+                : Icon(Icons.logout),
+            child: auth.isLoading ? null : Text('Sign Out'),
           ),
         ],
       );
@@ -69,6 +59,7 @@ class AuthCard extends StatelessWidget {
       style: surfaceStyle.resolve(tokens, const [
         SurfaceBorder.none,
         SurfaceShape.roundedXsm,
+        SurfaceShadow.none,
       ]),
       child: Column(
         spacing: tokens.spaceLayoutGapMd,
@@ -93,16 +84,14 @@ class AuthCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Button(
-                  style: buttonStyle.resolve(tokens, const [ButtonColor.hard]),
+                  variants: const [ButtonColor.hard],
                   onPressed: () => context.push(Pages.login.url),
                   child: const Text('LOG IN'),
                 ),
               ),
               Expanded(
                 child: Button(
-                  style: buttonStyle.resolve(tokens, const [
-                    ButtonColor.primary,
-                  ]),
+                  variants: const [ButtonColor.primary],
                   onPressed: () => context.push(Pages.register.url),
                   child: const Text('REGISTER'),
                 ),

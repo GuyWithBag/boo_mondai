@@ -43,6 +43,12 @@ class ProfileMapper extends ClassMapperBase<Profile> {
   static DateTime _$updatedAt(Profile v) => v.updatedAt;
   static const Field<Profile, DateTime> _f$updatedAt =
       Field('updatedAt', _$updatedAt, key: r'updated_at');
+  static DateTime? _$deletedAt(Profile v) => v.deletedAt;
+  static const Field<Profile, DateTime> _f$deletedAt =
+      Field('deletedAt', _$deletedAt, key: r'deleted_at', opt: true);
+  static DateTime? _$purgeAfter(Profile v) => v.purgeAfter;
+  static const Field<Profile, DateTime> _f$purgeAfter =
+      Field('purgeAfter', _$purgeAfter, key: r'purge_after', opt: true);
   static bool _$isAnonymous(Profile v) => v.isAnonymous;
   static const Field<Profile, bool> _f$isAnonymous = Field(
       'isAnonymous', _$isAnonymous,
@@ -58,6 +64,8 @@ class ProfileMapper extends ClassMapperBase<Profile> {
     #createdAt: _f$createdAt,
     #userId: _f$userId,
     #updatedAt: _f$updatedAt,
+    #deletedAt: _f$deletedAt,
+    #purgeAfter: _f$purgeAfter,
     #isAnonymous: _f$isAnonymous,
   };
 
@@ -71,6 +79,8 @@ class ProfileMapper extends ClassMapperBase<Profile> {
         createdAt: data.dec(_f$createdAt),
         userId: data.dec(_f$userId),
         updatedAt: data.dec(_f$updatedAt),
+        deletedAt: data.dec(_f$deletedAt),
+        purgeAfter: data.dec(_f$purgeAfter),
         isAnonymous: data.dec(_f$isAnonymous));
   }
 
@@ -134,6 +144,8 @@ abstract class ProfileCopyWith<$R, $In extends Profile, $Out>
       DateTime? createdAt,
       String? userId,
       DateTime? updatedAt,
+      DateTime? deletedAt,
+      DateTime? purgeAfter,
       bool? isAnonymous});
   ProfileCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -156,6 +168,8 @@ class _ProfileCopyWithImpl<$R, $Out>
           DateTime? createdAt,
           String? userId,
           DateTime? updatedAt,
+          Object? deletedAt = $none,
+          Object? purgeAfter = $none,
           bool? isAnonymous}) =>
       $apply(FieldCopyWithData({
         if (id != null) #id: id,
@@ -166,6 +180,8 @@ class _ProfileCopyWithImpl<$R, $Out>
         if (createdAt != null) #createdAt: createdAt,
         if (userId != null) #userId: userId,
         if (updatedAt != null) #updatedAt: updatedAt,
+        if (deletedAt != $none) #deletedAt: deletedAt,
+        if (purgeAfter != $none) #purgeAfter: purgeAfter,
         if (isAnonymous != null) #isAnonymous: isAnonymous
       }));
   @override
@@ -178,6 +194,8 @@ class _ProfileCopyWithImpl<$R, $Out>
       createdAt: data.get(#createdAt, or: $value.createdAt),
       userId: data.get(#userId, or: $value.userId),
       updatedAt: data.get(#updatedAt, or: $value.updatedAt),
+      deletedAt: data.get(#deletedAt, or: $value.deletedAt),
+      purgeAfter: data.get(#purgeAfter, or: $value.purgeAfter),
       isAnonymous: data.get(#isAnonymous, or: $value.isAnonymous));
 
   @override

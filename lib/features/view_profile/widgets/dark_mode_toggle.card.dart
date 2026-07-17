@@ -1,8 +1,5 @@
-import 'dart:ui' show BlendMode, Paint;
-
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        AppSpacing,
         AppTokens,
         SurfaceBorder,
         SurfaceColor,
@@ -13,39 +10,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         surfaceStyle,
         textStyle,
         TextSize;
-import 'package:flutter/material.dart'
-    show
-        StatelessWidget,
-        Widget,
-        BuildContext,
-        Color,
-        Clip,
-        EdgeInsets,
-        SizedBox,
-        MediaQuery,
-        ThemeMode,
-        Brightness,
-        HitTestBehavior,
-        BoxShape,
-        BoxDecoration,
-        AnimatedContainer,
-        Colors,
-        AnimatedRotation,
-        TextAlign,
-        Theme,
-        TextStyle,
-        FontStyle,
-        FontWeight,
-        Text,
-        Center,
-        Padding,
-        Stack,
-        GestureDetector,
-        Positioned,
-        LayoutBuilder,
-        Curves,
-        Align,
-        Alignment;
+import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart'
     show HookWidget, useEffect, useRef, useState;
 import 'package:flutter_screenutil/flutter_screenutil.dart';

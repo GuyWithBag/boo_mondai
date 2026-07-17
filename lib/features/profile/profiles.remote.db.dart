@@ -31,6 +31,9 @@ class ProfilesRemoteDB extends SupabaseRemoteDB<Profile> {
   @override
   String get upsertConflictTarget => 'id';
 
+  @override
+  bool get supportsSoftDelete => true;
+
   Future<Profile?> selectByAuthUserId(String authUserId) =>
       selectOne(filters: {'user_id': authUserId});
 }

@@ -1,10 +1,9 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, AuthController, Button, ButtonColor, buttonStyle;
+    show AuthController, Button, ButtonColor;
 
 import 'package:flutter/material.dart'
     show StatelessWidget, Widget, BuildContext, Icons, Icon, Text;
 import 'package:provider/provider.dart' show ReadContext;
-import 'package:theme_variants/theme_variants.dart';
 
 class GoogleSignInButton extends StatelessWidget {
   const GoogleSignInButton({super.key});
@@ -14,9 +13,7 @@ class GoogleSignInButton extends StatelessWidget {
     final auth = context.read<AuthController>();
 
     return Button(
-      style: buttonStyle.resolve(context.themeTokens<AppTokens>(), const [
-        ButtonColor.google,
-      ]),
+      variants: [ButtonColor.google],
       leading: const Icon(Icons.g_mobiledata),
       child: const Text('CONTINUE WITH GOOGLE'),
       onPressed: () async {

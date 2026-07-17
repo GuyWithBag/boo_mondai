@@ -15,7 +15,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         Scaffold,
         AuthCard;
 import 'package:flutter/material.dart' hide Scaffold;
-import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
 import 'package:go_router/go_router.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -28,14 +27,16 @@ class ViewAccountPage extends StatelessWidget {
     final pages = Pages.appDetails;
 
     return Scaffold(
+      // resizeBodyForKeyboard: false,
+      // materialResizeToAvoidBottomInset: true,
       body: Column(
-        spacing: tokens.spaceLayoutGapSm,
+        spacing: tokens.spaceLayoutGapMd,
         children: [
           const ProfileCard(),
           const DarkModeToggleCard(),
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            spacing: tokens.spaceLayoutGapMd,
+            spacing: tokens.spaceLayoutGapSm,
             children: [
               for (final page in pages) ...[
                 Button(
@@ -47,7 +48,6 @@ class ViewAccountPage extends StatelessWidget {
               ],
             ],
           ),
-          SizedBox(height: tokens.spaceLayoutGapXsm.h),
           const AuthCard(),
         ],
       ),

@@ -4,8 +4,7 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         AuthController,
         EditableTextValue,
-        StoredMediaService,
-        StoredMediaPathHelper,
+        ViewProfileController,
         ProfileAvatar;
 import 'package:flutter/material.dart'
     show
@@ -28,8 +27,9 @@ class ProfileCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthController>();
+    final viewProfile = context.watch<ViewProfileController>();
     final tokens = context.themeTokens<AppTokens>();
-    final profile = auth.currentProfile;
+    final profile = viewProfile.currentProfile;
     final email = auth.currentEmail;
     final displayName = profile.displayName.trim().isEmpty
         ? 'Guest User'
@@ -48,13 +48,9 @@ class ProfileCard extends StatelessWidget {
         children: [
           ProfileAvatar(
             displayName: displayName,
-            avatarUrl:
-                StoredMediaService.getFileByPath(
-                  StoredMediaPathHelper.profileAvatar(),
-                )?.path ??
-                profile.avatarUrl,
+            avatarUrl: viewProfile.currentAvatarUrl,
             radius: 66,
-            onImagePicked: auth.updateAvatarImage,
+            onImagePicked: viewProfile.updateAvatarImage,
           ),
           Column(
             mainAxisSize: MainAxisSize.min,
@@ -66,7 +62,8 @@ class ProfileCard extends StatelessWidget {
                 textStyle: textStyle.resolve(tokens, const [
                   TextSize.headerLarge,
                 ]),
-                onSave: auth.updateDisplayName,
+                ensureEditActionsAreVisibleWhenKeyboardVisible: false,
+                onSave: viewProfile.updateDisplayName,
                 textAlign: TextAlign.center,
               ),
               MetaLabel(label: '@${profile.username}'),
