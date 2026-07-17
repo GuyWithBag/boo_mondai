@@ -75,15 +75,13 @@ class DarkModeToggleCard extends HookWidget {
 
         return GestureDetector(
           behavior: HitTestBehavior.opaque,
-          onTapDown: (_) async {
+          onTap: () async {
             final nextMode = isDark ? ThemeMode.light : ThemeMode.dark;
             controller.setThemeMode(nextMode);
             await UiSoundsService.soloud.playSource(
               asset: 'assets/ui/button_down/minimalist_3.wav',
               volume: 2,
             );
-          },
-          onTapUp: (_) async {
             await UiSoundsService.soloud.playSource(
               asset: 'assets/ui/button_up/minimalist_1.wav',
               volume: 2,
