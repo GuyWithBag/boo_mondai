@@ -16,6 +16,8 @@ class FillInTheBlanksTemplate extends CardTemplate
     required super.sortOrder,
     required super.createdAt,
     required super.updatedAt,
+    super.deletedAt,
+    super.purgeAfter,
     super.sourceTemplateId,
     super.tags,
     super.verticallyCentered,

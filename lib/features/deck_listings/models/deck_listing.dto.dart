@@ -24,6 +24,8 @@ class DeckListing with DeckListingMappable {
 
   final DateTime updatedAt;
   final DateTime createdAt;
+  final DateTime? deletedAt;
+  final DateTime? purgeAfter;
 
   const DeckListing({
     this.upvotesCount = 0,
@@ -38,6 +40,8 @@ class DeckListing with DeckListingMappable {
     this.featuredImages = const [],
     required this.updatedAt,
     required this.createdAt,
+    this.deletedAt,
+    this.purgeAfter,
     required this.deckId,
   });
 }

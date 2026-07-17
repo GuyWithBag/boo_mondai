@@ -15,8 +15,11 @@ class CardTemplatesLocalDB extends HiveLocalDB<CardTemplate> {
   @override
   Map<String, Object?> primaryKeyFromItem(CardTemplate item) => {'id': item.id};
 
+  @override
+  DateTime? getDeletedAt(CardTemplate item) => item.deletedAt;
+
   List<CardTemplate> getByDeckId(String deckId) => guardSync(
-    () => box.values.where((c) => c.deckId == deckId).toList(),
+    () => selectMany(where: (c) => c.deckId == deckId),
     action: 'getByDeckId($deckId)',
   );
 
@@ -25,21 +28,17 @@ class CardTemplatesLocalDB extends HiveLocalDB<CardTemplate> {
     action: 'selectManyByDeckIds(${deckIds.length} deckIds)',
   );
 
-  List<SyncIndexEntry> selectSyncIndexByDeckIds(
-    Set<String> deckIds,
-  ) => guardSync(
-    () => selectManyByDeckIds(deckIds)
-        .map(
-          (template) =>
-              SyncIndexEntry(id: template.id, updatedAt: template.updatedAt),
-        )
-        .toList(growable: false),
-    action: 'selectSyncIndexByDeckIds(${deckIds.length} deckIds)',
-  );
+  List<SyncIndexEntry> selectSyncIndexByDeckIds(Set<String> deckIds) =>
+      selectSyncIndexWhere(
+        where: (template) => deckIds.contains(template.deckId),
+        getId: (template) => template.id,
+        getUpdatedAt: (template) => template.updatedAt,
+        action: 'selectSyncIndexByDeckIds(${deckIds.length} deckIds)',
+      );
 
   List<CardTemplate> selectManyByIds(List<String> ids) => guardSync(
     () => [
-      for (final id in ids) ?selectByPk({'id': id}),
+      for (final id in ids) ?selectByPk({'id': id}, includeDeleted: true),
     ],
     action: 'selectManyByIds(${ids.length} ids)',
   );

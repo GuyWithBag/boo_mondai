@@ -34,15 +34,14 @@ import 'package:boo_mondai/lib.barrel.dart'
         SnackbarTone,
         StatusLayoutState,
         SyncButton,
+        SyncDeckService,
         SyncPage,
         ViewDecksHelper,
         ViewDecksLocalController,
         ViewDecksSearchScope,
-        adoptLegacyDeckOwnerForSync,
-        buttonStyle,
         showSnackbar,
         useChangeTrackerController,
-        useDeckSyncController,
+        useSyncController,
         useSelectionController;
 import 'package:flutter/material.dart' hide AppBar, Scaffold;
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -57,16 +56,20 @@ class ViewDecksLocalPage extends HookWidget {
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
     final controller = context.watch<ViewDecksLocalController>();
-    final changeTrackerController = useChangeTrackerController();
+    final changeTrackerController = useChangeTrackerController(
+      inboundLabel: 'pull',
+      outboundLabel: 'push',
+    );
     final selectionController = useSelectionController<String>(
       multiple: true,
       isEnabled: false,
       emptySelectionAllowed: true,
     );
     final importController = useMemoized(() => ImportExportController());
-    final syncController = useDeckSyncController(
+    final syncController = useSyncController(
+      title: 'Sync decks',
       userId: () => LocalDB.profile.getOrCreate().id,
-      beforeSync: adoptLegacyDeckOwnerForSync,
+      getTables: SyncDeckService.getTables,
       onSynced: controller.load,
     );
     final syncSnackbarHandle = useRef<SnackbarHandle?>(null);
@@ -363,9 +366,7 @@ class _DeckListView extends StatelessWidget {
               actions: [
                 Button(
                   onPressed: onCreate,
-                  style: buttonStyle.resolve(tokens, const [
-                    ButtonColor.primary,
-                  ]),
+                  variants: const [ButtonColor.primary],
                   child: Text('Create Deck'),
                 ),
               ],
@@ -443,11 +444,13 @@ class _DeckListingListView extends StatelessWidget {
               icon: Icons.search_off,
               title: 'No listings found',
               message: 'Try another search or remove filters',
+              disableScaffoldScrollingWhenShown: true,
             )
           : const StatusLayoutState(
               icon: Icons.public,
               title: 'No listings yet',
               message: 'Create a deck listing to manage it here',
+              disableScaffoldScrollingWhenShown: true,
             ),
       separatorHeight: tokens.spaceLayoutGapMd,
       itemBuilder: (context, _, deck) {

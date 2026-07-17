@@ -9,7 +9,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         WordScrambleTemplate,
         AppTokens,
         Button,
-        buttonStyle,
         PanelHeader,
         ButtonColor,
         ButtonVariant;
@@ -91,10 +90,7 @@ class EditDeckSideBar extends StatelessWidget {
                         : () => onTemplateSelected(template.id),
                     leading: Icon(_iconFor(template)),
                     mainAxisAlignment: MainAxisAlignment.start,
-                    style: buttonStyle.resolve(tokens, const [
-                      ButtonVariant.text,
-                      ButtonColor.baseline,
-                    ]),
+                    variants: const [ButtonVariant.text, ButtonColor.baseline],
                     child: Text(
                       _labelFor(template),
                       maxLines: 2,

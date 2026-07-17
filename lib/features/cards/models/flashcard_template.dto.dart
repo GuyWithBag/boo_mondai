@@ -22,6 +22,8 @@ class FlashcardTemplate extends CardTemplate with FlashcardTemplateMappable {
     required super.sortOrder,
     required super.createdAt,
     required super.updatedAt,
+    super.deletedAt,
+    super.purgeAfter,
     super.sourceTemplateId,
     super.tags,
     super.verticallyCentered,

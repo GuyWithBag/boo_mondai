@@ -42,6 +42,12 @@ class CardTemplateMapper extends SubClassMapperBase<CardTemplate> {
   static DateTime _$updatedAt(CardTemplate v) => v.updatedAt;
   static const Field<CardTemplate, DateTime> _f$updatedAt =
       Field('updatedAt', _$updatedAt, key: r'updated_at');
+  static DateTime? _$deletedAt(CardTemplate v) => v.deletedAt;
+  static const Field<CardTemplate, DateTime> _f$deletedAt =
+      Field('deletedAt', _$deletedAt, key: r'deleted_at', opt: true);
+  static DateTime? _$purgeAfter(CardTemplate v) => v.purgeAfter;
+  static const Field<CardTemplate, DateTime> _f$purgeAfter =
+      Field('purgeAfter', _$purgeAfter, key: r'purge_after', opt: true);
   static String? _$sourceTemplateId(CardTemplate v) => v.sourceTemplateId;
   static const Field<CardTemplate, String> _f$sourceTemplateId = Field(
       'sourceTemplateId', _$sourceTemplateId,
@@ -61,6 +67,8 @@ class CardTemplateMapper extends SubClassMapperBase<CardTemplate> {
     #sortOrder: _f$sortOrder,
     #createdAt: _f$createdAt,
     #updatedAt: _f$updatedAt,
+    #deletedAt: _f$deletedAt,
+    #purgeAfter: _f$purgeAfter,
     #sourceTemplateId: _f$sourceTemplateId,
     #tags: _f$tags,
     #verticallyCentered: _f$verticallyCentered,
@@ -107,6 +115,8 @@ abstract class CardTemplateCopyWith<$R, $In extends CardTemplate, $Out>
       int? sortOrder,
       DateTime? createdAt,
       DateTime? updatedAt,
+      DateTime? deletedAt,
+      DateTime? purgeAfter,
       String? sourceTemplateId,
       List<Tag>? tags,
       bool? verticallyCentered});

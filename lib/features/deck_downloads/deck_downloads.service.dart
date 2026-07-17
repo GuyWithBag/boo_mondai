@@ -7,6 +7,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         CardTemplate,
         CardTemplatesRemoteDB,
         ChangedEntity,
+        ChangeDirection,
         PreviewedChangePlan,
         ChangeResult,
         ChangeTrackerService,
@@ -50,7 +51,11 @@ class DeckDownloadsService extends Service {
   }) : progressCheckpointService =
            progressCheckpointService ?? ProgressCheckpointService(),
        changeTrackerService = ServiceRegistry.add(
-         changeTrackerService ?? ChangeTrackerService(),
+         changeTrackerService ??
+             ChangeTrackerService(
+               inboundLabel: 'download',
+               outboundLabel: 'upload',
+             ),
        );
 
   @override
@@ -328,6 +333,7 @@ class DeckDownloadsService extends Service {
         ChangedEntity(
           changeType: ChangeType.added,
           source: ChangeSource.deckDownload,
+          direction: ChangeDirection.inbound,
           id: remoteDeck.id,
           afterChange: remoteDeck,
           remoteId: remoteDeck.id,
@@ -339,6 +345,7 @@ class DeckDownloadsService extends Service {
           (t) => ChangedEntity(
             changeType: ChangeType.added,
             source: ChangeSource.deckDownload,
+            direction: ChangeDirection.inbound,
             id: t.id,
             afterChange: t,
             remoteId: t.id,
@@ -354,6 +361,7 @@ class DeckDownloadsService extends Service {
         ChangedEntity(
           changeType: ChangeType.modified,
           source: ChangeSource.deckDownload,
+          direction: ChangeDirection.inbound,
           id: localDeck.id,
           beforeChange: localDeck,
           afterChange: remoteDeck,
@@ -382,6 +390,7 @@ class DeckDownloadsService extends Service {
           ChangedEntity(
             changeType: ChangeType.added,
             source: ChangeSource.deckDownload,
+            direction: ChangeDirection.inbound,
             id: remoteTemplate.id,
             afterChange: remoteTemplate,
             remoteId: remoteTemplate.id,
@@ -393,6 +402,7 @@ class DeckDownloadsService extends Service {
           ChangedEntity(
             changeType: ChangeType.modified,
             source: ChangeSource.deckDownload,
+            direction: ChangeDirection.inbound,
             id: localTemplate.id,
             beforeChange: localTemplate,
             afterChange: remoteTemplate,
@@ -417,6 +427,7 @@ class DeckDownloadsService extends Service {
           changeType: ChangeType.removed,
 
           source: ChangeSource.deckDownload,
+          direction: ChangeDirection.inbound,
           id: localTemplate.id,
           beforeChange: localTemplate,
           afterChange: localTemplate,

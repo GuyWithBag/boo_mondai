@@ -35,53 +35,45 @@ class DeckListingsRemoteDB extends SupabaseRemoteDB<DeckListing> {
   @override
   String get upsertConflictTarget => 'deck_id';
 
+  @override
+  bool get supportsSoftDelete => true;
+
   // ── Custom Queries ──────────────────────────────────────────────
 
   /// Fetches a specific listing by its Deck ID.
   /// (Overrides standard selectById since the column is 'deck_id')
-  Future<DeckListing?> getByDeckId(String deckId) =>
-      selectOne(filters: {'deck_id': deckId});
+  Future<DeckListing?> getByDeckId(
+    String deckId, {
+    bool includeDeleted = false,
+  }) => selectOne(filters: {'deck_id': deckId}, includeDeleted: includeDeleted);
 
-  Future<List<DeckListing>> selectManyByDeckIds(List<String> deckIds) async {
+  Future<List<DeckListing>> selectManyByDeckIds(
+    List<String> deckIds, {
+    bool includeDeleted = false,
+  }) async {
     final listings = <DeckListing>[];
     for (final deckId in deckIds) {
-      final listing = await getByDeckId(deckId);
+      final listing = await getByDeckId(deckId, includeDeleted: includeDeleted);
       if (listing != null) listings.add(listing);
     }
     return listings;
   }
 
   Future<List<SyncIndexEntry>> selectSyncIndexByDeckIds(List<String> deckIds) =>
-      guard(() async {
-        if (deckIds.isEmpty) return const <SyncIndexEntry>[];
-
-        final response = await client
-            .from(tableName)
-            .select('deck_id, updated_at')
-            .inFilter('deck_id', deckIds);
-        return List<Map<String, dynamic>>.from(response)
-            .map(
-              (row) => SyncIndexEntry(
-                id: row['deck_id'] as String,
-                updatedAt: DateTime.parse(row['updated_at'] as String),
-              ),
-            )
-            .toList(growable: false);
-      }, action: 'selectSyncIndexByDeckIds(${deckIds.length} deckIds)');
+      deckIds.isEmpty
+      ? Future.value(const <SyncIndexEntry>[])
+      : selectSyncIndex(
+          idColumn: 'deck_id',
+          applyQuery: (query) => query.inFilter('deck_id', deckIds),
+          action: 'selectSyncIndexByDeckIds(${deckIds.length} deckIds)',
+        );
 
   Future<SyncIndexEntry?> selectSyncIndexByDeckId(String deckId) =>
-      guard(() async {
-        final row = await client
-            .from(tableName)
-            .select('deck_id, updated_at')
-            .eq('deck_id', deckId)
-            .maybeSingle();
-        if (row == null) return null;
-        return SyncIndexEntry(
-          id: row['deck_id'] as String,
-          updatedAt: DateTime.parse(row['updated_at'] as String),
-        );
-      }, action: 'selectSyncIndexByDeckId($deckId)');
+      selectSyncIndex(
+        idColumn: 'deck_id',
+        applyQuery: (query) => query.eq('deck_id', deckId),
+        action: 'selectSyncIndexByDeckId($deckId)',
+      ).then((entries) => entries.firstOrNull);
 
   /// Updates the Listing.
   /// RLS ensures only the deck owner can successfully execute this.

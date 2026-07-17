@@ -37,6 +37,9 @@ class DecksRemoteDB extends SupabaseRemoteDB<Deck> {
   String get upsertConflictTarget => 'id';
 
   @override
+  bool get supportsSoftDelete => true;
+
+  @override
   String get defaultSelect => _deckWithRelationsSelect;
 
   @override
@@ -51,7 +54,13 @@ class DecksRemoteDB extends SupabaseRemoteDB<Deck> {
   Deck fromJoinedMap(Map<String, dynamic> map) {
     final listing = map['listing'];
     if (listing is List) {
-      map['listing'] = listing.isEmpty ? null : listing.first;
+      final firstListing = listing.isEmpty
+          ? null
+          : Map<String, dynamic>.from(listing.first as Map);
+      map['listing'] =
+          firstListing == null || firstListing['deleted_at'] != null
+          ? null
+          : firstListing;
     }
 
     return fromMap(map);
@@ -72,12 +81,16 @@ class DecksRemoteDB extends SupabaseRemoteDB<Deck> {
     offset: offset,
   );
 
-  Future<Deck?> selectById(String deckId) => selectOne(filters: {'id': deckId});
+  Future<Deck?> selectById(String deckId, {bool includeDeleted = false}) =>
+      selectOne(filters: {'id': deckId}, includeDeleted: includeDeleted);
 
-  Future<List<Deck>> selectManyByIds(List<String> ids) async {
+  Future<List<Deck>> selectManyByIds(
+    List<String> ids, {
+    bool includeDeleted = false,
+  }) async {
     final decks = <Deck>[];
     for (final id in ids) {
-      final deck = await selectById(id);
+      final deck = await selectById(id, includeDeleted: includeDeleted);
       if (deck != null) decks.add(deck);
     }
     return decks;
@@ -103,21 +116,11 @@ class DecksRemoteDB extends SupabaseRemoteDB<Deck> {
   Future<List<SyncIndexEntry>> selectSyncIndexByUserIdAndOptionalDeckId({
     required String userId,
     String? deckId,
-  }) => guard(() async {
-    dynamic query = client.from(tableName).select('id, updated_at');
-    final filters = {'user_id': userId, 'id': ?deckId};
-    query = applyFilters(query, filters);
-
-    final response = await query;
-    return List<Map<String, dynamic>>.from(response)
-        .map(
-          (row) => SyncIndexEntry(
-            id: row['id'] as String,
-            updatedAt: DateTime.parse(row['updated_at'] as String),
-          ),
-        )
-        .toList(growable: false);
-  }, action: 'selectSyncIndexByUserIdAndOptionalDeckId($userId, $deckId)');
+  }) => selectSyncIndex(
+    applyQuery: (query) =>
+        applyFilters(query, {'user_id': userId, 'id': ?deckId}),
+    action: 'selectSyncIndexByUserIdAndOptionalDeckId($userId, $deckId)',
+  );
 
   String _columnForSortField(DeckSortField field) {
     return switch (field) {

@@ -86,8 +86,7 @@ class EditDeckPage extends HookWidget {
       haveSideBarOpenButton: true,
       // hideAppBarOnScroll: true,
       // hideFloatingActionButtonOnScroll: true,
-      // resizeToAvoidBottomInset: false,
-      resizeBodyForKeyboard: true,
+      // materialResizeToAvoidBottomInset: false,
       inheritMainBottomNavBarHeight: false,
       toolBar: ToolBar.withActions(
         controller: toolBarController,

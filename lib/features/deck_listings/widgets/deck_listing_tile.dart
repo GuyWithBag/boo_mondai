@@ -3,7 +3,7 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
         Deck,
-        DecksService,
+        DeckListingsService,
         DeckTile,
         DeckTileState,
         HeaderBadge,
@@ -49,7 +49,7 @@ class DeckListingTile extends HookWidget {
         : deck.shortDescription;
     final version = deck.version.isEmpty ? '1.0.0' : deck.version;
     final backgroundImage = ImageHelper.getImageProviderFromSource(
-      DecksService.getListingFeaturedImageSource(deck: deck),
+      DeckListingsService.getFeaturedImages(deck: deck),
     );
     final creatorName = deck.userProfile?.username ?? 'Unknown creator';
 

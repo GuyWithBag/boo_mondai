@@ -3,7 +3,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart'
-    show HiveLocalDB, DeckListing, SyncIndexEntry;
+    show DeckListing, HiveLocalDB, HivePrimaryKey, SyncIndexEntry;
 
 class DeckListingsLocalDB extends HiveLocalDB<DeckListing> {
   @override
@@ -14,22 +14,45 @@ class DeckListingsLocalDB extends HiveLocalDB<DeckListing> {
     'deck_id': item.deckId,
   };
 
+  @override
+  DateTime? getDeletedAt(DeckListing item) => item.deletedAt;
+
+  DeckListing? selectByPkIncludingDeleted(HivePrimaryKey primaryKey) {
+    return selectByPk(primaryKey, includeDeleted: true);
+  }
+
   List<DeckListing> selectManyByDeckIds(Set<String> deckIds) => guardSync(
     () => selectMany(where: (listing) => deckIds.contains(listing.deckId)),
     action: 'selectManyByDeckIds(${deckIds.length} deckIds)',
   );
 
-  List<SyncIndexEntry> selectSyncIndexByDeckIds(
-    Set<String> deckIds,
-  ) => guardSync(
-    () => selectManyByDeckIds(deckIds)
-        .map(
-          (listing) =>
-              SyncIndexEntry(id: listing.deckId, updatedAt: listing.updatedAt),
-        )
-        .toList(growable: false),
-    action: 'selectSyncIndexByDeckIds(${deckIds.length} deckIds)',
+  List<DeckListing> selectManyByDeckIdsIncludingDeleted(Set<String> deckIds) =>
+      guardSync(
+        () => selectManyIncludingDeleted(
+          where: (listing) => deckIds.contains(listing.deckId),
+        ),
+        action:
+            'selectManyByDeckIdsIncludingDeleted(${deckIds.length} deckIds)',
+      );
+
+  List<DeckListing> selectManyIncludingDeleted({
+    bool Function(DeckListing item)? where,
+    int? limit,
+    int offset = 0,
+  }) => selectMany(
+    where: where,
+    limit: limit,
+    offset: offset,
+    includeDeleted: true,
   );
+
+  List<SyncIndexEntry> selectSyncIndexByDeckIds(Set<String> deckIds) =>
+      selectSyncIndexWhere(
+        where: (listing) => deckIds.contains(listing.deckId),
+        getId: (listing) => listing.deckId,
+        getUpdatedAt: (listing) => listing.updatedAt,
+        action: 'selectSyncIndexByDeckIds(${deckIds.length} deckIds)',
+      );
 
   // ── All standard CRUD (put, getById, delete, etc.) is inherited! ──
 }

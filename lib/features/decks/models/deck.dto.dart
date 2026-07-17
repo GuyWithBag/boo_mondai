@@ -25,12 +25,15 @@ part 'deck.dto.mapper.dart';
 
 @MappableClass()
 class Deck with DeckMappable implements MutableEntity {
-  @override
   final String id;
   @override
   final DateTime updatedAt;
   @override
   final DateTime createdAt;
+  @override
+  final DateTime? deletedAt;
+  @override
+  final DateTime? purgeAfter;
 
   final String userId;
   final String title;
@@ -74,6 +77,8 @@ class Deck with DeckMappable implements MutableEntity {
     this.buildNumber = 1,
     required this.createdAt,
     required this.updatedAt,
+    this.deletedAt,
+    this.purgeAfter,
     this.tags = const [],
     this.userProfile,
     this.listing,

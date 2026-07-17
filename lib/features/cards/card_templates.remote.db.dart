@@ -23,6 +23,9 @@ class CardTemplatesRemoteDB extends SupabaseRemoteDB<CardTemplate> {
   String get upsertConflictTarget => 'id';
 
   @override
+  bool get supportsSoftDelete => true;
+
+  @override
   String get defaultSelect => _cardTemplateWithRelationsSelect;
 
   @override
@@ -33,59 +36,53 @@ class CardTemplatesRemoteDB extends SupabaseRemoteDB<CardTemplate> {
     'pairs',
   };
 
-  Future<List<CardTemplate>> selectManyByDeckId(String deckId) =>
-      selectMany(filters: {'deck_id': deckId});
+  Future<List<CardTemplate>> selectManyByDeckId(
+    String deckId, {
+    bool includeDeleted = false,
+  }) =>
+      selectMany(filters: {'deck_id': deckId}, includeDeleted: includeDeleted);
 
-  Future<List<CardTemplate>> selectManyByDeckIds(List<String> deckIds) async {
+  Future<List<CardTemplate>> selectManyByDeckIds(
+    List<String> deckIds, {
+    bool includeDeleted = false,
+  }) async {
     final templates = <CardTemplate>[];
     for (final deckId in deckIds) {
-      templates.addAll(await selectManyByDeckId(deckId));
+      templates.addAll(
+        await selectManyByDeckId(deckId, includeDeleted: includeDeleted),
+      );
     }
     return templates;
   }
 
-  Future<List<CardTemplate>> selectManyByIds(List<String> ids) async {
+  Future<List<CardTemplate>> selectManyByIds(
+    List<String> ids, {
+    bool includeDeleted = false,
+  }) async {
     final templates = <CardTemplate>[];
     for (final id in ids) {
-      final template = await selectOne(filters: {'id': id});
+      final template = await selectOne(
+        filters: {'id': id},
+        includeDeleted: includeDeleted,
+      );
       if (template != null) templates.add(template);
     }
     return templates;
   }
 
   Future<List<SyncIndexEntry>> selectSyncIndexByDeckIds(List<String> deckIds) =>
-      guard(() async {
-        if (deckIds.isEmpty) return const <SyncIndexEntry>[];
-
-        final response = await client
-            .from(tableName)
-            .select('id, updated_at')
-            .inFilter('deck_id', deckIds);
-        return List<Map<String, dynamic>>.from(response)
-            .map(
-              (row) => SyncIndexEntry(
-                id: row['id'] as String,
-                updatedAt: DateTime.parse(row['updated_at'] as String),
-              ),
-            )
-            .toList(growable: false);
-      }, action: 'selectSyncIndexByDeckIds(${deckIds.length} deckIds)');
+      deckIds.isEmpty
+      ? Future.value(const <SyncIndexEntry>[])
+      : selectSyncIndex(
+          applyQuery: (query) => query.inFilter('deck_id', deckIds),
+          action: 'selectSyncIndexByDeckIds(${deckIds.length} deckIds)',
+        );
 
   Future<List<SyncIndexEntry>> selectSyncIndexByDeckId(String deckId) =>
-      guard(() async {
-        final response = await client
-            .from(tableName)
-            .select('id, updated_at')
-            .eq('deck_id', deckId);
-        return List<Map<String, dynamic>>.from(response)
-            .map(
-              (row) => SyncIndexEntry(
-                id: row['id'] as String,
-                updatedAt: DateTime.parse(row['updated_at'] as String),
-              ),
-            )
-            .toList(growable: false);
-      }, action: 'selectSyncIndexByDeckId($deckId)');
+      selectSyncIndex(
+        applyQuery: (query) => query.eq('deck_id', deckId),
+        action: 'selectSyncIndexByDeckId($deckId)',
+      );
 }
 
 const _cardTemplateWithRelationsSelect =

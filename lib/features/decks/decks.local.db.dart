@@ -15,18 +15,27 @@ class DecksLocalDB extends HiveLocalDB<Deck> {
   Map<String, Object?> primaryKeyFromItem(Deck item) => {'id': item.id};
 
   @override
+  DateTime? getDeletedAt(Deck item) => item.deletedAt;
+
+  @override
   List<Deck> selectMany({
     bool Function(Deck item)? where,
     int? limit,
     int offset = 0,
+    bool includeDeleted = false,
   }) => super
-      .selectMany(where: where, limit: limit, offset: offset)
+      .selectMany(
+        where: where,
+        limit: limit,
+        offset: offset,
+        includeDeleted: includeDeleted,
+      )
       .map(_withLocalProfile)
       .toList();
 
   @override
-  Deck? selectByPk(HivePrimaryKey primaryKey) {
-    final deck = super.selectByPk(primaryKey);
+  Deck? selectByPk(HivePrimaryKey primaryKey, {bool includeDeleted = false}) {
+    final deck = super.selectByPk(primaryKey, includeDeleted: includeDeleted);
     return deck == null ? null : _withLocalProfile(deck);
   }
 
@@ -58,16 +67,19 @@ class DecksLocalDB extends HiveLocalDB<Deck> {
   List<SyncIndexEntry> selectSyncIndexByUserIdAndOptionalDeckId({
     required String userId,
     String? deckId,
-  }) => guardSync(
-    () => selectManyByUserIdAndOptionalDeckId(userId: userId, deckId: deckId)
-        .map((deck) => SyncIndexEntry(id: deck.id, updatedAt: deck.updatedAt))
-        .toList(growable: false),
+  }) => selectSyncIndexWhere(
+    where: (deck) {
+      if (deck.userId != userId) return false;
+      return deckId == null || deck.id == deckId;
+    },
+    getId: (deck) => deck.id,
+    getUpdatedAt: (deck) => deck.updatedAt,
     action: 'selectSyncIndexByUserIdAndOptionalDeckId($userId, $deckId)',
   );
 
   List<Deck> selectManyByIds(List<String> ids) => guardSync(
     () => [
-      for (final id in ids) ?selectByPk({'id': id}),
+      for (final id in ids) ?selectByPk({'id': id}, includeDeleted: true),
     ],
     action: 'selectManyByIds(${ids.length} ids)',
   );
@@ -89,22 +101,6 @@ class DecksLocalDB extends HiveLocalDB<Deck> {
 
     return _sortDecks(filtered, field: sortField, direction: sortDirection);
   }, action: 'filterDecks($query, $sortField, $sortDirection)');
-
-  Future<void> adoptLegacyOwnerId({
-    required String legacyUserId,
-    required String currentProfileId,
-  }) => guard(() async {
-    if (legacyUserId == currentProfileId) return;
-
-    final legacyDecks = box.values
-        .where((deck) => deck.userId == legacyUserId)
-        .toList();
-    for (final deck in legacyDecks) {
-      await upsert(
-        deck.copyWith(userId: currentProfileId, updatedAt: DateTime.now()),
-      );
-    }
-  }, action: 'adoptLegacyOwnerId($legacyUserId, $currentProfileId)');
 
   List<Deck> _sortDecks(
     Iterable<Deck> decks, {

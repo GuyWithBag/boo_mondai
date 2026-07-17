@@ -24,139 +24,86 @@ class ViewDeckSingleSheetController extends Controller {
        _deck = initialDeck;
 
   Deck _deck;
-  bool _isSavingPublishState = false;
 
   final BuildContext _context;
   final ViewDecksLocalController _parentController;
 
   Deck get deck => _deck;
-  bool get isSavingPublishState => _isSavingPublishState;
 
-  void _setDeck(Deck value) {
-    _deck = value;
-    notifyListeners();
-  }
-
-  void _setSavingPublishState(bool value) {
-    _isSavingPublishState = value;
-    notifyListeners();
-  }
-
-  void _applyUpdatedDeck(Deck? updatedDeck) {
+  void _setDeck(Deck? updatedDeck) {
     if (updatedDeck == null) return;
 
-    _setDeck(updatedDeck);
+    _deck = updatedDeck;
+    notifyListeners();
     _parentController.load();
   }
 
-  Future<void> setPublished(bool isPublished) async {
-    if (_isSavingPublishState || _deck.isPublished == isPublished) return;
+  Future<void> onCreateListingPressed() async {
+    if (_deck.isPublished) return;
 
-    if (isPublished) {
-      final confirmed = await showModal<bool>(
-        context: _context,
-        title: 'Create deck listing?',
-        subtitle:
-            'This will create a listing of this deck to publish online. You will have to publish it in the listing.',
-        leading: const Icon(Icons.public_outlined),
-        actions: [
-          const ModalAction<bool>(value: false, label: 'Cancel'),
-          const ModalAction<bool>(
-            value: true,
-            label: 'Create Listing',
-            color: ButtonColor.primary,
-          ),
-        ],
-      );
-      if (confirmed != true) return;
-
-      final listingDeck = await DecksService.createListingDraft(_deck);
-      _applyUpdatedDeck(listingDeck);
-
-      if (_context.mounted) {
-        await showViewDeckListingSingleSheet(
-          _context,
-          listingDeck,
-          initialState: DeckListingSheetState.editor,
-        );
-      }
-      return;
-    }
-
-    final actionLabel = isPublished ? 'Publish' : 'Unpublish';
-    final confirmed = await showModal<bool>(
+    final shouldCreateListing = await showModal<bool>(
       context: _context,
-      title: '$actionLabel deck?',
-      subtitle: isPublished
-          ? 'Publishing "${ViewDeckSingleHelper.title(_deck)}" makes it available after your next sync.'
-          : 'Unpublishing "${ViewDeckSingleHelper.title(_deck)}" removes it from public browsing after your next sync.',
-      leading: Icon(
-        isPublished
-            ? Icons.cloud_upload_outlined
-            : Icons.visibility_off_outlined,
-      ),
+      title: 'Create deck listing?',
+      subtitle:
+          'This will create a listing of this deck to publish online. You will have to publish it in the listing.',
+      leading: const Icon(Icons.public_outlined),
       actions: [
         const ModalAction<bool>(value: false, label: 'Cancel'),
-        ModalAction<bool>(
+        const ModalAction<bool>(
           value: true,
-          label: actionLabel,
-          color: isPublished ? ButtonColor.success : ButtonColor.error,
+          label: 'Create',
+          color: ButtonColor.primary,
         ),
       ],
     );
-    if (confirmed != true) return;
+    if (shouldCreateListing != true) return;
 
-    _setSavingPublishState(true);
+    _setDeck(await DecksService.createAndUpsertListing(deck));
 
-    try {
-      final updatedDeck = await DecksService.update(
-        deck: _deck,
-        isPublished: isPublished,
+    if (_context.mounted) {
+      await showViewDeckListingSingleSheet(
+        _context,
+        deck,
+        initialState: DeckListingSheetState.editor,
       );
-      _applyUpdatedDeck(updatedDeck);
-    } finally {
-      _setSavingPublishState(false);
     }
   }
 
-  Future<void> updateTitle(String value) async {
-    final updatedDeck = await DecksService.updateTitle(
-      deck: _deck,
-      title: value,
-    );
-    _applyUpdatedDeck(updatedDeck);
+  Future<void> setTitle(String value) async {
+    final updatedDeck = await DecksService.setTitle(deck: _deck, title: value);
+    _setDeck(updatedDeck);
   }
 
-  Future<void> updateShortDescription(String value) async {
+  Future<void> setShortDescription(String value) async {
     final updatedDeck = await DecksService.update(
       deck: _deck,
       shortDescription: value,
     );
-    _applyUpdatedDeck(updatedDeck);
+    _setDeck(updatedDeck);
   }
 
-  Future<void> updateLongDescription(String value) async {
+  Future<void> setLongDescription(String value) async {
     final updatedDeck = await DecksService.update(
       deck: _deck,
       longDescription: value,
     );
-    _applyUpdatedDeck(updatedDeck);
+    _setDeck(updatedDeck);
   }
 
-  Future<void> updateTags(List<String> tagNames) async {
-    final updatedDeck = await DecksService.updateTags(
+  Future<void> setTags(List<String> tagNames) async {
+    final updatedDeck = await DecksService.setTags(
       deck: _deck,
       tagNames: tagNames,
     );
-    _applyUpdatedDeck(updatedDeck);
+    _setDeck(updatedDeck);
   }
 
   Future<void> onCoverImagePicked(PlatformFile file) async {
-    final updatedDeck = await DecksService.updateCoverImage(
+    final updatedDeck = await DecksService.setCoverImageUrl(
       deck: _deck,
       file: file,
     );
-    _applyUpdatedDeck(updatedDeck);
+    _setDeck(updatedDeck);
   }
 
   Future<void> deleteDeck() async {

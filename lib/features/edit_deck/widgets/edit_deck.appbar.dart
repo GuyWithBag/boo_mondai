@@ -1,35 +1,16 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppBar,
-        AppTokens,
         Button,
         ButtonColor,
         ButtonPadding,
-        buttonStyle,
-        HeaderBadge,
         MarkdownText,
         MarkdownTextMode,
-        MetaLabel,
         TextFieldFrame,
         TextFieldSize,
         ButtonSize,
         BottomNavBar;
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart'
-    show
-        TextEditingController,
-        StatelessWidget,
-        Widget,
-        BuildContext,
-        CrossAxisAlignment,
-        MainAxisAlignment,
-        Icons,
-        SizedBox,
-        CircularProgressIndicator,
-        Icon,
-        Column,
-        Row;
-import 'package:theme_variants/theme_variants.dart';
+import 'package:flutter/material.dart' hide AppBar;
 
 class EditDeckAppBar extends StatelessWidget implements PreferredSizeWidget {
   const EditDeckAppBar({
@@ -48,16 +29,14 @@ class EditDeckAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
-
     return AppBar(
       actions: [
         Button(
-          style: buttonStyle.resolve(tokens, const [
+          variants: const [
             ButtonColor.primary,
             ButtonSize.icon,
             ButtonPadding.none,
-          ]),
+          ],
           onPressed: isSaving ? null : onSave,
           leading: isSaving
               ? const SizedBox.square(

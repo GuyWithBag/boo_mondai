@@ -1,33 +1,9 @@
-import 'dart:ui';
-
 import 'package:boo_mondai/features/app_theme/app_theme.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
-    show
-        AppTokens,
-        Button,
-        ButtonColor,
-        Deck,
-        DrillStudySessionHelper,
-        LocalDB,
-        Scaffold,
-        buttonStyle;
-import 'package:flutter/material.dart'
-    show
-        StatelessWidget,
-        Widget,
-        BuildContext,
-        Text,
-        Expanded,
-        Tooltip,
-        Row,
-        EdgeInsets,
-        Padding,
-        MediaQuery,
-        View,
-        PreferredSizeWidget;
+    show AppTokens, Button, ButtonColor, Deck, DrillStudySessionHelper, LocalDB;
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart' show GoRouterHelper;
-import 'package:theme_variants/theme_variants.dart'
-    show ThemeVariantsContext, Surface;
+import 'package:theme_variants/theme_variants.dart' show ThemeVariantsContext;
 
 class ViewDeckSingleBottomNavBar extends StatelessWidget
     implements PreferredSizeWidget {
@@ -70,7 +46,7 @@ class ViewDeckSingleBottomNavBar extends StatelessWidget
                   ? '$eligibleCards.length cards ready'
                   : 'Completed',
               child: Button(
-                style: buttonStyle.resolve(tokens, const [ButtonColor.primary]),
+                variants: const [ButtonColor.primary],
                 onPressed: canDrill
                     ? () => context.push('/drill/${deck.id}/session')
                     : null,

@@ -17,7 +17,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         SurfaceColor,
         ViewDecksLocalController,
         ViewDeckSingleSheetController,
-        chipStyle,
         surfaceStyle,
         useViewDeckSingleSheet,
         Scaffold,
@@ -67,9 +66,6 @@ class ViewDeckSingleSheet extends HookWidget {
     );
     final toolBarController = useToolBarController();
     final activeDeck = sheet.deck;
-    final publishChipStyle = chipStyle.resolve(tokens, [
-      activeDeck.isPublished ? ChipTone.filled : ChipTone.hard,
-    ]);
 
     return DraggableScrollableSheet(
       expand: false,
@@ -105,6 +101,11 @@ class ViewDeckSingleSheet extends HookWidget {
               actions: [
                 Button.icon(
                   tokens: tokens,
+                  icon: Icons.list,
+                  onPressed: sheet.onCreateListingPressed,
+                ),
+                Button.icon(
+                  tokens: tokens,
                   icon: Icons.edit,
                   onPressed: activeDeck.isEditable
                       ? () => context.push('/decks-local/${activeDeck.id}/edit')
@@ -128,23 +129,6 @@ class ViewDeckSingleSheet extends HookWidget {
                   children: [
                     if (activeDeck.isPremade)
                       const HeaderBadge(label: 'Premade'),
-                    ChipTheme(
-                      data: publishChipStyle,
-                      child: ChoiceChip(
-                        avatar: Icon(
-                          activeDeck.isPublished
-                              ? Icons.public_outlined
-                              : Icons.public_off_outlined,
-                        ),
-                        label: Text(
-                          activeDeck.isPublished ? 'Published' : 'Draft',
-                        ),
-                        selected: activeDeck.isPublished,
-                        onSelected: sheet.isSavingPublishState
-                            ? null
-                            : sheet.setPublished,
-                      ),
-                    ),
                     if (!activeDeck.isEditable)
                       const Chip(label: Text('Locked')),
                   ],
@@ -188,7 +172,7 @@ class _Body extends StatelessWidget {
           height: headerHeight + tokens.radiusSurfaceLg,
           child: BackgroundImageSurface(
             image: ImageHelper.getImageProviderFromSource(
-              DecksService.getCoverImageSource(deck),
+              DecksService.getCoverImageUrl(deck),
             ),
           ),
         ),
@@ -266,11 +250,11 @@ class _BodySubSection extends StatelessWidget {
                       deck,
                     ),
                     longDescription: ViewDeckSingleHelper.longDescription(deck),
-                    onTitleChanged: sheet.updateTitle,
-                    onShortDescriptionChanged: sheet.updateShortDescription,
-                    onLongDescriptionChanged: sheet.updateLongDescription,
+                    onTitleChanged: sheet.setTitle,
+                    onShortDescriptionChanged: sheet.setShortDescription,
+                    onLongDescriptionChanged: sheet.setLongDescription,
                     tags: tags,
-                    onTagsChanged: sheet.updateTags,
+                    onTagsChanged: sheet.setTags,
                     areTagsEditable: deck.isEditable,
                     isEditable: deck.isEditable,
                     tagsPlaceholder: deck.isEditable
@@ -301,10 +285,10 @@ class _BodySubSection extends StatelessWidget {
             top: 0,
             child: deck.isEditable
                 ? FormField<String?>(
-                    value: DecksService.getCoverImageSource(deck),
+                    value: DecksService.getCoverImageUrl(deck),
                     listenable: sheet,
                     valueReader: () {
-                      return DecksService.getCoverImageSource(sheet.deck);
+                      return DecksService.getCoverImageUrl(sheet.deck);
                     },
                     validator: DeckFormValidator.optionalImage,
                     builder: (_, _) => DeckTile(

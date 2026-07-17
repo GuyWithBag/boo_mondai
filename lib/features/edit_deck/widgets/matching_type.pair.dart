@@ -1,12 +1,10 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
-        MatchingTypeInput,
         MarkdownText,
         MarkdownTextMode,
         TextFieldSize,
-        TextFieldFrame,
-        TextFieldColor;
+        TextFieldFrame;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 

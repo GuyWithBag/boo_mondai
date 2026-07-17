@@ -1,6 +1,6 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        ViewDeckListingSingleController,
+        ViewDeckListingSinglePreviewController,
         AppTokens,
         SectionEyebrow,
         DiscussionTile,
@@ -23,7 +23,7 @@ import 'package:theme_variants/theme_variants.dart' show ThemeVariantsContext;
 class DiscussionSection extends StatelessWidget {
   const DiscussionSection({super.key, required this.sheet});
 
-  final ViewDeckListingSingleController sheet;
+  final ViewDeckListingSinglePreviewController sheet;
 
   @override
   Widget build(BuildContext context) {

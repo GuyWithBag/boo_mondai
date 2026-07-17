@@ -39,12 +39,15 @@ part 'card_template.dto.mapper.dart';
   ],
 )
 abstract class CardTemplate with CardTemplateMappable implements MutableEntity {
-  @override
   final String id;
   @override
   final DateTime createdAt;
   @override
   final DateTime updatedAt;
+  @override
+  final DateTime? deletedAt;
+  @override
+  final DateTime? purgeAfter;
 
   final String deckId;
   final int sortOrder;
@@ -63,6 +66,8 @@ abstract class CardTemplate with CardTemplateMappable implements MutableEntity {
     required this.sortOrder,
     required this.createdAt,
     required this.updatedAt,
+    this.deletedAt,
+    this.purgeAfter,
     this.sourceTemplateId,
     this.tags = const [],
     this.verticallyCentered = true,

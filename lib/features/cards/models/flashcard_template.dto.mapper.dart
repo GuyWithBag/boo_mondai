@@ -37,6 +37,12 @@ class FlashcardTemplateMapper extends SubClassMapperBase<FlashcardTemplate> {
   static DateTime _$updatedAt(FlashcardTemplate v) => v.updatedAt;
   static const Field<FlashcardTemplate, DateTime> _f$updatedAt =
       Field('updatedAt', _$updatedAt, key: r'updated_at');
+  static DateTime? _$deletedAt(FlashcardTemplate v) => v.deletedAt;
+  static const Field<FlashcardTemplate, DateTime> _f$deletedAt =
+      Field('deletedAt', _$deletedAt, key: r'deleted_at', opt: true);
+  static DateTime? _$purgeAfter(FlashcardTemplate v) => v.purgeAfter;
+  static const Field<FlashcardTemplate, DateTime> _f$purgeAfter =
+      Field('purgeAfter', _$purgeAfter, key: r'purge_after', opt: true);
   static String? _$sourceTemplateId(FlashcardTemplate v) => v.sourceTemplateId;
   static const Field<FlashcardTemplate, String> _f$sourceTemplateId = Field(
       'sourceTemplateId', _$sourceTemplateId,
@@ -66,6 +72,8 @@ class FlashcardTemplateMapper extends SubClassMapperBase<FlashcardTemplate> {
     #sortOrder: _f$sortOrder,
     #createdAt: _f$createdAt,
     #updatedAt: _f$updatedAt,
+    #deletedAt: _f$deletedAt,
+    #purgeAfter: _f$purgeAfter,
     #sourceTemplateId: _f$sourceTemplateId,
     #tags: _f$tags,
     #verticallyCentered: _f$verticallyCentered,
@@ -89,6 +97,8 @@ class FlashcardTemplateMapper extends SubClassMapperBase<FlashcardTemplate> {
         sortOrder: data.dec(_f$sortOrder),
         createdAt: data.dec(_f$createdAt),
         updatedAt: data.dec(_f$updatedAt),
+        deletedAt: data.dec(_f$deletedAt),
+        purgeAfter: data.dec(_f$purgeAfter),
         sourceTemplateId: data.dec(_f$sourceTemplateId),
         tags: data.dec(_f$tags),
         verticallyCentered: data.dec(_f$verticallyCentered),
@@ -162,6 +172,8 @@ abstract class FlashcardTemplateCopyWith<$R, $In extends FlashcardTemplate,
       int? sortOrder,
       DateTime? createdAt,
       DateTime? updatedAt,
+      DateTime? deletedAt,
+      DateTime? purgeAfter,
       String? sourceTemplateId,
       List<Tag>? tags,
       bool? verticallyCentered,
@@ -190,6 +202,8 @@ class _FlashcardTemplateCopyWithImpl<$R, $Out>
           int? sortOrder,
           DateTime? createdAt,
           DateTime? updatedAt,
+          Object? deletedAt = $none,
+          Object? purgeAfter = $none,
           Object? sourceTemplateId = $none,
           List<Tag>? tags,
           bool? verticallyCentered,
@@ -202,6 +216,8 @@ class _FlashcardTemplateCopyWithImpl<$R, $Out>
         if (sortOrder != null) #sortOrder: sortOrder,
         if (createdAt != null) #createdAt: createdAt,
         if (updatedAt != null) #updatedAt: updatedAt,
+        if (deletedAt != $none) #deletedAt: deletedAt,
+        if (purgeAfter != $none) #purgeAfter: purgeAfter,
         if (sourceTemplateId != $none) #sourceTemplateId: sourceTemplateId,
         if (tags != null) #tags: tags,
         if (verticallyCentered != null) #verticallyCentered: verticallyCentered,
@@ -216,6 +232,8 @@ class _FlashcardTemplateCopyWithImpl<$R, $Out>
       sortOrder: data.get(#sortOrder, or: $value.sortOrder),
       createdAt: data.get(#createdAt, or: $value.createdAt),
       updatedAt: data.get(#updatedAt, or: $value.updatedAt),
+      deletedAt: data.get(#deletedAt, or: $value.deletedAt),
+      purgeAfter: data.get(#purgeAfter, or: $value.purgeAfter),
       sourceTemplateId:
           data.get(#sourceTemplateId, or: $value.sourceTemplateId),
       tags: data.get(#tags, or: $value.tags),

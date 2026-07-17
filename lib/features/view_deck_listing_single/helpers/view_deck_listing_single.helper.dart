@@ -2,9 +2,9 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         TextHelper,
         Deck,
-        DecksService,
         StoredMediaService,
-        StoredMediaPathHelper;
+        StoredMediaPathHelper,
+        DeckListingsService;
 
 final class ViewDeckListingSingleHelper {
   const ViewDeckListingSingleHelper();
@@ -28,7 +28,7 @@ final class ViewDeckListingSingleHelper {
   }
 
   List<String> carouselImageUrls(Deck deck) {
-    return DecksService.getListingCarouselImageSources(deck)
+    return DeckListingsService.getCarouselImages(deck)
         .map((value) => value.trim())
         .where((value) => value.isNotEmpty)
         .toSet()

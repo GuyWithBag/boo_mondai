@@ -76,6 +76,12 @@ class DeckMapper extends ClassMapperBase<Deck> {
   static DateTime _$updatedAt(Deck v) => v.updatedAt;
   static const Field<Deck, DateTime> _f$updatedAt =
       Field('updatedAt', _$updatedAt, key: r'updated_at');
+  static DateTime? _$deletedAt(Deck v) => v.deletedAt;
+  static const Field<Deck, DateTime> _f$deletedAt =
+      Field('deletedAt', _$deletedAt, key: r'deleted_at', opt: true);
+  static DateTime? _$purgeAfter(Deck v) => v.purgeAfter;
+  static const Field<Deck, DateTime> _f$purgeAfter =
+      Field('purgeAfter', _$purgeAfter, key: r'purge_after', opt: true);
   static List<Tag> _$tags(Deck v) => v.tags;
   static const Field<Deck, List<Tag>> _f$tags =
       Field('tags', _$tags, opt: true, def: const []);
@@ -104,6 +110,8 @@ class DeckMapper extends ClassMapperBase<Deck> {
     #buildNumber: _f$buildNumber,
     #createdAt: _f$createdAt,
     #updatedAt: _f$updatedAt,
+    #deletedAt: _f$deletedAt,
+    #purgeAfter: _f$purgeAfter,
     #tags: _f$tags,
     #userProfile: _f$userProfile,
     #listing: _f$listing,
@@ -127,6 +135,8 @@ class DeckMapper extends ClassMapperBase<Deck> {
         buildNumber: data.dec(_f$buildNumber),
         createdAt: data.dec(_f$createdAt),
         updatedAt: data.dec(_f$updatedAt),
+        deletedAt: data.dec(_f$deletedAt),
+        purgeAfter: data.dec(_f$purgeAfter),
         tags: data.dec(_f$tags),
         userProfile: data.dec(_f$userProfile),
         listing: data.dec(_f$listing));
@@ -199,6 +209,8 @@ abstract class DeckCopyWith<$R, $In extends Deck, $Out>
       int? buildNumber,
       DateTime? createdAt,
       DateTime? updatedAt,
+      DateTime? deletedAt,
+      DateTime? purgeAfter,
       List<Tag>? tags,
       CachedProfile? userProfile,
       DeckListing? listing});
@@ -238,6 +250,8 @@ class _DeckCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Deck, $Out>
           int? buildNumber,
           DateTime? createdAt,
           DateTime? updatedAt,
+          Object? deletedAt = $none,
+          Object? purgeAfter = $none,
           List<Tag>? tags,
           Object? userProfile = $none,
           Object? listing = $none}) =>
@@ -258,6 +272,8 @@ class _DeckCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Deck, $Out>
         if (buildNumber != null) #buildNumber: buildNumber,
         if (createdAt != null) #createdAt: createdAt,
         if (updatedAt != null) #updatedAt: updatedAt,
+        if (deletedAt != $none) #deletedAt: deletedAt,
+        if (purgeAfter != $none) #purgeAfter: purgeAfter,
         if (tags != null) #tags: tags,
         if (userProfile != $none) #userProfile: userProfile,
         if (listing != $none) #listing: listing
@@ -281,6 +297,8 @@ class _DeckCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Deck, $Out>
       buildNumber: data.get(#buildNumber, or: $value.buildNumber),
       createdAt: data.get(#createdAt, or: $value.createdAt),
       updatedAt: data.get(#updatedAt, or: $value.updatedAt),
+      deletedAt: data.get(#deletedAt, or: $value.deletedAt),
+      purgeAfter: data.get(#purgeAfter, or: $value.purgeAfter),
       tags: data.get(#tags, or: $value.tags),
       userProfile: data.get(#userProfile, or: $value.userProfile),
       listing: data.get(#listing, or: $value.listing));
