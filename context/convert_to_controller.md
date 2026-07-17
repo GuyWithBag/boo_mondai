@@ -362,7 +362,7 @@ static String visibilityLabel(Deck deck) {
 Avoid helper methods that write to DB:
 
 ```dart
-static Future<bool> updateTitle(...) async {
+static Future<bool> setTitle(...) async {
   await LocalDB.deck.upsert(...);
   return true;
 }
@@ -378,7 +378,7 @@ Example: updating deck tags belongs in `DecksService`, not `TagsService`, becaus
 the persisted aggregate is the deck:
 
 ```dart
-static Future<Deck?> updateTags({
+static Future<Deck?> setTags({
   required Deck deck,
   required List<String> tagNames,
 }) async {
@@ -642,7 +642,7 @@ The controller can still keep specific UI callback names while using the generic
 service update:
 
 ```dart
-Future<void> updateTitle(String value) async {
+Future<void> setTitle(String value) async {
   final updatedDeck = await DecksService.update(
     deck: _deck,
     title: value,

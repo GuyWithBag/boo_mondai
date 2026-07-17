@@ -179,13 +179,13 @@ folder is organized by deck title. When a deck title changes,
 
 Deck image rendering is local-first.
 
-For cover images, `DecksService.getCoverImageSource` resolves in this order:
+For cover images, `DecksService.getCoverImageUrl` resolves in this order:
 
 1. Local file by deck cover `StoredMediaPath`.
 2. Local file associated with `deck.coverImageUrl`.
 3. `deck.coverImageUrl`.
 
-For featured images, `DecksService.getListingFeaturedImageSource` resolves in
+For featured images, `DecksService.getFeaturedImages` resolves in
 this order:
 
 1. Local file by featured-image `StoredMediaPath`.
@@ -220,7 +220,7 @@ URL, rendering can still use the local cached file because the matching
 When the user changes a deck cover image:
 
 ```dart
-DecksService.updateCoverImage(...)
+DecksService.setCoverImageUrl(...)
 ```
 
 The service:
@@ -478,7 +478,7 @@ sequenceDiagram
     participant RemoteDB as SupabaseRemoteDB
 
     User->>UI: Pick cover image
-    UI->>DecksService: updateCoverImage(deck, file)
+    UI->>DecksService: setCoverImageUrl(deck, file)
     DecksService->>StoredMedia: storeFile(local deck cover path)
     DecksService->>LocalDB: upsert deck with updatedAt
     UI->>StoredMedia: resolve local file

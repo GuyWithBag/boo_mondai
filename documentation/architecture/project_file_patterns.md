@@ -68,7 +68,7 @@ StoredMediaService.getByRemoteUrl(...)
 Use verbs for functions when the function performs an action:
 
 ```dart
-getCoverImageSource(...)
+getCoverImageUrl(...)
 setDisplayName(...)
 uploadBytes(...)
 deleteWhere(...)
@@ -142,7 +142,7 @@ Services are appropriate when:
 Examples:
 
 ```dart
-DecksService.updateCoverImage(...)
+DecksService.setCoverImageUrl(...)
 StoredMediaService.storeFile(...)
 SyncDeletionService.createDeckScoped(...)
 ```
@@ -552,8 +552,8 @@ Avoid noun-only function names unless it is a getter/property.
 If a function returns a specific value, make that obvious:
 
 ```dart
-getCoverImageSource(...)
-getListingFeaturedImageSource(...)
+getCoverImageUrl(...)
+getFeaturedImages(...)
 loadDeletedEntityIds(...)
 createSignedUrl(...)
 ```

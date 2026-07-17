@@ -476,7 +476,7 @@ static Future<CardTemplate> preprocessPushItem({
 })
 ```
 
-`CardTemplateMediaFieldsHelper` should own subtype-specific field descriptors.
+`MarkdownMediaFieldsHelper` should own subtype-specific field descriptors.
 
 Possible descriptor classes:
 
@@ -510,7 +510,7 @@ become general card-template metadata.
 
 - [ ] Create `CardTemplateMediaSyncPreprocessor`.
 - [ ] Create field descriptor classes.
-- [ ] Create `CardTemplateMediaFieldsHelper`.
+- [ ] Create `MarkdownMediaFieldsHelper`.
 - [ ] Keep each descriptor class/enum in its own file unless it is only a typedef.
 - [ ] Add doc comments to descriptor classes explaining how read/write callbacks work.
 - [ ] Use `get*`/`set*` names for getter/setter-like callback fields.
@@ -742,7 +742,7 @@ every media field.
 - [ ] Add `DeckMediaSyncPreprocessor`.
 - [ ] Add `DeckListingMediaSyncPreprocessor`.
 - [ ] Add `CardTemplateMediaSyncPreprocessor`.
-- [ ] Add `CardTemplateMediaFieldsHelper`.
+- [ ] Add `MarkdownMediaFieldsHelper`.
 - [ ] Remove card subtype switch from `DeckSyncSession`.
 
 ### Profile
