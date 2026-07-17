@@ -62,7 +62,9 @@ Set<StylePart<SurfaceStyle>> _surfacePalette({
 }
 
 final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
-  base: (_) => {},
+  base: (tokens) => {
+    SurfaceStylePart.icon({IconThemePart.color(tokens.colorTextBaseline)}),
+  },
   defaultVariants: const [
     SurfaceColor.baseline,
     SurfaceBorder.baseline,
@@ -235,7 +237,7 @@ final surfaceStyle = VariantStyle.surfaceParts<AppTokens>(
     SurfaceColor.baseline: (tokens) => _surfacePalette(
       background: tokens.colorSurfaceBackground,
       border: tokens.colorBorderNeutralSubtle,
-      shadow: tokens.colorBorderNeutralSubtle.withValues(alpha: 0.30),
+      shadow: tokens.colorLayoutShadow,
       foreground: tokens.colorTextBaseline,
     ),
     SurfaceBorderColor.inherit: (_) => const <StylePart<SurfaceStyle>>{},

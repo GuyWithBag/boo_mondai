@@ -59,16 +59,15 @@ class RatingButton extends StatelessWidget {
     }
 
     final tokens = context.themeTokens<AppTokens>();
-    final resolvedButtonStyle = buttonStyle.resolve(tokens, [
-      color,
-      ButtonPadding.sm,
-    ]);
+    final variants = [color, ButtonPadding.sm];
+    final resolvedButtonStyle = buttonStyle.resolve(tokens, variants);
+
     return Expanded(
       child: Tooltip(
         message: 'Press $shortcut',
         child: Button(
           onPressed: onTap,
-          style: resolvedButtonStyle,
+          variants: variants,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             spacing: tokens.spaceLayoutGapXsm,

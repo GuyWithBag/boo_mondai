@@ -8,7 +8,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         HomePage,
         ViewDeckListingsPage,
         ViewDecksLocalPage,
-        ViewStudyCardsPage,
+        ViewStudyDecksPage,
         ViewAccountPage,
         LoginPage,
         RegisterPage,
@@ -97,7 +97,7 @@ class Pages {
           pathParameters = const {},
           queryParameters = const {},
           extra,
-        }) => const ViewStudyCardsPage(),
+        }) => const ViewStudyDecksPage(),
   );
 
   static final account = AppPage(

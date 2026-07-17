@@ -90,7 +90,7 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
   variants: {
     ButtonColor.primary: (tokens) => _buttonPalette(
       background: tokens.colorPrimary,
-      border: tokens.colorPrimary,
+      border: tokens.colorPrimaryDim,
       shadow: tokens.colorPrimaryDim,
       foreground: tokens.colorTextOnBrand,
     ),
@@ -364,6 +364,9 @@ final buttonStyle = VariantStyle.surfaceParts<AppTokens>(
       when: const {ButtonVariant.elevated, ButtonState.pressed},
       build: (_) => {
         SurfaceStylePart.transform(Matrix4.translationValues(0, 0, 0)),
+        SurfaceStylePart.decoration({
+          DecorationPart.boxShadowParts({BoxShadowPart.offset(Offset.zero)}),
+        }),
       },
     ),
     CompoundVariantParts<AppTokens, SurfaceStyle>(

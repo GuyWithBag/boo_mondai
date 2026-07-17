@@ -23,8 +23,11 @@ class ImmutableEntityMapper extends ClassMapperBase<ImmutableEntity> {
   static String _$id(ImmutableEntity v) => v.id;
   static const Field<ImmutableEntity, String> _f$id = Field('id', _$id);
   static DateTime _$createdAt(ImmutableEntity v) => v.createdAt;
-  static const Field<ImmutableEntity, DateTime> _f$createdAt =
-      Field('createdAt', _$createdAt, key: r'created_at');
+  static const Field<ImmutableEntity, DateTime> _f$createdAt = Field(
+    'createdAt',
+    _$createdAt,
+    key: r'created_at',
+  );
 
   @override
   final MappableFields<ImmutableEntity> fields = const {
@@ -52,12 +55,13 @@ mixin ImmutableEntityMappable {
   String toJson();
   Map<String, dynamic> toMap();
   ImmutableEntityCopyWith<ImmutableEntity, ImmutableEntity, ImmutableEntity>
-      get copyWith;
+  get copyWith;
 }
 
 abstract class ImmutableEntityCopyWith<$R, $In extends ImmutableEntity, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   $R call({String? id, DateTime? createdAt});
   ImmutableEntityCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-      Then<$Out2, $R2> t);
+    Then<$Out2, $R2> t,
+  );
 }

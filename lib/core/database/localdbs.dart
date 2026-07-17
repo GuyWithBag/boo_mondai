@@ -16,6 +16,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         UserSettingsLocalDB,
         ProgressCheckpointLocalDB,
         StoredMediasLocalDB,
+        SyncClientLocalDB,
         SyncDeletionLocalDB,
         TagLocalDB,
         DeckTagsLocalDB,
@@ -42,6 +43,7 @@ class LocalDB {
   static late final UserSettingsLocalDB userSettings;
   static late final ProgressCheckpointLocalDB progressCheckpoint;
   static late final StoredMediasLocalDB storedMedia;
+  static late final SyncClientLocalDB syncClient;
   static late final SyncDeletionLocalDB syncDeletion;
   static late final TagLocalDB tag;
   static late final DeckTagsLocalDB deckTag;
@@ -70,6 +72,7 @@ class LocalDB {
     progressCheckpoint =
         await ProgressCheckpointLocalDB().init() as ProgressCheckpointLocalDB;
     storedMedia = await StoredMediasLocalDB().init() as StoredMediasLocalDB;
+    syncClient = await SyncClientLocalDB().init() as SyncClientLocalDB;
     syncDeletion = await SyncDeletionLocalDB().init() as SyncDeletionLocalDB;
     tag = await TagLocalDB().init() as TagLocalDB;
     deckTag = await DeckTagsLocalDB().init() as DeckTagsLocalDB;
@@ -98,6 +101,7 @@ class LocalDB {
     await userSettings.clear();
     await progressCheckpoint.clear();
     await storedMedia.clear();
+    await syncClient.clear();
     await syncDeletion.clear();
     await tag.clear();
     await deckTag.clear();

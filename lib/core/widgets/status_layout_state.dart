@@ -60,18 +60,29 @@ class StatusLayoutState extends HookWidget {
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
     final scrollLockScope = ScaffoldScrollLockScope.maybeOf(context);
+    final setScrollLocked = scrollLockScope?.setScrollLocked;
     final scrollLockKey = useMemoized(Object.new);
 
     useEffect(() {
-      if (!disableScaffoldScrollingWhenShown || scrollLockScope == null) {
+      if (!disableScaffoldScrollingWhenShown || setScrollLocked == null) {
         return null;
       }
 
-      scrollLockScope.setScrollLocked(scrollLockKey, true);
+      var active = true;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!active) return;
+        setScrollLocked(scrollLockKey, true);
+      });
+
       return () {
-        scrollLockScope.setScrollLocked(scrollLockKey, false);
+        active = false;
+
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          setScrollLocked(scrollLockKey, false);
+        });
       };
-    }, [disableScaffoldScrollingWhenShown, scrollLockScope, scrollLockKey]);
+    }, [disableScaffoldScrollingWhenShown, setScrollLocked, scrollLockKey]);
 
     return Column(
       spacing: tokens.spaceLayoutGapSm,

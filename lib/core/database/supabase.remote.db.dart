@@ -10,6 +10,7 @@ import 'dart:developer' as developer;
 import 'dart:io';
 import 'package:boo_mondai/core/exceptions/app_exception.dart'
     show AppException;
+import 'package:boo_mondai/lib.barrel.dart' show SyncIndexEntry;
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -37,6 +38,11 @@ abstract class SupabaseRemoteDB<T> {
 
   /// Default select used by read methods. Override this to include joins.
   String get defaultSelect => '*';
+
+  /// Override for tables with a nullable deleted_at soft-delete column.
+  bool get supportsSoftDelete => false;
+
+  String get deletedAtColumn => 'deleted_at';
 
   /// Map keys that are populated by joined selects and must not be written.
   Set<String> get joinedFields => const {};
@@ -163,6 +169,11 @@ abstract class SupabaseRemoteDB<T> {
     return query;
   }
 
+  dynamic applySoftDeleteFilter(dynamic query, {required bool includeDeleted}) {
+    if (!supportsSoftDelete || includeDeleted) return query;
+    return query.isFilter(deletedAtColumn, null);
+  }
+
   Map<String, dynamic> _updatesWithoutPrimaryKey(T item) {
     final updates = toWriteMap(item);
     for (final key in primaryKeyFromItem(item).keys) {
@@ -189,8 +200,10 @@ abstract class SupabaseRemoteDB<T> {
     bool ascending = true,
     int? limit,
     int? offset,
+    bool includeDeleted = false,
   }) => guard(() async {
     dynamic query = client.from(tableName).select(select ?? defaultSelect);
+    query = applySoftDeleteFilter(query, includeDeleted: includeDeleted);
 
     if (filters.isNotEmpty) {
       query = applyFilters(query, filters);
@@ -210,6 +223,38 @@ abstract class SupabaseRemoteDB<T> {
     ).map(fromJoinedMap).toList();
   }, action: 'selectMany');
 
+  Future<List<SyncIndexEntry>> selectSyncIndex({
+    String idColumn = 'id',
+    String updatedAtColumn = 'updated_at',
+    dynamic Function(dynamic query)? applyQuery,
+    required String action,
+    bool includeDeleted = true,
+  }) => guard(() async {
+    dynamic query = client
+        .from(tableName)
+        .select('$idColumn, $updatedAtColumn');
+    query = applySoftDeleteFilter(query, includeDeleted: includeDeleted);
+    if (applyQuery != null) {
+      query = applyQuery(query);
+    }
+
+    final response = await query;
+    return List<Map<String, dynamic>>.from(response)
+        .map(
+          (row) => SyncIndexEntry(
+            id: row[idColumn] as String,
+            updatedAt: _dateTimeFromRow(row, updatedAtColumn),
+          ),
+        )
+        .toList(growable: false);
+  }, action: action);
+
+  DateTime _dateTimeFromRow(Map<String, dynamic> row, String key) {
+    final value = row[key];
+    if (value is DateTime) return value;
+    return DateTime.parse(value as String);
+  }
+
   Future<List<T>> selectManyPaged({
     String? select,
     Map<String, Object?> filters = const {},
@@ -217,6 +262,7 @@ abstract class SupabaseRemoteDB<T> {
     bool ascending = true,
     required int offset,
     required int pageSize,
+    bool includeDeleted = false,
   }) => selectMany(
     select: select,
     filters: filters,
@@ -224,25 +270,29 @@ abstract class SupabaseRemoteDB<T> {
     ascending: ascending,
     limit: pageSize,
     offset: offset,
+    includeDeleted: includeDeleted,
   );
 
-  Future<int> count({Map<String, Object?> filters = const {}}) =>
-      guard(() async {
-        dynamic query = client.from(tableName).count(CountOption.exact);
-        if (filters.isNotEmpty) {
-          query = applyFilters(query, filters);
-        }
-        return await query;
-      }, action: 'count');
+  Future<int> count({
+    Map<String, Object?> filters = const {},
+    bool includeDeleted = false,
+  }) => guard(() async {
+    dynamic query = client.from(tableName).count(CountOption.exact);
+    query = applySoftDeleteFilter(query, includeDeleted: includeDeleted);
+    if (filters.isNotEmpty) {
+      query = applyFilters(query, filters);
+    }
+    return await query;
+  }, action: 'count');
 
   Future<T?> selectOne({
     String? select,
     required Map<String, Object?> filters,
+    bool includeDeleted = false,
   }) => guard(() async {
-    final row = await applyFilters(
-      client.from(tableName).select(select ?? defaultSelect),
-      filters,
-    ).maybeSingle();
+    dynamic query = client.from(tableName).select(select ?? defaultSelect);
+    query = applySoftDeleteFilter(query, includeDeleted: includeDeleted);
+    final row = await applyFilters(query, filters).maybeSingle();
     return row == null ? null : fromJoinedMap(row);
   }, action: 'selectOne($filters)');
 

@@ -1,6 +1,6 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, SurfaceBorder, surfaceStyle, Scaffold;
-import 'package:flutter/material.dart' hide Scaffold;
+    show AppTokens, SurfaceBorder, surfaceStyle;
+import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 class BottomNavBar extends StatelessWidget implements PreferredSizeWidget {

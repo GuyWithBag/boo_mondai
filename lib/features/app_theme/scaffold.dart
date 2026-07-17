@@ -48,7 +48,6 @@ class Scaffold extends HookWidget {
     this.inheritMainBottomNavBarHeight = true,
     this.scrollController,
     this.scrollStartAtTheBottom = false,
-    this.resizeToAvoidBottomInset = false,
     this.resizeBodyForKeyboard = true,
     this.centeredBody = false,
     this.showUnfocusButton = true,
@@ -84,7 +83,6 @@ class Scaffold extends HookWidget {
   final bool inheritMainBottomNavBarHeight;
   final ScrollController? scrollController;
   final bool scrollStartAtTheBottom;
-  final bool resizeToAvoidBottomInset;
   final bool resizeBodyForKeyboard;
   final bool showUnfocusButton;
   final bool showViewPaddingBottom;
@@ -104,13 +102,13 @@ class Scaffold extends HookWidget {
     final controller = this.controller ?? internalController;
     final scrollLockKeys = useState(<Object>{});
 
-    void setScrollLocked(Object key, bool value) {
+    final setScrollLocked = useCallback((Object key, bool value) {
       final next = {...scrollLockKeys.value};
       final didChange = value ? next.add(key) : next.remove(key);
       if (didChange) {
         scrollLockKeys.value = next;
       }
-    }
+    }, [scrollLockKeys]);
 
     final helper = ScaffoldHelper(
       tokens: tokens,
@@ -431,7 +429,7 @@ class Scaffold extends HookWidget {
     ];
 
     return material.Scaffold(
-      resizeToAvoidBottomInset: resizeToAvoidBottomInset,
+      resizeToAvoidBottomInset: false,
       backgroundColor: backgroundColor ?? tokens.colorScaffoldBackground,
       body: Stack(clipBehavior: Clip.none, children: stackChildren),
     );

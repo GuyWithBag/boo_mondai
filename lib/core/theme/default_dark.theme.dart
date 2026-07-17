@@ -1,10 +1,11 @@
 import 'package:boo_mondai/lib.barrel.dart' show AppTokens, buildAppThemeData;
-import 'package:flutter/material.dart' show Color, Brightness;
+import 'package:flutter/material.dart' show Color, Brightness, Colors;
 import 'package:theme_variants/theme_variants.dart'
     show ThemeVariant, ThemeVariantBrightness;
 
 final AppTokens defaultDark = AppTokens(
   name: 'BooMondai Dark',
+  colorLayoutShadow: Color(0x36000000),
   colorPrimary: Color(0xff6366f1),
   colorPrimaryDim: Color(0xff3f498a),
   colorPrimaryBright: Color(0xff3730a3),

@@ -18,6 +18,7 @@ enum ModalTone {
 
 final modalStyle = VariantStyle.surfaceParts<AppTokens>(
   base: (tokens) => {
+    SurfaceStylePart.icon({IconThemePart.color(tokens.colorTextBaseline)}),
     SurfaceStylePart.padding(EdgeInsets.all(tokens.spaceLayoutPadding.r)),
     SurfaceStylePart.decoration({
       DecorationPart.color(tokens.colorSurfaceBackground),

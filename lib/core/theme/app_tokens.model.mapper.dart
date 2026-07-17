@@ -186,6 +186,10 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
   static Color _$colorTextOnMono(AppTokens v) => v.colorTextOnMono;
   static const Field<AppTokens, Color> _f$colorTextOnMono =
       Field('colorTextOnMono', _$colorTextOnMono, key: r'color_text_on_mono');
+  static Color _$colorLayoutShadow(AppTokens v) => v.colorLayoutShadow;
+  static const Field<AppTokens, Color> _f$colorLayoutShadow = Field(
+      'colorLayoutShadow', _$colorLayoutShadow,
+      key: r'color_layout_shadow');
   static String _$fontFamily(AppTokens v) => v.fontFamily;
   static const Field<AppTokens, String> _f$fontFamily = Field(
       'fontFamily', _$fontFamily,
@@ -412,6 +416,10 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
   static const Field<AppTokens, double> _f$sizeIconLg = Field(
       'sizeIconLg', _$sizeIconLg,
       key: r'size_icon_lg', mode: FieldMode.member);
+  static double _$sizeModalIcon(AppTokens v) => v.sizeModalIcon;
+  static const Field<AppTokens, double> _f$sizeModalIcon = Field(
+      'sizeModalIcon', _$sizeModalIcon,
+      key: r'size_modal_icon', mode: FieldMode.member);
   static double _$sizeButtonIcon(AppTokens v) => v.sizeButtonIcon;
   static const Field<AppTokens, double> _f$sizeButtonIcon = Field(
       'sizeButtonIcon', _$sizeButtonIcon,
@@ -502,6 +510,7 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
     #colorMono: _f$colorMono,
     #colorMonoDim: _f$colorMonoDim,
     #colorTextOnMono: _f$colorTextOnMono,
+    #colorLayoutShadow: _f$colorLayoutShadow,
     #fontFamily: _f$fontFamily,
     #colorTransparent: _f$colorTransparent,
     #colorTextOnBrand: _f$colorTextOnBrand,
@@ -554,6 +563,7 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
     #sizeIconSm: _f$sizeIconSm,
     #sizeIcon: _f$sizeIcon,
     #sizeIconLg: _f$sizeIconLg,
+    #sizeModalIcon: _f$sizeModalIcon,
     #sizeButtonIcon: _f$sizeButtonIcon,
     #sizeButtonIconSm: _f$sizeButtonIconSm,
     #radiusButtonIconSm: _f$radiusButtonIconSm,
@@ -613,7 +623,8 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
         colorTextOnGoogle: data.dec(_f$colorTextOnGoogle),
         colorMono: data.dec(_f$colorMono),
         colorMonoDim: data.dec(_f$colorMonoDim),
-        colorTextOnMono: data.dec(_f$colorTextOnMono));
+        colorTextOnMono: data.dec(_f$colorTextOnMono),
+        colorLayoutShadow: data.dec(_f$colorLayoutShadow));
   }
 
   @override
@@ -708,7 +719,8 @@ abstract class AppTokensCopyWith<$R, $In extends AppTokens, $Out>
       Color? colorTextOnGoogle,
       Color? colorMono,
       Color? colorMonoDim,
-      Color? colorTextOnMono});
+      Color? colorTextOnMono,
+      Color? colorLayoutShadow});
   AppTokensCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -762,7 +774,8 @@ class _AppTokensCopyWithImpl<$R, $Out>
           Color? colorTextOnGoogle,
           Color? colorMono,
           Color? colorMonoDim,
-          Color? colorTextOnMono}) =>
+          Color? colorTextOnMono,
+          Color? colorLayoutShadow}) =>
       $apply(FieldCopyWithData({
         if (name != null) #name: name,
         if (colorPrimary != null) #colorPrimary: colorPrimary,
@@ -827,7 +840,8 @@ class _AppTokensCopyWithImpl<$R, $Out>
         if (colorTextOnGoogle != null) #colorTextOnGoogle: colorTextOnGoogle,
         if (colorMono != null) #colorMono: colorMono,
         if (colorMonoDim != null) #colorMonoDim: colorMonoDim,
-        if (colorTextOnMono != null) #colorTextOnMono: colorTextOnMono
+        if (colorTextOnMono != null) #colorTextOnMono: colorTextOnMono,
+        if (colorLayoutShadow != null) #colorLayoutShadow: colorLayoutShadow
       }));
   @override
   AppTokens $make(CopyWithData data) => AppTokens(
@@ -893,7 +907,8 @@ class _AppTokensCopyWithImpl<$R, $Out>
       colorTextOnGoogle: data.get(#colorTextOnGoogle, or: $value.colorTextOnGoogle),
       colorMono: data.get(#colorMono, or: $value.colorMono),
       colorMonoDim: data.get(#colorMonoDim, or: $value.colorMonoDim),
-      colorTextOnMono: data.get(#colorTextOnMono, or: $value.colorTextOnMono));
+      colorTextOnMono: data.get(#colorTextOnMono, or: $value.colorTextOnMono),
+      colorLayoutShadow: data.get(#colorLayoutShadow, or: $value.colorLayoutShadow));
 
   @override
   AppTokensCopyWith<$R2, AppTokens, $Out2> $chain<$R2, $Out2>(

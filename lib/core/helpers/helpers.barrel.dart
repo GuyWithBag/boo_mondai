@@ -15,3 +15,4 @@ export 'string.helper.dart';
 export 'media.helper.dart';
 export 'markdown_format.helper.dart';
 export 'media_remote_path.helper.dart';
+export 'theme.helper.dart';

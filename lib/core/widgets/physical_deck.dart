@@ -67,7 +67,7 @@ class PhysicalDeck extends StatelessWidget {
       textScale,
     );
     final coverImage = ImageHelper.getImageProviderFromSource(
-      deck == null ? null : DecksService.getCoverImageSource(deck!),
+      deck == null ? null : DecksService.getCoverImageUrl(deck!),
     );
     final visibleTags = deck?.tags.take(8).toList() ?? const [];
 

@@ -20,6 +20,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         ResearchRemoteDB,
         PublicBucketRemoteDB,
         PrivateBucketRemoteDB,
+        SyncClientsRemoteDB,
         StreaksRemoteDB,
         StudyCardsRemoteDB,
         TagsRemoteDB,
@@ -53,6 +54,7 @@ class RemoteDB {
   static late final ResearchRemoteDB research;
   static late final PublicBucketRemoteDB publicBucket;
   static late final PrivateBucketRemoteDB privateBucket;
+  static late final SyncClientsRemoteDB syncClient;
   static late final StreaksRemoteDB streak;
   static late final TagsRemoteDB tag;
   static late final DeckTagsRemoteDB deckTag;
@@ -82,6 +84,7 @@ class RemoteDB {
     research = ResearchRemoteDB();
     publicBucket = PublicBucketRemoteDB();
     privateBucket = PrivateBucketRemoteDB();
+    syncClient = SyncClientsRemoteDB();
     streak = StreaksRemoteDB();
     tag = TagsRemoteDB();
     deckTag = DeckTagsRemoteDB();

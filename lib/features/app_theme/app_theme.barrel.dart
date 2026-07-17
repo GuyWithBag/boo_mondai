@@ -45,3 +45,4 @@ export 'interaction_handler.dart';
 export 'view_padding_sized_box.dart';
 export 'form_field.dart';
 export 'floating_action_button.dart';
+export 'progress_indicator.dart';

@@ -7,8 +7,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         textStyle,
         TextSize,
         TextWeight,
-        Button,
-        buttonStyle;
+        Button;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -22,6 +21,8 @@ Future<T?> showModal<T>({
   List<Widget>? actionsCustom,
   ModalTone tone = ModalTone.surface,
   bool barrierDismissible = true,
+  bool showCancelButton = false,
+  MainAxisAlignment actionsMainAxisAlignment = MainAxisAlignment.end,
 }) {
   return showDialog<T>(
     context: context,
@@ -33,6 +34,8 @@ Future<T?> showModal<T>({
       actions: actions,
       actionsCustom: actionsCustom,
       tone: tone,
+      showCancelButton: showCancelButton,
+      actionsMainAxisAlignment: actionsMainAxisAlignment,
       child: child,
     ),
   );
@@ -49,6 +52,8 @@ class Modal<T> extends StatelessWidget {
     this.actionsCustom,
     this.tone = ModalTone.surface,
     this.maxWidth = 520,
+    this.showCancelButton = false,
+    this.actionsMainAxisAlignment = MainAxisAlignment.end,
   });
 
   final Icon? leading;
@@ -59,6 +64,8 @@ class Modal<T> extends StatelessWidget {
   final List<Widget>? actionsCustom;
   final ModalTone tone;
   final double maxWidth;
+  final bool showCancelButton;
+  final MainAxisAlignment actionsMainAxisAlignment;
 
   @override
   Widget build(BuildContext context) {
@@ -67,9 +74,9 @@ class Modal<T> extends StatelessWidget {
     final hasActions =
         actions.isNotEmpty || (actionsCustom?.isNotEmpty ?? false);
 
-    return Center(
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: maxWidth),
+    return Padding(
+      padding: EdgeInsets.all(tokens.spaceScaffoldPadding),
+      child: Center(
         child: Material(
           type: MaterialType.transparency,
           child: Surface(
@@ -79,12 +86,25 @@ class Modal<T> extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                if (showCancelButton) ...[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Button.icon(
+                        tokens: tokens,
+                        icon: Icons.close,
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: tokens.spaceLayoutGapXsm),
+                ],
                 if (leading != null) ...[
                   IconTheme.merge(
-                    data: IconThemeData(size: tokens.sizeIcon),
+                    data: IconThemeData(size: tokens.sizeModalIcon),
                     child: leading!,
                   ),
-                  SizedBox(height: tokens.spaceLayoutGapLg),
+                  SizedBox(height: tokens.spaceLayoutGapSm),
                 ],
                 if (title != null)
                   Text(
@@ -112,17 +132,22 @@ class Modal<T> extends StatelessWidget {
                 ],
                 if (hasActions) ...[
                   SizedBox(height: tokens.spaceLayoutGapLg),
-                  Wrap(
-                    alignment: WrapAlignment.end,
+                  Row(
                     spacing: tokens.spaceLayoutGapSm,
-                    runSpacing: tokens.spaceLayoutGapSm,
+                    mainAxisAlignment: actionsMainAxisAlignment,
                     children: [
                       ...actions.map(
                         (action) => Button(
-                          style: buttonStyle.resolve(tokens, [action.color]),
+                          variants: [action.color],
                           onPressed: () {
                             action.onPressed?.call();
-                            Navigator.pop(context, action.value);
+                            if (!action.dismissesModal) return;
+
+                            final valueBuilder = action.valueBuilder;
+                            final value = valueBuilder == null
+                                ? action.value
+                                : valueBuilder();
+                            Navigator.pop(context, value);
                           },
                           child: Text(action.label),
                         ),

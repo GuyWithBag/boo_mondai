@@ -109,7 +109,6 @@ class _TopSnackbarHandle implements SnackbarHandle {
 
 class _TopSnackbarOverlay extends HookWidget {
   const _TopSnackbarOverlay({
-    super.key,
     required this.message,
     required this.leading,
     required this.content,

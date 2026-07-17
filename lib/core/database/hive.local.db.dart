@@ -7,7 +7,7 @@
 
 import 'dart:convert';
 import 'dart:developer' as developer;
-import 'package:boo_mondai/lib.barrel.dart' show HiveException;
+import 'package:boo_mondai/lib.barrel.dart' show HiveException, SyncIndexEntry;
 import 'package:flutter/foundation.dart';
 import 'package:hive_ce/hive.dart';
 
@@ -28,6 +28,13 @@ abstract class HiveLocalDB<T> {
 
   /// Extracts the real primary key for [item].
   HivePrimaryKey primaryKeyFromItem(T item);
+
+  /// Override for models with soft-delete state.
+  DateTime? getDeletedAt(T item) => null;
+
+  bool _isVisible(T item, {required bool includeDeleted}) {
+    return includeDeleted || getDeletedAt(item) == null;
+  }
 
   String encodePrimaryKey(HivePrimaryKey primaryKey) {
     final orderedKeys = primaryKey.keys.toList()..sort();
@@ -97,8 +104,11 @@ abstract class HiveLocalDB<T> {
     bool Function(T item)? where,
     int? limit,
     int offset = 0,
+    bool includeDeleted = false,
   }) => guardSync(() {
-    Iterable<T> values = box.values;
+    Iterable<T> values = box.values.where(
+      (item) => _isVisible(item, includeDeleted: includeDeleted),
+    );
     if (where != null) {
       values = values.where(where);
     }
@@ -111,10 +121,32 @@ abstract class HiveLocalDB<T> {
     return values.toList();
   }, action: 'selectMany');
 
-  T? selectByPk(HivePrimaryKey primaryKey) => guardSync(
-    () => box.get(encodePrimaryKey(primaryKey)),
-    action: 'selectByPk($primaryKey)',
+  List<SyncIndexEntry> selectSyncIndexWhere({
+    required bool Function(T item) where,
+    required String Function(T item) getId,
+    required DateTime Function(T item) getUpdatedAt,
+    required String action,
+    bool includeDeleted = true,
+  }) => guardSync(
+    () => box.values
+        .where((item) => _isVisible(item, includeDeleted: includeDeleted))
+        .where(where)
+        .map(
+          (item) =>
+              SyncIndexEntry(id: getId(item), updatedAt: getUpdatedAt(item)),
+        )
+        .toList(growable: false),
+    action: action,
   );
+
+  T? selectByPk(HivePrimaryKey primaryKey, {bool includeDeleted = false}) =>
+      guardSync(() {
+        final item = box.get(encodePrimaryKey(primaryKey));
+        if (item == null || !_isVisible(item, includeDeleted: includeDeleted)) {
+          return null;
+        }
+        return item;
+      }, action: 'selectByPk($primaryKey)');
 
   Future<void> insert(T item) => guard(() async {
     final key = encodePrimaryKey(primaryKeyFromItem(item));

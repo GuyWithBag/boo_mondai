@@ -21,9 +21,10 @@ class Button extends HookWidget {
     this.selected = false,
     this.mainAxisAlignment = MainAxisAlignment.center,
     this.axis = Axis.horizontal,
-    this.style,
+    this.variants = const [],
     bool dashed = false,
     super.key,
+    this.elevated = true,
   }) : _isDashed = dashed;
 
   final Widget? child;
@@ -33,7 +34,8 @@ class Button extends HookWidget {
   final bool selected;
   final MainAxisAlignment mainAxisAlignment;
   final Axis axis;
-  final SurfaceStyle? style;
+  final List<Object> variants;
+  final bool elevated;
   final bool _isDashed;
 
   static Button icon({
@@ -49,12 +51,7 @@ class Button extends HookWidget {
       leading: icon == null ? null : Icon(icon),
       selected: selected,
       dashed: variant == ButtonVariant.dashed,
-      style: buttonStyle.resolve(tokens, [
-        color,
-        ButtonSize.icon,
-        ButtonPadding.none,
-        variant,
-      ]),
+      variants: [color, ButtonSize.icon, ButtonPadding.none, variant],
     );
   }
 
@@ -71,12 +68,7 @@ class Button extends HookWidget {
       leading: icon == null ? null : Icon(icon),
       selected: selected,
       dashed: variant == ButtonVariant.dashed,
-      style: buttonStyle.resolve(tokens, [
-        color,
-        ButtonSize.iconSmall,
-        ButtonPadding.none,
-        variant,
-      ]),
+      variants: [color, ButtonSize.iconSmall, ButtonPadding.none, variant],
     );
   }
 
@@ -97,10 +89,7 @@ class Button extends HookWidget {
       selected: selected,
       mainAxisAlignment: mainAxisAlignment,
       axis: axis,
-      style: buttonStyle.resolve(tokens, const [
-        ButtonVariant.dashed,
-        ButtonColor.dashed,
-      ]),
+      variants: const [ButtonVariant.dashed, ButtonColor.dashed],
       dashed: true,
       child: child,
     );
@@ -119,12 +108,7 @@ class Button extends HookWidget {
       leading: icon == null ? null : Icon(icon),
       selected: selected,
       dashed: variant == ButtonVariant.dashed,
-      style: buttonStyle.resolve(tokens, [
-        color,
-        ButtonSize.iconOnly,
-        ButtonPadding.none,
-        variant,
-      ]),
+      variants: [color, ButtonSize.iconOnly, ButtonPadding.none, variant],
     );
   }
 
@@ -141,12 +125,7 @@ class Button extends HookWidget {
       leading: icon == null ? null : Icon(icon),
       selected: selected,
       dashed: variant == ButtonVariant.dashed,
-      style: buttonStyle.resolve(tokens, [
-        color,
-        ButtonSize.iconOnlySmall,
-        ButtonPadding.none,
-        variant,
-      ]),
+      variants: [color, ButtonSize.iconOnlySmall, ButtonPadding.none, variant],
     );
   }
 
@@ -165,12 +144,12 @@ class Button extends HookWidget {
       selected: selected,
       axis: Axis.vertical,
       dashed: variant == ButtonVariant.dashed,
-      style: buttonStyle.resolve(tokens, [
+      variants: [
         color,
         ButtonSize.iconWithLabel,
         ButtonPadding.iconWithLabel,
         variant,
-      ]),
+      ],
       child: Text(
         label,
         maxLines: 2,
@@ -208,41 +187,11 @@ class Button extends HookWidget {
       return null;
     }, [onPressed, selected]);
 
-    final effectiveStyle = style ?? buttonStyle.resolve(tokens);
+    final effectiveStyle = buttonStyle.resolve(tokens, [
+      ...variants,
+      state.value,
+    ]);
     var resolvedStyle = effectiveStyle;
-
-    if (state.value == ButtonState.selected) {
-      resolvedStyle = resolvedStyle.copyWith(
-        decoration: resolvedStyle.decoration.copyWith(
-          color: tokens.colorPrimarySoft,
-          border: Border.all(
-            color: tokens.colorPrimaryBright,
-            width: tokens.borderWidthDefault.w,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: tokens.colorPrimaryBright,
-              offset: Offset(0, tokens.buttonShadowOffset.h),
-              blurRadius: 0,
-            ),
-          ],
-        ),
-        contentStyle: resolvedStyle.contentStyle.copyWith(
-          textStyle: resolvedStyle.textStyle.copyWith(
-            color: tokens.colorPrimary,
-          ),
-          iconTheme: resolvedStyle.iconTheme.copyWith(
-            color: tokens.colorPrimary,
-          ),
-        ),
-      );
-    } else if (state.value == ButtonState.disabled) {
-      resolvedStyle = resolvedStyle.copyWith(opacity: 0.5);
-    } else if (state.value == ButtonState.pressed) {
-      resolvedStyle = resolvedStyle.copyWith(
-        transform: Matrix4.translationValues(0, 0, 0),
-      );
-    }
 
     final contentChild = switch (axis) {
       Axis.horizontal => Row(
@@ -277,11 +226,24 @@ class Button extends HookWidget {
       ),
     };
 
-    final content = Surface(
-      style: resolvedStyle,
-      duration: const Duration(milliseconds: 130),
-      curve: Curves.easeOutCubic,
-      child: contentChild,
+    final content = Container(
+      decoration: elevated
+          ? BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                  color: tokens.colorLayoutShadow,
+                  offset: Offset(0, 1),
+                  blurRadius: 10,
+                ),
+              ],
+            )
+          : null,
+      child: Surface(
+        style: resolvedStyle,
+        duration: const Duration(milliseconds: 130),
+        curve: Curves.easeOutCubic,
+        child: contentChild,
+      ),
     );
 
     final paintedContent = _isDashed

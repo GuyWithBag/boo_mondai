@@ -1,8 +1,6 @@
-import 'package:boo_mondai/features/app_theme/button.dart';
-import 'package:boo_mondai/features/app_theme/button.variant.dart';
-import 'package:boo_mondai/lib.barrel.dart' show AppTokens, buttonStyle;
+import 'package:boo_mondai/lib.barrel.dart'
+    show ButtonColor, ButtonVariant, ButtonPadding, Button;
 import 'package:flutter/material.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class ToggleButton extends StatelessWidget {
   const ToggleButton({
@@ -30,13 +28,12 @@ class ToggleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
     final icon = value ? trueIcon : falseIcon;
     final color = value ? trueColor : falseColor;
     final tooltip = value ? trueTooltip : falseTooltip;
 
     final button = Button(
-      style: buttonStyle.resolve(tokens, [color, variant, ButtonPadding.none]),
+      variants: [color, variant, ButtonPadding.none],
       onPressed: onChanged == null ? null : () => onChanged!(!value),
       leading: Icon(icon),
       selected: value,

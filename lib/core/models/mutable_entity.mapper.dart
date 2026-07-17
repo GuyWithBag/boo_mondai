@@ -20,20 +20,25 @@ class MutableEntityMapper extends ClassMapperBase<MutableEntity> {
   @override
   final String id = 'MutableEntity';
 
-  static String _$id(MutableEntity v) => v.id;
-  static const Field<MutableEntity, String> _f$id = Field('id', _$id);
   static DateTime _$createdAt(MutableEntity v) => v.createdAt;
   static const Field<MutableEntity, DateTime> _f$createdAt =
       Field('createdAt', _$createdAt, key: r'created_at');
   static DateTime _$updatedAt(MutableEntity v) => v.updatedAt;
   static const Field<MutableEntity, DateTime> _f$updatedAt =
       Field('updatedAt', _$updatedAt, key: r'updated_at');
+  static DateTime? _$deletedAt(MutableEntity v) => v.deletedAt;
+  static const Field<MutableEntity, DateTime> _f$deletedAt =
+      Field('deletedAt', _$deletedAt, key: r'deleted_at', opt: true);
+  static DateTime? _$purgeAfter(MutableEntity v) => v.purgeAfter;
+  static const Field<MutableEntity, DateTime> _f$purgeAfter =
+      Field('purgeAfter', _$purgeAfter, key: r'purge_after', opt: true);
 
   @override
   final MappableFields<MutableEntity> fields = const {
-    #id: _f$id,
     #createdAt: _f$createdAt,
     #updatedAt: _f$updatedAt,
+    #deletedAt: _f$deletedAt,
+    #purgeAfter: _f$purgeAfter,
   };
 
   static MutableEntity _instantiate(DecodingData data) {
@@ -61,6 +66,10 @@ mixin MutableEntityMappable {
 
 abstract class MutableEntityCopyWith<$R, $In extends MutableEntity, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  $R call({String? id, DateTime? createdAt, DateTime? updatedAt});
+  $R call(
+      {DateTime? createdAt,
+      DateTime? updatedAt,
+      DateTime? deletedAt,
+      DateTime? purgeAfter});
   MutableEntityCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }

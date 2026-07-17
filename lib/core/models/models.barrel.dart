@@ -8,3 +8,4 @@ export 'identifiable.entity.dart';
 export 'mutable_entity.dart';
 export 'immutable_entity.dart';
 export 'side.dart';
+export 'study_rating_color_set.dart';

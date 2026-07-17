@@ -49,6 +49,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         StudyCard,
         StudyRating,
         Tag,
+        SyncClient,
         UserSettings,
         UserStudyCardTag,
         VisibilityState,
@@ -104,6 +105,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
   AdapterSpec<ProgressCheckpointStatus>(),
   AdapterSpec<StoredMedia>(),
   AdapterSpec<SyncDeletion>(),
+  AdapterSpec<SyncClient>(),
 ])
 // ignore: unused_element
 part 'adapters.g.dart';

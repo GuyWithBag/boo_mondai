@@ -11,14 +11,16 @@ part 'mutable_entity.mapper.dart';
 
 /// Mutable model — synced via SyncService using updatedAt for conflict resolution.
 @MappableClass()
-abstract class MutableEntity {
-  final String id;
+abstract class MutableEntity with MutableEntityMappable {
   final DateTime createdAt;
   final DateTime updatedAt;
+  final DateTime? deletedAt;
+  final DateTime? purgeAfter;
 
   const MutableEntity({
-    required this.id,
     required this.createdAt,
     required this.updatedAt,
+    this.deletedAt,
+    this.purgeAfter,
   });
 }

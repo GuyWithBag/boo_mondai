@@ -122,10 +122,13 @@ class AppTokens with AppTokensMappable {
     required this.colorMono,
     required this.colorMonoDim,
     required this.colorTextOnMono,
+    required this.colorLayoutShadow,
   });
 
   final String name;
   final String fontFamily = 'Noto Sans';
+
+  final Color colorLayoutShadow;
 
   // Primary
   final Color colorPrimary;
@@ -247,6 +250,7 @@ class AppTokens with AppTokensMappable {
   final double sizeIconSm = 18;
   final double sizeIcon = 24;
   final double sizeIconLg = 30;
+  final double sizeModalIcon = 50;
 
   final double sizeButtonIcon = 48;
   final double sizeButtonIconSm = 38;
