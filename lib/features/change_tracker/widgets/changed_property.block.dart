@@ -4,7 +4,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         ChangeTrackerHelper,
         ChangeType,
         ChangedProperty,
-        TextWeight,
         textStyle,
         TextSize;
 import 'package:flutter/material.dart';
@@ -33,6 +32,11 @@ class ChangedPropertyBlock extends StatelessWidget {
     final propertyTextStyle = textStyle.resolve(tokens);
 
     final iconWidth = tokens.sizeIcon;
+
+    final doesBeforeFitBlock = property.before.toString().length < 7;
+    final doesAfterFitBlock = property.after.toString().length < 7;
+
+    final doesPropertyFitBlock = doesBeforeFitBlock && doesAfterFitBlock;
 
     return Container(
       padding: EdgeInsets.all(tokens.spaceLayoutPadding),
@@ -66,15 +70,9 @@ class ChangedPropertyBlock extends StatelessWidget {
                       ),
                     ),
               ),
-            ],
-          ),
-          if (type == ChangeType.modified) ...[
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(width: iconWidth),
-                Expanded(
-                  child: Text(
+              if (type == ChangeType.modified) ...[
+                if (doesBeforeFitBlock)
+                  Text(
                     '${property.before}',
                     style:
                         (type == ChangeType.modified
@@ -89,26 +87,67 @@ class ChangedPropertyBlock extends StatelessWidget {
                               ),
                             ),
                   ),
-                ),
+                SizedBox(width: tokens.spaceLayoutGapSm),
+                if (doesAfterFitBlock)
+                  Text(
+                    '${property.before}',
+                    style:
+                        (type == ChangeType.modified
+                                ? propertyTextStyle
+                                : propertyTextStyle)
+                            .copyWith(
+                              color: ChangeTrackerHelper.getTypeForeground(
+                                tokens,
+                                type,
+                              ),
+                            ),
+                  ),
               ],
-            ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(width: iconWidth),
-                Expanded(
-                  child: Text(
-                    '${property.after}',
-                    style: propertyTextStyle.copyWith(
-                      color: ChangeTrackerHelper.getTypeForeground(
-                        tokens,
-                        type,
+            ],
+          ),
+          if (type == ChangeType.modified) ...[
+            if (!doesBeforeFitBlock)
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(width: iconWidth),
+                  Expanded(
+                    child: Text(
+                      '${property.before}',
+                      style:
+                          (type == ChangeType.modified
+                                  ? propertyTextStyle.copyWith(
+                                      decoration: TextDecoration.lineThrough,
+                                    )
+                                  : propertyTextStyle)
+                              .copyWith(
+                                color: ChangeTrackerHelper.getTypeBorder(
+                                  tokens,
+                                  type,
+                                ),
+                              ),
+                    ),
+                  ),
+                ],
+              ),
+            if (!doesAfterFitBlock)
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(width: iconWidth),
+                  Expanded(
+                    child: Text(
+                      '${property.after}',
+                      style: propertyTextStyle.copyWith(
+                        color: ChangeTrackerHelper.getTypeForeground(
+                          tokens,
+                          type,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
           ],
         ],
       ),

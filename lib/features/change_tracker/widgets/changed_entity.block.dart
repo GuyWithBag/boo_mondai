@@ -22,11 +22,13 @@ class ChangedEntityBlock extends StatelessWidget {
     required this.changedEntity,
     this.child,
     this.name,
+    this.directionLabel,
   });
 
   final ChangedEntity changedEntity;
   final Widget? child;
   final String? name;
+  final String? directionLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -37,46 +39,88 @@ class ChangedEntityBlock extends StatelessWidget {
       SurfaceShadow.none,
       SurfaceShape.sharp,
     ]);
+    final coloredHeaderDecoration = headerStyle.decoration.copyWith(
+      color: ChangeTrackerHelper.getTypeBorder(
+        tokens,
+        changedEntity.changeType,
+      ),
+    );
+    final coloredHeaderStyle = headerStyle.copyWith(
+      decoration: coloredHeaderDecoration,
+    );
+    final containerStyle = surfaceStyle.resolve(tokens, const [
+      SurfacePadding.none,
+      SurfaceBorder.none,
+      SurfaceShape.roundedSm,
+      SurfaceShadow.none,
+    ]);
+    final coloredContainerDecoration = containerStyle.decoration.copyWith(
+      color: ChangeTrackerHelper.getTypeBackground(
+        tokens,
+        changedEntity.changeType,
+      ),
+    );
+    final coloredContainerStyle = containerStyle.copyWith(
+      decoration: coloredContainerDecoration,
+    );
     return Surface(
-      style: surfaceStyle
-          .resolve(tokens, const [
-            SurfacePadding.none,
-            SurfaceBorder.none,
-            SurfaceShape.roundedSm,
-            SurfaceShadow.none,
-          ])
-          .copyWith(clipBehavior: Clip.hardEdge),
+      style: coloredContainerStyle,
+      hasClipRRect: true,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Surface(
-            style: headerStyle,
+            style: coloredHeaderStyle,
             child: Row(
               spacing: tokens.spaceLayoutGapSm,
               children: [
-                Icon(ChangeTrackerHelper.getTypeIcon(changedEntity.changeType)),
+                Icon(
+                  ChangeTrackerHelper.getTypeIcon(changedEntity.changeType),
+                  color: ChangeTrackerHelper.getTypeForeground(
+                    tokens,
+                    changedEntity.changeType,
+                  ),
+                ),
                 Text(
-                  '${changedEntity.typeName} ${ChangeTrackerHelper.getTypeLabel(changedEntity.changeType)}',
-                  style: textStyle.resolve(tokens, const [
-                    TextSize.label,
-                    TextWeight.body,
-                  ]),
+                  [
+                    if (directionLabel != null) directionLabel,
+                    changedEntity.typeName,
+                    ChangeTrackerHelper.getTypeLabel(changedEntity.changeType),
+                  ].join(' '),
+                  style: textStyle
+                      .resolve(tokens, const [TextSize.label, TextWeight.body])
+                      .copyWith(
+                        color: ChangeTrackerHelper.getTypeForeground(
+                          tokens,
+                          changedEntity.changeType,
+                        ),
+                      ),
                 ),
               ],
             ),
           ),
-          Padding(padding: headerStyle.padding!, child: child),
-          Padding(
-            padding: headerStyle.padding!,
-            child: Text(
-              name != null ? name! : changedEntity.typeName,
-              textAlign: TextAlign.start,
-              style: textStyle.resolve(tokens, const [
-                TextSize.header,
-                TextWeight.body,
-              ]),
+          if (child != null)
+            Padding(padding: coloredHeaderStyle.padding!, child: child),
+          if (child != null)
+            Padding(
+              padding: EdgeInsets.only(
+                left: tokens.spaceLayoutPadding,
+                right: tokens.spaceLayoutPadding,
+                bottom: tokens.spaceLayoutPadding,
+              ),
+              child: Text(
+                name != null ? name! : changedEntity.typeName,
+                textAlign: TextAlign.start,
+                style: textStyle
+                    .resolve(tokens, const [TextSize.header, TextWeight.body])
+                    .copyWith(
+                      color: ChangeTrackerHelper.getTypeForeground(
+                        tokens,
+                        changedEntity.changeType,
+                      ),
+                    ),
+              ),
             ),
-          ),
         ],
       ),
     );

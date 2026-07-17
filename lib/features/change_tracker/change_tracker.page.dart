@@ -12,10 +12,15 @@ import 'package:boo_mondai/lib.barrel.dart'
         ChangedEntityBlock,
         ChangedEntitySection,
         Deck,
+        DeckListing,
+        DeckListingTile,
         DeckTile,
         DeckTileState,
+        LocalDB,
+        ModalAction,
         Scaffold,
         ServiceRegistry,
+        showModal,
         useChangeTrackerController,
         MetaLabel;
 import 'package:flutter/material.dart' hide Scaffold, AppBar;
@@ -85,6 +90,48 @@ class ChangeTrackerPage extends HookWidget {
 
     final canReviewChanges = entry.status == ChangeTrackerStatus.reviewing;
 
+    Deck? deckForListing(DeckListing listing) {
+      for (final change in entry.changes) {
+        final after = change.afterChange;
+        if (after is Deck && after.id == listing.deckId) {
+          return after.copyWith(listing: listing);
+        }
+
+        final before = change.beforeChange;
+        if (before is Deck && before.id == listing.deckId) {
+          return before.copyWith(listing: listing);
+        }
+      }
+
+      return LocalDB.deck
+          .selectByPk({'id': listing.deckId}, includeDeleted: true)
+          ?.copyWith(listing: listing);
+    }
+
+    Future<void> discardRemoteChanges() async {
+      final confirmed = await showModal<bool>(
+        context: context,
+        title: 'Discard remote changes?',
+        subtitle:
+            'This keeps your local data and makes the remote account match it. Remote edits will be overwritten, and rows that only exist remotely will be deleted from the account.',
+        leading: const Icon(Icons.warning_amber_rounded),
+        actions: const [
+          ModalAction<bool>(value: false, label: 'Cancel'),
+          ModalAction<bool>(
+            value: true,
+            label: 'Discard remote',
+            color: ButtonColor.error,
+          ),
+        ],
+      );
+      if (confirmed != true) return;
+
+      await controller.discard(entry.id);
+      if (context.mounted) {
+        popToFirstRoute();
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: 'Sync',
@@ -104,18 +151,14 @@ class ChangeTrackerPage extends HookWidget {
                 children: [
                   Expanded(
                     child: Button(
-                      onPressed: () {
-                        controller.cancel(entry.id);
-                        popToFirstRoute();
-                      },
+                      onPressed: discardRemoteChanges,
+                      variants: const [ButtonColor.error],
                       child: const Text('Discard'),
                     ),
                   ),
                   Expanded(
                     child: Button(
-                      style: buttonStyle.resolve(tokens, const [
-                        ButtonColor.primary,
-                      ]),
+                      variants: const [ButtonColor.primary],
                       onPressed: () {
                         controller.apply(entry.id);
                         popToFirstRoute();
@@ -144,12 +187,20 @@ class ChangeTrackerPage extends HookWidget {
               final changedEntity = entry.changes[index];
               final entity = changedEntity.afterChange;
               final entityIsDeck = entity is Deck;
+              final entityIsDeckListing = entity is DeckListing;
+              final deckListingDeck = entityIsDeckListing
+                  ? deckForListing(entity)
+                  : null;
+              final directionLabel = controller.getDirectionLabel(
+                changedEntity.direction,
+              );
 
               if (changedEntity.changeType == ChangeType.added ||
                   changedEntity.changeType == ChangeType.removed) {
                 return ChangedEntityBlock(
                   changedEntity: changedEntity,
-                  name: entityIsDeck ? entity.title : null,
+                  directionLabel: directionLabel,
+                  name: entityIsDeck ? entity.title : deckListingDeck?.title,
                   child: entityIsDeck
                       ? SizedBox(
                           height: 180.h,
@@ -161,7 +212,21 @@ class ChangeTrackerPage extends HookWidget {
                             ),
                           ),
                         )
-                      : null,
+                      : deckListingDeck == null
+                      ? null
+                      : Center(child: DeckListingTile(deck: deckListingDeck)),
+                );
+              }
+              if (deckListingDeck != null) {
+                return ChangedEntitySection(
+                  leading: SizedBox(
+                    width: 280.w,
+                    child: DeckListingTile(deck: deckListingDeck),
+                  ),
+                  metaLabels: [
+                    MetaLabel(icon: Icons.sync_alt, label: directionLabel),
+                  ],
+                  entity: changedEntity,
                 );
               }
               if (entityIsDeck) {
@@ -172,12 +237,18 @@ class ChangeTrackerPage extends HookWidget {
                     state: DeckTileState.bare,
                   ),
                   metaLabels: [
+                    MetaLabel(icon: Icons.sync_alt, label: directionLabel),
                     MetaLabel(icon: Icons.build, label: entity.version),
                   ],
                   entity: entry.changes[index],
                 );
               }
-              return ChangedEntitySection(entity: entry.changes[index]);
+              return ChangedEntitySection(
+                entity: entry.changes[index],
+                metaLabels: [
+                  MetaLabel(icon: Icons.sync_alt, label: directionLabel),
+                ],
+              );
             },
           ),
         ],

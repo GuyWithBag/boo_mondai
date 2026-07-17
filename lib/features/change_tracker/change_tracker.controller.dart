@@ -1,8 +1,10 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         ChangedEntity,
+        ChangeDirection,
         ChangeTrackerEntry,
         ChangeTrackerApply,
+        ChangeTrackerDiscard,
         ChangeTrackerService,
         ChangeTrackerStatus,
         Controller;
@@ -32,6 +34,10 @@ class ChangeTrackerController extends Controller {
   /// behavior.
   ChangeTrackerService get service => _service;
 
+  /// Returns the workflow-specific user-facing label for [direction].
+  String getDirectionLabel(ChangeDirection direction) =>
+      _service.getDirectionLabel(direction);
+
   /// All known entries, newest first.
   List<ChangeTrackerEntry<Object?>> get entries => _service.entries;
 
@@ -45,9 +51,14 @@ class ChangeTrackerController extends Controller {
   /// Creates an entry and optionally stores the callback that applies it.
   ChangeTrackerEntry<T> start<T>({
     required ChangeTrackerEntry<T> entry,
-    ChangeTrackerApply<T>? onApply,
+    ChangeTrackerApply<T>? onChangeApply,
+    ChangeTrackerDiscard<T>? onChangeDiscard,
   }) {
-    return _service.start(entry: entry, onApply: onApply);
+    return _service.start(
+      entry: entry,
+      onChangeApply: onChangeApply,
+      onChangeDiscard: onChangeDiscard,
+    );
   }
 
   /// Updates lifecycle fields for an entry unless it has already been canceled.
@@ -81,6 +92,14 @@ class ChangeTrackerController extends Controller {
   /// using the change tracker to display status.
   Future<void> apply(String entryId) async {
     final error = await _service.apply(entryId);
+    if (error != null) {
+      setError(error is Exception ? error : Exception(error.toString()));
+      notifyListeners();
+    }
+  }
+
+  Future<void> discard(String entryId) async {
+    final error = await _service.discard(entryId);
     if (error != null) {
       setError(error is Exception ? error : Exception(error.toString()));
       notifyListeners();
@@ -133,10 +152,19 @@ class ChangeTrackerController extends Controller {
 
 ChangeTrackerController useChangeTrackerController({
   ChangeTrackerService? service,
+  String inboundLabel = 'inbound',
+  String outboundLabel = 'outbound',
 }) {
   final controller = useMemoized(
-    () => ChangeTrackerController(service: service),
-    [service],
+    () => ChangeTrackerController(
+      service:
+          service ??
+          ChangeTrackerService(
+            inboundLabel: inboundLabel,
+            outboundLabel: outboundLabel,
+          ),
+    ),
+    [service, inboundLabel, outboundLabel],
   );
   useListenable(controller);
   return controller;

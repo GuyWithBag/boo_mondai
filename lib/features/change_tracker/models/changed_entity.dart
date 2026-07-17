@@ -1,4 +1,5 @@
 import 'package:boo_mondai/features/change_tracker/models/change_source.dart';
+import 'package:boo_mondai/features/change_tracker/models/change_direction.dart';
 import 'package:boo_mondai/features/change_tracker/models/change_type.dart';
 import 'package:boo_mondai/features/change_tracker/models/changed_property.dart';
 import 'package:dart_mappable/dart_mappable.dart';
@@ -17,6 +18,7 @@ class ChangedEntity<T> with ChangedEntityMappable<T> {
   /// Creates a record for one entity-level operation.
   const ChangedEntity({
     required this.source,
+    required this.direction,
     required this.changeType,
     required this.id,
     this.beforeChange,
@@ -33,6 +35,9 @@ class ChangedEntity<T> with ChangedEntityMappable<T> {
 
   /// Workflow that produced the change.
   final ChangeSource source;
+
+  /// Direction the changed data moves in the owning workflow.
+  final ChangeDirection direction;
 
   /// Storage or domain entity name, such as `deck` or `card_template`.
   String get typeName =>

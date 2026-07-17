@@ -1,5 +1,10 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show ChangedEntity, ChangeTrackerEntry, ChangeTrackerStatus, Service;
+    show
+        ChangedEntity,
+        ChangeDirection,
+        ChangeTrackerEntry,
+        ChangeTrackerStatus,
+        Service;
 
 /// Callback registered by a workflow to apply a reviewed operation.
 ///
@@ -8,6 +13,7 @@ import 'package:boo_mondai/lib.barrel.dart'
 /// must return the [ChangedEntity] list that was actually applied so the final
 /// entry reflects the committed result rather than only the original plan.
 typedef ChangeTrackerApply<T> = Future<List<ChangedEntity<T>>> Function();
+typedef ChangeTrackerDiscard<T> = Future<List<ChangedEntity<T>>> Function();
 
 /// Pure workflow service for tracked change operations.
 ///
@@ -15,13 +21,26 @@ typedef ChangeTrackerApply<T> = Future<List<ChangedEntity<T>>> Function();
 /// on Flutter notification APIs. [ChangeTrackerController] wraps this service
 /// for Provider/UI consumption.
 class ChangeTrackerService extends Service {
+  ChangeTrackerService({
+    this.inboundLabel = 'inbound',
+    this.outboundLabel = 'outbound',
+  });
+
   @override
   String get name => 'ChangeTrackerService';
+
+  /// User-facing label for [ChangeDirection.inbound].
+  final String inboundLabel;
+
+  /// User-facing label for [ChangeDirection.outbound].
+  final String outboundLabel;
 
   final Set<void Function()> _onChangedListeners = {};
   final List<ChangeTrackerEntry<Object?>> _entries = [];
   final Map<String, Future<List<ChangedEntity<Object?>>> Function()>
   _applyByEntryId = {};
+  final Map<String, Future<List<ChangedEntity<Object?>>> Function()>
+  _discardByEntryId = {};
 
   /// Registers a callback that runs after the service mutates entry state.
   ///
@@ -43,6 +62,14 @@ class ChangeTrackerService extends Service {
   List<ChangeTrackerEntry<Object?>> get activeEntries =>
       _entries.where((entry) => entry.isActive).toList(growable: false);
 
+  /// Returns the workflow-specific user-facing label for [direction].
+  String getDirectionLabel(ChangeDirection direction) {
+    return switch (direction) {
+      ChangeDirection.inbound => inboundLabel,
+      ChangeDirection.outbound => outboundLabel,
+    };
+  }
+
   /// Finds an entry by id, returning null when it has been removed.
   ChangeTrackerEntry<Object?>? entryById(String entryId) {
     for (final entry in _entries) {
@@ -54,12 +81,17 @@ class ChangeTrackerService extends Service {
   /// Creates an entry and optionally stores the callback that applies it.
   ChangeTrackerEntry<T> start<T>({
     required ChangeTrackerEntry<T> entry,
-    ChangeTrackerApply<T>? onApply,
+    ChangeTrackerApply<T>? onChangeApply,
+    ChangeTrackerDiscard<T>? onChangeDiscard,
   }) {
     _entries.insert(0, _eraseEntryType(entry));
-    if (onApply != null) {
+    if (onChangeApply != null) {
       _applyByEntryId[entry.id] = () async =>
-          (await onApply()).cast<ChangedEntity<Object?>>();
+          (await onChangeApply()).cast<ChangedEntity<Object?>>();
+    }
+    if (onChangeDiscard != null) {
+      _discardByEntryId[entry.id] = () async =>
+          (await onChangeDiscard()).cast<ChangedEntity<Object?>>();
     }
     _emitChanged();
     return entry;
@@ -125,6 +157,28 @@ class ChangeTrackerService extends Service {
       return e;
     } finally {
       _applyByEntryId.remove(entryId);
+      _discardByEntryId.remove(entryId);
+    }
+  }
+
+  Future<Object?> discard(String entryId) async {
+    final discardFn = _discardByEntryId[entryId];
+    if (discardFn == null) {
+      cancel(entryId);
+      return null;
+    }
+
+    update(entryId, status: ChangeTrackerStatus.applying, progress: 0);
+    try {
+      final changes = await discardFn();
+      complete(entryId, changes: changes);
+      return null;
+    } catch (e) {
+      fail(entryId, e);
+      return e;
+    } finally {
+      _applyByEntryId.remove(entryId);
+      _discardByEntryId.remove(entryId);
     }
   }
 
@@ -173,6 +227,7 @@ class ChangeTrackerService extends Service {
   /// Cancels an entry and removes any pending apply callback.
   void cancel(String entryId) {
     _applyByEntryId.remove(entryId);
+    _discardByEntryId.remove(entryId);
     _replace(
       entryId,
       (entry) => entry.copyWith(
@@ -188,6 +243,7 @@ class ChangeTrackerService extends Service {
     final index = _entries.indexWhere((entry) => entry.id == entryId);
     if (index == -1) return;
     _applyByEntryId.remove(entryId);
+    _discardByEntryId.remove(entryId);
     _entries.removeAt(index);
     _emitChanged();
   }
@@ -196,6 +252,7 @@ class ChangeTrackerService extends Service {
   void clearFinished() {
     for (final entry in _entries.where((entry) => !entry.isActive)) {
       _applyByEntryId.remove(entry.id);
+      _discardByEntryId.remove(entry.id);
     }
     _entries.removeWhere((entry) => !entry.isActive);
     _emitChanged();

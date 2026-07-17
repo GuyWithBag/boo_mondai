@@ -9,3 +9,4 @@ export 'change_batch_result.dart';
 export 'change_tracker_status.dart';
 export 'previewed_change_plan.dart';
 export 'changed_entity.dart';
+export 'change_direction.dart';

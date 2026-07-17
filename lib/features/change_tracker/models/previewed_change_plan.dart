@@ -14,7 +14,7 @@ class PreviewedChangePlan<TPayload, TEntity> {
 
   /// Workflow-specific data needed to apply the previewed operation.
   ///
-  /// For example, deck sync stores a `DeckSyncPlanPayload` containing the
+  /// For example, strategy sync stores a `StrategySyncPlanPayload` containing the
   /// sync steps that were already previewed. Deck download stores fetched
   /// remote deck records so applying the download does not need to fetch them
   /// again. The change tracker displays [changes]; the owning service uses

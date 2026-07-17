@@ -25,6 +25,9 @@ class ChangedEntityMapper extends ClassMapperBase<ChangedEntity> {
   static ChangeSource _$source(ChangedEntity v) => v.source;
   static const Field<ChangedEntity, ChangeSource> _f$source =
       Field('source', _$source);
+  static ChangeDirection _$direction(ChangedEntity v) => v.direction;
+  static const Field<ChangedEntity, ChangeDirection> _f$direction =
+      Field('direction', _$direction);
   static ChangeType _$changeType(ChangedEntity v) => v.changeType;
   static const Field<ChangedEntity, ChangeType> _f$changeType =
       Field('changeType', _$changeType, key: r'change_type');
@@ -63,6 +66,7 @@ class ChangedEntityMapper extends ClassMapperBase<ChangedEntity> {
   @override
   final MappableFields<ChangedEntity> fields = const {
     #source: _f$source,
+    #direction: _f$direction,
     #changeType: _f$changeType,
     #id: _f$id,
     #beforeChange: _f$beforeChange,
@@ -77,6 +81,7 @@ class ChangedEntityMapper extends ClassMapperBase<ChangedEntity> {
   static ChangedEntity<T> _instantiate<T>(DecodingData data) {
     return ChangedEntity(
         source: data.dec(_f$source),
+        direction: data.dec(_f$direction),
         changeType: data.dec(_f$changeType),
         id: data.dec(_f$id),
         beforeChange: data.dec(_f$beforeChange),
@@ -149,6 +154,7 @@ abstract class ChangedEntityCopyWith<$R, $In extends ChangedEntity<T>, $Out, T>
           ChangedProperty<Object?>>> get changedProperties;
   $R call(
       {ChangeSource? source,
+      ChangeDirection? direction,
       ChangeType? changeType,
       String? id,
       T? beforeChange,
@@ -182,6 +188,7 @@ class _ChangedEntityCopyWithImpl<$R, $Out, T>
   @override
   $R call(
           {ChangeSource? source,
+          ChangeDirection? direction,
           ChangeType? changeType,
           String? id,
           Object? beforeChange = $none,
@@ -193,6 +200,7 @@ class _ChangedEntityCopyWithImpl<$R, $Out, T>
           Object? remoteUpdatedAt = $none}) =>
       $apply(FieldCopyWithData({
         if (source != null) #source: source,
+        if (direction != null) #direction: direction,
         if (changeType != null) #changeType: changeType,
         if (id != null) #id: id,
         if (beforeChange != $none) #beforeChange: beforeChange,
@@ -206,6 +214,7 @@ class _ChangedEntityCopyWithImpl<$R, $Out, T>
   @override
   ChangedEntity<T> $make(CopyWithData data) => ChangedEntity(
       source: data.get(#source, or: $value.source),
+      direction: data.get(#direction, or: $value.direction),
       changeType: data.get(#changeType, or: $value.changeType),
       id: data.get(#id, or: $value.id),
       beforeChange: data.get(#beforeChange, or: $value.beforeChange),

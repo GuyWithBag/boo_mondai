@@ -119,19 +119,17 @@ stateDiagram-v2
 ## Sync Sequence
 
 Sync is the clearest review-first user of the tracker. `SyncService.sync()`
-starts an explicit `ChangeTrackerEntry` with an `onApply` callback, builds a
-`PreviewedChangePlan<SyncPlanPayload<T>, T>`, then moves the entry into review when
-changes exist. `SyncController` keeps track of the bound
-`ChangeTrackerController`, and `SyncPage` owns the user actions: it routes to
+starts an explicit `ChangeTrackerEntry` with an `onChangeApply` callback, builds a
+`PreviewedChangePlan<StrategySyncPlanPayload<TContext>, Object?>`, then moves the
+entry into review when changes exist. `SyncPage` owns the user actions: it routes to
 the change-review page with the registered tracker service id and entry id,
 applies the entry, or discards it. The callback closes over the completed plan
-and calls
-`applySync()` only after the user confirms.
+and applies the planned `SyncPlanStep`s only after the user confirms.
 
 ```mermaid
 sequenceDiagram
     participant UI as View decks / sync UI
-    participant SyncController as SyncController
+    participant SyncController as Workflow controller
     participant SyncPage as SyncPage
     participant Controller as ChangeTrackerController
     participant ReviewPage as ChangeTrackerPage
@@ -141,7 +139,7 @@ sequenceDiagram
 
     UI->>SyncController: sync(changeTrackerController)
     SyncController->>Service: sync(localDb, remoteDb, userId, changeTrackerController)
-    Service->>Controller: start(entry: ChangeTrackerEntry(sync, planning), onApply)
+    Service->>Controller: start(entry: ChangeTrackerEntry(sync, planning), onChangeApply)
     Service->>Controller: update(status: fetching, progress)
     Service->>Remote: selectMany(user_id)
     Service->>Local: selectMany()
@@ -158,7 +156,7 @@ sequenceDiagram
         ReviewPage->>Controller: useChangeTrackerController(service)
         ReviewPage->>Controller: entryById(entryId)
         ReviewPage->>Controller: apply(entryId)
-        Controller->>Service: onApply()
+        Controller->>Service: onChangeApply()
         Service->>Local: upsert pulled records
         Service->>Remote: upsert pushed records
         Service-->>Controller: applied ChangedEntity list
