@@ -82,6 +82,7 @@ class DarkModeToggleCard extends HookWidget {
               asset: 'assets/ui/button_down/minimalist_3.wav',
               volume: 2,
             );
+            await Future.delayed(Duration(milliseconds: 460));
             await UiSoundsService.soloud.playSource(
               asset: 'assets/ui/button_up/minimalist_1.wav',
               volume: 2,
