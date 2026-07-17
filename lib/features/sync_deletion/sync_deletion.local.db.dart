@@ -24,15 +24,13 @@ class SyncDeletionLocalDB extends HiveLocalDB<SyncDeletion> {
     action: 'selectManyByUserIdAndEntityType($userId, $entityType)',
   );
 
-  List<SyncIndexEntry> selectSyncIndexByUserId(String userId) => guardSync(
-    () => selectManyByUserId(userId)
-        .map(
-          (deletion) =>
-              SyncIndexEntry(id: deletion.id, updatedAt: deletion.deletedAt),
-        )
-        .toList(growable: false),
-    action: 'selectSyncIndexByUserId($userId)',
-  );
+  List<SyncIndexEntry> selectSyncIndexByUserId(String userId) =>
+      selectSyncIndexWhere(
+        where: (deletion) => deletion.userId == userId,
+        getId: (deletion) => deletion.id,
+        getUpdatedAt: (deletion) => deletion.deletedAt,
+        action: 'selectSyncIndexByUserId($userId)',
+      );
 
   List<SyncDeletion> selectManyByIds(List<String> ids) => guardSync(
     () => [

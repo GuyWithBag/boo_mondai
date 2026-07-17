@@ -1,18 +1,19 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show ChangedEntity, SyncStrategy, TypedSyncPlanStep;
+    show ChangedEntity, SyncTable, TypedSyncPlanStep;
 
-abstract class SyncPlanStep<TContext> {
-  static Future<SyncPlanStep<TContext>> createFromStrategyPreview<T, TContext>(
-    SyncStrategy<T, TContext> strategy,
-    TContext context,
-  ) async {
-    final plan = await strategy.getSyncStrategyPullPushPlan(context);
-    return TypedSyncPlanStep<T, TContext>(strategy: strategy, plan: plan);
+abstract class SyncPlanStep {
+  static Future<SyncPlanStep> createFromTablePreview<T>(
+    SyncTable<T> table, {
+    required String userId,
+  }) async {
+    final plan = await table.getSyncPlan(userId: userId);
+    return TypedSyncPlanStep<T>(table: table, plan: plan);
   }
 
   List<ChangedEntity<Object?>> get changes;
   int get pullCount;
   int get pushCount;
   int get skipped;
-  Future<List<ChangedEntity<Object?>>> apply(TContext context);
+  Future<List<ChangedEntity<Object?>>> apply({required String userId});
+  Future<List<ChangedEntity<Object?>>> discard({required String userId});
 }

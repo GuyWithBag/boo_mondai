@@ -2,17 +2,13 @@
 
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        AppTokens,
         Button,
         ButtonColor,
-        ButtonPadding,
         ButtonSize,
-        ButtonVariant,
         SnackbarTone,
-        buttonStyle,
-        showSnackbar;
+        showSnackbar,
+        ButtonPadding;
 import 'package:flutter/material.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 /// AppBar action that drives the deck sync operation.
 ///
@@ -32,29 +28,10 @@ class SyncButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
-    if (isSyncing) {
-      return Button(
-        onPressed: null,
-        style: buttonStyle.resolve(tokens, const [
-          ButtonSize.icon,
-          ButtonPadding.none,
-          ButtonVariant.text,
-        ]),
-        child: const SizedBox(
-          width: 20,
-          height: 20,
-          child: CircularProgressIndicator(strokeWidth: 2),
-        ),
-      );
-    }
-
     return Tooltip(
       message: isAuthenticated ? 'Sync decks' : 'Sign in to sync',
-      child: Button.icon(
-        icon: Icons.sync_rounded,
-        color: ButtonColor.primary,
-        tokens: tokens,
+      child: Button(
+        variants: [ButtonColor.primary, ButtonSize.icon, ButtonPadding.none],
         onPressed: () {
           if (!isAuthenticated) {
             showSnackbar(
@@ -67,6 +44,9 @@ class SyncButton extends StatelessWidget {
           }
           onSync();
         },
+        child: isSyncing
+            ? CircularProgressIndicator(strokeWidth: 2)
+            : Icon(Icons.sync_rounded),
       ),
     );
   }

@@ -2,11 +2,12 @@
 
 // Other files
 export 'sync.summary.dart';
-export 'sync.plan_payload.dart';
-export 'sync.workflow_controller.dart';
-export 'sync.strategy.dart';
 export 'sync.strategy_pull_push_plan.dart';
 export 'sync.index_entry.dart';
 export 'sync_media_reference.dart';
 export 'sync.plan_step.dart';
 export 'typed_sync.plan_step.dart';
+export 'strategy_sync.plan_payload.dart';
+export 'sync.table.dart';
+export 'sync_deletion_policy.dart';
+export 'sync_client.dart';

@@ -4,12 +4,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         FillInTheBlanksTemplate,
         FlashcardTemplate,
         IdentificationTemplate,
-        MarkdownMediaField,
         MatchMadnessTemplate,
         MultipleChoiceTemplate,
-        WordScrambleTemplate;
+        WordScrambleTemplate,
+        MarkdownMediaField;
 
-abstract final class CardTemplateMediaFieldsHelper {
+abstract final class MarkdownMediaFieldsHelper {
   static List<MarkdownMediaField> markdownFields(CardTemplate template) {
     return switch (template) {
       FlashcardTemplate() => const [

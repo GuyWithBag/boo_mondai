@@ -1,10 +1,9 @@
-import 'package:boo_mondai/lib.barrel.dart'
-    show DeckSyncSession, SyncSummary, SyncPlanStep;
+import 'package:boo_mondai/lib.barrel.dart' show SyncPlanStep, SyncSummary;
 
-class DeckSyncPlanPayload {
-  const DeckSyncPlanPayload({required this.steps});
+class StrategySyncPlanPayload {
+  const StrategySyncPlanPayload({required this.steps});
 
-  final List<SyncPlanStep<DeckSyncSession>> steps;
+  final List<SyncPlanStep> steps;
 
   SyncSummary get summary {
     var summary = const SyncSummary();

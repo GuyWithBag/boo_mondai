@@ -11,10 +11,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         ChangeTrackerRouteArgs,
         ChangeTrackerStatus,
         ChangeTrackerSummaryChips,
+        ModalAction,
         StatusLayoutState,
-        SyncWorkflowController,
+        SyncController,
         Scaffold,
-        buttonStyle;
+        showModal;
 import 'package:flutter/material.dart' hide Scaffold;
 import 'package:go_router/go_router.dart';
 import 'package:theme_variants/theme_variants.dart' show ThemeVariantsContext;
@@ -22,7 +23,7 @@ import 'package:theme_variants/theme_variants.dart' show ThemeVariantsContext;
 class SyncPage extends StatelessWidget {
   const SyncPage({super.key, required this.syncController});
 
-  final SyncWorkflowController syncController;
+  final SyncController syncController;
 
   ChangeTrackerEntry get entry => syncController.currentEntry!;
 
@@ -42,6 +43,27 @@ class SyncPage extends StatelessWidget {
 
   void _discard() {
     syncController.dismissCurrentEntry();
+  }
+
+  Future<void> _discardRemoteChanges(BuildContext context) async {
+    final confirmed = await showModal<bool>(
+      context: context,
+      title: 'Discard remote changes?',
+      subtitle:
+          'This keeps your local data and makes the remote account match it. Remote edits will be overwritten, and rows that only exist remotely will be deleted from the account.',
+      leading: const Icon(Icons.warning_amber_rounded),
+      actions: const [
+        ModalAction<bool>(value: false, label: 'Cancel'),
+        ModalAction<bool>(
+          value: true,
+          label: 'Discard remote',
+          color: ButtonColor.error,
+        ),
+      ],
+    );
+    if (confirmed != true) return;
+
+    syncController.discardRemoteChangesForCurrentEntry();
   }
 
   @override
@@ -103,18 +125,14 @@ class SyncPage extends StatelessWidget {
               actions: [
                 Expanded(
                   child: Button(
-                    style: buttonStyle.resolve(tokens, const [
-                      ButtonColor.primary,
-                    ]),
+                    variants: const [ButtonColor.primary],
                     onPressed: _discard,
                     child: Text('Back'),
                   ),
                 ),
               ],
               extraAction: Button(
-                style: buttonStyle.resolve(tokens, [
-                  if (canApply) ButtonColor.primary,
-                ]),
+                variants: [if (canApply) ButtonColor.primary],
                 onPressed: () => _viewChanges(context),
                 child: const Text('View Changes'),
               ),
@@ -125,29 +143,36 @@ class SyncPage extends StatelessWidget {
               message: message,
               progressValue: progressValue,
               actions: [
-                if (canApply)
+                if (canApply) ...[
                   Expanded(
                     child: Button(
-                      style: buttonStyle.resolve(tokens, const []),
+                      variants: const [ButtonColor.error],
+                      onPressed: () => _discardRemoteChanges(context),
+                      child: const Text('Discard'),
+                    ),
+                  ),
+                  Expanded(
+                    child: Button(
+                      variants: [ButtonColor.success],
                       onPressed: _apply,
                       child: const Text('Apply'),
                     ),
                   ),
-                if (canViewChanges)
-                  Expanded(
-                    child: Button(
-                      style: buttonStyle.resolve(tokens, [
-                        if (canApply) ButtonColor.primary,
-                      ]),
+                ],
+              ],
+              extraAction: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                spacing: tokens.spaceLayoutGapSm,
+                children: [
+                  if (canViewChanges)
+                    Button(
+                      variants: [if (canApply) ButtonColor.primary],
                       onPressed: () => _viewChanges(context),
                       child: const Text('View Changes'),
                     ),
-                  ),
-              ],
-              extraAction: Button(
-                style: buttonStyle.resolve(tokens, const []),
-                onPressed: _discard,
-                child: Text('Cancel'),
+
+                  Button(onPressed: _discard, child: const Text('Cancel')),
+                ],
               ),
               child: isDoneFetching
                   ? ChangeTrackerSummaryChips(entry: entry)

@@ -1,10 +1,10 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show ChangedEntity, SyncPlanStep, SyncStrategy, SyncStrategyPullPushPlan;
+    show ChangedEntity, SyncPlanStep, SyncTable, SyncStrategyPullPushPlan;
 
-class TypedSyncPlanStep<T, TContext> implements SyncPlanStep<TContext> {
-  const TypedSyncPlanStep({required this.strategy, required this.plan});
+class TypedSyncPlanStep<T> implements SyncPlanStep {
+  const TypedSyncPlanStep({required this.table, required this.plan});
 
-  final SyncStrategy<T, TContext> strategy;
+  final SyncTable<T> table;
   final SyncStrategyPullPushPlan<T> plan;
 
   @override
@@ -21,8 +21,14 @@ class TypedSyncPlanStep<T, TContext> implements SyncPlanStep<TContext> {
   int get skipped => plan.skipped;
 
   @override
-  Future<List<ChangedEntity<Object?>>> apply(TContext context) async {
-    final applied = await strategy.applySyncStrategyPullPushPlan(plan, context);
+  Future<List<ChangedEntity<Object?>>> apply({required String userId}) async {
+    final applied = await table.applySyncPlan(plan, userId: userId);
+    return applied.cast<ChangedEntity<Object?>>();
+  }
+
+  @override
+  Future<List<ChangedEntity<Object?>>> discard({required String userId}) async {
+    final applied = await table.discardRemoteChanges(plan, userId: userId);
     return applied.cast<ChangedEntity<Object?>>();
   }
 }

@@ -2,8 +2,9 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         Deck,
         DeckListing,
-        DeckSyncSession,
         ImageHelper,
+        LocalDB,
+        RemoteDB,
         MediaRemotePathHelper,
         StoredMediaPath,
         StoredMediaPathHelper,
@@ -15,21 +16,21 @@ abstract final class DeckListingMediaSyncPreprocessor {
   /// Uploads deck-listing local media before the listing row is pushed remotely.
   static Future<DeckListing> preprocessPushItem({
     required DeckListing listing,
-    required DeckSyncSession session,
+    required String userId,
   }) async {
-    final deck = session.decks.selectByPk({'id': listing.deckId});
+    final deck = LocalDB.deck.selectByPk({'id': listing.deckId});
     if (deck == null) return listing;
 
     return SyncMediaReferenceApplier.apply<DeckListing>(
       item: listing,
-      persistItem: session.deckListings.upsert,
+      persistItem: LocalDB.deckListing.upsert,
       references: [
         for (var index = 0; index < listing.featuredImages.length; index++)
           _featuredImageReference(
             deck: deck,
             listing: listing,
             index: index,
-            session: session,
+            userId: userId,
           ),
       ],
     );
@@ -39,7 +40,7 @@ abstract final class DeckListingMediaSyncPreprocessor {
     required Deck deck,
     required DeckListing listing,
     required int index,
-    required DeckSyncSession session,
+    required String userId,
   }) {
     final localPath = StoredMediaPathHelper.deckListingFeaturedImage(
       deckTitle: deck.title,
@@ -49,11 +50,11 @@ abstract final class DeckListingMediaSyncPreprocessor {
     return SyncMediaReference<DeckListing>(
       localPath: localPath,
       remotePath: MediaRemotePathHelper.deckListingFeaturedImage(
-        profileId: session.userId,
+        profileId: userId,
         deckId: listing.deckId,
         index: index,
       ),
-      bucket: session.remoteStorage,
+      bucket: RemoteDB.publicBucket,
       readValue: (listing) => listing.featuredImages[index],
       shouldUpload: (_, currentValue) =>
           _shouldUploadStoredMedia(localPath, currentValue),

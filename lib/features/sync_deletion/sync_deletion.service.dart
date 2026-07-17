@@ -1,13 +1,15 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         ChangedEntity,
+        ChangeDirection,
         ChangeSource,
         ChangeType,
-        DeckSyncSession,
+        LocalDB,
+        RemoteDB,
         SyncDeletion,
         SyncIndexEntry,
         SyncStrategyPullPushPlan,
-        SyncStrategy;
+        SyncTable;
 
 abstract final class SyncDeletionService {
   static const decks = 'decks';
@@ -21,9 +23,13 @@ abstract final class SyncDeletionService {
   static const cardTemplateTags = 'card_template_tags';
   static const userStudyCardTags = 'user_study_cards_tags';
 
-  static SyncStrategy<SyncDeletion, DeckSyncSession> createStrategy(
-    DeckSyncSession session,
-  ) => const _LocalSyncDeletionStrategy();
+  static SyncTable<SyncDeletion> createTable() {
+    return SyncTable<SyncDeletion>.custom(
+      name: 'sync_deletions',
+      getPlan: _getPlan,
+      applyPlan: _applyPlan,
+    );
+  }
 
   static SyncDeletion create({
     required String entityType,
@@ -64,12 +70,12 @@ abstract final class SyncDeletionService {
     return SyncDeletion.compositeEntityId(values);
   }
 
-  static Future<Set<String>> loadDeletedEntityIds({
-    required DeckSyncSession session,
+  static Future<Set<String>> getDeletedEntityIds({
+    required String userId,
     required String entityType,
   }) async {
-    final local = session.syncDeletions.selectManyByUserIdAndEntityType(
-      userId: session.userId,
+    final local = LocalDB.syncDeletion.selectManyByUserIdAndEntityType(
+      userId: userId,
       entityType: entityType,
     );
 
@@ -89,77 +95,99 @@ abstract final class SyncDeletionService {
   static List<T> withoutDeletedItems<T>(
     List<T> items,
     Set<String> deletedIds,
-    String Function(T item) itemId,
+    String Function(T item) getItemId,
   ) {
     if (deletedIds.isEmpty) return items;
     return items
-        .where((item) => !deletedIds.contains(itemId(item)))
+        .where((item) => !deletedIds.contains(getItemId(item)))
         .toList(growable: false);
   }
 
-  static Future<void> _applyLocal(
-    DeckSyncSession session,
-    SyncDeletion deletion,
+  static Future<SyncStrategyPullPushPlan<SyncDeletion>> _getPlan(
+    String userId,
   ) async {
+    final deletions = LocalDB.syncDeletion.selectManyByUserId(userId);
+    return SyncStrategyPullPushPlan<SyncDeletion>(
+      pullItems: const [],
+      pushItems: deletions,
+      changes: [
+        for (final deletion in deletions)
+          ChangedEntity<SyncDeletion>(
+            source: ChangeSource.sync,
+            direction: ChangeDirection.outbound,
+            changeType: ChangeType.removed,
+            id: 'sync_deletions:${deletion.id}',
+            afterChange: deletion,
+            localId: deletion.entityId,
+            localUpdatedAt: deletion.deletedAt,
+          ),
+      ],
+    );
+  }
+
+  static Future<List<ChangedEntity<SyncDeletion>>> _applyPlan(
+    SyncStrategyPullPushPlan<SyncDeletion> plan,
+    String userId,
+  ) async {
+    for (final deletion in plan.pushItems) {
+      await _applyLocal(deletion);
+      await _applyRemote(deletion);
+      await LocalDB.syncDeletion.deleteByPk({'id': deletion.id});
+    }
+    return plan.changes;
+  }
+
+  static Future<void> _applyLocal(SyncDeletion deletion) async {
     switch (deletion.entityType) {
       case decks:
-        await session.decks.deleteByPk({'id': deletion.entityId});
+        await LocalDB.deck.deleteByPk({'id': deletion.entityId});
       case deckListings:
-        await session.deckListings.deleteByPk({'deck_id': deletion.entityId});
+        await LocalDB.deckListing.deleteByPk({'deck_id': deletion.entityId});
       case cardTemplates:
-        await session.cardTemplates.deleteByPk({'id': deletion.entityId});
+        await LocalDB.cardTemplate.deleteByPk({'id': deletion.entityId});
       case studyCards:
-        await session.studyCards.deleteByPk({'id': deletion.entityId});
+        await LocalDB.studyCard.deleteByPk({'id': deletion.entityId});
       case fsrsCards:
-        await session.fsrsCards.deleteByPk({'id': deletion.entityId});
+        await LocalDB.fsrsCard.deleteByPk({'id': deletion.entityId});
       case deckTags:
-        await session.deckTags.deleteByPk(_decodeComposite(deletion.entityId));
+        await LocalDB.deckTag.deleteByPk(_decodeComposite(deletion.entityId));
       case cardTemplateTags:
-        await session.cardTemplateTags.deleteByPk(
+        await LocalDB.cardTemplateTag.deleteByPk(
           _decodeComposite(deletion.entityId),
         );
       case userStudyCardTags:
-        await session.userStudyCardTags.deleteByPk(
+        await LocalDB.userStudyCardTag.deleteByPk(
           _decodeComposite(deletion.entityId),
         );
       case tags:
-        await session.tags.deleteByPk({'id': deletion.entityId});
+        await LocalDB.tag.deleteByPk({'id': deletion.entityId});
     }
   }
 
-  static Future<void> _applyRemote(
-    DeckSyncSession session,
-    SyncDeletion deletion,
-  ) async {
+  static Future<void> _applyRemote(SyncDeletion deletion) async {
     switch (deletion.entityType) {
       case decks:
-        await session.remoteDecks.deleteWhere({'id': deletion.entityId});
+        await RemoteDB.deck.deleteWhere({'id': deletion.entityId});
       case deckListings:
-        await session.remoteDeckListings.deleteWhere({
-          'deck_id': deletion.entityId,
-        });
+        await RemoteDB.deckListing.deleteWhere({'deck_id': deletion.entityId});
       case cardTemplates:
-        await session.remoteCardTemplates.deleteWhere({
-          'id': deletion.entityId,
-        });
+        await RemoteDB.card.deleteWhere({'id': deletion.entityId});
       case studyCards:
-        await session.remoteStudyCards.deleteWhere({'id': deletion.entityId});
+        await RemoteDB.studyCard.deleteWhere({'id': deletion.entityId});
       case fsrsCards:
-        await session.remoteFsrsCards.deleteWhere({'id': deletion.entityId});
+        await RemoteDB.fsrsSync.deleteWhere({'id': deletion.entityId});
       case deckTags:
-        await session.remoteDeckTags.deleteWhere(
-          _decodeComposite(deletion.entityId),
-        );
+        await RemoteDB.deckTag.deleteWhere(_decodeComposite(deletion.entityId));
       case cardTemplateTags:
-        await session.remoteCardTemplateTags.deleteWhere(
+        await RemoteDB.cardTemplateTag.deleteWhere(
           _decodeComposite(deletion.entityId),
         );
       case userStudyCardTags:
-        await session.remoteUserStudyCardTags.deleteWhere(
+        await RemoteDB.userStudyCardTag.deleteWhere(
           _decodeComposite(deletion.entityId),
         );
       case tags:
-        await session.remoteTags.deleteWhere({'id': deletion.entityId});
+        await RemoteDB.tag.deleteWhere({'id': deletion.entityId});
     }
   }
 
@@ -171,53 +199,5 @@ abstract final class SyncDeletionService {
             pair.indexOf('=') + 1,
           ),
     };
-  }
-}
-
-class _LocalSyncDeletionStrategy
-    implements SyncStrategy<SyncDeletion, DeckSyncSession> {
-  const _LocalSyncDeletionStrategy();
-
-  @override
-  String get name => 'sync_deletions';
-
-  @override
-  Future<bool> doesItNeedSync(DeckSyncSession context) async {
-    return context.syncDeletions.selectManyByUserId(context.userId).isNotEmpty;
-  }
-
-  @override
-  Future<SyncStrategyPullPushPlan<SyncDeletion>> getSyncStrategyPullPushPlan(
-    DeckSyncSession context,
-  ) async {
-    final deletions = context.syncDeletions.selectManyByUserId(context.userId);
-    return SyncStrategyPullPushPlan<SyncDeletion>(
-      pullItems: const [],
-      pushItems: deletions,
-      changes: [
-        for (final deletion in deletions)
-          ChangedEntity<SyncDeletion>(
-            source: ChangeSource.sync,
-            changeType: ChangeType.removed,
-            id: '$name:${deletion.id}',
-            afterChange: deletion,
-            localId: deletion.entityId,
-            localUpdatedAt: deletion.deletedAt,
-          ),
-      ],
-    );
-  }
-
-  @override
-  Future<List<ChangedEntity<SyncDeletion>>> applySyncStrategyPullPushPlan(
-    SyncStrategyPullPushPlan<SyncDeletion> plan,
-    DeckSyncSession context,
-  ) async {
-    for (final deletion in plan.pushItems) {
-      await SyncDeletionService._applyLocal(context, deletion);
-      await SyncDeletionService._applyRemote(context, deletion);
-      await context.syncDeletions.deleteByPk({'id': deletion.id});
-    }
-    return plan.changes;
   }
 }

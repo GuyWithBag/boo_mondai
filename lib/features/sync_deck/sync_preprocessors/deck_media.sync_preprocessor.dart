@@ -1,8 +1,9 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         Deck,
-        DeckSyncSession,
         ImageHelper,
+        LocalDB,
+        RemoteDB,
         MediaRemotePathHelper,
         StoredMediaPath,
         StoredMediaPathHelper,
@@ -15,7 +16,7 @@ abstract final class DeckMediaSyncPreprocessor {
   /// Uploads deck-owned local media before the deck row is pushed remotely.
   static Future<Deck> preprocessPushItem({
     required Deck deck,
-    required DeckSyncSession session,
+    required String userId,
   }) async {
     final localPath = StoredMediaPathHelper.deckCoverImage(
       deckTitle: deck.title,
@@ -23,15 +24,15 @@ abstract final class DeckMediaSyncPreprocessor {
 
     var updated = await SyncMediaReferenceApplier.apply<Deck>(
       item: deck,
-      persistItem: session.decks.upsert,
+      persistItem: LocalDB.deck.upsert,
       references: [
         SyncMediaReference<Deck>(
           localPath: localPath,
           remotePath: MediaRemotePathHelper.deckCoverImage(
-            profileId: session.userId,
+            profileId: userId,
             deckId: deck.id,
           ),
-          bucket: session.remoteStorage,
+          bucket: RemoteDB.publicBucket,
           readValue: (deck) => deck.coverImageUrl,
           shouldUpload: (_, currentValue) =>
               _shouldUploadStoredMedia(localPath, currentValue),
@@ -43,10 +44,10 @@ abstract final class DeckMediaSyncPreprocessor {
 
     final longDescription = await SyncMarkdownMediaApplier.uploadAndRewrite(
       markdown: updated.longDescription,
-      bucket: session.remoteStorage,
+      bucket: RemoteDB.publicBucket,
       remotePath: (storedMedia, index) =>
           MediaRemotePathHelper.deckMarkdownAttachment(
-            profileId: session.userId,
+            profileId: userId,
             deckId: updated.id,
             fileName: MediaRemotePathHelper.fileNameFromStoredMedia(
               storedMedia,
@@ -57,7 +58,7 @@ abstract final class DeckMediaSyncPreprocessor {
 
     if (longDescription != updated.longDescription) {
       updated = updated.copyWith(longDescription: longDescription);
-      await session.decks.upsert(updated);
+      await LocalDB.deck.upsert(updated);
     }
 
     return updated;

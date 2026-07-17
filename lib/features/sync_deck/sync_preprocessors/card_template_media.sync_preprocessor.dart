@@ -1,28 +1,27 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         CardTemplate,
-        CardTemplateMediaFieldsHelper,
-        DeckSyncSession,
+        MarkdownMediaFieldsHelper,
+        LocalDB,
         MediaRemotePathHelper,
+        RemoteDB,
         SyncMarkdownMediaApplier;
 
 abstract final class CardTemplateMediaSyncPreprocessor {
   /// Uploads card-template local media before the template row is pushed remotely.
   static Future<CardTemplate> preprocessPushItem({
     required CardTemplate template,
-    required DeckSyncSession session,
+    required String userId,
   }) async {
     var updated = template;
 
-    for (final field in CardTemplateMediaFieldsHelper.markdownFields(
-      template,
-    )) {
+    for (final field in MarkdownMediaFieldsHelper.markdownFields(template)) {
       final markdown = await SyncMarkdownMediaApplier.uploadAndRewrite(
         markdown: field.getValue(updated),
-        bucket: session.remoteStorage,
+        bucket: RemoteDB.publicBucket,
         remotePath: (storedMedia, index) =>
             MediaRemotePathHelper.cardMarkdownAttachment(
-              profileId: session.userId,
+              profileId: userId,
               deckId: updated.deckId,
               templateId: updated.id,
               field: field.name,
@@ -36,7 +35,7 @@ abstract final class CardTemplateMediaSyncPreprocessor {
     }
 
     if (updated != template) {
-      await session.cardTemplates.upsert(updated);
+      await LocalDB.cardTemplate.upsert(updated);
     }
 
     return updated;

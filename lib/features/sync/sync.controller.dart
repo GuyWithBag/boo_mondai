@@ -1,54 +1,43 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        MutableEntity,
-        Controller,
-        HiveLocalDB,
-        SupabaseRemoteDB,
-        ChangeTrackerController,
-        SyncPlanPayload,
-        PreviewedChangePlan,
-        ChangeTrackerService,
-        ChangeTrackerEntry,
         AppException,
         ChangeSource,
+        ChangeTrackerController,
+        ChangeTrackerEntry,
+        ChangeTrackerService,
         ChangeTrackerStatus,
+        Controller,
         SyncService,
-        SyncWorkflowController;
+        SyncTable;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
-class SyncController<T extends MutableEntity> extends Controller
-    implements SyncWorkflowController {
+class SyncController extends Controller {
   SyncController({
-    required this.localDb,
-    required this.remoteDb,
+    required this.title,
     required this.userId,
+    required this.getTables,
     required this.onSynced,
-    this.localWhere,
     this.beforeSync,
   });
 
-  final HiveLocalDB<T> localDb;
-  final SupabaseRemoteDB<T> remoteDb;
+  final String title;
   final String Function() userId;
+  final List<SyncTable<dynamic>> Function() getTables;
   final VoidCallback onSynced;
-  final bool Function(T item)? localWhere;
   final Future<void> Function()? beforeSync;
 
   bool _isSyncing = false;
   String? _syncError;
   ChangeTrackerController? _changeTrackerController;
-  PreviewedChangePlan<SyncPlanPayload<T>, T>? changePlan;
 
-  @override
   bool get isSyncing => _isSyncing;
-  @override
+
   String? get syncError => _syncError;
-  @override
+
   ChangeTrackerService? get changeTrackerService =>
       _changeTrackerController?.service;
 
-  @override
   ChangeTrackerEntry? get currentEntry {
     final changeTrackerController = _changeTrackerController;
     if (changeTrackerController == null) return null;
@@ -64,11 +53,9 @@ class SyncController<T extends MutableEntity> extends Controller
     return null;
   }
 
-  @override
   bool get isAlreadyUpToDate =>
       currentEntry?.status == ChangeTrackerStatus.alreadyUpToDate;
 
-  @override
   bool get shouldShowSyncPage {
     return switch (currentEntry?.status) {
       ChangeTrackerStatus.reviewing ||
@@ -91,23 +78,11 @@ class SyncController<T extends MutableEntity> extends Controller
     notifyListeners();
   }
 
-  @override
   void clearSyncError() {
     _syncError = null;
     notifyListeners();
   }
 
-  void clearChangePreview() {
-    changePlan = null;
-    notifyListeners();
-  }
-
-  void clearSyncing() {
-    _isSyncing = false;
-    notifyListeners();
-  }
-
-  @override
   void applyCurrentEntry() {
     final entry = currentEntry;
     final changeTrackerController = _changeTrackerController;
@@ -117,13 +92,11 @@ class SyncController<T extends MutableEntity> extends Controller
     changeTrackerController.apply(entry.id);
   }
 
-  @override
   void dismissCurrentEntry() {
     final entry = currentEntry;
     final changeTrackerController = _changeTrackerController;
     _isSyncing = false;
     _syncError = null;
-    changePlan = null;
     if (entry != null && changeTrackerController != null) {
       changeTrackerController.cancel(entry.id);
       changeTrackerController.remove(entry.id);
@@ -131,12 +104,19 @@ class SyncController<T extends MutableEntity> extends Controller
     notifyListeners();
   }
 
-  @override
+  void discardRemoteChangesForCurrentEntry() {
+    final entry = currentEntry;
+    final changeTrackerController = _changeTrackerController;
+    if (entry == null || changeTrackerController == null) return;
+    _isSyncing = false;
+    notifyListeners();
+    changeTrackerController.discard(entry.id);
+  }
+
   void clearAlreadyUpToDate() {
     final entry = currentEntry;
     final changeTrackerController = _changeTrackerController;
     _isSyncing = false;
-    changePlan = null;
     if (entry != null && changeTrackerController != null) {
       changeTrackerController.remove(entry.id);
     }
@@ -156,15 +136,14 @@ class SyncController<T extends MutableEntity> extends Controller
 
     try {
       await beforeSync?.call();
-      changePlan = await SyncService.sync<T>(
-        localDb: localDb,
-        remoteDb: remoteDb,
+      await SyncService.sync(
+        title: title,
         userId: userId(),
+        tables: getTables(),
         changeTrackerController: changeTrackerController,
-        localWhere: localWhere,
       );
-
       onSynced();
+      _isSyncing = false;
     } on AppException catch (e) {
       if (_isSyncing) {
         _syncError = e.message;
@@ -182,34 +161,33 @@ class SyncController<T extends MutableEntity> extends Controller
   }
 }
 
-SyncController<T> useSyncController<T extends MutableEntity>({
-  required HiveLocalDB<T> localDb,
-  required SupabaseRemoteDB<T> remoteDb,
+SyncController useSyncController({
+  required String title,
   required String Function() userId,
+  required List<SyncTable<dynamic>> Function() getTables,
   required VoidCallback onSynced,
-  bool Function(T item)? localWhere,
   Future<void> Function()? beforeSync,
+  List<Object?> keys = const [],
 }) {
-  final onSyncedRef = useRef(onSynced);
   final userIdRef = useRef(userId);
-  final localWhereRef = useRef(localWhere);
+  final getTablesRef = useRef(getTables);
+  final onSyncedRef = useRef(onSynced);
   final beforeSyncRef = useRef(beforeSync);
 
-  onSyncedRef.value = onSynced;
   userIdRef.value = userId;
-  localWhereRef.value = localWhere;
+  getTablesRef.value = getTables;
+  onSyncedRef.value = onSynced;
   beforeSyncRef.value = beforeSync;
 
   final controller = useMemoized(
-    () => SyncController<T>(
-      localDb: localDb,
-      remoteDb: remoteDb,
+    () => SyncController(
+      title: title,
       userId: () => userIdRef.value(),
+      getTables: () => getTablesRef.value(),
       onSynced: () => onSyncedRef.value(),
-      localWhere: (item) => localWhereRef.value?.call(item) ?? true,
       beforeSync: () => beforeSyncRef.value?.call() ?? Future.value(),
     ),
-    [localDb, remoteDb],
+    [title, ...keys],
   );
 
   useEffect(() => controller.dispose, [controller]);
