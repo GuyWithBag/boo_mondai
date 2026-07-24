@@ -5,8 +5,11 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/lib.barrel.dart' show AppColors, StudyRating;
+import 'package:boo_mondai/features/app_theme/app_theme.barrel.dart';
+import 'package:boo_mondai/lib.barrel.dart'
+    show StudyRating, AppTokens, AppColors, ThemeHelper;
 import 'package:flutter/material.dart';
+import 'package:theme_variants/theme_variants.dart';
 
 class AnswerResultTile extends StatelessWidget {
   const AnswerResultTile({
@@ -23,22 +26,23 @@ class AnswerResultTile extends StatelessWidget {
   // Helper to determine pass/fail for the leading icon
   bool get _isCorrect => type != StudyRating.incorrect;
 
-  // Helper to grab the correct display text based on the enum
-  String get _ratingLabel => switch (type) {
-    StudyRating.again => 'Again',
-    StudyRating.hard => 'Hard',
-    StudyRating.good => 'Good',
-    StudyRating.easy => 'Easy',
-    StudyRating.incorrect => '',
-  };
-
   @override
   Widget build(BuildContext context) {
-    return Card(
+    final tokens = context.themeTokens<AppTokens>();
+    final ratingColorSet = ThemeHelper.getStudyRatingColorSet(tokens, type);
+
+    return Surface(
+      style: surfaceStyle.resolve(tokens, const [
+        SurfaceShape.roundedSm,
+        SurfacePadding.sm,
+        // SurfaceBorder.none,
+      ]),
       child: ListTile(
         leading: Icon(
           _isCorrect ? Icons.check_circle : Icons.cancel,
-          color: _isCorrect ? AppColors.correct : AppColors.incorrect,
+          color: _isCorrect
+              ? tokens.colorActionSuccess
+              : tokens.colorActionError,
         ),
         title: Text(userAnswer.isEmpty ? '(no answer)' : userAnswer),
         trailing: isEjected
@@ -57,7 +61,7 @@ class AnswerResultTile extends StatelessWidget {
               )
             // If it's correct (not a typo), show the FSRS rating they gave it
             : type != StudyRating.incorrect
-            ? Chip(label: Text(_ratingLabel))
+            ? Chip(label: Text(ratingColorSet.name))
             : null,
       ),
     );

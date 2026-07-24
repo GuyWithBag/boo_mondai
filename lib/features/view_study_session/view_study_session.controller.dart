@@ -42,6 +42,9 @@ final class ViewStudySessionController extends Controller {
 
       if (_mode == SessionMode.review) {
         _context.read<StreakController>().recordActivity(DateTime.now());
+        final sessionId = _sessionController.session?.id;
+        if (sessionId == null) return;
+        _context.go('/review/$sessionId/result');
         return;
       }
 

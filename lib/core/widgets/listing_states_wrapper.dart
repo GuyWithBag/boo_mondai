@@ -6,12 +6,12 @@ class ListingStatesWrapper<T> extends StatelessWidget {
   /// Private base constructor. Handles the state logic.
   const ListingStatesWrapper({
     super.key,
-    required this.isLoading,
+    this.isLoading = false,
     this.exception,
     required this.items,
-    required this.emptyState,
-    required this.onRetry,
-    required this.skeletonTile,
+    this.emptyState,
+    this.onRetry,
+    this.skeletonTile,
     required this.itemBuilder,
     required this.layoutBuilder,
     this.leadingItem,
@@ -23,12 +23,12 @@ class ListingStatesWrapper<T> extends StatelessWidget {
   /// 1. Constructor for ListView.separated
   ListingStatesWrapper.list({
     super.key,
-    required this.isLoading,
+    this.isLoading = false,
     this.exception,
     required this.items,
-    required this.emptyState,
-    required this.onRetry,
-    required this.skeletonTile,
+    this.emptyState,
+    this.onRetry,
+    this.skeletonTile,
     required this.itemBuilder,
     EdgeInsetsGeometry padding = EdgeInsets.zero,
     double separatorHeight = 12.0,
@@ -60,16 +60,16 @@ class ListingStatesWrapper<T> extends StatelessWidget {
   /// 2. Constructor for GridView
   ListingStatesWrapper.grid({
     super.key,
-    required this.isLoading,
+    this.isLoading = false,
     this.exception,
     this.leadingItem,
     this.showLeadingItemAlways = true,
     this.header,
     this.showHeaderWhenEmpty = false,
     required this.items,
-    required this.emptyState,
-    required this.onRetry,
-    required this.skeletonTile,
+    this.emptyState,
+    this.onRetry,
+    this.skeletonTile,
     required this.itemBuilder,
     required SliverGridDelegate gridDelegate,
     EdgeInsetsGeometry padding = EdgeInsets.zero,
@@ -102,12 +102,12 @@ class ListingStatesWrapper<T> extends StatelessWidget {
   /// 3. Constructor for Wrap
   ListingStatesWrapper.wrap({
     super.key,
-    required this.isLoading,
+    this.isLoading = false,
     this.exception,
     required this.items,
-    required this.emptyState,
-    required this.onRetry,
-    required this.skeletonTile,
+    this.emptyState,
+    this.onRetry,
+    this.skeletonTile,
     required this.itemBuilder,
     this.leadingItem,
     this.showLeadingItemAlways = true,
@@ -135,9 +135,9 @@ class ListingStatesWrapper<T> extends StatelessWidget {
   final bool isLoading;
   final Exception? exception;
   final List<T> items;
-  final StatusLayoutState emptyState;
-  final VoidCallback onRetry;
-  final Widget skeletonTile;
+  final StatusLayoutState? emptyState;
+  final VoidCallback? onRetry;
+  final Widget? skeletonTile;
   final Widget Function(BuildContext context, int index, T item) itemBuilder;
   final Widget Function(
     BuildContext context,
@@ -165,7 +165,7 @@ class ListingStatesWrapper<T> extends StatelessWidget {
           child: layoutBuilder(
             context,
             6, // The number of dummy skeleton items to show
-            (context, index) => skeletonTile,
+            (context, index) => skeletonTile ?? SizedBox.shrink(),
           ),
         ),
       );
@@ -183,16 +183,16 @@ class ListingStatesWrapper<T> extends StatelessWidget {
     );
   }
 
-  Widget _withHeader(Widget body, {bool isEmpty = false}) {
+  Widget _withHeader(Widget? body, {bool isEmpty = false}) {
     final shouldShowHeader =
         header != null && (!isEmpty || showHeaderWhenEmpty);
-    if (!shouldShowHeader) return body;
+    if (!shouldShowHeader) return body ?? SizedBox.shrink();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         header!,
-        Expanded(child: body),
+        if (body != null) Expanded(child: body),
       ],
     );
   }

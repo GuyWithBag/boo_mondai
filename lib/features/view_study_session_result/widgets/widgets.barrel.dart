@@ -1,4 +1,3 @@
 export 'answer_result_tile.dart';
 export 'deck_review_row.dart';
-export 'review_prompt.dart';
-export 'score_reveal.dart';
+export 'study_rating_breakdown.dart';

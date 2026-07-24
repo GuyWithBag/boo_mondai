@@ -3,10 +3,10 @@
 // PURPOSE: Unified session interface for both Drill and Review modes
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/features/view_message_session_step/view_message_session_step.page.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppBar,
-        AppSpacing,
         AppTokens,
         BottomNavBar,
         Button,
@@ -90,59 +90,15 @@ class ViewStudySessionPage extends HookWidget {
 
     // 3. Handle Completion
     if (controller.isComplete) {
-      if (mode == SessionMode.drill) {
-        return const Scaffold(body: SizedBox.shrink());
-      } else {
-        return Scaffold(
-          body: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.auto_awesome, size: 80, color: Colors.orange),
-                const SizedBox(height: AppSpacing.lg),
-                const Text('Deck Review Finished!'),
-                const SizedBox(height: AppSpacing.lg),
-                Button(
-                  onPressed: studySessionPageController.onReviewCompletePressed,
-                  leading: const Icon(Icons.arrow_back),
-                  child: const Text('Back to Dashboard'),
-                ),
-              ],
-            ),
-          ),
-        );
-      }
+      return const Scaffold(body: SizedBox.shrink());
     }
 
     final step = controller.currentStep;
     if (step is MessageSessionStep) {
-      return Scaffold(
-        scrollable: false,
-        appBar: AppBar(
-          onPop: studySessionPageController.onSessionPop,
-          child: ProgressBar(value: controller.getProgressPercentage()),
-        ),
-        bottomNavBar: BottomNavBar(
-          child: Button(
-            onPressed: controller.advancePresentationStep,
-            child: const Text('Continue'),
-          ),
-        ),
-        inheritMainBottomNavBarHeight: false,
-        body: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                step.title,
-                style: Theme.of(context).textTheme.headlineMedium,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: AppSpacing.md),
-              Text(step.message, textAlign: TextAlign.center),
-            ],
-          ),
-        ),
+      return ViewMessageSessionStepPage(
+        step: step,
+        controller: controller,
+        studySessionPageController: studySessionPageController,
       );
     }
 

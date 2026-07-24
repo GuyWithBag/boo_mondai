@@ -17,7 +17,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         ViewLeaderboardPage,
         EditDeckPage,
         SessionMode,
-        ViewDrillResultPage,
+        ViewStudySessionResultPage,
         PlaceholderAppPage,
         AnswerSurveyPage,
         ChangeTrackerPage,
@@ -188,7 +188,8 @@ class Pages {
           pathParameters = const {},
           queryParameters = const {},
           extra,
-        }) => ViewDrillResultPage(sessionId: pathParameters['sessionId']!),
+        }) =>
+            ViewStudySessionResultPage(sessionId: pathParameters['sessionId']!),
   );
 
   static final reviewSession = AppPage(
@@ -202,6 +203,19 @@ class Pages {
           extra,
         }) =>
             const ViewStudySessionPage(deckId: null, mode: SessionMode.review),
+  );
+
+  static final reviewResult = AppPage(
+    url: '/review/:sessionId/result',
+    name: 'Review Result',
+    builder:
+        (
+          context, {
+          pathParameters = const {},
+          queryParameters = const {},
+          extra,
+        }) =>
+            ViewStudySessionResultPage(sessionId: pathParameters['sessionId']!),
   );
 
   static final reviewDeckSession = AppPage(
@@ -376,6 +390,7 @@ class Pages {
     drillSession,
     drillResult,
     reviewSession,
+    reviewResult,
     reviewDeckSession,
     changeReview,
     research,
