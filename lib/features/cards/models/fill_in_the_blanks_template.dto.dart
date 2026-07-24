@@ -26,8 +26,12 @@ class FillInTheBlanksTemplate extends CardTemplate
 
   @override
   bool checkAnswer(String userAnswer, {bool isReversed = false}) {
-    // Note: In your current UI, FitbInteraction handles the exact array matching
-    // and just submits true/false, but this satisfies the class contract.
-    return segments.any((s) => s.checkAnswer(userAnswer));
+    final answers = userAnswer.split('|');
+
+    return segments.isNotEmpty &&
+        answers.length == segments.length &&
+        segments.asMap().entries.every((entry) {
+          return entry.value.checkAnswer(answers[entry.key]);
+        });
   }
 }

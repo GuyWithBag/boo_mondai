@@ -59,7 +59,7 @@ class RatingArea extends HookWidget {
       final template = studySessionController.currentTemplate!;
       if (answer != null &&
           StudySessionHelper.isAutoGraded(template) &&
-          !StudySessionHelper.isAnswerCorrect(template, answer)) {
+          !template.checkAnswer(answer)) {
         interactionsController.reveal(
           studySessionController,
           pendingRating: StudyRating.incorrect,
@@ -87,7 +87,7 @@ class RatingArea extends HookWidget {
       final template = studySessionController.currentTemplate!;
       final effectiveType =
           StudySessionHelper.isAutoGraded(template) &&
-              !StudySessionHelper.isAnswerCorrect(template, answer)
+              !template.checkAnswer(answer)
           ? StudyRating.incorrect
           : type;
 

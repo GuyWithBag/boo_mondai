@@ -9,3 +9,4 @@ export 'matching_type.card.dart';
 export 'study_session.card_stage.dart';
 export 'flashcard.frontside.dart';
 export 'multiple_choice.card.dart';
+export 'rating_area.dart';

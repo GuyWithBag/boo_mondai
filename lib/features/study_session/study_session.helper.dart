@@ -29,19 +29,6 @@ abstract final class StudySessionHelper {
         template is FillInTheBlanksTemplate;
   }
 
-  static bool isAnswerCorrect(CardTemplate template, String userAnswer) {
-    if (template is FillInTheBlanksTemplate) {
-      final answers = userAnswer.split('|');
-      return template.segments.isNotEmpty &&
-          answers.length == template.segments.length &&
-          template.segments.asMap().entries.every((entry) {
-            return entry.value.checkAnswer(answers[entry.key]);
-          });
-    }
-
-    return template.checkAnswer(userAnswer);
-  }
-
   static String formatFsrsInterval(DateTime now, DateTime nextReview) {
     final diff = nextReview.difference(now);
     if (diff.inMinutes < 1) return '< 1m';
