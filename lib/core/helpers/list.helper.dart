@@ -17,4 +17,15 @@ abstract final class ListHelper {
     if (index < 0 || index >= values.length) return null;
     return values[index];
   }
+
+  static Map<K, List<T>> groupBy<T, K>(
+    Iterable<T> values,
+    K Function(T value) keyOf,
+  ) {
+    final grouped = <K, List<T>>{};
+    for (final value in values) {
+      (grouped[keyOf(value)] ??= <T>[]).add(value);
+    }
+    return grouped;
+  }
 }

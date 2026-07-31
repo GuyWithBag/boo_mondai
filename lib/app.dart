@@ -8,6 +8,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:media_variants/media_variants.dart';
 import 'package:theme_variants/theme_variants.dart';
 import 'package:boo_mondai/lib.barrel.dart';
 
@@ -39,23 +40,27 @@ class BooMondaiApp extends HookWidget {
       () => UserSettingsThemeBridge.createController(settingsController),
       [settingsController],
     );
+    final mediaPackController = useMemoized(createAppMediaPackController);
     useListenable(controller);
 
     return ThemeVariantsProvider<AppTokens>(
       controller: controller,
-      child: ScreenUtilInit(
-        designSize: Breakpoints.baseMobileSize,
-        minTextAdapt: true,
-        splitScreenMode: true,
-        enableScaleWH: _scaleScreenUtilForSmallAndMediumWidth,
-        enableScaleText: _scaleScreenUtilForSmallAndMediumWidth,
-        builder: (context, child) => MaterialApp.router(
-          title: 'BooMondai',
-          debugShowCheckedModeBanner: false,
-          theme: controller.getCurrentLightTheme().themeData,
-          darkTheme: controller.getCurrentDarkTheme().themeData,
-          themeMode: controller.themeMode,
-          routerConfig: router,
+      child: MediaPackProvider<AppMediaPack>(
+        controller: mediaPackController,
+        child: ScreenUtilInit(
+          designSize: Breakpoints.baseMobileSize,
+          minTextAdapt: true,
+          splitScreenMode: true,
+          enableScaleWH: _scaleScreenUtilForSmallAndMediumWidth,
+          enableScaleText: _scaleScreenUtilForSmallAndMediumWidth,
+          builder: (context, child) => MaterialApp.router(
+            title: 'BooMondai',
+            debugShowCheckedModeBanner: false,
+            theme: controller.getCurrentLightTheme().themeData,
+            darkTheme: controller.getCurrentDarkTheme().themeData,
+            themeMode: controller.themeMode,
+            routerConfig: router,
+          ),
         ),
       ),
     );
