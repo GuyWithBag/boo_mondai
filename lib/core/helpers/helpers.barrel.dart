@@ -18,3 +18,4 @@ export 'theme.helper.dart';
 export 'path.helper.dart';
 export 'study_rating.helper.dart';
 export 'study_session_step.helper.dart';
+export 'text.helper.dart';

@@ -3,7 +3,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         Controller,
         SettingsController,
         NotificationsService,
-        AppSetting,
+        SettingsService,
         LocalDB;
 
 /// High-level notification manager.
@@ -43,7 +43,7 @@ class NotificationsController extends Controller {
 
   /// Schedule (or cancel) the daily review reminder based on current settings.
   Future<void> scheduleReviewReminder() async {
-    final enabled = _settings.get(AppSetting.reviewRemindersEnabled);
+    final enabled = _settings.get(SettingsService.reviewRemindersEnabled);
     if (!enabled) {
       await NotificationsService.cancel(NotificationsService.reviewReminderId);
       return;
@@ -52,8 +52,8 @@ class NotificationsController extends Controller {
       id: NotificationsService.reviewReminderId,
       title: 'Time to review 🗂️',
       body: 'Your cards are waiting. Keep your streak going!',
-      hour: _settings.get(AppSetting.reviewReminderHour),
-      minute: _settings.get(AppSetting.reviewReminderMinute),
+      hour: _settings.get(SettingsService.reviewReminderHour),
+      minute: _settings.get(SettingsService.reviewReminderMinute),
     );
   }
 
@@ -62,7 +62,7 @@ class NotificationsController extends Controller {
   /// Also checks whether the user has already completed a review session
   /// today — if they have, the reminder is suppressed even if enabled.
   Future<void> scheduleStreakReminder() async {
-    final enabled = _settings.get(AppSetting.streakRemindersEnabled);
+    final enabled = _settings.get(SettingsService.streakRemindersEnabled);
     if (!enabled) {
       await NotificationsService.cancel(NotificationsService.streakReminderId);
       return;
@@ -79,8 +79,8 @@ class NotificationsController extends Controller {
       id: NotificationsService.streakReminderId,
       title: "Don't break your streak 🔥",
       body: 'A quick review is all it takes to keep it alive.',
-      hour: _settings.get(AppSetting.streakReminderHour),
-      minute: _settings.get(AppSetting.streakReminderMinute),
+      hour: _settings.get(SettingsService.streakReminderHour),
+      minute: _settings.get(SettingsService.streakReminderMinute),
     );
   }
 

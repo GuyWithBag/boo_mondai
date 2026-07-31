@@ -14,4 +14,3 @@ export 'strike_chip.dart';
 export 'word_chip_area.dart';
 export 'word_scramble_interaction.dart';
 export 'flashcard_interaction.dart';
-export 'rating_area.dart';

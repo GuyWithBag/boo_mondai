@@ -6,8 +6,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart'
-    show InputCard, FitbPreview, AppSpacing;
-import 'package:boo_mondai/core/helpers/text.helper.dart';
+    show InputCard, FitbPreview, AppSpacing, StringHelper;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
@@ -64,7 +63,7 @@ class FitbEditor extends HookWidget {
             validator: (value) {
               if (value == null || value.trim().isEmpty) return 'Required';
 
-              final answers = TextHelper.getTrimmedCommaSeparatedValues(value);
+              final answers = StringHelper.toTrimmedCommaSeparatedValues(value);
               if (answers.isEmpty) return 'Required';
 
               final sentence = sentenceController.text.trim().toLowerCase();

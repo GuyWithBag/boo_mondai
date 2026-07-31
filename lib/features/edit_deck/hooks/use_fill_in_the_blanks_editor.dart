@@ -1,4 +1,4 @@
-import 'package:boo_mondai/lib.barrel.dart' show TextHelper;
+import 'package:boo_mondai/lib.barrel.dart' show StringHelper;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
@@ -28,7 +28,7 @@ FillInTheBlanksEditorState useFillInTheBlanksEditor({
   useListenable(answersController);
 
   final sentence = sentenceController.text;
-  final answers = TextHelper.getTrimmedCommaSeparatedValues(
+  final answers = StringHelper.toTrimmedCommaSeparatedValues(
     answersController.text,
   );
   final selectedText = _selectedSentenceText(sentenceController);

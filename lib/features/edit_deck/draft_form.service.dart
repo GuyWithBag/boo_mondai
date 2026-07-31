@@ -18,6 +18,7 @@ import 'package:boo_mondai/features/edit_deck/helpers/edit_deck_question_type.he
 import 'package:boo_mondai/features/edit_deck/models/card_template.form_state.dart';
 import 'package:boo_mondai/features/edit_deck/models/deck_editor_types.dart';
 import 'package:boo_mondai/features/edit_deck/models/question_type.dart';
+import 'package:boo_mondai/lib.barrel.dart' show StringHelper;
 
 abstract interface class DraftFormAdapter<TDraft> {
   String draftId(TDraft draft);
@@ -372,7 +373,7 @@ class CardTemplateDraftFormAdapter implements DraftFormAdapter<CardTemplate> {
 
   List<FillInTheBlankSegment> _buildSegments(String templateId) {
     final sentence = formState.fillInTheBlankSentenceController.text.trim();
-    final answers = TextHelper.getTrimmedCommaSeparatedValues(
+    final answers = StringHelper.toTrimmedCommaSeparatedValues(
       formState.fillInTheBlankAnswersController.text,
     );
     if (sentence.isEmpty || answers.isEmpty) return [];

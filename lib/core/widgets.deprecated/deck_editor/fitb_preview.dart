@@ -6,8 +6,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppColors, AppSpacing, AppRadii;
-import 'package:boo_mondai/core/helpers/text.helper.dart';
+    show AppColors, AppSpacing, AppRadii, StringHelper;
 import 'package:flutter/material.dart';
 
 /// Shows a live preview of how a "Fill in the Blank" sentence will look to the user.
@@ -27,7 +26,7 @@ class FitbPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeColorScheme = Theme.of(context).colorScheme;
-    final answers = TextHelper.getTrimmedCommaSeparatedValues(answersRaw);
+    final answers = StringHelper.toTrimmedCommaSeparatedValues(answersRaw);
     final trimmedSentence = sentence.trim();
     final lowerSentence = trimmedSentence.toLowerCase();
 

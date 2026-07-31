@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:boo_mondai/lib.barrel.dart'
-    show TextHelper, ToolBarAction, ToolBarTextEditingControllerExtension;
+    show StringHelper, ToolBarAction, ToolBarTextEditingControllerExtension;
 
 final class KebabCaseToolBarAction extends ToolBarAction {
   const KebabCaseToolBarAction();
@@ -10,6 +10,6 @@ final class KebabCaseToolBarAction extends ToolBarAction {
 
   @override
   Future<void> perform(TextEditingController controller) async {
-    controller.transformSelectedTextOrCurrentWord(TextHelper.toKebabCase);
+    controller.transformSelectedTextOrCurrentWord(StringHelper.toKebabCase);
   }
 }

@@ -1,6 +1,6 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        TextHelper,
+        StringHelper,
         Deck,
         StoredMediaService,
         StoredMediaPathHelper,
@@ -10,18 +10,18 @@ final class ViewDeckListingSingleHelper {
   const ViewDeckListingSingleHelper();
 
   String title(Deck deck) {
-    return TextHelper.getTrimmedTextOrFallback(deck.title, 'Untitled deck');
+    return StringHelper.toTrimmedOrFallback(deck.title, 'Untitled deck');
   }
 
   String shortDescription(Deck deck) {
-    return TextHelper.getTrimmedTextOrFallback(
+    return StringHelper.toTrimmedOrFallback(
       deck.shortDescription,
       'No short description yet.',
     );
   }
 
   String longDescription(Deck deck) {
-    return TextHelper.getTrimmedTextOrFallback(
+    return StringHelper.toTrimmedOrFallback(
       deck.longDescription,
       'No long description yet.',
     );
@@ -36,7 +36,7 @@ final class ViewDeckListingSingleHelper {
   }
 
   String profileName(Deck deck) {
-    return TextHelper.getTrimmedTextOrFallback(
+    return StringHelper.toTrimmedOrFallback(
       deck.userProfile?.username,
       'Unknown author',
     );
@@ -45,7 +45,7 @@ final class ViewDeckListingSingleHelper {
   String? profileAvatarUrl(Deck deck) {
     final profile = deck.userProfile;
     if (profile == null) return null;
-    return TextHelper.getTrimmedTextOrNull(
+    return StringHelper.toTrimmedOrNull(
       StoredMediaService.getFileByPath(
             StoredMediaPathHelper.profileAvatar(),
           )?.path ??

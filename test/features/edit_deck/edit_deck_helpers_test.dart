@@ -7,7 +7,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         MultipleChoiceOptionData,
         MultipleChoiceOptionHelper,
         QuestionType,
-        TextHelper;
+        StringHelper;
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -77,7 +77,7 @@ void main() {
 
   group('TextHelper', () {
     test('splits comma separated text', () {
-      expect(TextHelper.getTrimmedCommaSeparatedValues('one, two, ,three'), [
+      expect(StringHelper.toTrimmedCommaSeparatedValues('one, two, ,three'), [
         'one',
         'two',
         'three',
