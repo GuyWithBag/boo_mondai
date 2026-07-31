@@ -3,13 +3,16 @@
 // PURPOSE: Unified session interface for both Drill and Review modes
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'dart:async';
+
 import 'package:boo_mondai/features/view_message_session_step/view_message_session_step.page.dart';
+import 'package:boo_mondai/features/ui_sounds/ui_sounds.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppBar,
+        AppMediaPack,
         AppTokens,
         BottomNavBar,
-        Button,
         ErrorState,
         ErrorText,
         FlashcardTemplate,
@@ -19,6 +22,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         Scaffold,
         SessionException,
         SessionMode,
+        SettingsController,
+        SettingsService,
         StudySessionCardStage,
         StudySessionController,
         TextColor,
@@ -32,6 +37,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         useStudySessionCardStageController;
 import 'package:flutter/material.dart' hide AppBar, Scaffold;
 import 'package:flutter_hooks/flutter_hooks.dart' show useEffect, HookWidget;
+import 'package:media_variants/media_variants.dart';
 import 'package:provider/provider.dart' show ReadContext;
 import 'package:theme_variants/theme_variants.dart';
 
@@ -77,6 +83,17 @@ class ViewStudySessionPage extends HookWidget {
     );
 
     useEffect(() {
+      if (controller.isComplete) {
+        unawaited(
+          UiSoundsService.playIfEnabled(
+            context.mediaPackController<AppMediaPack>().resolve(
+              (media) => media.studySessionCompleteSound,
+            ),
+            settingsController: context.read<SettingsController>(),
+            enabledSetting: SettingsService.uiSoundsEnabled,
+          ),
+        );
+      }
       studySessionPageController.onCompletion();
       return null;
     }, [controller.isComplete, controller.session?.id]);

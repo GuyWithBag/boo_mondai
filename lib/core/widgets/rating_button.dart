@@ -9,13 +9,16 @@ import 'package:boo_mondai/lib.barrel.dart'
         Button,
         ButtonColor,
         ButtonPadding,
+        SettingsService,
         StudyRating,
+        StudyRatingHelper,
         StudySessionController,
         TextSize,
         TextWeight,
         buttonStyle,
         textStyle;
 import 'package:flutter/material.dart';
+import 'package:media_variants/media_variants.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 class RatingButton extends StatelessWidget {
@@ -68,6 +71,10 @@ class RatingButton extends StatelessWidget {
         child: Button(
           onPressed: onTap,
           variants: variants,
+          buttonDownSound: (_) => const MediaAsset.none(),
+          buttonUpSound: StudyRatingHelper.getSound(type),
+          buttonDownSoundEnabledSetting: SettingsService.uiSoundsEnabled,
+          buttonUpSoundEnabledSetting: SettingsService.uiSoundsEnabled,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             spacing: tokens.spaceLayoutGapXsm,

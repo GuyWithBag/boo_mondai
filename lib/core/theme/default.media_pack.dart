@@ -7,5 +7,16 @@ const defaultMediaPack = MediaPack<AppMediaPack>(
   media: (
     buttonDownSound: MediaAsset.audio('assets/ui/button_down/minimalist_3.wav'),
     buttonUpSound: MediaAsset.audio('assets/ui/button_up/minimalist_1.wav'),
+    studySessionRevealSound: MediaAsset.none(),
+    studySessionCorrectSound: MediaAsset.none(),
+    studySessionIncorrectSound: MediaAsset.none(),
+    studySessionAgainSound: MediaAsset.none(),
+    studySessionHardSound: MediaAsset.none(),
+    studySessionGoodSound: MediaAsset.none(),
+    studySessionEasySound: MediaAsset.none(),
+    studySessionContinueSound: MediaAsset.none(),
+    studySessionCompleteSound: MediaAsset.none(),
+    studySessionSlowDownSound: MediaAsset.none(),
+    studySessionProgressMilestoneSound: MediaAsset.none(),
   ),
 );

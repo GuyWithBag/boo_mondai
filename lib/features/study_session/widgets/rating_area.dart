@@ -5,21 +5,31 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'dart:async';
+
 import 'package:boo_mondai/features/app_theme/app_theme.barrel.dart';
+import 'package:boo_mondai/features/ui_sounds/ui_sounds.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
+        AppMediaPack,
         StudyRating,
         StudySessionController,
         StudySessionCardStageController,
         AppTokens,
+        StudyRatingHelper,
         StudySessionHelper,
         Button,
         ButtonColor,
-        RatingButton;
+        MediaSelector,
+        RatingButton,
+        SettingsController,
+        SettingsService;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:media_variants/media_variants.dart';
+import 'package:provider/provider.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 // Custom intents for the keyboard shortcuts
@@ -50,6 +60,18 @@ class RatingArea extends HookWidget {
           studySessionController.currentTemplate!,
         );
     final String? answer = interactionsController.answer;
+    final mediaPackController = context.mediaPackController<AppMediaPack>();
+    final settingsController = context.read<SettingsController>();
+
+    void playStudySessionSound(MediaSelector<AppMediaPack> sound) {
+      unawaited(
+        UiSoundsService.playIfEnabled(
+          mediaPackController.resolve(sound),
+          settingsController: settingsController,
+          enabledSetting: SettingsService.uiSoundsEnabled,
+        ),
+      );
+    }
 
     void onSubmit() {
       if (!interactionsController.canReveal) {
@@ -57,16 +79,24 @@ class RatingArea extends HookWidget {
       }
 
       final template = studySessionController.currentTemplate!;
-      if (answer != null &&
-          StudySessionHelper.isAutoGraded(template) &&
-          !template.checkAnswer(answer)) {
-        interactionsController.reveal(
-          studySessionController,
-          pendingRating: StudyRating.incorrect,
-        );
+      if (answer != null && StudySessionHelper.isAutoGraded(template)) {
+        if (!template.checkAnswer(answer)) {
+          playStudySessionSound(
+            StudyRatingHelper.getSound(StudyRating.incorrect),
+          );
+          interactionsController.reveal(
+            studySessionController,
+            pendingRating: StudyRating.incorrect,
+          );
+          return;
+        }
+
+        playStudySessionSound((media) => media.studySessionCorrectSound);
+        interactionsController.reveal(studySessionController);
         return;
       }
 
+      playStudySessionSound((media) => media.studySessionRevealSound);
       interactionsController.reveal(studySessionController);
     }
 
@@ -76,10 +106,11 @@ class RatingArea extends HookWidget {
         return;
       }
 
+      playStudySessionSound((media) => media.studySessionContinueSound);
       studySessionController.submitAnswer(answer, pendingRating);
     }
 
-    void onRatingTap(StudyRating type) {
+    void onRatingTap(StudyRating type, {bool playSound = true}) {
       if (answer == null) {
         return;
       }
@@ -91,6 +122,9 @@ class RatingArea extends HookWidget {
           ? StudyRating.incorrect
           : type;
 
+      if (playSound) {
+        playStudySessionSound(StudyRatingHelper.getSound(effectiveType));
+      }
       studySessionController.submitAnswer(answer, effectiveType);
     }
 
@@ -210,22 +244,26 @@ class RatingArea extends HookWidget {
                   RatingButton(
                     StudyRating.again,
                     ctrl: studySessionController,
-                    onTap: () => onRatingTap(StudyRating.again),
+                    onTap: () =>
+                        onRatingTap(StudyRating.again, playSound: false),
                   ),
                   RatingButton(
                     StudyRating.hard,
                     ctrl: studySessionController,
-                    onTap: () => onRatingTap(StudyRating.hard),
+                    onTap: () =>
+                        onRatingTap(StudyRating.hard, playSound: false),
                   ),
                   RatingButton(
                     ctrl: studySessionController,
                     StudyRating.good,
-                    onTap: () => onRatingTap(StudyRating.good),
+                    onTap: () =>
+                        onRatingTap(StudyRating.good, playSound: false),
                   ),
                   RatingButton(
                     StudyRating.easy,
                     ctrl: studySessionController,
-                    onTap: () => onRatingTap(StudyRating.easy),
+                    onTap: () =>
+                        onRatingTap(StudyRating.easy, playSound: false),
                   ),
                 ],
               ),
