@@ -7,7 +7,7 @@ part 'sync_client.mapper.dart';
 class SyncClient with SyncClientMappable {
   const SyncClient({
     required this.id,
-    required this.userId,
+    required this.profileId,
     required this.createdAt,
     required this.lastSeenAt,
     this.lastSyncedAt,
@@ -15,17 +15,17 @@ class SyncClient with SyncClientMappable {
   });
 
   final String id;
-  final String userId;
+  final String profileId;
   final String? deviceName;
   final DateTime createdAt;
   final DateTime lastSeenAt;
   final DateTime? lastSyncedAt;
 
-  factory SyncClient.create({required String userId, String? deviceName}) {
+  factory SyncClient.create({required String profileId, String? deviceName}) {
     final now = DateTime.now();
     return SyncClient(
       id: uuid.v7(),
-      userId: userId,
+      profileId: profileId,
       deviceName: deviceName,
       createdAt: now,
       lastSeenAt: now,

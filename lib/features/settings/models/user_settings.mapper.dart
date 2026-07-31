@@ -22,9 +22,9 @@ class UserSettingsMapper extends ClassMapperBase<UserSettings> {
 
   static String _$id(UserSettings v) => v.id;
   static const Field<UserSettings, String> _f$id = Field('id', _$id);
-  static String _$userId(UserSettings v) => v.userId;
-  static const Field<UserSettings, String> _f$userId =
-      Field('userId', _$userId, key: r'user_id');
+  static String _$profileId(UserSettings v) => v.profileId;
+  static const Field<UserSettings, String> _f$profileId =
+      Field('profileId', _$profileId, key: r'profile_id');
   static Map<String, dynamic> _$preferences(UserSettings v) => v.preferences;
   static const Field<UserSettings, Map<String, dynamic>> _f$preferences =
       Field('preferences', _$preferences);
@@ -38,7 +38,7 @@ class UserSettingsMapper extends ClassMapperBase<UserSettings> {
   @override
   final MappableFields<UserSettings> fields = const {
     #id: _f$id,
-    #userId: _f$userId,
+    #profileId: _f$profileId,
     #preferences: _f$preferences,
     #createdAt: _f$createdAt,
     #updatedAt: _f$updatedAt,
@@ -47,7 +47,7 @@ class UserSettingsMapper extends ClassMapperBase<UserSettings> {
   static UserSettings _instantiate(DecodingData data) {
     return UserSettings(
         id: data.dec(_f$id),
-        userId: data.dec(_f$userId),
+        profileId: data.dec(_f$profileId),
         preferences: data.dec(_f$preferences),
         createdAt: data.dec(_f$createdAt),
         updatedAt: data.dec(_f$updatedAt));
@@ -110,7 +110,7 @@ abstract class UserSettingsCopyWith<$R, $In extends UserSettings, $Out>
       get preferences;
   $R call(
       {String? id,
-      String? userId,
+      String? profileId,
       Map<String, dynamic>? preferences,
       DateTime? createdAt,
       DateTime? updatedAt});
@@ -134,13 +134,13 @@ class _UserSettingsCopyWithImpl<$R, $Out>
   @override
   $R call(
           {String? id,
-          String? userId,
+          String? profileId,
           Map<String, dynamic>? preferences,
           DateTime? createdAt,
           DateTime? updatedAt}) =>
       $apply(FieldCopyWithData({
         if (id != null) #id: id,
-        if (userId != null) #userId: userId,
+        if (profileId != null) #profileId: profileId,
         if (preferences != null) #preferences: preferences,
         if (createdAt != null) #createdAt: createdAt,
         if (updatedAt != null) #updatedAt: updatedAt
@@ -148,7 +148,7 @@ class _UserSettingsCopyWithImpl<$R, $Out>
   @override
   UserSettings $make(CopyWithData data) => UserSettings(
       id: data.get(#id, or: $value.id),
-      userId: data.get(#userId, or: $value.userId),
+      profileId: data.get(#profileId, or: $value.profileId),
       preferences: data.get(#preferences, or: $value.preferences),
       createdAt: data.get(#createdAt, or: $value.createdAt),
       updatedAt: data.get(#updatedAt, or: $value.updatedAt));

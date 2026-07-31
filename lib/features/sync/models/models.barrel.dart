@@ -9,5 +9,5 @@ export 'sync.plan_step.dart';
 export 'typed_sync.plan_step.dart';
 export 'strategy_sync.plan_payload.dart';
 export 'sync.table.dart';
-export 'sync_deletion_policy.dart';
 export 'sync_client.dart';
+export 'sync_deletion_policy.dart';

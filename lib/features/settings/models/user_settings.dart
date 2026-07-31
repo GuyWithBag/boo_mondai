@@ -3,7 +3,7 @@ import 'package:boo_mondai/lib.barrel.dart'
 import 'package:dart_mappable/dart_mappable.dart';
 part 'user_settings.mapper.dart';
 
-/// Single settings row per user, stored as a typed key-value map.
+/// Single settings row per profile, stored as a typed key-value map.
 ///
 /// Add new settings via [Setting] constants — no model changes required.
 @MappableClass()
@@ -15,7 +15,7 @@ class UserSettings
         UserSettingsMappable {
   const UserSettings({
     required this.id,
-    required this.userId,
+    required this.profileId,
     required this.preferences,
     required this.createdAt,
     required this.updatedAt,
@@ -24,7 +24,7 @@ class UserSettings
   @override
   final String id;
   @override
-  final String userId;
+  final String profileId;
   @override
   final DateTime createdAt;
   @override
@@ -50,12 +50,12 @@ class UserSettings
   // Factory
   // ---------------------------------------------------------------------------
 
-  /// Creates a defaults row for [userId] with an empty preferences map.
-  factory UserSettings.defaults({required String userId}) {
+  /// Creates a defaults row for [profileId] with an empty preferences map.
+  factory UserSettings.defaults({required String profileId}) {
     final now = DateTime.now();
     return UserSettings(
       id: uuid.v7(),
-      userId: userId,
+      profileId: profileId,
       preferences: const {},
       createdAt: now,
       updatedAt: now,

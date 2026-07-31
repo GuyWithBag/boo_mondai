@@ -15,14 +15,14 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 class SyncController extends Controller {
   SyncController({
     required this.title,
-    required this.userId,
+    required this.profileId,
     required this.getTables,
     required this.onSynced,
     this.beforeSync,
   });
 
   final String title;
-  final String Function() userId;
+  final String Function() profileId;
   final List<SyncTable<dynamic>> Function() getTables;
   final VoidCallback onSynced;
   final Future<void> Function()? beforeSync;
@@ -138,7 +138,7 @@ class SyncController extends Controller {
       await beforeSync?.call();
       await SyncService.sync(
         title: title,
-        userId: userId(),
+        profileId: profileId(),
         tables: getTables(),
         changeTrackerController: changeTrackerController,
       );
@@ -163,18 +163,18 @@ class SyncController extends Controller {
 
 SyncController useSyncController({
   required String title,
-  required String Function() userId,
+  required String Function() profileId,
   required List<SyncTable<dynamic>> Function() getTables,
   required VoidCallback onSynced,
   Future<void> Function()? beforeSync,
   List<Object?> keys = const [],
 }) {
-  final userIdRef = useRef(userId);
+  final profileIdRef = useRef(profileId);
   final getTablesRef = useRef(getTables);
   final onSyncedRef = useRef(onSynced);
   final beforeSyncRef = useRef(beforeSync);
 
-  userIdRef.value = userId;
+  profileIdRef.value = profileId;
   getTablesRef.value = getTables;
   onSyncedRef.value = onSynced;
   beforeSyncRef.value = beforeSync;
@@ -182,7 +182,7 @@ SyncController useSyncController({
   final controller = useMemoized(
     () => SyncController(
       title: title,
-      userId: () => userIdRef.value(),
+      profileId: () => profileIdRef.value(),
       getTables: () => getTablesRef.value(),
       onSynced: () => onSyncedRef.value(),
       beforeSync: () => beforeSyncRef.value?.call() ?? Future.value(),

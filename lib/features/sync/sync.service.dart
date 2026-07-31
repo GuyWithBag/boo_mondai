@@ -14,8 +14,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         SyncTable;
 
 class SyncService {
-  static void _ensureAuthenticated({required String userId}) {
-    if (!AuthService.isAuthenticatedRemote || userId.trim().isEmpty) {
+  static void _ensureAuthenticated({required String profileId}) {
+    if (!AuthService.isAuthenticatedRemote || profileId.trim().isEmpty) {
       throw const SyncException(
         'Sign in to sync your data.',
         code: 'SYNC_AUTH_REQUIRED',
@@ -25,7 +25,7 @@ class SyncService {
 
   static Future<PreviewedChangePlan<StrategySyncPlanPayload, Object?>> sync({
     required String title,
-    required String userId,
+    required String profileId,
     required List<SyncTable<dynamic>> tables,
     required ChangeTrackerController changeTrackerController,
   }) async {
@@ -41,7 +41,7 @@ class SyncService {
       onChangeApply: () async {
         final changes = await SyncPlanStepApplier.applyAll(
           steps: syncPlan.payload.steps,
-          userId: userId,
+          profileId: profileId,
           onProgressChanged: (progress) {
             changeTrackerController.update(
               entryId,
@@ -50,7 +50,7 @@ class SyncService {
             );
           },
         );
-        await SyncClientService.markSynced(userId: userId);
+        await SyncClientService.markSynced(profileId: profileId);
         await SyncClientService.purgeRemoteTombstones();
         await SyncClientService.purgeLocalTombstones();
         return changes;
@@ -58,7 +58,7 @@ class SyncService {
       onChangeDiscard: () async {
         final changes = await SyncPlanStepApplier.discardAll(
           steps: syncPlan.payload.steps,
-          userId: userId,
+          profileId: profileId,
           onProgressChanged: (progress) {
             changeTrackerController.update(
               entryId,
@@ -67,7 +67,7 @@ class SyncService {
             );
           },
         );
-        await SyncClientService.markSynced(userId: userId);
+        await SyncClientService.markSynced(profileId: profileId);
         await SyncClientService.purgeRemoteTombstones();
         await SyncClientService.purgeLocalTombstones();
         return changes;
@@ -76,8 +76,8 @@ class SyncService {
     entryId = entry.id;
 
     try {
-      _ensureAuthenticated(userId: userId);
-      await SyncClientService.touchSeen(userId: userId);
+      _ensureAuthenticated(profileId: profileId);
+      await SyncClientService.touchSeen(profileId: profileId);
       changeTrackerController.update(
         entry.id,
         status: ChangeTrackerStatus.fetching,
@@ -85,7 +85,7 @@ class SyncService {
       );
 
       syncPlan = await previewSyncPlan(
-        userId: userId,
+        profileId: profileId,
         tables: tables,
         onProgressChanged: (progress) {
           changeTrackerController.update(
@@ -103,7 +103,7 @@ class SyncService {
           progress: 1,
           changes: const [],
         );
-        await SyncClientService.markSynced(userId: userId);
+        await SyncClientService.markSynced(profileId: profileId);
         await SyncClientService.purgeRemoteTombstones();
         await SyncClientService.purgeLocalTombstones();
         return syncPlan;
@@ -128,7 +128,7 @@ class SyncService {
 
   static Future<PreviewedChangePlan<StrategySyncPlanPayload, Object?>>
   previewSyncPlan({
-    required String userId,
+    required String profileId,
     required List<SyncTable<dynamic>> tables,
     void Function(double progress)? onProgressChanged,
   }) async {
@@ -144,7 +144,10 @@ class SyncService {
 
     for (var i = 0; i < tables.length; i++) {
       steps.add(
-        await SyncPlanStep.createFromTablePreview(tables[i], userId: userId),
+        await SyncPlanStep.createFromTablePreview(
+          tables[i],
+          profileId: profileId,
+        ),
       );
       onProgressChanged?.call((i + 1) / tables.length);
     }

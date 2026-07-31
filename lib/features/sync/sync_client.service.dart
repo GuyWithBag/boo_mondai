@@ -6,18 +6,24 @@ abstract final class SyncClientService {
     return LocalDB.syncClient.getOrCreate().id;
   }
 
-  static Future<void> touchSeen({required String userId}) async {
+  static Future<void> touchSeen({required String profileId}) async {
     final client = LocalDB.syncClient.getOrCreate();
-    await RemoteDB.syncClient.touchSeen(clientId: client.id, userId: userId);
+    await RemoteDB.syncClient.touchSeen(
+      clientId: client.id,
+      profileId: profileId,
+    );
   }
 
-  static Future<void> markSynced({required String userId}) async {
+  static Future<void> markSynced({required String profileId}) async {
     final client = LocalDB.syncClient.getOrCreate();
     final now = DateTime.now();
     await LocalDB.syncClient.upsert(
-      client.copyWith(userId: userId, lastSeenAt: now, lastSyncedAt: now),
+      client.copyWith(profileId: profileId, lastSeenAt: now, lastSyncedAt: now),
     );
-    await RemoteDB.syncClient.markSynced(clientId: client.id, userId: userId);
+    await RemoteDB.syncClient.markSynced(
+      clientId: client.id,
+      profileId: profileId,
+    );
   }
 
   static Future<void> purgeRemoteTombstones() {

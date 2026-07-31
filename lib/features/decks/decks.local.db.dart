@@ -39,42 +39,42 @@ class DecksLocalDB extends HiveLocalDB<Deck> {
     return deck == null ? null : _withLocalProfile(deck);
   }
 
-  List<Deck> getByCurrentUser() => guardSync(
+  List<Deck> getByCurrentProfile() => guardSync(
     () => selectMany()
-        .where((d) => d.userId == LocalDB.profile.getOrCreate().id)
+        .where((d) => d.profileId == LocalDB.profile.getOrCreate().id)
         .toList(),
-    action: 'getByCurrentUser',
+    action: 'getByCurrentProfile',
   );
 
-  List<Deck> getByUserId(String userId) => guardSync(
-    () => selectMany(where: (deck) => deck.userId == userId),
-    action: 'getByUserId($userId)',
+  List<Deck> getByProfileId(String profileId) => guardSync(
+    () => selectMany(where: (deck) => deck.profileId == profileId),
+    action: 'getByProfileId($profileId)',
   );
 
-  List<Deck> selectManyByUserIdAndOptionalDeckId({
-    required String userId,
+  List<Deck> selectManyByProfileIdAndOptionalDeckId({
+    required String profileId,
     String? deckId,
   }) => guardSync(
     () => selectMany(
       where: (deck) {
-        if (deck.userId != userId) return false;
+        if (deck.profileId != profileId) return false;
         return deckId == null || deck.id == deckId;
       },
     ),
-    action: 'selectManyByUserIdAndOptionalDeckId($userId, $deckId)',
+    action: 'selectManyByProfileIdAndOptionalDeckId($profileId, $deckId)',
   );
 
-  List<SyncIndexEntry> selectSyncIndexByUserIdAndOptionalDeckId({
-    required String userId,
+  List<SyncIndexEntry> selectSyncIndexByProfileIdAndOptionalDeckId({
+    required String profileId,
     String? deckId,
   }) => selectSyncIndexWhere(
     where: (deck) {
-      if (deck.userId != userId) return false;
+      if (deck.profileId != profileId) return false;
       return deckId == null || deck.id == deckId;
     },
     getId: (deck) => deck.id,
     getUpdatedAt: (deck) => deck.updatedAt,
-    action: 'selectSyncIndexByUserIdAndOptionalDeckId($userId, $deckId)',
+    action: 'selectSyncIndexByProfileIdAndOptionalDeckId($profileId, $deckId)',
   );
 
   List<Deck> selectManyByIds(List<String> ids) => guardSync(
@@ -92,7 +92,7 @@ class DecksLocalDB extends HiveLocalDB<Deck> {
     final normalizedQuery = query.trim().toLowerCase();
     final currentProfileId = LocalDB.profile.getOrCreate().id;
     final filtered = selectMany().where((deck) {
-      if (deck.userId != currentProfileId) return false;
+      if (deck.profileId != currentProfileId) return false;
       if (normalizedQuery.isEmpty) return true;
       return deck.title.toLowerCase().contains(normalizedQuery) ||
           deck.shortDescription.toLowerCase().contains(normalizedQuery) ||
@@ -128,7 +128,7 @@ class DecksLocalDB extends HiveLocalDB<Deck> {
     if (deck.userProfile != null) return deck;
 
     final profile = LocalDB.profile.getOrCreate();
-    if (deck.userId != profile.id) return deck;
+    if (deck.profileId != profile.id) return deck;
 
     return deck.copyWith(
       userProfile: CachedProfile(

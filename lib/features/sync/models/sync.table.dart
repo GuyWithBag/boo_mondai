@@ -10,18 +10,20 @@ import 'package:boo_mondai/lib.barrel.dart'
         SyncStrategyPullPushPlan,
         TimeHelper;
 
-typedef SyncIndexGetter = Future<List<SyncIndexEntry>> Function(String userId);
+typedef SyncIndexGetter =
+    Future<List<SyncIndexEntry>> Function(String profileId);
 typedef SyncItemsByIdsGetter<T> =
-    Future<List<T>> Function(String userId, List<String> ids);
-typedef SyncPushItemPreprocessor<T> = Future<T> Function(T item, String userId);
+    Future<List<T>> Function(String profileId, List<String> ids);
+typedef SyncPushItemPreprocessor<T> =
+    Future<T> Function(T item, String profileId);
 typedef SyncDeletedAtGetter<T> = DateTime? Function(T item);
 typedef SyncDeleteRemoteItemById = Future<void> Function(String id);
 typedef SyncPlanGetter<T> =
-    Future<SyncStrategyPullPushPlan<T>> Function(String userId);
+    Future<SyncStrategyPullPushPlan<T>> Function(String profileId);
 typedef SyncPlanApplier<T> =
     Future<List<ChangedEntity<T>>> Function(
       SyncStrategyPullPushPlan<T> plan,
-      String userId,
+      String profileId,
     );
 
 enum SyncTableMode { newestWins, appendOnly, custom }
@@ -103,24 +105,24 @@ class SyncTable<T> {
   final SyncPlanApplier<T>? applyPlan;
 
   Future<SyncStrategyPullPushPlan<T>> getSyncPlan({
-    required String userId,
+    required String profileId,
   }) async {
     final customGetter = getPlan;
-    if (customGetter != null) return customGetter(userId);
+    if (customGetter != null) return customGetter(profileId);
 
     return switch (mode) {
-      SyncTableMode.newestWins => _getNewestWinsSyncPlan(userId),
-      SyncTableMode.appendOnly => _getAppendOnlySyncPlan(userId),
+      SyncTableMode.newestWins => _getNewestWinsSyncPlan(profileId),
+      SyncTableMode.appendOnly => _getAppendOnlySyncPlan(profileId),
       SyncTableMode.custom => throw StateError('$name has no custom plan.'),
     };
   }
 
   Future<List<ChangedEntity<T>>> applySyncPlan(
     SyncStrategyPullPushPlan<T> plan, {
-    required String userId,
+    required String profileId,
   }) async {
     final customApplier = applyPlan;
-    if (customApplier != null) return customApplier(plan, userId);
+    if (customApplier != null) return customApplier(plan, profileId);
 
     final pullApplier = applyPullItem;
     final pushApplier = applyPushItem;
@@ -132,7 +134,7 @@ class SyncTable<T> {
       await pullApplier(remote);
     }
     for (final local in plan.pushItems) {
-      final pushItem = await _preprocessPushItem(local, userId);
+      final pushItem = await _preprocessPushItem(local, profileId);
       await pushApplier(pushItem);
     }
     return plan.changes;
@@ -140,7 +142,7 @@ class SyncTable<T> {
 
   Future<List<ChangedEntity<T>>> discardRemoteChanges(
     SyncStrategyPullPushPlan<T> plan, {
-    required String userId,
+    required String profileId,
   }) async {
     final pullApplier = applyPullItem;
     final pushApplier = applyPushItem;
@@ -155,7 +157,7 @@ class SyncTable<T> {
       final id = _getItemId(local);
       final mirrored = await _pushLocalAndMirrorSavedRemote(
         local: local,
-        userId: userId,
+        profileId: profileId,
         pushApplier: pushApplier,
         pullApplier: pullApplier,
       );
@@ -202,7 +204,7 @@ class SyncTable<T> {
 
       final mirrored = await _pushLocalAndMirrorSavedRemote(
         local: local,
-        userId: userId,
+        profileId: profileId,
         pushApplier: pushApplier,
         pullApplier: pullApplier,
       );
@@ -228,15 +230,15 @@ class SyncTable<T> {
 
   Future<T> _pushLocalAndMirrorSavedRemote({
     required T local,
-    required String userId,
+    required String profileId,
     required Future<void> Function(T item) pushApplier,
     required Future<void> Function(T item) pullApplier,
   }) async {
     final id = _getItemId(local);
-    final pushItem = await _preprocessPushItem(local, userId);
+    final pushItem = await _preprocessPushItem(local, profileId);
     await pushApplier(pushItem);
 
-    final savedRemoteItems = await _getRemoteItemsByIds(userId, [id]);
+    final savedRemoteItems = await _getRemoteItemsByIds(profileId, [id]);
     final savedRemote = savedRemoteItems.isEmpty
         ? pushItem
         : savedRemoteItems.first;
@@ -245,9 +247,9 @@ class SyncTable<T> {
   }
 
   Future<SyncStrategyPullPushPlan<T>> _getNewestWinsSyncPlan(
-    String userId,
+    String profileId,
   ) async {
-    final comparison = await _compareNewestWinsIndexes(userId);
+    final comparison = await _compareNewestWinsIndexes(profileId);
     final localIndexById = comparison.localIndexById;
     final remoteIndexById = comparison.remoteIndexById;
     final pullAddedIds = comparison.pullAddedIds;
@@ -256,14 +258,14 @@ class SyncTable<T> {
     final pushModifiedIds = comparison.pushModifiedIds;
     final changes = <ChangedEntity<T>>[];
 
-    final pullItems = await _getRemoteItemsByIds(userId, comparison.pullIds);
-    final pushItems = await _getLocalItemsByIds(userId, comparison.pushIds);
+    final pullItems = await _getRemoteItemsByIds(profileId, comparison.pullIds);
+    final pushItems = await _getLocalItemsByIds(profileId, comparison.pushIds);
     final localModifiedItems = await _getLocalItemsByIds(
-      userId,
+      profileId,
       pullModifiedIds,
     );
     final remoteModifiedItems = await _getRemoteItemsByIds(
-      userId,
+      profileId,
       pushModifiedIds,
     );
 
@@ -373,11 +375,11 @@ class SyncTable<T> {
   }
 
   Future<SyncStrategyPullPushPlan<T>> _getAppendOnlySyncPlan(
-    String userId,
+    String profileId,
   ) async {
-    final comparison = await _compareAppendOnlyIndexes(userId);
-    final pullItems = await _getRemoteItemsByIds(userId, comparison.pullIds);
-    final pushItems = await _getLocalItemsByIds(userId, comparison.pushIds);
+    final comparison = await _compareAppendOnlyIndexes(profileId);
+    final pullItems = await _getRemoteItemsByIds(profileId, comparison.pullIds);
+    final pushItems = await _getLocalItemsByIds(profileId, comparison.pushIds);
     final changes = <ChangedEntity<T>>[];
 
     for (final remote in pullItems) {
@@ -417,10 +419,10 @@ class SyncTable<T> {
   }
 
   Future<_NewestWinsIndexComparison> _compareNewestWinsIndexes(
-    String userId,
+    String profileId,
   ) async {
-    final localIndexData = await _getLocalIndex(userId);
-    final remoteIndexData = await _getRemoteIndex(userId);
+    final localIndexData = await _getLocalIndex(profileId);
+    final remoteIndexData = await _getRemoteIndex(profileId);
     final localIndexById = {
       for (final entry in localIndexData) entry.id: entry,
     };
@@ -472,10 +474,10 @@ class SyncTable<T> {
   }
 
   Future<_AppendOnlyIndexComparison> _compareAppendOnlyIndexes(
-    String userId,
+    String profileId,
   ) async {
-    final localIndexData = await _getLocalIndex(userId);
-    final remoteIndexData = await _getRemoteIndex(userId);
+    final localIndexData = await _getLocalIndex(profileId);
+    final remoteIndexData = await _getRemoteIndex(profileId);
     final localIds = {for (final item in localIndexData) item.id};
     final remoteIds = {for (final item in remoteIndexData) item.id};
     final pullIds = <String>[];
@@ -502,11 +504,11 @@ class SyncTable<T> {
     );
   }
 
-  Future<T> _preprocessPushItem(T item, String userId) {
+  Future<T> _preprocessPushItem(T item, String profileId) {
     final preprocessor = preprocessPushItem;
     return preprocessor == null
         ? Future.value(item)
-        : preprocessor(item, userId);
+        : preprocessor(item, profileId);
   }
 
   ChangeType _changeTypeFor(T item, {required ChangeType fallback}) {
@@ -528,28 +530,28 @@ class SyncTable<T> {
     );
   }
 
-  Future<List<SyncIndexEntry>> _getLocalIndex(String userId) {
+  Future<List<SyncIndexEntry>> _getLocalIndex(String profileId) {
     final getter = getLocalIndex;
     if (getter == null) throw StateError('$name has no local index getter.');
-    return getter(userId);
+    return getter(profileId);
   }
 
-  Future<List<SyncIndexEntry>> _getRemoteIndex(String userId) {
+  Future<List<SyncIndexEntry>> _getRemoteIndex(String profileId) {
     final getter = getRemoteIndex;
     if (getter == null) throw StateError('$name has no remote index getter.');
-    return getter(userId);
+    return getter(profileId);
   }
 
-  Future<List<T>> _getLocalItemsByIds(String userId, List<String> ids) {
+  Future<List<T>> _getLocalItemsByIds(String profileId, List<String> ids) {
     final getter = getLocalItemsByIds;
     if (getter == null) throw StateError('$name has no local item getter.');
-    return getter(userId, ids);
+    return getter(profileId, ids);
   }
 
-  Future<List<T>> _getRemoteItemsByIds(String userId, List<String> ids) {
+  Future<List<T>> _getRemoteItemsByIds(String profileId, List<String> ids) {
     final getter = getRemoteItemsByIds;
     if (getter == null) throw StateError('$name has no remote item getter.');
-    return getter(userId, ids);
+    return getter(profileId, ids);
   }
 
   String _getItemId(T item) {

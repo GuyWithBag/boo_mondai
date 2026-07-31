@@ -5,7 +5,7 @@ class SyncPlanStepApplier {
 
   static Future<List<ChangedEntity<Object?>>> applyAll({
     required List<SyncPlanStep> steps,
-    required String userId,
+    required String profileId,
     void Function(double progress)? onProgressChanged,
   }) async {
     final appliedChanges = <ChangedEntity<Object?>>[];
@@ -17,7 +17,7 @@ class SyncPlanStepApplier {
 
     for (var i = 0; i < steps.length; i++) {
       onProgressChanged?.call(i / steps.length);
-      appliedChanges.addAll(await steps[i].apply(userId: userId));
+      appliedChanges.addAll(await steps[i].apply(profileId: profileId));
     }
 
     onProgressChanged?.call(1);
@@ -26,7 +26,7 @@ class SyncPlanStepApplier {
 
   static Future<List<ChangedEntity<Object?>>> discardAll({
     required List<SyncPlanStep> steps,
-    required String userId,
+    required String profileId,
     void Function(double progress)? onProgressChanged,
   }) async {
     final appliedChanges = <ChangedEntity<Object?>>[];
@@ -39,7 +39,9 @@ class SyncPlanStepApplier {
     final reversedSteps = steps.reversed.toList(growable: false);
     for (var i = 0; i < reversedSteps.length; i++) {
       onProgressChanged?.call(i / reversedSteps.length);
-      appliedChanges.addAll(await reversedSteps[i].discard(userId: userId));
+      appliedChanges.addAll(
+        await reversedSteps[i].discard(profileId: profileId),
+      );
     }
 
     onProgressChanged?.call(1);

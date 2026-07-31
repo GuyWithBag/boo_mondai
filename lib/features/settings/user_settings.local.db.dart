@@ -7,19 +7,22 @@ class UserSettingsLocalDB extends HiveLocalDB<UserSettings> {
   @override
   Map<String, Object?> primaryKeyFromItem(UserSettings item) => {'id': item.id};
 
-  /// Returns the settings row for [userId], or null if none exists.
-  UserSettings? getByUserId(String userId) {
-    final rows = selectMany(where: (row) => row.userId == userId, limit: 1);
+  /// Returns the settings row for [profileId], or null if none exists.
+  UserSettings? getByProfileId(String profileId) {
+    final rows = selectMany(
+      where: (row) => row.profileId == profileId,
+      limit: 1,
+    );
     return rows.isEmpty ? null : rows.first;
   }
 
-  /// Returns existing settings for [userId], or creates and persists
+  /// Returns existing settings for [profileId], or creates and persists
   /// a defaults row if none exists.
-  UserSettings getOrCreateByUserId(String userId) {
-    final existing = getByUserId(userId);
+  UserSettings getOrCreateByProfileId(String profileId) {
+    final existing = getByProfileId(profileId);
     if (existing != null) return existing;
 
-    final defaults = UserSettings.defaults(userId: userId);
+    final defaults = UserSettings.defaults(profileId: profileId);
     upsert(defaults); // fire-and-forget, errors surfaced via guard()
     return defaults;
   }

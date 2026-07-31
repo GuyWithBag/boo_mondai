@@ -15,24 +15,24 @@ class SyncClientsRemoteDB extends SupabaseRemoteDB<SyncClient> {
   @override
   Map<String, Object?> primaryKeyFromItem(SyncClient item) => {
     'id': item.id,
-    'user_id': item.userId,
+    'profile_id': item.profileId,
   };
 
   @override
-  String get upsertConflictTarget => 'id,user_id';
+  String get upsertConflictTarget => 'id,profile_id';
 
   Future<void> touchSeen({
     required String clientId,
-    required String userId,
+    required String profileId,
   }) async {
     final now = DateTime.now();
-    final primaryKey = {'id': clientId, 'user_id': userId};
+    final primaryKey = {'id': clientId, 'profile_id': profileId};
     final existing = await selectOne(filters: primaryKey);
     if (existing == null) {
       await upsert(
         SyncClient(
           id: clientId,
-          userId: userId,
+          profileId: profileId,
           createdAt: now,
           lastSeenAt: now,
         ),
@@ -48,16 +48,16 @@ class SyncClientsRemoteDB extends SupabaseRemoteDB<SyncClient> {
 
   Future<void> markSynced({
     required String clientId,
-    required String userId,
+    required String profileId,
   }) async {
     final now = DateTime.now();
-    final primaryKey = {'id': clientId, 'user_id': userId};
+    final primaryKey = {'id': clientId, 'profile_id': profileId};
     final existing = await selectOne(filters: primaryKey);
     if (existing == null) {
       await upsert(
         SyncClient(
           id: clientId,
-          userId: userId,
+          profileId: profileId,
           createdAt: now,
           lastSeenAt: now,
           lastSyncedAt: now,
@@ -75,12 +75,12 @@ class SyncClientsRemoteDB extends SupabaseRemoteDB<SyncClient> {
     );
   }
 
-  Future<List<SyncClient>> selectActiveByUserId({
-    required String userId,
+  Future<List<SyncClient>> selectActiveByProfileId({
+    required String profileId,
     required Duration activeClientWindow,
   }) {
     final cutoff = DateTime.now().subtract(activeClientWindow);
-    return selectMany(filters: {'user_id': userId}).then(
+    return selectMany(filters: {'profile_id': profileId}).then(
       (clients) => clients
           .where((client) => client.lastSeenAt.isAfter(cutoff))
           .toList(growable: false),

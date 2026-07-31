@@ -22,9 +22,9 @@ class SyncClientMapper extends ClassMapperBase<SyncClient> {
 
   static String _$id(SyncClient v) => v.id;
   static const Field<SyncClient, String> _f$id = Field('id', _$id);
-  static String _$userId(SyncClient v) => v.userId;
-  static const Field<SyncClient, String> _f$userId =
-      Field('userId', _$userId, key: r'user_id');
+  static String _$profileId(SyncClient v) => v.profileId;
+  static const Field<SyncClient, String> _f$profileId =
+      Field('profileId', _$profileId, key: r'profile_id');
   static DateTime _$createdAt(SyncClient v) => v.createdAt;
   static const Field<SyncClient, DateTime> _f$createdAt =
       Field('createdAt', _$createdAt, key: r'created_at');
@@ -41,7 +41,7 @@ class SyncClientMapper extends ClassMapperBase<SyncClient> {
   @override
   final MappableFields<SyncClient> fields = const {
     #id: _f$id,
-    #userId: _f$userId,
+    #profileId: _f$profileId,
     #createdAt: _f$createdAt,
     #lastSeenAt: _f$lastSeenAt,
     #lastSyncedAt: _f$lastSyncedAt,
@@ -51,7 +51,7 @@ class SyncClientMapper extends ClassMapperBase<SyncClient> {
   static SyncClient _instantiate(DecodingData data) {
     return SyncClient(
         id: data.dec(_f$id),
-        userId: data.dec(_f$userId),
+        profileId: data.dec(_f$profileId),
         createdAt: data.dec(_f$createdAt),
         lastSeenAt: data.dec(_f$lastSeenAt),
         lastSyncedAt: data.dec(_f$lastSyncedAt),
@@ -112,7 +112,7 @@ abstract class SyncClientCopyWith<$R, $In extends SyncClient, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   $R call(
       {String? id,
-      String? userId,
+      String? profileId,
       DateTime? createdAt,
       DateTime? lastSeenAt,
       DateTime? lastSyncedAt,
@@ -131,14 +131,14 @@ class _SyncClientCopyWithImpl<$R, $Out>
   @override
   $R call(
           {String? id,
-          String? userId,
+          String? profileId,
           DateTime? createdAt,
           DateTime? lastSeenAt,
           Object? lastSyncedAt = $none,
           Object? deviceName = $none}) =>
       $apply(FieldCopyWithData({
         if (id != null) #id: id,
-        if (userId != null) #userId: userId,
+        if (profileId != null) #profileId: profileId,
         if (createdAt != null) #createdAt: createdAt,
         if (lastSeenAt != null) #lastSeenAt: lastSeenAt,
         if (lastSyncedAt != $none) #lastSyncedAt: lastSyncedAt,
@@ -147,7 +147,7 @@ class _SyncClientCopyWithImpl<$R, $Out>
   @override
   SyncClient $make(CopyWithData data) => SyncClient(
       id: data.get(#id, or: $value.id),
-      userId: data.get(#userId, or: $value.userId),
+      profileId: data.get(#profileId, or: $value.profileId),
       createdAt: data.get(#createdAt, or: $value.createdAt),
       lastSeenAt: data.get(#lastSeenAt, or: $value.lastSeenAt),
       lastSyncedAt: data.get(#lastSyncedAt, or: $value.lastSyncedAt),

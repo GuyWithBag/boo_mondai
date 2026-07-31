@@ -12,7 +12,7 @@ part 'study_session.dto.mapper.dart';
 @MappableClass(discriminatorKey: 'session_type')
 abstract class StudySession with StudySessionMappable {
   final String id;
-  final String userId;
+  final String profileId;
   final String? deckId;
   final DateTime startedAt;
   final DateTime? completedAt;
@@ -21,7 +21,7 @@ abstract class StudySession with StudySessionMappable {
 
   const StudySession({
     required this.id,
-    required this.userId,
+    required this.profileId,
     this.deckId,
     required this.startedAt,
     this.completedAt,

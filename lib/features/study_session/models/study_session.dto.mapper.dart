@@ -24,9 +24,9 @@ class StudySessionMapper extends ClassMapperBase<StudySession> {
 
   static String _$id(StudySession v) => v.id;
   static const Field<StudySession, String> _f$id = Field('id', _$id);
-  static String _$userId(StudySession v) => v.userId;
-  static const Field<StudySession, String> _f$userId =
-      Field('userId', _$userId, key: r'user_id');
+  static String _$profileId(StudySession v) => v.profileId;
+  static const Field<StudySession, String> _f$profileId =
+      Field('profileId', _$profileId, key: r'profile_id');
   static String? _$deckId(StudySession v) => v.deckId;
   static const Field<StudySession, String> _f$deckId =
       Field('deckId', _$deckId, key: r'deck_id', opt: true);
@@ -46,7 +46,7 @@ class StudySessionMapper extends ClassMapperBase<StudySession> {
   @override
   final MappableFields<StudySession> fields = const {
     #id: _f$id,
-    #userId: _f$userId,
+    #profileId: _f$profileId,
     #deckId: _f$deckId,
     #startedAt: _f$startedAt,
     #completedAt: _f$completedAt,
@@ -82,7 +82,7 @@ abstract class StudySessionCopyWith<$R, $In extends StudySession, $Out>
   DeckCopyWith<$R, Deck, Deck>? get deck;
   $R call(
       {String? id,
-      String? userId,
+      String? profileId,
       String? deckId,
       DateTime? startedAt,
       DateTime? completedAt,

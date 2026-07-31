@@ -13,5 +13,5 @@ export 'sync_plan_step_applier.dart';
 export 'sync.service.dart';
 export 'sync.controller.dart';
 export 'sync_client.local.db.dart';
-export 'sync_clients.remote.db.dart';
 export 'sync_client.service.dart';
+export 'sync_clients.remote.db.dart';

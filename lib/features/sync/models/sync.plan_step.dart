@@ -4,9 +4,9 @@ import 'package:boo_mondai/lib.barrel.dart'
 abstract class SyncPlanStep {
   static Future<SyncPlanStep> createFromTablePreview<T>(
     SyncTable<T> table, {
-    required String userId,
+    required String profileId,
   }) async {
-    final plan = await table.getSyncPlan(userId: userId);
+    final plan = await table.getSyncPlan(profileId: profileId);
     return TypedSyncPlanStep<T>(table: table, plan: plan);
   }
 
@@ -14,6 +14,6 @@ abstract class SyncPlanStep {
   int get pullCount;
   int get pushCount;
   int get skipped;
-  Future<List<ChangedEntity<Object?>>> apply({required String userId});
-  Future<List<ChangedEntity<Object?>>> discard({required String userId});
+  Future<List<ChangedEntity<Object?>>> apply({required String profileId});
+  Future<List<ChangedEntity<Object?>>> discard({required String profileId});
 }

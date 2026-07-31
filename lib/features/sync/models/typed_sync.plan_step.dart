@@ -21,14 +21,21 @@ class TypedSyncPlanStep<T> implements SyncPlanStep {
   int get skipped => plan.skipped;
 
   @override
-  Future<List<ChangedEntity<Object?>>> apply({required String userId}) async {
-    final applied = await table.applySyncPlan(plan, userId: userId);
+  Future<List<ChangedEntity<Object?>>> apply({
+    required String profileId,
+  }) async {
+    final applied = await table.applySyncPlan(plan, profileId: profileId);
     return applied.cast<ChangedEntity<Object?>>();
   }
 
   @override
-  Future<List<ChangedEntity<Object?>>> discard({required String userId}) async {
-    final applied = await table.discardRemoteChanges(plan, userId: userId);
+  Future<List<ChangedEntity<Object?>>> discard({
+    required String profileId,
+  }) async {
+    final applied = await table.discardRemoteChanges(
+      plan,
+      profileId: profileId,
+    );
     return applied.cast<ChangedEntity<Object?>>();
   }
 }
