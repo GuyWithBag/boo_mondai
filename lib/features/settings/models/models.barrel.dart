@@ -2,4 +2,6 @@
 
 // Other files
 export 'user_settings.dart';
-export 'app_setting.dart';
+export 'setting.dart';
+export 'setting.path.dart';
+export 'setting.tile_entry.dart';

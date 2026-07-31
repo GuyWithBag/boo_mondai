@@ -1,171 +1,97 @@
-import 'package:flutter/material.dart';
+import 'package:boo_mondai/lib.barrel.dart'
+    show
+        ListHelper,
+        PathHelper,
+        StringHelper,
+        SettingsController,
+        SettingTileEntry,
+        SettingsService,
+        SettingsTile,
+        SettingsSection,
+        ListingStatesWrapper,
+        AppBar,
+        Scaffold,
+        AppTokens;
+import 'package:flutter/material.dart' hide Scaffold, AppBar;
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-
-import '../settings/models/app_setting.dart';
-import 'settings.controller.dart';
+import 'package:theme_variants/theme_variants.dart';
 
 class SettingsPage extends StatelessWidget {
-  const SettingsPage({super.key});
+  const SettingsPage({super.key, this.pagePath});
+
+  final String? pagePath;
 
   @override
   Widget build(BuildContext context) {
+    final pagePath = this.pagePath;
+    if (pagePath == null) {
+      return const _SettingsIndexPage();
+    }
+    final tokens = context.themeTokens<AppTokens>();
     // Watch so the page rebuilds when any setting changes.
-    final ctrl = context.watch<SettingsController>();
+    final controller = context.watch<SettingsController>();
+    final entries = SettingsService.uiForPage(pagePath);
+    final sections = ListHelper.groupBy<SettingTileEntry<dynamic>, String>(
+      entries,
+      (entry) => entry.path.section,
+    );
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
-      body: ListView(
-        children: [
-          _SettingsSection(
-            title: 'Notifications',
-            children: [
-              _SwitchTile(
-                label: 'Review reminders',
-                description: 'Daily reminder to review your due cards.',
-                value: ctrl.get(AppSetting.reviewRemindersEnabled),
-                onChanged: (v) =>
-                    ctrl.set(AppSetting.reviewRemindersEnabled, v),
-              ),
-              if (ctrl.get(AppSetting.reviewRemindersEnabled))
-                _TimeTile(
-                  label: 'Review reminder time',
-                  description: 'When to send the daily review reminder.',
-                  hour: ctrl.get(AppSetting.reviewReminderHour),
-                  minute: ctrl.get(AppSetting.reviewReminderMinute),
-                  onTimePicked: (picked) async {
-                    await ctrl.set(AppSetting.reviewReminderHour, picked.hour);
-                    await ctrl.set(
-                      AppSetting.reviewReminderMinute,
-                      picked.minute,
-                    );
-                  },
-                ),
-              _SwitchTile(
-                label: 'Streak reminders',
-                description: 'Evening nudge to keep your streak alive.',
-                value: ctrl.get(AppSetting.streakRemindersEnabled),
-                onChanged: (v) =>
-                    ctrl.set(AppSetting.streakRemindersEnabled, v),
-              ),
-              if (ctrl.get(AppSetting.streakRemindersEnabled))
-                _TimeTile(
-                  label: 'Streak reminder time',
-                  description: 'When to send the streak reminder.',
-                  hour: ctrl.get(AppSetting.streakReminderHour),
-                  minute: ctrl.get(AppSetting.streakReminderMinute),
-                  onTimePicked: (picked) async {
-                    await ctrl.set(AppSetting.streakReminderHour, picked.hour);
-                    await ctrl.set(
-                      AppSetting.streakReminderMinute,
-                      picked.minute,
-                    );
-                  },
-                ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Section wrapper
-// ---------------------------------------------------------------------------
-
-class _SettingsSection extends StatelessWidget {
-  const _SettingsSection({required this.title, required this.children});
-
-  final String title;
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 24, 16, 4),
-          child: Text(title.toUpperCase()),
+      appBar: AppBar(
+        title: StringHelper.toTitleCase(
+          PathHelper.getLastPathSegmentOrFallback(pagePath, 'settings'),
         ),
-        ...children,
-        const Divider(height: 1),
-      ],
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Tile: Switch
-// ---------------------------------------------------------------------------
-
-class _SwitchTile extends StatelessWidget {
-  const _SwitchTile({
-    required this.label,
-    required this.description,
-    required this.value,
-    required this.onChanged,
-  });
-
-  final String label;
-  final String description;
-  final bool value;
-  final ValueChanged<bool> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return SwitchListTile(
-      title: Text(label),
-      subtitle: Text(description),
-      value: value,
-      onChanged: onChanged,
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Tile: Time picker
-// ---------------------------------------------------------------------------
-
-class _TimeTile extends StatelessWidget {
-  const _TimeTile({
-    required this.label,
-    required this.description,
-    required this.hour,
-    required this.minute,
-    required this.onTimePicked,
-  });
-
-  final String label;
-  final String description;
-  final int hour;
-  final int minute;
-  final Future<void> Function(TimeOfDay picked) onTimePicked;
-
-  String get _formatted {
-    final h = hour.toString().padLeft(2, '0');
-    final m = minute.toString().padLeft(2, '0');
-    return '$h:$m';
-  }
-
-  Future<void> _pick(BuildContext context) async {
-    final picked = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay(hour: hour, minute: minute),
-    );
-    if (picked != null) await onTimePicked(picked);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(label),
-      subtitle: Text(description),
-      trailing: TextButton(
-        onPressed: () => _pick(context),
-        child: Text(_formatted),
       ),
-      onTap: () => _pick(context),
+      body: ListingStatesWrapper.list(
+        useParentScroll: true,
+        padding: EdgeInsets.zero,
+        separatorHeight: tokens.spaceLayoutGapSm,
+        items: sections.entries.toList(),
+        itemBuilder: (context, _, section) {
+          return SettingsSection(
+            title: StringHelper.toTitleCase(section.key),
+            children: [
+              for (final entry in section.value)
+                if (entry.visibleWhen?.call(controller) ?? true)
+                  SettingsTile(
+                    settingTileEntry: entry,
+                    settingsController: controller,
+                  ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _SettingsIndexPage extends StatelessWidget {
+  const _SettingsIndexPage();
+
+  @override
+  Widget build(BuildContext context) {
+    final pagePaths = SettingsService.pagePaths;
+
+    return Scaffold(
+      appBar: AppBar(title: 'Settings'),
+      body: ListingStatesWrapper.list(
+        useParentScroll: true,
+        separatorHeight: 0,
+        items: pagePaths,
+        itemBuilder: (context, _, pagePath) {
+          return ListTile(
+            title: Text(
+              StringHelper.toTitleCase(
+                PathHelper.getLastPathSegmentOrFallback(pagePath, pagePath),
+              ),
+            ),
+            subtitle: Text(pagePath),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push(SettingsService.pageUrl(pagePath)),
+          );
+        },
+      ),
     );
   }
 }

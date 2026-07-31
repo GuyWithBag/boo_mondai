@@ -5,7 +5,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         SettingsController,
         CustomThemePreset,
         ThemeOverride,
-        AppSetting,
+        SettingsService,
         CustomThemePresetMapper,
         ThemeOverrideMapper,
         appThemeRegistry,
@@ -28,13 +28,13 @@ class UserSettingsThemeBridge {
     final settings = settingsCtrl.settings;
 
     // Decode custom presets from stored maps.
-    final rawPresets = settings.get(AppSetting.customThemePresets);
+    final rawPresets = settings.get(SettingsService.customThemePresets);
     final customPresets = rawPresets
         .map((raw) => CustomThemePresetMapper.fromMap(raw))
         .toList(growable: false);
 
     // Decode optional theme override.
-    final rawOverride = settings.get(AppSetting.themeOverride);
+    final rawOverride = settings.get(SettingsService.themeOverride);
     final themeOverride = rawOverride != null
         ? ThemeOverrideMapper.fromMap(rawOverride)
         : null;
@@ -45,13 +45,13 @@ class UserSettingsThemeBridge {
       registry: registry,
       lightThemeId: _resolvedPresetId(
         registry: registry,
-        requestedId: settings.get(AppSetting.lightThemePresetId),
+        requestedId: settings.get(SettingsService.lightThemePresetId),
       ),
       darkThemeId: _resolvedPresetId(
         registry: registry,
-        requestedId: settings.get(AppSetting.darkThemePresetId),
+        requestedId: settings.get(SettingsService.darkThemePresetId),
       ),
-      themeMode: _themeMode(settings.get(AppSetting.themeMode)),
+      themeMode: _themeMode(settings.get(SettingsService.themeMode)),
       transform: (theme) => _applyOverride(theme, themeOverride),
     );
   }

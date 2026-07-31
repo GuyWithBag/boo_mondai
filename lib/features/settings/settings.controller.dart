@@ -1,5 +1,5 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show LocalDB, Controller, UserSettings, AppSetting;
+    show LocalDB, Controller, UserSettings, Setting;
 
 class SettingsController extends Controller {
   UserSettings? _settings;
@@ -21,11 +21,11 @@ class SettingsController extends Controller {
   }
 
   /// Returns the current value of [setting], falling back to its default.
-  T get<T>(AppSetting<T> setting) => settings.get(setting);
+  T get<T>(Setting<T> setting) => settings.get(setting);
 
   /// Persists [value] for [setting] and notifies listeners.
   /// No loading guard — Hive writes are synchronous/fast.
-  Future<void> set<T>(AppSetting<T> setting, T value) async {
+  Future<void> set<T>(Setting<T> setting, T value) async {
     final updated = settings
         .set(setting, value)
         .copyWith(updatedAt: DateTime.now());
