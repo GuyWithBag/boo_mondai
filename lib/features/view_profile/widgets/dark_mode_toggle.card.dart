@@ -1,4 +1,5 @@
-import 'package:boo_mondai/features/ui_sounds/ui_sounds.service.dart';
+import 'package:boo_mondai/core/theme/app_media_pack.model.dart';
+import 'package:boo_mondai/features/ui_sounds/ui_sounds.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
@@ -10,11 +11,15 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextWeight,
         surfaceStyle,
         textStyle,
-        TextSize;
+        TextSize,
+        SettingsController,
+        SettingsService;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart'
     show HookWidget, useEffect, useRef, useState;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:media_variants/media_variants.dart';
+import 'package:provider/provider.dart';
 import 'package:theme_variants/theme_variants.dart'
     show ThemeVariantsContext, Surface;
 
@@ -41,6 +46,8 @@ class DarkModeToggleCard extends HookWidget {
     }, [isDark]);
 
     final tokens = context.themeTokens<AppTokens>();
+    final uiSounds = context.mediaPackController<AppMediaPack>();
+    final settingsController = context.read<SettingsController>();
 
     final contrastTextPaint = Paint()
       ..color = Colors.white
@@ -78,13 +85,17 @@ class DarkModeToggleCard extends HookWidget {
           onTap: () async {
             final nextMode = isDark ? ThemeMode.light : ThemeMode.dark;
             controller.setThemeMode(nextMode);
-            await UiSoundsService.soloud.playSource(
-              asset: 'assets/ui/button_down/minimalist_3.wav',
+            await UiSoundsService.playIfEnabled(
+              uiSounds.resolve((media) => media.buttonDownSound),
+              settingsController: settingsController,
+              enabledSetting: SettingsService.buttonDownSoundEnabled,
               volume: 2,
             );
             await Future.delayed(Duration(milliseconds: 460));
-            await UiSoundsService.soloud.playSource(
-              asset: 'assets/ui/button_up/minimalist_1.wav',
+            await UiSoundsService.playIfEnabled(
+              uiSounds.resolve((media) => media.buttonUpSound),
+              settingsController: settingsController,
+              enabledSetting: SettingsService.buttonUpSoundEnabled,
               volume: 2,
             );
           },

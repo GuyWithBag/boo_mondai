@@ -1,3 +1,4 @@
+import 'package:boo_mondai/core/theme/app_media_pack.model.dart';
 import 'package:boo_mondai/features/ui_sounds/ui_sounds.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
@@ -9,10 +10,16 @@ import 'package:boo_mondai/lib.barrel.dart'
         ButtonVariant,
         ButtonColor,
         Elevated,
-        ScaleHelper;
+        MediaSelector,
+        ScaleHelper,
+        Setting,
+        SettingsController,
+        SettingsService;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:media_variants/media_variants.dart';
+import 'package:provider/provider.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 class Button extends HookWidget {
@@ -26,6 +33,10 @@ class Button extends HookWidget {
     this.axis = Axis.horizontal,
     this.variants = const [],
     this.contentScale = 1,
+    this.buttonDownSound,
+    this.buttonUpSound,
+    this.buttonDownSoundEnabledSetting,
+    this.buttonUpSoundEnabledSetting,
     bool dashed = false,
     super.key,
     this.elevated = true,
@@ -41,6 +52,10 @@ class Button extends HookWidget {
   final List<Object> variants;
   final double contentScale;
   final bool elevated;
+  final MediaSelector<AppMediaPack>? buttonDownSound;
+  final MediaSelector<AppMediaPack>? buttonUpSound;
+  final Setting<bool>? buttonDownSoundEnabledSetting;
+  final Setting<bool>? buttonUpSoundEnabledSetting;
   final bool _isDashed;
 
   static Button icon({
@@ -196,6 +211,8 @@ class Button extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
+    final mediaPackController = context.mediaPackController<AppMediaPack>();
+    final settingsController = context.read<SettingsController>();
     final state = useState(getState());
     useEffect(() {
       state.value = getState();
@@ -296,8 +313,14 @@ class Button extends HookWidget {
                     ? ButtonState.selectedPressed
                     : ButtonState.pressed;
 
-                await UiSoundsService.soloud.playSource(
-                  asset: 'assets/ui/button_down/minimalist_3.wav',
+                await UiSoundsService.playIfEnabled(
+                  mediaPackController.resolve(
+                    buttonDownSound ?? (media) => media.buttonDownSound,
+                  ),
+                  settingsController: settingsController,
+                  enabledSetting:
+                      buttonDownSoundEnabledSetting ??
+                      SettingsService.buttonDownSoundEnabled,
                   volume: 2,
                 );
               },
@@ -309,8 +332,14 @@ class Button extends HookWidget {
             : (_) async {
                 onPressed?.call();
                 state.value = getHoverState();
-                await UiSoundsService.soloud.playSource(
-                  asset: 'assets/ui/button_up/minimalist_1.wav',
+                await UiSoundsService.playIfEnabled(
+                  mediaPackController.resolve(
+                    buttonUpSound ?? (media) => media.buttonUpSound,
+                  ),
+                  settingsController: settingsController,
+                  enabledSetting:
+                      buttonUpSoundEnabledSetting ??
+                      SettingsService.buttonUpSoundEnabled,
                   volume: 2,
                 );
               },
