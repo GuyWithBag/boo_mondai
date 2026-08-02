@@ -4,7 +4,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         SettingsController,
         NotificationsService,
         SettingsService,
-        LocalDB;
+        LocalDB,
+        DateHelper,
+        NotificationIntent,
+        NotificationIds,
+        NotificationRecurrence,
+        Notifications;
 
 /// High-level notification manager.
 ///
@@ -45,15 +50,17 @@ class NotificationsController extends Controller {
   Future<void> scheduleReviewReminder() async {
     final enabled = _settings.get(SettingsService.reviewRemindersEnabled);
     if (!enabled) {
-      await NotificationsService.cancel(NotificationsService.reviewReminderId);
+      await NotificationsService.cancel(NotificationIds.reviewReminder);
       return;
     }
-    await NotificationsService.scheduleDailyAt(
-      id: NotificationsService.reviewReminderId,
-      title: 'Time to review 🗂️',
-      body: 'Your cards are waiting. Keep your streak going!',
-      hour: _settings.get(SettingsService.reviewReminderHour),
-      minute: _settings.get(SettingsService.reviewReminderMinute),
+
+    await notify(
+      Notifications.reviewReminder(
+        recurrence: NotificationRecurrence.daily(
+          hour: _settings.get(SettingsService.reviewReminderHour),
+          minute: _settings.get(SettingsService.reviewReminderMinute),
+        ),
+      ),
     );
   }
 
@@ -64,23 +71,24 @@ class NotificationsController extends Controller {
   Future<void> scheduleStreakReminder() async {
     final enabled = _settings.get(SettingsService.streakRemindersEnabled);
     if (!enabled) {
-      await NotificationsService.cancel(NotificationsService.streakReminderId);
+      await NotificationsService.cancel(NotificationIds.streakReminder);
       return;
     }
 
     // Suppress if the user already reviewed today.
     final reviewedToday = await _hasReviewedToday();
     if (reviewedToday) {
-      await NotificationsService.cancel(NotificationsService.streakReminderId);
+      await NotificationsService.cancel(NotificationIds.streakReminder);
       return;
     }
 
-    await NotificationsService.scheduleDailyAt(
-      id: NotificationsService.streakReminderId,
-      title: "Don't break your streak 🔥",
-      body: 'A quick review is all it takes to keep it alive.',
-      hour: _settings.get(SettingsService.streakReminderHour),
-      minute: _settings.get(SettingsService.streakReminderMinute),
+    await notify(
+      Notifications.streakReminder(
+        recurrence: NotificationRecurrence.daily(
+          hour: _settings.get(SettingsService.streakReminderHour),
+          minute: _settings.get(SettingsService.streakReminderMinute),
+        ),
+      ),
     );
   }
 
@@ -88,37 +96,42 @@ class NotificationsController extends Controller {
   // Event notifications (fire-and-forget)
   // -------------------------------------------------------------------------
 
-  /// Show an immediate notification when a deck download finishes.
-  Future<void> notifyDownloadComplete(String deckTitle) async {
-    await NotificationsService.showImmediate(
-      id: NotificationsService.downloadCompleteId,
-      title: 'Download complete',
-      body: deckTitle,
-    );
+  Future<void> notify(NotificationIntent notification) async {
+    if (notification.persistInInbox) {
+      // TODO: Persist to an in-app inbox once notification storage exists.
+    }
+
+    if (!notification.showSystemNotification) return;
+
+    final recurrence = notification.recurrence;
+    if (recurrence != null) {
+      await NotificationsService.scheduleDaily(notification);
+      return;
+    }
+
+    await NotificationsService.showImmediate(notification);
   }
 
-  /// Show an immediate notification when a raw sync finishes.
-  Future<void> notifyRawSyncComplete() async {
-    await NotificationsService.showImmediate(
-      id: NotificationsService.syncCompleteId,
-      title: 'Sync complete',
-      body: 'Your decks are up to date.',
-    );
-  }
+  /// Show an immediate notification when a deck download finishes.
+  // Future<void> notifyDownloadComplete(String deckTitle) async {
+  //   await notify(Notifications.downloadComplete(deckTitle: deckTitle));
+  // }
+
+  // /// Show an immediate notification when a raw sync finishes.
+  // Future<void> notifyRawSyncComplete() async {
+  //   await notify(Notifications.syncComplete());
+  // }
 
   // -------------------------------------------------------------------------
   // Helpers
   // -------------------------------------------------------------------------
 
   Future<bool> _hasReviewedToday() async {
-    final sessions = await LocalDB.reviewSession.selectMany(
-      where: (s) => s.completedAt != null && _isToday(s.completedAt!),
+    final sessions = LocalDB.reviewSession.selectMany(
+      where: (s) =>
+          s.completedAt != null &&
+          DateHelper.isSameLocalDate(s.completedAt!, DateTime.now()),
     );
     return sessions.isNotEmpty;
-  }
-
-  bool _isToday(DateTime dt) {
-    final now = DateTime.now();
-    return dt.year == now.year && dt.month == now.month && dt.day == now.day;
   }
 }

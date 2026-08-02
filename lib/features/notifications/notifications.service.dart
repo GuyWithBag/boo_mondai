@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'models/notification.intent.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
@@ -12,15 +13,6 @@ import 'package:timezone/timezone.dart' as tz;
 /// one-off fire-and-forget events (download complete, sync complete).
 class NotificationsService {
   NotificationsService._();
-
-  // -------------------------------------------------------------------------
-  // Notification IDs
-  // -------------------------------------------------------------------------
-
-  static const int reviewReminderId = 1;
-  static const int streakReminderId = 2;
-  static const int downloadCompleteId = 3;
-  static const int syncCompleteId = 4;
 
   // -------------------------------------------------------------------------
   // Android channel IDs
@@ -112,14 +104,17 @@ class NotificationsService {
   ///
   /// On Linux this is a no-op — the plugin doesn't support scheduled
   /// notifications on that platform.
-  static Future<void> scheduleDailyAt({
-    required int id,
-    required String title,
-    required String body,
-    required int hour,
-    required int minute,
-  }) async {
+  static Future<void> scheduleDaily(NotificationIntent notification) async {
     if (Platform.isLinux) return;
+
+    final recurrence = notification.recurrence;
+    if (recurrence == null) {
+      throw ArgumentError.value(
+        notification,
+        'notification',
+        'Daily scheduled notifications require a recurrence.',
+      );
+    }
 
     final now = tz.TZDateTime.now(tz.local);
     var scheduledDate = tz.TZDateTime(
@@ -127,17 +122,17 @@ class NotificationsService {
       now.year,
       now.month,
       now.day,
-      hour,
-      minute,
+      recurrence.hour,
+      recurrence.minute,
     );
     if (scheduledDate.isBefore(now)) {
       scheduledDate = scheduledDate.add(const Duration(days: 1));
     }
 
     await _plugin.zonedSchedule(
-      id: id,
-      title: title,
-      body: body,
+      id: notification.id,
+      title: notification.title,
+      body: notification.body,
       scheduledDate: scheduledDate,
       notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
@@ -151,6 +146,7 @@ class NotificationsService {
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       matchDateTimeComponents: DateTimeComponents.time,
+      payload: notification.route,
     );
   }
 
@@ -161,16 +157,14 @@ class NotificationsService {
   /// Show a one-shot notification immediately.
   ///
   /// [channelId] defaults to [_eventsChannelId].
-  static Future<void> showImmediate({
-    required int id,
-    required String title,
-    required String body,
+  static Future<void> showImmediate(
+    NotificationIntent notification, {
     String channelId = _eventsChannelId,
   }) async {
     await _plugin.show(
-      id: id,
-      title: title,
-      body: body,
+      id: notification.id,
+      title: notification.title,
+      body: notification.body,
       notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
           channelId,
@@ -180,6 +174,7 @@ class NotificationsService {
         ),
         linux: const LinuxNotificationDetails(),
       ),
+      payload: notification.route,
     );
   }
 
