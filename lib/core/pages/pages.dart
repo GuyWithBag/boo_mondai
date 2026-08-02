@@ -2,9 +2,6 @@ import 'package:boo_mondai/features/view_deck_downloads/view_deck_downloads.page
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppPage,
-        VocabularyTestPage,
-        AuthController,
-        EnterResearchCodePage,
         HomePage,
         ViewDeckListingsPage,
         ViewDecksLocalPage,
@@ -13,20 +10,17 @@ import 'package:boo_mondai/lib.barrel.dart'
         LoginPage,
         RegisterPage,
         ViewStudySessionPage,
-        ResearcherDashboardPage,
         ViewLeaderboardPage,
         EditDeckPage,
         SessionMode,
         ViewStudySessionResultPage,
         PlaceholderAppPage,
-        AnswerSurveyPage,
         ChangeTrackerPage,
         ChangeTrackerRouteArgs,
         SettingsPage;
 import 'package:boo_mondai/features/view_cards/view_cards.page.dart'
     show ViewCardsPage;
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart' show WatchContext;
 
 class Pages {
   static final home = AppPage(
@@ -40,10 +34,6 @@ class Pages {
           queryParameters = const {},
           extra,
         }) {
-          final auth = context.watch<AuthController>();
-          if (auth.currentProfile.role == 'group_b_participant') {
-            return const EnterResearchCodePage();
-          }
           return const HomePage();
         },
   );
@@ -255,18 +245,6 @@ class Pages {
         },
   );
 
-  static final research = AppPage(
-    url: '/research',
-    name: 'Research',
-    builder:
-        (
-          context, {
-          pathParameters = const {},
-          queryParameters = const {},
-          extra,
-        }) => const ResearcherDashboardPage(),
-  );
-
   static final leaderboard = AppPage(
     url: '/leaderboard',
     name: 'Leaderboard',
@@ -331,45 +309,6 @@ class Pages {
         }) => const PlaceholderAppPage(title: 'Terms of Service'),
   );
 
-  static final researchCode = AppPage(
-    url: '/research/code',
-    name: 'Research Code',
-    builder:
-        (
-          context, {
-          pathParameters = const {},
-          queryParameters = const {},
-          extra,
-        }) => const EnterResearchCodePage(),
-  );
-
-  static final researchSurvey = AppPage(
-    url: '/research/survey/:surveyType',
-    name: 'Survey',
-    builder:
-        (
-          context, {
-          pathParameters = const {},
-          queryParameters = const {},
-          extra,
-        }) => AnswerSurveyPage(
-          surveyType: pathParameters['surveyType']!,
-          timePoint: queryParameters['timePoint'],
-        ),
-  );
-
-  static final researchTest = AppPage(
-    url: '/research/test/:testSet',
-    name: 'Vocabulary Test',
-    builder:
-        (
-          context, {
-          pathParameters = const {},
-          queryParameters = const {},
-          extra,
-        }) => VocabularyTestPage(testSet: pathParameters['testSet']!),
-  );
-
   static final shell = <AppPage>[
     home,
     decksOnline,
@@ -393,11 +332,7 @@ class Pages {
     reviewResult,
     reviewDeckSession,
     changeReview,
-    research,
     leaderboard,
-    researchCode,
-    researchSurvey,
-    researchTest,
     downloads,
   ];
 }

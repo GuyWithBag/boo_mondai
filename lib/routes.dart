@@ -38,7 +38,7 @@ GoRouter createRouter(AuthController authController) {
       }
 
       final auth = authController;
-      final isAnonymous = !auth.currentProfile.isAnonymous;
+      // final isAnonymous = !auth.currentProfile.isAnonymous;
       final loc = state.matchedLocation;
 
       if (AuthService.isAuthenticatedRemote &&
@@ -47,23 +47,23 @@ GoRouter createRouter(AuthController authController) {
         return Pages.home.url;
       }
 
-      if (loc == Pages.research.url &&
-          (isAnonymous || auth.currentProfile.role != 'researcher')) {
-        return Pages.home.url;
-      }
+      // if (loc == Pages.research.url &&
+      //     (isAnonymous || auth.currentProfile.role != 'researcher')) {
+      //   return Pages.home.url;
+      // }
 
-      if (!isAnonymous && auth.currentProfile.role == 'group_b_participant') {
-        final allowed = [
-          Pages.home.url,
-          Pages.researchCode.url,
-          Pages.account.url,
-        ];
-        if (!allowed.contains(loc) &&
-            !loc.startsWith('/research/survey') &&
-            !loc.startsWith('/research/test')) {
-          return Pages.researchCode.url;
-        }
-      }
+      // if (!isAnonymous && auth.currentProfile.role == 'group_b_participant') {
+      //   final allowed = [
+      //     Pages.home.url,
+      //     Pages.researchCode.url,
+      //     Pages.account.url,
+      //   ];
+      //   if (!allowed.contains(loc) &&
+      //       !loc.startsWith('/research/survey') &&
+      //       !loc.startsWith('/research/test')) {
+      //     return Pages.researchCode.url;
+      //   }
+      // }
 
       return null;
     },

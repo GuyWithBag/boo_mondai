@@ -22,7 +22,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         ViewDeckListingsController,
         ViewLeaderboardController,
         StreakController,
-        ResearchController,
         MainController,
         SettingsController,
         NotificationsController,
@@ -89,7 +88,6 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => ViewDeckListingsController()),
         ChangeNotifierProvider(create: (_) => ViewLeaderboardController()),
         ChangeNotifierProvider(create: (_) => StreakController()),
-        ChangeNotifierProvider(create: (_) => ResearchController()),
         ChangeNotifierProvider(create: (_) => MainController()),
       ],
       child: BooMondaiApp(
