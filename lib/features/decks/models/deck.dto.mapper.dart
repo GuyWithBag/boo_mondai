@@ -27,9 +27,9 @@ class DeckMapper extends ClassMapperBase<Deck> {
 
   static String _$id(Deck v) => v.id;
   static const Field<Deck, String> _f$id = Field('id', _$id);
-  static String _$userId(Deck v) => v.userId;
-  static const Field<Deck, String> _f$userId =
-      Field('userId', _$userId, key: r'user_id');
+  static String _$profileId(Deck v) => v.profileId;
+  static const Field<Deck, String> _f$profileId =
+      Field('profileId', _$profileId, key: r'profile_id');
   static String _$title(Deck v) => v.title;
   static const Field<Deck, String> _f$title = Field('title', _$title);
   static String _$shortDescription(Deck v) => v.shortDescription;
@@ -95,7 +95,7 @@ class DeckMapper extends ClassMapperBase<Deck> {
   @override
   final MappableFields<Deck> fields = const {
     #id: _f$id,
-    #userId: _f$userId,
+    #profileId: _f$profileId,
     #title: _f$title,
     #shortDescription: _f$shortDescription,
     #longDescription: _f$longDescription,
@@ -120,7 +120,7 @@ class DeckMapper extends ClassMapperBase<Deck> {
   static Deck _instantiate(DecodingData data) {
     return Deck(
         id: data.dec(_f$id),
-        userId: data.dec(_f$userId),
+        profileId: data.dec(_f$profileId),
         title: data.dec(_f$title),
         shortDescription: data.dec(_f$shortDescription),
         longDescription: data.dec(_f$longDescription),
@@ -194,7 +194,7 @@ abstract class DeckCopyWith<$R, $In extends Deck, $Out>
   @override
   $R call(
       {String? id,
-      String? userId,
+      String? profileId,
       String? title,
       String? shortDescription,
       String? longDescription,
@@ -235,7 +235,7 @@ class _DeckCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Deck, $Out>
   @override
   $R call(
           {String? id,
-          String? userId,
+          String? profileId,
           String? title,
           String? shortDescription,
           String? longDescription,
@@ -257,7 +257,7 @@ class _DeckCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Deck, $Out>
           Object? listing = $none}) =>
       $apply(FieldCopyWithData({
         if (id != null) #id: id,
-        if (userId != null) #userId: userId,
+        if (profileId != null) #profileId: profileId,
         if (title != null) #title: title,
         if (shortDescription != null) #shortDescription: shortDescription,
         if (longDescription != null) #longDescription: longDescription,
@@ -281,7 +281,7 @@ class _DeckCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Deck, $Out>
   @override
   Deck $make(CopyWithData data) => Deck(
       id: data.get(#id, or: $value.id),
-      userId: data.get(#userId, or: $value.userId),
+      profileId: data.get(#profileId, or: $value.profileId),
       title: data.get(#title, or: $value.title),
       shortDescription:
           data.get(#shortDescription, or: $value.shortDescription),

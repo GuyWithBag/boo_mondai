@@ -18,7 +18,7 @@ class UserStudyCardTagsRemoteDB extends SupabaseRemoteDB<UserStudyCardTag> {
 
   @override
   Map<String, Object?> primaryKeyFromItem(UserStudyCardTag item) => {
-    'user_id': item.userId,
+    'profile_id': item.profileId,
     'study_cards_id': item.studyCardId,
     'tag_id': item.tagId,
   };
@@ -28,11 +28,11 @@ class UserStudyCardTagsRemoteDB extends SupabaseRemoteDB<UserStudyCardTag> {
 
   // Override delete because this table uses a composite primary key
   Future<void> deleteComposite({
-    required String userId,
+    required String profileId,
     required String studyCardId,
     required String tagId,
   }) => deleteWhere({
-    'user_id': userId,
+    'profile_id': profileId,
     'study_cards_id': studyCardId,
     'tag_id': tagId,
   });

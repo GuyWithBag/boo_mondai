@@ -152,7 +152,7 @@ class ViewDecksLocalController extends Controller {
     setError(null);
     try {
       final deck = Deck.createNow(
-        userId: LocalDB.profile.getOrCreate().id,
+        profileId: LocalDB.profile.getOrCreate().id,
         title: 'Untitled Deck',
         isPublished: false,
       );

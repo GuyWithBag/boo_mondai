@@ -5,12 +5,10 @@ nextTypeId: 54
 types:
   Profile:
     typeId: 0
-    nextIndex: 11
+    nextIndex: 13
     fields:
       id:
         index: 0
-      userId:
-        index: 1
       username:
         index: 2
       displayName:
@@ -29,6 +27,8 @@ types:
         index: 9
       purgeAfter:
         index: 10
+      userId:
+        index: 12
   CachedProfile:
     typeId: 1
     nextIndex: 4
@@ -43,7 +43,7 @@ types:
         index: 3
   Deck:
     typeId: 2
-    nextIndex: 21
+    nextIndex: 22
     fields:
       id:
         index: 0
@@ -51,8 +51,6 @@ types:
         index: 1
       createdAt:
         index: 2
-      userId:
-        index: 3
       title:
         index: 4
       shortDescription:
@@ -87,6 +85,8 @@ types:
         index: 19
       purgeAfter:
         index: 20
+      profileId:
+        index: 21
   MultipleChoiceOption:
     typeId: 5
     nextIndex: 5
@@ -327,7 +327,7 @@ types:
         index: 6
   DrillSession:
     typeId: 15
-    nextIndex: 10
+    nextIndex: 11
     fields:
       previewed:
         index: 0
@@ -337,8 +337,6 @@ types:
         index: 2
       id:
         index: 3
-      userId:
-        index: 4
       deckId:
         index: 5
       startedAt:
@@ -349,6 +347,8 @@ types:
         index: 8
       deck:
         index: 9
+      profileId:
+        index: 10
   DrillAnswer:
     typeId: 16
     nextIndex: 8
@@ -403,7 +403,7 @@ types:
         index: 6
   FsrsCard:
     typeId: 19
-    nextIndex: 9
+    nextIndex: 10
     fields:
       id:
         index: 0
@@ -411,8 +411,6 @@ types:
         index: 1
       updatedAt:
         index: 2
-      userId:
-        index: 3
       studyCardId:
         index: 4
       state:
@@ -423,6 +421,8 @@ types:
         index: 7
       purgeAfter:
         index: 8
+      profileId:
+        index: 9
   ReviewLog:
     typeId: 20
     nextIndex: 4
@@ -437,7 +437,7 @@ types:
         index: 3
   ReviewSession:
     typeId: 21
-    nextIndex: 9
+    nextIndex: 10
     fields:
       totalCards:
         index: 0
@@ -445,8 +445,6 @@ types:
         index: 1
       id:
         index: 2
-      userId:
-        index: 3
       deckId:
         index: 4
       startedAt:
@@ -457,6 +455,8 @@ types:
         index: 7
       deck:
         index: 8
+      profileId:
+        index: 9
   FsrsReviewLog:
     typeId: 22
     nextIndex: 4
@@ -481,7 +481,7 @@ types:
         index: 2
   Streak:
     typeId: 24
-    nextIndex: 9
+    nextIndex: 10
     fields:
       id:
         index: 0
@@ -489,8 +489,6 @@ types:
         index: 1
       updatedAt:
         index: 2
-      userId:
-        index: 3
       currentStreak:
         index: 4
       longestStreak:
@@ -501,6 +499,8 @@ types:
         index: 7
       purgeAfter:
         index: 8
+      profileId:
+        index: 9
   Rating:
     typeId: 25
     nextIndex: 4
@@ -603,7 +603,7 @@ types:
     fields:
       id:
         index: 0
-      userId:
+      profileId:
         index: 1
       name:
         index: 2
@@ -661,14 +661,14 @@ types:
         index: 1
   UserStudyCardTag:
     typeId: 35
-    nextIndex: 3
+    nextIndex: 4
     fields:
-      userId:
-        index: 0
       studyCardId:
         index: 1
       tagId:
         index: 2
+      profileId:
+        index: 3
   ImportExportBackup:
     typeId: 36
     nextIndex: 8
@@ -691,18 +691,18 @@ types:
         index: 7
   UserSettings:
     typeId: 37
-    nextIndex: 5
+    nextIndex: 6
     fields:
       id:
         index: 0
-      userId:
-        index: 1
       createdAt:
         index: 2
       updatedAt:
         index: 3
       preferences:
         index: 4
+      profileId:
+        index: 5
   ProgressCheckpoint:
     typeId: 41
     nextIndex: 9
@@ -865,7 +865,7 @@ types:
         index: 6
   SyncDeletion:
     typeId: 52
-    nextIndex: 8
+    nextIndex: 9
     fields:
       id:
         index: 0
@@ -877,20 +877,18 @@ types:
         index: 3
       scopeId:
         index: 4
-      userId:
-        index: 5
       deletedAt:
         index: 6
       createdAt:
         index: 7
+      profileId:
+        index: 8
   SyncClient:
     typeId: 53
-    nextIndex: 6
+    nextIndex: 7
     fields:
       id:
         index: 0
-      userId:
-        index: 1
       deviceName:
         index: 2
       createdAt:
@@ -899,3 +897,5 @@ types:
         index: 4
       lastSyncedAt:
         index: 5
+      profileId:
+        index: 6

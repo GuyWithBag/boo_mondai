@@ -5,10 +5,10 @@ class StudyCardSyncTable extends SyncTable<StudyCard> {
   StudyCardSyncTable({required String? deckId})
     : super.newestWins(
         name: 'study_cards',
-        getLocalIndex: (userId) =>
-            getLocalStudyCardIndex(userId: userId, deckId: deckId),
-        getRemoteIndex: (userId) =>
-            getRemoteStudyCardIndex(userId: userId, deckId: deckId),
+        getLocalIndex: (profileId) =>
+            getLocalStudyCardIndex(profileId: profileId, deckId: deckId),
+        getRemoteIndex: (profileId) =>
+            getRemoteStudyCardIndex(profileId: profileId, deckId: deckId),
         getLocalItemsByIds: getLocalStudyCardsByIds,
         getRemoteItemsByIds: getRemoteStudyCardsByIds,
         getItemId: (card) => card.id,
@@ -21,15 +21,15 @@ class StudyCardSyncTable extends SyncTable<StudyCard> {
       );
 
   static Future<List<String>> getStudyCardIds({
-    required String userId,
+    required String profileId,
     String? deckId,
   }) async {
     final localCards = await getLocalStudyCardIndex(
-      userId: userId,
+      profileId: profileId,
       deckId: deckId,
     );
     final remoteCards = await getRemoteStudyCardIndex(
-      userId: userId,
+      profileId: profileId,
       deckId: deckId,
     );
     return {
@@ -39,36 +39,36 @@ class StudyCardSyncTable extends SyncTable<StudyCard> {
   }
 
   static Future<List<SyncIndexEntry>> getLocalStudyCardIndex({
-    required String userId,
+    required String profileId,
     String? deckId,
   }) async {
     final deckIds = (await DeckSyncTable.getDeckIds(
-      userId: userId,
+      profileId: profileId,
       deckId: deckId,
     )).toSet();
     return LocalDB.studyCard.selectSyncIndexByDeckIds(deckIds);
   }
 
   static Future<List<SyncIndexEntry>> getRemoteStudyCardIndex({
-    required String userId,
+    required String profileId,
     String? deckId,
   }) async {
     final deckIds = await DeckSyncTable.getDeckIds(
-      userId: userId,
+      profileId: profileId,
       deckId: deckId,
     );
     return RemoteDB.studyCard.selectSyncIndexByDeckIds(deckIds);
   }
 
   static Future<List<StudyCard>> getLocalStudyCardsByIds(
-    String userId,
+    String profileId,
     List<String> ids,
   ) async {
     return LocalDB.studyCard.selectManyByIds(ids);
   }
 
   static Future<List<StudyCard>> getRemoteStudyCardsByIds(
-    String userId,
+    String profileId,
     List<String> ids,
   ) async {
     return RemoteDB.studyCard.selectManyByIds(ids, includeDeleted: true);

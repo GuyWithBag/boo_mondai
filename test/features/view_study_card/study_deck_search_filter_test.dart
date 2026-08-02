@@ -25,7 +25,7 @@ void main() {
     final entries = [
       StudyDeckEntry(
         deck: Deck.createNow(
-          userId: 'user-1',
+          profileId: 'user-1',
           title: 'Japanese Basics',
           isPublished: false,
         ),
@@ -38,7 +38,7 @@ void main() {
       ),
       StudyDeckEntry(
         deck: Deck.createNow(
-          userId: 'user-1',
+          profileId: 'user-1',
           title: 'French Basics',
           isPublished: false,
         ),

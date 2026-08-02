@@ -11,10 +11,10 @@ class DeckSyncTable extends SyncTable<Deck> {
   DeckSyncTable({required String? deckId})
     : super.newestWins(
         name: 'decks',
-        getLocalIndex: (userId) =>
-            getLocalDeckIndex(userId: userId, deckId: deckId),
-        getRemoteIndex: (userId) =>
-            getRemoteDeckIndex(userId: userId, deckId: deckId),
+        getLocalIndex: (profileId) =>
+            getLocalDeckIndex(profileId: profileId, deckId: deckId),
+        getRemoteIndex: (profileId) =>
+            getRemoteDeckIndex(profileId: profileId, deckId: deckId),
         getLocalItemsByIds: getLocalDecksByIds,
         getRemoteItemsByIds: getRemoteDecksByIds,
         getItemId: (deck) => deck.id,
@@ -22,28 +22,28 @@ class DeckSyncTable extends SyncTable<Deck> {
         applyPullItem: LocalDB.deck.upsert,
         applyPushItem: RemoteDB.deck.upsert,
         deleteRemoteItemById: (id) => RemoteDB.deck.deleteWhere({'id': id}),
-        preprocessPushItem: (deck, userId) =>
+        preprocessPushItem: (deck, profileId) =>
             DeckMediaSyncPreprocessor.preprocessPushItem(
               deck: deck,
-              userId: userId,
+              profileId: profileId,
             ),
         toMap: (deck) =>
             RemoteDB.deck.withoutJoinedFields(RemoteDB.deck.toMap(deck)),
       );
 
   static Future<List<String>> getDeckIds({
-    required String userId,
+    required String profileId,
     String? deckId,
   }) async {
     if (deckId != null) return [deckId];
 
-    final localDecks = LocalDB.deck.selectSyncIndexByUserIdAndOptionalDeckId(
-      userId: userId,
+    final localDecks = LocalDB.deck.selectSyncIndexByProfileIdAndOptionalDeckId(
+      profileId: profileId,
       deckId: deckId,
     );
     final remoteDecks = await RemoteDB.deck
-        .selectSyncIndexByUserIdAndOptionalDeckId(
-          userId: userId,
+        .selectSyncIndexByProfileIdAndOptionalDeckId(
+          profileId: profileId,
           deckId: deckId,
         );
 
@@ -54,34 +54,34 @@ class DeckSyncTable extends SyncTable<Deck> {
   }
 
   static Future<List<SyncIndexEntry>> getLocalDeckIndex({
-    required String userId,
+    required String profileId,
     String? deckId,
   }) async {
-    return LocalDB.deck.selectSyncIndexByUserIdAndOptionalDeckId(
-      userId: userId,
+    return LocalDB.deck.selectSyncIndexByProfileIdAndOptionalDeckId(
+      profileId: profileId,
       deckId: deckId,
     );
   }
 
   static Future<List<SyncIndexEntry>> getRemoteDeckIndex({
-    required String userId,
+    required String profileId,
     String? deckId,
   }) async {
-    return RemoteDB.deck.selectSyncIndexByUserIdAndOptionalDeckId(
-      userId: userId,
+    return RemoteDB.deck.selectSyncIndexByProfileIdAndOptionalDeckId(
+      profileId: profileId,
       deckId: deckId,
     );
   }
 
   static Future<List<Deck>> getLocalDecksByIds(
-    String userId,
+    String profileId,
     List<String> ids,
   ) async {
     return LocalDB.deck.selectManyByIds(ids);
   }
 
   static Future<List<Deck>> getRemoteDecksByIds(
-    String userId,
+    String profileId,
     List<String> ids,
   ) async {
     return RemoteDB.deck.selectManyByIds(ids, includeDeleted: true);

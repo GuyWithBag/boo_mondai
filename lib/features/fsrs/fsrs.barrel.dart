@@ -4,8 +4,8 @@
 export 'models/models.barrel.dart';
 export 'widgets.deprecated/widgets.deprecated.barrel.dart';
 // Other files
-export 'fsrs_cards.remote.db.dart';
 export 'fsrs_cards.local.db.dart';
 export 'review_logs.local.db.dart';
 export 'review_logs.remote.db.dart';
 export 'fsrs.service.dart';
+export 'fsrs_cards.remote.db.dart';

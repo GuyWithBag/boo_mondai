@@ -43,8 +43,8 @@ class DeckVoteReviewsRemoteDB extends SupabaseRemoteDB<DeckVoteReview> {
 
   Future<DeckVoteReview?> getByDeckAndUser({
     required String deckId,
-    required String userId,
-  }) => selectOne(filters: {'deck_id': deckId, 'user_id': userId});
+    required String profileId,
+  }) => selectOne(filters: {'deck_id': deckId, 'profile_id': profileId});
 }
 
 class DeckVoteReviewEditLogsRemoteDB

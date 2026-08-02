@@ -24,7 +24,7 @@ class FsrsCardsRemoteDB extends SupabaseRemoteDB<FsrsCard> {
       'updated_at': item.updatedAt.toIso8601String(),
       'deleted_at': item.deletedAt?.toIso8601String(),
       'purge_after': item.purgeAfter?.toIso8601String(),
-      'user_id': item.userId,
+      'profile_id': item.profileId,
       'study_cards_id': item.studyCardId,
       'state': item.state.toMap(),
     };
@@ -46,12 +46,12 @@ class FsrsCardsRemoteDB extends SupabaseRemoteDB<FsrsCard> {
   Set<String> get joinedFields => const {'studyCard', 'study_cards'};
 
   Future<List<FsrsCard>> selectManyByUserIdAndStudyCardIds({
-    required String userId,
+    required String profileId,
     required Set<String> studyCardIds,
     bool includeDeleted = false,
   }) async {
     final cards = await selectMany(
-      filters: {'user_id': userId},
+      filters: {'profile_id': profileId},
       includeDeleted: includeDeleted,
     );
     return cards
@@ -74,17 +74,17 @@ class FsrsCardsRemoteDB extends SupabaseRemoteDB<FsrsCard> {
     return cards;
   }
 
-  Future<List<SyncIndexEntry>> selectSyncIndexByUserIdAndStudyCardIds({
-    required String userId,
+  Future<List<SyncIndexEntry>> selectSyncIndexByProfileIdAndStudyCardIds({
+    required String profileId,
     required Set<String> studyCardIds,
   }) => studyCardIds.isEmpty
       ? Future.value(const <SyncIndexEntry>[])
       : selectSyncIndex(
           applyQuery: (query) => query
-              .eq('user_id', userId)
+              .eq('profile_id', profileId)
               .inFilter('study_cards_id', studyCardIds.toList()),
           action:
-              'selectSyncIndexByUserIdAndStudyCardIds($userId, ${studyCardIds.length} studyCardIds)',
+              'selectSyncIndexByProfileIdAndStudyCardIds($profileId, ${studyCardIds.length} studyCardIds)',
         );
 
   FsrsCard _fsrsCardFromMap(Map<String, dynamic> map) {
@@ -96,7 +96,7 @@ class FsrsCardsRemoteDB extends SupabaseRemoteDB<FsrsCard> {
       updatedAt: _dateTimeFromMap(map, 'updated_at'),
       deletedAt: _nullableDateTimeFromMap(map, 'deleted_at'),
       purgeAfter: _nullableDateTimeFromMap(map, 'purge_after'),
-      userId: map['user_id'] as String,
+      profileId: map['user_id'] as String,
       studyCardId: (map['study_card_id'] ?? map['study_cards_id']) as String,
       state: _stateFromMap(map['state']),
       studyCard: studyCard == null

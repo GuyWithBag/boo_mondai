@@ -35,9 +35,9 @@ class StreakMapper extends ClassMapperBase<Streak> {
   static DateTime? _$purgeAfter(Streak v) => v.purgeAfter;
   static const Field<Streak, DateTime> _f$purgeAfter =
       Field('purgeAfter', _$purgeAfter, key: r'purge_after', opt: true);
-  static String _$userId(Streak v) => v.userId;
-  static const Field<Streak, String> _f$userId =
-      Field('userId', _$userId, key: r'user_id');
+  static String _$profileId(Streak v) => v.profileId;
+  static const Field<Streak, String> _f$profileId =
+      Field('profileId', _$profileId, key: r'profile_id');
   static int _$currentStreak(Streak v) => v.currentStreak;
   static const Field<Streak, int> _f$currentStreak =
       Field('currentStreak', _$currentStreak, key: r'current_streak');
@@ -56,7 +56,7 @@ class StreakMapper extends ClassMapperBase<Streak> {
     #updatedAt: _f$updatedAt,
     #deletedAt: _f$deletedAt,
     #purgeAfter: _f$purgeAfter,
-    #userId: _f$userId,
+    #profileId: _f$profileId,
     #currentStreak: _f$currentStreak,
     #longestStreak: _f$longestStreak,
     #lastActivityDate: _f$lastActivityDate,
@@ -69,7 +69,7 @@ class StreakMapper extends ClassMapperBase<Streak> {
         updatedAt: data.dec(_f$updatedAt),
         deletedAt: data.dec(_f$deletedAt),
         purgeAfter: data.dec(_f$purgeAfter),
-        userId: data.dec(_f$userId),
+        profileId: data.dec(_f$profileId),
         currentStreak: data.dec(_f$currentStreak),
         longestStreak: data.dec(_f$longestStreak),
         lastActivityDate: data.dec(_f$lastActivityDate));
@@ -128,7 +128,7 @@ abstract class StreakCopyWith<$R, $In extends Streak, $Out>
       DateTime? updatedAt,
       DateTime? deletedAt,
       DateTime? purgeAfter,
-      String? userId,
+      String? profileId,
       int? currentStreak,
       int? longestStreak,
       DateTime? lastActivityDate});
@@ -148,7 +148,7 @@ class _StreakCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Streak, $Out>
           DateTime? updatedAt,
           Object? deletedAt = $none,
           Object? purgeAfter = $none,
-          String? userId,
+          String? profileId,
           int? currentStreak,
           int? longestStreak,
           Object? lastActivityDate = $none}) =>
@@ -158,7 +158,7 @@ class _StreakCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Streak, $Out>
         if (updatedAt != null) #updatedAt: updatedAt,
         if (deletedAt != $none) #deletedAt: deletedAt,
         if (purgeAfter != $none) #purgeAfter: purgeAfter,
-        if (userId != null) #userId: userId,
+        if (profileId != null) #profileId: profileId,
         if (currentStreak != null) #currentStreak: currentStreak,
         if (longestStreak != null) #longestStreak: longestStreak,
         if (lastActivityDate != $none) #lastActivityDate: lastActivityDate
@@ -170,7 +170,7 @@ class _StreakCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Streak, $Out>
       updatedAt: data.get(#updatedAt, or: $value.updatedAt),
       deletedAt: data.get(#deletedAt, or: $value.deletedAt),
       purgeAfter: data.get(#purgeAfter, or: $value.purgeAfter),
-      userId: data.get(#userId, or: $value.userId),
+      profileId: data.get(#profileId, or: $value.profileId),
       currentStreak: data.get(#currentStreak, or: $value.currentStreak),
       longestStreak: data.get(#longestStreak, or: $value.longestStreak),
       lastActivityDate:

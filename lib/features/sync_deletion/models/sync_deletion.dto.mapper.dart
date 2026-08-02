@@ -28,9 +28,9 @@ class SyncDeletionMapper extends ClassMapperBase<SyncDeletion> {
   static String _$entityId(SyncDeletion v) => v.entityId;
   static const Field<SyncDeletion, String> _f$entityId =
       Field('entityId', _$entityId, key: r'entity_id');
-  static String _$userId(SyncDeletion v) => v.userId;
-  static const Field<SyncDeletion, String> _f$userId =
-      Field('userId', _$userId, key: r'user_id');
+  static String _$profileId(SyncDeletion v) => v.profileId;
+  static const Field<SyncDeletion, String> _f$profileId =
+      Field('profileId', _$profileId, key: r'profile_id');
   static DateTime _$deletedAt(SyncDeletion v) => v.deletedAt;
   static const Field<SyncDeletion, DateTime> _f$deletedAt =
       Field('deletedAt', _$deletedAt, key: r'deleted_at');
@@ -49,7 +49,7 @@ class SyncDeletionMapper extends ClassMapperBase<SyncDeletion> {
     #id: _f$id,
     #entityType: _f$entityType,
     #entityId: _f$entityId,
-    #userId: _f$userId,
+    #profileId: _f$profileId,
     #deletedAt: _f$deletedAt,
     #createdAt: _f$createdAt,
     #scopeType: _f$scopeType,
@@ -61,7 +61,7 @@ class SyncDeletionMapper extends ClassMapperBase<SyncDeletion> {
         id: data.dec(_f$id),
         entityType: data.dec(_f$entityType),
         entityId: data.dec(_f$entityId),
-        userId: data.dec(_f$userId),
+        profileId: data.dec(_f$profileId),
         deletedAt: data.dec(_f$deletedAt),
         createdAt: data.dec(_f$createdAt),
         scopeType: data.dec(_f$scopeType),
@@ -125,7 +125,7 @@ abstract class SyncDeletionCopyWith<$R, $In extends SyncDeletion, $Out>
       {String? id,
       String? entityType,
       String? entityId,
-      String? userId,
+      String? profileId,
       DateTime? deletedAt,
       DateTime? createdAt,
       String? scopeType,
@@ -146,7 +146,7 @@ class _SyncDeletionCopyWithImpl<$R, $Out>
           {String? id,
           String? entityType,
           String? entityId,
-          String? userId,
+          String? profileId,
           DateTime? deletedAt,
           DateTime? createdAt,
           Object? scopeType = $none,
@@ -155,7 +155,7 @@ class _SyncDeletionCopyWithImpl<$R, $Out>
         if (id != null) #id: id,
         if (entityType != null) #entityType: entityType,
         if (entityId != null) #entityId: entityId,
-        if (userId != null) #userId: userId,
+        if (profileId != null) #profileId: profileId,
         if (deletedAt != null) #deletedAt: deletedAt,
         if (createdAt != null) #createdAt: createdAt,
         if (scopeType != $none) #scopeType: scopeType,
@@ -166,7 +166,7 @@ class _SyncDeletionCopyWithImpl<$R, $Out>
       id: data.get(#id, or: $value.id),
       entityType: data.get(#entityType, or: $value.entityType),
       entityId: data.get(#entityId, or: $value.entityId),
-      userId: data.get(#userId, or: $value.userId),
+      profileId: data.get(#profileId, or: $value.profileId),
       deletedAt: data.get(#deletedAt, or: $value.deletedAt),
       createdAt: data.get(#createdAt, or: $value.createdAt),
       scopeType: data.get(#scopeType, or: $value.scopeType),

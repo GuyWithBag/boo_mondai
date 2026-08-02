@@ -129,8 +129,8 @@ class AuthController extends Controller {
   }
 
   Future<bool> hasLocalSyncData() async {
-    final userId = currentProfile.id;
-    final decks = LocalDB.deck.getByCurrentUser();
+    final profileId = currentProfile.id;
+    final decks = LocalDB.deck.getByCurrentProfile();
 
     if (decks.isEmpty) return false;
 
@@ -141,7 +141,7 @@ class AuthController extends Controller {
         final getLocalIndex = table.getLocalIndex;
         if (getLocalIndex == null) continue;
 
-        final localIndex = await getLocalIndex(userId);
+        final localIndex = await getLocalIndex(profileId);
         if (localIndex.isNotEmpty) return true;
       }
     }

@@ -4,5 +4,5 @@
 export 'card_template_tag.dto.dart';
 export 'deck_tag.dto.dart';
 export 'tag.dto.dart';
-export 'user_study_card_tag.dto.dart';
 export 'tag_sort_field.dart';
+export 'user_study_card_tag.dto.dart';

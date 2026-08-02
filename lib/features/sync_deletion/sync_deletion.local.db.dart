@@ -8,28 +8,28 @@ class SyncDeletionLocalDB extends HiveLocalDB<SyncDeletion> {
   @override
   Map<String, Object?> primaryKeyFromItem(SyncDeletion item) => {'id': item.id};
 
-  List<SyncDeletion> selectManyByUserId(String userId) => guardSync(
-    () => selectMany(where: (deletion) => deletion.userId == userId),
-    action: 'selectManyByUserId($userId)',
+  List<SyncDeletion> selectManyByUserId(String profileId) => guardSync(
+    () => selectMany(where: (deletion) => deletion.profileId == profileId),
+    action: 'selectManyByUserId($profileId)',
   );
 
   List<SyncDeletion> selectManyByUserIdAndEntityType({
-    required String userId,
+    required String profileId,
     required String entityType,
   }) => guardSync(
     () => selectMany(
       where: (deletion) =>
-          deletion.userId == userId && deletion.entityType == entityType,
+          deletion.profileId == profileId && deletion.entityType == entityType,
     ),
-    action: 'selectManyByUserIdAndEntityType($userId, $entityType)',
+    action: 'selectManyByUserIdAndEntityType($profileId, $entityType)',
   );
 
-  List<SyncIndexEntry> selectSyncIndexByUserId(String userId) =>
+  List<SyncIndexEntry> selectSyncIndexByUserId(String profileId) =>
       selectSyncIndexWhere(
-        where: (deletion) => deletion.userId == userId,
+        where: (deletion) => deletion.profileId == profileId,
         getId: (deletion) => deletion.id,
         getUpdatedAt: (deletion) => deletion.deletedAt,
-        action: 'selectSyncIndexByUserId($userId)',
+        action: 'selectSyncIndexByUserId($profileId)',
       );
 
   List<SyncDeletion> selectManyByIds(List<String> ids) => guardSync(

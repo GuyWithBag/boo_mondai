@@ -10,14 +10,14 @@ part 'deck_favorite.dto.mapper.dart';
 @MappableClass()
 class DeckFavorite with DeckFavoriteMappable {
   final String deckId;
-  final String userId;
+  final String profileId;
   final DateTime createdAt;
   final Deck? deck;
   final CachedProfile? userProfile;
 
   const DeckFavorite({
     required this.deckId,
-    required this.userId,
+    required this.profileId,
     required this.createdAt,
     this.deck,
     this.userProfile,
@@ -25,14 +25,14 @@ class DeckFavorite with DeckFavoriteMappable {
 
   factory DeckFavorite.createNow({
     required String deckId,
-    required String userId,
+    required String profileId,
   }) {
     return DeckFavorite(
       deckId: deckId,
-      userId: userId,
+      profileId: profileId,
       createdAt: DateTime.now(),
     );
   }
 
-  String get compositeId => '${deckId}_$userId';
+  String get compositeId => '${deckId}_$profileId';
 }

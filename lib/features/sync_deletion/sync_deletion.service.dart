@@ -34,7 +34,7 @@ abstract final class SyncDeletionService {
   static SyncDeletion create({
     required String entityType,
     required String entityId,
-    required String userId,
+    required String profileId,
     required DateTime deletedAt,
     String? scopeType,
     String? scopeId,
@@ -42,7 +42,7 @@ abstract final class SyncDeletionService {
     return SyncDeletion.createNow(
       entityType: entityType,
       entityId: entityId,
-      userId: userId,
+      profileId: profileId,
       scopeType: scopeType,
       scopeId: scopeId,
       deletedAt: deletedAt,
@@ -53,13 +53,13 @@ abstract final class SyncDeletionService {
     required String entityType,
     required String entityId,
     required String deckId,
-    required String userId,
+    required String profileId,
     required DateTime deletedAt,
   }) {
     return create(
       entityType: entityType,
       entityId: entityId,
-      userId: userId,
+      profileId: profileId,
       scopeType: 'deck',
       scopeId: deckId,
       deletedAt: deletedAt,
@@ -71,11 +71,11 @@ abstract final class SyncDeletionService {
   }
 
   static Future<Set<String>> getDeletedEntityIds({
-    required String userId,
+    required String profileId,
     required String entityType,
   }) async {
     final local = LocalDB.syncDeletion.selectManyByUserIdAndEntityType(
-      userId: userId,
+      profileId: profileId,
       entityType: entityType,
     );
 
@@ -104,9 +104,9 @@ abstract final class SyncDeletionService {
   }
 
   static Future<SyncStrategyPullPushPlan<SyncDeletion>> _getPlan(
-    String userId,
+    String profileId,
   ) async {
-    final deletions = LocalDB.syncDeletion.selectManyByUserId(userId);
+    final deletions = LocalDB.syncDeletion.selectManyByUserId(profileId);
     return SyncStrategyPullPushPlan<SyncDeletion>(
       pullItems: const [],
       pushItems: deletions,
@@ -127,7 +127,7 @@ abstract final class SyncDeletionService {
 
   static Future<List<ChangedEntity<SyncDeletion>>> _applyPlan(
     SyncStrategyPullPushPlan<SyncDeletion> plan,
-    String userId,
+    String profileId,
   ) async {
     for (final deletion in plan.pushItems) {
       await _applyLocal(deletion);

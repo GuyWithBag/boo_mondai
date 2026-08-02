@@ -7,7 +7,7 @@ part 'deck_vote_review_comment.dto.mapper.dart';
 class DeckVoteReviewComment with DeckVoteReviewCommentMappable {
   final String id;
   final String reviewId;
-  final String userId;
+  final String profileId;
   final String? parentCommentId;
   final String body;
   final bool isDeleted;
@@ -18,7 +18,7 @@ class DeckVoteReviewComment with DeckVoteReviewCommentMappable {
   const DeckVoteReviewComment({
     required this.id,
     required this.reviewId,
-    required this.userId,
+    required this.profileId,
     this.parentCommentId,
     required this.body,
     this.isDeleted = false,
@@ -30,7 +30,7 @@ class DeckVoteReviewComment with DeckVoteReviewCommentMappable {
   factory DeckVoteReviewComment.createNow({
     required String id,
     required String reviewId,
-    required String userId,
+    required String profileId,
     String? parentCommentId,
     required String body,
   }) {
@@ -38,7 +38,7 @@ class DeckVoteReviewComment with DeckVoteReviewCommentMappable {
     return DeckVoteReviewComment(
       id: id,
       reviewId: reviewId,
-      userId: userId,
+      profileId: profileId,
       parentCommentId: parentCommentId,
       body: body,
       createdAt: now,

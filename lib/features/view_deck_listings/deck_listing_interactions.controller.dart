@@ -31,7 +31,7 @@ class DeckListingInteractionsController extends Controller {
     try {
       final state = await _remoteDB.getState(
         deckId: deck.id,
-        userId: profile.id,
+        profileId: profile.id,
       );
       voteValue = state.voteValue;
       isFavorite = state.isFavorite;
@@ -59,7 +59,7 @@ class DeckListingInteractionsController extends Controller {
     try {
       await _remoteDB.setFavorite(
         deckId: deck.id,
-        userId: LocalDB.profile.getOrCreate().id,
+        profileId: LocalDB.profile.getOrCreate().id,
         isFavorite: nextFavorite,
       );
     } on Exception catch (e) {
@@ -85,7 +85,7 @@ class DeckListingInteractionsController extends Controller {
     try {
       await _remoteDB.setVote(
         deckId: deck.id,
-        userId: LocalDB.profile.getOrCreate().id,
+        profileId: LocalDB.profile.getOrCreate().id,
         voteValue: nextVoteValue,
       );
     } on Exception catch (e) {

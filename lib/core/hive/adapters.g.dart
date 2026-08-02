@@ -23,7 +23,7 @@ class ProfileAdapter extends TypeAdapter<Profile> {
       role: fields[4] as String?,
       avatarUrl: fields[5] as String?,
       createdAt: fields[6] as DateTime,
-      userId: fields[1] as String,
+      userId: fields[12] as String,
       updatedAt: fields[7] as DateTime,
       deletedAt: fields[9] as DateTime?,
       purgeAfter: fields[10] as DateTime?,
@@ -37,8 +37,6 @@ class ProfileAdapter extends TypeAdapter<Profile> {
       ..writeByte(11)
       ..writeByte(0)
       ..write(obj.id)
-      ..writeByte(1)
-      ..write(obj.userId)
       ..writeByte(2)
       ..write(obj.username)
       ..writeByte(3)
@@ -56,7 +54,9 @@ class ProfileAdapter extends TypeAdapter<Profile> {
       ..writeByte(9)
       ..write(obj.deletedAt)
       ..writeByte(10)
-      ..write(obj.purgeAfter);
+      ..write(obj.purgeAfter)
+      ..writeByte(12)
+      ..write(obj.userId);
   }
 
   @override
@@ -125,7 +125,7 @@ class DeckAdapter extends TypeAdapter<Deck> {
     };
     return Deck(
       id: fields[0] as String,
-      userId: fields[3] as String,
+      profileId: fields[21] as String,
       title: fields[4] as String,
       shortDescription: fields[5] == null ? '' : fields[5] as String,
       longDescription: fields[6] == null ? '' : fields[6] as String,
@@ -158,8 +158,6 @@ class DeckAdapter extends TypeAdapter<Deck> {
       ..write(obj.updatedAt)
       ..writeByte(2)
       ..write(obj.createdAt)
-      ..writeByte(3)
-      ..write(obj.userId)
       ..writeByte(4)
       ..write(obj.title)
       ..writeByte(5)
@@ -193,7 +191,9 @@ class DeckAdapter extends TypeAdapter<Deck> {
       ..writeByte(19)
       ..write(obj.deletedAt)
       ..writeByte(20)
-      ..write(obj.purgeAfter);
+      ..write(obj.purgeAfter)
+      ..writeByte(21)
+      ..write(obj.profileId);
   }
 
   @override
@@ -831,7 +831,7 @@ class DrillSessionAdapter extends TypeAdapter<DrillSession> {
     };
     return DrillSession(
       id: fields[3] as String,
-      userId: fields[4] as String,
+      profileId: fields[10] as String,
       deckId: fields[5] as String?,
       startedAt: fields[6] as DateTime,
       completedAt: fields[7] as DateTime?,
@@ -855,8 +855,6 @@ class DrillSessionAdapter extends TypeAdapter<DrillSession> {
       ..write(obj.correctCount)
       ..writeByte(3)
       ..write(obj.id)
-      ..writeByte(4)
-      ..write(obj.userId)
       ..writeByte(5)
       ..write(obj.deckId)
       ..writeByte(6)
@@ -866,7 +864,9 @@ class DrillSessionAdapter extends TypeAdapter<DrillSession> {
       ..writeByte(8)
       ..write(obj.userProfile)
       ..writeByte(9)
-      ..write(obj.deck);
+      ..write(obj.deck)
+      ..writeByte(10)
+      ..write(obj.profileId);
   }
 
   @override
@@ -1052,7 +1052,7 @@ class FsrsCardAdapter extends TypeAdapter<FsrsCard> {
       updatedAt: fields[2] as DateTime,
       deletedAt: fields[7] as DateTime?,
       purgeAfter: fields[8] as DateTime?,
-      userId: fields[3] as String,
+      profileId: fields[9] as String,
       studyCardId: fields[4] as String,
       state: fields[5] as Card,
       studyCard: fields[6] as StudyCard?,
@@ -1069,8 +1069,6 @@ class FsrsCardAdapter extends TypeAdapter<FsrsCard> {
       ..write(obj.createdAt)
       ..writeByte(2)
       ..write(obj.updatedAt)
-      ..writeByte(3)
-      ..write(obj.userId)
       ..writeByte(4)
       ..write(obj.studyCardId)
       ..writeByte(5)
@@ -1080,7 +1078,9 @@ class FsrsCardAdapter extends TypeAdapter<FsrsCard> {
       ..writeByte(7)
       ..write(obj.deletedAt)
       ..writeByte(8)
-      ..write(obj.purgeAfter);
+      ..write(obj.purgeAfter)
+      ..writeByte(9)
+      ..write(obj.profileId);
   }
 
   @override
@@ -1149,7 +1149,7 @@ class ReviewSessionAdapter extends TypeAdapter<ReviewSession> {
     };
     return ReviewSession(
       id: fields[2] as String,
-      userId: fields[3] as String,
+      profileId: fields[9] as String,
       deckId: fields[4] as String?,
       startedAt: fields[5] as DateTime,
       completedAt: fields[6] as DateTime?,
@@ -1170,8 +1170,6 @@ class ReviewSessionAdapter extends TypeAdapter<ReviewSession> {
       ..write(obj.cardsReviewed)
       ..writeByte(2)
       ..write(obj.id)
-      ..writeByte(3)
-      ..write(obj.userId)
       ..writeByte(4)
       ..write(obj.deckId)
       ..writeByte(5)
@@ -1181,7 +1179,9 @@ class ReviewSessionAdapter extends TypeAdapter<ReviewSession> {
       ..writeByte(7)
       ..write(obj.userProfile)
       ..writeByte(8)
-      ..write(obj.deck);
+      ..write(obj.deck)
+      ..writeByte(9)
+      ..write(obj.profileId);
   }
 
   @override
@@ -1295,7 +1295,7 @@ class StreakAdapter extends TypeAdapter<Streak> {
       updatedAt: fields[2] as DateTime,
       deletedAt: fields[7] as DateTime?,
       purgeAfter: fields[8] as DateTime?,
-      userId: fields[3] as String,
+      profileId: fields[9] as String,
       currentStreak: (fields[4] as num).toInt(),
       longestStreak: (fields[5] as num).toInt(),
       lastActivityDate: fields[6] as DateTime?,
@@ -1312,8 +1312,6 @@ class StreakAdapter extends TypeAdapter<Streak> {
       ..write(obj.createdAt)
       ..writeByte(2)
       ..write(obj.updatedAt)
-      ..writeByte(3)
-      ..write(obj.userId)
       ..writeByte(4)
       ..write(obj.currentStreak)
       ..writeByte(5)
@@ -1323,7 +1321,9 @@ class StreakAdapter extends TypeAdapter<Streak> {
       ..writeByte(7)
       ..write(obj.deletedAt)
       ..writeByte(8)
-      ..write(obj.purgeAfter);
+      ..write(obj.purgeAfter)
+      ..writeByte(9)
+      ..write(obj.profileId);
   }
 
   @override
@@ -1626,7 +1626,7 @@ class TagAdapter extends TypeAdapter<Tag> {
     };
     return Tag(
       id: fields[0] as String,
-      userId: fields[1] as String?,
+      profileId: fields[1] as String?,
       name: fields[2] as String,
       createdAt: fields[3] as DateTime,
     );
@@ -1639,7 +1639,7 @@ class TagAdapter extends TypeAdapter<Tag> {
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.userId)
+      ..write(obj.profileId)
       ..writeByte(2)
       ..write(obj.name)
       ..writeByte(3)
@@ -1821,7 +1821,7 @@ class UserStudyCardTagAdapter extends TypeAdapter<UserStudyCardTag> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return UserStudyCardTag(
-      userId: fields[0] as String,
+      profileId: fields[3] as String,
       studyCardId: fields[1] as String,
       tagId: fields[2] as String,
     );
@@ -1831,12 +1831,12 @@ class UserStudyCardTagAdapter extends TypeAdapter<UserStudyCardTag> {
   void write(BinaryWriter writer, UserStudyCardTag obj) {
     writer
       ..writeByte(3)
-      ..writeByte(0)
-      ..write(obj.userId)
       ..writeByte(1)
       ..write(obj.studyCardId)
       ..writeByte(2)
-      ..write(obj.tagId);
+      ..write(obj.tagId)
+      ..writeByte(3)
+      ..write(obj.profileId);
   }
 
   @override
@@ -1917,7 +1917,7 @@ class UserSettingsAdapter extends TypeAdapter<UserSettings> {
     };
     return UserSettings(
       id: fields[0] as String,
-      userId: fields[1] as String,
+      profileId: fields[5] as String,
       preferences: (fields[4] as Map).cast<String, dynamic>(),
       createdAt: fields[2] as DateTime,
       updatedAt: fields[3] as DateTime,
@@ -1930,14 +1930,14 @@ class UserSettingsAdapter extends TypeAdapter<UserSettings> {
       ..writeByte(5)
       ..writeByte(0)
       ..write(obj.id)
-      ..writeByte(1)
-      ..write(obj.userId)
       ..writeByte(2)
       ..write(obj.createdAt)
       ..writeByte(3)
       ..write(obj.updatedAt)
       ..writeByte(4)
-      ..write(obj.preferences);
+      ..write(obj.preferences)
+      ..writeByte(5)
+      ..write(obj.profileId);
   }
 
   @override
@@ -2464,7 +2464,7 @@ class SyncDeletionAdapter extends TypeAdapter<SyncDeletion> {
       id: fields[0] as String,
       entityType: fields[1] as String,
       entityId: fields[2] as String,
-      userId: fields[5] as String,
+      profileId: fields[8] as String,
       deletedAt: fields[6] as DateTime,
       createdAt: fields[7] as DateTime,
       scopeType: fields[3] as String?,
@@ -2486,12 +2486,12 @@ class SyncDeletionAdapter extends TypeAdapter<SyncDeletion> {
       ..write(obj.scopeType)
       ..writeByte(4)
       ..write(obj.scopeId)
-      ..writeByte(5)
-      ..write(obj.userId)
       ..writeByte(6)
       ..write(obj.deletedAt)
       ..writeByte(7)
-      ..write(obj.createdAt);
+      ..write(obj.createdAt)
+      ..writeByte(8)
+      ..write(obj.profileId);
   }
 
   @override
@@ -2517,7 +2517,7 @@ class SyncClientAdapter extends TypeAdapter<SyncClient> {
     };
     return SyncClient(
       id: fields[0] as String,
-      userId: fields[1] as String,
+      profileId: fields[6] as String,
       createdAt: fields[3] as DateTime,
       lastSeenAt: fields[4] as DateTime,
       lastSyncedAt: fields[5] as DateTime?,
@@ -2531,8 +2531,6 @@ class SyncClientAdapter extends TypeAdapter<SyncClient> {
       ..writeByte(6)
       ..writeByte(0)
       ..write(obj.id)
-      ..writeByte(1)
-      ..write(obj.userId)
       ..writeByte(2)
       ..write(obj.deviceName)
       ..writeByte(3)
@@ -2540,7 +2538,9 @@ class SyncClientAdapter extends TypeAdapter<SyncClient> {
       ..writeByte(4)
       ..write(obj.lastSeenAt)
       ..writeByte(5)
-      ..write(obj.lastSyncedAt);
+      ..write(obj.lastSyncedAt)
+      ..writeByte(6)
+      ..write(obj.profileId);
   }
 
   @override

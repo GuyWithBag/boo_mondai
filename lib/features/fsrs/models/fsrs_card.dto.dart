@@ -26,7 +26,7 @@ class FsrsCard with FsrsCardMappable implements MutableEntity {
   final DateTime? deletedAt;
   @override
   final DateTime? purgeAfter;
-  final String userId;
+  final String profileId;
 
   /// <-- CHANGED: Now points to the StudyCard (the testable instance)
   /// instead of the Template (the raw data blueprint).
@@ -41,7 +41,7 @@ class FsrsCard with FsrsCardMappable implements MutableEntity {
     required this.updatedAt,
     this.deletedAt,
     this.purgeAfter,
-    required this.userId,
+    required this.profileId,
     required this.studyCardId,
     required this.state,
     this.studyCard,
@@ -49,14 +49,14 @@ class FsrsCard with FsrsCardMappable implements MutableEntity {
 
   static Future<FsrsCard> create({
     required String studyCardId,
-    required String userId,
+    required String profileId,
   }) async {
     final now = DateTime.now();
     return FsrsCard(
       id: uuid.v7(),
       createdAt: now,
       updatedAt: now,
-      userId: userId,
+      profileId: profileId,
       studyCardId: studyCardId,
       state: await Card.create(),
     );

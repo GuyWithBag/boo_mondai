@@ -16,7 +16,6 @@ class Profile with ProfileMappable implements MutableEntity {
   final String id;
   final String userId;
   final String username;
-  @MappableField(key: r'display_name')
   final String displayName;
   final String? role;
   final String? avatarUrl;

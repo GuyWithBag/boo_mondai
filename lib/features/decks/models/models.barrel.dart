@@ -3,5 +3,5 @@
 // Other files
 export 'deck_favorite.dto.dart';
 export 'visibility_state.dto.dart';
-export 'deck.dto.dart';
 export 'deck_sort_field.dart';
+export 'deck.dto.dart';

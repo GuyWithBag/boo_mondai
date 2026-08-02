@@ -13,7 +13,7 @@
 //   /// Creates a persisted user settings row.
 //   const UserSettings({
 //     required super.id,
-//     required this.userId,
+//     required this.profileId,
 //     required this.themeModeName,
 //     required this.lightThemePresetId,
 //     required this.darkThemePresetId,
@@ -24,7 +24,7 @@
 //   });
 
 //   /// Owning profile/user id.
-//   final String userId;
+//   final String profileId;
 
 //   /// Stored `ThemeMode` name (`system`, `light`, `dark`).
 //   final String themeModeName;

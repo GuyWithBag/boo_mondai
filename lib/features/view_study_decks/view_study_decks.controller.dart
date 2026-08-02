@@ -65,20 +65,20 @@ class ViewStudyCardsController extends Controller {
     notifyListeners();
 
     try {
-      final userId = LocalDB.profile.getOrCreate().id;
+      final profileId = LocalDB.profile.getOrCreate().id;
       final allDecks = LocalDB.deck.selectMany();
       final deckMap = {for (final d in allDecks) d.id: d};
 
       // 1. Fetch Historical (Only if requested or not cached)
       if (fetchHistorical || _cachedHistoricalStats == null) {
         _cachedHistoricalStats = Services.fsrs.calculateHistoricalStats(
-          userId: userId,
+          profileId: profileId,
         );
       }
 
       // 2. Fetch Due (Always calculated based on filter)
       final dueMap = Services.fsrs.calculateDueStats(
-        userId: userId,
+        profileId: profileId,
         dueFilter: _reviewFilter.dueFilter,
       );
 
@@ -106,7 +106,7 @@ class ViewStudyCardsController extends Controller {
                 deck ??
                 Deck(
                   id: deckId,
-                  userId: userId,
+                  profileId: profileId,
                   title: stats.deckTitle,
                   visibilityState: VisibilityState.private,
                   isPublished: false,

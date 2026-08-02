@@ -12,7 +12,7 @@ class StreakLocalDB extends HiveSingleDataLocalDB<Streak> {
   String get boxName => 'streaks';
 
   @override
-  String getId(Streak item) => item.userId;
+  String getId(Streak item) => item.profileId;
 
   // This is not used.
   @override
@@ -20,7 +20,7 @@ class StreakLocalDB extends HiveSingleDataLocalDB<Streak> {
     updatedAt: DateTime.now(),
     createdAt: DateTime.now(),
     id: uuid.v7(),
-    userId: LocalDB.profile.getOrCreate().id,
+    profileId: LocalDB.profile.getOrCreate().id,
     currentStreak: 0,
     longestStreak: 0,
     lastActivityDate: null,
@@ -55,7 +55,7 @@ class StreakLocalDB extends HiveSingleDataLocalDB<Streak> {
         updatedAt: DateTime.now(),
         createdAt: DateTime.now(),
         id: uuid.v7(),
-        userId: LocalDB.profile.getOrCreate().id,
+        profileId: LocalDB.profile.getOrCreate().id,
         currentStreak: 1,
         longestStreak: 1,
         lastActivityDate: activityDate,

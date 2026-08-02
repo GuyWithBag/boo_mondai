@@ -112,7 +112,7 @@ class _ViewDeckListingsView extends HookWidget {
 
 final Deck _skeletonDeck = Deck(
   id: 'loading',
-  userId: 'loading',
+  profileId: 'loading',
   title: 'Loading deck',
   shortDescription: 'Loading deck description',
   visibilityState: VisibilityState.public,

@@ -33,7 +33,7 @@ class TagsRemoteDB extends SupabaseRemoteDB<Tag> {
 
   Future<List<Tag>> selectManyFiltered({
     String query = '',
-    String? userId,
+    String? profileId,
     bool includeGlobalTags = true,
     TagSortField sortField = TagSortField.letters,
     SearchSortDirection sortDirection = SearchSortDirection.ascending,
@@ -46,10 +46,10 @@ class TagsRemoteDB extends SupabaseRemoteDB<Tag> {
       request = request.ilike('name', '%$normalizedQuery%');
     }
 
-    if (userId != null) {
+    if (profileId != null) {
       request = includeGlobalTags
-          ? request.or('user_id.eq.$userId,user_id.is.null')
-          : request.eq('user_id', userId);
+          ? request.or('profile_id.eq.$profileId,profile_id.is.null')
+          : request.eq('profile_id', profileId);
     }
 
     request = request.order(
@@ -63,7 +63,7 @@ class TagsRemoteDB extends SupabaseRemoteDB<Tag> {
 
     final response = await request;
     return List<Map<String, dynamic>>.from(response).map(fromMap).toList();
-  }, action: 'selectManyFiltered($query, $userId)');
+  }, action: 'selectManyFiltered($query, $profileId)');
 
   String _columnForSortField(TagSortField field) {
     return switch (field) {

@@ -11,7 +11,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         surfaceStyle,
         textStyle,
         TextSize,
-        ViewProfileController,
         SurfaceBorder,
         SurfaceShape,
         SurfaceShadow;
@@ -28,21 +27,21 @@ class AuthCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
     final auth = context.watch<AuthController>();
-    final viewProfile = context.watch<ViewProfileController>();
-    final profile = viewProfile.currentProfile;
+    // final viewProfile = context.watch<ViewProfileController>();
+    // final profile = viewProfile.currentProfile;
 
     if (auth.isAuthenticatedEither) {
       return Column(
         spacing: tokens.spaceLayoutGapSm,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (profile.role != 'researcher') ...[
-            Button(
-              onPressed: () => context.push(Pages.researchCode.url),
-              leading: const Icon(Icons.vpn_key_outlined),
-              child: const Text('ENTER RESEARCH CODE'),
-            ),
-          ],
+          // if (profile.role != 'researcher') ...[
+          //   Button(
+          //     onPressed: () => context.push(Pages.researchCode.url),
+          //     leading: const Icon(Icons.vpn_key_outlined),
+          //     child: const Text('ENTER RESEARCH CODE'),
+          //   ),
+          // ],
           Button(
             variants: [ButtonColor.error],
             onPressed: () => auth.onSignOutPressed(context: context),

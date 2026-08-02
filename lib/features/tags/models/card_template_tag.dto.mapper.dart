@@ -21,17 +21,11 @@ class CardTemplateTagMapper extends ClassMapperBase<CardTemplateTag> {
   final String id = 'CardTemplateTag';
 
   static String _$templateId(CardTemplateTag v) => v.templateId;
-  static const Field<CardTemplateTag, String> _f$templateId = Field(
-    'templateId',
-    _$templateId,
-    key: r'template_id',
-  );
+  static const Field<CardTemplateTag, String> _f$templateId =
+      Field('templateId', _$templateId, key: r'template_id');
   static String _$tagId(CardTemplateTag v) => v.tagId;
-  static const Field<CardTemplateTag, String> _f$tagId = Field(
-    'tagId',
-    _$tagId,
-    key: r'tag_id',
-  );
+  static const Field<CardTemplateTag, String> _f$tagId =
+      Field('tagId', _$tagId, key: r'tag_id');
 
   @override
   final MappableFields<CardTemplateTag> fields = const {
@@ -41,9 +35,7 @@ class CardTemplateTagMapper extends ClassMapperBase<CardTemplateTag> {
 
   static CardTemplateTag _instantiate(DecodingData data) {
     return CardTemplateTag(
-      templateId: data.dec(_f$templateId),
-      tagId: data.dec(_f$tagId),
-    );
+        templateId: data.dec(_f$templateId), tagId: data.dec(_f$tagId));
   }
 
   @override
@@ -65,38 +57,30 @@ mixin CardTemplateTagMappable {
   }
 
   Map<String, dynamic> toMap() {
-    return CardTemplateTagMapper.ensureInitialized().encodeMap<CardTemplateTag>(
-      this as CardTemplateTag,
-    );
+    return CardTemplateTagMapper.ensureInitialized()
+        .encodeMap<CardTemplateTag>(this as CardTemplateTag);
   }
 
   CardTemplateTagCopyWith<CardTemplateTag, CardTemplateTag, CardTemplateTag>
-  get copyWith =>
-      _CardTemplateTagCopyWithImpl<CardTemplateTag, CardTemplateTag>(
-        this as CardTemplateTag,
-        $identity,
-        $identity,
-      );
+      get copyWith =>
+          _CardTemplateTagCopyWithImpl<CardTemplateTag, CardTemplateTag>(
+              this as CardTemplateTag, $identity, $identity);
   @override
   String toString() {
-    return CardTemplateTagMapper.ensureInitialized().stringifyValue(
-      this as CardTemplateTag,
-    );
+    return CardTemplateTagMapper.ensureInitialized()
+        .stringifyValue(this as CardTemplateTag);
   }
 
   @override
   bool operator ==(Object other) {
-    return CardTemplateTagMapper.ensureInitialized().equalsValue(
-      this as CardTemplateTag,
-      other,
-    );
+    return CardTemplateTagMapper.ensureInitialized()
+        .equalsValue(this as CardTemplateTag, other);
   }
 
   @override
   int get hashCode {
-    return CardTemplateTagMapper.ensureInitialized().hashValue(
-      this as CardTemplateTag,
-    );
+    return CardTemplateTagMapper.ensureInitialized()
+        .hashValue(this as CardTemplateTag);
   }
 }
 
@@ -110,8 +94,7 @@ abstract class CardTemplateTagCopyWith<$R, $In extends CardTemplateTag, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   $R call({String? templateId, String? tagId});
   CardTemplateTagCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-    Then<$Out2, $R2> t,
-  );
+      Then<$Out2, $R2> t);
 }
 
 class _CardTemplateTagCopyWithImpl<$R, $Out>
@@ -123,20 +106,17 @@ class _CardTemplateTagCopyWithImpl<$R, $Out>
   late final ClassMapperBase<CardTemplateTag> $mapper =
       CardTemplateTagMapper.ensureInitialized();
   @override
-  $R call({String? templateId, String? tagId}) => $apply(
-    FieldCopyWithData({
-      if (templateId != null) #templateId: templateId,
-      if (tagId != null) #tagId: tagId,
-    }),
-  );
+  $R call({String? templateId, String? tagId}) => $apply(FieldCopyWithData({
+        if (templateId != null) #templateId: templateId,
+        if (tagId != null) #tagId: tagId
+      }));
   @override
   CardTemplateTag $make(CopyWithData data) => CardTemplateTag(
-    templateId: data.get(#templateId, or: $value.templateId),
-    tagId: data.get(#tagId, or: $value.tagId),
-  );
+      templateId: data.get(#templateId, or: $value.templateId),
+      tagId: data.get(#tagId, or: $value.tagId));
 
   @override
   CardTemplateTagCopyWith<$R2, CardTemplateTag, $Out2> $chain<$R2, $Out2>(
-    Then<$Out2, $R2> t,
-  ) => _CardTemplateTagCopyWithImpl<$R2, $Out2>($value, $cast, t);
+          Then<$Out2, $R2> t) =>
+      _CardTemplateTagCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }

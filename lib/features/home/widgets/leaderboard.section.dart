@@ -98,7 +98,7 @@ class LeaderboardSection extends StatelessWidget {
                 child: LeaderboardTileWidget(
                   rank: entries.indexOf(entry) + 1,
                   entry: entry,
-                  isCurrentUser: entry.userId == currentUserId,
+                  isCurrentUser: entry.profileId == currentUserId,
                 ),
               ),
             ),
@@ -126,7 +126,7 @@ class LeaderboardSection extends StatelessWidget {
     }
 
     final currentIndex = entries.indexWhere(
-      (entry) => entry.userId == currentUserId,
+      (entry) => entry.profileId == currentUserId,
     );
     if (currentIndex == -1) {
       return [entries.first];

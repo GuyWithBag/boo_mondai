@@ -224,7 +224,7 @@ Rating values: `1` = Again, `2` = Hard, `3` = Good, `4` = Easy.
         │  (drill uses the blueprint directly; FSRS not involved yet)
         ▼
 4. On drill completion, for each answered card with a self-rating:
-     FsrsCard.create(studyCardId, userId)
+     FsrsCard.create(studyCardId, profileId)
      → inserts a row into fsrs_cards with a fresh FSRS state (state=0 New)
         │
         ▼

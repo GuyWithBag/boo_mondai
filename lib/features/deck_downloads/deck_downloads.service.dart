@@ -181,7 +181,7 @@ class DeckDownloadsService extends Service {
       final now = DateTime.now();
       var newLocalDeck = remoteDeck.copyWith(
         id: localDeckId,
-        userId: LocalDB.profile.getOrCreate().id,
+        profileId: LocalDB.profile.getOrCreate().id,
         sourceDeckId: remoteDeck.id,
         visibilityState: VisibilityState.private,
         isPublished: false,

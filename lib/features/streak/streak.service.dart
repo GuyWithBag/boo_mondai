@@ -22,7 +22,7 @@ class StreakService extends Service {
       id: existing?.id ?? uuid.v7(),
       createdAt: existing?.createdAt ?? now,
       updatedAt: now,
-      userId: profile.id,
+      profileId: profile.id,
       currentStreak: calculation.currentStreak,
       longestStreak: calculation.longestStreak,
       lastActivityDate: calculation.lastActivityDate,

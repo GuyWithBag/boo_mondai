@@ -101,7 +101,7 @@ class ViewLeaderboardPage extends HookWidget {
                     child: LeaderboardTileWidget(
                       rank: i,
                       entry: entry,
-                      isCurrentUser: entry.userId == auth.currentProfile.id,
+                      isCurrentUser: entry.profileId == auth.currentProfile.id,
                     ),
                   );
                 },

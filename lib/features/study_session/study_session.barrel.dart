@@ -6,9 +6,9 @@ export 'widgets.deprecated/widgets.deprecated.barrel.dart';
 export 'widgets/widgets.barrel.dart';
 export 'controllers/controllers.barrel.dart';
 export 'engine/engine.barrel.dart';
-export 'rule_models/rule_models.barrel.dart';
 export 'persistence/persistence.barrel.dart';
 export 'session_steps/session_steps.barrel.dart';
+export 'rule_models/rule_models.barrel.dart';
 // Other files
 export 'preview_drill.local.page.dart';
 export 'session_mode.dart';

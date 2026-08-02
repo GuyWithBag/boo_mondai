@@ -28,7 +28,7 @@ class NewDeckBlock extends StatelessWidget {
         children: [
           Surface(child: Row(children: [Icon(icon), Text(action)])),
           DeckTile(
-            deck: Deck.createNow(userId: '', title: ''),
+            deck: Deck.createNow(profileId: '', title: ''),
             state: DeckTileState.spread,
           ),
           Text('Deck Title'),

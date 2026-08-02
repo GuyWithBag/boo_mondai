@@ -25,7 +25,7 @@ class DeckVoteReviewsService {
 
   static Future<void> upsertReview({
     required String deckId,
-    required String userId,
+    required String profileId,
     required int voteValue,
     required String title,
     required String body,
@@ -36,14 +36,14 @@ class DeckVoteReviewsService {
     final trimmedTitle = title.trim();
     await RemoteDB.deckInteractions.setVote(
       deckId: deckId,
-      userId: userId,
+      profileId: profileId,
       voteValue: voteValue,
     );
 
     final review = DeckVoteReview.createNow(
       id: uuid.v7(),
       deckId: deckId,
-      userId: userId,
+      profileId: profileId,
       voteValueAtCreation: voteValue,
       title: trimmedTitle,
       body: trimmedBody,
@@ -51,7 +51,7 @@ class DeckVoteReviewsService {
 
     final existingReview = await RemoteDB.deckVoteReview.getByDeckAndUser(
       deckId: deckId,
-      userId: userId,
+      profileId: profileId,
     );
     if (existingReview == null) {
       await RemoteDB.deckVoteReview.insert(review);
@@ -93,7 +93,7 @@ class DeckVoteReviewsService {
 
   static Future<void> addComment({
     required String reviewId,
-    required String userId,
+    required String profileId,
     required String body,
     String? parentCommentId,
   }) async {
@@ -103,7 +103,7 @@ class DeckVoteReviewsService {
     final comment = DeckVoteReviewComment.createNow(
       id: uuid.v7(),
       reviewId: reviewId,
-      userId: userId,
+      profileId: profileId,
       parentCommentId: parentCommentId,
       body: trimmedBody,
     );

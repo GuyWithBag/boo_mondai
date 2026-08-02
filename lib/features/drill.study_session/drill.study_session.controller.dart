@@ -77,10 +77,10 @@ final class DrillSessionController
   }) async {
     reset(notify: false);
     try {
-      final userId = LocalDB.profile.getOrCreate().id;
+      final profileId = LocalDB.profile.getOrCreate().id;
       final resumable = LocalDB.drillSession.selectMany(
         where: (value) =>
-            value.userId == userId &&
+            value.profileId == profileId &&
             value.deckId == deckId &&
             !value.isComplete,
       );
@@ -103,7 +103,7 @@ final class DrillSessionController
       final allCards = LocalDB.studyCard.getByDeckId(deckId);
       final eligible = DrillSessionPolicy.selectCards(
         deckId: deckId,
-        userId: userId,
+        profileId: profileId,
         limit: batchSize ?? defaultBatchSize,
       );
       if (eligible.isEmpty) {
@@ -120,7 +120,7 @@ final class DrillSessionController
       final now = DateTime.now();
       session = DrillSession(
         id: uuid.v7(),
-        userId: userId,
+        profileId: profileId,
         deckId: deckId,
         previewed: previewed,
         totalQuestions: cards.length,

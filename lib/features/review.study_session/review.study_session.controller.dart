@@ -56,10 +56,10 @@ final class ReviewSessionController
   }) async {
     reset(notify: false);
     try {
-      final userId = LocalDB.profile.getOrCreate().id;
+      final profileId = LocalDB.profile.getOrCreate().id;
       final resumable = LocalDB.reviewSession.selectMany(
         where: (value) =>
-            value.userId == userId &&
+            value.profileId == profileId &&
             value.deckId == deckId &&
             !value.isComplete,
       );
@@ -89,7 +89,7 @@ final class ReviewSessionController
       final cardDecks = {for (final card in studyCards) card.id: card.deckId};
       final dueCards =
           LocalDB.fsrsCard
-              .getByUserId(userId)
+              .getByProfileId(profileId)
               .where(
                 (card) =>
                     (deckId == null || cardDecks[card.studyCardId] == deckId) &&
@@ -106,7 +106,7 @@ final class ReviewSessionController
           .toList();
       session = ReviewSession(
         id: uuid.v7(),
-        userId: userId,
+        profileId: profileId,
         deckId: deckId,
         totalCards: cards.length,
         startedAt: now,

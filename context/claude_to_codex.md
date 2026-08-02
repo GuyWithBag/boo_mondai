@@ -299,25 +299,25 @@ abstract class SupabaseRemoteDB<T> {
     return row == null ? null : fromMap(row);
   }, action: 'selectByPk($pk)');
 
-  Future<T?> selectByUserId(String userId) => guard(() async {
+  Future<T?> selectByUserId(String profileId) => guard(() async {
     final row = await client
         .from(tableName)
         .select()
-        .eq('user_id', userId)
+        .eq('profile_id', profileId)
         .maybeSingle();
     return row == null ? null : fromMap(row);
-  }, action: 'selectByUserId($userId)');
+  }, action: 'selectByUserId($profileId)');
 
-  Future<List<T>> selectManyByUserId(String userId) => guard(() async {
-    final row = await client.from(tableName).select().eq('user_id', userId);
+  Future<List<T>> selectManyByUserId(String profileId) => guard(() async {
+    final row = await client.from(tableName).select().eq('profile_id', profileId);
     return List<Map<String, dynamic>>.from(row).map(fromMap).toList();
-  }, action: 'selectManyByUserId($userId)');
+  }, action: 'selectManyByUserId($profileId)');
 
   Future<List<T>> selectManyByCurrentUser() => guard(() async {
     final row = await client
         .from(tableName)
         .select()
-        .eq('user_id', LocalDB.profile.getOrCreate().userId);
+        .eq('user_id', LocalDB.profile.getOrCreate().profileId);
     return List<Map<String, dynamic>>.from(row).map(fromMap).toList();
   }, action: 'selectManyByUserCurrentUser()');
 
@@ -653,25 +653,25 @@ abstract class SupabaseRemoteDB<T> {
     return row == null ? null : fromMap(row);
   }, action: 'selectByPk($pk)');
 
-  Future<T?> selectByUserId(String userId) => guard(() async {
+  Future<T?> selectByUserId(String profileId) => guard(() async {
     final row = await client
         .from(tableName)
         .select()
-        .eq('user_id', userId)
+        .eq('profile_id', profileId)
         .maybeSingle();
     return row == null ? null : fromMap(row);
-  }, action: 'selectByUserId($userId)');
+  }, action: 'selectByUserId($profileId)');
 
-  Future<List<T>> selectManyByUserId(String userId) => guard(() async {
-    final row = await client.from(tableName).select().eq('user_id', userId);
+  Future<List<T>> selectManyByUserId(String profileId) => guard(() async {
+    final row = await client.from(tableName).select().eq('profile_id', profileId);
     return List<Map<String, dynamic>>.from(row).map(fromMap).toList();
-  }, action: 'selectManyByUserId($userId)');
+  }, action: 'selectManyByUserId($profileId)');
 
   Future<List<T>> selectManyByCurrentUser() => guard(() async {
     final row = await client
         .from(tableName)
         .select()
-        .eq('user_id', LocalDB.profile.getOrCreate().userId);
+        .eq('user_id', LocalDB.profile.getOrCreate().profileId);
     return List<Map<String, dynamic>>.from(row).map(fromMap).toList();
   }, action: 'selectManyByUserCurrentUser()');
 
@@ -724,7 +724,7 @@ Future<void> upsertByPk(String pk, T item, {String? onConflict}) => guard(
 **2. `selectManyByCurrentUser` is a layer violation**
 
 ```dart
-.eq('user_id', LocalDB.profile.getOrCreate().userId);
+.eq('user_id', LocalDB.profile.getOrCreate().profileId);
 ```
 
 The remote DB class is reaching into the local DB to get the current user ID. The remote layer shouldn't depend on the local layer at all — that's a circular dependency and it makes unit testing impossible (you'd need a real Hive box just to call a remote method). The user ID should be passed in by the caller, or read from `Supabase.instance.client.auth.currentUser?.id`.

@@ -22,7 +22,7 @@ class Streak with StreakMappable implements MutableEntity {
   final DateTime? deletedAt;
   @override
   final DateTime? purgeAfter;
-  final String userId;
+  final String profileId;
   final int currentStreak;
   final int longestStreak;
   final DateTime? lastActivityDate;
@@ -33,7 +33,7 @@ class Streak with StreakMappable implements MutableEntity {
     required this.updatedAt,
     this.deletedAt,
     this.purgeAfter,
-    required this.userId,
+    required this.profileId,
     required this.currentStreak,
     required this.longestStreak,
     this.lastActivityDate,

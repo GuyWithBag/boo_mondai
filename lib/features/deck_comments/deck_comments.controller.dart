@@ -72,7 +72,7 @@ class DeckCommentsController {
     if (!AuthService.isAuthenticatedRemote || comment.isDeleted) return false;
 
     final profile = LocalDB.profile.getOrCreate();
-    return profile.id == comment.userId;
+    return profile.id == comment.profileId;
   }
 
   bool canEditItem(DiscussionItem item) {
@@ -113,7 +113,7 @@ class DeckCommentsController {
       final profile = LocalDB.profile.getOrCreate();
       await DeckCommentsService.addComment(
         deckId: deck.id,
-        userId: profile.id,
+        profileId: profile.id,
         body: trimmedBody,
         parentCommentId: parentCommentId,
       );

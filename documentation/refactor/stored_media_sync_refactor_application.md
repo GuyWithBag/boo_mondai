@@ -239,14 +239,14 @@ static String fileNameFromStoredMedia(StoredMedia storedMedia, int index) { ... 
 Replace:
 
 ```dart
-'users/$userId/decks/${deck.id}/cover'
+'users/$profileId/decks/${deck.id}/cover'
 ```
 
 with:
 
 ```dart
 MediaRemotePathHelper.deckCoverImage(
-  profileId: userId,
+  profileId: profileId,
   deckId: deck.id,
 )
 ```

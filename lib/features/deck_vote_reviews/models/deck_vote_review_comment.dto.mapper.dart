@@ -25,50 +25,29 @@ class DeckVoteReviewCommentMapper
   static String _$id(DeckVoteReviewComment v) => v.id;
   static const Field<DeckVoteReviewComment, String> _f$id = Field('id', _$id);
   static String _$reviewId(DeckVoteReviewComment v) => v.reviewId;
-  static const Field<DeckVoteReviewComment, String> _f$reviewId = Field(
-    'reviewId',
-    _$reviewId,
-    key: r'review_id',
-  );
-  static String _$userId(DeckVoteReviewComment v) => v.userId;
-  static const Field<DeckVoteReviewComment, String> _f$userId = Field(
-    'userId',
-    _$userId,
-    key: r'user_id',
-  );
+  static const Field<DeckVoteReviewComment, String> _f$reviewId =
+      Field('reviewId', _$reviewId, key: r'review_id');
+  static String _$profileId(DeckVoteReviewComment v) => v.profileId;
+  static const Field<DeckVoteReviewComment, String> _f$profileId =
+      Field('profileId', _$profileId, key: r'profile_id');
   static String? _$parentCommentId(DeckVoteReviewComment v) =>
       v.parentCommentId;
   static const Field<DeckVoteReviewComment, String> _f$parentCommentId = Field(
-    'parentCommentId',
-    _$parentCommentId,
-    key: r'parent_comment_id',
-    opt: true,
-  );
+      'parentCommentId', _$parentCommentId,
+      key: r'parent_comment_id', opt: true);
   static String _$body(DeckVoteReviewComment v) => v.body;
-  static const Field<DeckVoteReviewComment, String> _f$body = Field(
-    'body',
-    _$body,
-  );
+  static const Field<DeckVoteReviewComment, String> _f$body =
+      Field('body', _$body);
   static bool _$isDeleted(DeckVoteReviewComment v) => v.isDeleted;
   static const Field<DeckVoteReviewComment, bool> _f$isDeleted = Field(
-    'isDeleted',
-    _$isDeleted,
-    key: r'is_deleted',
-    opt: true,
-    def: false,
-  );
+      'isDeleted', _$isDeleted,
+      key: r'is_deleted', opt: true, def: false);
   static DateTime _$createdAt(DeckVoteReviewComment v) => v.createdAt;
-  static const Field<DeckVoteReviewComment, DateTime> _f$createdAt = Field(
-    'createdAt',
-    _$createdAt,
-    key: r'created_at',
-  );
+  static const Field<DeckVoteReviewComment, DateTime> _f$createdAt =
+      Field('createdAt', _$createdAt, key: r'created_at');
   static DateTime _$updatedAt(DeckVoteReviewComment v) => v.updatedAt;
-  static const Field<DeckVoteReviewComment, DateTime> _f$updatedAt = Field(
-    'updatedAt',
-    _$updatedAt,
-    key: r'updated_at',
-  );
+  static const Field<DeckVoteReviewComment, DateTime> _f$updatedAt =
+      Field('updatedAt', _$updatedAt, key: r'updated_at');
   static CachedProfile? _$userProfile(DeckVoteReviewComment v) => v.userProfile;
   static const Field<DeckVoteReviewComment, CachedProfile> _f$userProfile =
       Field('userProfile', _$userProfile, key: r'user_profile', opt: true);
@@ -77,7 +56,7 @@ class DeckVoteReviewCommentMapper
   final MappableFields<DeckVoteReviewComment> fields = const {
     #id: _f$id,
     #reviewId: _f$reviewId,
-    #userId: _f$userId,
+    #profileId: _f$profileId,
     #parentCommentId: _f$parentCommentId,
     #body: _f$body,
     #isDeleted: _f$isDeleted,
@@ -88,16 +67,15 @@ class DeckVoteReviewCommentMapper
 
   static DeckVoteReviewComment _instantiate(DecodingData data) {
     return DeckVoteReviewComment(
-      id: data.dec(_f$id),
-      reviewId: data.dec(_f$reviewId),
-      userId: data.dec(_f$userId),
-      parentCommentId: data.dec(_f$parentCommentId),
-      body: data.dec(_f$body),
-      isDeleted: data.dec(_f$isDeleted),
-      createdAt: data.dec(_f$createdAt),
-      updatedAt: data.dec(_f$updatedAt),
-      userProfile: data.dec(_f$userProfile),
-    );
+        id: data.dec(_f$id),
+        reviewId: data.dec(_f$reviewId),
+        profileId: data.dec(_f$profileId),
+        parentCommentId: data.dec(_f$parentCommentId),
+        body: data.dec(_f$body),
+        isDeleted: data.dec(_f$isDeleted),
+        createdAt: data.dec(_f$createdAt),
+        updatedAt: data.dec(_f$updatedAt),
+        userProfile: data.dec(_f$userProfile));
   }
 
   @override
@@ -123,68 +101,53 @@ mixin DeckVoteReviewCommentMappable {
         .encodeMap<DeckVoteReviewComment>(this as DeckVoteReviewComment);
   }
 
-  DeckVoteReviewCommentCopyWith<
-    DeckVoteReviewComment,
-    DeckVoteReviewComment,
-    DeckVoteReviewComment
-  >
-  get copyWith =>
-      _DeckVoteReviewCommentCopyWithImpl<
-        DeckVoteReviewComment,
-        DeckVoteReviewComment
-      >(this as DeckVoteReviewComment, $identity, $identity);
+  DeckVoteReviewCommentCopyWith<DeckVoteReviewComment, DeckVoteReviewComment,
+      DeckVoteReviewComment> get copyWith => _DeckVoteReviewCommentCopyWithImpl<
+          DeckVoteReviewComment, DeckVoteReviewComment>(
+      this as DeckVoteReviewComment, $identity, $identity);
   @override
   String toString() {
-    return DeckVoteReviewCommentMapper.ensureInitialized().stringifyValue(
-      this as DeckVoteReviewComment,
-    );
+    return DeckVoteReviewCommentMapper.ensureInitialized()
+        .stringifyValue(this as DeckVoteReviewComment);
   }
 
   @override
   bool operator ==(Object other) {
-    return DeckVoteReviewCommentMapper.ensureInitialized().equalsValue(
-      this as DeckVoteReviewComment,
-      other,
-    );
+    return DeckVoteReviewCommentMapper.ensureInitialized()
+        .equalsValue(this as DeckVoteReviewComment, other);
   }
 
   @override
   int get hashCode {
-    return DeckVoteReviewCommentMapper.ensureInitialized().hashValue(
-      this as DeckVoteReviewComment,
-    );
+    return DeckVoteReviewCommentMapper.ensureInitialized()
+        .hashValue(this as DeckVoteReviewComment);
   }
 }
 
 extension DeckVoteReviewCommentValueCopy<$R, $Out>
     on ObjectCopyWith<$R, DeckVoteReviewComment, $Out> {
   DeckVoteReviewCommentCopyWith<$R, DeckVoteReviewComment, $Out>
-  get $asDeckVoteReviewComment => $base.as(
-    (v, t, t2) => _DeckVoteReviewCommentCopyWithImpl<$R, $Out>(v, t, t2),
-  );
+      get $asDeckVoteReviewComment => $base.as(
+          (v, t, t2) => _DeckVoteReviewCommentCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
 abstract class DeckVoteReviewCommentCopyWith<
-  $R,
-  $In extends DeckVoteReviewComment,
-  $Out
->
-    implements ClassCopyWith<$R, $In, $Out> {
+    $R,
+    $In extends DeckVoteReviewComment,
+    $Out> implements ClassCopyWith<$R, $In, $Out> {
   CachedProfileCopyWith<$R, CachedProfile, CachedProfile>? get userProfile;
-  $R call({
-    String? id,
-    String? reviewId,
-    String? userId,
-    String? parentCommentId,
-    String? body,
-    bool? isDeleted,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-    CachedProfile? userProfile,
-  });
+  $R call(
+      {String? id,
+      String? reviewId,
+      String? profileId,
+      String? parentCommentId,
+      String? body,
+      bool? isDeleted,
+      DateTime? createdAt,
+      DateTime? updatedAt,
+      CachedProfile? userProfile});
   DeckVoteReviewCommentCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-    Then<$Out2, $R2> t,
-  );
+      Then<$Out2, $R2> t);
 }
 
 class _DeckVoteReviewCommentCopyWithImpl<$R, $Out>
@@ -199,44 +162,41 @@ class _DeckVoteReviewCommentCopyWithImpl<$R, $Out>
   CachedProfileCopyWith<$R, CachedProfile, CachedProfile>? get userProfile =>
       $value.userProfile?.copyWith.$chain((v) => call(userProfile: v));
   @override
-  $R call({
-    String? id,
-    String? reviewId,
-    String? userId,
-    Object? parentCommentId = $none,
-    String? body,
-    bool? isDeleted,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-    Object? userProfile = $none,
-  }) => $apply(
-    FieldCopyWithData({
-      if (id != null) #id: id,
-      if (reviewId != null) #reviewId: reviewId,
-      if (userId != null) #userId: userId,
-      if (parentCommentId != $none) #parentCommentId: parentCommentId,
-      if (body != null) #body: body,
-      if (isDeleted != null) #isDeleted: isDeleted,
-      if (createdAt != null) #createdAt: createdAt,
-      if (updatedAt != null) #updatedAt: updatedAt,
-      if (userProfile != $none) #userProfile: userProfile,
-    }),
-  );
+  $R call(
+          {String? id,
+          String? reviewId,
+          String? profileId,
+          Object? parentCommentId = $none,
+          String? body,
+          bool? isDeleted,
+          DateTime? createdAt,
+          DateTime? updatedAt,
+          Object? userProfile = $none}) =>
+      $apply(FieldCopyWithData({
+        if (id != null) #id: id,
+        if (reviewId != null) #reviewId: reviewId,
+        if (profileId != null) #profileId: profileId,
+        if (parentCommentId != $none) #parentCommentId: parentCommentId,
+        if (body != null) #body: body,
+        if (isDeleted != null) #isDeleted: isDeleted,
+        if (createdAt != null) #createdAt: createdAt,
+        if (updatedAt != null) #updatedAt: updatedAt,
+        if (userProfile != $none) #userProfile: userProfile
+      }));
   @override
   DeckVoteReviewComment $make(CopyWithData data) => DeckVoteReviewComment(
-    id: data.get(#id, or: $value.id),
-    reviewId: data.get(#reviewId, or: $value.reviewId),
-    userId: data.get(#userId, or: $value.userId),
-    parentCommentId: data.get(#parentCommentId, or: $value.parentCommentId),
-    body: data.get(#body, or: $value.body),
-    isDeleted: data.get(#isDeleted, or: $value.isDeleted),
-    createdAt: data.get(#createdAt, or: $value.createdAt),
-    updatedAt: data.get(#updatedAt, or: $value.updatedAt),
-    userProfile: data.get(#userProfile, or: $value.userProfile),
-  );
+      id: data.get(#id, or: $value.id),
+      reviewId: data.get(#reviewId, or: $value.reviewId),
+      profileId: data.get(#profileId, or: $value.profileId),
+      parentCommentId: data.get(#parentCommentId, or: $value.parentCommentId),
+      body: data.get(#body, or: $value.body),
+      isDeleted: data.get(#isDeleted, or: $value.isDeleted),
+      createdAt: data.get(#createdAt, or: $value.createdAt),
+      updatedAt: data.get(#updatedAt, or: $value.updatedAt),
+      userProfile: data.get(#userProfile, or: $value.userProfile));
 
   @override
   DeckVoteReviewCommentCopyWith<$R2, DeckVoteReviewComment, $Out2>
-  $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-      _DeckVoteReviewCommentCopyWithImpl<$R2, $Out2>($value, $cast, t);
+      $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+          _DeckVoteReviewCommentCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }

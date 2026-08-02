@@ -54,7 +54,7 @@ abstract final class ViewDeckSingleHelper {
   }
 
   static Object? _profile(Deck deck) {
-    return LocalDB.cachedProfile.selectByPk({'id': deck.userId}) ??
+    return LocalDB.cachedProfile.selectByPk({'id': deck.profileId}) ??
         LocalDB.profile.getOrCreate();
   }
 
@@ -67,6 +67,6 @@ abstract final class ViewDeckSingleHelper {
       return null;
     }
 
-    return LocalDB.cachedProfile.selectByPk({'id': sourceDeck.userId});
+    return LocalDB.cachedProfile.selectByPk({'id': sourceDeck.profileId});
   }
 }

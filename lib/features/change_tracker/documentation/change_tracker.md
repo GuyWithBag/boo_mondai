@@ -138,7 +138,7 @@ sequenceDiagram
     participant Remote as SupabaseRemoteDB
 
     UI->>SyncController: sync(changeTrackerController)
-    SyncController->>Service: sync(localDb, remoteDb, userId, changeTrackerController)
+    SyncController->>Service: sync(localDb, remoteDb, profileId, changeTrackerController)
     Service->>Controller: start(entry: ChangeTrackerEntry(sync, planning), onChangeApply)
     Service->>Controller: update(status: fetching, progress)
     Service->>Remote: selectMany(user_id)

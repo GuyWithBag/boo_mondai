@@ -11,7 +11,7 @@ abstract final class CardTemplateMediaSyncPreprocessor {
   /// Uploads card-template local media before the template row is pushed remotely.
   static Future<CardTemplate> preprocessPushItem({
     required CardTemplate template,
-    required String userId,
+    required String profileId,
   }) async {
     var updated = template;
 
@@ -21,7 +21,7 @@ abstract final class CardTemplateMediaSyncPreprocessor {
         bucket: RemoteDB.publicBucket,
         remotePath: (storedMedia, index) =>
             MediaRemotePathHelper.cardMarkdownAttachment(
-              profileId: userId,
+              profileId: profileId,
               deckId: updated.deckId,
               templateId: updated.id,
               field: field.name,

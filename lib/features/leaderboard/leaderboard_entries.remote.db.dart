@@ -21,7 +21,7 @@ class LeaderboardEntriesRemoteDB extends SupabaseRemoteDB<LeaderboardEntry> {
 
   @override
   Map<String, Object?> primaryKeyFromItem(LeaderboardEntry item) => {
-    'user_id': item.userId,
+    'profile_id': item.profileId,
   };
 
   @override

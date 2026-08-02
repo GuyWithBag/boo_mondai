@@ -1,5 +1,4 @@
 import 'package:boo_mondai/core/services/uuid.dart';
-import 'package:boo_mondai/core/helpers/text.helper.dart';
 import 'package:boo_mondai/features/cards/models/card_template.dto.dart';
 import 'package:boo_mondai/features/cards/models/card_type.dto.dart';
 import 'package:boo_mondai/features/cards/models/fill_in_the_blank_segment.dto.dart';

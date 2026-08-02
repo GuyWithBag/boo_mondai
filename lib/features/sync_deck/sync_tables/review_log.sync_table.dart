@@ -12,10 +12,10 @@ class ReviewLogSyncTable extends SyncTable<FsrsReviewLog> {
   ReviewLogSyncTable({required String? deckId})
     : super.appendOnly(
         name: 'review_logs',
-        getLocalIndex: (userId) =>
-            getLocalReviewLogIndex(userId: userId, deckId: deckId),
-        getRemoteIndex: (userId) =>
-            getRemoteReviewLogIndex(userId: userId, deckId: deckId),
+        getLocalIndex: (profileId) =>
+            getLocalReviewLogIndex(profileId: profileId, deckId: deckId),
+        getRemoteIndex: (profileId) =>
+            getRemoteReviewLogIndex(profileId: profileId, deckId: deckId),
         getLocalItemsByIds: getLocalReviewLogsByIds,
         getRemoteItemsByIds: getRemoteReviewLogsByIds,
         getItemId: (log) => log.id,
@@ -27,36 +27,36 @@ class ReviewLogSyncTable extends SyncTable<FsrsReviewLog> {
       );
 
   static Future<List<SyncIndexEntry>> getLocalReviewLogIndex({
-    required String userId,
+    required String profileId,
     String? deckId,
   }) async {
     final fsrsCardIds = (await FsrsCardSyncTable.getFsrsCardIds(
-      userId: userId,
+      profileId: profileId,
       deckId: deckId,
     )).toSet();
     return LocalDB.reviewLog.selectSyncIndexByFsrsCardIds(fsrsCardIds);
   }
 
   static Future<List<SyncIndexEntry>> getRemoteReviewLogIndex({
-    required String userId,
+    required String profileId,
     String? deckId,
   }) async {
     final fsrsCardIds = await FsrsCardSyncTable.getFsrsCardIds(
-      userId: userId,
+      profileId: profileId,
       deckId: deckId,
     );
     return RemoteDB.reviewLog.selectSyncIndexByFsrsCardIds(fsrsCardIds);
   }
 
   static Future<List<FsrsReviewLog>> getLocalReviewLogsByIds(
-    String userId,
+    String profileId,
     List<String> ids,
   ) async {
     return LocalDB.reviewLog.selectManyByIds(ids);
   }
 
   static Future<List<FsrsReviewLog>> getRemoteReviewLogsByIds(
-    String userId,
+    String profileId,
     List<String> ids,
   ) async {
     return RemoteDB.reviewLog.selectManyByIds(ids);

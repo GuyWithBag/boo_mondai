@@ -9,5 +9,5 @@ export 'editors/editors.barrel.dart';
 // Other files
 export 'edit_deck.controller.dart';
 export 'edit_deck.page.dart';
-export 'draft_form.service.dart';
 export 'edit_deck.service.dart';
+export 'draft_form.service.dart';

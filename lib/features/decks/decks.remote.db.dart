@@ -103,23 +103,23 @@ class DecksRemoteDB extends SupabaseRemoteDB<Deck> {
   );
 
   Future<List<Deck>> selectManyByUserIdAndOptionalDeckId({
-    required String userId,
+    required String profileId,
     String? deckId,
   }) async {
     if (deckId != null) {
       final deck = await selectById(deckId);
       return deck == null ? const [] : [deck];
     }
-    return selectManyByUserId(userId);
+    return selectManyByUserId(profileId);
   }
 
-  Future<List<SyncIndexEntry>> selectSyncIndexByUserIdAndOptionalDeckId({
-    required String userId,
+  Future<List<SyncIndexEntry>> selectSyncIndexByProfileIdAndOptionalDeckId({
+    required String profileId,
     String? deckId,
   }) => selectSyncIndex(
     applyQuery: (query) =>
-        applyFilters(query, {'user_id': userId, 'id': ?deckId}),
-    action: 'selectSyncIndexByUserIdAndOptionalDeckId($userId, $deckId)',
+        applyFilters(query, {'profile_id': profileId, 'id': ?deckId}),
+    action: 'selectSyncIndexByProfileIdAndOptionalDeckId($profileId, $deckId)',
   );
 
   String _columnForSortField(DeckSortField field) {

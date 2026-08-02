@@ -10,7 +10,7 @@ class SyncDeletion with SyncDeletionMappable {
   final String entityId;
   final String? scopeType;
   final String? scopeId;
-  final String userId;
+  final String profileId;
   final DateTime deletedAt;
   final DateTime createdAt;
 
@@ -18,7 +18,7 @@ class SyncDeletion with SyncDeletionMappable {
     required this.id,
     required this.entityType,
     required this.entityId,
-    required this.userId,
+    required this.profileId,
     required this.deletedAt,
     required this.createdAt,
     this.scopeType,
@@ -28,7 +28,7 @@ class SyncDeletion with SyncDeletionMappable {
   factory SyncDeletion.createNow({
     required String entityType,
     required String entityId,
-    required String userId,
+    required String profileId,
     String? scopeType,
     String? scopeId,
     DateTime? deletedAt,
@@ -40,7 +40,7 @@ class SyncDeletion with SyncDeletionMappable {
       entityId: entityId,
       scopeType: scopeType,
       scopeId: scopeId,
-      userId: userId,
+      profileId: profileId,
       deletedAt: now,
       createdAt: now,
     );

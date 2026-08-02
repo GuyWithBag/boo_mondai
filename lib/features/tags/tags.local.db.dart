@@ -13,9 +13,9 @@ class TagLocalDB extends HiveLocalDB<Tag> {
   Map<String, Object?> primaryKeyFromItem(Tag item) => {'id': item.id};
 
   // Custom Method: Get only tags owned by the current user
-  List<Tag> getByCurrentUser(String currentUserId) => guardSync(
-    () => box.values.where((tag) => tag.userId == currentUserId).toList(),
-    action: 'getByCurrentUser($currentUserId)',
+  List<Tag> getByCurrentProfile(String currentUserId) => guardSync(
+    () => box.values.where((tag) => tag.profileId == currentUserId).toList(),
+    action: 'getByCurrentProfile($currentUserId)',
   );
 
   List<Tag> selectManyByIds(Set<String> ids) => guardSync(
@@ -25,7 +25,7 @@ class TagLocalDB extends HiveLocalDB<Tag> {
 
   List<Tag> filterTags({
     String query = '',
-    String? userId,
+    String? profileId,
     bool includeGlobalTags = true,
     TagSortField sortField = TagSortField.letters,
     SearchSortDirection sortDirection = SearchSortDirection.ascending,
@@ -37,12 +37,13 @@ class TagLocalDB extends HiveLocalDB<Tag> {
         return false;
       }
 
-      if (userId == null) return true;
-      return tag.userId == userId || (includeGlobalTags && tag.userId == null);
+      if (profileId == null) return true;
+      return tag.profileId == profileId ||
+          (includeGlobalTags && tag.profileId == null);
     });
 
     return _sortTags(filtered, field: sortField, direction: sortDirection);
-  }, action: 'filterTags($query, $userId, $sortField, $sortDirection)');
+  }, action: 'filterTags($query, $profileId, $sortField, $sortDirection)');
 
   List<Tag> _sortTags(
     Iterable<Tag> tags, {

@@ -4,6 +4,6 @@
 export 'models/models.barrel.dart';
 export 'widgets/widgets.barrel.dart';
 // Other files
-export 'leaderboard_entries.remote.db.dart';
 export 'view_leaderboard.controller.dart';
 export 'view_leaderboard.online.page.dart';
+export 'leaderboard_entries.remote.db.dart';

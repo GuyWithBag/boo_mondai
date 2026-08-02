@@ -69,7 +69,7 @@ class ViewDecksLocalPage extends HookWidget {
     final importController = useMemoized(() => ImportExportController());
     final syncController = useSyncController(
       title: 'Sync decks',
-      userId: () => LocalDB.profile.getOrCreate().id,
+      profileId: () => LocalDB.profile.getOrCreate().id,
       getTables: SyncDeckService.getTables,
       onSynced: controller.load,
     );
@@ -436,7 +436,7 @@ class _DeckListingListView extends StatelessWidget {
       onRetry: onRetry,
       skeletonTile: DeckListingTile(
         deck: Deck.createNow(
-          userId: 'loading',
+          profileId: 'loading',
           title: 'Loading listing',
           shortDescription: 'Loading listing description',
           isPublished: true,

@@ -22,37 +22,29 @@ class TagMapper extends ClassMapperBase<Tag> {
 
   static String _$id(Tag v) => v.id;
   static const Field<Tag, String> _f$id = Field('id', _$id);
-  static String? _$userId(Tag v) => v.userId;
-  static const Field<Tag, String> _f$userId = Field(
-    'userId',
-    _$userId,
-    key: r'user_id',
-    opt: true,
-  );
+  static String? _$profileId(Tag v) => v.profileId;
+  static const Field<Tag, String> _f$profileId =
+      Field('profileId', _$profileId, key: r'profile_id', opt: true);
   static String _$name(Tag v) => v.name;
   static const Field<Tag, String> _f$name = Field('name', _$name);
   static DateTime _$createdAt(Tag v) => v.createdAt;
-  static const Field<Tag, DateTime> _f$createdAt = Field(
-    'createdAt',
-    _$createdAt,
-    key: r'created_at',
-  );
+  static const Field<Tag, DateTime> _f$createdAt =
+      Field('createdAt', _$createdAt, key: r'created_at');
 
   @override
   final MappableFields<Tag> fields = const {
     #id: _f$id,
-    #userId: _f$userId,
+    #profileId: _f$profileId,
     #name: _f$name,
     #createdAt: _f$createdAt,
   };
 
   static Tag _instantiate(DecodingData data) {
     return Tag(
-      id: data.dec(_f$id),
-      userId: data.dec(_f$userId),
-      name: data.dec(_f$name),
-      createdAt: data.dec(_f$createdAt),
-    );
+        id: data.dec(_f$id),
+        profileId: data.dec(_f$profileId),
+        name: data.dec(_f$name),
+        createdAt: data.dec(_f$createdAt));
   }
 
   @override
@@ -101,7 +93,7 @@ extension TagValueCopy<$R, $Out> on ObjectCopyWith<$R, Tag, $Out> {
 
 abstract class TagCopyWith<$R, $In extends Tag, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  $R call({String? id, String? userId, String? name, DateTime? createdAt});
+  $R call({String? id, String? profileId, String? name, DateTime? createdAt});
   TagCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -112,26 +104,23 @@ class _TagCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Tag, $Out>
   @override
   late final ClassMapperBase<Tag> $mapper = TagMapper.ensureInitialized();
   @override
-  $R call({
-    String? id,
-    Object? userId = $none,
-    String? name,
-    DateTime? createdAt,
-  }) => $apply(
-    FieldCopyWithData({
-      if (id != null) #id: id,
-      if (userId != $none) #userId: userId,
-      if (name != null) #name: name,
-      if (createdAt != null) #createdAt: createdAt,
-    }),
-  );
+  $R call(
+          {String? id,
+          Object? profileId = $none,
+          String? name,
+          DateTime? createdAt}) =>
+      $apply(FieldCopyWithData({
+        if (id != null) #id: id,
+        if (profileId != $none) #profileId: profileId,
+        if (name != null) #name: name,
+        if (createdAt != null) #createdAt: createdAt
+      }));
   @override
   Tag $make(CopyWithData data) => Tag(
-    id: data.get(#id, or: $value.id),
-    userId: data.get(#userId, or: $value.userId),
-    name: data.get(#name, or: $value.name),
-    createdAt: data.get(#createdAt, or: $value.createdAt),
-  );
+      id: data.get(#id, or: $value.id),
+      profileId: data.get(#profileId, or: $value.profileId),
+      name: data.get(#name, or: $value.name),
+      createdAt: data.get(#createdAt, or: $value.createdAt));
 
   @override
   TagCopyWith<$R2, Tag, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>

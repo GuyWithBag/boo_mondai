@@ -12,7 +12,7 @@ class DeckCommentsService {
 
   static Future<void> addComment({
     required String deckId,
-    required String userId,
+    required String profileId,
     required String body,
     String? parentCommentId,
   }) async {
@@ -22,7 +22,7 @@ class DeckCommentsService {
     final comment = DeckComment.createNow(
       id: uuid.v7(),
       deckId: deckId,
-      userId: userId,
+      profileId: profileId,
       parentCommentId: parentCommentId,
       body: trimmedBody,
     );

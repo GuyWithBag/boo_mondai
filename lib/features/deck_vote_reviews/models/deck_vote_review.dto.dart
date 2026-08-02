@@ -7,7 +7,7 @@ part 'deck_vote_review.dto.mapper.dart';
 class DeckVoteReview with DeckVoteReviewMappable {
   final String id;
   final String deckId;
-  final String userId;
+  final String profileId;
   final int voteValueAtCreation;
   final String title;
   final String body;
@@ -19,7 +19,7 @@ class DeckVoteReview with DeckVoteReviewMappable {
   const DeckVoteReview({
     required this.id,
     required this.deckId,
-    required this.userId,
+    required this.profileId,
     required this.voteValueAtCreation,
     this.title = '',
     required this.body,
@@ -32,7 +32,7 @@ class DeckVoteReview with DeckVoteReviewMappable {
   factory DeckVoteReview.createNow({
     required String id,
     required String deckId,
-    required String userId,
+    required String profileId,
     required int voteValueAtCreation,
     required String title,
     required String body,
@@ -41,7 +41,7 @@ class DeckVoteReview with DeckVoteReviewMappable {
     return DeckVoteReview(
       id: id,
       deckId: deckId,
-      userId: userId,
+      profileId: profileId,
       voteValueAtCreation: voteValueAtCreation,
       title: title,
       body: body,

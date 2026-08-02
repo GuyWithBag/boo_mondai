@@ -12,13 +12,13 @@ part 'leaderboard_entry.dto.mapper.dart';
 
 @MappableClass()
 class LeaderboardEntry with LeaderboardEntryMappable {
-  final String userId;
+  final String profileId;
   final int drillScore;
   final int reviewCount;
   final CachedProfile? userProfile;
 
   const LeaderboardEntry({
-    required this.userId,
+    required this.profileId,
     required this.drillScore,
     required this.reviewCount,
     this.userProfile,

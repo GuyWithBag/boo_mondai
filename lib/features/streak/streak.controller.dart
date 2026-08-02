@@ -9,7 +9,7 @@ import 'package:boo_mondai/lib.barrel.dart'
 class StreakController extends Controller {
   Streak? get streak => LocalDB.streak.retrieve();
 
-  // void fetchStreak(String userId) {
+  // void fetchStreak(String profileId) {
   //   setLoading(true);
   //   setError(null);;
   //   notifyListeners();

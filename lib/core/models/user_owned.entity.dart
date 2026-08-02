@@ -1,3 +1,3 @@
 mixin UserOwnedEntity {
-  String get userId;
+  String get profileId;
 }

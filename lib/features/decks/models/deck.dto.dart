@@ -35,7 +35,7 @@ class Deck with DeckMappable implements MutableEntity {
   @override
   final DateTime? purgeAfter;
 
-  final String userId;
+  final String profileId;
   final String title;
   final String shortDescription;
   final String longDescription;
@@ -62,7 +62,7 @@ class Deck with DeckMappable implements MutableEntity {
 
   const Deck({
     required this.id,
-    required this.userId,
+    required this.profileId,
     required this.title,
     this.shortDescription = '',
     this.longDescription = '',
@@ -85,7 +85,7 @@ class Deck with DeckMappable implements MutableEntity {
   });
 
   factory Deck.createNow({
-    required String userId,
+    required String profileId,
     required String title,
     String? shortDescription,
     String? longDescription,
@@ -101,7 +101,7 @@ class Deck with DeckMappable implements MutableEntity {
     final now = DateTime.now();
     return Deck(
       id: uuid.v7(),
-      userId: userId,
+      profileId: profileId,
       title: title,
       shortDescription: shortDescription ?? '',
       longDescription: longDescription ?? '',

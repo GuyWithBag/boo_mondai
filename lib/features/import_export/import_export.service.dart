@@ -271,7 +271,7 @@ class ImportExportService {
 
       var deck = incomingDeck.copyWith(
         id: targetDeckId,
-        userId: currentUserId,
+        profileId: currentUserId,
         isPublished: false,
         isEditable: true,
         userProfile: null,
@@ -474,7 +474,7 @@ class ImportExportService {
     final now = DateTime.now();
     final createdDeck = incomingDeck.copyWith(
       id: uuid.v7(),
-      userId: profile.id,
+      profileId: profile.id,
       createdAt: now,
       updatedAt: now,
       isPublished: false,

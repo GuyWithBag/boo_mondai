@@ -24,12 +24,12 @@ final class DrillStepOutcome {
 abstract final class DrillSessionPolicy {
   static List<StudyCard> selectCards({
     required String deckId,
-    required String userId,
+    required String profileId,
     required int limit,
   }) {
     return (DrillStudySessionHelper.getEligibleDrillCards(
       deckId,
-      userId,
+      profileId,
     )..shuffle()).take(limit).toList();
   }
 
@@ -74,7 +74,7 @@ abstract final class DrillSessionPolicy {
       if (LocalDB.fsrsCard.getByStudyCardId(card.id) == null) {
         final fsrsCard = await FsrsCard.create(
           studyCardId: card.id,
-          userId: session.userId,
+          profileId: session.profileId,
         );
         await Services.fsrs.enrollCard(
           card: fsrsCard,

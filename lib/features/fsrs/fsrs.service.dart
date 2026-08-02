@@ -50,11 +50,11 @@ class FsrsService extends Service {
 
   // ── Due Stats (Calculated dynamically based on time/filter) ──
   Map<String, DeckDueStats> calculateDueStats({
-    required String userId,
+    required String profileId,
     required DueFilterThreshold dueFilter,
   }) {
     final now = DateTime.now();
-    final allFsrsCards = LocalDB.fsrsCard.getByUserId(userId);
+    final allFsrsCards = LocalDB.fsrsCard.getByProfileId(profileId);
     final allStudyCards = LocalDB.studyCard.selectMany();
     final rcToDeck = {for (final rc in allStudyCards) rc.id: rc.deckId};
 
@@ -105,10 +105,10 @@ class FsrsService extends Service {
 
   // ── Historical Stats (Calculated once, independent of time) ──
   Map<String, DeckHistoricalStats> calculateHistoricalStats({
-    required String userId,
+    required String profileId,
   }) {
     final allLogs = LocalDB.reviewLog.selectMany();
-    // In a real app, you'd want to query logs by userId, but relying on the card relation works for now
+    // In a real app, you'd want to query logs by profileId, but relying on the card relation works for now
     final allStudyCards = LocalDB.studyCard.selectMany();
     final rcToDeck = {for (final rc in allStudyCards) rc.id: rc.deckId};
 

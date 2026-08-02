@@ -134,7 +134,9 @@ CREATE POLICY "streaks: owner manages" ON streaks FOR ALL USING (profile_id = cu
 DROP POLICY IF EXISTS "deck_votes: read all" ON deck_votes;
 CREATE POLICY "deck_votes: read all" ON deck_votes FOR SELECT USING (true);
 
-CREATE OR REPLACE VIEW leaderboard_entries WITH (security_invoker = true) AS
+DROP VIEW IF EXISTS leaderboard_entries;
+
+CREATE VIEW leaderboard_entries WITH (security_invoker = true) AS
 SELECT
   p.id AS profile_id,
   jsonb_build_object(

@@ -256,7 +256,7 @@ Never perform these writes directly from a widget.
 
 ```dart
 final resumable = await store.findUnfinishedSession(
-  userId: userId,
+  profileId: profileId,
   mode: mode,
   deckId: deckId,
 );
@@ -327,4 +327,3 @@ At minimum, test:
 - Helpers remain small and stateless.
 - Presentation steps are persisted for resume but excluded from learning
   history and scoring.
-

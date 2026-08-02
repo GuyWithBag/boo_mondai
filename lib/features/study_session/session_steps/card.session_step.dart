@@ -1,6 +1,7 @@
-import 'package:boo_mondai/lib.barrel.dart'
-    show SessionStep, CardSessionStepMappable;
+import 'package:boo_mondai/features/study_session/session_steps/session_step.dto.dart';
 import 'package:dart_mappable/dart_mappable.dart';
+
+part 'card.session_step.mapper.dart';
 
 @MappableClass(discriminatorValue: 'card')
 final class CardSessionStep extends SessionStep with CardSessionStepMappable {

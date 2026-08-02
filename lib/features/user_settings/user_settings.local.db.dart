@@ -9,8 +9,8 @@
 //   Map<String, Object?> primaryKeyFromItem(UserSettings item) => {'id': item.id};
 
 //   /// Returns one settings row by owner `userId`.
-//   UserSettings? getByUserId(String userId) {
-//     final rows = selectMany(where: (row) => row.userId == userId, limit: 1);
+//   UserSettings? getByProfileId(String profileId) {
+//     final rows = selectMany(where: (row) => row.userId == profileId, limit: 1);
 //     return rows.isEmpty ? null : rows.first;
 //   }
 // }

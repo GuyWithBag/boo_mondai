@@ -14,7 +14,7 @@ class ReviewSession extends StudySession with ReviewSessionMappable {
   const ReviewSession({
     // Use 'super' to pass the shared properties up to the base class
     required super.id,
-    required super.userId,
+    required super.profileId,
     super.deckId,
     required super.startedAt,
     super.completedAt,

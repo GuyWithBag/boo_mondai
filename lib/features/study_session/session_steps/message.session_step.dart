@@ -1,6 +1,7 @@
-import 'package:boo_mondai/lib.barrel.dart'
-    show MessageSessionStepMappable, SessionStep;
+import 'package:boo_mondai/features/study_session/session_steps/session_step.dto.dart';
 import 'package:dart_mappable/dart_mappable.dart';
+
+part 'message.session_step.mapper.dart';
 
 @MappableClass(discriminatorValue: 'message')
 final class MessageSessionStep extends SessionStep

@@ -99,13 +99,13 @@ class _PublishToggle extends StatelessWidget { ... }
 
 ## 8. `loadFromCache` result ignored — always triggering a slow network fetch
 
-**What went wrong:** `DeckListPage` called `loadFromCache(userId)` but then always called `fetchUserDecks` regardless, causing a loading spinner on every mount even when cached data was already present.
+**What went wrong:** `DeckListPage` called `loadFromCache(profileId)` but then always called `fetchUserDecks` regardless, causing a loading spinner on every mount even when cached data was already present.
 
 **Rule:** `loadFromCache` returns the count of cached items. Only fetch from the network when the cache is empty:
 ```dart
-final cachedCount = deckProv.loadFromCache(userId);
+final cachedCount = deckProv.loadFromCache(profileId);
 if (cachedCount == 0) {
-  Future.microtask(() => deckProv.fetchUserDecks(userId));
+  Future.microtask(() => deckProv.fetchUserDecks(profileId));
 }
 ```
 
@@ -213,7 +213,7 @@ context.pop(); // pop after showing snackbar
 **Rule:** Any field the user can control must flow through as a parameter — don't assume defaults in the provider internals:
 ```dart
 // ✓ Correct — caller decides
-Future<Deck?> createDeck(String userId, String title, String shortDesc,
+Future<Deck?> createDeck(String profileId, String title, String shortDesc,
     String lang, {bool isPublic = true}) async {
   final data = {
     ...

@@ -6,7 +6,7 @@ class UserStudyCardTagsLocalDB extends HiveLocalDB<UserStudyCardTag> {
 
   @override
   Map<String, Object?> primaryKeyFromItem(UserStudyCardTag item) => {
-    'user_id': item.userId,
+    'profile_id': item.profileId,
     'study_cards_id': item.studyCardId,
     'tag_id': item.tagId,
   };

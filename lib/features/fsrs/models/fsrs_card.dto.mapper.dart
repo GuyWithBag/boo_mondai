@@ -36,9 +36,9 @@ class FsrsCardMapper extends ClassMapperBase<FsrsCard> {
   static DateTime? _$purgeAfter(FsrsCard v) => v.purgeAfter;
   static const Field<FsrsCard, DateTime> _f$purgeAfter =
       Field('purgeAfter', _$purgeAfter, key: r'purge_after', opt: true);
-  static String _$userId(FsrsCard v) => v.userId;
-  static const Field<FsrsCard, String> _f$userId =
-      Field('userId', _$userId, key: r'user_id');
+  static String _$profileId(FsrsCard v) => v.profileId;
+  static const Field<FsrsCard, String> _f$profileId =
+      Field('profileId', _$profileId, key: r'profile_id');
   static String _$studyCardId(FsrsCard v) => v.studyCardId;
   static const Field<FsrsCard, String> _f$studyCardId =
       Field('studyCardId', _$studyCardId, key: r'study_card_id');
@@ -55,7 +55,7 @@ class FsrsCardMapper extends ClassMapperBase<FsrsCard> {
     #updatedAt: _f$updatedAt,
     #deletedAt: _f$deletedAt,
     #purgeAfter: _f$purgeAfter,
-    #userId: _f$userId,
+    #profileId: _f$profileId,
     #studyCardId: _f$studyCardId,
     #state: _f$state,
     #studyCard: _f$studyCard,
@@ -68,7 +68,7 @@ class FsrsCardMapper extends ClassMapperBase<FsrsCard> {
         updatedAt: data.dec(_f$updatedAt),
         deletedAt: data.dec(_f$deletedAt),
         purgeAfter: data.dec(_f$purgeAfter),
-        userId: data.dec(_f$userId),
+        profileId: data.dec(_f$profileId),
         studyCardId: data.dec(_f$studyCardId),
         state: data.dec(_f$state),
         studyCard: data.dec(_f$studyCard));
@@ -132,7 +132,7 @@ abstract class FsrsCardCopyWith<$R, $In extends FsrsCard, $Out>
       DateTime? updatedAt,
       DateTime? deletedAt,
       DateTime? purgeAfter,
-      String? userId,
+      String? profileId,
       String? studyCardId,
       Card? state,
       StudyCard? studyCard});
@@ -157,7 +157,7 @@ class _FsrsCardCopyWithImpl<$R, $Out>
           DateTime? updatedAt,
           Object? deletedAt = $none,
           Object? purgeAfter = $none,
-          String? userId,
+          String? profileId,
           String? studyCardId,
           Card? state,
           Object? studyCard = $none}) =>
@@ -167,7 +167,7 @@ class _FsrsCardCopyWithImpl<$R, $Out>
         if (updatedAt != null) #updatedAt: updatedAt,
         if (deletedAt != $none) #deletedAt: deletedAt,
         if (purgeAfter != $none) #purgeAfter: purgeAfter,
-        if (userId != null) #userId: userId,
+        if (profileId != null) #profileId: profileId,
         if (studyCardId != null) #studyCardId: studyCardId,
         if (state != null) #state: state,
         if (studyCard != $none) #studyCard: studyCard
@@ -179,7 +179,7 @@ class _FsrsCardCopyWithImpl<$R, $Out>
       updatedAt: data.get(#updatedAt, or: $value.updatedAt),
       deletedAt: data.get(#deletedAt, or: $value.deletedAt),
       purgeAfter: data.get(#purgeAfter, or: $value.purgeAfter),
-      userId: data.get(#userId, or: $value.userId),
+      profileId: data.get(#profileId, or: $value.profileId),
       studyCardId: data.get(#studyCardId, or: $value.studyCardId),
       state: data.get(#state, or: $value.state),
       studyCard: data.get(#studyCard, or: $value.studyCard));

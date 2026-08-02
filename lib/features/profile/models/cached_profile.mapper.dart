@@ -23,23 +23,14 @@ class CachedProfileMapper extends ClassMapperBase<CachedProfile> {
   static String _$id(CachedProfile v) => v.id;
   static const Field<CachedProfile, String> _f$id = Field('id', _$id);
   static String _$username(CachedProfile v) => v.username;
-  static const Field<CachedProfile, String> _f$username = Field(
-    'username',
-    _$username,
-  );
+  static const Field<CachedProfile, String> _f$username =
+      Field('username', _$username);
   static String? _$avatarUrl(CachedProfile v) => v.avatarUrl;
-  static const Field<CachedProfile, String> _f$avatarUrl = Field(
-    'avatarUrl',
-    _$avatarUrl,
-    key: r'avatar_url',
-    opt: true,
-  );
+  static const Field<CachedProfile, String> _f$avatarUrl =
+      Field('avatarUrl', _$avatarUrl, key: r'avatar_url', opt: true);
   static DateTime _$createdAt(CachedProfile v) => v.createdAt;
-  static const Field<CachedProfile, DateTime> _f$createdAt = Field(
-    'createdAt',
-    _$createdAt,
-    key: r'created_at',
-  );
+  static const Field<CachedProfile, DateTime> _f$createdAt =
+      Field('createdAt', _$createdAt, key: r'created_at');
 
   @override
   final MappableFields<CachedProfile> fields = const {
@@ -51,11 +42,10 @@ class CachedProfileMapper extends ClassMapperBase<CachedProfile> {
 
   static CachedProfile _instantiate(DecodingData data) {
     return CachedProfile(
-      id: data.dec(_f$id),
-      username: data.dec(_f$username),
-      avatarUrl: data.dec(_f$avatarUrl),
-      createdAt: data.dec(_f$createdAt),
-    );
+        id: data.dec(_f$id),
+        username: data.dec(_f$username),
+        avatarUrl: data.dec(_f$avatarUrl),
+        createdAt: data.dec(_f$createdAt));
   }
 
   @override
@@ -72,43 +62,34 @@ class CachedProfileMapper extends ClassMapperBase<CachedProfile> {
 
 mixin CachedProfileMappable {
   String toJson() {
-    return CachedProfileMapper.ensureInitialized().encodeJson<CachedProfile>(
-      this as CachedProfile,
-    );
+    return CachedProfileMapper.ensureInitialized()
+        .encodeJson<CachedProfile>(this as CachedProfile);
   }
 
   Map<String, dynamic> toMap() {
-    return CachedProfileMapper.ensureInitialized().encodeMap<CachedProfile>(
-      this as CachedProfile,
-    );
+    return CachedProfileMapper.ensureInitialized()
+        .encodeMap<CachedProfile>(this as CachedProfile);
   }
 
   CachedProfileCopyWith<CachedProfile, CachedProfile, CachedProfile>
-  get copyWith => _CachedProfileCopyWithImpl<CachedProfile, CachedProfile>(
-    this as CachedProfile,
-    $identity,
-    $identity,
-  );
+      get copyWith => _CachedProfileCopyWithImpl<CachedProfile, CachedProfile>(
+          this as CachedProfile, $identity, $identity);
   @override
   String toString() {
-    return CachedProfileMapper.ensureInitialized().stringifyValue(
-      this as CachedProfile,
-    );
+    return CachedProfileMapper.ensureInitialized()
+        .stringifyValue(this as CachedProfile);
   }
 
   @override
   bool operator ==(Object other) {
-    return CachedProfileMapper.ensureInitialized().equalsValue(
-      this as CachedProfile,
-      other,
-    );
+    return CachedProfileMapper.ensureInitialized()
+        .equalsValue(this as CachedProfile, other);
   }
 
   @override
   int get hashCode {
-    return CachedProfileMapper.ensureInitialized().hashValue(
-      this as CachedProfile,
-    );
+    return CachedProfileMapper.ensureInitialized()
+        .hashValue(this as CachedProfile);
   }
 }
 
@@ -120,12 +101,8 @@ extension CachedProfileValueCopy<$R, $Out>
 
 abstract class CachedProfileCopyWith<$R, $In extends CachedProfile, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  $R call({
-    String? id,
-    String? username,
-    String? avatarUrl,
-    DateTime? createdAt,
-  });
+  $R call(
+      {String? id, String? username, String? avatarUrl, DateTime? createdAt});
   CachedProfileCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -138,29 +115,26 @@ class _CachedProfileCopyWithImpl<$R, $Out>
   late final ClassMapperBase<CachedProfile> $mapper =
       CachedProfileMapper.ensureInitialized();
   @override
-  $R call({
-    String? id,
-    String? username,
-    Object? avatarUrl = $none,
-    DateTime? createdAt,
-  }) => $apply(
-    FieldCopyWithData({
-      if (id != null) #id: id,
-      if (username != null) #username: username,
-      if (avatarUrl != $none) #avatarUrl: avatarUrl,
-      if (createdAt != null) #createdAt: createdAt,
-    }),
-  );
+  $R call(
+          {String? id,
+          String? username,
+          Object? avatarUrl = $none,
+          DateTime? createdAt}) =>
+      $apply(FieldCopyWithData({
+        if (id != null) #id: id,
+        if (username != null) #username: username,
+        if (avatarUrl != $none) #avatarUrl: avatarUrl,
+        if (createdAt != null) #createdAt: createdAt
+      }));
   @override
   CachedProfile $make(CopyWithData data) => CachedProfile(
-    id: data.get(#id, or: $value.id),
-    username: data.get(#username, or: $value.username),
-    avatarUrl: data.get(#avatarUrl, or: $value.avatarUrl),
-    createdAt: data.get(#createdAt, or: $value.createdAt),
-  );
+      id: data.get(#id, or: $value.id),
+      username: data.get(#username, or: $value.username),
+      avatarUrl: data.get(#avatarUrl, or: $value.avatarUrl),
+      createdAt: data.get(#createdAt, or: $value.createdAt));
 
   @override
   CachedProfileCopyWith<$R2, CachedProfile, $Out2> $chain<$R2, $Out2>(
-    Then<$Out2, $R2> t,
-  ) => _CachedProfileCopyWithImpl<$R2, $Out2>($value, $cast, t);
+          Then<$Out2, $R2> t) =>
+      _CachedProfileCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }

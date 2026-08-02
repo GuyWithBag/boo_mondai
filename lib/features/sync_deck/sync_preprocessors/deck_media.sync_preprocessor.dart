@@ -16,7 +16,7 @@ abstract final class DeckMediaSyncPreprocessor {
   /// Uploads deck-owned local media before the deck row is pushed remotely.
   static Future<Deck> preprocessPushItem({
     required Deck deck,
-    required String userId,
+    required String profileId,
   }) async {
     final localPath = StoredMediaPathHelper.deckCoverImage(
       deckTitle: deck.title,
@@ -29,7 +29,7 @@ abstract final class DeckMediaSyncPreprocessor {
         SyncMediaReference<Deck>(
           localPath: localPath,
           remotePath: MediaRemotePathHelper.deckCoverImage(
-            profileId: userId,
+            profileId: profileId,
             deckId: deck.id,
           ),
           bucket: RemoteDB.publicBucket,
@@ -47,7 +47,7 @@ abstract final class DeckMediaSyncPreprocessor {
       bucket: RemoteDB.publicBucket,
       remotePath: (storedMedia, index) =>
           MediaRemotePathHelper.deckMarkdownAttachment(
-            profileId: userId,
+            profileId: profileId,
             deckId: updated.id,
             fileName: MediaRemotePathHelper.fileNameFromStoredMedia(
               storedMedia,

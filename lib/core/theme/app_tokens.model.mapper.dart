@@ -260,6 +260,18 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
       Field('buttonPaddingVerticalExtendedFab',
           _$buttonPaddingVerticalExtendedFab,
           key: r'button_padding_vertical_extended_fab', mode: FieldMode.member);
+  static double _$buttonIconSmallTactileShadowOffset(AppTokens v) =>
+      v.buttonIconSmallTactileShadowOffset;
+  static const Field<AppTokens, double> _f$buttonIconSmallTactileShadowOffset =
+      Field('buttonIconSmallTactileShadowOffset',
+          _$buttonIconSmallTactileShadowOffset,
+          key: r'button_icon_small_tactile_shadow_offset',
+          mode: FieldMode.member);
+  static double _$buttonTactileShadowOffset(AppTokens v) =>
+      v.buttonTactileShadowOffset;
+  static const Field<AppTokens, double> _f$buttonTactileShadowOffset = Field(
+      'buttonTactileShadowOffset', _$buttonTactileShadowOffset,
+      key: r'button_tactile_shadow_offset', mode: FieldMode.member);
   static double _$buttonShadowOffset(AppTokens v) => v.buttonShadowOffset;
   static const Field<AppTokens, double> _f$buttonShadowOffset = Field(
       'buttonShadowOffset', _$buttonShadowOffset,
@@ -373,6 +385,18 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
   static const Field<AppTokens, double> _f$radiusSurfaceXsm = Field(
       'radiusSurfaceXsm', _$radiusSurfaceXsm,
       key: r'radius_surface_xsm', mode: FieldMode.member);
+  static double _$radiusButton(AppTokens v) => v.radiusButton;
+  static const Field<AppTokens, double> _f$radiusButton = Field(
+      'radiusButton', _$radiusButton,
+      key: r'radius_button', mode: FieldMode.member);
+  static double _$radiusButtonIcon(AppTokens v) => v.radiusButtonIcon;
+  static const Field<AppTokens, double> _f$radiusButtonIcon = Field(
+      'radiusButtonIcon', _$radiusButtonIcon,
+      key: r'radius_button_icon', mode: FieldMode.member);
+  static double _$radiusButtonIconSm(AppTokens v) => v.radiusButtonIconSm;
+  static const Field<AppTokens, double> _f$radiusButtonIconSm = Field(
+      'radiusButtonIconSm', _$radiusButtonIconSm,
+      key: r'radius_button_icon_sm', mode: FieldMode.member);
   static double _$textSizeHeaderLarge(AppTokens v) => v.textSizeHeaderLarge;
   static const Field<AppTokens, double> _f$textSizeHeaderLarge = Field(
       'textSizeHeaderLarge', _$textSizeHeaderLarge,
@@ -428,10 +452,6 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
   static const Field<AppTokens, double> _f$sizeButtonIconSm = Field(
       'sizeButtonIconSm', _$sizeButtonIconSm,
       key: r'size_button_icon_sm', mode: FieldMode.member);
-  static double _$radiusButtonIconSm(AppTokens v) => v.radiusButtonIconSm;
-  static const Field<AppTokens, double> _f$radiusButtonIconSm = Field(
-      'radiusButtonIconSm', _$radiusButtonIconSm,
-      key: r'radius_button_icon_sm', mode: FieldMode.member);
   static double _$studyCardAspectRatio(AppTokens v) => v.studyCardAspectRatio;
   static const Field<AppTokens, double> _f$studyCardAspectRatio = Field(
       'studyCardAspectRatio', _$studyCardAspectRatio,
@@ -525,6 +545,8 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
     #buttonPaddingVerticalIconWithLabel: _f$buttonPaddingVerticalIconWithLabel,
     #buttonPaddingHorizontalExtendedFab: _f$buttonPaddingHorizontalExtendedFab,
     #buttonPaddingVerticalExtendedFab: _f$buttonPaddingVerticalExtendedFab,
+    #buttonIconSmallTactileShadowOffset: _f$buttonIconSmallTactileShadowOffset,
+    #buttonTactileShadowOffset: _f$buttonTactileShadowOffset,
     #buttonShadowOffset: _f$buttonShadowOffset,
     #modalShadowOffset: _f$modalShadowOffset,
     #fontWeightTextBody: _f$fontWeightTextBody,
@@ -552,6 +574,9 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
     #radiusSurface: _f$radiusSurface,
     #radiusSurfaceSm: _f$radiusSurfaceSm,
     #radiusSurfaceXsm: _f$radiusSurfaceXsm,
+    #radiusButton: _f$radiusButton,
+    #radiusButtonIcon: _f$radiusButtonIcon,
+    #radiusButtonIconSm: _f$radiusButtonIconSm,
     #textSizeHeaderLarge: _f$textSizeHeaderLarge,
     #textSizeHeader: _f$textSizeHeader,
     #textSizeHeader2: _f$textSizeHeader2,
@@ -566,7 +591,6 @@ class AppTokensMapper extends ClassMapperBase<AppTokens> {
     #sizeModalIcon: _f$sizeModalIcon,
     #sizeButtonIcon: _f$sizeButtonIcon,
     #sizeButtonIconSm: _f$sizeButtonIconSm,
-    #radiusButtonIconSm: _f$radiusButtonIconSm,
     #studyCardAspectRatio: _f$studyCardAspectRatio,
     #studyCardWidth: _f$studyCardWidth,
     #studyCardRadius: _f$studyCardRadius,

@@ -107,14 +107,14 @@ class DeckVoteReviewsController {
     if (!AuthService.isAuthenticatedRemote || review.isDeleted) return false;
 
     final profile = LocalDB.profile.getOrCreate();
-    return profile.id == review.userId;
+    return profile.id == review.profileId;
   }
 
   bool canEditReviewComment(DeckVoteReviewComment comment) {
     if (!AuthService.isAuthenticatedRemote || comment.isDeleted) return false;
 
     final profile = LocalDB.profile.getOrCreate();
-    return profile.id == comment.userId;
+    return profile.id == comment.profileId;
   }
 
   bool canEditItem(DiscussionItem item) {
@@ -177,7 +177,7 @@ class DeckVoteReviewsController {
       final profile = LocalDB.profile.getOrCreate();
       await DeckVoteReviewsService.upsertReview(
         deckId: deck.id,
-        userId: profile.id,
+        profileId: profile.id,
         voteValue: voteValue,
         title: title.trim(),
         body: trimmedBody,
@@ -286,7 +286,7 @@ class DeckVoteReviewsController {
       final profile = LocalDB.profile.getOrCreate();
       await DeckVoteReviewsService.addComment(
         reviewId: reviewId,
-        userId: profile.id,
+        profileId: profile.id,
         body: trimmedBody,
         parentCommentId: isReplyingToReview ? null : parentCommentId,
       );

@@ -23,14 +23,14 @@
 //   const UserSettingsService._();
 
 //   /// Returns existing settings for [userId], or creates a default row.
-//   static Future<UserSettings> getOrCreateForUser(String userId) async {
-//     final existing = LocalDB.userSettings.getByUserId(userId);
+//   static Future<UserSettings> getOrCreateForUser(String profileId) async {
+//     final existing = LocalDB.userSettings.getByProfileId(profileId);
 //     if (existing != null) return existing;
 
 //     final now = DateTime.now();
 //     final created = UserSettings(
 //       id: uuid.v7(),
-//       userId: userId,
+//       profileId: profileId,
 //       themeModeName: ThemeMode.system.name,
 //       lightThemePresetId: 'boomondai',
 //       darkThemePresetId: 'boomondai',
@@ -49,10 +49,10 @@
 
 //   /// Updates the selected theme mode for [userId].
 //   static Future<UserSettings> updateThemeMode({
-//     required String userId,
+//     required String profileId,
 //     required ThemeMode themeMode,
 //   }) async {
-//     final current = await getOrCreateForUser(userId);
+//     final current = await getOrCreateForUser(profileId);
 //     final updated = current.copyWith(
 //       themeModeName: themeMode.name,
 //       updatedAt: DateTime.now(),
@@ -63,11 +63,11 @@
 
 //   /// Updates selected light/dark preset ids for [userId].
 //   static Future<UserSettings> updateThemeSelections({
-//     required String userId,
+//     required String profileId,
 //     String? lightThemePresetId,
 //     String? darkThemePresetId,
 //   }) async {
-//     final current = await getOrCreateForUser(userId);
+//     final current = await getOrCreateForUser(profileId);
 //     final updated = current.copyWith(
 //       lightThemePresetId: lightThemePresetId ?? current.lightThemePresetId,
 //       darkThemePresetId: darkThemePresetId ?? current.darkThemePresetId,
@@ -79,10 +79,10 @@
 
 //   /// Replaces theme overrides for [userId].
 //   static Future<UserSettings> updateThemeOverride({
-//     required String userId,
+//     required String profileId,
 //     ThemeOverride? override,
 //   }) async {
-//     final current = await getOrCreateForUser(userId);
+//     final current = await getOrCreateForUser(profileId);
 //     final updated = current.copyWith(
 //       themeOverride: override,
 //       updatedAt: DateTime.now(),
@@ -93,10 +93,10 @@
 
 //   /// Inserts or updates one custom preset in [userId] settings.
 //   static Future<UserSettings> upsertCustomPreset({
-//     required String userId,
+//     required String profileId,
 //     required CustomThemePreset preset,
 //   }) async {
-//     final current = await getOrCreateForUser(userId);
+//     final current = await getOrCreateForUser(profileId);
 //     final presets = [...current.customThemePresets];
 //     final index = presets.indexWhere((item) => item.id == preset.id);
 //     final now = DateTime.now();
@@ -119,10 +119,10 @@
 
 //   /// Removes one custom preset from [userId] settings.
 //   static Future<UserSettings> removeCustomPreset({
-//     required String userId,
+//     required String profileId,
 //     required String presetId,
 //   }) async {
-//     final current = await getOrCreateForUser(userId);
+//     final current = await getOrCreateForUser(profileId);
 //     final remaining = current.customThemePresets
 //         .where((item) => item.id != presetId)
 //         .toList(growable: false);
@@ -147,13 +147,13 @@
 //   /// Exports current settings to JSON-friendly map using [options].
 //   static Future<UserSettingsOperationResult<Map<String, dynamic>>>
 //   exportSettings({
-//     required String userId,
+//     required String profileId,
 //     UserSettingsExportOptions options = const UserSettingsExportOptions(),
 //   }) async {
-//     final settings = await getOrCreateForUser(userId);
+//     final settings = await getOrCreateForUser(profileId);
 //     final payload = <String, dynamic>{
 //       'format': 'boo_mondai_user_settings_v1',
-//       'user_id': userId,
+//       'profile_id': profileId,,
 //       'exported_at': DateTime.now().toIso8601String(),
 //       'schema_version': 1,
 //     };
@@ -181,7 +181,7 @@
 //           type: UserSettingsChangeType.created,
 //           type: 'user_settings',
 //           id: settings.id,
-//           message: 'Exported user settings for profile $userId.',
+//           message: 'Exported user settings for profile $profileId.',
 //         ),
 //       ],
 //     );
@@ -189,10 +189,10 @@
 
 //   /// Exports current settings to JSON string.
 //   static Future<UserSettingsOperationResult<String>> exportSettingsJson({
-//     required String userId,
+//     required String profileId,
 //     UserSettingsExportOptions options = const UserSettingsExportOptions(),
 //   }) async {
-//     final result = await exportSettings(userId: userId, options: options);
+//     final result = await exportSettings(profileId: profileId, options: options);
 //     return UserSettingsOperationResult(
 //       value: jsonEncode(result.value),
 //       changeLogs: result.changeLogs,
@@ -202,11 +202,11 @@
 
 //   /// Imports settings from decoded [payload] using [mode].
 //   static Future<UserSettingsOperationResult<UserSettings>> importSettings({
-//     required String userId,
+//     required String profileId,
 //     required Map<String, dynamic> payload,
 //     UserSettingsImportMode mode = UserSettingsImportMode.mergeCurrent,
 //   }) async {
-//     final current = await getOrCreateForUser(userId);
+//     final current = await getOrCreateForUser(profileId);
 //     final logs = <UserSettingsChangeRecord>[];
 //     final failures = <String>[];
 //     final now = DateTime.now();
@@ -348,7 +348,7 @@
 
 //   /// Imports settings from raw JSON string.
 //   static Future<UserSettingsOperationResult<UserSettings>> importSettingsJson({
-//     required String userId,
+//     required String profileId,
 //     required String rawJson,
 //     UserSettingsImportMode mode = UserSettingsImportMode.mergeCurrent,
 //   }) async {
@@ -357,7 +357,7 @@
 //       throw Exception('Settings import payload must decode to a JSON object.');
 //     }
 //     return importSettings(
-//       userId: userId,
+//       profileId: profileId,
 //       payload: Map<String, dynamic>.from(decoded),
 //       mode: mode,
 //     );

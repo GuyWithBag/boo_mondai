@@ -505,9 +505,9 @@ same upload executor.
 Remote paths are currently built with raw strings:
 
 ```dart
-'users/$userId/decks/${deck.id}/cover'
-'users/$userId/decks/$deckId/featured/image$index'
-'users/$userId/decks/$deckId/markdown/...'
+'users/$profileId/decks/${deck.id}/cover'
+'users/$profileId/decks/$deckId/featured/image$index'
+'users/$profileId/decks/$deckId/markdown/...'
 'users/${profile.id}/profile/avatar'
 ```
 

@@ -15,8 +15,8 @@ class SettingsController extends Controller {
   /// Reads or creates the UserSettings row for the current user.
   /// Call once at app start before the router is built.
   Future<void> init() async {
-    final userId = LocalDB.profile.getOrCreate().id;
-    _settings = LocalDB.userSettings.getOrCreateByUserId(userId);
+    final profileId = LocalDB.profile.getOrCreate().id;
+    _settings = LocalDB.userSettings.getOrCreateByProfileId(profileId);
     notifyListeners();
   }
 

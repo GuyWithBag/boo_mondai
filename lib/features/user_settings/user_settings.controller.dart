@@ -37,7 +37,7 @@
 //     setLoading(true);
 //     try {
 //       settings = await UserSettingsService.updateThemeMode(
-//         userId: current.userId,
+//         profileId: current.profileId,
 //         themeMode: mode,
 //       );
 //       latestFailures = const [];
@@ -58,7 +58,7 @@
 //     setLoading(true);
 //     try {
 //       settings = await UserSettingsService.updateThemeSelections(
-//         userId: current.userId,
+//         profileId: current.profileId,
 //         lightThemePresetId: lightThemePresetId,
 //         darkThemePresetId: darkThemePresetId,
 //       );
@@ -77,7 +77,7 @@
 //     setLoading(true);
 //     try {
 //       settings = await UserSettingsService.updateThemeOverride(
-//         userId: current.userId,
+//         profileId: current.profileId,
 //         override: override,
 //       );
 //       latestFailures = const [];
@@ -95,7 +95,7 @@
 //     setLoading(true);
 //     try {
 //       settings = await UserSettingsService.upsertCustomPreset(
-//         userId: current.userId,
+//         profileId: current.profileId,
 //         preset: preset,
 //       );
 //       latestFailures = const [];
@@ -113,7 +113,7 @@
 //     setLoading(true);
 //     try {
 //       settings = await UserSettingsService.removeCustomPreset(
-//         userId: current.userId,
+//         profileId: current.profileId,
 //         presetId: presetId,
 //       );
 //       latestFailures = const [];
@@ -133,7 +133,7 @@
 //     setLoading(true);
 //     try {
 //       final result = await UserSettingsService.exportSettings(
-//         userId: current.userId,
+//         profileId: current.profileId,
 //         options: options,
 //       );
 //       latestChangeRecords = result.changeLogs;
@@ -156,7 +156,7 @@
 //     setLoading(true);
 //     try {
 //       final result = await UserSettingsService.exportSettingsJson(
-//         userId: current.userId,
+//         profileId: current.profileId,
 //         options: options,
 //       );
 //       latestChangeRecords = result.changeLogs;
@@ -180,7 +180,7 @@
 //     setLoading(true);
 //     try {
 //       final result = await UserSettingsService.importSettings(
-//         userId: current.userId,
+//         profileId: current.profileId,
 //         payload: payload,
 //         mode: mode,
 //       );
@@ -204,7 +204,7 @@
 //     setLoading(true);
 //     try {
 //       final result = await UserSettingsService.importSettingsJson(
-//         userId: current.userId,
+//         profileId: current.profileId,
 //         rawJson: rawJson,
 //         mode: mode,
 //       );
@@ -224,7 +224,7 @@
 //     if (current == null) return;
 //     setLoading(true);
 //     try {
-//       settings = await UserSettingsService.syncForUser(current.userId);
+//       settings = await UserSettingsService.syncForUser(current.profileId);
 //       latestFailures = const [];
 //     } on Exception catch (e) {
 //       setError(e);

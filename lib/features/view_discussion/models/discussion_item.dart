@@ -9,7 +9,7 @@ import 'package:boo_mondai/lib.barrel.dart'
 class DiscussionItem {
   const DiscussionItem({
     required this.id,
-    required this.userId,
+    required this.profileId,
     required this.body,
     required this.createdAt,
     required this.updatedAt,
@@ -24,7 +24,7 @@ class DiscussionItem {
   factory DiscussionItem.fromDeckComment(DeckComment comment) {
     return DiscussionItem(
       id: comment.id,
-      userId: comment.userId,
+      profileId: comment.profileId,
       parentCommentId: comment.parentCommentId,
       body: comment.body,
       isDeleted: comment.isDeleted,
@@ -40,7 +40,7 @@ class DiscussionItem {
   }) {
     return DiscussionItem(
       id: review.id,
-      userId: review.userId,
+      profileId: review.profileId,
       title: review.title,
       body: review.body,
       isDeleted: review.isDeleted,
@@ -55,7 +55,7 @@ class DiscussionItem {
   factory DiscussionItem.fromReviewComment(DeckVoteReviewComment comment) {
     return DiscussionItem(
       id: comment.id,
-      userId: comment.userId,
+      profileId: comment.profileId,
       parentCommentId: comment.parentCommentId,
       body: comment.body,
       isDeleted: comment.isDeleted,
@@ -66,7 +66,7 @@ class DiscussionItem {
   }
 
   final String id;
-  final String userId;
+  final String profileId;
   final String? parentCommentId;
   final String? title;
   final String body;

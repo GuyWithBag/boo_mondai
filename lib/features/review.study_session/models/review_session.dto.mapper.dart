@@ -25,9 +25,9 @@ class ReviewSessionMapper extends SubClassMapperBase<ReviewSession> {
 
   static String _$id(ReviewSession v) => v.id;
   static const Field<ReviewSession, String> _f$id = Field('id', _$id);
-  static String _$userId(ReviewSession v) => v.userId;
-  static const Field<ReviewSession, String> _f$userId =
-      Field('userId', _$userId, key: r'user_id');
+  static String _$profileId(ReviewSession v) => v.profileId;
+  static const Field<ReviewSession, String> _f$profileId =
+      Field('profileId', _$profileId, key: r'profile_id');
   static String? _$deckId(ReviewSession v) => v.deckId;
   static const Field<ReviewSession, String> _f$deckId =
       Field('deckId', _$deckId, key: r'deck_id', opt: true);
@@ -54,7 +54,7 @@ class ReviewSessionMapper extends SubClassMapperBase<ReviewSession> {
   @override
   final MappableFields<ReviewSession> fields = const {
     #id: _f$id,
-    #userId: _f$userId,
+    #profileId: _f$profileId,
     #deckId: _f$deckId,
     #startedAt: _f$startedAt,
     #completedAt: _f$completedAt,
@@ -75,7 +75,7 @@ class ReviewSessionMapper extends SubClassMapperBase<ReviewSession> {
   static ReviewSession _instantiate(DecodingData data) {
     return ReviewSession(
         id: data.dec(_f$id),
-        userId: data.dec(_f$userId),
+        profileId: data.dec(_f$profileId),
         deckId: data.dec(_f$deckId),
         startedAt: data.dec(_f$startedAt),
         completedAt: data.dec(_f$completedAt),
@@ -145,7 +145,7 @@ abstract class ReviewSessionCopyWith<$R, $In extends ReviewSession, $Out>
   @override
   $R call(
       {String? id,
-      String? userId,
+      String? profileId,
       String? deckId,
       DateTime? startedAt,
       DateTime? completedAt,
@@ -173,7 +173,7 @@ class _ReviewSessionCopyWithImpl<$R, $Out>
   @override
   $R call(
           {String? id,
-          String? userId,
+          String? profileId,
           Object? deckId = $none,
           DateTime? startedAt,
           Object? completedAt = $none,
@@ -183,7 +183,7 @@ class _ReviewSessionCopyWithImpl<$R, $Out>
           int? cardsReviewed}) =>
       $apply(FieldCopyWithData({
         if (id != null) #id: id,
-        if (userId != null) #userId: userId,
+        if (profileId != null) #profileId: profileId,
         if (deckId != $none) #deckId: deckId,
         if (startedAt != null) #startedAt: startedAt,
         if (completedAt != $none) #completedAt: completedAt,
@@ -195,7 +195,7 @@ class _ReviewSessionCopyWithImpl<$R, $Out>
   @override
   ReviewSession $make(CopyWithData data) => ReviewSession(
       id: data.get(#id, or: $value.id),
-      userId: data.get(#userId, or: $value.userId),
+      profileId: data.get(#profileId, or: $value.profileId),
       deckId: data.get(#deckId, or: $value.deckId),
       startedAt: data.get(#startedAt, or: $value.startedAt),
       completedAt: data.get(#completedAt, or: $value.completedAt),

@@ -178,7 +178,7 @@ abstract final class DecksService {
     final updatedTags = [
       for (final tagName in normalizedTagNames)
         existingTagsByName[tagName.toLowerCase()] ??
-            Tag.createNow(name: tagName, userId: deck.userId),
+            Tag.createNow(name: tagName, profileId: deck.profileId),
     ];
     final updatedDeck = deck.copyWith(
       tags: updatedTags,
@@ -254,7 +254,7 @@ abstract final class DecksService {
 
     final now = DateTime.now();
     final purgeAfter = SyncDeletionPolicy.current().purgeAfter(now);
-    final userId = deck.userId;
+    final profileId = deck.profileId;
     final studyCards = LocalDB.studyCard.getByDeckId(deck.id);
     final studyCardIds = studyCards.map((card) => card.id).toSet();
     final cardTemplates = LocalDB.cardTemplate.getByDeckId(deck.id);
@@ -352,7 +352,7 @@ abstract final class DecksService {
     await LocalDB.cardTemplateTag.deleteByTemplateIds(templateIds);
     await LocalDB.deckTag.deleteByDeckId(deck.id);
 
-    final orphanedTags = _orphanedOwnedTags(tagIdsToCheck, userId);
+    final orphanedTags = _orphanedOwnedTags(tagIdsToCheck, profileId);
     if (orphanedTags.isEmpty) return;
 
     await LocalDB.tag.deleteManyByPk([
@@ -360,11 +360,11 @@ abstract final class DecksService {
     ]);
   }
 
-  static List<Tag> _orphanedOwnedTags(Set<String> tagIds, String userId) {
+  static List<Tag> _orphanedOwnedTags(Set<String> tagIds, String profileId) {
     return LocalDB.tag
         .selectManyByIds(tagIds)
         .where((tag) {
-          if (tag.userId != userId) return false;
+          if (tag.profileId != profileId) return false;
           return !LocalDB.deckTag.isTagReferenced(tag.id) &&
               !LocalDB.cardTemplateTag.isTagReferenced(tag.id) &&
               !LocalDB.userStudyCardTag.isTagReferenced(tag.id) &&

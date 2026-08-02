@@ -60,12 +60,12 @@
 //                       child: FilledButton(
 //                         onPressed: () async {
 //                           final auth = context.read<AuthController>();
-//                           final userId = auth.currentProfile.id;
+//                           final profileId = auth.currentProfile.id;
 //                           if (userId == null) return;
 
 //                           await context.read<DrillProvider>().startSession(
 //                             deckId,
-//                             userId,
+//                             profileId,
 //                             cardProvider.cards,
 //                             true,
 //                           );

@@ -12,10 +12,10 @@ class DeckListingSyncTable extends SyncTable<DeckListing> {
   DeckListingSyncTable({required String? deckId})
     : super.newestWins(
         name: 'deck_listings',
-        getLocalIndex: (userId) =>
-            getLocalDeckListingIndex(userId: userId, deckId: deckId),
-        getRemoteIndex: (userId) =>
-            getRemoteDeckListingIndex(userId: userId, deckId: deckId),
+        getLocalIndex: (profileId) =>
+            getLocalDeckListingIndex(profileId: profileId, deckId: deckId),
+        getRemoteIndex: (profileId) =>
+            getRemoteDeckListingIndex(profileId: profileId, deckId: deckId),
         getLocalItemsByIds: getLocalDeckListingsByIds,
         getRemoteItemsByIds: getRemoteDeckListingsByIds,
         getItemId: (listing) => listing.deckId,
@@ -24,45 +24,45 @@ class DeckListingSyncTable extends SyncTable<DeckListing> {
         applyPushItem: RemoteDB.deckListing.upsert,
         deleteRemoteItemById: (id) =>
             RemoteDB.deckListing.deleteWhere({'deck_id': id}),
-        preprocessPushItem: (listing, userId) =>
+        preprocessPushItem: (listing, profileId) =>
             DeckListingMediaSyncPreprocessor.preprocessPushItem(
               listing: listing,
-              userId: userId,
+              profileId: profileId,
             ),
         toMap: RemoteDB.deckListing.toMap,
       );
 
   static Future<List<SyncIndexEntry>> getLocalDeckListingIndex({
-    required String userId,
+    required String profileId,
     String? deckId,
   }) async {
     final deckIds = (await DeckSyncTable.getDeckIds(
-      userId: userId,
+      profileId: profileId,
       deckId: deckId,
     )).toSet();
     return LocalDB.deckListing.selectSyncIndexByDeckIds(deckIds);
   }
 
   static Future<List<SyncIndexEntry>> getRemoteDeckListingIndex({
-    required String userId,
+    required String profileId,
     String? deckId,
   }) async {
     final deckIds = await DeckSyncTable.getDeckIds(
-      userId: userId,
+      profileId: profileId,
       deckId: deckId,
     );
     return RemoteDB.deckListing.selectSyncIndexByDeckIds(deckIds);
   }
 
   static Future<List<DeckListing>> getLocalDeckListingsByIds(
-    String userId,
+    String profileId,
     List<String> ids,
   ) async {
     return LocalDB.deckListing.selectManyByDeckIdsIncludingDeleted(ids.toSet());
   }
 
   static Future<List<DeckListing>> getRemoteDeckListingsByIds(
-    String userId,
+    String profileId,
     List<String> ids,
   ) async {
     return RemoteDB.deckListing.selectManyByDeckIds(ids, includeDeleted: true);

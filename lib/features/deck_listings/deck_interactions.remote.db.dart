@@ -26,7 +26,7 @@ class DeckVotesRemoteDB extends SupabaseRemoteDB<DeckVote> {
   @override
   Map<String, Object?> primaryKeyFromItem(DeckVote item) => {
     'deck_id': item.deckId,
-    'user_id': item.userId,
+    'profile_id': item.profileId,
   };
 
   @override
@@ -34,25 +34,28 @@ class DeckVotesRemoteDB extends SupabaseRemoteDB<DeckVote> {
 
   Future<DeckVote?> getByDeckAndUser({
     required String deckId,
-    required String userId,
-  }) => selectOne(filters: {'deck_id': deckId, 'user_id': userId});
+    required String profileId,
+  }) => selectOne(filters: {'deck_id': deckId, 'profile_id': profileId});
 
   Future<void> setVote({
     required String deckId,
-    required String userId,
+    required String profileId,
     required int? voteValue,
   }) async {
     if (voteValue == null) {
-      await deleteWhere({'deck_id': deckId, 'user_id': userId});
+      await deleteWhere({'deck_id': deckId, 'profile_id': profileId});
       return;
     }
 
-    final existing = await getByDeckAndUser(deckId: deckId, userId: userId);
+    final existing = await getByDeckAndUser(
+      deckId: deckId,
+      profileId: profileId,
+    );
     if (existing == null) {
       await insert(
         DeckVote.createNow(
           deckId: deckId,
-          userId: userId,
+          profileId: profileId,
           voteValue: voteValue,
         ),
       );
@@ -64,7 +67,7 @@ class DeckVotesRemoteDB extends SupabaseRemoteDB<DeckVote> {
     await update(
       DeckVote(
         deckId: existing.deckId,
-        userId: existing.userId,
+        profileId: existing.profileId,
         voteValue: voteValue,
         createdAt: existing.createdAt,
         updatedAt: DateTime.now(),
@@ -87,7 +90,7 @@ class DeckFavoritesRemoteDB extends SupabaseRemoteDB<DeckFavorite> {
   @override
   Map<String, Object?> primaryKeyFromItem(DeckFavorite item) => {
     'deck_id': item.deckId,
-    'user_id': item.userId,
+    'profile_id': item.profileId,
   };
 
   @override
@@ -114,15 +117,18 @@ class DeckFavoritesRemoteDB extends SupabaseRemoteDB<DeckFavorite> {
 
   Future<DeckFavorite?> getByDeckAndUser({
     required String deckId,
-    required String userId,
-  }) => selectOne(filters: {'deck_id': deckId, 'user_id': userId});
+    required String profileId,
+  }) => selectOne(filters: {'deck_id': deckId, 'profile_id': profileId});
 
   Future<void> setFavorite({
     required String deckId,
-    required String userId,
+    required String profileId,
     required bool isFavorite,
   }) async {
-    final existing = await getByDeckAndUser(deckId: deckId, userId: userId);
+    final existing = await getByDeckAndUser(
+      deckId: deckId,
+      profileId: profileId,
+    );
 
     if (!isFavorite) {
       if (existing == null) return;
@@ -132,11 +138,11 @@ class DeckFavoritesRemoteDB extends SupabaseRemoteDB<DeckFavorite> {
 
     if (existing != null) return;
 
-    await insert(DeckFavorite.createNow(deckId: deckId, userId: userId));
+    await insert(DeckFavorite.createNow(deckId: deckId, profileId: profileId));
   }
 
-  Future<List<DeckFavorite>> getByUser(String userId) => selectMany(
-    filters: {'user_id': userId},
+  Future<List<DeckFavorite>> getByUser(String profileId) => selectMany(
+    filters: {'profile_id': profileId},
     orderBy: 'created_at',
     ascending: false,
   );
@@ -157,12 +163,15 @@ class DeckInteractionsRemoteDB {
 
   Future<DeckInteractionState> getState({
     required String deckId,
-    required String userId,
+    required String profileId,
   }) async {
-    final vote = await _votes.getByDeckAndUser(deckId: deckId, userId: userId);
+    final vote = await _votes.getByDeckAndUser(
+      deckId: deckId,
+      profileId: profileId,
+    );
     final favorite = await _favorites.getByDeckAndUser(
       deckId: deckId,
-      userId: userId,
+      profileId: profileId,
     );
 
     return DeckInteractionState(
@@ -173,17 +182,21 @@ class DeckInteractionsRemoteDB {
 
   Future<void> setVote({
     required String deckId,
-    required String userId,
+    required String profileId,
     required int? voteValue,
-  }) => _votes.setVote(deckId: deckId, userId: userId, voteValue: voteValue);
+  }) => _votes.setVote(
+    deckId: deckId,
+    profileId: profileId,
+    voteValue: voteValue,
+  );
 
   Future<void> setFavorite({
     required String deckId,
-    required String userId,
+    required String profileId,
     required bool isFavorite,
   }) => _favorites.setFavorite(
     deckId: deckId,
-    userId: userId,
+    profileId: profileId,
     isFavorite: isFavorite,
   );
 }

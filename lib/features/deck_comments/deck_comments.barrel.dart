@@ -3,6 +3,6 @@
 // Barrel files
 export 'models/models.barrel.dart';
 // Other files
-export 'deck_comments.remote.db.dart';
 export 'deck_comments.service.dart';
 export 'deck_comments.controller.dart';
+export 'deck_comments.remote.db.dart';

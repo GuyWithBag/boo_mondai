@@ -9,14 +9,14 @@ part 'deck_vote.dto.mapper.dart';
 @MappableClass()
 class DeckVote with DeckVoteMappable {
   final String deckId;
-  final String userId;
+  final String profileId;
   final int voteValue;
   final DateTime createdAt;
   final DateTime updatedAt;
 
   const DeckVote({
     required this.deckId,
-    required this.userId,
+    required this.profileId,
     required this.voteValue,
     required this.createdAt,
     required this.updatedAt,
@@ -24,18 +24,18 @@ class DeckVote with DeckVoteMappable {
 
   factory DeckVote.createNow({
     required String deckId,
-    required String userId,
+    required String profileId,
     required int voteValue,
   }) {
     final now = DateTime.now();
     return DeckVote(
       deckId: deckId,
-      userId: userId,
+      profileId: profileId,
       voteValue: voteValue,
       createdAt: now,
       updatedAt: now,
     );
   }
 
-  String get compositeId => '${deckId}_$userId';
+  String get compositeId => '${deckId}_$profileId';
 }
