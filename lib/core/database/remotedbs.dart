@@ -17,7 +17,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         DrillAnswersRemoteDB,
         FsrsCardsRemoteDB,
         LeaderboardEntriesRemoteDB,
-        ResearchRemoteDB,
         PublicBucketRemoteDB,
         PrivateBucketRemoteDB,
         SyncClientsRemoteDB,
@@ -27,7 +26,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         DeckTagsRemoteDB,
         CardTemplateTagsRemoteDB,
         UserStudyCardTagsRemoteDB,
-        ReviewLogsRemoteDB;
+        ReviewLogsRemoteDB,
+        SurveysRemoteDB,
+        SurveyQuestionsRemoteDB,
+        SurveyQuestionOptionsRemoteDB,
+        SurveyAssignmentsRemoteDB,
+        SurveyResponsesRemoteDB;
 
 class RemoteDB {
   // ── Remote Data Sources ──────────────────────────
@@ -51,7 +55,6 @@ class RemoteDB {
   static late final DrillAnswersRemoteDB drillAnswer;
   static late final FsrsCardsRemoteDB fsrsSync;
   static late final LeaderboardEntriesRemoteDB leaderboard;
-  static late final ResearchRemoteDB research;
   static late final PublicBucketRemoteDB publicBucket;
   static late final PrivateBucketRemoteDB privateBucket;
   static late final SyncClientsRemoteDB syncClient;
@@ -60,6 +63,11 @@ class RemoteDB {
   static late final DeckTagsRemoteDB deckTag;
   static late final CardTemplateTagsRemoteDB cardTemplateTag;
   static late final UserStudyCardTagsRemoteDB userStudyCardTag;
+  static late final SurveysRemoteDB survey;
+  static late final SurveyQuestionsRemoteDB surveyQuestion;
+  static late final SurveyQuestionOptionsRemoteDB surveyQuestionOption;
+  static late final SurveyAssignmentsRemoteDB surveyAssignment;
+  static late final SurveyResponsesRemoteDB surveyResponse;
 
   static Future<void> init() async {
     profile = ProfilesRemoteDB();
@@ -81,7 +89,6 @@ class RemoteDB {
     drillAnswer = DrillAnswersRemoteDB();
     fsrsSync = FsrsCardsRemoteDB();
     leaderboard = LeaderboardEntriesRemoteDB();
-    research = ResearchRemoteDB();
     publicBucket = PublicBucketRemoteDB();
     privateBucket = PrivateBucketRemoteDB();
     syncClient = SyncClientsRemoteDB();
@@ -90,5 +97,10 @@ class RemoteDB {
     deckTag = DeckTagsRemoteDB();
     cardTemplateTag = CardTemplateTagsRemoteDB();
     userStudyCardTag = UserStudyCardTagsRemoteDB();
+    survey = SurveysRemoteDB();
+    surveyQuestion = SurveyQuestionsRemoteDB();
+    surveyQuestionOption = SurveyQuestionOptionsRemoteDB();
+    surveyAssignment = SurveyAssignmentsRemoteDB();
+    surveyResponse = SurveyResponsesRemoteDB();
   }
 }
