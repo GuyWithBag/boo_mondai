@@ -17,7 +17,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         PlaceholderAppPage,
         ChangeTrackerPage,
         ChangeTrackerRouteArgs,
-        SettingsPage;
+        SettingsPage,
+        ViewSurveyPage;
 import 'package:boo_mondai/features/view_cards/view_cards.page.dart'
     show ViewCardsPage;
 import 'package:flutter/material.dart';
@@ -245,6 +246,18 @@ class Pages {
         },
   );
 
+  static final viewSurvey = AppPage(
+    url: '/view-survey/:assignmentId',
+    name: 'Survey',
+    builder:
+        (
+          context, {
+          pathParameters = const {},
+          queryParameters = const {},
+          extra,
+        }) => ViewSurveyPage(assignmentId: pathParameters['assignmentId']!),
+  );
+
   static final leaderboard = AppPage(
     url: '/leaderboard',
     name: 'Leaderboard',
@@ -332,6 +345,7 @@ class Pages {
     reviewResult,
     reviewDeckSession,
     changeReview,
+    viewSurvey,
     leaderboard,
     downloads,
   ];
