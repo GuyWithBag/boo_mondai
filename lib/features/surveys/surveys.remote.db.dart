@@ -3,9 +3,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         SupabaseRemoteDB,
         Survey,
         SurveyMapper,
-        SurveyQuestion,
-        SurveyQuestionMapper,
-        SurveyMultipleChoiceQuestion,
+        SurveyPage,
+        SurveyPageMapper,
+        SurveyBlock,
+        SurveyBlockMapper,
+        SurveyMultipleChoiceInputBlock,
         SurveyChoiceOption,
         SurveyChoiceOptionMapper,
         SurveyAssignment,
@@ -30,33 +32,49 @@ class SurveysRemoteDB extends SupabaseRemoteDB<Survey> {
   String get upsertConflictTarget => 'id';
 }
 
-class SurveyQuestionsRemoteDB extends SupabaseRemoteDB<SurveyQuestion> {
+class SurveyPagesRemoteDB extends SupabaseRemoteDB<SurveyPage> {
   @override
-  String get tableName => 'survey_questions';
+  String get tableName => 'survey_pages';
 
   @override
-  SurveyQuestion Function(Map<String, dynamic>) get fromMap =>
-      SurveyQuestionMapper.fromMap;
+  SurveyPage Function(Map<String, dynamic>) get fromMap =>
+      SurveyPageMapper.fromMap;
 
   @override
-  Map<String, dynamic> toMap(SurveyQuestion item) => item.toMap();
+  Map<String, dynamic> toMap(SurveyPage item) => item.toMap();
 
   @override
-  Map<String, Object?> primaryKeyFromItem(SurveyQuestion item) => {
-    'id': item.id,
-  };
+  Map<String, Object?> primaryKeyFromItem(SurveyPage item) => {'id': item.id};
+
+  @override
+  String get upsertConflictTarget => 'id';
+}
+
+class SurveyBlocksRemoteDB extends SupabaseRemoteDB<SurveyBlock> {
+  @override
+  String get tableName => 'survey_blocks';
+
+  @override
+  SurveyBlock Function(Map<String, dynamic>) get fromMap =>
+      SurveyBlockMapper.fromMap;
+
+  @override
+  Map<String, dynamic> toMap(SurveyBlock item) => item.toMap();
+
+  @override
+  Map<String, Object?> primaryKeyFromItem(SurveyBlock item) => {'id': item.id};
 
   @override
   String get upsertConflictTarget => 'id';
 
   @override
-  String get defaultSelect => '*, options:survey_question_options(*)';
+  String get defaultSelect => '*, options:survey_block_options(*)';
 
   @override
   Set<String> get joinedFields => const {'options'};
 
   @override
-  SurveyQuestion fromJoinedMap(Map<String, dynamic> map) {
+  SurveyBlock fromJoinedMap(Map<String, dynamic> map) {
     final options = map['options'];
     if (options is List) {
       map['options'] = List<Map<String, dynamic>>.from(
@@ -67,9 +85,9 @@ class SurveyQuestionsRemoteDB extends SupabaseRemoteDB<SurveyQuestion> {
   }
 
   @override
-  Map<String, dynamic> toWriteMap(SurveyQuestion item) {
+  Map<String, dynamic> toWriteMap(SurveyBlock item) {
     final map = super.toWriteMap(item);
-    if (item is! SurveyMultipleChoiceQuestion) {
+    if (item is! SurveyMultipleChoiceInputBlock) {
       map.remove('min_answers');
       map.remove('max_answers');
     }
@@ -77,10 +95,9 @@ class SurveyQuestionsRemoteDB extends SupabaseRemoteDB<SurveyQuestion> {
   }
 }
 
-class SurveyQuestionOptionsRemoteDB
-    extends SupabaseRemoteDB<SurveyChoiceOption> {
+class SurveyBlockOptionsRemoteDB extends SupabaseRemoteDB<SurveyChoiceOption> {
   @override
-  String get tableName => 'survey_question_options';
+  String get tableName => 'survey_block_options';
 
   @override
   SurveyChoiceOption Function(Map<String, dynamic>) get fromMap =>

@@ -28,8 +28,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         UserStudyCardTagsRemoteDB,
         ReviewLogsRemoteDB,
         SurveysRemoteDB,
-        SurveyQuestionsRemoteDB,
-        SurveyQuestionOptionsRemoteDB,
+        SurveyPagesRemoteDB,
+        SurveyBlocksRemoteDB,
+        SurveyBlockOptionsRemoteDB,
         SurveyAssignmentsRemoteDB,
         SurveyResponsesRemoteDB;
 
@@ -64,8 +65,9 @@ class RemoteDB {
   static late final CardTemplateTagsRemoteDB cardTemplateTag;
   static late final UserStudyCardTagsRemoteDB userStudyCardTag;
   static late final SurveysRemoteDB survey;
-  static late final SurveyQuestionsRemoteDB surveyQuestion;
-  static late final SurveyQuestionOptionsRemoteDB surveyQuestionOption;
+  static late final SurveyPagesRemoteDB surveyPage;
+  static late final SurveyBlocksRemoteDB surveyBlock;
+  static late final SurveyBlockOptionsRemoteDB surveyBlockOption;
   static late final SurveyAssignmentsRemoteDB surveyAssignment;
   static late final SurveyResponsesRemoteDB surveyResponse;
 
@@ -98,8 +100,9 @@ class RemoteDB {
     cardTemplateTag = CardTemplateTagsRemoteDB();
     userStudyCardTag = UserStudyCardTagsRemoteDB();
     survey = SurveysRemoteDB();
-    surveyQuestion = SurveyQuestionsRemoteDB();
-    surveyQuestionOption = SurveyQuestionOptionsRemoteDB();
+    surveyPage = SurveyPagesRemoteDB();
+    surveyBlock = SurveyBlocksRemoteDB();
+    surveyBlockOption = SurveyBlockOptionsRemoteDB();
     surveyAssignment = SurveyAssignmentsRemoteDB();
     surveyResponse = SurveyResponsesRemoteDB();
   }

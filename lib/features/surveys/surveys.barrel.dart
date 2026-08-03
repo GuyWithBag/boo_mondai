@@ -2,6 +2,5 @@
 
 // Barrel files
 export 'models/models.barrel.dart';
-
 // Other files
 export 'surveys.remote.db.dart';

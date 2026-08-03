@@ -3,13 +3,15 @@
 // Other files
 export 'survey.status.dart';
 export 'survey.dto.dart';
-export 'survey_question.dto.dart';
-export 'survey_text_question.dto.dart';
-export 'survey_number_question.dto.dart';
 export 'survey_choice_option.dto.dart';
-export 'survey_multiple_choice_question.dto.dart';
-export 'survey_likert_question.dto.dart';
-export 'survey_boolean_question.dto.dart';
 export 'survey_assignment.status.dart';
 export 'survey_assignment.dto.dart';
 export 'survey_response.dto.dart';
+export 'survey_page.dto.dart';
+export 'survey_block.dto.dart';
+export 'survey_content_block.dto.dart';
+export 'survey_text_input_block.dto.dart';
+export 'survey_number_input_block.dto.dart';
+export 'survey_multiple_choice_input_block.dto.dart';
+export 'survey_likert_input_block.dto.dart';
+export 'survey_boolean_input_block.dto.dart';
