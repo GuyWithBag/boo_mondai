@@ -15,6 +15,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         ReadyToReviewCard,
         Scaffold,
         StreaksCard,
+        NotificationButton,
         ViewLeaderboardController,
         ViewStudyCardsController;
 import 'package:flutter/material.dart' hide Scaffold, AppBar;
@@ -42,7 +43,7 @@ class HomePage extends HookWidget {
     }, []);
 
     return Scaffold(
-      appBar: AppBar(title: 'Home'),
+      appBar: AppBar(title: 'Home', actions: const [NotificationButton()]),
       scrollable: true,
       body: RefreshIndicator(
         onRefresh: () async {

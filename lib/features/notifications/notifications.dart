@@ -32,7 +32,6 @@ abstract final class Notifications {
   static NotificationIntent downloadComplete({
     required String deckTitle,
     String? route,
-    Map<String, dynamic> data = const {},
   }) {
     return NotificationIntent(
       id: NotificationIds.downloadComplete,
@@ -40,7 +39,6 @@ abstract final class Notifications {
       title: 'Download complete',
       body: deckTitle,
       route: route,
-      data: data,
     );
   }
 
@@ -50,6 +48,17 @@ abstract final class Notifications {
       type: 'sync_complete',
       title: 'Sync complete',
       body: 'Your decks are up to date.',
+    );
+  }
+
+  static NotificationIntent firstDrillSurvey({required String surveyId}) {
+    return NotificationIntent(
+      id: NotificationIds.firstDrillSurvey,
+      type: 'first_drill_survey',
+      title: 'Quick question',
+      body: 'Tell us how your first drill felt.',
+      route: '/view-survey/$surveyId',
+      persistInInbox: true,
     );
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:boo_mondai/lib.barrel.dart'
     show
         Controller,
@@ -27,6 +29,11 @@ class NotificationsController extends Controller {
   NotificationsController(this._settings);
 
   final SettingsController _settings;
+  final List<NotificationIntent> _notifications = [];
+
+  List<NotificationIntent> get notifications =>
+      List.unmodifiable(_notifications);
+  int get unreadCount => _notifications.length;
 
   // -------------------------------------------------------------------------
   // Init
@@ -98,18 +105,28 @@ class NotificationsController extends Controller {
 
   Future<void> notify(NotificationIntent notification) async {
     if (notification.persistInInbox) {
-      // TODO: Persist to an in-app inbox once notification storage exists.
+      _notifications.insert(0, notification);
+      notifyListeners();
     }
 
     if (!notification.showSystemNotification) return;
 
-    final recurrence = notification.recurrence;
-    if (recurrence != null) {
-      await NotificationsService.scheduleDaily(notification);
-      return;
-    }
+    try {
+      final recurrence = notification.recurrence;
+      if (recurrence != null) {
+        await NotificationsService.scheduleDaily(notification);
+        return;
+      }
 
-    await NotificationsService.showImmediate(notification);
+      await NotificationsService.showImmediate(notification);
+    } catch (error, stackTrace) {
+      developer.log(
+        'Failed to show system notification.',
+        name: 'NotificationsController',
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
   }
 
   /// Show an immediate notification when a deck download finishes.

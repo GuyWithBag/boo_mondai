@@ -6,7 +6,6 @@ class NotificationIntent {
   final String title;
   final String body;
   final String? route;
-  final Map<String, dynamic> data;
   final bool persistInInbox;
   final bool showSystemNotification;
   final NotificationRecurrence? recurrence;
@@ -17,7 +16,6 @@ class NotificationIntent {
     required this.title,
     required this.body,
     this.route,
-    this.data = const {},
     this.persistInInbox = false,
     this.showSystemNotification = true,
     this.recurrence,
