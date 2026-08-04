@@ -52,6 +52,13 @@ abstract class StringHelper {
         .toList();
   }
 
+  static String truncateWithEllipsis(String value, int maxLength) {
+    if (maxLength <= 0) return '';
+    if (value.length <= maxLength) return value;
+    if (maxLength <= 3) return '.' * maxLength;
+    return '${value.substring(0, maxLength - 3)}...';
+  }
+
   static List<String> _caseWords(String text) {
     final separated = text
         .replaceAllMapped(
