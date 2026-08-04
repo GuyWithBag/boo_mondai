@@ -3,6 +3,7 @@ import 'package:boo_mondai/features/app_theme/app_theme.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AuthController,
+        DateHelper,
         EditableTextValue,
         ViewProfileController,
         ProfileAvatar;
@@ -72,7 +73,8 @@ class ProfileCard extends StatelessWidget {
                 MetaLabel(label: email),
               ],
               MetaLabel(
-                label: 'Joined at ${_formatShortDate(profile.createdAt)}',
+                label:
+                    'Joined at ${DateHelper.formatDateYyyyMmDd(profile.createdAt)}',
                 icon: Icons.calendar_month,
               ),
             ],
@@ -81,11 +83,4 @@ class ProfileCard extends StatelessWidget {
       ),
     );
   }
-}
-
-String _formatShortDate(DateTime value) {
-  final year = value.year.toString().padLeft(4, '0');
-  final month = value.month.toString().padLeft(2, '0');
-  final day = value.day.toString().padLeft(2, '0');
-  return '$year-$month-$day';
 }

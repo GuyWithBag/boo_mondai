@@ -8,6 +8,7 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
+        AuthController,
         Button,
         Pages,
         DarkModeToggleCard,
@@ -16,6 +17,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         AuthCard;
 import 'package:flutter/material.dart' hide Scaffold;
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 class ViewAccountPage extends StatelessWidget {
@@ -24,6 +26,7 @@ class ViewAccountPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
+    final auth = context.watch<AuthController>();
     final pages = Pages.appDetails;
 
     return Scaffold(
@@ -31,8 +34,16 @@ class ViewAccountPage extends StatelessWidget {
       // materialResizeToAvoidBottomInset: true,
       body: Column(
         spacing: tokens.spaceLayoutGapMd,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const ProfileCard(),
+          if (auth.currentProfile.isResearcher)
+            Button(
+              leading: const Icon(Icons.science_outlined),
+              onPressed: () => context.push(Pages.researcherDashboard.url),
+              mainAxisAlignment: MainAxisAlignment.start,
+              child: const Text('Researcher Dashboard'),
+            ),
           const DarkModeToggleCard(),
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,

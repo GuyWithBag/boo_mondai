@@ -18,6 +18,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         ChangeTrackerPage,
         ChangeTrackerRouteArgs,
         SettingsPage,
+        ResearcherDashboardPage,
+        ResearcherSurveyDetailPage,
+        ResearcherSurveyResponsePage,
         ViewSurveyPage;
 import 'package:boo_mondai/features/view_cards/view_cards.page.dart'
     show ViewCardsPage;
@@ -247,7 +250,7 @@ class Pages {
   );
 
   static final viewSurvey = AppPage(
-    url: '/view-survey/:assignmentId',
+    url: '/view-survey/:surveyId',
     name: 'Survey',
     builder:
         (
@@ -255,8 +258,61 @@ class Pages {
           pathParameters = const {},
           queryParameters = const {},
           extra,
-        }) => ViewSurveyPage(assignmentId: pathParameters['assignmentId']!),
+        }) => ViewSurveyPage(surveyId: pathParameters['surveyId']!),
   );
+
+  static final researcherDashboard = AppPage(
+    url: '/researcher-dashboard',
+    icon: Icons.science_outlined,
+    name: 'Researcher Dashboard',
+    builder:
+        (
+          context, {
+          pathParameters = const {},
+          queryParameters = const {},
+          extra,
+        }) => const ResearcherDashboardPage(),
+  );
+
+  static final researcherSurvey = AppPage(
+    url: '/researcher-dashboard/surveys/:surveyId',
+    icon: Icons.analytics_outlined,
+    name: 'Survey Data',
+    builder:
+        (
+          context, {
+          pathParameters = const {},
+          queryParameters = const {},
+          extra,
+        }) => ResearcherSurveyDetailPage(surveyId: pathParameters['surveyId']!),
+  );
+
+  static final researcherSurveyResponse = AppPage(
+    url: '/researcher-dashboard/surveys/:surveyId/responses/:responseId',
+    icon: Icons.assignment_turned_in_outlined,
+    name: 'Survey Response',
+    builder:
+        (
+          context, {
+          pathParameters = const {},
+          queryParameters = const {},
+          extra,
+        }) => ResearcherSurveyResponsePage(
+          surveyId: pathParameters['surveyId']!,
+          responseId: pathParameters['responseId']!,
+        ),
+  );
+
+  static String researcherSurveyUrl(String surveyId) {
+    return '/researcher-dashboard/surveys/$surveyId';
+  }
+
+  static String researcherSurveyResponseUrl(
+    String surveyId,
+    String responseId,
+  ) {
+    return '/researcher-dashboard/surveys/$surveyId/responses/$responseId';
+  }
 
   static final leaderboard = AppPage(
     url: '/leaderboard',
@@ -346,6 +402,9 @@ class Pages {
     reviewDeckSession,
     changeReview,
     viewSurvey,
+    researcherDashboard,
+    researcherSurveyResponse,
+    researcherSurvey,
     leaderboard,
     downloads,
   ];

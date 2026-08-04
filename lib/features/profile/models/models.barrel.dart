@@ -3,3 +3,4 @@
 // Other files
 export 'cached_profile.dart';
 export 'profile.dto.dart';
+export 'profile.roles.dart';

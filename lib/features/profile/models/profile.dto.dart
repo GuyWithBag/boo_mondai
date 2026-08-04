@@ -6,7 +6,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart'
-    show MutableEntity, MutableEntityCopyWith, MutableEntityMapper;
+    show MutableEntity, MutableEntityCopyWith, MutableEntityMapper, ProfileRole;
 import 'package:dart_mappable/dart_mappable.dart';
 
 part 'profile.dto.mapper.dart';
@@ -42,4 +42,8 @@ class Profile with ProfileMappable implements MutableEntity {
     this.purgeAfter,
     this.isAnonymous = true,
   });
+
+  ProfileRole get profileRole => ProfileRole.fromString(role);
+
+  bool get isResearcher => profileRole == ProfileRole.researcher;
 }

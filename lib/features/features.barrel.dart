@@ -51,3 +51,5 @@ export 'view_message_session_step/view_message_session_step.barrel.dart';
 export 'ui_sounds/ui_sounds.barrel.dart';
 export 'surveys/surveys.barrel.dart';
 export 'view_survey/view_survey.barrel.dart';
+export 'view_notifications/view_notifications.barrel.dart';
+export 'researcher_dashboard/researcher_dashboard.barrel.dart';

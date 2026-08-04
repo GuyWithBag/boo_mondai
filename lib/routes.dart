@@ -47,10 +47,10 @@ GoRouter createRouter(AuthController authController) {
         return Pages.home.url;
       }
 
-      // if (loc == Pages.research.url &&
-      //     (isAnonymous || auth.currentProfile.role != 'researcher')) {
-      //   return Pages.home.url;
-      // }
+      if (loc.startsWith(Pages.researcherDashboard.url) &&
+          !auth.currentProfile.isResearcher) {
+        return Pages.home.url;
+      }
 
       // if (!isAnonymous && auth.currentProfile.role == 'group_b_participant') {
       //   final allowed = [

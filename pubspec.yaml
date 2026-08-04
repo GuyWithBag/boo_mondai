@@ -69,6 +69,7 @@ dependencies:
   just_audio: ^0.10.6
   signals: ^7.1.0
   flutter_soloud: ^4.0.12
+  fl_chart: ^1.2.0
 
 dev_dependencies:
   flutter_test:
