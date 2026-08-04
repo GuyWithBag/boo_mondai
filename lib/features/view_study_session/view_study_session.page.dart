@@ -19,6 +19,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         ProgressBar,
         RatingArea,
         MessageSessionStep,
+        NotificationsController,
         Scaffold,
         SessionException,
         SessionMode,
@@ -67,7 +68,10 @@ class ViewStudySessionPage extends HookWidget {
     final tokens = context.themeTokens<AppTokens>();
 
     if (mode == SessionMode.drill) {
-      controller = useDrillSessionController(deckId: deckId!);
+      controller = useDrillSessionController(
+        deckId: deckId!,
+        notificationsController: context.read<NotificationsController>(),
+      );
     } else {
       controller = useReviewSessionController(
         deckId: deckId,
@@ -81,22 +85,32 @@ class ViewStudySessionPage extends HookWidget {
       sessionController: controller,
       dashboardController: dashboardController,
     );
+    final studySessionCompleteSound = context
+        .mediaPackController<AppMediaPack>()
+        .resolve((media) => media.studySessionCompleteSound);
+    final settingsController = context.read<SettingsController>();
 
-    useEffect(() {
-      if (controller.isComplete) {
-        unawaited(
-          UiSoundsService.playIfEnabled(
-            context.mediaPackController<AppMediaPack>().resolve(
-              (media) => media.studySessionCompleteSound,
+    useEffect(
+      () {
+        if (controller.isComplete) {
+          unawaited(
+            UiSoundsService.playIfEnabled(
+              studySessionCompleteSound,
+              settingsController: settingsController,
+              enabledSetting: SettingsService.uiSoundsEnabled,
             ),
-            settingsController: context.read<SettingsController>(),
-            enabledSetting: SettingsService.uiSoundsEnabled,
-          ),
-        );
-      }
-      studySessionPageController.onCompletion();
-      return null;
-    }, [controller.isComplete, controller.session?.id]);
+          );
+        }
+        studySessionPageController.onCompletion();
+        return null;
+      },
+      [
+        controller.isComplete,
+        controller.session?.id,
+        studySessionCompleteSound,
+        settingsController,
+      ],
+    );
 
     // 1. Handle Loading (Review only has isLoading, Drill uses null session or missing template)
 

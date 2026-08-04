@@ -7,6 +7,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         DrillSessionPolicy,
         CardSessionStep,
         LocalDB,
+        FirstDrillSurvey,
+        Notifications,
+        NotificationsController,
         SessionException,
         SessionMode,
         StudyCard,
@@ -21,10 +24,14 @@ import 'package:fsrs/fsrs.dart' as fsrs;
 
 DrillSessionController useDrillSessionController({
   required String deckId,
+  NotificationsController? notificationsController,
   bool previewed = false,
   int? batchSize,
 }) {
-  final controller = useMemoized(DrillSessionController.new);
+  final controller = useMemoized(
+    () => DrillSessionController(notificationsController),
+    [notificationsController],
+  );
   useListenable(controller);
   useEffect(() {
     unawaited(
@@ -41,8 +48,11 @@ DrillSessionController useDrillSessionController({
 
 final class DrillSessionController
     extends StudySessionController<DrillSession> {
+  DrillSessionController([this._notificationsController]);
+
   static const int defaultBatchSize = 20;
 
+  final NotificationsController? _notificationsController;
   final Map<String, StudyCard> _cards = {};
   final List<DrillAnswer> _answers = [];
 
@@ -219,7 +229,25 @@ final class DrillSessionController
       correctCount: correctCount,
     );
     await LocalDB.drillSession.upsert(session!);
+    await _notifyFirstDrillSurveyIfNeeded(session!);
     notifyListeners();
+  }
+
+  Future<void> _notifyFirstDrillSurveyIfNeeded(DrillSession completed) async {
+    final notificationsController = _notificationsController;
+    if (notificationsController == null || completed.previewed) return;
+
+    final completedDrills = LocalDB.drillSession.selectMany(
+      where: (session) =>
+          session.profileId == completed.profileId &&
+          session.completedAt != null &&
+          !session.previewed,
+    );
+    if (completedDrills.length != 1) return;
+
+    await notificationsController.notify(
+      Notifications.firstDrillSurvey(surveyId: FirstDrillSurvey.id),
+    );
   }
 
   @override

@@ -20,9 +20,9 @@ import 'package:provider/provider.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 class ViewSurveyPage extends HookWidget {
-  const ViewSurveyPage({super.key, required this.assignmentId});
+  const ViewSurveyPage({super.key, required this.surveyId});
 
-  final String assignmentId;
+  final String surveyId;
 
   @override
   Widget build(BuildContext context) {
@@ -30,9 +30,9 @@ class ViewSurveyPage extends HookWidget {
     final tokens = context.themeTokens<AppTokens>();
 
     useEffect(() {
-      controller.load(assignmentId);
+      controller.load(surveyId);
       return controller.dispose;
-    }, [assignmentId]);
+    }, [surveyId]);
 
     return ChangeNotifierProvider.value(
       value: controller,

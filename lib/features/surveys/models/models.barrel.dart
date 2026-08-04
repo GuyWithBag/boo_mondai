@@ -15,3 +15,4 @@ export 'survey_number_input_block.dto.dart';
 export 'survey_multiple_choice_input_block.dto.dart';
 export 'survey_likert_input_block.dto.dart';
 export 'survey_boolean_input_block.dto.dart';
+export 'survey_definition.dart';

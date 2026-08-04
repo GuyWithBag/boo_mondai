@@ -1,15 +1,17 @@
+import 'dart:developer' as developer;
+
 import 'package:boo_mondai/lib.barrel.dart'
     show
         Controller,
+        LocalDB,
         RemoteDB,
         Survey,
-        SurveyAssignment,
-        SurveyAssignmentStatus,
         SurveyBlock,
         SurveyBooleanInputBlock,
         SurveyLikertInputBlock,
         SurveyMultipleChoiceInputBlock,
         SurveyNumberInputBlock,
+        SurveyRegistry,
         SurveyResponse,
         SurveyPage,
         SurveyTextInputBlock,
@@ -24,7 +26,6 @@ final class ViewSurveyPageData {
 
 final class ViewSurveyController extends Controller {
   Survey? survey;
-  SurveyAssignment? assignment;
   List<ViewSurveyPageData> pages = const [];
   int pageIndex = 0;
   bool isSubmitted = false;
@@ -37,48 +38,36 @@ final class ViewSurveyController extends Controller {
   ViewSurveyPageData? get currentPage =>
       pages.isEmpty ? null : pages[pageIndex];
 
-  Future<void> load(String assignmentId) async {
+  Future<void> load(String surveyId) async {
     setLoading(true);
     setError(null);
     notifyListeners();
 
     try {
-      final loadedAssignment = await RemoteDB.surveyAssignment.selectOne(
-        filters: {'id': assignmentId},
-      );
-      if (loadedAssignment == null) {
-        throw Exception('Survey assignment was not found.');
-      }
-
-      final loadedSurvey = await RemoteDB.survey.selectOne(
-        filters: {'id': loadedAssignment.surveyId},
-      );
-      if (loadedSurvey == null) {
+      final definition = SurveyRegistry.getById(surveyId);
+      if (definition == null) {
         throw Exception('Survey was not found.');
       }
-
-      final loadedPages = await RemoteDB.surveyPage.selectMany(
-        filters: {'survey_id': loadedSurvey.id},
-        orderBy: 'position',
-      );
-      final loadedBlocks = await RemoteDB.surveyBlock.selectMany(
-        filters: {'survey_id': loadedSurvey.id},
-        orderBy: 'position',
+      final profileId = LocalDB.profile.getOrCreate().id;
+      final existingResponse = LocalDB.surveyResponse.selectBySurveyAndProfile(
+        surveyId: definition.survey.id,
+        profileId: profileId,
       );
 
-      survey = loadedSurvey;
-      assignment = loadedAssignment;
+      survey = definition.survey;
       pages = [
-        for (final page in loadedPages)
+        for (final page in definition.pages)
           ViewSurveyPageData(
             page: page,
             blocks:
-                loadedBlocks.where((block) => block.pageId == page.id).toList()
+                definition.blocks
+                    .where((block) => block.pageId == page.id)
+                    .toList()
                   ..sort((a, b) => a.position.compareTo(b.position)),
           ),
       ];
       pageIndex = 0;
-      isSubmitted = loadedAssignment.status == SurveyAssignmentStatus.completed;
+      isSubmitted = existingResponse != null;
     } catch (e) {
       setError(e is Exception ? e : Exception(e.toString()));
     } finally {
@@ -88,11 +77,7 @@ final class ViewSurveyController extends Controller {
   }
 
   void setAnswer(String key, dynamic value) {
-    if (value == null || (value is String && value.trim().isEmpty)) {
-      answers.remove(key);
-    } else {
-      answers[key] = value;
-    }
+    answers[key] = value is String && value.trim().isEmpty ? null : value;
     notifyListeners();
   }
 
@@ -113,8 +98,7 @@ final class ViewSurveyController extends Controller {
 
   Future<void> submit() async {
     final loadedSurvey = survey;
-    final loadedAssignment = assignment;
-    if (loadedSurvey == null || loadedAssignment == null) return;
+    if (loadedSurvey == null) return;
     if (pages.any((page) => !_validatePage(page))) return;
 
     setLoading(true);
@@ -122,24 +106,16 @@ final class ViewSurveyController extends Controller {
     notifyListeners();
 
     try {
-      await RemoteDB.surveyResponse.insert(
-        SurveyResponse(
-          id: uuid.v7(),
-          surveyId: loadedSurvey.id,
-          profileId: loadedAssignment.profileId,
-          assignmentId: loadedAssignment.id,
-          answers: Map<String, dynamic>.from(answers),
-          submittedAt: DateTime.now(),
-        ),
+      final response = SurveyResponse(
+        id: uuid.v7(),
+        surveyId: loadedSurvey.id,
+        profileId: LocalDB.profile.getOrCreate().id,
+        answers: _answersWithNullsForInputBlocks(),
+        submittedAt: DateTime.now(),
       );
 
-      await RemoteDB.surveyAssignment.updateWhere(
-        filters: {'id': loadedAssignment.id},
-        values: {
-          'status': SurveyAssignmentStatus.completed.name,
-          'completed_at': DateTime.now().toIso8601String(),
-        },
-      );
+      await LocalDB.surveyResponse.upsert(response);
+      await _pushResponseRemote(response);
 
       isSubmitted = true;
     } catch (e) {
@@ -147,6 +123,37 @@ final class ViewSurveyController extends Controller {
     } finally {
       setLoading(false);
       notifyListeners();
+    }
+  }
+
+  Map<String, dynamic> _answersWithNullsForInputBlocks() {
+    final values = Map<String, dynamic>.from(answers);
+    for (final page in pages) {
+      for (final block in page.blocks) {
+        final key = switch (block) {
+          SurveyTextInputBlock(:final key) => key,
+          SurveyNumberInputBlock(:final key) => key,
+          SurveyMultipleChoiceInputBlock(:final key) => key,
+          SurveyLikertInputBlock(:final key) => key,
+          SurveyBooleanInputBlock(:final key) => key,
+          _ => null,
+        };
+        if (key != null) values.putIfAbsent(key, () => null);
+      }
+    }
+    return values;
+  }
+
+  Future<void> _pushResponseRemote(SurveyResponse response) async {
+    try {
+      await RemoteDB.surveyResponse.upsert(response);
+    } catch (error, stackTrace) {
+      developer.log(
+        'Failed to push survey response remotely.',
+        name: 'ViewSurveyController',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 

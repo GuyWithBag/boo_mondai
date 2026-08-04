@@ -2,5 +2,8 @@
 
 // Barrel files
 export 'models/models.barrel.dart';
+export 'definitions/definitions.barrel.dart';
+export 'helpers/helpers.barrel.dart';
 // Other files
 export 'surveys.remote.db.dart';
+export 'survey_responses.local.db.dart';
