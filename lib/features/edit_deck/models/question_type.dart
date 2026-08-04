@@ -23,8 +23,8 @@ part 'question_type.mapper.dart';
 ///   All other types must use [CardType.normal].
 /// - [matchMadness] → Notes are NOT generated; content lives in [MatchMadnessPair]s only.
 /// - [wordScramble] → Note.frontText stores the full sentence; words are split at runtime.
-/// - [identification] → Note.frontText is the prompt; acceptable answers are stored
-///   in [DeckCard.identificationAnswer] (comma-separated), not in Note.backText.
+/// - [identification] → template prompt stores the prompt; accepted answers are
+///   ordered answer objects with per-answer casing rules.
 @MappableEnum()
 enum QuestionType {
   flashcard,
@@ -47,7 +47,7 @@ enum QuestionType {
   /// True when the card uses [MatchMadnessPair]s (and no Notes).
   bool get usesPairs => this == matchMadness;
 
-  /// True when accepted answers are stored in [DeckCard.identificationAnswer]
-  /// rather than in Note.backText.
+  /// True when accepted answers are stored as ordered answer objects rather than
+  /// in Note.backText.
   bool get usesIdentificationAnswer => this == identification;
 }

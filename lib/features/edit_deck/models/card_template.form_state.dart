@@ -7,8 +7,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         MultipleChoiceOptionData,
         CardType,
         QuestionType,
+        IdentificationAnswerData,
         MatchPairData,
         defaultMultipleChoiceOptions,
+        defaultIdentificationAnswers,
         defaultMatchPairs;
 import 'package:flutter/material.dart';
 
@@ -18,7 +20,7 @@ class CardTemplateFormState {
   final ValueNotifier<bool> verticallyCentered;
   final TextEditingController frontController;
   final TextEditingController backController;
-  final TextEditingController identificationAnswerController;
+  final ValueNotifier<List<IdentificationAnswerData>> identificationAnswers;
   final ValueNotifier<List<MultipleChoiceOptionData>> multipleChoiceOptions;
   final TextEditingController fillInTheBlankSentenceController;
   final TextEditingController fillInTheBlankAnswersController;
@@ -30,7 +32,7 @@ class CardTemplateFormState {
     required this.verticallyCentered,
     required this.frontController,
     required this.backController,
-    required this.identificationAnswerController,
+    required this.identificationAnswers,
     required this.multipleChoiceOptions,
     required this.fillInTheBlankSentenceController,
     required this.fillInTheBlankAnswersController,
@@ -48,7 +50,7 @@ class CardTemplateFormState {
       verticallyCentered: ValueNotifier(verticallyCentered),
       frontController: TextEditingController(),
       backController: TextEditingController(),
-      identificationAnswerController: TextEditingController(),
+      identificationAnswers: ValueNotifier([...defaultIdentificationAnswers]),
       fillInTheBlankSentenceController: TextEditingController(),
       fillInTheBlankAnswersController: TextEditingController(),
       // Assumes these defaults exist in your types
@@ -63,7 +65,7 @@ class CardTemplateFormState {
     verticallyCentered.dispose();
     frontController.dispose();
     backController.dispose();
-    identificationAnswerController.dispose();
+    identificationAnswers.dispose();
     multipleChoiceOptions.dispose();
     fillInTheBlankSentenceController.dispose();
     fillInTheBlankAnswersController.dispose();

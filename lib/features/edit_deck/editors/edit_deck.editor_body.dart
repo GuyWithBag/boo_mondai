@@ -5,10 +5,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         EditDeckController,
         ErrorText,
         FillInTheBlanksEditor,
+        IdentificationEditor,
         MatchingTypeEditor,
         QuestionType,
         FlashcardEditor,
-        MultipleChoiceEditor;
+        MultipleChoiceEditor,
+        WordScrambleEditor;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -37,10 +39,15 @@ class EditDeckEditorBody extends StatelessWidget {
             QuestionType.fillInTheBlanks => FillInTheBlanksEditor(
               formState: editor.formState,
             ),
+            QuestionType.identification => IdentificationEditor(
+              formState: editor.formState,
+            ),
             QuestionType.matchMadness => MatchingTypeEditor(
               formState: editor.formState,
             ),
-            _ => FlashcardEditor(formState: editor.formState),
+            QuestionType.wordScramble => WordScrambleEditor(
+              formState: editor.formState,
+            ),
           },
           if (editor.error != null) ...[
             const SizedBox(height: 16),

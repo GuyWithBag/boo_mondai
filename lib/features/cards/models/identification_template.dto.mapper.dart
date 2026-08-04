@@ -16,6 +16,7 @@ class IdentificationTemplateMapper
       MapperContainer.globals.use(_instance = IdentificationTemplateMapper._());
       CardTemplateMapper.ensureInitialized().addSubMapper(_instance!);
       TagMapper.ensureInitialized();
+      IdentificationAnswerMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -59,9 +60,11 @@ class IdentificationTemplateMapper
   static String _$promptText(IdentificationTemplate v) => v.promptText;
   static const Field<IdentificationTemplate, String> _f$promptText =
       Field('promptText', _$promptText, key: r'prompt_text');
-  static String _$acceptedAnswers(IdentificationTemplate v) =>
+  static List<IdentificationAnswer> _$acceptedAnswers(
+          IdentificationTemplate v) =>
       v.acceptedAnswers;
-  static const Field<IdentificationTemplate, String> _f$acceptedAnswers =
+  static const Field<IdentificationTemplate, List<IdentificationAnswer>>
+      _f$acceptedAnswers =
       Field('acceptedAnswers', _$acceptedAnswers, key: r'accepted_answers');
 
   @override
@@ -164,6 +167,11 @@ abstract class IdentificationTemplateCopyWith<
     $Out> implements CardTemplateCopyWith<$R, $In, $Out> {
   @override
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags;
+  ListCopyWith<
+      $R,
+      IdentificationAnswer,
+      IdentificationAnswerCopyWith<$R, IdentificationAnswer,
+          IdentificationAnswer>> get acceptedAnswers;
   @override
   $R call(
       {String? id,
@@ -177,7 +185,7 @@ abstract class IdentificationTemplateCopyWith<
       List<Tag>? tags,
       bool? verticallyCentered,
       String? promptText,
-      String? acceptedAnswers});
+      List<IdentificationAnswer>? acceptedAnswers});
   IdentificationTemplateCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
       Then<$Out2, $R2> t);
 }
@@ -195,6 +203,15 @@ class _IdentificationTemplateCopyWithImpl<$R, $Out>
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags => ListCopyWith(
       $value.tags, (v, t) => v.copyWith.$chain(t), (v) => call(tags: v));
   @override
+  ListCopyWith<
+      $R,
+      IdentificationAnswer,
+      IdentificationAnswerCopyWith<$R, IdentificationAnswer,
+          IdentificationAnswer>> get acceptedAnswers => ListCopyWith(
+      $value.acceptedAnswers,
+      (v, t) => v.copyWith.$chain(t),
+      (v) => call(acceptedAnswers: v));
+  @override
   $R call(
           {String? id,
           String? deckId,
@@ -207,7 +224,7 @@ class _IdentificationTemplateCopyWithImpl<$R, $Out>
           List<Tag>? tags,
           bool? verticallyCentered,
           String? promptText,
-          String? acceptedAnswers}) =>
+          List<IdentificationAnswer>? acceptedAnswers}) =>
       $apply(FieldCopyWithData({
         if (id != null) #id: id,
         if (deckId != null) #deckId: deckId,

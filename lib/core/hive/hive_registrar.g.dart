@@ -12,6 +12,7 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(CardSessionStepAdapter());
     registerAdapter(CardTemplateTagAdapter());
     registerAdapter(CardTypeAdapter());
+    registerAdapter(CasingTypeAdapter());
     registerAdapter(DeckAdapter());
     registerAdapter(DeckListingAdapter());
     registerAdapter(DeckTagAdapter());
@@ -22,6 +23,7 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(FlashcardTemplateAdapter());
     registerAdapter(FsrsCardAdapter());
     registerAdapter(FsrsReviewLogAdapter());
+    registerAdapter(IdentificationAnswerAdapter());
     registerAdapter(IdentificationTemplateAdapter());
     registerAdapter(ImportExportBackupAdapter());
     registerAdapter(MatchMadnessPairAdapter());
@@ -64,6 +66,7 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(CardSessionStepAdapter());
     registerAdapter(CardTemplateTagAdapter());
     registerAdapter(CardTypeAdapter());
+    registerAdapter(CasingTypeAdapter());
     registerAdapter(DeckAdapter());
     registerAdapter(DeckListingAdapter());
     registerAdapter(DeckTagAdapter());
@@ -74,6 +77,7 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(FlashcardTemplateAdapter());
     registerAdapter(FsrsCardAdapter());
     registerAdapter(FsrsReviewLogAdapter());
+    registerAdapter(IdentificationAnswerAdapter());
     registerAdapter(IdentificationTemplateAdapter());
     registerAdapter(ImportExportBackupAdapter());
     registerAdapter(MatchMadnessPairAdapter());

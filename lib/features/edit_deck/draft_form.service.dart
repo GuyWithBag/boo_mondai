@@ -4,6 +4,8 @@ import 'package:boo_mondai/features/cards/models/card_type.dto.dart';
 import 'package:boo_mondai/features/cards/models/fill_in_the_blank_segment.dto.dart';
 import 'package:boo_mondai/features/cards/models/fill_in_the_blanks_template.dto.dart';
 import 'package:boo_mondai/features/cards/models/flashcard_template.dto.dart';
+import 'package:boo_mondai/features/cards/models/identification_answer.dto.dart';
+import 'package:boo_mondai/features/cards/models/identification_answer_data.dto.dart';
 import 'package:boo_mondai/features/cards/models/identification_template.dto.dart';
 import 'package:boo_mondai/features/cards/models/match_madness_pair.dto.dart';
 import 'package:boo_mondai/features/cards/models/match_madness_template.dto.dart';
@@ -109,7 +111,7 @@ class CardTemplateDraftFormAdapter implements DraftFormAdapter<CardTemplate> {
     formState.verticallyCentered.value = true;
     formState.frontController.clear();
     formState.backController.clear();
-    formState.identificationAnswerController.clear();
+    formState.identificationAnswers.value = [...defaultIdentificationAnswers];
     formState.fillInTheBlankSentenceController.clear();
     formState.fillInTheBlankAnswersController.clear();
 
@@ -124,8 +126,20 @@ class CardTemplateDraftFormAdapter implements DraftFormAdapter<CardTemplate> {
 
       case IdentificationTemplate i:
         formState.questionType.value = QuestionType.identification;
+        formState.verticallyCentered.value = i.verticallyCentered;
         formState.frontController.text = i.promptText;
-        formState.identificationAnswerController.text = i.acceptedAnswers;
+        final acceptedAnswers = i.acceptedAnswers.toList()
+          ..sort((a, b) => a.displayOrder.compareTo(b.displayOrder));
+        formState.identificationAnswers.value = acceptedAnswers.isNotEmpty
+            ? acceptedAnswers
+                  .map(
+                    (answer) => IdentificationAnswerData(
+                      answer: answer.answer,
+                      casingType: answer.casingType,
+                    ),
+                  )
+                  .toList()
+            : [...defaultIdentificationAnswers];
         break;
 
       case MultipleChoiceTemplate m:
@@ -221,8 +235,9 @@ class CardTemplateDraftFormAdapter implements DraftFormAdapter<CardTemplate> {
         createdAt: createdAt,
         updatedAt: updatedAt,
         sourceTemplateId: sourceId,
+        verticallyCentered: formState.verticallyCentered.value,
         promptText: formState.frontController.text.trim(),
-        acceptedAnswers: formState.identificationAnswerController.text.trim(),
+        acceptedAnswers: _buildIdentificationAnswers(id),
       ),
       QuestionType.multipleChoice => MultipleChoiceTemplate(
         id: id,
@@ -342,8 +357,9 @@ class CardTemplateDraftFormAdapter implements DraftFormAdapter<CardTemplate> {
         sortOrder: sortOrder,
         createdAt: now,
         updatedAt: now,
+        verticallyCentered: formState.verticallyCentered.value,
         promptText: '',
-        acceptedAnswers: '',
+        acceptedAnswers: const [],
       ),
       QuestionType.wordScramble => WordScrambleTemplate(
         id: id,
@@ -366,6 +382,29 @@ class CardTemplateDraftFormAdapter implements DraftFormAdapter<CardTemplate> {
         optionText: tuples[index].text,
         isCorrect: tuples[index].isCorrect,
         displayOrder: index,
+      ),
+    );
+  }
+
+  List<IdentificationAnswer> _buildIdentificationAnswers(String templateId) {
+    final answers = formState.identificationAnswers.value
+        .map(
+          (answer) => IdentificationAnswerData(
+            answer: answer.answer.trim(),
+            casingType: answer.casingType,
+          ),
+        )
+        .where((answer) => answer.answer.isNotEmpty)
+        .toList();
+
+    return List.generate(
+      answers.length,
+      (index) => IdentificationAnswer(
+        id: uuid.v7(),
+        templateId: templateId,
+        displayOrder: index,
+        answer: answers[index].answer,
+        casingType: answers[index].casingType,
       ),
     );
   }

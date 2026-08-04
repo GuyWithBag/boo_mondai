@@ -6,7 +6,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         DrillSessionController,
         FillInTheBlanksTemplate,
         FlashcardTemplate,
+        IdentificationTemplate,
         MultipleChoiceTemplate,
+        WordScrambleTemplate,
         ReviewSessionController,
         Services,
         SessionException,
@@ -26,7 +28,9 @@ abstract final class StudySessionHelper {
 
   static bool isAutoGraded(CardTemplate template) {
     return template is MultipleChoiceTemplate ||
-        template is FillInTheBlanksTemplate;
+        template is IdentificationTemplate ||
+        template is FillInTheBlanksTemplate ||
+        template is WordScrambleTemplate;
   }
 
   static String formatFsrsInterval(DateTime now, DateTime nextReview) {

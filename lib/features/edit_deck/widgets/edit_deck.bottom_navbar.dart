@@ -4,6 +4,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         BottomNavBar,
         Button,
         EditDeckController,
+        EditDeckQuestionTypeHelper,
         useSelectionController;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -20,12 +21,7 @@ class EditDeckBottomNavBar extends HookWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final formats = [
-      (Icons.slideshow_outlined, 'Flashcard'),
-      (Icons.list, 'Multiple Choice'),
-      (Icons.draw, 'Fill in Blanks'),
-      (Icons.shuffle, 'Match Madness'),
-    ];
+    final formats = EditDeckQuestionTypeHelper.visibleQuestionTypes;
     final selection = useSelectionController<int>(
       selectedValues: [editor.selectedFormatIndex],
       onSelectionChanged: (selected) {
@@ -42,11 +38,13 @@ class EditDeckBottomNavBar extends HookWidget implements PreferredSizeWidget {
           children: [
             for (var index = 0; index < formats.length; index++) ...[
               Button(
-                leading: Icon(formats[index].$1),
+                leading: Icon(
+                  EditDeckQuestionTypeHelper.iconFor(formats[index]),
+                ),
                 selected: selection.isSelected(index),
                 onPressed: () => selection.select(index),
                 child: Text(
-                  formats[index].$2,
+                  EditDeckQuestionTypeHelper.labelFor(formats[index]),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),

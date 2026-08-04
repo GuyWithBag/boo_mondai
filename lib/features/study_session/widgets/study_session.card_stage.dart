@@ -2,15 +2,19 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         StudySessionController,
         FlashcardTemplate,
+        IdentificationTemplate,
         StudySessionCardStageController,
         CardTemplate,
         MultipleChoiceTemplate,
         FillInTheBlanksTemplate,
         MatchMadnessTemplate,
+        WordScrambleTemplate,
         FlashcardCard,
         MultipleChoiceCard,
         FillInTheBlanksCard,
-        MatchingTypeCard;
+        MatchingTypeCard,
+        IdentificationCard,
+        WordScrambleCard;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
@@ -28,8 +32,10 @@ class StudySessionCardStage extends HookWidget {
   static bool isImplemented(CardTemplate template) {
     return template is FlashcardTemplate ||
         template is MultipleChoiceTemplate ||
+        template is IdentificationTemplate ||
         template is FillInTheBlanksTemplate ||
-        template is MatchMadnessTemplate;
+        template is MatchMadnessTemplate ||
+        template is WordScrambleTemplate;
   }
 
   @override
@@ -52,12 +58,20 @@ class StudySessionCardStage extends HookWidget {
         template: m,
         interactionsController: interactionsController,
       ),
+      IdentificationTemplate i => IdentificationCard(
+        template: i,
+        interactionsController: interactionsController,
+      ),
       FillInTheBlanksTemplate fb => FillInTheBlanksCard(
         template: fb,
         interactionsController: interactionsController,
       ),
       MatchMadnessTemplate mm => MatchingTypeCard(
         template: mm,
+        interactionsController: interactionsController,
+      ),
+      WordScrambleTemplate ws => WordScrambleCard(
+        template: ws,
         interactionsController: interactionsController,
       ),
       _ => Center(

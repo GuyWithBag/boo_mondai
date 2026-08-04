@@ -543,7 +543,7 @@ class IdentificationTemplateAdapter
       tags: fields[10] == null ? const [] : (fields[10] as List).cast<Tag>(),
       verticallyCentered: fields[12] == null ? true : fields[12] as bool,
       promptText: fields[0] as String,
-      acceptedAnswers: fields[1] as String,
+      acceptedAnswers: (fields[1] as List).cast<IdentificationAnswer>(),
     );
   }
 
@@ -2550,6 +2550,109 @@ class SyncClientAdapter extends TypeAdapter<SyncClient> {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is SyncClientAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class IdentificationAnswerAdapter extends TypeAdapter<IdentificationAnswer> {
+  @override
+  final typeId = 54;
+
+  @override
+  IdentificationAnswer read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return IdentificationAnswer(
+      id: fields[0] as String,
+      templateId: fields[1] as String,
+      displayOrder: (fields[2] as num).toInt(),
+      answer: fields[3] as String,
+      casingType: fields[4] == null ? CasingType.any : fields[4] as CasingType,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, IdentificationAnswer obj) {
+    writer
+      ..writeByte(5)
+      ..writeByte(0)
+      ..write(obj.id)
+      ..writeByte(1)
+      ..write(obj.templateId)
+      ..writeByte(2)
+      ..write(obj.displayOrder)
+      ..writeByte(3)
+      ..write(obj.answer)
+      ..writeByte(4)
+      ..write(obj.casingType);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is IdentificationAnswerAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class CasingTypeAdapter extends TypeAdapter<CasingType> {
+  @override
+  final typeId = 55;
+
+  @override
+  CasingType read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return CasingType.any;
+      case 1:
+        return CasingType.exact;
+      case 2:
+        return CasingType.camel;
+      case 3:
+        return CasingType.pascal;
+      case 4:
+        return CasingType.snake;
+      case 5:
+        return CasingType.kebab;
+      case 6:
+        return CasingType.title;
+      default:
+        return CasingType.any;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, CasingType obj) {
+    switch (obj) {
+      case CasingType.any:
+        writer.writeByte(0);
+      case CasingType.exact:
+        writer.writeByte(1);
+      case CasingType.camel:
+        writer.writeByte(2);
+      case CasingType.pascal:
+        writer.writeByte(3);
+      case CasingType.snake:
+        writer.writeByte(4);
+      case CasingType.kebab:
+        writer.writeByte(5);
+      case CasingType.title:
+        writer.writeByte(6);
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CasingTypeAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

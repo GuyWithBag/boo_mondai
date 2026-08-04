@@ -981,8 +981,12 @@ class ImportExportService {
         updatedAt: now,
         sourceTemplateId: t.sourceTemplateId ?? t.id,
         tags: t.tags,
+        verticallyCentered: t.verticallyCentered,
         promptText: t.promptText,
-        acceptedAnswers: t.acceptedAnswers,
+        acceptedAnswers: [
+          for (final answer in t.acceptedAnswers)
+            answer.copyWith(id: uuid.v7(), templateId: targetId),
+        ],
       ),
       MultipleChoiceTemplate t => MultipleChoiceTemplate(
         id: targetId,
@@ -1123,7 +1127,8 @@ class ImportExportService {
   static String _templatePreview(CardTemplate template) {
     return switch (template) {
       FlashcardTemplate t => '${t.frontText} -> ${t.backText}',
-      IdentificationTemplate t => '${t.promptText} -> ${t.acceptedAnswers}',
+      IdentificationTemplate t =>
+        '${t.promptText} -> ${t.acceptedAnswers.map((a) => a.answer).join(', ')}',
       MultipleChoiceTemplate t =>
         '${t.questionPrompt} -> ${t.options.where((o) => o.isCorrect).map((o) => o.optionText).join(', ')}',
       FillInTheBlanksTemplate t =>

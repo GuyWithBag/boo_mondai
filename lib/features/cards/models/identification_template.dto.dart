@@ -1,5 +1,6 @@
 import 'package:boo_mondai/features/cards/models/card_template.dto.dart';
 import 'package:dart_mappable/dart_mappable.dart';
+import 'package:boo_mondai/features/cards/models/identification_answer.dto.dart';
 import 'package:boo_mondai/features/tags/models/tag.dto.dart';
 
 part 'identification_template.dto.mapper.dart';
@@ -8,7 +9,8 @@ part 'identification_template.dto.mapper.dart';
 class IdentificationTemplate extends CardTemplate
     with IdentificationTemplateMappable {
   final String promptText;
-  final String acceptedAnswers; // Comma-separated
+  @MappableField(key: 'accepted_answers')
+  final List<IdentificationAnswer> acceptedAnswers;
 
   const IdentificationTemplate({
     required super.id,
@@ -27,10 +29,6 @@ class IdentificationTemplate extends CardTemplate
 
   @override
   bool checkAnswer(String userAnswer, {bool isReversed = false}) {
-    return acceptedAnswers
-        .split(',')
-        .map((a) => a.trim().toLowerCase())
-        .where((a) => a.isNotEmpty)
-        .contains(userAnswer.trim().toLowerCase());
+    return acceptedAnswers.any((answer) => answer.accepts(userAnswer));
   }
 }

@@ -1,3 +1,4 @@
+import 'package:boo_mondai/features/cards/models/identification_answer_data.dto.dart';
 import 'package:boo_mondai/features/cards/models/match_pair_data.dto.dart';
 import 'package:boo_mondai/features/cards/models/multiple_choice_option_data.dto.dart';
 
@@ -8,6 +9,18 @@ abstract final class EditDeckFormValidator {
 
   static String? answer(String? value) {
     return _required(value, 'Enter an answer');
+  }
+
+  static String? identificationAnswers(
+    List<IdentificationAnswerData>? answers,
+  ) {
+    if (answers == null || answers.isEmpty) {
+      return 'Add at least one accepted answer';
+    }
+    if (!answers.any((answer) => answer.answer.trim().isNotEmpty)) {
+      return 'Add at least one accepted answer';
+    }
+    return null;
   }
 
   static String? multipleChoiceOptions(

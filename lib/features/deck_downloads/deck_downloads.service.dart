@@ -469,8 +469,12 @@ class DeckDownloadsService extends Service {
         updatedAt: now,
         sourceTemplateId: t.id,
         tags: t.tags,
+        verticallyCentered: t.verticallyCentered,
         promptText: t.promptText,
-        acceptedAnswers: t.acceptedAnswers,
+        acceptedAnswers: [
+          for (final answer in t.acceptedAnswers)
+            answer.copyWith(id: uuid.v7(), templateId: localTemplateId),
+        ],
       ),
       MultipleChoiceTemplate t => MultipleChoiceTemplate(
         id: localTemplateId,

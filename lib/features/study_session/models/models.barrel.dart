@@ -6,3 +6,4 @@ export 'study_rating.dto.dart';
 export 'session_flow_snapshot.dto.dart';
 export 'study_session_step_record.dto.dart';
 export 'study_session.dto.dart';
+export 'scrambled_word.dart';

@@ -10,3 +10,5 @@ export 'matching_type.card.dart';
 export 'multiple_choice.card.dart';
 export 'study_session.card_stage.dart';
 export 'rating_area.dart';
+export 'word_scramble.card.dart';
+export 'identification.card.dart';

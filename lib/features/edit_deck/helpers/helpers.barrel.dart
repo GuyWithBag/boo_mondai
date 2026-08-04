@@ -5,3 +5,4 @@ export 'edit_deck_question_type.helper.dart';
 export 'multiple_choice_option.helper.dart';
 export 'match_pair.helper.dart';
 export 'edit_deck_form.validator.dart';
+export 'identification_answer.helper.dart';
