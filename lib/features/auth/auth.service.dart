@@ -254,7 +254,6 @@ class AuthService {
     final user = response.user!;
 
     final profile = await _upsertNewRemoteProfile(user.id, username);
-    await LocalDB.profile.upsert(profile);
 
     final needsMerge = GuestMigrationService.hasLocalData(guestProfileId);
 
@@ -394,6 +393,7 @@ class AuthService {
     );
 
     await RemoteDB.profile.upsert(profile);
+    await LocalDB.profile.upsert(profile);
     return profile;
   }
 }

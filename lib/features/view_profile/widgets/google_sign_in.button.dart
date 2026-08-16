@@ -17,7 +17,7 @@ class GoogleSignInButton extends StatelessWidget {
       leading: const Icon(Icons.g_mobiledata),
       child: const Text('CONTINUE WITH GOOGLE'),
       onPressed: () async {
-        final loginFuture = auth.signInWithGoogle();
+        final loginFuture = auth.signInWithGoogle(context);
 
         await loginFuture;
       },

@@ -41,27 +41,34 @@ class RegisterController extends Controller {
   Future<void> signUp(BuildContext context) async {
     if (!(formKey.currentState?.validate() ?? false)) return;
 
-    await _authController.signUp(
-      emailController.text.trim(),
-      passwordController.text,
-      nameController.text.trim(),
+    final response = await _authController.signUp(
+      context,
+      email: emailController.text.trim(),
+      password: passwordController.text,
+      username: nameController.text.trim(),
     );
 
     if (!context.mounted) return;
 
-    if (_authController.hasPendingGuestMerge) {
+    if (response.profile == null) return;
+
+    if (response.needsMerge) {
       final isMergeResolved = await _authController.showPendingGuestMerge(
-        context: context,
+        context,
+        authServiceResponse: response,
       );
       if (!context.mounted || !isMergeResolved) return;
 
-      showSnackbar(context, message: 'Succesfully registered!');
+      showSnackbar(
+        context,
+        message: 'Succesfully registered and merge resolved!',
+      );
       context.go(Pages.account.url);
       return;
     }
 
     showSnackbar(context, message: 'Succesfully registered!');
-    context.go(Pages.home.url);
+    context.go(Pages.account.url);
   }
 
   @override

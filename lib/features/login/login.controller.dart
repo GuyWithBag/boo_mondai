@@ -37,20 +37,27 @@ class LoginController extends Controller {
   Future<void> signIn(BuildContext context) async {
     if (!(formKey.currentState?.validate() ?? false)) return;
 
-    await _authController.signIn(
+    final response = await _authController.signIn(
+      context,
       email: emailController.text.trim(),
       password: passwordController.text,
     );
 
     if (!context.mounted) return;
 
-    if (_authController.hasPendingGuestMerge) {
+    if (response.profile == null) return;
+
+    if (response.needsMerge) {
       final isMergeResolved = await _authController.showPendingGuestMerge(
-        context: context,
+        context,
+        authServiceResponse: response,
       );
       if (!context.mounted || !isMergeResolved) return;
 
-      showSnackbar(context, message: 'Succesfully logged in!');
+      showSnackbar(
+        context,
+        message: 'Succesfully logged in and merge resolved!',
+      );
       context.go(Pages.account.url);
       return;
     }

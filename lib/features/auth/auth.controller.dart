@@ -3,6 +3,7 @@
 // PURPOSE: Manages UI state, loading indicators, and migration flows.
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/features/app_theme/app_theme.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         Controller,
@@ -18,9 +19,6 @@ import 'package:boo_mondai/lib.barrel.dart'
 import 'package:flutter/material.dart';
 
 class AuthController extends Controller {
-  /// Holds the result of the latest auth action to drive UI logic (like merges)
-  AuthServiceResponse? authServiceResponse;
-
   // ── Getters ─────────────────────────────────────────────
 
   Profile get currentProfile => LocalDB.profile.getOrCreate();
@@ -28,9 +26,6 @@ class AuthController extends Controller {
   String? get currentEmail => AuthService.currentUser?.email;
 
   bool get isAuthenticatedEither => AuthService.isAuthenticatedEither;
-
-  /// Drives the UI prompt for merging guest data based on the latest auth response.
-  bool get hasPendingGuestMerge => authServiceResponse?.needsMerge ?? false;
 
   // ── Actions ─────────────────────────────────────────────
 
@@ -45,20 +40,31 @@ class AuthController extends Controller {
     }
   }
 
-  Future<void> signIn({required String email, required String password}) async {
+  Future<AuthServiceResponse> signIn(
+    BuildContext context, {
+    required String email,
+    required String password,
+  }) async {
     setLoading(true);
     try {
-      authServiceResponse = await AuthService.signIn(email, password);
+      final response = await AuthService.signIn(email, password);
+      return response;
     } on Exception catch (e) {
       setError(e);
+      if (!context.mounted) {
+        return (profile: null, needsMerge: false, guestUserId: null);
+      }
+      showSnackbar(context, message: e.toString());
     } finally {
       setLoading(false);
     }
+    return (profile: null, needsMerge: false, guestUserId: null);
   }
 
-  Future<bool> showPendingGuestMerge({required BuildContext context}) async {
-    if (!hasPendingGuestMerge) return false;
-
+  Future<bool> showPendingGuestMerge(
+    BuildContext context, {
+    required AuthServiceResponse authServiceResponse,
+  }) async {
     final shouldMerge = await showModal<bool>(
       context: context,
       barrierDismissible: false,
@@ -81,47 +87,66 @@ class AuthController extends Controller {
     );
 
     if (shouldMerge == null) return false;
-    await confirmMerge(shouldMerge);
+
+    final guestId = authServiceResponse.guestUserId;
+    final remoteProfile = authServiceResponse.profile;
+
+    if (guestId == null || remoteProfile == null) return false;
+
+    setLoading(true);
+    try {
+      await AuthService.executeMergeDecision(
+        authServiceResponse.needsMerge,
+        guestId,
+        remoteProfile,
+      );
+    } on Exception catch (e) {
+      setError(e);
+      if (!context.mounted) return false;
+      showSnackbar(context, message: e.toString());
+    } finally {
+      setLoading(false);
+    }
     return true;
   }
 
-  Future<void> signInWithGoogle() async {
+  Future<AuthServiceResponse> signInWithGoogle(BuildContext context) async {
     setLoading(true);
     try {
-      authServiceResponse = await AuthService.signInWithGoogle();
+      final response = await AuthService.signInWithGoogle();
+      return response;
     } on Exception catch (e) {
       setError(e);
+      if (!context.mounted) {
+        return (profile: null, needsMerge: false, guestUserId: null);
+      }
+      showSnackbar(context, message: e.toString());
     } finally {
       setLoading(false);
     }
+    return (profile: null, needsMerge: false, guestUserId: null);
   }
 
-  Future<void> signUp(String email, String password, String username) async {
+  Future<AuthServiceResponse> signUp(
+    BuildContext context, {
+    required String email,
+    required String password,
+    required String username,
+  }) async {
     setLoading(true);
     try {
-      authServiceResponse = await AuthService.signUp(email, password, username);
-    } on Exception catch (e) {
-      setError(e); // Removed the debug junk!
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  Future<void> confirmMerge(bool merge) async {
-    final guestId = authServiceResponse?.guestUserId;
-    final remoteProfile = authServiceResponse?.profile;
-
-    if (guestId == null || remoteProfile == null) return;
-
-    setLoading(true);
-    try {
-      await AuthService.executeMergeDecision(merge, guestId, remoteProfile);
+      final response = await AuthService.signUp(email, password, username);
+      return response;
     } on Exception catch (e) {
       setError(e);
+      if (!context.mounted) {
+        return (profile: null, needsMerge: false, guestUserId: null);
+      }
+      showSnackbar(context, message: e.toString());
     } finally {
-      authServiceResponse = null; // Clear merge state once decision is executed
       setLoading(false);
     }
+    return (profile: null, needsMerge: false, guestUserId: null);
   }
 
   Future<bool> hasLocalSyncData() async {
@@ -145,51 +170,65 @@ class AuthController extends Controller {
     return false;
   }
 
-  Future<void> onSignOutPressed({required BuildContext context}) async {
+  Future<void> onSignOutPressed(BuildContext context) async {
     setLoading(true);
     if (!await hasLocalSyncData()) {
       if (!context.mounted) return;
-      showModal<void>(
-        context: context,
-        tone: ModalTone.error,
-        leading: const Icon(Icons.logout),
-        actionsMainAxisAlignment: MainAxisAlignment.spaceBetween,
-        title: 'Sign Out',
-        subtitle: 'Are you sure?',
-        actions: [
-          ModalAction(value: null, label: 'Cancel'),
-          ModalAction(value: null, label: 'Continue', onPressed: signOut),
-        ],
-      );
+      final proceed =
+          await showModal<bool>(
+            context: context,
+            tone: ModalTone.error,
+            leading: const Icon(Icons.logout),
+            actionsMainAxisAlignment: MainAxisAlignment.spaceBetween,
+            title: 'Sign Out',
+            subtitle: 'Are you sure?',
+            actions: [
+              ModalAction(value: false, label: 'Cancel'),
+              ModalAction(value: true, label: 'Continue'),
+            ],
+          ) ??
+          false;
+      if (!context.mounted) return;
+      if (proceed) await signOut(context);
       setLoading(false);
       return;
     }
 
     if (!context.mounted) return;
 
-    showModal<void>(
-      context: context,
-      tone: ModalTone.error,
-      leading: const Icon(Icons.logout),
-      showCancelButton: true,
-      actionsMainAxisAlignment: MainAxisAlignment.spaceBetween,
-      title: 'Sign Out',
-      subtitle:
-          'Keep your local data on this device, or remove it after signing out.',
-      actions: [
-        ModalAction(value: null, label: 'Keep data', onPressed: signOut),
-        ModalAction(
-          value: null,
-          label: 'Remove data',
-          color: ButtonColor.hard,
-          onPressed: onRemoveDataPressed,
-        ),
-      ],
-    );
+    final proceed =
+        await showModal<bool>(
+          context: context,
+          tone: ModalTone.error,
+          leading: const Icon(Icons.logout),
+          showCancelButton: true,
+          actionsMainAxisAlignment: MainAxisAlignment.spaceBetween,
+          title: 'Sign Out',
+          subtitle:
+              'Keep your local data on this device, or remove it after signing out.',
+          actions: [
+            ModalAction(value: false, label: 'Keep data'),
+            ModalAction(
+              value: true,
+              label: 'Remove data',
+              color: ButtonColor.hard,
+            ),
+          ],
+        ) ??
+        false;
+    if (!context.mounted) return;
+    if (proceed) {
+      onRemoveDataPressed(context);
+    } else {
+      signOut(context);
+    }
     setLoading(false);
   }
 
-  Future<void> signOut({bool removeLocalData = false}) async {
+  Future<void> signOut(
+    BuildContext context, {
+    bool removeLocalData = false,
+  }) async {
     setLoading(true);
 
     try {
@@ -198,17 +237,19 @@ class AuthController extends Controller {
       if (removeLocalData) {
         await LocalDB.clearAll();
       }
-      authServiceResponse = null; // Reset auth state on sign out
     } on Exception catch (e) {
       setError(e);
+      if (!context.mounted) return;
+      showSnackbar(context, message: e.toString());
     } finally {
       setLoading(false);
     }
   }
 
-  Future<void> onRemoveDataPressed() async {
+  Future<void> onRemoveDataPressed(BuildContext context) async {
     await LocalDB.clearAll();
-    await signOut();
+    if (!context.mounted) return;
+    await signOut(context);
   }
 
   Future<void> manualDevSignIn(String url) async {

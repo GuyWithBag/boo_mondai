@@ -42,7 +42,6 @@ GoRouter createRouter(AuthController authController) {
       final loc = state.matchedLocation;
 
       if (AuthService.isAuthenticatedRemote &&
-          !auth.hasPendingGuestMerge &&
           (loc == Pages.login.url || loc == Pages.register.url)) {
         return Pages.home.url;
       }

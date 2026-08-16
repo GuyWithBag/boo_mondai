@@ -44,7 +44,7 @@ class AuthCard extends StatelessWidget {
           // ],
           Button(
             variants: [ButtonColor.error],
-            onPressed: () => auth.onSignOutPressed(context: context),
+            onPressed: () => auth.onSignOutPressed(context),
             leading: auth.isLoading
                 ? CircularProgressIndicator()
                 : Icon(Icons.logout),
