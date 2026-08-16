@@ -18,7 +18,7 @@ enum TextSize {
 
 enum TextWeight { body, strong, heavy }
 
-enum TextColor { baseline, muted, brand }
+enum TextColor { baseline, muted, brand, error }
 
 final textStyle = VariantStyle.textParts<AppTokens>(
   base: (tokens) => {
@@ -77,5 +77,6 @@ final textStyle = VariantStyle.textParts<AppTokens>(
     },
     TextColor.muted: (tokens) => {TextStylePart.color(tokens.colorTextMuted)},
     TextColor.brand: (tokens) => {TextStylePart.color(tokens.colorPrimary)},
+    TextColor.error: (tokens) => {TextStylePart.color(tokens.colorActionError)},
   },
 );

@@ -104,14 +104,25 @@ class Scaffold extends HookWidget {
     );
     final controller = this.controller ?? internalController;
     final scrollLockKeys = useState(<Object>{});
+    final isMounted = useRef(true);
+
+    useEffect(() {
+      isMounted.value = true;
+      return () {
+        isMounted.value = false;
+      };
+    }, const []);
 
     final setScrollLocked = useCallback((Object key, bool value) {
+      if (!isMounted.value) return;
+
       final next = {...scrollLockKeys.value};
       final didChange = value ? next.add(key) : next.remove(key);
-      if (didChange) {
+
+      if (didChange && isMounted.value) {
         scrollLockKeys.value = next;
       }
-    }, [scrollLockKeys]);
+    }, [scrollLockKeys, isMounted]);
 
     final helper = ScaffoldHelper(
       tokens: tokens,
