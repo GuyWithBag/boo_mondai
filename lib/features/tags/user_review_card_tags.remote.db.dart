@@ -24,7 +24,7 @@ class UserStudyCardTagsRemoteDB extends SupabaseRemoteDB<UserStudyCardTag> {
   };
 
   @override
-  String get upsertConflictTarget => 'user_id,study_cards_id,tag_id';
+  String get upsertConflictTarget => 'profile_id,study_cards_id,tag_id';
 
   // Override delete because this table uses a composite primary key
   Future<void> deleteComposite({

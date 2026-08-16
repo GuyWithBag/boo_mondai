@@ -46,7 +46,7 @@ class LeaderboardTileWidget extends HookWidget {
           ];
 
     final streakFuture = useMemoized<Future<Streak?>>(
-      () => RemoteDB.streak.selectOne(filters: {'user_id': entry.profileId}),
+      () => RemoteDB.streak.selectOne(filters: {'profile_id': entry.profileId}),
       [entry.profileId],
     );
 

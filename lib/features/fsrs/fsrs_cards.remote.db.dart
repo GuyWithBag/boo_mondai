@@ -96,7 +96,7 @@ class FsrsCardsRemoteDB extends SupabaseRemoteDB<FsrsCard> {
       updatedAt: _dateTimeFromMap(map, 'updated_at'),
       deletedAt: _nullableDateTimeFromMap(map, 'deleted_at'),
       purgeAfter: _nullableDateTimeFromMap(map, 'purge_after'),
-      profileId: map['user_id'] as String,
+      profileId: map['profile_id'] as String,
       studyCardId: (map['study_card_id'] ?? map['study_cards_id']) as String,
       state: _stateFromMap(map['state']),
       studyCard: studyCard == null

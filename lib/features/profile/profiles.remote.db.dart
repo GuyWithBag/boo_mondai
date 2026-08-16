@@ -35,5 +35,5 @@ class ProfilesRemoteDB extends SupabaseRemoteDB<Profile> {
   bool get supportsSoftDelete => true;
 
   Future<Profile?> selectByAuthUserId(String authUserId) =>
-      selectOne(filters: {'user_id': authUserId});
+      selectOne(filters: {'profile_id': authUserId});
 }

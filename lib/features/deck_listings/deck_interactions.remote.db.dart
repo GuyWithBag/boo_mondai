@@ -30,7 +30,7 @@ class DeckVotesRemoteDB extends SupabaseRemoteDB<DeckVote> {
   };
 
   @override
-  String get upsertConflictTarget => 'deck_id,user_id';
+  String get upsertConflictTarget => 'deck_id,profile_id';
 
   Future<DeckVote?> getByDeckAndUser({
     required String deckId,
@@ -94,7 +94,7 @@ class DeckFavoritesRemoteDB extends SupabaseRemoteDB<DeckFavorite> {
   };
 
   @override
-  String get upsertConflictTarget => 'deck_id,user_id';
+  String get upsertConflictTarget => 'deck_id,profile_id';
 
   @override
   String get defaultSelect => _deckFavoriteWithRelationsSelect;

@@ -97,7 +97,7 @@ class DecksRemoteDB extends SupabaseRemoteDB<Deck> {
   }
 
   Future<List<Deck>> selectManyByUserId(String profileId) => selectMany(
-    filters: {'user_id': profileId},
+    filters: {'profile_id': profileId},
     orderBy: 'updated_at',
     ascending: false,
   );

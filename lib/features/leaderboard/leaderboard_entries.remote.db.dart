@@ -44,4 +44,4 @@ class LeaderboardEntriesRemoteDB extends SupabaseRemoteDB<LeaderboardEntry> {
 }
 
 const _leaderboardEntryWithRelationsSelect =
-    'user_id, drill_score, review_count, user_profile';
+    'profile_id, drill_score, review_count, user_profile';

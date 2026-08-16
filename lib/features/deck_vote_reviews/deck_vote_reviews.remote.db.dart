@@ -27,7 +27,7 @@ class DeckVoteReviewsRemoteDB extends SupabaseRemoteDB<DeckVoteReview> {
   };
 
   @override
-  String get upsertConflictTarget => 'deck_id,user_id';
+  String get upsertConflictTarget => 'deck_id,profile_id';
 
   @override
   String get defaultSelect => _deckVoteReviewWithRelationsSelect;
