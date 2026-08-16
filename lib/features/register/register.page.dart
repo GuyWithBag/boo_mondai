@@ -5,6 +5,7 @@
 // HOOKS: useTextEditingController, useFocusNode
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/features/app_theme/loading_indicator.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AuthController,
@@ -14,7 +15,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         ButtonColor,
         Button,
-        ButtonVariant,
         FormField,
         Scaffold,
         AppBar,
@@ -36,7 +36,6 @@ class RegisterPage extends HookWidget {
     final tokens = context.themeTokens<AppTokens>();
 
     final register = useRegisterController(
-      context: context,
       authController: context.read<AuthController>(),
     );
 
@@ -126,27 +125,25 @@ class RegisterPage extends HookWidget {
                       TextFieldFrame.outline,
                     ],
                     onChanged: field.didChange,
-                    onSubmitted: (_) => register.signUp(),
+                    onSubmitted: (_) => register.signUp(context),
                   ),
                 ],
               ),
             ),
-            if (register.error != null) ...[ErrorText(register.error)],
+            if (register.error != null) ...[
+              ErrorText.exception(register.error),
+            ],
             Button(
               variants: [ButtonColor.primary],
 
-              onPressed: register.isLoading ? null : register.signUp,
+              onPressed: register.isLoading
+                  ? null
+                  : () => register.signUp(context),
               child: register.isLoading
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
+                  ? const LoadingIndicator()
                   : const Text('Sign Up'),
             ),
             Button(
-              variants: const [ButtonColor.primary, ButtonVariant.flat],
-
               onPressed: () => context.push('/login'),
               child: const Text('Already have an account? Sign In'),
             ),

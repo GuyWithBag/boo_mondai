@@ -1,3 +1,4 @@
+import 'package:boo_mondai/features/features.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show AuthController, Controller, Pages;
 import 'package:flutter/material.dart';
@@ -6,7 +7,6 @@ import 'package:go_router/go_router.dart';
 
 class RegisterController extends Controller {
   RegisterController({
-    required BuildContext context,
     required AuthController authController,
     required this.nameController,
     required this.emailController,
@@ -15,12 +15,10 @@ class RegisterController extends Controller {
     required this.emailFocus,
     required this.passwordFocus,
     required this.formKey,
-  }) : _context = context,
-       _authController = authController {
+  }) : _authController = authController {
     _authController.addListener(notifyListeners);
   }
 
-  final BuildContext _context;
   final AuthController _authController;
   final TextEditingController nameController;
   final TextEditingController emailController;
@@ -40,7 +38,7 @@ class RegisterController extends Controller {
     nameFocus.requestFocus();
   }
 
-  Future<void> signUp() async {
+  Future<void> signUp(BuildContext context) async {
     if (!(formKey.currentState?.validate() ?? false)) return;
 
     await _authController.signUp(
@@ -49,19 +47,21 @@ class RegisterController extends Controller {
       nameController.text.trim(),
     );
 
-    if (!_context.mounted) return;
+    if (!context.mounted) return;
 
     if (_authController.hasPendingGuestMerge) {
-      final didResolveMerge = await _authController.showPendingGuestMerge(
-        context: _context,
+      final isMergeResolved = await _authController.showPendingGuestMerge(
+        context: context,
       );
-      if (!_context.mounted || !didResolveMerge) return;
+      if (!context.mounted || !isMergeResolved) return;
 
-      _context.go(Pages.account.url);
+      showSnackbar(context, message: 'Succesfully registered!');
+      context.go(Pages.account.url);
       return;
     }
 
-    _context.go(Pages.home.url);
+    showSnackbar(context, message: 'Succesfully registered!');
+    context.go(Pages.home.url);
   }
 
   @override
@@ -72,7 +72,6 @@ class RegisterController extends Controller {
 }
 
 RegisterController useRegisterController({
-  required BuildContext context,
   required AuthController authController,
 }) {
   final nameController = useTextEditingController();
@@ -84,7 +83,6 @@ RegisterController useRegisterController({
   final formKey = useMemoized(GlobalKey<FormState>.new);
   final controller = useMemoized(
     () => RegisterController(
-      context: context,
       authController: authController,
       nameController: nameController,
       emailController: emailController,

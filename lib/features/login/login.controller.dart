@@ -1,3 +1,4 @@
+import 'package:boo_mondai/features/app_theme/app_theme.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show AuthController, Controller, Pages;
 import 'package:flutter/material.dart';
@@ -6,19 +7,16 @@ import 'package:go_router/go_router.dart';
 
 class LoginController extends Controller {
   LoginController({
-    required BuildContext context,
     required AuthController authController,
     required this.emailController,
     required this.passwordController,
     required this.emailFocus,
     required this.passwordFocus,
     required this.formKey,
-  }) : _context = context,
-       _authController = authController {
+  }) : _authController = authController {
     _authController.addListener(notifyListeners);
   }
 
-  final BuildContext _context;
   final AuthController _authController;
   final TextEditingController emailController;
   final TextEditingController passwordController;
@@ -36,28 +34,28 @@ class LoginController extends Controller {
     emailFocus.requestFocus();
   }
 
-  Future<void> signIn() async {
+  Future<void> signIn(BuildContext context) async {
     if (!(formKey.currentState?.validate() ?? false)) return;
 
     await _authController.signIn(
-      context: _context,
       email: emailController.text.trim(),
       password: passwordController.text,
     );
 
-    if (!_context.mounted) return;
+    if (!context.mounted) return;
 
     if (_authController.hasPendingGuestMerge) {
-      final didResolveMerge = await _authController.showPendingGuestMerge(
-        context: _context,
+      final isMergeResolved = await _authController.showPendingGuestMerge(
+        context: context,
       );
-      if (!_context.mounted || !didResolveMerge) return;
+      if (!context.mounted || !isMergeResolved) return;
 
-      _context.go(Pages.account.url);
+      showSnackbar(context, message: 'Succesfully logged in!');
+      context.go(Pages.account.url);
       return;
     }
-
-    _context.go(Pages.home.url);
+    showSnackbar(context, message: 'Succesfully logged in!');
+    context.go(Pages.account.url);
   }
 
   @override
@@ -67,10 +65,7 @@ class LoginController extends Controller {
   }
 }
 
-LoginController useLoginController({
-  required BuildContext context,
-  required AuthController authController,
-}) {
+LoginController useLoginController({required AuthController authController}) {
   final emailController = useTextEditingController();
   final passwordController = useTextEditingController();
   final emailFocus = useFocusNode();
@@ -78,7 +73,6 @@ LoginController useLoginController({
   final formKey = useMemoized(GlobalKey<FormState>.new);
   final controller = useMemoized(
     () => LoginController(
-      context: context,
       authController: authController,
       emailController: emailController,
       passwordController: passwordController,

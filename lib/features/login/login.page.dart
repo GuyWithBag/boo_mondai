@@ -9,7 +9,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         ButtonColor,
         Button,
-        ButtonVariant,
         FormField,
         Scaffold,
         AppBar,
@@ -29,7 +28,6 @@ class LoginPage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final login = useLoginController(
-      context: context,
       authController: context.read<AuthController>(),
     );
     final tokens = context.themeTokens<AppTokens>();
@@ -95,23 +93,21 @@ class LoginPage extends HookWidget {
                       TextFieldFrame.outline,
                     ],
                     onChanged: field.didChange,
-                    onSubmitted: (_) => login.signIn(),
+                    onSubmitted: (_) => login.signIn(context),
                   ),
                 ],
               ),
             ),
-            if (login.error != null) ...[ErrorText(login.error)],
+            if (login.error != null) ...[ErrorText.exception(login.error)],
             Button(
               variants: const [ButtonColor.primary],
 
-              onPressed: login.isLoading ? null : login.signIn,
+              onPressed: login.isLoading ? null : () => login.signIn(context),
               child: login.isLoading
                   ? const LoadingIndicator()
                   : const Text('Sign In'),
             ),
             Button(
-              variants: const [ButtonColor.primary, ButtonVariant.flat],
-
               onPressed: () => context.push('/register'),
               child: const Text("Don't have an account? Sign Up"),
             ),

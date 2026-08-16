@@ -45,11 +45,7 @@ class AuthController extends Controller {
     }
   }
 
-  Future<void> signIn({
-    required BuildContext context,
-    required String email,
-    required String password,
-  }) async {
+  Future<void> signIn({required String email, required String password}) async {
     setLoading(true);
     try {
       authServiceResponse = await AuthService.signIn(email, password);
