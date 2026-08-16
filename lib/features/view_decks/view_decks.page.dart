@@ -12,7 +12,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         AuthService,
         Button,
         ButtonColor,
-        ChangeTrackerController,
         ChangeTrackerStatus,
         CreateDeckTile,
         Deck,
