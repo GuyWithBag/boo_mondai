@@ -9,12 +9,12 @@ abstract final class Env {
   // Replace with your Supabase project credentials
   static const supabaseUrl = String.fromEnvironment(
     'SUPABASE_URL',
-    defaultValue: 'https://auircyjdjlsrvfcnfwny.supabase.co',
+    defaultValue: 'http://192.168.1.105:54321',
   );
 
   static const supabaseAnonKey = String.fromEnvironment(
     'SUPABASE_ANON_KEY',
-    defaultValue: 'sb_publishable_BPJX6jV9oHx7hWsdXGGRmA_aRnlscTD',
+    defaultValue: 'sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH',
   );
 
   static const publicMediaBucket = 'public-media';
