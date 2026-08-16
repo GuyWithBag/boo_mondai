@@ -9,9 +9,7 @@ export 'hooks/hooks.barrel.dart';
 export 'models/models.barrel.dart';
 export 'pages/pages.barrel.dart';
 export 'services/services.barrel.dart';
-export 'theme.deprecated/theme.deprecated.barrel.dart';
 export 'theme/theme.barrel.dart';
-export 'widgets.deprecated/widgets.deprecated.barrel.dart';
 export 'widgets/widgets.barrel.dart';
 export 'helpers/helpers.barrel.dart';
 // Other files

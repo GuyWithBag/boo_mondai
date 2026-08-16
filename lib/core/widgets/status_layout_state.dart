@@ -6,7 +6,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, textStyle, TextSize, TextWeight, ProgressBar;
+    show AppTokens, textStyle, TextSize, TextWeight, ProgressBar, Button;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -55,6 +55,29 @@ class StatusLayoutState extends HookWidget {
   final Widget? child;
   final double? progressValue;
   final bool disableScaffoldScrollingWhenShown;
+
+  factory StatusLayoutState.exception({
+    Key? key,
+    required Exception? exception,
+    VoidCallback? onRetry,
+    bool disableScaffoldScrollingWhenShown = false,
+  }) {
+    return StatusLayoutState(
+      key: key,
+      icon: Icons.error_outline,
+      title: 'Something went wrong',
+      message: exception?.toString() ?? 'An unknown error occurred.',
+      actions: [
+        if (onRetry != null)
+          Button(
+            onPressed: onRetry,
+            leading: const Icon(Icons.refresh),
+            child: const Text('Retry'),
+          ),
+      ],
+      disableScaffoldScrollingWhenShown: disableScaffoldScrollingWhenShown,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

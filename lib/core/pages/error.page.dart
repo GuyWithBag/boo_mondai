@@ -1,13 +1,13 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// PATH: lib/widgets/error_state.dart
-// PURPOSE: Reusable error state with message and optional retry button
+// PATH: lib/core/pages/error.page.dart
+// PURPOSE: Route-level error page with a recovery action
 // PROVIDERS: none
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/lib.barrel.dart' show ErrorState;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:boo_mondai/lib.barrel.dart' show StatusLayoutState;
 
 class ErrorPage extends StatelessWidget {
   const ErrorPage({super.key, required this.exception});
@@ -22,7 +22,7 @@ class ErrorPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         spacing: 10,
         children: [
-          ErrorState(exception: exception),
+          StatusLayoutState.exception(exception: exception),
           ElevatedButton(
             onPressed: () => context.go('/'),
             child: Text('Go Back'),

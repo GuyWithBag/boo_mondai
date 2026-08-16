@@ -1,4 +1,4 @@
-import 'package:boo_mondai/lib.barrel.dart' show StatusLayoutState, ErrorState;
+import 'package:boo_mondai/lib.barrel.dart' show StatusLayoutState;
 import 'package:flutter/widgets.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -155,7 +155,9 @@ class ListingStatesWrapper<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (exception != null) {
-      return _withHeader(ErrorState(exception: exception, onRetry: onRetry));
+      return _withHeader(
+        StatusLayoutState.exception(exception: exception, onRetry: onRetry),
+      );
     }
 
     if (isLoading) {
