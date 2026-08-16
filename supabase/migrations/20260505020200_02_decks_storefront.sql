@@ -6,7 +6,7 @@ create extension if not exists moddatetime schema extensions;
 
 CREATE TABLE decks (
   id                uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id           uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  profile_id           uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   title             text NOT NULL,
   short_description text NOT NULL DEFAULT '',
   long_description  text NOT NULL DEFAULT '',
@@ -24,17 +24,21 @@ CREATE TABLE decks (
   design_config     jsonb,
 
   created_at        timestamptz NOT NULL DEFAULT now(),
-  updated_at        timestamptz NOT NULL DEFAULT now()
+  updated_at        timestamptz NOT NULL DEFAULT now(),
+  deleted_at        timestamptz,
+  purge_after       timestamptz
 );
 
 ALTER TABLE decks ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "decks: read access" ON decks FOR SELECT USING (visibility_state IN ('public', 'unlisted') OR user_id = current_profile_id());
-CREATE POLICY "decks: owner insert" ON decks FOR INSERT WITH CHECK (user_id = current_profile_id());
-CREATE POLICY "decks: owner update" ON decks FOR UPDATE USING (user_id = current_profile_id()) WITH CHECK (user_id = current_profile_id());
-CREATE POLICY "decks: owner delete" ON decks FOR DELETE USING (user_id = current_profile_id());
-CREATE INDEX ON decks (user_id);
+CREATE POLICY "decks: read access" ON decks FOR SELECT USING (visibility_state IN ('public', 'unlisted') OR profile_id = current_profile_id());
+CREATE POLICY "decks: owner insert" ON decks FOR INSERT WITH CHECK (profile_id = current_profile_id());
+CREATE POLICY "decks: owner update" ON decks FOR UPDATE USING (profile_id = current_profile_id()) WITH CHECK (profile_id = current_profile_id());
+CREATE POLICY "decks: owner delete" ON decks FOR DELETE USING (profile_id = current_profile_id());
+CREATE INDEX ON decks (profile_id);
 CREATE INDEX ON decks (visibility_state);
 CREATE INDEX ON decks (source_deck_id);
+CREATE INDEX idx_decks_deleted_at ON decks(deleted_at);
+CREATE INDEX idx_decks_purge_after ON decks(purge_after);
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON decks FOR EACH ROW EXECUTE FUNCTION extensions.moddatetime(updated_at);
 
 -- ── DECK LISTINGS (The Storefront Metadata) ───────────
@@ -51,18 +55,23 @@ CREATE TABLE deck_listings (
   featured_cards   jsonb NOT NULL DEFAULT '[]',
   featured_images  text[] NOT NULL DEFAULT '{}',
   created_at       timestamptz NOT NULL DEFAULT now(),
-  updated_at       timestamptz NOT NULL DEFAULT now()
+  updated_at       timestamptz NOT NULL DEFAULT now(),
+  deleted_at       timestamptz,
+  purge_after      timestamptz
 );
 
 ALTER TABLE deck_listings ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "deck_listings: read all" ON deck_listings FOR SELECT USING (true);
 CREATE POLICY "deck_listings: owner insert" ON deck_listings FOR INSERT
-  WITH CHECK (EXISTS (SELECT 1 FROM decks WHERE id = deck_listings.deck_id AND user_id = current_profile_id()));
+  WITH CHECK (EXISTS (SELECT 1 FROM decks WHERE id = deck_listings.deck_id AND profile_id = current_profile_id()));
 CREATE POLICY "deck_listings: owner update" ON deck_listings FOR UPDATE
-  USING (EXISTS (SELECT 1 FROM decks WHERE id = deck_listings.deck_id AND user_id = current_profile_id()));
+  USING (EXISTS (SELECT 1 FROM decks WHERE id = deck_listings.deck_id AND profile_id = current_profile_id()));
 
 CREATE INDEX idx_listings_upvotes ON deck_listings(upvotes_count DESC);
 CREATE INDEX idx_listings_downloads ON deck_listings(downloads_count DESC);
+CREATE INDEX idx_deck_listings_deleted_at ON deck_listings(deleted_at);
+CREATE INDEX idx_deck_listings_purge_after ON deck_listings(purge_after);
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON deck_listings FOR EACH ROW EXECUTE FUNCTION extensions.moddatetime(updated_at);
 
 -- ── deck_tags ─────────────────────────────────────────
 CREATE TABLE deck_tags (
@@ -72,6 +81,6 @@ CREATE TABLE deck_tags (
   PRIMARY KEY (deck_id, tag_id)
 );
 ALTER TABLE deck_tags ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "deck_tags: read access" ON deck_tags FOR SELECT USING (EXISTS (SELECT 1 FROM decks d WHERE d.id = deck_tags.deck_id AND (d.visibility_state IN ('public', 'unlisted') OR d.user_id = current_profile_id())));
-CREATE POLICY "deck_tags: owner manages" ON deck_tags FOR ALL USING (EXISTS (SELECT 1 FROM decks d WHERE d.id = deck_tags.deck_id AND d.user_id = current_profile_id())) WITH CHECK (EXISTS (SELECT 1 FROM decks d WHERE d.id = deck_tags.deck_id AND d.user_id = current_profile_id()));
+CREATE POLICY "deck_tags: read access" ON deck_tags FOR SELECT USING (EXISTS (SELECT 1 FROM decks d WHERE d.id = deck_tags.deck_id AND (d.visibility_state IN ('public', 'unlisted') OR d.profile_id = current_profile_id())));
+CREATE POLICY "deck_tags: owner manages" ON deck_tags FOR ALL USING (EXISTS (SELECT 1 FROM decks d WHERE d.id = deck_tags.deck_id AND d.profile_id = current_profile_id())) WITH CHECK (EXISTS (SELECT 1 FROM decks d WHERE d.id = deck_tags.deck_id AND d.profile_id = current_profile_id()));
 CREATE INDEX ON deck_tags (tag_id);

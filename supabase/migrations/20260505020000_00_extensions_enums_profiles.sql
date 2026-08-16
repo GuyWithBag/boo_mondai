@@ -30,6 +30,8 @@ CREATE TABLE profiles (
   is_anonymous  bool NOT NULL DEFAULT true,
   created_at    timestamptz NOT NULL DEFAULT now(),
   updated_at    timestamptz NOT NULL DEFAULT now(),
+  deleted_at    timestamptz,
+  purge_after   timestamptz,
 
   CONSTRAINT profiles_role_check
     CHECK (role IN ('group_a_participant', 'group_b_participant', 'researcher') OR role IS NULL)
@@ -39,6 +41,8 @@ ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "profiles: insert own" ON profiles FOR INSERT TO authenticated WITH CHECK ((select auth.uid()) = user_id);
 CREATE POLICY "profiles: read all" ON profiles FOR SELECT USING (true);
 CREATE POLICY "profiles: update own" ON profiles FOR UPDATE USING ((select auth.uid()) = user_id) WITH CHECK ((select auth.uid()) = user_id);
+CREATE INDEX idx_profiles_deleted_at ON profiles(deleted_at);
+CREATE INDEX idx_profiles_purge_after ON profiles(purge_after);
 
 -- Helper: resolve auth.uid() → profiles.id
 CREATE OR REPLACE FUNCTION current_profile_id() RETURNS uuid LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$

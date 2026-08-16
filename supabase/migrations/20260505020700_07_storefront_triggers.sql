@@ -43,14 +43,16 @@ CREATE TRIGGER trigger_deck_votes AFTER INSERT OR UPDATE OR DELETE ON deck_votes
 CREATE OR REPLACE FUNCTION record_deck_vote_event() RETURNS TRIGGER AS $$
 BEGIN
   IF (TG_OP = 'INSERT') THEN
-    INSERT INTO deck_vote_events (deck_id, user_id, old_vote_value, new_vote_value)
-    VALUES (NEW.deck_id, NEW.user_id, NULL, NEW.vote_value);
+    INSERT INTO deck_vote_events (deck_id, profile_id, old_vote_value, new_vote_value)
+    VALUES (NEW.deck_id, NEW.profile_id, NULL, NEW.vote_value);
   ELSIF (TG_OP = 'UPDATE' AND OLD.vote_value IS DISTINCT FROM NEW.vote_value) THEN
-    INSERT INTO deck_vote_events (deck_id, user_id, old_vote_value, new_vote_value)
-    VALUES (NEW.deck_id, NEW.user_id, OLD.vote_value, NEW.vote_value);
+    INSERT INTO deck_vote_events (deck_id, profile_id, old_vote_value, new_vote_value)
+    VALUES (NEW.deck_id, NEW.profile_id, OLD.vote_value, NEW.vote_value);
   ELSIF (TG_OP = 'DELETE') THEN
-    INSERT INTO deck_vote_events (deck_id, user_id, old_vote_value, new_vote_value)
-    VALUES (OLD.deck_id, OLD.user_id, OLD.vote_value, NULL);
+    IF EXISTS (SELECT 1 FROM decks WHERE id = OLD.deck_id) THEN
+      INSERT INTO deck_vote_events (deck_id, profile_id, old_vote_value, new_vote_value)
+      VALUES (OLD.deck_id, OLD.profile_id, OLD.vote_value, NULL);
+    END IF;
   END IF;
   RETURN NULL;
 END;
@@ -63,7 +65,7 @@ DECLARE
 BEGIN
   SELECT vote_value INTO current_vote
   FROM deck_votes
-  WHERE deck_id = NEW.deck_id AND user_id = NEW.user_id;
+  WHERE deck_id = NEW.deck_id AND profile_id = NEW.profile_id;
 
   IF current_vote IS NULL THEN
     RAISE EXCEPTION 'A deck vote is required before adding a review';
@@ -85,7 +87,7 @@ BEGIN
     INSERT INTO deck_vote_review_edit_logs (
       review_id, edited_by, old_vote_value_at_creation, new_vote_value_at_creation, old_title, new_title, old_body, new_body
     ) VALUES (
-      OLD.id, NEW.user_id, OLD.vote_value_at_creation, NEW.vote_value_at_creation, OLD.title, NEW.title, OLD.body, NEW.body
+      OLD.id, NEW.profile_id, OLD.vote_value_at_creation, NEW.vote_value_at_creation, OLD.title, NEW.title, OLD.body, NEW.body
     );
   END IF;
   RETURN NEW;
@@ -97,7 +99,7 @@ CREATE OR REPLACE FUNCTION log_deck_vote_review_comment_edit() RETURNS TRIGGER A
 BEGIN
   IF (OLD.body IS DISTINCT FROM NEW.body) THEN
     INSERT INTO deck_vote_review_comment_edit_logs (comment_id, edited_by, old_body, new_body)
-    VALUES (OLD.id, NEW.user_id, OLD.body, NEW.body);
+    VALUES (OLD.id, NEW.profile_id, OLD.body, NEW.body);
   END IF;
   RETURN NEW;
 END;
@@ -166,7 +168,7 @@ CREATE OR REPLACE FUNCTION log_deck_comment_edit() RETURNS TRIGGER AS $$
 BEGIN
   IF (OLD.body IS DISTINCT FROM NEW.body) THEN
     INSERT INTO deck_comment_edit_logs (comment_id, edited_by, old_body, new_body)
-    VALUES (OLD.id, NEW.user_id, OLD.body, NEW.body);
+    VALUES (OLD.id, NEW.profile_id, OLD.body, NEW.body);
   END IF;
   RETURN NEW;
 END;

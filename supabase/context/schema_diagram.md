@@ -14,7 +14,7 @@ erDiagram
     
     profiles {
         uuid id PK
-        uuid user_id FK
+        uuid profile_id FK
         text username
         text display_name
         text role
@@ -23,7 +23,7 @@ erDiagram
     
     tags {
         uuid id PK
-        uuid user_id FK
+        uuid profile_id FK
         text name
     }
 
@@ -46,7 +46,7 @@ erDiagram
 
     decks {
         uuid id PK
-        uuid user_id FK
+        uuid profile_id FK
         text title
         uuid source_deck_id FK "For Forking"
         visibility_state visibility_state
@@ -177,14 +177,14 @@ erDiagram
     }
 
     user_study_cards_tags {
-        uuid user_id PK, FK
+        uuid profile_id PK, FK
         uuid study_cards_id PK, FK
         uuid tag_id PK, FK
     }
 
     fsrs_cards {
         uuid id PK
-        uuid user_id FK
+        uuid profile_id FK
         uuid study_cards_id FK
         jsonb state
         timestamptz created_at
@@ -200,7 +200,7 @@ erDiagram
 
     drill_sessions {
         uuid id PK
-        uuid user_id FK
+        uuid profile_id FK
         uuid deck_id FK
         int correct_count
     }
@@ -242,14 +242,14 @@ erDiagram
 
     deck_votes {
         uuid deck_id PK, FK
-        uuid user_id PK, FK
+        uuid profile_id PK, FK
         int vote_value
     }
 
     deck_vote_events {
         uuid id PK
         uuid deck_id FK
-        uuid user_id FK
+        uuid profile_id FK
         int old_vote_value
         int new_vote_value
     }
@@ -257,7 +257,7 @@ erDiagram
     deck_vote_reviews {
         uuid id PK
         uuid deck_id FK
-        uuid user_id FK
+        uuid profile_id FK
         int vote_value_at_creation
         text title
         text body
@@ -278,7 +278,7 @@ erDiagram
     deck_vote_review_comments {
         uuid id PK
         uuid review_id FK
-        uuid user_id FK
+        uuid profile_id FK
         uuid parent_comment_id FK
         text body
     }
@@ -294,7 +294,7 @@ erDiagram
     deck_comments {
         uuid id PK
         uuid deck_id FK
-        uuid user_id FK
+        uuid profile_id FK
         uuid parent_comment_id FK
         text body
     }
@@ -309,18 +309,18 @@ erDiagram
 
     deck_downloads {
         uuid deck_id PK, FK
-        uuid user_id PK, FK
+        uuid profile_id PK, FK
     }
 
     deck_favorites {
         uuid deck_id PK, FK
-        uuid user_id PK, FK
+        uuid profile_id PK, FK
     }
 
     deck_reports {
         uuid id PK
         uuid deck_id FK
-        uuid user_id FK
+        uuid profile_id FK
         text reason
         text status
     }
@@ -367,7 +367,7 @@ erDiagram
 
     research_profiles {
         uuid id PK
-        uuid user_id FK
+        uuid profile_id FK
         text role
         text goal
     }
@@ -381,14 +381,14 @@ erDiagram
 
     survey_responses {
         uuid id PK
-        uuid user_id FK
+        uuid profile_id FK
         text survey_type
         jsonb responses
     }
 
     vocabulary_test_results {
         uuid id PK
-        uuid user_id FK
+        uuid profile_id FK
         text test_set
         int score
     }

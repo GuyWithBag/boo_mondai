@@ -23,18 +23,23 @@ CREATE TABLE card_templates (
   back_audio_url       text,
   card_type            card_type,
   prompt_text          text,
-  accepted_answers     text,
+  accepted_answers     jsonb NOT NULL DEFAULT '[]'::jsonb,
   question_prompt      text,
   sentence_to_scramble text,
   image_url            text,
-  audio_url            text
+  audio_url            text,
+  vertically_centered  boolean NOT NULL DEFAULT true,
+  deleted_at           timestamptz,
+  purge_after          timestamptz
 );
 ALTER TABLE card_templates ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "card_templates: read access" ON card_templates FOR SELECT USING (EXISTS (SELECT 1 FROM decks d WHERE d.id = card_templates.deck_id AND (d.visibility_state IN ('public', 'unlisted') OR d.user_id = current_profile_id())));
-CREATE POLICY "card_templates: owner insert" ON card_templates FOR INSERT WITH CHECK (EXISTS (SELECT 1 FROM decks d WHERE d.id = card_templates.deck_id AND d.user_id = current_profile_id()));
-CREATE POLICY "card_templates: owner update" ON card_templates FOR UPDATE USING (EXISTS (SELECT 1 FROM decks d WHERE d.id = card_templates.deck_id AND d.user_id = current_profile_id())) WITH CHECK (EXISTS (SELECT 1 FROM decks d WHERE d.id = card_templates.deck_id AND d.user_id = current_profile_id()));
-CREATE POLICY "card_templates: owner delete" ON card_templates FOR DELETE USING (EXISTS (SELECT 1 FROM decks d WHERE d.id = card_templates.deck_id AND d.user_id = current_profile_id()));
+CREATE POLICY "card_templates: read access" ON card_templates FOR SELECT USING (EXISTS (SELECT 1 FROM decks d WHERE d.id = card_templates.deck_id AND (d.visibility_state IN ('public', 'unlisted') OR d.profile_id = current_profile_id())));
+CREATE POLICY "card_templates: owner insert" ON card_templates FOR INSERT WITH CHECK (EXISTS (SELECT 1 FROM decks d WHERE d.id = card_templates.deck_id AND d.profile_id = current_profile_id()));
+CREATE POLICY "card_templates: owner update" ON card_templates FOR UPDATE USING (EXISTS (SELECT 1 FROM decks d WHERE d.id = card_templates.deck_id AND d.profile_id = current_profile_id())) WITH CHECK (EXISTS (SELECT 1 FROM decks d WHERE d.id = card_templates.deck_id AND d.profile_id = current_profile_id()));
+CREATE POLICY "card_templates: owner delete" ON card_templates FOR DELETE USING (EXISTS (SELECT 1 FROM decks d WHERE d.id = card_templates.deck_id AND d.profile_id = current_profile_id()));
 CREATE INDEX ON card_templates (deck_id);
+CREATE INDEX idx_card_templates_deleted_at ON card_templates(deleted_at);
+CREATE INDEX idx_card_templates_purge_after ON card_templates(purge_after);
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON card_templates FOR EACH ROW EXECUTE FUNCTION extensions.moddatetime(updated_at);
 
 -- ── card_template_tags ────────────────────────────────
@@ -45,8 +50,8 @@ CREATE TABLE card_template_tags (
   PRIMARY KEY (template_id, tag_id)
 );
 ALTER TABLE card_template_tags ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "card_template_tags: read access" ON card_template_tags FOR SELECT USING (EXISTS (SELECT 1 FROM card_templates ct JOIN decks d ON d.id = ct.deck_id WHERE ct.id = card_template_tags.template_id AND (d.visibility_state IN ('public', 'unlisted') OR d.user_id = current_profile_id())));
-CREATE POLICY "card_template_tags: owner manages" ON card_template_tags FOR ALL USING (EXISTS (SELECT 1 FROM card_templates ct JOIN decks d ON d.id = ct.deck_id WHERE ct.id = card_template_tags.template_id AND d.user_id = current_profile_id())) WITH CHECK (EXISTS (SELECT 1 FROM card_templates ct JOIN decks d ON d.id = ct.deck_id WHERE ct.id = card_template_tags.template_id AND d.user_id = current_profile_id()));
+CREATE POLICY "card_template_tags: read access" ON card_template_tags FOR SELECT USING (EXISTS (SELECT 1 FROM card_templates ct JOIN decks d ON d.id = ct.deck_id WHERE ct.id = card_template_tags.template_id AND (d.visibility_state IN ('public', 'unlisted') OR d.profile_id = current_profile_id())));
+CREATE POLICY "card_template_tags: owner manages" ON card_template_tags FOR ALL USING (EXISTS (SELECT 1 FROM card_templates ct JOIN decks d ON d.id = ct.deck_id WHERE ct.id = card_template_tags.template_id AND d.profile_id = current_profile_id())) WITH CHECK (EXISTS (SELECT 1 FROM card_templates ct JOIN decks d ON d.id = ct.deck_id WHERE ct.id = card_template_tags.template_id AND d.profile_id = current_profile_id()));
 
 -- ── template specifics (MCQ, FITB, Match Madness) ─────
 CREATE TABLE multiple_choice_options (
@@ -57,8 +62,8 @@ CREATE TABLE multiple_choice_options (
   display_order int  NOT NULL DEFAULT 0
 );
 ALTER TABLE multiple_choice_options ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "multiple_choice_options: read access" ON multiple_choice_options FOR SELECT USING (EXISTS (SELECT 1 FROM card_templates ct JOIN decks d ON d.id = ct.deck_id WHERE ct.id = multiple_choice_options.template_id AND (d.visibility_state IN ('public', 'unlisted') OR d.user_id = current_profile_id())));
-CREATE POLICY "multiple_choice_options: owner manages" ON multiple_choice_options FOR ALL USING (EXISTS (SELECT 1 FROM card_templates ct JOIN decks d ON d.id = ct.deck_id WHERE ct.id = multiple_choice_options.template_id AND d.user_id = current_profile_id()));
+CREATE POLICY "multiple_choice_options: read access" ON multiple_choice_options FOR SELECT USING (EXISTS (SELECT 1 FROM card_templates ct JOIN decks d ON d.id = ct.deck_id WHERE ct.id = multiple_choice_options.template_id AND (d.visibility_state IN ('public', 'unlisted') OR d.profile_id = current_profile_id())));
+CREATE POLICY "multiple_choice_options: owner manages" ON multiple_choice_options FOR ALL USING (EXISTS (SELECT 1 FROM card_templates ct JOIN decks d ON d.id = ct.deck_id WHERE ct.id = multiple_choice_options.template_id AND d.profile_id = current_profile_id()));
 
 CREATE TABLE fill_in_the_blank_segments (
   id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -70,8 +75,8 @@ CREATE TABLE fill_in_the_blank_segments (
   CONSTRAINT fitb_blank_order CHECK (blank_start < blank_end)
 );
 ALTER TABLE fill_in_the_blank_segments ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "fitb_segments: read access" ON fill_in_the_blank_segments FOR SELECT USING (EXISTS (SELECT 1 FROM card_templates ct JOIN decks d ON d.id = ct.deck_id WHERE ct.id = fill_in_the_blank_segments.card_id AND (d.visibility_state IN ('public', 'unlisted') OR d.user_id = current_profile_id())));
-CREATE POLICY "fitb_segments: owner manages" ON fill_in_the_blank_segments FOR ALL USING (EXISTS (SELECT 1 FROM card_templates ct JOIN decks d ON d.id = ct.deck_id WHERE ct.id = fill_in_the_blank_segments.card_id AND d.user_id = current_profile_id()));
+CREATE POLICY "fitb_segments: read access" ON fill_in_the_blank_segments FOR SELECT USING (EXISTS (SELECT 1 FROM card_templates ct JOIN decks d ON d.id = ct.deck_id WHERE ct.id = fill_in_the_blank_segments.card_id AND (d.visibility_state IN ('public', 'unlisted') OR d.profile_id = current_profile_id())));
+CREATE POLICY "fitb_segments: owner manages" ON fill_in_the_blank_segments FOR ALL USING (EXISTS (SELECT 1 FROM card_templates ct JOIN decks d ON d.id = ct.deck_id WHERE ct.id = fill_in_the_blank_segments.card_id AND d.profile_id = current_profile_id()));
 
 CREATE TABLE match_madness_pairs (
   id                 uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -83,6 +88,6 @@ CREATE TABLE match_madness_pairs (
   display_order      int  NOT NULL DEFAULT 0
 );
 ALTER TABLE match_madness_pairs ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "match_madness: read access" ON match_madness_pairs FOR SELECT USING (EXISTS (SELECT 1 FROM card_templates ct JOIN decks d ON d.id = ct.deck_id WHERE ct.id = match_madness_pairs.template_id AND (d.visibility_state IN ('public', 'unlisted') OR d.user_id = current_profile_id())));
-CREATE POLICY "match_madness: owner manages" ON match_madness_pairs FOR ALL USING (EXISTS (SELECT 1 FROM card_templates ct JOIN decks d ON d.id = ct.deck_id WHERE ct.id = match_madness_pairs.template_id AND d.user_id = current_profile_id()));
+CREATE POLICY "match_madness: read access" ON match_madness_pairs FOR SELECT USING (EXISTS (SELECT 1 FROM card_templates ct JOIN decks d ON d.id = ct.deck_id WHERE ct.id = match_madness_pairs.template_id AND (d.visibility_state IN ('public', 'unlisted') OR d.profile_id = current_profile_id())));
+CREATE POLICY "match_madness: owner manages" ON match_madness_pairs FOR ALL USING (EXISTS (SELECT 1 FROM card_templates ct JOIN decks d ON d.id = ct.deck_id WHERE ct.id = match_madness_pairs.template_id AND d.profile_id = current_profile_id()));
 

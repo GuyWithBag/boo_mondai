@@ -10,7 +10,7 @@ File created successfully at preventing-multiple-permissive-policies-rls.md
 ```sql
 -- Policy 1: Users can read their own data
 CREATE POLICY "read own data" ON my_table FOR SELECT 
-  USING (user_id = auth.uid());
+  USING (profile_id = auth.uid());
 
 -- Policy 2: Admins/Researchers can read all data
 CREATE POLICY "admin read all" ON my_table FOR SELECT 
@@ -39,7 +39,7 @@ Never leave a policy scoped to `PUBLIC` unless it genuinely needs to be accessed
 CREATE POLICY "my_table: select access" ON my_table FOR SELECT TO authenticated
   USING (
     -- Condition A: Is the owner
-    user_id = auth.uid()
+    profile_id = auth.uid()
     OR 
     -- Condition B: Is an admin/researcher
     EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')

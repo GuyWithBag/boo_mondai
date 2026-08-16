@@ -154,7 +154,7 @@ INSERT INTO profiles (
 ON CONFLICT (id) DO NOTHING;
 
 -- ── Tags ──────────────────────────────────────────────
-INSERT INTO tags (id, user_id, name, created_at) VALUES
+INSERT INTO tags (id, profile_id, name, created_at) VALUES
   (tag_jlpt_n5, NULL, 'jlpt-n5', now()),
   (tag_animals, NULL, 'animals', now()),
   (tag_nature,  NULL, 'nature',  now())
@@ -162,7 +162,7 @@ ON CONFLICT (id) DO NOTHING;
 
 -- ── Decks ─────────────────────────────────────────────
 INSERT INTO decks (
-  id, user_id, title, short_description, long_description,
+  id, profile_id, title, short_description, long_description,
   is_premade, visibility_state, is_published, is_editable,
   card_count, source_deck_id, design_config, created_at, updated_at
 ) VALUES
@@ -296,7 +296,7 @@ INSERT INTO study_cards (id, template_id, is_reversed, deck_id) VALUES
 ON CONFLICT (id) DO NOTHING;
 
 -- ── Streaks ───────────────────────────────────────────
-INSERT INTO streaks (id, user_id, current_streak, longest_streak, last_activity_date, created_at, updated_at)
+INSERT INTO streaks (id, profile_id, current_streak, longest_streak, last_activity_date, created_at, updated_at)
 VALUES
   (streak_alice, p_alice, 5, 12, '2026-03-25', now(), now()),
   (streak_bob,   p_bob,   0,  3, '2026-03-20', now(), now())
@@ -304,7 +304,7 @@ ON CONFLICT (id) DO NOTHING;
 
 -- ── Research Profiles ─────────────────────────────────
 INSERT INTO research_profiles
-  (id, user_id, first_name, last_name, age, role, goal, created_at)
+  (id, profile_id, first_name, last_name, age, role, goal, created_at)
 VALUES
   (rp_alice, p_alice, 'Alice', 'Smith', 21, 'group_a_participant', 'japanese', now()),
   (rp_bob,   p_bob,   'Bob',   'Jones', 22, 'group_a_participant', 'japanese', now()),
@@ -330,7 +330,7 @@ ON CONFLICT (code) DO NOTHING;
 
 -- ── Drill Session (Alice completed one drill on N5 deck) ──
 INSERT INTO drill_sessions (
-  id, user_id, deck_id, session_type,
+  id, profile_id, deck_id, session_type,
   previewed, total_questions, correct_count,
   started_at, completed_at
 ) VALUES (
@@ -350,7 +350,7 @@ INSERT INTO drill_answers (session_id, card_id, user_answer, type, created_at) V
 
 -- ── FSRS Cards (Alice's review schedule after her drill) ─
 -- state is a JSONB snapshot of the fsrs package Card object
-INSERT INTO fsrs_cards (id, user_id, study_cards_id, state, created_at, updated_at) VALUES
+INSERT INTO fsrs_cards (id, profile_id, study_cards_id, state, created_at, updated_at) VALUES
   (fsrs_inu, p_alice, rc_inu,
    '{"due":"2026-03-26T10:00:00Z","stability":4.5,"difficulty":5.0,"elapsed_days":1,"scheduled_days":3,"reps":1,"lapses":0,"state":2,"last_review":"2026-03-25T10:02:00Z"}'::jsonb,
    now(), now()),
@@ -375,7 +375,7 @@ INSERT INTO review_logs (fsrs_card_id, log, created_at) VALUES
 
 -- ── Review Session (Alice reviewed 4 cards) ───────────
 INSERT INTO review_sessions (
-  id, user_id, deck_id, session_type,
+  id, profile_id, deck_id, session_type,
   total_cards, cards_reviewed, started_at, completed_at
 ) VALUES (
   review_session_alice, p_alice, deck_n5, 'review',
@@ -384,18 +384,18 @@ INSERT INTO review_sessions (
 ) ON CONFLICT (id) DO NOTHING;
 
 -- ── Storefront Votes, Reviews, and Comments ───────────
-INSERT INTO deck_votes (deck_id, user_id, vote_value, created_at, updated_at) VALUES
+INSERT INTO deck_votes (deck_id, profile_id, vote_value, created_at, updated_at) VALUES
   (deck_n5, p_alice, 1,  '2026-03-25 12:00:00+00', '2026-03-25 12:00:00+00'),
   (deck_n5, p_bob,   -1, '2026-03-25 12:05:00+00', '2026-03-25 12:05:00+00')
-ON CONFLICT (deck_id, user_id) DO NOTHING;
+ON CONFLICT (deck_id, profile_id) DO NOTHING;
 
 -- Bob changes his mind, giving the vote history table an example timeline.
 UPDATE deck_votes
 SET vote_value = 1,
     updated_at = '2026-03-25 12:20:00+00'
-WHERE deck_id = deck_n5 AND user_id = p_bob AND vote_value = -1;
+WHERE deck_id = deck_n5 AND profile_id = p_bob AND vote_value = -1;
 
-INSERT INTO deck_vote_reviews (id, deck_id, user_id, vote_value_at_creation, title, body, created_at, updated_at)
+INSERT INTO deck_vote_reviews (id, deck_id, profile_id, vote_value_at_creation, title, body, created_at, updated_at)
 VALUES (
   review_alice_n5,
   deck_n5,
@@ -405,14 +405,14 @@ VALUES (
   'The animal and nature cards are concise and easy to drill.',
   '2026-03-25 12:10:00+00',
   '2026-03-25 12:10:00+00'
-) ON CONFLICT (deck_id, user_id) DO NOTHING;
+) ON CONFLICT (deck_id, profile_id) DO NOTHING;
 
 UPDATE deck_vote_reviews
 SET body = 'The animal and nature cards are concise, easy to drill, and useful for day-one practice.',
     updated_at = '2026-03-25 12:30:00+00'
 WHERE id = review_alice_n5;
 
-INSERT INTO deck_comments (id, deck_id, user_id, parent_comment_id, body, created_at, updated_at) VALUES
+INSERT INTO deck_comments (id, deck_id, profile_id, parent_comment_id, body, created_at, updated_at) VALUES
   (comment_alice_n5, deck_n5, p_alice, NULL, 'Could use more kana-only examples.', '2026-03-25 12:15:00+00', '2026-03-25 12:15:00+00'),
   (comment_bob_n5,   deck_n5, p_bob,   comment_alice_n5, 'Agreed. A kana hint mode would help.', '2026-03-25 12:25:00+00', '2026-03-25 12:25:00+00')
 ON CONFLICT (id) DO NOTHING;
@@ -423,7 +423,7 @@ SET body = 'Could use more kana-only examples for first-time learners.',
 WHERE id = comment_alice_n5;
 
 -- ── Survey Responses (Alice completed Day 1 surveys) ──
-INSERT INTO survey_responses (user_id, survey_type, time_point, responses, submitted_at)
+INSERT INTO survey_responses (profile_id, survey_type, time_point, responses, submitted_at)
 VALUES
   (p_alice, 'proficiency_screener', NULL,
    '{"item_1":2,"item_2":2,"item_3":1,"item_4":3,"item_5":2,"item_6":4,"proficiency_level":"beginner"}'::jsonb,
@@ -431,6 +431,6 @@ VALUES
   (p_alice, 'language_interest', NULL,
    '{"item_1":5,"item_2":4,"item_3":4,"item_4":3,"item_5":5}'::jsonb,
    '2026-03-20 09:05:00+00')
-ON CONFLICT (user_id, survey_type, time_point) DO NOTHING;
+ON CONFLICT (profile_id, survey_type, time_point) DO NOTHING;
 
 END $$;
