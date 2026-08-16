@@ -69,7 +69,7 @@ A web-based gamified language learning platform that combines user-generated dri
 ## Data the Agent Must Record
 
 ### research_users
-- Links platform `user_id` to research study
+- Links platform `profile_id` to research study
 - Records `role` and `target_language`
 - Created by researcher with a Researcher/Admin view
 

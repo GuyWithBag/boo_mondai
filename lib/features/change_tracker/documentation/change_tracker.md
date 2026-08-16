@@ -141,7 +141,7 @@ sequenceDiagram
     SyncController->>Service: sync(localDb, remoteDb, profileId, changeTrackerController)
     Service->>Controller: start(entry: ChangeTrackerEntry(sync, planning), onChangeApply)
     Service->>Controller: update(status: fetching, progress)
-    Service->>Remote: selectMany(user_id)
+    Service->>Remote: selectMany(profile_id)
     Service->>Local: selectMany()
     Service->>Service: compare timestamps and build PreviewedChangePlan
 

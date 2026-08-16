@@ -21,7 +21,7 @@ erDiagram
 
   decks {
     uuid id PK
-    uuid user_id FK
+    uuid profile_id FK
     text title
     text target_language
     bool is_premade
@@ -105,14 +105,14 @@ erDiagram
 
   profiles {
     uuid id PK
-    uuid user_id FK
+    uuid profile_id FK
     text username
     text role
   }
 
   fsrs_cards {
     uuid id PK
-    uuid user_id FK "auth.users.id"
+    uuid profile_id FK "auth.users.id"
     uuid study_cards_id FK
     jsonb state
     timestamptz created_at
@@ -132,7 +132,7 @@ erDiagram
   card_templates     ||--o{ match_madness_pairs     : "template_id"
   card_templates     ||--|{ study_cards             : "template_id"
   decks              ||--o{ study_cards             : "deck_id"
-  profiles           ||--o{ fsrs_cards               : "user_id"
+  profiles           ||--o{ fsrs_cards               : "profile_id"
   study_cards       ||--o{ fsrs_cards               : "study_cards_id"
   fsrs_cards         ||--o{ review_logs              : "fsrs_card_id"
 ```
@@ -247,5 +247,5 @@ Rating values: `1` = Again, `2` = Hard, `3` = Good, `4` = Easy.
 | `card_templates.source_template_id` | `card_templates.id` | Tracks copied templates (e.g. Bob copied Alice's deck) |
 | `match_madness_pairs.source_template_id` | `card_templates.id` | Tracks which template a pair was auto-generated from |
 | `fill_in_the_blank_segments.card_id` | `card_templates.id` | Named `card_id` to match the `FillInTheBlankSegment` MutableEntity field |
-| `fsrs_cards.user_id` | `auth.users.id` | Auth UUID directly — RLS uses `auth.uid()` with no detour through profiles |
-| `review_logs.fsrs_card_id` | `fsrs_cards.id` | No `user_id` on review_logs — derive ownership via this join |
+| `fsrs_cards.profile_id` | `auth.users.id` | Auth UUID directly — RLS uses `auth.uid()` with no detour through profiles |
+| `review_logs.fsrs_card_id` | `fsrs_cards.id` | No `profile_id` on review_logs — derive ownership via this join |

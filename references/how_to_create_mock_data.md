@@ -210,7 +210,7 @@ INSERT INTO mm_pairs (id, card_id, term, match, is_auto_picked, display_order) V
 ## Step 6 — drill_sessions and drill_answers
 
 ```sql
-INSERT INTO drill_sessions (id, user_id, deck_id, previewed, total_questions,
+INSERT INTO drill_sessions (id, profile_id, deck_id, previewed, total_questions,
                             correct_count, started_at, completed_at)
 VALUES (
   'session-uuid',
@@ -239,15 +239,15 @@ VALUES
 
 ## Step 7 — fsrs_cards
 
-The `fsrs_cards` table tracks spaced-repetition state per user per card. Its `id` is a **text** field in the format `{user_id}_{card_id}` (the two UUIDs joined by an underscore).
+The `fsrs_cards` table tracks spaced-repetition state per user per card. Its `id` is a **text** field in the format `{profile_id}_{card_id}` (the two UUIDs joined by an underscore).
 
 ```sql
-INSERT INTO fsrs_cards (id, user_id, card_id, due, stability, difficulty,
+INSERT INTO fsrs_cards (id, profile_id, card_id, due, stability, difficulty,
                         elapsed_days, scheduled_days, reps, lapses, state,
                         last_review, updated_at)
 VALUES (
   '00000000-0000-0000-0000-000000000002_00000000-0000-0000-0000-000000000020',
-  '00000000-0000-0000-0000-000000000002',  -- user_id
+  '00000000-0000-0000-0000-000000000002',  -- profile_id
   '00000000-0000-0000-0000-000000000020',  -- card_id
   '2026-03-29 09:00:00+00',  -- due: when this card is next due for review
   1.3,                       -- stability
@@ -272,7 +272,7 @@ For a well-reviewed card: `stability ≈ 10–30`, `reps = 5+`, `state = 2`.
 One row per FSRS review event:
 
 ```sql
-INSERT INTO review_logs (id, user_id, card_id, rating, scheduled_days,
+INSERT INTO review_logs (id, profile_id, card_id, rating, scheduled_days,
                           elapsed_days, review, state, created_at)
 VALUES (
   'log-uuid',
@@ -294,7 +294,7 @@ VALUES (
 One row per user. `last_activity_date` is a `date` (not timestamp):
 
 ```sql
-INSERT INTO streaks (id, user_id, current_streak, longest_streak, last_activity_date, updated_at)
+INSERT INTO streaks (id, profile_id, current_streak, longest_streak, last_activity_date, updated_at)
 VALUES
   ('streak-1-uuid', 'user-1-uuid', 7, 14, '2026-03-28', now()),
   ('streak-2-uuid', 'user-2-uuid', 0,  5, '2026-03-20', now());
@@ -306,7 +306,7 @@ VALUES
 
 ### research_users
 ```sql
-INSERT INTO research_users (id, user_id, role, target_language, created_at)
+INSERT INTO research_users (id, profile_id, role, target_language, created_at)
 VALUES ('ru-uuid', 'user-uuid', 'group_a_participant', 'japanese', now());
 ```
 
@@ -338,7 +338,7 @@ Valid `unlocks` values (the string must match exactly what the app checks):
 6 items (1–5 each) + proficiency_level:
 ```sql
 INSERT INTO research_proficiency_screener
-  (id, user_id, item_1, item_2, item_3, item_4, item_5, item_6, proficiency_level, submitted_at)
+  (id, profile_id, item_1, item_2, item_3, item_4, item_5, item_6, proficiency_level, submitted_at)
 VALUES ('rps-uuid', 'alice-uuid', 2, 2, 1, 1, 3, 4, 'beginner', now());
 ```
 `proficiency_level` must be one of: `none`, `beginner`, `elementary`, `intermediate`, `advanced`
@@ -347,13 +347,13 @@ VALUES ('rps-uuid', 'alice-uuid', 2, 2, 1, 1, 3, 4, 'beginner', now());
 5 items (1–5 each):
 ```sql
 INSERT INTO research_language_interest
-  (id, user_id, item_1, item_2, item_3, item_4, item_5, submitted_at)
+  (id, profile_id, item_1, item_2, item_3, item_4, item_5, submitted_at)
 VALUES ('rli-uuid', 'alice-uuid', 4, 5, 4, 3, 5, now());
 ```
 
 ### research_vocabulary_test
 ```sql
-INSERT INTO research_vocabulary_test (id, user_id, test_set, score, answers, submitted_at)
+INSERT INTO research_vocabulary_test (id, profile_id, test_set, score, answers, submitted_at)
 VALUES (
   'rvt-uuid', 'alice-uuid', 'A', 22,
   '{"q1":"A","q2":"C","q3":"B"}'::jsonb,
@@ -366,7 +366,7 @@ VALUES (
 15 items across enjoyment (5), engagement (5), motivation (5). Has `time_point`:
 ```sql
 INSERT INTO research_experience_survey
-  (id, user_id, time_point,
+  (id, profile_id, time_point,
    enjoyment_1, enjoyment_2, enjoyment_3, enjoyment_4, enjoyment_5,
    engagement_1, engagement_2, engagement_3, engagement_4, engagement_5,
    motivation_1, motivation_2, motivation_3, motivation_4, motivation_5,
@@ -378,13 +378,13 @@ VALUES
    4, 4, 5, 3, 4,
    now());
 ```
-`time_point` must be `'short_term'` or `'long_term'`. UNIQUE on `(user_id, time_point)`.
+`time_point` must be `'short_term'` or `'long_term'`. UNIQUE on `(profile_id, time_point)`.
 
 ### research_preview_usefulness / research_fsrs_usefulness
 5 items each (1–5):
 ```sql
 INSERT INTO research_preview_usefulness
-  (id, user_id, item_1, item_2, item_3, item_4, item_5, submitted_at)
+  (id, profile_id, item_1, item_2, item_3, item_4, item_5, submitted_at)
 VALUES ('rpu-uuid', 'alice-uuid', 4, 4, 3, 5, 4, now());
 ```
 
@@ -392,7 +392,7 @@ VALUES ('rpu-uuid', 'alice-uuid', 4, 4, 3, 5, 4, now());
 6 items (1–5):
 ```sql
 INSERT INTO research_ugc_perception
-  (id, user_id, item_1, item_2, item_3, item_4, item_5, item_6, submitted_at)
+  (id, profile_id, item_1, item_2, item_3, item_4, item_5, item_6, submitted_at)
 VALUES ('rug-uuid', 'alice-uuid', 3, 4, 4, 3, 5, 4, now());
 ```
 
@@ -400,7 +400,7 @@ VALUES ('rug-uuid', 'alice-uuid', 3, 4, 4, 3, 5, 4, now());
 10 items + computed `sus_score`:
 ```sql
 INSERT INTO research_sus
-  (id, user_id, item_1, item_2, item_3, item_4, item_5,
+  (id, profile_id, item_1, item_2, item_3, item_4, item_5,
    item_6, item_7, item_8, item_9, item_10, sus_score, submitted_at)
 VALUES (
   'rsus-uuid', 'alice-uuid',
@@ -530,7 +530,7 @@ Unless told otherwise, generate:
 1. **Forgetting `card_count`**: Set it to the exact number of `deck_cards` rows for that deck.
 2. **Wrong FITB indices**: Count characters starting at 0. End index is exclusive. The string `full_text[blank_start:blank_end]` must equal `correct_answer` exactly (same case).
 3. **MC with no correct option**: Every multiple_choice card must have exactly one `mc_options` row where `is_correct = true`.
-4. **fsrs_cards wrong PK format**: The `id` column is `'{user_id}_{card_id}'` — two UUIDs joined by underscore, not a UUID itself.
+4. **fsrs_cards wrong PK format**: The `id` column is `'{profile_id}_{card_id}'` — two UUIDs joined by underscore, not a UUID itself.
 5. **Inserting profiles before auth.users**: Profiles has `id REFERENCES auth.users(id)`. auth.users must come first.
 6. **match_madness with notes**: Don't insert `notes` rows for `match_madness` cards — they have no notes.
 7. **fill_in_the_blanks with notes**: Don't insert `notes` rows for `fill_in_the_blanks` cards — they have no notes.

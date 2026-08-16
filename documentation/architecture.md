@@ -313,7 +313,7 @@ Maps to `ReviewSession`. Tracks FSRS review session state (`totalCards`, `cardsR
 ### `drill_sessions` (was `quiz_sessions`)
 | Old | New | Change |
 |---|---|---|
-| `user_id` | `"userId"` | Renamed |
+| `profile_id` | `"userId"` | Renamed |
 | `deck_id NOT NULL` | `"deckId"` (nullable) | Renamed + made nullable (StudySession.deckId is optional) |
 | `total_questions` | `"totalQuestions"` | Renamed |
 | `correct_count` | `"correctCount"` | Renamed |
@@ -332,7 +332,7 @@ Maps to `ReviewSession`. Tracks FSRS review session state (`totalCards`, `cardsR
 ### `fsrs_cards`
 | Old | New | Change |
 |---|---|---|
-| `user_id` | `"userId"` | Renamed |
+| `profile_id` | `"userId"` | Renamed |
 | `card_id uuid REFERENCES deck_cards` | `"studyCardId" uuid REFERENCES study_cards` | Renamed + FK target changed |
 | `due`, `stability`, `difficulty`, etc. | `state jsonb` | Collapsed into single JSONB |
 
@@ -346,7 +346,7 @@ Maps to `ReviewSession`. Tracks FSRS review session state (`totalCards`, `cardsR
 ### `streaks`
 | Old | New | Change |
 |---|---|---|
-| `user_id` | `"userId"` | Renamed |
+| `profile_id` | `"userId"` | Renamed |
 | `current_streak` | `"currentStreak"` | Renamed |
 | `longest_streak` | `"longestStreak"` | Renamed |
 | `last_activity_date` | `"lastActivityDate"` | Renamed |
@@ -356,7 +356,7 @@ Maps to `ReviewSession`. Tracks FSRS review session state (`totalCards`, `cardsR
 | Old | New | Change |
 |---|---|---|
 | `research_users` | `research_profiles` | Table renamed to match class |
-| `user_id` | `"userId"` | Renamed |
+| `profile_id` | `"userId"` | Renamed |
 | `target_language` | `"targetLanguage"` | Renamed |
 | `created_at` | `"createdAt"` | Renamed |
 | *(missing)* | `"username"` | Added |
@@ -381,7 +381,7 @@ All individual survey tables (`research_proficiency_screener`, `research_languag
 | Old | New | Change |
 |---|---|---|
 | `research_vocabulary_test` | `vocabulary_test_results` | Table renamed to match class |
-| `user_id` | `"userId"` | Renamed |
+| `profile_id` | `"userId"` | Renamed |
 | `test_set` | `"testSet"` | Renamed |
 | `submitted_at` | `"submittedAt"` | Renamed |
 

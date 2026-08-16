@@ -94,15 +94,15 @@ Add a Supabase table:
 ```sql
 create table if not exists sync_clients (
   id uuid not null,
-  user_id uuid not null references profiles(id) on delete cascade,
+  profile_id uuid not null references profiles(id) on delete cascade,
   device_name text,
   created_at timestamptz not null default now(),
   last_seen_at timestamptz not null default now(),
   last_synced_at timestamptz,
-  primary key (id, user_id)
+  primary key (id, profile_id)
 );
 
-create index if not exists idx_sync_clients_user_id on sync_clients(user_id);
+create index if not exists idx_sync_clients_user_id on sync_clients(profile_id);
 create index if not exists idx_sync_clients_last_seen_at on sync_clients(last_seen_at);
 create index if not exists idx_sync_clients_last_synced_at on sync_clients(last_synced_at);
 ```
@@ -211,7 +211,7 @@ Implement cleanup as an RPC or service.
 Inputs:
 
 ```txt
-user_id
+profile_id
 active_client_window
 ```
 
@@ -220,7 +220,7 @@ Compute:
 ```sql
 oldest_active_sync = min(last_synced_at)
 from sync_clients
-where user_id = target_user_id
+where profile_id = target_user_id
 and last_seen_at >= now() - active_client_window
 and last_synced_at is not null
 ```

@@ -287,7 +287,7 @@ Example format:
 -- ── [table_name] ──────────────────────────────────────────
 CREATE TABLE [table_name] (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id     uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  profile_id     uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   [field]     [type] NOT NULL,
   [field]     [type],
   created_at  timestamptz NOT NULL DEFAULT now(),
@@ -299,11 +299,11 @@ ALTER TABLE [table_name] ENABLE ROW LEVEL SECURITY;
 -- RLS policies
 CREATE POLICY "[table_name]: users manage own rows"
   ON [table_name] FOR ALL
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
+  USING (auth.uid() = profile_id)
+  WITH CHECK (auth.uid() = profile_id);
 
 -- Indexes
-CREATE INDEX ON [table_name] (user_id);
+CREATE INDEX ON [table_name] (profile_id);
 CREATE INDEX ON [table_name] ([frequently_filtered_column]);
 
 -- Auto-update updated_at
@@ -318,9 +318,9 @@ CREATE EXTENSION IF NOT EXISTS moddatetime SCHEMA extensions;
 ```
 
 RLS POLICY PATTERNS:
-- Authenticated read own rows: USING (auth.uid() = user_id)
+- Authenticated read own rows: USING (auth.uid() = profile_id)
 - Public read: USING (true)
-- Insert own: WITH CHECK (auth.uid() = user_id)
+- Insert own: WITH CHECK (auth.uid() = profile_id)
 - Admin only: USING (auth.jwt() ->> 'role' = 'admin')
 Document which pattern applies to each table and why.
 
@@ -356,7 +356,7 @@ Rules:
 -- Empty state: no inserts needed (test by not seeding)
 
 -- Single item
-INSERT INTO [table_name] (id, user_id, [fields])
+INSERT INTO [table_name] (id, profile_id, [fields])
 VALUES (
   '00000000-0000-0000-0000-000000000001',
   '00000000-0000-0000-0000-000000000099',  -- mock user ID
@@ -364,7 +364,7 @@ VALUES (
 );
 
 -- List (enough to fill one screen)
-INSERT INTO [table_name] (id, user_id, [fields]) VALUES
+INSERT INTO [table_name] (id, profile_id, [fields]) VALUES
   ('00000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000099', [values]),
   ('00000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000099', [values]),
   ('00000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000099', [values]);

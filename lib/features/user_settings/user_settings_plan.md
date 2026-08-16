@@ -146,7 +146,7 @@ Local-first is the initial behavior.
 
 Later, a sync button can call a user settings sync method. The current generic `SyncService` may work if `UserSettings` extends `MutableEntity` and has `id`, `createdAt`, and `updatedAt`, but there are concerns:
 
-- `SyncService` filters remote records by `user_id`; the settings MutableEntity/table must use that column name or the generic service needs a filter override.
+- `SyncService` filters remote records by `profile_id`; the settings MutableEntity/table must use that column name or the generic service needs a filter override.
 - Settings are single-row-per-profile data, while the generic service is list-oriented. It can still work, but a settings-specific wrapper should enforce one settings row per profile.
 - Conflict resolution is newest `updatedAt` wins. That is acceptable for first sync, but it may overwrite one device's theme edits if another device updated later.
 

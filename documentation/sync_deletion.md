@@ -104,7 +104,7 @@ To avoid that, track each active sync client:
 
 ```txt
 client_id
-user_id
+profile_id
 last_synced_at
 last_seen_at
 created_at
@@ -113,7 +113,7 @@ device_name nullable
 
 Each app install gets a stable `client_id`.
 
-On the remote table, use `(client_id, user_id)` as the key. The same app install
+On the remote table, use `(client_id, profile_id)` as the key. The same app install
 can sign into different accounts over time, so `client_id` alone is not unique
 across users.
 

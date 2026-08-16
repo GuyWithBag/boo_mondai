@@ -192,11 +192,11 @@ UPDATE profiles SET role = 'researcher' WHERE email = 'your@email.com';
 UPDATE research_codes SET used_by = NULL, used_at = NULL WHERE code = 'VOCAB-A-001';
 
 -- See all vocabulary test results
-SELECT user_id, test_set, score, submitted_at FROM research_vocabulary_test;
+SELECT profile_id, test_set, score, submitted_at FROM research_vocabulary_test;
 
 -- See all drill sessions
 SELECT qs.id, p.email, d.title, qs.correct_count, qs.total_questions, qs.completed_at
 FROM drill_sessions qs
-JOIN profiles p ON p.id = qs.user_id
+JOIN profiles p ON p.id = qs.profile_id
 JOIN decks d ON d.id = qs.deck_id;
 ```
