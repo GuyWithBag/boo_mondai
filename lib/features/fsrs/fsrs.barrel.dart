@@ -2,7 +2,6 @@
 
 // Barrel files
 export 'models/models.barrel.dart';
-export 'widgets.deprecated/widgets.deprecated.barrel.dart';
 // Other files
 export 'fsrs_cards.local.db.dart';
 export 'review_logs.local.db.dart';
