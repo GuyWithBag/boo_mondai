@@ -48,7 +48,7 @@ class ViewSurveyPage extends HookWidget {
           if (controller.error != null) {
             return Scaffold(
               appBar: const AppBar(title: 'Survey'),
-              body: Center(child: ErrorText(controller.error!)),
+              body: Center(child: ErrorText.exception(controller.error!)),
             );
           }
 
@@ -136,7 +136,8 @@ class ViewSurveyPage extends HookWidget {
                     defaultMarkdownAlignment: WrapAlignment.start,
                   ),
                 for (final block in page.blocks) SurveyBlockField(block: block),
-                if (controller.error != null) ErrorText(controller.error!),
+                if (controller.error != null)
+                  ErrorText.exception(controller.error!),
               ],
             ),
           );
