@@ -51,7 +51,7 @@ class EditDeckEditorBody extends StatelessWidget {
           },
           if (editor.error != null) ...[
             const SizedBox(height: 16),
-            ErrorText(editor.error!),
+            ErrorText.exception(editor.error!),
           ],
         ],
       ),
