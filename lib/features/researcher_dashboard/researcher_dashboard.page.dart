@@ -67,7 +67,8 @@ class ResearcherDashboardPage extends HookWidget {
                   onResultSelected: (summary) =>
                       context.push(Pages.researcherSurveyUrl(summary.id)),
                 ),
-                if (controller.error != null) ErrorText(controller.error!),
+                if (controller.error != null)
+                  ErrorText.exception(controller.error!),
                 for (final summary
                     in visibleSummaries.value.isEmpty
                         ? summaries

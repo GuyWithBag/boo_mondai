@@ -48,7 +48,7 @@ class ResearcherSurveyResponsePage extends HookWidget {
           if (controller.error != null) {
             return Scaffold(
               appBar: const AppBar(title: 'Survey Response'),
-              body: Center(child: ErrorText(controller.error!)),
+              body: Center(child: ErrorText.exception(controller.error!)),
             );
           }
 
