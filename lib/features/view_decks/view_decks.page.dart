@@ -12,6 +12,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         AuthService,
         Button,
         ButtonColor,
+        ChangeTrackerController,
         ChangeTrackerStatus,
         CreateDeckTile,
         Deck,
@@ -24,7 +25,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         ImportFileStatus,
         InteractionHandler,
         ListingStatesWrapper,
-        LocalDB,
         ProgressBar,
         Scaffold,
         SegmentOption,
@@ -34,16 +34,15 @@ import 'package:boo_mondai/lib.barrel.dart'
         SnackbarColor,
         SnackbarVariant,
         StatusLayoutState,
+        SyncController,
         SyncButton,
-        SyncDeckService,
         SyncPage,
         ViewDecksHelper,
         ViewDecksLocalController,
         ViewDecksSearchScope,
         showSnackbar,
-        useChangeTrackerController,
-        useSyncController,
-        useSelectionController;
+        useSelectionController,
+        useChangeTrackerController;
 import 'package:flutter/material.dart' hide AppBar, Scaffold;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
@@ -61,18 +60,13 @@ class ViewDecksLocalPage extends HookWidget {
       inboundLabel: 'pull',
       outboundLabel: 'push',
     );
+    final syncController = context.watch<SyncController>();
     final selectionController = useSelectionController<String>(
       multiple: true,
       isEnabled: false,
       emptySelectionAllowed: true,
     );
     final importController = useMemoized(() => ImportExportController());
-    final syncController = useSyncController(
-      title: 'Sync decks',
-      profileId: () => LocalDB.profile.getOrCreate().id,
-      getTables: SyncDeckService.getTables,
-      onSynced: controller.load,
-    );
     final syncSnackbarHandle = useRef<SnackbarHandle?>(null);
     final syncProgress = useRef(ValueNotifier(0.0));
 

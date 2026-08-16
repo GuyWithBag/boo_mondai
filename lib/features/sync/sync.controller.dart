@@ -10,7 +10,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         SyncService,
         SyncTable;
 import 'package:flutter/foundation.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 
 class SyncController extends Controller {
   SyncController({
@@ -159,39 +158,4 @@ class SyncController extends Controller {
     _changeTrackerController?.removeListener(_handleChangeTrackerChanged);
     super.dispose();
   }
-}
-
-SyncController useSyncController({
-  required String title,
-  required String Function() profileId,
-  required List<SyncTable<dynamic>> Function() getTables,
-  required VoidCallback onSynced,
-  Future<void> Function()? beforeSync,
-  List<Object?> keys = const [],
-}) {
-  final profileIdRef = useRef(profileId);
-  final getTablesRef = useRef(getTables);
-  final onSyncedRef = useRef(onSynced);
-  final beforeSyncRef = useRef(beforeSync);
-
-  profileIdRef.value = profileId;
-  getTablesRef.value = getTables;
-  onSyncedRef.value = onSynced;
-  beforeSyncRef.value = beforeSync;
-
-  final controller = useMemoized(
-    () => SyncController(
-      title: title,
-      profileId: () => profileIdRef.value(),
-      getTables: () => getTablesRef.value(),
-      onSynced: () => onSyncedRef.value(),
-      beforeSync: () => beforeSyncRef.value?.call() ?? Future.value(),
-    ),
-    [title, ...keys],
-  );
-
-  useEffect(() => controller.dispose, [controller]);
-  useListenable(controller);
-
-  return controller;
 }

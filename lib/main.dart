@@ -16,6 +16,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         LocalDB,
         Services,
         AuthController,
+        ChangeTrackerController,
+        ChangeTrackerService,
         ViewProfileController,
         ViewStudyCardsController,
         ViewDecksLocalController,
@@ -26,6 +28,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         SettingsController,
         NotificationsController,
         ImportExportController,
+        SyncController,
+        SyncDeckService,
         BooMondaiApp;
 import 'package:flutter/material.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
@@ -70,6 +74,17 @@ Future<void> main() async {
   // ── Restore session ─────────────────────────────────
   final authController = AuthController();
   await authController.restoreSession();
+  // ── App-level sync ──────────────────────────────────
+  final viewDecksLocalController = ViewDecksLocalController();
+  final syncChangeTrackerController = ChangeTrackerController(
+    service: ChangeTrackerService(inboundLabel: 'pull', outboundLabel: 'push'),
+  );
+  final syncController = SyncController(
+    title: 'Sync decks',
+    profileId: () => LocalDB.profile.getOrCreate().id,
+    getTables: SyncDeckService.getTables,
+    onSynced: viewDecksLocalController.load,
+  );
   // ── Deep links ──────────────────────────────────────
   final appLinks = AppLinks();
   appLinks.uriLinkStream.listen((uri) {
@@ -81,10 +96,12 @@ Future<void> main() async {
         ChangeNotifierProvider.value(value: authController),
         ChangeNotifierProvider.value(value: settingsController),
         ChangeNotifierProvider.value(value: notificationsController),
+        ChangeNotifierProvider.value(value: syncChangeTrackerController),
+        ChangeNotifierProvider.value(value: syncController),
         ChangeNotifierProvider(create: (_) => ViewProfileController()),
         ChangeNotifierProvider(create: (_) => ImportExportController()),
         ChangeNotifierProvider(create: (_) => ViewStudyCardsController()),
-        ChangeNotifierProvider(create: (_) => ViewDecksLocalController()),
+        ChangeNotifierProvider.value(value: viewDecksLocalController),
         ChangeNotifierProvider(create: (_) => ViewDeckListingsController()),
         ChangeNotifierProvider(create: (_) => ViewLeaderboardController()),
         ChangeNotifierProvider(create: (_) => StreakController()),

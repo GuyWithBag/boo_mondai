@@ -219,10 +219,12 @@ class ChangeTrackerPage extends HookWidget {
               }
               if (deckListingDeck != null) {
                 return ChangedEntitySection(
-                  leading: SizedBox(
-                    width: 280.w,
-                    child: DeckListingTile(deck: deckListingDeck),
-                  ),
+                  // leading: Expanded(
+                  //   child: Transform.scale(
+                  //     scale: 0.2,
+                  //     child: DeckListingTile(deck: deckListingDeck),
+                  //   ),
+                  // ),
                   metaLabels: [
                     MetaLabel(icon: Icons.sync_alt, label: directionLabel),
                   ],

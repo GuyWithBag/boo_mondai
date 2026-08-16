@@ -174,7 +174,7 @@ class SyncPage extends StatelessWidget {
                   Button(onPressed: _discard, child: const Text('Cancel')),
                 ],
               ),
-              child: isDoneFetching
+              child: isDoneFetching && syncController.error == null
                   ? ChangeTrackerSummaryChips(entry: entry)
                   : null,
             ),
