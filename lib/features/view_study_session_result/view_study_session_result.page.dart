@@ -40,9 +40,7 @@ class ViewStudySessionResultPage extends HookWidget {
 
     if (drillSession == null && reviewSession == null) {
       return Scaffold(
-        body: Center(
-          child: ErrorText(Exception('Study session result was not found.')),
-        ),
+        body: Center(child: ErrorText('Study session result was not found.')),
       );
     }
 

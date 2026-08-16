@@ -2,7 +2,6 @@
 
 // Barrel files
 export 'models/models.barrel.dart';
-export 'widgets.deprecated/widgets.deprecated.barrel.dart';
 export 'widgets/widgets.barrel.dart';
 export 'controllers/controllers.barrel.dart';
 export 'engine/engine.barrel.dart';

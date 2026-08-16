@@ -5,8 +5,9 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/lib.barrel.dart' show HeaderBadge, AppSpacing;
+import 'package:boo_mondai/lib.barrel.dart' show HeaderBadge, AppTokens;
 import 'package:flutter/material.dart';
+import 'package:theme_variants/theme_variants.dart';
 
 class DeckReviewRow extends StatelessWidget {
   const DeckReviewRow({
@@ -22,16 +23,11 @@ class DeckReviewRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = context.themeTokens<AppTokens>();
     return Row(
       children: [
-        Expanded(
-          child: Text(
-            deckTitle,
-            style: Theme.of(context).textTheme.bodyMedium,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-        const SizedBox(width: AppSpacing.sm),
+        Expanded(child: Text(deckTitle, overflow: TextOverflow.ellipsis)),
+        SizedBox(width: tokens.spaceLayoutGapSm),
         if (reviewableNow > 0)
           HeaderBadge(
             label: '$reviewableNow ready',

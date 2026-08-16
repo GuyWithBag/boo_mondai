@@ -13,7 +13,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppMediaPack,
         AppTokens,
         BottomNavBar,
-        ErrorState,
         ErrorText,
         FlashcardTemplate,
         ProgressBar,
@@ -25,6 +24,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         SessionMode,
         SettingsController,
         SettingsService,
+        StatusLayoutState,
         StudySessionCardStage,
         StudySessionController,
         TextColor,
@@ -116,7 +116,7 @@ class ViewStudySessionPage extends HookWidget {
 
     // 2. Handle Errors
     if (controller.error != null) {
-      return ErrorState(exception: controller.error);
+      return StatusLayoutState.exception(exception: controller.error);
     }
 
     // 3. Handle Completion
@@ -138,7 +138,7 @@ class ViewStudySessionPage extends HookWidget {
     final studyCard = controller.currentStudyCard;
 
     if (template == null || studyCard == null) {
-      return ErrorText(controller.error);
+      return ErrorText.exception(controller.error);
     }
 
     final interactionsController = useStudySessionCardStageController(

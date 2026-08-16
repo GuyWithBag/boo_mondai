@@ -7,7 +7,7 @@
 
 import 'package:boo_mondai/features/app_theme/app_theme.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
-    show StudyRating, AppTokens, AppColors, ThemeHelper;
+    show StudyRating, AppTokens, ThemeHelper;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -48,15 +48,9 @@ class AnswerResultTile extends StatelessWidget {
         trailing: isEjected
             ? Tooltip(
                 message: 'This card was moved to FSRS review',
-                child: Chip(
-                  label: const Text('Review Later'),
-                  backgroundColor: AppColors.hard.withValues(alpha: 0.12),
-                  labelStyle: const TextStyle(
-                    color: AppColors.hard,
-                    fontSize: 11,
-                  ),
-                  side: BorderSide.none,
-                  visualDensity: VisualDensity.compact,
+                child: ChipTheme(
+                  data: chipStyle.resolve(tokens, const [ChipTone.hard]),
+                  child: Chip(label: const Text('Review Later')),
                 ),
               )
             // If it's correct (not a typo), show the FSRS rating they gave it
