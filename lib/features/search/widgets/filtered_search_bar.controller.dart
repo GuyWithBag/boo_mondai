@@ -113,7 +113,7 @@ class FilteredSearchBarController<TObject, TFilter extends SearchFilter>
   }
 
   void updateDropdownState() {
-    if (focusNode.hasFocus && _results.isNotEmpty) {
+    if (focusNode.hasFocus && hasDropdownResults) {
       openDropdown();
     } else {
       closeDropdown();
