@@ -151,9 +151,10 @@ class ViewDecksLocalController extends Controller {
     setLoading(true);
     setError(null);
     try {
+      final title = await DecksService.nextUntitledDeckTitle();
       final deck = Deck.createNow(
         profileId: LocalDB.profile.getOrCreate().id,
-        title: 'Untitled Deck',
+        title: title,
         isPublished: false,
       );
 

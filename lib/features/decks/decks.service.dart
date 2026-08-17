@@ -12,6 +12,30 @@ import 'package:boo_mondai/lib.barrel.dart'
 import 'package:file_picker/file_picker.dart' show PlatformFile;
 
 abstract final class DecksService {
+  static Future<String> nextUntitledDeckTitle() async {
+    const baseTitle = 'Untitled Deck';
+    final existingTitles = LocalDB.deck
+        .selectMany()
+        .map((deck) => deck.title.trim().toLowerCase())
+        .toSet();
+
+    for (var index = 1; true; index++) {
+      final candidate = '$baseTitle $index';
+      if (existingTitles.contains(candidate.toLowerCase())) {
+        continue;
+      }
+
+      final directoryExists = await StoredMediaService.directoryExistsById(
+        StoredMediaPathHelper.deckFolderPrefix(deckTitle: candidate),
+      );
+      if (directoryExists) {
+        continue;
+      }
+
+      return candidate;
+    }
+  }
+
   static Future<Deck?> update({
     required Deck deck,
     String? title,
@@ -85,8 +109,10 @@ abstract final class DecksService {
     );
 
     await StoredMediaService.renameFolderByPrefix(
-      oldPrefix: deck.title,
-      newPrefix: updatedDeck.title,
+      oldPrefix: StoredMediaPathHelper.deckFolderPrefix(deckTitle: deck.title),
+      newPrefix: StoredMediaPathHelper.deckFolderPrefix(
+        deckTitle: updatedDeck.title,
+      ),
     );
     await LocalDB.deck.upsert(updatedDeck);
 
@@ -233,6 +259,25 @@ abstract final class DecksService {
     }
 
     return remoteUrl;
+  }
+
+  static String getDeckCoverImageStoredPath(Deck deck) {
+    return StoredMediaPathHelper.deckCoverImage(
+      deckTitle: deck.title,
+    ).relativePathPrefix();
+  }
+
+  static String? getDeckCoverImageLocalPath(Deck deck) {
+    return StoredMediaService.getFileByPath(
+      StoredMediaPathHelper.deckCoverImage(deckTitle: deck.title),
+    )?.path;
+  }
+
+  static Future<String> getDeckMediaDirectoryPath(Deck deck) async {
+    final directory = await StoredMediaService.getMediaDirectory(
+      StoredMediaPathHelper.deckCoverImage(deckTitle: deck.title),
+    );
+    return directory.path;
   }
 
   static Future<Deck> createAndUpsertListing(Deck deck) async {

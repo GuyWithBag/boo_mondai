@@ -212,6 +212,10 @@ abstract final class StoredMediaService {
         ),
       );
     }
+
+    await _deleteEmptyDirectoryTree(
+      Directory(await _getLocalFilePathFromId(oldPrefix)),
+    );
   }
 
   static Future<void> deleteLocalFile(String localPath) async {
@@ -230,6 +234,10 @@ abstract final class StoredMediaService {
       await directory.create(recursive: true);
     }
     return directory;
+  }
+
+  static Future<bool> directoryExistsById(String id) async {
+    return Directory(await _getLocalFilePathFromId(id)).exists();
   }
 
   static Future<String> _getLocalFilePathFromId(String id) async {
@@ -257,5 +265,20 @@ abstract final class StoredMediaService {
     }
 
     await currentFile.rename(newFilePath);
+  }
+
+  static Future<void> _deleteEmptyDirectoryTree(Directory directory) async {
+    if (!await directory.exists()) return;
+
+    final children = await directory.list(followLinks: false).toList();
+    for (final child in children) {
+      if (child is Directory) {
+        await _deleteEmptyDirectoryTree(child);
+      }
+    }
+
+    if (await directory.list(followLinks: false).isEmpty) {
+      await directory.delete();
+    }
   }
 }
