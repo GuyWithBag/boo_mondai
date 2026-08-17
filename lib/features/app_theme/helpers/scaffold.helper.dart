@@ -69,15 +69,22 @@ class ScaffoldHelper {
 
   bool get shouldHaveToolBar => toolBar != null && isUserInputFocusing;
 
+  bool get shouldInheritMainBottomNavBarHeight {
+    final isKeyboardOpen = mediaQuery.viewInsets.bottom > 0;
+    return inheritMainBottomNavBarHeight &&
+        mainController.isBottomNavBarVisible &&
+        !isKeyboardOpen;
+  }
+
   bool get shouldBodyHaveBottomScaffoldSafeArea =>
       (shouldHaveToolBar ||
           shouldHaveBottomNavBar ||
           shouldHaveEitherFab ||
-          inheritMainBottomNavBarHeight) &&
+          shouldInheritMainBottomNavBarHeight) &&
       haveBottomNavBarBottomGap;
 
   double get trueBottomNavBarHeight {
-    if (inheritMainBottomNavBarHeight) {
+    if (shouldInheritMainBottomNavBarHeight) {
       return mainController.bottomNavBarHeight + mediaQuery.viewPadding.bottom;
     }
     if (shouldHaveBottomNavBar) {

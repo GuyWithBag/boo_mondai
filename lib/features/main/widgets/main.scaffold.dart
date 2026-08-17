@@ -43,6 +43,8 @@ class MainScaffold extends HookWidget {
       inheritMainBottomNavBarHeight: false,
       showViewPaddingTop: false,
       showViewPaddingBottom: false,
+      resizeBodyForKeyboard: false,
+      showUnfocusButton: false,
     );
   }
 }

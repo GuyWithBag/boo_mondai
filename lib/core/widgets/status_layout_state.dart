@@ -138,9 +138,9 @@ class StatusLayoutState extends HookWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             spacing: tokens.spaceLayoutGapSm,
-            children: [...actions],
+            children: actions,
           ),
-        if (actions.isNotEmpty || extraAction != null)
+        if (actions.isNotEmpty && extraAction != null)
           Column(
             spacing: tokens.spaceLayoutGapSm,
             crossAxisAlignment: CrossAxisAlignment.stretch,

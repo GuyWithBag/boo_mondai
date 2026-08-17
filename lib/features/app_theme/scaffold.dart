@@ -271,7 +271,7 @@ class Scaffold extends HookWidget {
           Flexible(child: paddedBody),
         if (shouldBodyHaveBottomScaffoldSafeArea)
           SizedBox(height: effectiveBottomScaffoldSafeAreaHeight)
-        else if (showViewPaddingBottom)
+        else if (showViewPaddingBottom && !isKeyboardOpen)
           ViewPaddingSizedBox(side: Side.bottom),
       ],
     );
