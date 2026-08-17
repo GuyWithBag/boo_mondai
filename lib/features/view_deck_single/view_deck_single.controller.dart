@@ -69,6 +69,35 @@ class ViewDeckSingleSheetController extends Controller {
     }
   }
 
+  Future<void> showDeckPath() async {
+    final mediaDirectoryPath = await DecksService.getDeckMediaDirectoryPath(
+      _deck,
+    );
+    if (!_context.mounted) return;
+
+    final coverStoredPath = DecksService.getDeckCoverImageStoredPath(_deck);
+    final coverLocalPath = DecksService.getDeckCoverImageLocalPath(_deck);
+
+    await showModal<void>(
+      context: _context,
+      leading: const Icon(Icons.folder_outlined),
+      title: 'Deck path',
+      child: SelectableText(
+        [
+          'Media directory:',
+          mediaDirectoryPath,
+          '',
+          'Cover stored path:',
+          coverStoredPath,
+          '',
+          'Cover local file:',
+          coverLocalPath ?? 'No local cover image file found',
+        ].join('\n'),
+      ),
+      showCancelButton: true,
+    );
+  }
+
   Future<void> setTitle(String value) async {
     final updatedDeck = await DecksService.setTitle(deck: _deck, title: value);
     _setDeck(updatedDeck);

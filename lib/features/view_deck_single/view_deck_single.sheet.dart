@@ -106,6 +106,11 @@ class ViewDeckSingleSheet extends HookWidget {
                 ),
                 Button.icon(
                   tokens: tokens,
+                  icon: Icons.folder_outlined,
+                  onPressed: sheet.showDeckPath,
+                ),
+                Button.icon(
+                  tokens: tokens,
                   icon: Icons.edit,
                   onPressed: activeDeck.isEditable
                       ? () => context.push('/decks-local/${activeDeck.id}/edit')

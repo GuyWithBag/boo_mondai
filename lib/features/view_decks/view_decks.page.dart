@@ -5,6 +5,8 @@
 // HOOKS: useEffect, useScrollController, useTextEditingController
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'dart:io' show Directory, FileSystemEntity, Link;
+
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppBar,
@@ -40,11 +42,13 @@ import 'package:boo_mondai/lib.barrel.dart'
         ViewDecksLocalController,
         ViewDecksSearchScope,
         showSnackbar,
+        showModal,
         useSelectionController,
         useChangeTrackerController;
 import 'package:flutter/material.dart' hide AppBar, Scaffold;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -216,6 +220,27 @@ class ViewDecksLocalPage extends HookWidget {
       selection.isEnabled = false;
     }
 
+    Future<void> showSandboxFiles() async {
+      final sandboxDirectory = await getApplicationDocumentsDirectory();
+      final output = await _buildDirectoryTree(sandboxDirectory);
+
+      debugPrint(output, wrapWidth: 1024);
+
+      if (!context.mounted) return;
+      await showModal<void>(
+        context: context,
+        leading: const Icon(Icons.folder_outlined),
+        title: 'Sandbox files',
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.sizeOf(context).height * 0.6,
+          ),
+          child: SingleChildScrollView(child: SelectableText(output)),
+        ),
+        showCancelButton: true,
+      );
+    }
+
     // If there's an active sync plan, show SyncPage while this page-owned
     // tracker service has reviewable sync work.
     if (AuthService.isAuthenticatedRemote &&
@@ -252,6 +277,11 @@ class ViewDecksLocalPage extends HookWidget {
           Button.icon(tokens: tokens, icon: Icons.import_export),
         ],
         actions: [
+          Button.icon(
+            tokens: tokens,
+            icon: Icons.folder_outlined,
+            onPressed: showSandboxFiles,
+          ),
           Button.icon(
             tokens: tokens,
             icon: Icons.file_open_outlined,
@@ -309,6 +339,67 @@ class ViewDecksLocalPage extends HookWidget {
             ),
     );
   }
+}
+
+Future<String> _buildDirectoryTree(Directory root) async {
+  final lines = <String>[root.path];
+
+  if (!await root.exists()) {
+    lines.add('└── Directory does not exist.');
+    return lines.join('\n');
+  }
+
+  await _appendDirectoryChildren(lines: lines, directory: root, indent: '');
+  return lines.join('\n');
+}
+
+Future<void> _appendDirectoryChildren({
+  required List<String> lines,
+  required Directory directory,
+  required String indent,
+}) async {
+  final children = await directory.list(followLinks: false).toList();
+
+  children.sort((a, b) {
+    final aIsDirectory = a is Directory;
+    final bIsDirectory = b is Directory;
+    if (aIsDirectory != bIsDirectory) return aIsDirectory ? -1 : 1;
+    return _entityName(a).compareTo(_entityName(b));
+  });
+
+  if (children.isEmpty) {
+    lines.add('$indent└── <empty>');
+    return;
+  }
+
+  for (var index = 0; index < children.length; index++) {
+    final child = children[index];
+    final isLast = index == children.length - 1;
+    final connector = isLast ? '└──' : '├──';
+    final childIndent = isLast ? '    ' : '│   ';
+    final name = _entityName(child);
+
+    lines.add('$indent$connector $name');
+
+    if (child is Directory) {
+      await _appendDirectoryChildren(
+        lines: lines,
+        directory: child,
+        indent: '$indent$childIndent',
+      );
+    } else if (child is Link) {
+      final target = await child.target();
+      lines.add('$indent$childIndent└── -> $target');
+    }
+  }
+}
+
+String _entityName(FileSystemEntity entity) {
+  final segments = entity.uri.pathSegments
+      .where((segment) => segment.isNotEmpty)
+      .toList(growable: false);
+  if (segments.isEmpty) return entity.path;
+  return segments.last;
 }
 
 class _DeckListView extends StatelessWidget {
