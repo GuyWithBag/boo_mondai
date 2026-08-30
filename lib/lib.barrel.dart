@@ -3,6 +3,7 @@
 // Barrel files
 export 'core/core.barrel.dart';
 export 'features/features.barrel.dart';
+export 'ui/ui.barrel.dart';
 // Other files
 export 'env.dart';
 export 'main.dart';

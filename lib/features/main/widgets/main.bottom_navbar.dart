@@ -35,24 +35,35 @@ class MainBottomNavBar extends StatelessWidget implements PreferredSizeWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         spacing: tokens.spaceLayoutGapSm,
-        children: List.generate(pages.length, (index) {
-          final page = pages[index];
-          final isSelected = index == currentPageIndex;
+        children: [
+          ...List.generate(pages.length, (index) {
+            final page = pages[index];
+            final isSelected = index == currentPageIndex;
 
-          return Expanded(
+            return Expanded(
+              child: Button.iconWithLabel(
+                color: ButtonColor.baseline,
+                variant: ButtonVariant.selectedElevatedText,
+                selected: isSelected,
+                icon: isSelected && page.selectedIcon != null
+                    ? page.selectedIcon!
+                    : page.icon!,
+
+                label: page.name,
+                onPressed: () => context.go(pages[index].url),
+              ),
+            );
+          }),
+          Expanded(
             child: Button.iconWithLabel(
               color: ButtonColor.baseline,
               variant: ButtonVariant.selectedElevatedText,
-              selected: isSelected,
-              icon: isSelected && page.selectedIcon != null
-                  ? page.selectedIcon!
-                  : page.icon!,
-
-              label: page.name,
-              onPressed: () => context.go(pages[index].url),
+              icon: Icons.open_in_new_outlined,
+              label: 'Plain',
+              onPressed: () => context.push(Pages.viewTestPlain.url),
             ),
-          );
-        }),
+          ),
+        ],
       ),
     );
   }

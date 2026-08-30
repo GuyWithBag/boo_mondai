@@ -16,21 +16,20 @@ class ProfileLabel extends StatelessWidget {
     super.key,
     required this.displayName,
     this.label = 'By',
-    this.avatarUrl,
+    this.avatar,
     this.isSourceAuthor = false,
     this.facingLeft = false,
   });
 
   final String displayName;
   final String label;
-  final String? avatarUrl;
+  final ImageProvider? avatar;
   final bool isSourceAuthor;
   final bool facingLeft;
 
   @override
   Widget build(BuildContext context) {
     final name = displayName.trim().isEmpty ? '...' : displayName.trim();
-    final imageUrl = avatarUrl?.trim();
     final tokens = context.themeTokens<AppTokens>();
 
     return Row(
@@ -39,7 +38,7 @@ class ProfileLabel extends StatelessWidget {
       children: [
         ProfileAvatar(
           displayName: name,
-          avatarUrl: imageUrl,
+          avatar: avatar,
           radius: isSourceAuthor ? 16 : 18,
           isSourceAuthor: isSourceAuthor,
         ),

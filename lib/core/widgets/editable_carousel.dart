@@ -89,7 +89,9 @@ class EditableCarousel extends HookWidget {
 
         return BackgroundImageSurface(
           border: SurfaceBorder.baseline,
-          image: ImageHelper.getImageProviderFromSource(imageSource),
+          image: imageSource != null
+              ? ImageHelper.getImageProviderFromSource(imageSource)
+              : null,
           missingImageIcon: isAddItem
               ? Icons.add_photo_alternate_outlined
               : null,

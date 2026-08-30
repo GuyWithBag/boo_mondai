@@ -1,23 +1,24 @@
 import 'package:boo_mondai/core/widgets/background_image_surface.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
+        AppTokens,
         BackgroundImagePicked,
+        Cube,
         CubeController,
         Deck,
+        DecksDirectoryPaths,
         DecksService,
-        AppTokens,
         ImageHelper,
-        textStyle,
-        TextSize,
-        TextWeight,
+        ScaleHelper,
         SurfaceBorder,
         SurfaceBorderColor,
-        surfaceStyle,
-        SurfaceShape,
-        SurfacePadding,
         SurfaceColor,
-        ScaleHelper,
-        Cube;
+        SurfacePadding,
+        SurfaceShape,
+        TextSize,
+        TextWeight,
+        surfaceStyle,
+        textStyle;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -66,8 +67,12 @@ class PhysicalDeck extends StatelessWidget {
       textStyle.resolve(tokens, const [TextSize.labelSmall, TextWeight.body]),
       textScale,
     );
+
+    // The reason why it needs the image provider is because this can be a network or asset image.
     final coverImage = ImageHelper.getImageProviderFromSource(
-      deck == null ? null : DecksService.getCoverImageUrl(deck!),
+      deck == null
+          ? null
+          : DecksDirectoryPaths.coverImage(deckTitle: deck!.title),
     );
     final visibleTags = deck?.tags.take(8).toList() ?? const [];
 

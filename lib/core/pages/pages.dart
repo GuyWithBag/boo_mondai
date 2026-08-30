@@ -1,4 +1,3 @@
-import 'package:boo_mondai/features/view_deck_downloads/view_deck_downloads.page.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppPage,
@@ -6,7 +5,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         ViewDeckListingsPage,
         ViewDecksLocalPage,
         ViewStudyDecksPage,
-        ViewAccountPage,
+        ViewProfilePage,
         LoginPage,
         RegisterPage,
         ViewStudySessionPage,
@@ -21,11 +20,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         ResearcherDashboardPage,
         ResearcherSurveyDetailPage,
         ResearcherSurveyResponsePage,
-        ViewSurveyPage;
-import 'package:boo_mondai/features/view_cards/view_cards.page.dart'
-    show ViewCardsPage;
-import 'package:boo_mondai/features/view_test/view_test.page.dart'
-    show ViewTestPage;
+        ViewSurveyPage,
+        ViewDeckDownloadsPage,
+        ViewTestPage,
+        ViewTestPlainPage,
+        ViewCardsPage;
+
 import 'package:flutter/material.dart';
 
 class Pages {
@@ -106,7 +106,7 @@ class Pages {
           pathParameters = const {},
           queryParameters = const {},
           extra,
-        }) => const ViewAccountPage(),
+        }) => const ViewProfilePage(),
   );
 
   static final login = AppPage(
@@ -341,6 +341,19 @@ class Pages {
         }) => const ViewTestPage(),
   );
 
+  static final viewTestPlain = AppPage(
+    url: '/view-test-plain',
+    icon: Icons.open_in_new_outlined,
+    name: 'Plain View Test',
+    builder:
+        (
+          context, {
+          pathParameters = const {},
+          queryParameters = const {},
+          extra,
+        }) => const ViewTestPlainPage(),
+  );
+
   static final settings = AppPage(
     url: '/settings',
     icon: Icons.settings_outlined,
@@ -422,6 +435,7 @@ class Pages {
     researcherSurveyResponse,
     researcherSurvey,
     leaderboard,
+    viewTestPlain,
     downloads,
   ];
 }

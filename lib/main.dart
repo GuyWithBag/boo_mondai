@@ -27,7 +27,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         MainController,
         SettingsController,
         NotificationsController,
-        ImportExportController,
         SyncController,
         SyncDeckService,
         BooMondaiApp;
@@ -98,8 +97,6 @@ Future<void> main() async {
         ChangeNotifierProvider.value(value: notificationsController),
         ChangeNotifierProvider.value(value: syncChangeTrackerController),
         ChangeNotifierProvider.value(value: syncController),
-        ChangeNotifierProvider(create: (_) => ViewProfileController()),
-        ChangeNotifierProvider(create: (_) => ImportExportController()),
         ChangeNotifierProvider(create: (_) => ViewStudyCardsController()),
         ChangeNotifierProvider.value(value: viewDecksLocalController),
         ChangeNotifierProvider(create: (_) => ViewDeckListingsController()),

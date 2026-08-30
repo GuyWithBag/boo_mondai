@@ -14,15 +14,15 @@ class DeckProfilesLabel extends StatelessWidget {
   const DeckProfilesLabel({
     super.key,
     required this.profileName,
-    this.profileAvatarUrl,
+    this.profileAvatar,
     this.sourceProfileName,
-    this.sourceProfileAvatarUrl,
+    this.sourceProfileAvatar,
   });
 
   final String profileName;
-  final String? profileAvatarUrl;
+  final ImageProvider? profileAvatar;
   final String? sourceProfileName;
-  final String? sourceProfileAvatarUrl;
+  final ImageProvider? sourceProfileAvatar;
 
   @override
   Widget build(BuildContext context) {
@@ -35,14 +35,14 @@ class DeckProfilesLabel extends StatelessWidget {
       children: [
         ProfileLabel(
           displayName: profileName,
-          avatarUrl: profileAvatarUrl,
+          avatar: profileAvatar,
           label: 'By',
         ),
         if (hasSourceProfile) ...[
           SizedBox(width: tokens.spaceLayoutGapMd),
           ProfileLabel(
             displayName: sourceProfileName!,
-            avatarUrl: sourceProfileAvatarUrl,
+            avatar: sourceProfileAvatar,
             label: 'Originally By',
             isSourceAuthor: true,
           ),

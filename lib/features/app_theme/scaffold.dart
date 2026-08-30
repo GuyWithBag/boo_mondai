@@ -22,6 +22,13 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart' show WatchContext;
 import 'package:theme_variants/theme_variants.dart';
 
+typedef ScaffoldRefreshBuilder =
+    Widget Function(
+      BuildContext context,
+      RefreshCallback onRefresh,
+      Widget child,
+    );
+
 class Scaffold extends HookWidget {
   const Scaffold({
     super.key,
@@ -56,7 +63,13 @@ class Scaffold extends HookWidget {
     this.showUnfocusButton = true,
     this.showViewPaddingBottom = true,
     this.showViewPaddingTop = true,
-  }) : assert(sidebarWidth >= 0, 'sidebarWidth cannot be negative.');
+    this.onRefresh,
+    this.refreshBuilder,
+  }) : assert(sidebarWidth >= 0, 'sidebarWidth cannot be negative.'),
+       assert(
+         onRefresh == null || scrollable,
+         'onRefresh requires scrollable to be true.',
+       );
 
   final Widget body;
   final ScaffoldController? controller;
@@ -90,6 +103,8 @@ class Scaffold extends HookWidget {
   final bool showUnfocusButton;
   final bool showViewPaddingBottom;
   final bool showViewPaddingTop;
+  final RefreshCallback? onRefresh;
+  final ScaffoldRefreshBuilder? refreshBuilder;
 
   static const _animationDuration = Duration(milliseconds: 220);
 
@@ -276,13 +291,24 @@ class Scaffold extends HookWidget {
       ],
     );
 
+    final onRefresh = this.onRefresh;
+
     if (effectiveScrollable) {
       content = SingleChildScrollView(
         padding: EdgeInsets.zero,
+        physics: onRefresh == null
+            ? null
+            : const AlwaysScrollableScrollPhysics(),
         controller: scrollController,
         reverse: scrollStartAtTheBottom,
         child: content,
       );
+    }
+
+    if (onRefresh != null && effectiveScrollable) {
+      content =
+          refreshBuilder?.call(context, onRefresh, content) ??
+          RefreshIndicator(onRefresh: onRefresh, child: content);
     }
 
     if (shouldConstrainWidth) {
