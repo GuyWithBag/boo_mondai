@@ -27,6 +27,7 @@ class FilteredSearchBarController<TObject, TFilter extends SearchFilter>
        _ownsFocusNode = focusNode == null {
     _filter = initialFilter ?? _filterCodec.parse(this.textController.text);
     _results = _searchResults.resolve(items: _items, filter: _filter);
+    _lastText = this.textController.text;
     this.textController.addListener(_handleTextChanged);
     this.focusNode.addListener(_handleFocusChanged);
   }
@@ -41,6 +42,7 @@ class FilteredSearchBarController<TObject, TFilter extends SearchFilter>
   List<TObject> _items;
   late TFilter _filter;
   late List<TObject> _results;
+  late String _lastText;
   bool _isDropdownOpen = false;
 
   String get text => textController.text;
@@ -56,11 +58,13 @@ class FilteredSearchBarController<TObject, TFilter extends SearchFilter>
   TextEditingValue get value => textController.value;
 
   set value(TextEditingValue value) {
+    _lastText = value.text;
     textController.value = value;
   }
 
   void setText(String text) {
     if (textController.text == text) return;
+    _lastText = text;
     textController.value = TextEditingValue(
       text: text,
       selection: TextSelection.collapsed(offset: text.length),
@@ -87,6 +91,7 @@ class FilteredSearchBarController<TObject, TFilter extends SearchFilter>
   void clearValue() {
     if (textController.text.isEmpty) return;
 
+    _lastText = '';
     textController.clear();
     closeDropdown();
   }
@@ -123,6 +128,7 @@ class FilteredSearchBarController<TObject, TFilter extends SearchFilter>
   void _setTextWithoutNotify(String text) {
     if (textController.text == text) return;
     textController.removeListener(_handleTextChanged);
+    _lastText = text;
     textController.value = TextEditingValue(
       text: text,
       selection: TextSelection.collapsed(offset: text.length),
@@ -145,7 +151,11 @@ class FilteredSearchBarController<TObject, TFilter extends SearchFilter>
   }
 
   void _handleTextChanged() {
-    _filter = _filterCodec.parse(textController.text);
+    final nextText = textController.text;
+    if (nextText == _lastText) return;
+
+    _lastText = nextText;
+    _filter = _filterCodec.parse(nextText);
     _resolveResults();
     updateDropdownState();
     notifyListeners();

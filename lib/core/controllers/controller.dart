@@ -20,7 +20,7 @@ abstract class Controller extends ChangeNotifier {
 
   void setLoading(bool value) {
     _isLoading = value;
-    error = null; // Clear previous errors when starting a new action
+    if (value) error = null; // Clear previous errors when starting a new action
     notifyListeners();
   }
 }
