@@ -2,8 +2,8 @@
 
 // Barrel files
 export 'models/models.barrel.dart';
-export 'services/services.barrel.dart';
 export 'widgets/widgets.barrel.dart';
+export 'services/services.barrel.dart';
 // Other files
 export 'researcher_dashboard.controller.dart';
 export 'researcher_dashboard.page.dart';

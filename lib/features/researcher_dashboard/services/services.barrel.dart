@@ -2,6 +2,6 @@
 
 // Other files
 export 'researcher_survey.search_results.dart';
-export 'researcher_survey_response.search_results.dart';
 export 'researcher_survey_analytics.service.dart';
 export 'researcher_survey_export.service.dart';
+export 'researcher_survey_response.search_results.dart';
