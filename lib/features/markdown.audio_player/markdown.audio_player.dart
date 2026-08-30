@@ -4,13 +4,15 @@ import 'package:boo_mondai/lib.barrel.dart'
         Button,
         ButtonColor,
         ButtonVariant,
+        MarkdownAudioPlayerProgress,
+        MarkdownHelper,
+        ScaleHelper,
         SurfacePadding,
         SurfaceShadow,
         SurfaceShape,
         TextColor,
         TextSize,
         TextWeight,
-        ScaleHelper,
         surfaceStyle,
         textStyle;
 import 'package:flutter/material.dart';
@@ -21,14 +23,18 @@ import 'package:theme_variants/theme_variants.dart';
 
 class MarkdownAudioPlayer extends HookWidget {
   const MarkdownAudioPlayer({
-    required this.source,
-    required this.label,
+    required this.alt,
     this.contentScale = 1,
     super.key,
+    required this.uri,
+    this.title,
+    this.options,
   });
 
-  final String source;
-  final String label;
+  final Uri uri;
+  final String? alt;
+  final String? title;
+  final String? options;
   final double contentScale;
 
   Future<void> _togglePlayback({
@@ -61,6 +67,8 @@ class MarkdownAudioPlayer extends HookWidget {
       player.playerStateStream,
       initialData: player.playerState,
     );
+
+    final String source = MarkdownHelper.resolveAttachmentUrl(uri) ?? '';
 
     useEffect(() {
       var isDisposed = false;
@@ -144,7 +152,7 @@ class MarkdownAudioPlayer extends HookWidget {
       child: Column(
         children: [
           Text(
-            error.value ?? label,
+            error.value ?? alt ?? '',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: titleStyle,
@@ -159,7 +167,7 @@ class MarkdownAudioPlayer extends HookWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: progressGap),
-                    _AudioProgress(
+                    MarkdownAudioPlayerProgress(
                       player: player,
                       isEnabled: !isLoading.value && error.value == null,
                       textStyle: timeStyle,
@@ -209,103 +217,5 @@ class MarkdownAudioPlayer extends HookWidget {
   static bool _isRemoteSource(String source) {
     final uri = Uri.tryParse(source.trim());
     return uri != null && (uri.scheme == 'http' || uri.scheme == 'https');
-  }
-}
-
-class _AudioProgress extends StatelessWidget {
-  const _AudioProgress({
-    required this.player,
-    required this.isEnabled,
-    required this.textStyle,
-    required this.contentScale,
-  });
-
-  final AudioPlayer player;
-  final bool isEnabled;
-  final TextStyle textStyle;
-  final double contentScale;
-
-  @override
-  Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
-
-    return StreamBuilder<Duration?>(
-      stream: player.durationStream,
-      initialData: player.duration,
-      builder: (context, durationSnapshot) {
-        final duration = durationSnapshot.data ?? Duration.zero;
-
-        return StreamBuilder<Duration>(
-          stream: player.positionStream,
-          initialData: player.position,
-          builder: (context, positionSnapshot) {
-            final position = _clampPosition(
-              positionSnapshot.data ?? Duration.zero,
-              duration,
-            );
-
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SliderTheme(
-                  data: SliderTheme.of(context).copyWith(
-                    activeTrackColor: tokens.colorPrimary,
-                    inactiveTrackColor: tokens.colorMuted,
-                    thumbColor: tokens.colorPrimaryBright,
-                    overlayColor: tokens.colorPrimarySoft,
-                    trackHeight: ScaleHelper.getScaledValue(4.h, contentScale),
-                    thumbShape: RoundSliderThumbShape(
-                      enabledThumbRadius: ScaleHelper.getScaledValue(
-                        10.r,
-                        contentScale,
-                      ),
-                    ),
-                    overlayShape: RoundSliderOverlayShape(
-                      overlayRadius: ScaleHelper.getScaledValue(
-                        18.r,
-                        contentScale,
-                      ),
-                    ),
-                  ),
-                  child: Slider(
-                    min: 0,
-                    max: duration.inMilliseconds <= 0
-                        ? 1
-                        : duration.inMilliseconds.toDouble(),
-                    value: position.inMilliseconds.toDouble(),
-                    onChanged: isEnabled
-                        ? (value) {
-                            player.seek(Duration(milliseconds: value.round()));
-                          }
-                        : null,
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(_formatDuration(position), style: textStyle),
-                    Text(_formatDuration(duration), style: textStyle),
-                  ],
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
-
-  static Duration _clampPosition(Duration position, Duration duration) {
-    if (duration <= Duration.zero) return Duration.zero;
-    if (position < Duration.zero) return Duration.zero;
-    if (position > duration) return duration;
-    return position;
-  }
-
-  static String _formatDuration(Duration duration) {
-    final totalSeconds = duration.inSeconds;
-    final minutes = totalSeconds ~/ 60;
-    final seconds = totalSeconds % 60;
-    return '$minutes:${seconds.toString().padLeft(2, '0')}';
   }
 }

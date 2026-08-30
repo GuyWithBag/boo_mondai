@@ -1,9 +1,8 @@
 import 'package:markdown/markdown.dart' as md;
 
-const alignedLineMarkdownTag = 'aligned-line';
-
-class AlignedLineMarkdownSyntax extends md.BlockSyntax {
+class MarkdownAlignedTextSyntax extends md.BlockSyntax {
   static final _pattern = RegExp(r'^\](<|=|>)\s*(.+)$');
+  static final tag = 'aligned-line';
 
   @override
   RegExp get pattern => _pattern;
@@ -13,7 +12,7 @@ class AlignedLineMarkdownSyntax extends md.BlockSyntax {
     final match = _pattern.firstMatch(parser.current.content)!;
     parser.advance();
 
-    return md.Element.empty(alignedLineMarkdownTag)
+    return md.Element.empty(tag)
       ..attributes['align'] = match.group(1)!
       ..attributes['content'] = match.group(2)!;
   }

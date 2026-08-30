@@ -17,16 +17,19 @@ class MarkdownImageOptions {
   final BoxFit fit;
   final Alignment alignment;
 
-  static MarkdownImageOptions parse(String? title) {
-    final raw = title?.trim();
-    if (raw == null || !raw.startsWith('__bm_image_options:')) {
+  static MarkdownImageOptions parse(String? title, {String? rawOptions}) {
+    final rawTitle = title?.trim();
+    final raw = rawOptions?.trim();
+    if (raw == null &&
+        (rawTitle == null || !rawTitle.startsWith('__bm_image_options:'))) {
       return const MarkdownImageOptions(
         fit: BoxFit.contain,
         alignment: Alignment.center,
       );
     }
 
-    final params = _parseParams(raw.substring('__bm_image_options:'.length));
+    final options = raw ?? rawTitle!.substring('__bm_image_options:'.length);
+    final params = _parseParams(options);
     final size = params['size'];
     final width = _dimension(params['w'] ?? params['width']);
     final height = _dimension(params['h'] ?? params['height']);
