@@ -120,7 +120,7 @@ class AuthService {
     final user = currentUser;
     if (user == null) return null;
 
-    Profile? profileData = await RemoteDB.profile.selectByAuthUserId(user.id);
+    Profile? profileData = await RemoteDB.profile.selectByUserId(user.id);
 
     if (profileData == null) {
       final fallbackUsername = _createFallbackUsername(user);
@@ -147,7 +147,7 @@ class AuthService {
         .auth
         .currentUser!; // Safe to bang-operator because guard would have caught failure
 
-    var remoteProfileData = await RemoteDB.profile.selectByAuthUserId(user.id);
+    var remoteProfileData = await RemoteDB.profile.selectByUserId(user.id);
     final createdProfile = remoteProfileData == null;
     if (remoteProfileData == null) {
       final fallbackUsername = _createFallbackUsername(user);
@@ -345,7 +345,7 @@ class AuthService {
     User user,
     String guestProfileId,
   ) async {
-    Profile? profileData = await RemoteDB.profile.selectByAuthUserId(user.id);
+    Profile? profileData = await RemoteDB.profile.selectByUserId(user.id);
     final createdProfile = profileData == null;
 
     if (profileData == null) {
