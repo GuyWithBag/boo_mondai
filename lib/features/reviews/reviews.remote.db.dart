@@ -1,30 +1,27 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        DeckVoteReview,
-        DeckVoteReviewComment,
-        DeckVoteReviewCommentEditLog,
-        DeckVoteReviewCommentEditLogMapper,
-        DeckVoteReviewCommentMapper,
-        DeckVoteReviewEditLog,
-        DeckVoteReviewEditLogMapper,
-        DeckVoteReviewMapper,
+        Review,
+        ReviewComment,
+        ReviewCommentEditLog,
+        ReviewCommentEditLogMapper,
+        ReviewCommentMapper,
+        ReviewEditLog,
+        ReviewEditLogMapper,
+        ReviewMapper,
         SupabaseRemoteDB;
 
-class DeckVoteReviewsRemoteDB extends SupabaseRemoteDB<DeckVoteReview> {
+class ReviewsRemoteDB extends SupabaseRemoteDB<Review> {
   @override
   String get tableName => 'deck_vote_reviews';
 
   @override
-  DeckVoteReview Function(Map<String, dynamic>) get fromMap =>
-      DeckVoteReviewMapper.fromMap;
+  Review Function(Map<String, dynamic>) get fromMap => ReviewMapper.fromMap;
 
   @override
-  Map<String, dynamic> toMap(DeckVoteReview item) => item.toMap();
+  Map<String, dynamic> toMap(Review item) => item.toMap();
 
   @override
-  Map<String, Object?> primaryKeyFromItem(DeckVoteReview item) => {
-    'id': item.id,
-  };
+  Map<String, Object?> primaryKeyFromItem(Review item) => {'id': item.id};
 
   @override
   String get upsertConflictTarget => 'deck_id,profile_id';
@@ -35,32 +32,31 @@ class DeckVoteReviewsRemoteDB extends SupabaseRemoteDB<DeckVoteReview> {
   @override
   Set<String> get joinedFields => const {'userProfile', 'user_profile'};
 
-  Future<List<DeckVoteReview>> getByDeck(String deckId) => selectMany(
+  Future<List<Review>> getByDeck(String deckId) => selectMany(
     filters: {'deck_id': deckId, 'is_deleted': false},
     orderBy: 'created_at',
     ascending: false,
   );
 
-  Future<DeckVoteReview?> getByDeckAndUser({
+  Future<Review?> getByDeckAndUser({
     required String deckId,
     required String profileId,
   }) => selectOne(filters: {'deck_id': deckId, 'profile_id': profileId});
 }
 
-class DeckVoteReviewEditLogsRemoteDB
-    extends SupabaseRemoteDB<DeckVoteReviewEditLog> {
+class ReviewEditLogsRemoteDB extends SupabaseRemoteDB<ReviewEditLog> {
   @override
   String get tableName => 'deck_vote_review_edit_logs';
 
   @override
-  DeckVoteReviewEditLog Function(Map<String, dynamic>) get fromMap =>
-      DeckVoteReviewEditLogMapper.fromMap;
+  ReviewEditLog Function(Map<String, dynamic>) get fromMap =>
+      ReviewEditLogMapper.fromMap;
 
   @override
-  Map<String, dynamic> toMap(DeckVoteReviewEditLog item) => item.toMap();
+  Map<String, dynamic> toMap(ReviewEditLog item) => item.toMap();
 
   @override
-  Map<String, Object?> primaryKeyFromItem(DeckVoteReviewEditLog item) => {
+  Map<String, Object?> primaryKeyFromItem(ReviewEditLog item) => {
     'id': item.id,
   };
 
@@ -70,28 +66,26 @@ class DeckVoteReviewEditLogsRemoteDB
   @override
   Set<String> get joinedFields => const {'editorProfile', 'editor_profile'};
 
-  Future<List<DeckVoteReviewEditLog>> getByReview(String reviewId) =>
-      selectMany(
-        filters: {'review_id': reviewId},
-        orderBy: 'edited_at',
-        ascending: false,
-      );
+  Future<List<ReviewEditLog>> getByReview(String reviewId) => selectMany(
+    filters: {'review_id': reviewId},
+    orderBy: 'edited_at',
+    ascending: false,
+  );
 }
 
-class DeckVoteReviewCommentsRemoteDB
-    extends SupabaseRemoteDB<DeckVoteReviewComment> {
+class ReviewCommentsRemoteDB extends SupabaseRemoteDB<ReviewComment> {
   @override
   String get tableName => 'deck_vote_review_comments';
 
   @override
-  DeckVoteReviewComment Function(Map<String, dynamic>) get fromMap =>
-      DeckVoteReviewCommentMapper.fromMap;
+  ReviewComment Function(Map<String, dynamic>) get fromMap =>
+      ReviewCommentMapper.fromMap;
 
   @override
-  Map<String, dynamic> toMap(DeckVoteReviewComment item) => item.toMap();
+  Map<String, dynamic> toMap(ReviewComment item) => item.toMap();
 
   @override
-  Map<String, Object?> primaryKeyFromItem(DeckVoteReviewComment item) => {
+  Map<String, Object?> primaryKeyFromItem(ReviewComment item) => {
     'id': item.id,
   };
 
@@ -101,28 +95,28 @@ class DeckVoteReviewCommentsRemoteDB
   @override
   Set<String> get joinedFields => const {'userProfile', 'user_profile'};
 
-  Future<List<DeckVoteReviewComment>> getByReview(String reviewId) =>
-      selectMany(
-        filters: {'review_id': reviewId, 'is_deleted': false},
-        orderBy: 'created_at',
-      );
+  Future<List<ReviewComment>> getByReview(String reviewId) => selectMany(
+    filters: {'review_id': reviewId, 'is_deleted': false},
+    orderBy: 'created_at',
+  );
 }
 
-class DeckVoteReviewCommentEditLogsRemoteDB
-    extends SupabaseRemoteDB<DeckVoteReviewCommentEditLog> {
+class ReviewCommentEditLogsRemoteDB
+    extends SupabaseRemoteDB<ReviewCommentEditLog> {
   @override
   String get tableName => 'deck_vote_review_comment_edit_logs';
 
   @override
-  DeckVoteReviewCommentEditLog Function(Map<String, dynamic>) get fromMap =>
-      DeckVoteReviewCommentEditLogMapper.fromMap;
+  ReviewCommentEditLog Function(Map<String, dynamic>) get fromMap =>
+      ReviewCommentEditLogMapper.fromMap;
 
   @override
-  Map<String, dynamic> toMap(DeckVoteReviewCommentEditLog item) => item.toMap();
+  Map<String, dynamic> toMap(ReviewCommentEditLog item) => item.toMap();
 
   @override
-  Map<String, Object?> primaryKeyFromItem(DeckVoteReviewCommentEditLog item) =>
-      {'id': item.id};
+  Map<String, Object?> primaryKeyFromItem(ReviewCommentEditLog item) => {
+    'id': item.id,
+  };
 
   @override
   String get defaultSelect => _deckVoteReviewCommentEditLogWithRelationsSelect;
@@ -130,7 +124,7 @@ class DeckVoteReviewCommentEditLogsRemoteDB
   @override
   Set<String> get joinedFields => const {'editorProfile', 'editor_profile'};
 
-  Future<List<DeckVoteReviewCommentEditLog>> getByComment(String commentId) =>
+  Future<List<ReviewCommentEditLog>> getByComment(String commentId) =>
       selectMany(
         filters: {'comment_id': commentId},
         orderBy: 'edited_at',

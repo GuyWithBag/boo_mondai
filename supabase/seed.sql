@@ -412,12 +412,12 @@ SET body = 'The animal and nature cards are concise, easy to drill, and useful f
     updated_at = '2026-03-25 12:30:00+00'
 WHERE id = review_alice_n5;
 
-INSERT INTO deck_comments (id, deck_id, profile_id, parent_comment_id, body, created_at, updated_at) VALUES
+INSERT INTO comments (id, deck_id, profile_id, parent_comment_id, body, created_at, updated_at) VALUES
   (comment_alice_n5, deck_n5, p_alice, NULL, 'Could use more kana-only examples.', '2026-03-25 12:15:00+00', '2026-03-25 12:15:00+00'),
   (comment_bob_n5,   deck_n5, p_bob,   comment_alice_n5, 'Agreed. A kana hint mode would help.', '2026-03-25 12:25:00+00', '2026-03-25 12:25:00+00')
 ON CONFLICT (id) DO NOTHING;
 
-UPDATE deck_comments
+UPDATE comments
 SET body = 'Could use more kana-only examples for first-time learners.',
     updated_at = '2026-03-25 12:35:00+00'
 WHERE id = comment_alice_n5;

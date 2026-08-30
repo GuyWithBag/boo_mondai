@@ -173,9 +173,9 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
-CREATE TRIGGER trigger_log_deck_comment_edit BEFORE UPDATE ON deck_comments FOR EACH ROW EXECUTE FUNCTION log_deck_comment_edit();
+CREATE TRIGGER trigger_log_deck_comment_edit BEFORE UPDATE ON comments FOR EACH ROW EXECUTE FUNCTION log_deck_comment_edit();
 
-CREATE OR REPLACE FUNCTION update_deck_comments_count() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION update_comments_count() RETURNS TRIGGER AS $$
 BEGIN
   IF (TG_OP = 'INSERT') THEN
     IF NEW.is_deleted = false THEN
@@ -195,7 +195,7 @@ BEGIN
   RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
-CREATE TRIGGER trigger_deck_comments AFTER INSERT OR UPDATE OR DELETE ON deck_comments FOR EACH ROW EXECUTE FUNCTION update_deck_comments_count();
+CREATE TRIGGER trigger_comments AFTER INSERT OR UPDATE OR DELETE ON comments FOR EACH ROW EXECUTE FUNCTION update_comments_count();
 
 -- Update Forks (Targeting deck_listings)
 CREATE OR REPLACE FUNCTION update_deck_forks_count() RETURNS TRIGGER AS $$

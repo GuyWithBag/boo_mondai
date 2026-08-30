@@ -137,7 +137,7 @@ CREATE POLICY "deck_vote_review_comment_edit_logs: read visible" ON deck_vote_re
   ));
 CREATE INDEX ON deck_vote_review_comment_edit_logs (comment_id, edited_at DESC);
 
-CREATE TABLE deck_comments (
+CREATE TABLE comments (
   id                uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   deck_id           uuid NOT NULL REFERENCES decks(id) ON DELETE CASCADE,
   profile_id        uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
@@ -147,27 +147,27 @@ CREATE TABLE deck_comments (
   created_at        timestamptz NOT NULL DEFAULT now(),
   updated_at        timestamptz NOT NULL DEFAULT now(),
   UNIQUE (id, deck_id),
-  CONSTRAINT deck_comments_parent_fk
+  CONSTRAINT comments_parent_fk
     FOREIGN KEY (parent_comment_id, deck_id)
-    REFERENCES deck_comments(id, deck_id)
+    REFERENCES comments(id, deck_id)
     ON DELETE CASCADE
 );
-ALTER TABLE deck_comments ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "deck_comments: read visible" ON deck_comments FOR SELECT
-  USING (EXISTS (SELECT 1 FROM decks d WHERE d.id = deck_comments.deck_id AND (d.visibility_state IN ('public', 'unlisted') OR d.profile_id = current_profile_id())));
-CREATE POLICY "deck_comments: insert own" ON deck_comments FOR INSERT
-  WITH CHECK (profile_id = current_profile_id() AND EXISTS (SELECT 1 FROM decks d WHERE d.id = deck_comments.deck_id AND (d.visibility_state IN ('public', 'unlisted') OR d.profile_id = current_profile_id())));
-CREATE POLICY "deck_comments: update own" ON deck_comments FOR UPDATE
+ALTER TABLE comments ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "comments: read visible" ON comments FOR SELECT
+  USING (EXISTS (SELECT 1 FROM decks d WHERE d.id = comments.deck_id AND (d.visibility_state IN ('public', 'unlisted') OR d.profile_id = current_profile_id())));
+CREATE POLICY "comments: insert own" ON comments FOR INSERT
+  WITH CHECK (profile_id = current_profile_id() AND EXISTS (SELECT 1 FROM decks d WHERE d.id = comments.deck_id AND (d.visibility_state IN ('public', 'unlisted') OR d.profile_id = current_profile_id())));
+CREATE POLICY "comments: update own" ON comments FOR UPDATE
   USING (profile_id = current_profile_id())
   WITH CHECK (profile_id = current_profile_id());
-CREATE INDEX ON deck_comments (deck_id, created_at DESC) WHERE parent_comment_id IS NULL;
-CREATE INDEX ON deck_comments (parent_comment_id, created_at);
-CREATE INDEX ON deck_comments (profile_id, created_at DESC);
-CREATE TRIGGER set_updated_at BEFORE UPDATE ON deck_comments FOR EACH ROW EXECUTE FUNCTION extensions.moddatetime(updated_at);
+CREATE INDEX ON comments (deck_id, created_at DESC) WHERE parent_comment_id IS NULL;
+CREATE INDEX ON comments (parent_comment_id, created_at);
+CREATE INDEX ON comments (profile_id, created_at DESC);
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON comments FOR EACH ROW EXECUTE FUNCTION extensions.moddatetime(updated_at);
 
 CREATE TABLE deck_comment_edit_logs (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  comment_id  uuid NOT NULL REFERENCES deck_comments(id) ON DELETE CASCADE,
+  comment_id  uuid NOT NULL REFERENCES comments(id) ON DELETE CASCADE,
   edited_by   uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   old_body    text NOT NULL,
   new_body    text NOT NULL,
@@ -176,7 +176,7 @@ CREATE TABLE deck_comment_edit_logs (
 ALTER TABLE deck_comment_edit_logs ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "deck_comment_edit_logs: read visible" ON deck_comment_edit_logs FOR SELECT
   USING (EXISTS (
-    SELECT 1 FROM deck_comments c
+    SELECT 1 FROM comments c
     JOIN decks d ON d.id = c.deck_id
     WHERE c.id = deck_comment_edit_logs.comment_id
       AND (d.visibility_state IN ('public', 'unlisted') OR d.profile_id = current_profile_id())
@@ -213,4 +213,3 @@ CREATE TABLE deck_reports (
 ALTER TABLE deck_reports ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "deck_reports: insert own" ON deck_reports FOR INSERT WITH CHECK (profile_id = current_profile_id());
 CREATE POLICY "deck_reports: read access" ON deck_reports FOR SELECT USING (profile_id = current_profile_id() OR EXISTS (SELECT 1 FROM profiles WHERE id = current_profile_id() AND role = 'researcher'));
-

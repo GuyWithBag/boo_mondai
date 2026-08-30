@@ -291,7 +291,7 @@ erDiagram
         text new_body
     }
 
-    deck_comments {
+    comments {
         uuid id PK
         uuid deck_id FK
         uuid profile_id FK
@@ -337,10 +337,10 @@ erDiagram
     deck_vote_review_comments ||--o{ deck_vote_review_comments : "threads replies"
     deck_vote_review_comments ||--o{ deck_vote_review_comment_edit_logs : "keeps edit history"
 
-    profiles ||--o{ deck_comments : "comments"
-    decks ||--o{ deck_comments : "receives"
-    deck_comments ||--o{ deck_comments : "threads replies"
-    deck_comments ||--o{ deck_comment_edit_logs : "keeps edit history"
+    profiles ||--o{ comments : "comments"
+    decks ||--o{ comments : "receives"
+    comments ||--o{ comments : "threads replies"
+    comments ||--o{ deck_comment_edit_logs : "keeps edit history"
 
     profiles ||--o{ deck_downloads : "downloads"
     decks ||--o{ deck_downloads : "receives"

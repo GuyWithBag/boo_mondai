@@ -1,13 +1,13 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show DeckComment, DeckCommentEditLog, RemoteDB, uuid;
+    show Comment, CommentEditLog, RemoteDB, uuid;
 
-class DeckCommentsService {
-  const DeckCommentsService._();
+class CommentsService {
+  const CommentsService._();
 
-  static Future<List<DeckComment>> getByDeck(String deckId) =>
+  static Future<List<Comment>> getByDeck(String deckId) =>
       RemoteDB.deckComment.getByDeck(deckId);
 
-  static Future<List<DeckCommentEditLog>> getEditLogs(String commentId) =>
+  static Future<List<CommentEditLog>> getEditLogs(String commentId) =>
       RemoteDB.deckCommentEditLog.getByComment(commentId);
 
   static Future<void> addComment({
@@ -19,7 +19,7 @@ class DeckCommentsService {
     final trimmedBody = body.trim();
     if (trimmedBody.isEmpty) return;
 
-    final comment = DeckComment.createNow(
+    final comment = Comment.createNow(
       id: uuid.v7(),
       deckId: deckId,
       profileId: profileId,

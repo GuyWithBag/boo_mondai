@@ -1,19 +1,37 @@
+import 'dart:io';
+
+import 'package:boo_mondai/features/filesystem.handler/filesystem.handler.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         Deck,
         LocalDB,
         AuthService,
-        StoredMediaService,
-        StoredMediaPathHelper,
+        DecksDirectoryPaths,
         SyncDeletionPolicy,
         Tag,
-        StringHelper,
-        DeckListingsService;
+        DeckListingsService,
+        RemoteDB;
 import 'package:file_picker/file_picker.dart' show PlatformFile;
 
 abstract final class DecksService {
+  static Future<Deck> createAndUpsert({
+    String? title,
+    String? profileId,
+    bool isPublished = false,
+  }) async {
+    final resolvedTitle = await nextUntitledDeckTitle();
+    final deck = Deck.createNow(
+      profileId: profileId ?? LocalDB.profile.getOrCreate().id,
+      title: resolvedTitle.trim(),
+      isPublished: isPublished,
+    );
+    await LocalDB.deck.upsert(deck);
+    return deck;
+  }
+
   static Future<String> nextUntitledDeckTitle() async {
     const baseTitle = 'Untitled Deck';
+    // final pathAlreadyExsists = File('');
     final existingTitles = LocalDB.deck
         .selectMany()
         .map((deck) => deck.title.trim().toLowerCase())
@@ -25,9 +43,10 @@ abstract final class DecksService {
         continue;
       }
 
-      final directoryExists = await StoredMediaService.directoryExistsById(
-        StoredMediaPathHelper.deckFolderPrefix(deckTitle: candidate),
-      );
+      final directoryExists =
+          await FileSystemHandler.doesDirectoryExistRelatively(
+            DecksDirectoryPaths.root(deckTitle: candidate),
+          );
       if (directoryExists) {
         continue;
       }
@@ -94,29 +113,18 @@ abstract final class DecksService {
     required Deck deck,
     required String title,
   }) async {
-    if (!deck.isEditable) {
-      return null;
+    final relativePath = DecksDirectoryPaths.root(deckTitle: deck.title);
+    final absolutePath = await FileSystemHandler.getAbsolutePath(relativePath);
+
+    var directory = Directory(absolutePath);
+    try {
+      directory = await directory.rename(title);
+    } catch (e) {
+      rethrow;
     }
-
-    final trimmedTitle = title.trim();
-    if (trimmedTitle.isEmpty || trimmedTitle == deck.title) {
-      return null;
-    }
-
-    final updatedDeck = deck.copyWith(
-      title: trimmedTitle,
-      updatedAt: DateTime.now(),
-    );
-
-    await StoredMediaService.renameFolderByPrefix(
-      oldPrefix: StoredMediaPathHelper.deckFolderPrefix(deckTitle: deck.title),
-      newPrefix: StoredMediaPathHelper.deckFolderPrefix(
-        deckTitle: updatedDeck.title,
-      ),
-    );
-    await LocalDB.deck.upsert(updatedDeck);
-
-    return updatedDeck;
+    final newDeck = deck.copyWith(title: title, updatedAt: DateTime.now());
+    await LocalDB.deck.upsert(newDeck);
+    return newDeck;
   }
 
   static Future<Deck?> setShortDescription({
@@ -215,70 +223,45 @@ abstract final class DecksService {
     return updatedDeck;
   }
 
-  static Future<Deck?> setCoverImageUrl({
+  static Future<void> setCoverImageUrlByFile({
     required Deck deck,
     required PlatformFile file,
   }) async {
     if (!deck.isEditable) {
-      return null;
+      return;
     }
 
-    final localPath = await StoredMediaService.storeFile(
-      path: StoredMediaPathHelper.deckCoverImage(deckTitle: deck.title),
-      file: file,
+    final path = DecksDirectoryPaths.coverImage(deckTitle: deck.title);
+    final absolutePath = await FileSystemHandler.getAbsolutePath(path);
+    final file = File(absolutePath);
+    final bytes = await file.readAsBytes();
+    file.writeAsBytes(bytes);
+
+    final remoteUrl = await RemoteDB.publicBucket.uploadBytes(path, bytes);
+    final updatedDeck = deck.copyWith(
+      coverImageUrl: remoteUrl,
+      updatedAt: DateTime.now(),
     );
-    if (localPath == null) {
-      return null;
-    }
-
-    final updatedDeck = deck.copyWith(updatedAt: DateTime.now());
-
     await LocalDB.deck.upsert(updatedDeck);
-    return updatedDeck;
+    return;
   }
 
-  static String? getCoverImageUrl(Deck deck) {
-    final remoteUrl = StringHelper.toTrimmedOrNull(deck.coverImageUrl);
-    final localPath = StoredMediaService.getFileByPath(
-      StoredMediaPathHelper.deckCoverImage(deckTitle: deck.title),
-    )?.path;
+  // static String? getCoverImageUrl(Deck deck) {
+  //   final remoteUrl = deck.coverImageUrl;
+  //   final localPath = StoredMediaService.getFileByPath(
+  //     DecksDirectoryPaths.deckCoverImage(deckTitle: deck.title),
+  //   )?.path;
 
-    if (localPath != null) {
-      return localPath;
-    }
+  //   if (localPath != null) {
+  //     return localPath;
+  //   }
 
-    if (remoteUrl == null) {
-      return null;
-    }
+  //   if (remoteUrl == null) {
+  //     return null;
+  //   }
 
-    final cachedRemotePath = StoredMediaService.getFileByRemoteUrl(
-      remoteUrl,
-    )?.path;
-    if (cachedRemotePath != null) {
-      return cachedRemotePath;
-    }
-
-    return remoteUrl;
-  }
-
-  static String getDeckCoverImageStoredPath(Deck deck) {
-    return StoredMediaPathHelper.deckCoverImage(
-      deckTitle: deck.title,
-    ).relativePathPrefix();
-  }
-
-  static String? getDeckCoverImageLocalPath(Deck deck) {
-    return StoredMediaService.getFileByPath(
-      StoredMediaPathHelper.deckCoverImage(deckTitle: deck.title),
-    )?.path;
-  }
-
-  static Future<String> getDeckMediaDirectoryPath(Deck deck) async {
-    final directory = await StoredMediaService.getMediaDirectory(
-      StoredMediaPathHelper.deckCoverImage(deckTitle: deck.title),
-    );
-    return directory.path;
-  }
+  //   return remoteUrl;
+  // }
 
   static Future<Deck> createAndUpsertListing(Deck deck) async {
     final listing = await DeckListingsService.createListing(deck);

@@ -1,22 +1,21 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        DeckVoteReviewComment,
-        DeckVoteReview,
+        ReviewComment,
+        Review,
         Deck,
-        DeckVoteReviewsService,
+        ReviewsService,
         AuthService,
         LocalDB,
         DiscussionItem;
 import 'package:flutter/foundation.dart' show ValueNotifier;
 import 'package:flutter_hooks/flutter_hooks.dart' show useState, useEffect;
 
-class DeckVoteReviewsController {
-  DeckVoteReviewsController({
+class ReviewsController {
+  ReviewsController({
     required this.deck,
     required this.currentVoteValue,
-    required ValueNotifier<List<DeckVoteReview>> reviews,
-    required ValueNotifier<Map<String, List<DeckVoteReviewComment>>>
-    reviewComments,
+    required ValueNotifier<List<Review>> reviews,
+    required ValueNotifier<Map<String, List<ReviewComment>>> reviewComments,
     required ValueNotifier<bool> isLoading,
     required ValueNotifier<bool> isSubmittingReview,
     required ValueNotifier<bool> isSubmittingReviewComment,
@@ -33,8 +32,8 @@ class DeckVoteReviewsController {
   final int? currentVoteValue;
   final Future<void> Function()? onReviewChanged;
 
-  final ValueNotifier<List<DeckVoteReview>> _reviews;
-  final ValueNotifier<Map<String, List<DeckVoteReviewComment>>> _reviewComments;
+  final ValueNotifier<List<Review>> _reviews;
+  final ValueNotifier<Map<String, List<ReviewComment>>> _reviewComments;
   final ValueNotifier<bool> _isLoading;
   final ValueNotifier<bool> _isSubmittingReview;
   final ValueNotifier<bool> _isSubmittingReviewComment;
@@ -42,9 +41,8 @@ class DeckVoteReviewsController {
 
   // ─── Read-only state ────────────────────────────────────────────────────
 
-  List<DeckVoteReview> get reviews => _reviews.value;
-  Map<String, List<DeckVoteReviewComment>> get reviewComments =>
-      _reviewComments.value;
+  List<Review> get reviews => _reviews.value;
+  Map<String, List<ReviewComment>> get reviewComments => _reviewComments.value;
   bool get isLoading => _isLoading.value;
   bool get isSubmittingReview => _isSubmittingReview.value;
   bool get isSubmittingReviewComment => _isSubmittingReviewComment.value;
@@ -61,11 +59,11 @@ class DeckVoteReviewsController {
 
   // ─── Derived lookups ────────────────────────────────────────────────────
 
-  Map<String, DeckVoteReview> get _reviewByItemId => {
+  Map<String, Review> get _reviewByItemId => {
     for (final review in reviews) review.id: review,
   };
 
-  Map<String, DeckVoteReviewComment> get _reviewCommentByItemId => {
+  Map<String, ReviewComment> get _reviewCommentByItemId => {
     for (final commentsForReview in reviewComments.values)
       for (final comment in commentsForReview) comment.id: comment,
   };
@@ -103,14 +101,14 @@ class DeckVoteReviewsController {
     return false;
   }
 
-  bool canEditReview(DeckVoteReview review) {
+  bool canEditReview(Review review) {
     if (!AuthService.isAuthenticatedRemote || review.isDeleted) return false;
 
     final profile = LocalDB.profile.getOrCreate();
     return profile.id == review.profileId;
   }
 
-  bool canEditReviewComment(DeckVoteReviewComment comment) {
+  bool canEditReviewComment(ReviewComment comment) {
     if (!AuthService.isAuthenticatedRemote || comment.isDeleted) return false;
 
     final profile = LocalDB.profile.getOrCreate();
@@ -141,11 +139,12 @@ class DeckVoteReviewsController {
   }
 
   Future<void> _reloadReviews() async {
-    final loadedReviews = await DeckVoteReviewsService.getByDeck(deck.id);
-    final loadedReviewComments = <String, List<DeckVoteReviewComment>>{};
+    final loadedReviews = await ReviewsService.getByDeck(deck.id);
+    final loadedReviewComments = <String, List<ReviewComment>>{};
     for (final review in loadedReviews) {
-      loadedReviewComments[review.id] =
-          await DeckVoteReviewsService.getComments(review.id);
+      loadedReviewComments[review.id] = await ReviewsService.getComments(
+        review.id,
+      );
     }
 
     _reviews.value = loadedReviews;
@@ -155,7 +154,7 @@ class DeckVoteReviewsController {
   Future<void> _reloadReviewComments(String reviewId) async {
     _reviewComments.value = {
       ..._reviewComments.value,
-      reviewId: await DeckVoteReviewsService.getComments(reviewId),
+      reviewId: await ReviewsService.getComments(reviewId),
     };
   }
 
@@ -175,7 +174,7 @@ class DeckVoteReviewsController {
 
     try {
       final profile = LocalDB.profile.getOrCreate();
-      await DeckVoteReviewsService.upsertReview(
+      await ReviewsService.upsertReview(
         deckId: deck.id,
         profileId: profile.id,
         voteValue: voteValue,
@@ -212,7 +211,7 @@ class DeckVoteReviewsController {
   }
 
   Future<bool> _updateReview(
-    DeckVoteReview review,
+    Review review,
     String trimmedBody, {
     String? title,
   }) async {
@@ -225,7 +224,7 @@ class DeckVoteReviewsController {
     _error.value = null;
 
     try {
-      await DeckVoteReviewsService.updateReview(
+      await ReviewsService.updateReview(
         reviewId: review.id,
         voteValue: currentVoteValue ?? review.voteValueAtCreation,
         title: title ?? '',
@@ -242,7 +241,7 @@ class DeckVoteReviewsController {
   }
 
   Future<bool> _updateReviewComment(
-    DeckVoteReviewComment comment,
+    ReviewComment comment,
     String trimmedBody,
   ) async {
     if (!canEditReviewComment(comment)) {
@@ -254,7 +253,7 @@ class DeckVoteReviewsController {
     _error.value = null;
 
     try {
-      await DeckVoteReviewsService.updateComment(
+      await ReviewsService.updateComment(
         commentId: comment.id,
         body: trimmedBody,
       );
@@ -284,7 +283,7 @@ class DeckVoteReviewsController {
 
     try {
       final profile = LocalDB.profile.getOrCreate();
-      await DeckVoteReviewsService.addComment(
+      await ReviewsService.addComment(
         reviewId: reviewId,
         profileId: profile.id,
         body: trimmedBody,
@@ -301,22 +300,20 @@ class DeckVoteReviewsController {
   }
 }
 
-DeckVoteReviewsController useDeckVoteReviewsController({
+ReviewsController useReviewsController({
   required Deck deck,
   required int? currentVoteValue,
   Future<void> Function()? onReviewChanged,
   bool enabled = true,
 }) {
-  final reviews = useState(const <DeckVoteReview>[]);
-  final reviewComments = useState(
-    const <String, List<DeckVoteReviewComment>>{},
-  );
+  final reviews = useState(const <Review>[]);
+  final reviewComments = useState(const <String, List<ReviewComment>>{});
   final isLoading = useState(false);
   final isSubmittingReview = useState(false);
   final isSubmittingReviewComment = useState(false);
   final error = useState<Exception?>(null);
 
-  final controller = DeckVoteReviewsController(
+  final controller = ReviewsController(
     deck: deck,
     currentVoteValue: currentVoteValue,
     reviews: reviews,

@@ -22,9 +22,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         FillInTheBlanksTemplate,
         FlashcardTemplate,
         IdentificationTemplate,
-        StoredMediaService,
-        StoredMediaPathHelper,
-        ImageHelper,
         LocalDB,
         MatchMadnessPair,
         MatchMadnessTemplate,
@@ -44,6 +41,7 @@ import 'package:supabase_flutter/supabase_flutter.dart' show CountOption;
 
 const _kPageSize = 20;
 
+// ToDo: Need Re-evaluation
 class DeckDownloadsService extends Service {
   DeckDownloadsService({
     ChangeTrackerService? changeTrackerService,
@@ -68,8 +66,6 @@ class DeckDownloadsService extends Service {
   final CardTemplatesRemoteDB _cardTemplates = RemoteDB.card;
 
   final Set<String> _pausedEntryIds = {};
-
-  // ── Public API ────────────────────────────────────────────────────────────
 
   Future<ChangeResult<DeckDownloadPayload, Object?>> downloadDeck(
     Deck sourceDeck, {
@@ -207,18 +203,20 @@ class DeckDownloadsService extends Service {
       ];
 
       await LocalDB.deck.upsert(newLocalDeck);
-      final coverRemotePath = remoteDeck.coverImageUrl;
-      if (coverRemotePath != null && ImageHelper.isRemoteUrl(coverRemotePath)) {
-        final coverLocalPath = await StoredMediaService.remoteToLocal(
-          path: StoredMediaPathHelper.deckCoverImage(
-            deckTitle: newLocalDeck.title,
-          ),
-          remoteUrl: coverRemotePath,
-        );
-        if (coverLocalPath != null) {
-          await LocalDB.deck.upsert(newLocalDeck.copyWith(updatedAt: now));
-        }
-      }
+
+      // ToDo: What.
+      // final coverRemotePath = remoteDeck.coverImageUrl;
+      // if (coverRemotePath != null && MediaHelper.isRemoteUrl(coverRemotePath)) {
+      //   final coverLocalPath = await FileSystemHandler.storeRemoteAsFile(
+      //     destinationFilePath: DecksDirectoryPaths.coverImage(
+      //       deckTitle: newLocalDeck.title,
+      //     ),
+      //     remoteFileUrl: coverRemotePath,
+      //   );
+      //   if (coverLocalPath != null) {
+      //     await LocalDB.deck.upsert(newLocalDeck.copyWith(updatedAt: now));
+      //   }
+      // }
       await LocalDB.cardTemplate.upsertMany(localTemplates);
       await StudyCardService.syncDeckStudyCards(
         deckId: localDeckId,

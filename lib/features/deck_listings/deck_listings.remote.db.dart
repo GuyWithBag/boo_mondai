@@ -3,12 +3,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart'
-    show
-        SupabaseRemoteDB,
-        DeckListing,
-        DeckListingMapper,
-        ImageHelper,
-        SyncIndexEntry;
+    show SupabaseRemoteDB, DeckListing, DeckListingMapper, SyncIndexEntry;
 
 class DeckListingsRemoteDB extends SupabaseRemoteDB<DeckListing> {
   @override
@@ -19,13 +14,7 @@ class DeckListingsRemoteDB extends SupabaseRemoteDB<DeckListing> {
       DeckListingMapper.fromMap;
 
   @override
-  Map<String, dynamic> toMap(DeckListing item) {
-    final map = item.toMap();
-    map['featured_images'] = item.featuredImages
-        .where(ImageHelper.isRemoteUrl)
-        .toList(growable: false);
-    return map;
-  }
+  Map<String, dynamic> toMap(DeckListing item) => item.toMap();
 
   @override
   Map<String, Object?> primaryKeyFromItem(DeckListing item) => {

@@ -34,5 +34,16 @@ class DeckFavorite with DeckFavoriteMappable {
     );
   }
 
+  factory DeckFavorite.createDummy({
+    String deckId = '',
+    String profileId = '',
+  }) {
+    return DeckFavorite(
+      deckId: deckId,
+      profileId: profileId,
+      createdAt: DateTime.now(),
+    );
+  }
+
   String get compositeId => '${deckId}_$profileId';
 }

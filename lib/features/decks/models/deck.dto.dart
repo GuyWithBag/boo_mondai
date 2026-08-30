@@ -121,4 +121,22 @@ class Deck with DeckMappable implements MutableEntity {
       listing: null,
     );
   }
+
+  factory Deck.createDummy({
+    String? id,
+    String profileId = '',
+    String title = '',
+  }) {
+    final now = DateTime.now();
+    return Deck(
+      id: id ?? uuid.v7(),
+      profileId: profileId,
+      title: title,
+      visibilityState: VisibilityState.private,
+      isPublished: false,
+      cardCount: 0,
+      createdAt: now,
+      updatedAt: now,
+    );
+  }
 }

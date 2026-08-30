@@ -1,25 +1,18 @@
-import 'package:boo_mondai/lib.barrel.dart'
-    show
-        DeckVoteReview,
-        DeckVoteReviewComment,
-        DeckVoteReviewCommentEditLog,
-        DeckVoteReviewEditLog,
-        RemoteDB,
-        uuid;
+import 'package:boo_mondai/lib.barrel.dart' show RemoteDB, uuid;
 
-class DeckVoteReviewsService {
-  const DeckVoteReviewsService._();
+class ReviewsService {
+  const ReviewsService._();
 
-  static Future<List<DeckVoteReview>> getByDeck(String deckId) =>
+  static Future<List<Review>> getByDeck(String deckId) =>
       RemoteDB.deckVoteReview.getByDeck(deckId);
 
-  static Future<List<DeckVoteReviewEditLog>> getEditLogs(String reviewId) =>
+  static Future<List<ReviewEditLog>> getEditLogs(String reviewId) =>
       RemoteDB.deckVoteReviewEditLog.getByReview(reviewId);
 
-  static Future<List<DeckVoteReviewComment>> getComments(String reviewId) =>
+  static Future<List<ReviewComment>> getComments(String reviewId) =>
       RemoteDB.deckVoteReviewComment.getByReview(reviewId);
 
-  static Future<List<DeckVoteReviewCommentEditLog>> getCommentEditLogs(
+  static Future<List<ReviewCommentEditLog>> getCommentEditLogs(
     String commentId,
   ) => RemoteDB.deckVoteReviewCommentEditLog.getByComment(commentId);
 
@@ -34,13 +27,13 @@ class DeckVoteReviewsService {
     if (trimmedBody.isEmpty) return;
 
     final trimmedTitle = title.trim();
-    await RemoteDB.deckInteractions.setVote(
+    await RemoteDB.deckVotes.setVote(
       deckId: deckId,
       profileId: profileId,
       voteValue: voteValue,
     );
 
-    final review = DeckVoteReview.createNow(
+    final review = Review.createNow(
       id: uuid.v7(),
       deckId: deckId,
       profileId: profileId,
@@ -100,7 +93,7 @@ class DeckVoteReviewsService {
     final trimmedBody = body.trim();
     if (trimmedBody.isEmpty) return;
 
-    final comment = DeckVoteReviewComment.createNow(
+    final comment = ReviewComment.createNow(
       id: uuid.v7(),
       reviewId: reviewId,
       profileId: profileId,

@@ -10,8 +10,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         SyncIndexEntry,
         DeckSortField,
         SearchSortDirection,
-        DeckMapper,
-        ImageHelper;
+        DeckMapper;
 
 class DecksRemoteDB extends SupabaseRemoteDB<Deck> {
   @override
@@ -21,14 +20,7 @@ class DecksRemoteDB extends SupabaseRemoteDB<Deck> {
   Deck Function(Map<String, dynamic>) get fromMap => DeckMapper.fromMap;
 
   @override
-  Map<String, dynamic> toMap(Deck item) {
-    final map = item.toMap();
-    final coverImageUrl = item.coverImageUrl;
-    if (coverImageUrl != null && !ImageHelper.isRemoteUrl(coverImageUrl)) {
-      map['cover_image_url'] = null;
-    }
-    return map;
-  }
+  Map<String, dynamic> toMap(Deck item) => item.toMap();
 
   @override
   Map<String, Object?> primaryKeyFromItem(Deck item) => {'id': item.id};

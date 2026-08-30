@@ -9,6 +9,7 @@ part 'deck_listing.dto.mapper.dart';
 @MappableClass()
 class DeckListing with DeckListingMappable {
   final String deckId;
+  final String contentId;
   final int upvotesCount;
   final int downvotesCount;
   final int downloadsCount;
@@ -22,8 +23,6 @@ class DeckListing with DeckListingMappable {
   final List<Map<String, dynamic>> featuredCards;
   final List<String> featuredImages;
 
-  final DateTime updatedAt;
-  final DateTime createdAt;
   final DateTime? deletedAt;
   final DateTime? purgeAfter;
 
@@ -38,10 +37,9 @@ class DeckListing with DeckListingMappable {
     this.reportsCount = 0,
     this.featuredCards = const [],
     this.featuredImages = const [],
-    required this.updatedAt,
-    required this.createdAt,
     this.deletedAt,
     this.purgeAfter,
     required this.deckId,
+    required this.contentId,
   });
 }

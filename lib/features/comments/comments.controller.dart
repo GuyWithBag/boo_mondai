@@ -1,18 +1,12 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show
-        DiscussionItem,
-        DeckComment,
-        Deck,
-        DeckCommentsService,
-        AuthService,
-        LocalDB;
+    show DiscussionItem, Comment, Deck, CommentsService, AuthService, LocalDB;
 import 'package:flutter/foundation.dart' show ValueNotifier;
 import 'package:flutter_hooks/flutter_hooks.dart' show useState, useEffect;
 
-class DeckCommentsController {
-  DeckCommentsController({
+class CommentsController {
+  CommentsController({
     required this.deck,
-    required ValueNotifier<List<DeckComment>> comments,
+    required ValueNotifier<List<Comment>> comments,
     required ValueNotifier<bool> isLoading,
     required ValueNotifier<bool> isSubmitting,
     required ValueNotifier<Exception?> error,
@@ -23,14 +17,14 @@ class DeckCommentsController {
 
   final Deck deck;
 
-  final ValueNotifier<List<DeckComment>> _comments;
+  final ValueNotifier<List<Comment>> _comments;
   final ValueNotifier<bool> _isLoading;
   final ValueNotifier<bool> _isSubmitting;
   final ValueNotifier<Exception?> _error;
 
   // ─── Read-only state ────────────────────────────────────────────────────
 
-  List<DeckComment> get comments => _comments.value;
+  List<Comment> get comments => _comments.value;
   bool get isLoading => _isLoading.value;
   bool get isSubmitting => _isSubmitting.value;
   Exception? get error => _error.value;
@@ -39,7 +33,7 @@ class DeckCommentsController {
 
   List<DiscussionItem> get items => comments
       .where((comment) => comment.parentCommentId == null)
-      .map(DiscussionItem.fromDeckComment)
+      .map(DiscussionItem.fromComment)
       .toList(growable: false);
 
   void clearError() {
@@ -48,14 +42,14 @@ class DeckCommentsController {
 
   // ─── Derived lookups ────────────────────────────────────────────────────
 
-  Map<String, DeckComment> get _commentByItemId => {
+  Map<String, Comment> get _commentByItemId => {
     for (final comment in comments) comment.id: comment,
   };
 
   List<DiscussionItem> repliesFor(String itemId) {
     return comments
         .where((comment) => comment.parentCommentId == itemId)
-        .map(DiscussionItem.fromDeckComment)
+        .map(DiscussionItem.fromComment)
         .toList(growable: false);
   }
 
@@ -68,7 +62,7 @@ class DeckCommentsController {
     return false;
   }
 
-  bool canEditComment(DeckComment comment) {
+  bool canEditComment(Comment comment) {
     if (!AuthService.isAuthenticatedRemote || comment.isDeleted) return false;
 
     final profile = LocalDB.profile.getOrCreate();
@@ -96,7 +90,7 @@ class DeckCommentsController {
   }
 
   Future<void> _reloadComments() async {
-    _comments.value = await DeckCommentsService.getByDeck(deck.id);
+    _comments.value = await CommentsService.getByDeck(deck.id);
   }
 
   // ─── Mutations ──────────────────────────────────────────────────────────
@@ -111,7 +105,7 @@ class DeckCommentsController {
 
     try {
       final profile = LocalDB.profile.getOrCreate();
-      await DeckCommentsService.addComment(
+      await CommentsService.addComment(
         deckId: deck.id,
         profileId: profile.id,
         body: trimmedBody,
@@ -144,7 +138,7 @@ class DeckCommentsController {
     _error.value = null;
 
     try {
-      await DeckCommentsService.updateComment(
+      await CommentsService.updateComment(
         commentId: comment.id,
         body: trimmedBody,
       );
@@ -159,16 +153,16 @@ class DeckCommentsController {
   }
 }
 
-DeckCommentsController useDeckCommentsController({
+CommentsController useCommentsController({
   required Deck deck,
   bool enabled = true,
 }) {
-  final comments = useState(const <DeckComment>[]);
+  final comments = useState(const <Comment>[]);
   final isLoading = useState(false);
   final isSubmitting = useState(false);
   final error = useState<Exception?>(null);
 
-  final controller = DeckCommentsController(
+  final controller = CommentsController(
     deck: deck,
     comments: comments,
     isLoading: isLoading,

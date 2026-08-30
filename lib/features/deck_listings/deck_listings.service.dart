@@ -1,59 +1,46 @@
+import 'dart:io';
+
 import 'package:boo_mondai/lib.barrel.dart'
     show
         DecksService,
-        StoredMediaService,
         Deck,
         StringHelper,
         ListHelper,
-        StoredMediaPathHelper,
+        DecksDirectoryPaths,
         LocalDB,
         CardTemplate,
         DeckListing,
         VisibilityState,
         AuthService,
         SyncDeletionPolicy,
-        ImageHelper;
+        ImageHelper,
+        RemoteDB,
+        FileSystemHandler;
 import 'package:file_picker/file_picker.dart';
 
 abstract final class DeckListingsService {
-  static String? getFeaturedImages({required Deck deck, int index = 0}) {
+  static String getFeaturedImage({required Deck deck, int index = 0}) {
     final listing = deck.listing;
-    if (listing == null) return DecksService.getCoverImageUrl(deck);
+    if (listing == null && index == 0) {
+      return DecksDirectoryPaths.coverImage(deckTitle: deck.title);
+    }
 
-    final remoteUrl = StringHelper.toTrimmedOrNull(
-      ListHelper.getAtOrNull(listing.featuredImages, index),
+    return DecksDirectoryPaths.listingFeaturedImage(
+      deckTitle: deck.title,
+      index: index,
     );
-
-    return StoredMediaService.getFileByPath(
-          StoredMediaPathHelper.deckListingFeaturedImage(
-            deckTitle: deck.title,
-            index: index,
-          ),
-        )?.path ??
-        (remoteUrl == null
-            ? null
-            : StoredMediaService.getFileByRemoteUrl(remoteUrl)?.path) ??
-        remoteUrl ??
-        DecksService.getCoverImageUrl(deck);
   }
 
-  static List<String> getCarouselImages(Deck deck) {
-    final listingImages = deck.listing?.featuredImages ?? const <String>[];
-    final resolved = <String>[];
+  static List<String> getFeaturedImages(Deck deck) {
+    var images = <String>[];
 
-    for (var index = 0; index < listingImages.length; index++) {
-      final image = getFeaturedImages(deck: deck, index: index);
-      if (image != null && !resolved.contains(image)) {
-        resolved.add(image);
-      }
+    // ToDo: Add error handling for null listing
+    for (var index = 0; index < deck.listing!.featuredImages.length; index++) {
+      final image = getFeaturedImage(deck: deck, index: index);
+      images = [...images, image];
     }
 
-    final cover = DecksService.getCoverImageUrl(deck);
-    if (cover != null && !resolved.contains(cover)) {
-      resolved.add(cover);
-    }
-
-    return resolved;
+    return images;
   }
 
   static Future<DeckListing> createListing(Deck deck) async {
@@ -137,53 +124,73 @@ abstract final class DeckListingsService {
     return updatedDeck;
   }
 
-  static Future<Deck?> updateListingFeaturedImage({
+  static Future<void> setFeaturedImageByFile({
     required Deck deck,
     required int index,
     required PlatformFile file,
   }) async {
-    if (!deck.isEditable || index < 0) {
-      return null;
+    if (!deck.isEditable) {
+      return;
+    }
+    if (!deck.isEditable) {
+      return;
     }
 
-    final now = DateTime.now();
-    final listing =
-        deck.listing ??
-        DeckListing(deckId: deck.id, createdAt: now, updatedAt: now);
-    final featuredImages = listing.featuredImages.toList();
-    final targetIndex = index <= featuredImages.length
-        ? index
-        : featuredImages.length;
-
-    final localPath = await StoredMediaService.storeFile(
-      path: StoredMediaPathHelper.deckListingFeaturedImage(
-        deckTitle: deck.title,
-        index: targetIndex,
-      ),
-      file: file,
+    final path = DecksDirectoryPaths.listingFeaturedImage(
+      deckTitle: deck.title,
+      index: index,
     );
-    if (localPath == null) {
-      return null;
-    }
+    final deckListing = deck.listing!;
 
-    if (targetIndex < featuredImages.length) {
-      featuredImages[targetIndex] =
-          ImageHelper.isRemoteUrl(featuredImages[targetIndex])
-          ? featuredImages[targetIndex]
-          : '';
-    } else {
-      featuredImages.add('');
-    }
+    final absolutePath = await FileSystemHandler.getAbsolutePath(path);
+    final file = File(absolutePath);
+    final bytes = await file.readAsBytes();
+    file.writeAsBytes(bytes);
 
-    final updatedListing = listing.copyWith(
-      featuredImages: featuredImages,
-      updatedAt: now,
+    final remoteUrl = await RemoteDB.publicBucket.uploadBytes(path, bytes);
+
+    final feauturedImages = deckListing.featuredImages.toList();
+    feauturedImages[index] = remoteUrl;
+
+    final updatedDeckListing = deckListing.copyWith(
+      featuredImages: feauturedImages,
+      updatedAt: DateTime.now(),
     );
-    final updatedDeck = deck.copyWith(listing: updatedListing, updatedAt: now);
 
-    await LocalDB.deck.upsert(updatedDeck);
-    await LocalDB.deckListing.upsert(updatedListing);
-    return updatedDeck;
+    await LocalDB.deckListing.upsert(updatedDeckListing);
+  }
+
+  static Future<void> setFeaturedImagesByFile({
+    required Deck deck,
+    required List<PlatformFile> files,
+  }) async {
+    if (!deck.isEditable) {
+      return;
+    }
+
+    final paths = DecksDirectoryPaths.listingFeaturedImages(
+      deckTitle: deck.title,
+    );
+    final deckListing = deck.listing!;
+
+    // ToDo: Add error handling
+    for (int i = 0; i < deck.listing!.featuredImages.length; i++) {
+      final path = paths[i];
+
+      final absolutePath = await FileSystemHandler.getAbsolutePath(path);
+      final file = File(absolutePath);
+      final bytes = await file.readAsBytes();
+      file.writeAsBytes(bytes);
+
+      final remoteUrl = await RemoteDB.publicBucket.uploadBytes(path, bytes);
+
+      final updatedDeckListing = deckListing.copyWith(
+        featuredImages: [...deckListing.featuredImages, remoteUrl],
+        updatedAt: DateTime.now(),
+      );
+
+      await LocalDB.deckListing.upsert(updatedDeckListing);
+    }
   }
 
   static Future<Deck?> addListingFeaturedCard({

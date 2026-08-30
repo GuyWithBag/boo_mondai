@@ -3,6 +3,5 @@
 // Barrel files
 export 'models/models.barrel.dart';
 // Other files
-export 'deck_listings.local.db.dart';
-export 'deck_listings.remote.db.dart';
-export 'deck_listings.service.dart';
+export 'votes.remote.db.dart';
+export 'votes.local.db.dart';
