@@ -160,27 +160,27 @@ comments would increase community engagement and surface quality feedback for de
 
 ### Schema additions (future)
 ```sql
-CREATE TABLE deck_comments (
+CREATE TABLE comments (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   deck_id     uuid NOT NULL REFERENCES decks(id) ON DELETE CASCADE,
   author_id   uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-  parent_id   uuid REFERENCES deck_comments(id) ON DELETE CASCADE,
+  parent_id   uuid REFERENCES comments(id) ON DELETE CASCADE,
   body        text NOT NULL,
   is_pinned   bool NOT NULL DEFAULT false,
   is_deleted  bool NOT NULL DEFAULT false,
   created_at  timestamptz NOT NULL DEFAULT now(),
   updated_at  timestamptz NOT NULL DEFAULT now()
 );
-ALTER TABLE deck_comments ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "deck_comments: anyone reads" ON deck_comments FOR SELECT USING (true);
-CREATE POLICY "deck_comments: users insert own" ON deck_comments FOR INSERT WITH CHECK (auth.uid() = author_id);
-CREATE POLICY "deck_comments: author or deck owner soft-delete" ON deck_comments FOR UPDATE
+ALTER TABLE comments ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "comments: anyone reads" ON comments FOR SELECT USING (true);
+CREATE POLICY "comments: users insert own" ON comments FOR INSERT WITH CHECK (auth.uid() = author_id);
+CREATE POLICY "comments: author or deck owner soft-delete" ON comments FOR UPDATE
   USING (
     auth.uid() = author_id OR
-    EXISTS (SELECT 1 FROM decks WHERE decks.id = deck_comments.deck_id AND decks.creator_id = auth.uid())
+    EXISTS (SELECT 1 FROM decks WHERE decks.id = comments.deck_id AND decks.creator_id = auth.uid())
   );
-CREATE INDEX ON deck_comments (deck_id);
-CREATE INDEX ON deck_comments (parent_id);
+CREATE INDEX ON comments (deck_id);
+CREATE INDEX ON comments (parent_id);
 ```
 
 

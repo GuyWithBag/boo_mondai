@@ -4,3 +4,4 @@ extensions:
   - hive_ce: true
   - provider: true
   - shared_preferences: true
+  - signals: true

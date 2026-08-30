@@ -224,7 +224,7 @@ Future<String> saveMediaLocally({
 });
 ```
 
-- Directory: `getApplicationDocumentsDirectory()/media/`
+- Directory: `getRootDirectory()/media/`
 - Filename: `<attachmentId>.<ext>` where ext comes from `extensionFromMimeType()`
 - Returns the absolute file path
 - Creates the directory if it does not exist
@@ -509,7 +509,7 @@ record. Do not assume the update method signature.
   import only.
 - Do not assume Hive field indices. Read the existing adapter or annotations.
 - Do not hardcode the documents directory path. Use
-  `getApplicationDocumentsDirectory()`.
+  `getRootDirectory()`.
 - Do not generate new IDs at sync time. ID rewriting is import-time only.
 - Do not skip reading `_copyTemplate()` — the attachment-dropping bug must be
   fixed.

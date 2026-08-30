@@ -242,13 +242,13 @@ packages:
     source: hosted
     version: "3.1.2"
   cross_file:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: cross_file
-      sha256: "28bb3ae56f117b5aec029d702a90f57d285cd975c3c5c281eaca38dbc47c5937"
+      sha256: f141ea4f277af142a0356955707f6556f37b03947d39d55585981a06ca437bd6
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.5+2"
+    version: "0.3.5+5"
   crypto:
     dependency: transitive
     description:
@@ -257,6 +257,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.7"
+  csv:
+    dependency: "direct main"
+    description:
+      name: csv
+      sha256: "2e0a52fb729f2faacd19c9c0c954ff450bba37aa8ab999410309e2342e7013a2"
+      url: "https://pub.dev"
+    source: hosted
+    version: "8.0.0"
   dart_jsonwebtoken:
     dependency: transitive
     description:
@@ -1200,7 +1208,7 @@ packages:
     source: hosted
     version: "7.1.0"
   signals_hooks:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: signals_hooks
       sha256: af6c2c4be47f06214292fedab6f6e943433c02086c956eeaffe45c4a23a57413

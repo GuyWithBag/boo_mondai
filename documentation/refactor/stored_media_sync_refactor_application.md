@@ -63,8 +63,8 @@ Local media paths are constructed in multiple places:
 
 - `FolderPaths.deckCoverImage(...)`
 - `FolderPaths.deckListingFeaturedImage(...)`
-- UI toolbar callbacks building `StoredMediaPath.folder(...)`
-- `AuthController` using `StoredMediaPath.app(name: 'profileAvatar')`
+- UI toolbar callbacks building `StoredMediaFile.folder(...)`
+- `AuthController` using `StoredMediaFile.app(name: 'profileAvatar')`
 
 This spreads domain path rules across helpers, pages, and controllers.
 
@@ -79,31 +79,31 @@ lib/features/stored_media/stored_media_paths.helper.dart
 Recommended API:
 
 ```dart
-abstract final class StoredMediaPathHelper {
+abstract final class DecksDirectoryPaths {
   /// Returns the local stored-media path for a deck cover image.
-  static StoredMediaPath deckCoverImage({required String deckTitle}) { ... }
+  static StoredMediaFile deckCoverImage({required String deckTitle}) { ... }
 
   /// Returns the local stored-media path for a listing featured image.
-  static StoredMediaPath deckListingFeaturedImage({
+  static StoredMediaFile deckListingFeaturedImage({
     required String deckTitle,
     required int index,
   }) { ... }
 
   /// Returns the local stored-media path for a markdown attachment.
-  static StoredMediaPath deckAttachment({
+  static StoredMediaFile deckAttachment({
     required String deckTitle,
     required String fileName,
   }) { ... }
 
   /// Returns the singleton local stored-media path for the current profile avatar.
-  static StoredMediaPath profileAvatar() { ... }
+  static StoredMediaFile profileAvatar() { ... }
 }
 ```
 
 If you decide to move away from deck-title local paths, use deck ids:
 
 ```dart
-static StoredMediaPath deckCoverImage({required String deckId}) { ... }
+static StoredMediaFile deckCoverImage({required String deckId}) { ... }
 ```
 
 But that is a behavioral/local-data migration decision. Do it deliberately.
@@ -119,13 +119,13 @@ FolderPaths.deckCoverImage(deck.title).toStoredMediaPath()
 with:
 
 ```dart
-StoredMediaPathHelper.deckCoverImage(deckTitle: deck.title)
+DecksDirectoryPaths.deckCoverImage(deckTitle: deck.title)
 ```
 
 Replace toolbar-created paths:
 
 ```dart
-StoredMediaPath.folder(
+StoredMediaFile.folder(
   folderPath: '${deck.title}/media',
   name: FileHelper.fileNameWithoutExtension(file.name),
 )
@@ -134,7 +134,7 @@ StoredMediaPath.folder(
 with:
 
 ```dart
-StoredMediaPathHelper.deckAttachment(
+DecksDirectoryPaths.deckAttachment(
   deckTitle: deck.title,
   fileName: file.name,
 )
@@ -143,18 +143,18 @@ StoredMediaPathHelper.deckAttachment(
 Replace:
 
 ```dart
-const StoredMediaPath.app(name: 'profileAvatar')
+const StoredMediaFile.app(name: 'profileAvatar')
 ```
 
 with:
 
 ```dart
-StoredMediaPathHelper.profileAvatar()
+DecksDirectoryPaths.profileAvatar()
 ```
 
 ### Manual checklist
 
-- [ ] Create `StoredMediaPathHelper`.
+- [ ] Create `DecksDirectoryPaths`.
 - [ ] Add doc comments to public helper methods.
 - [ ] Export it through folder barrels up to `lib.barrel.dart`.
 - [ ] Move deck cover path logic into it.
@@ -404,7 +404,7 @@ preprocessPushItem: (deck, session) =>
 - [ ] Create/update `lib/features/sync_deck/sync_deck.barrel.dart`.
 - [ ] Export `sync_deck` through `features.barrel.dart` and `lib.barrel.dart`.
 - [ ] Move `_preprocessDeckPushItem`.
-- [ ] Replace raw paths with `StoredMediaPathHelper` and `MediaRemotePathHelper`.
+- [ ] Replace raw paths with `DecksDirectoryPaths` and `MediaRemotePathHelper`.
 - [ ] Remove deck media helper methods from `DeckSyncSession`.
 - [ ] Confirm deck sync still passes `remoteStorage`/bucket dependency.
 - [ ] Run targeted analyzer.
@@ -579,7 +579,7 @@ pending avatar media before profile remote upsert.
 - [ ] Export it through profile barrels up to `lib.barrel.dart`.
 - [ ] Move avatar local save into it.
 - [ ] Move avatar upload into it.
-- [ ] Replace profile avatar path with `StoredMediaPathHelper.profileAvatar`.
+- [ ] Replace profile avatar path with `DecksDirectoryPaths.profileAvatar`.
 - [ ] Replace remote path with `MediaRemotePathHelper.profileAvatar`.
 - [ ] Remove `SyncMediaReference` construction from `AuthController`.
 - [ ] Run targeted analyzer.
@@ -725,7 +725,7 @@ every media field.
 
 ### Path helpers
 
-- [ ] Add `StoredMediaPathHelper`.
+- [ ] Add `DecksDirectoryPaths`.
 - [ ] Add `MediaRemotePathHelper`.
 - [ ] Remove raw local path construction from UI/controller code.
 - [ ] Remove raw remote path construction from sync/profile code.

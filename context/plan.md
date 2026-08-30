@@ -308,7 +308,7 @@ This means a Dart class like `FlashcardTemplate extends CardTemplate` remains us
 - `deck_votes`
 - `deck_vote_reviews`
 - `deck_vote_review_comments`
-- `deck_comments`
+- `comments`
 - `deck_downloads`
 - `deck_favorites`
 - `deck_reports`

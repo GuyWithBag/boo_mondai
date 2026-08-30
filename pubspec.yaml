@@ -70,6 +70,9 @@ dependencies:
   signals: ^7.1.0
   flutter_soloud: ^4.0.12
   fl_chart: ^1.2.0
+  signals_hooks: ^7.1.0
+  cross_file: ^0.3.5+5
+  csv: ^8.0.0
 
 dev_dependencies:
   flutter_test:

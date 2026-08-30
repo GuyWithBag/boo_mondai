@@ -203,7 +203,7 @@ steps:
 
 They only differ in how the stored media is found:
 
-- by `StoredMediaPath`
+- by `StoredMediaFile`
 - by source string (`local:` or remote URL)
 
 This repeated upload pipeline should be in one lower-level helper.
@@ -223,7 +223,7 @@ Then:
 
 ```dart
 SyncMediaReferenceApplier
-  -> resolve by StoredMediaPath
+  -> resolve by StoredMediaFile
   -> StoredMediaUploadService.upload(...)
 
 SyncMediaSourceApplier
@@ -363,10 +363,10 @@ So either:
 
 Current naming implies behavior that does not exist.
 
-### `StoredMediaPath.app`
+### `StoredMediaFile.app`
 
 ```dart
-StoredMediaPath.app(name: 'profileAvatar')
+StoredMediaFile.app(name: 'profileAvatar')
 ```
 
 The name "app" is ambiguous. It means "global/single stored-media namespace",
@@ -375,10 +375,10 @@ not app asset or app-level file.
 Better names:
 
 ```dart
-StoredMediaPath.global(...)
-StoredMediaPath.singleton(...)
-StoredMediaPath.keyed(...)
-StoredMediaPath.named(...)
+StoredMediaFile.global(...)
+StoredMediaFile.singleton(...)
+StoredMediaFile.keyed(...)
+StoredMediaFile.named(...)
 ```
 
 The current `isApp` flag is also vague.
@@ -478,7 +478,7 @@ This is especially relevant if sync eventually supports non-deck contexts.
 Current system has at least two abstractions:
 
 1. `SyncMediaReference<T>`
-   - entity field + known `StoredMediaPath`
+   - entity field + known `StoredMediaFile`
 
 2. source string upload
    - `local:` or remote URL source + inferred `StoredMedia`
@@ -541,7 +541,7 @@ Deck cover and featured images use `FolderPaths`.
 Markdown attachments use ad-hoc paths from UI call sites:
 
 ```dart
-StoredMediaPath.folder(
+StoredMediaFile.folder(
   folderPath: '${deck.title}/media',
   name: FileHelper.fileNameWithoutExtension(file.name),
 )
@@ -550,7 +550,7 @@ StoredMediaPath.folder(
 Profile avatar uses:
 
 ```dart
-StoredMediaPath.app(name: 'profileAvatar')
+StoredMediaFile.app(name: 'profileAvatar')
 ```
 
 This is inconsistent.
@@ -558,16 +558,16 @@ This is inconsistent.
 Recommended shared local path helper:
 
 ```dart
-abstract final class StoredMediaPaths {
-  static StoredMediaPath deckCover(...);
-  static StoredMediaPath deckFeaturedImage(...);
-  static StoredMediaPath deckAttachment(...);
-  static StoredMediaPath cardAttachment(...);
-  static StoredMediaPath profileAvatar(...);
+abstract final class DecksDirectoryPaths {
+  static StoredMediaFile deckCover(...);
+  static StoredMediaFile deckFeaturedImage(...);
+  static StoredMediaFile deckAttachment(...);
+  static StoredMediaFile cardAttachment(...);
+  static StoredMediaFile profileAvatar(...);
 }
 ```
 
-This would remove `StoredMediaPath` construction from UI widgets and controllers.
+This would remove `StoredMediaFile` construction from UI widgets and controllers.
 
 ### The app has no explicit media ownership model
 
@@ -935,7 +935,7 @@ DeckSyncSession
   -> Study/Fsrs sync services
   -> SyncDeletion
   -> StoredMediaService
-  -> StoredMediaPath
+  -> StoredMediaFile
   -> FolderPaths
   -> Bucket repository
   -> Markdown media helper

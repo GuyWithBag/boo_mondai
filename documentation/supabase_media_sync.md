@@ -45,7 +45,7 @@ client.from('deck_listings').select(...)
 Storage bucket access uses `BucketSupabaseRemoteDB` subclasses:
 
 ```dart
-client.storage.from(bucketName).uploadBinary(...)
+client.storage.from(name).uploadBinary(...)
 ```
 
 The bucket repositories live under `lib/core/database/`.
@@ -114,13 +114,13 @@ Important fields:
 
 | Field | Meaning |
 |---|---|
-| `id` | Stable local identifier derived from `StoredMediaPath` and file extension |
+| `id` | Stable local identifier derived from `StoredMediaFile` and file extension |
 | `localPath` | File path on the device |
 | `remoteUrl` | Uploaded Supabase URL/path associated with this local file |
 | `mimeType` | Content type used when uploading |
 | `byteSize` | Stored file size |
 
-`StoredMediaPath` gives feature code a semantic way to identify where local
+`StoredMediaFile` gives feature code a semantic way to identify where local
 media belongs. For deck media, paths come from `FolderPaths`:
 
 ```dart
@@ -181,14 +181,14 @@ Deck image rendering is local-first.
 
 For cover images, `DecksService.getCoverImageUrl` resolves in this order:
 
-1. Local file by deck cover `StoredMediaPath`.
+1. Local file by deck cover `StoredMediaFile`.
 2. Local file associated with `deck.coverImageUrl`.
 3. `deck.coverImageUrl`.
 
 For featured images, `DecksService.getFeaturedImages` resolves in
 this order:
 
-1. Local file by featured-image `StoredMediaPath`.
+1. Local file by featured-image `StoredMediaFile`.
 2. Local file associated with the featured image URL at that index.
 3. The featured image URL at that index.
 4. The deck cover image source.
@@ -205,7 +205,7 @@ Markdown attachments are inserted as `local:{storedMediaId}` references:
 [audio](local:some/stored/audio.mp3)
 ```
 
-`MarkdownHelper.resolveMediaSourceUri` resolves markdown media in this order:
+`MarkdownHelper.resolveAttachmentUrl` resolves markdown media in this order:
 
 1. For `local:` URIs, local file by stored media id.
 2. For remote URLs, local file associated with that remote URL.
@@ -270,7 +270,7 @@ AuthController.updateAvatarImage(...)
 
 The controller:
 
-1. Stores the picked file at `StoredMediaPath.app(name: 'profileAvatar')`.
+1. Stores the picked file at `StoredMediaFile.app(name: 'profileAvatar')`.
 2. Does not keep the old `remoteUrl` on the new local media entry.
 3. Persists the local profile timestamp.
 4. If authenticated, uploads the avatar to `public-media`.
@@ -348,7 +348,7 @@ listings.
 ## Media Source Applier
 
 `SyncMediaSourceApplier` uploads one media source string without requiring a
-known `StoredMediaPath`.
+known `StoredMediaFile`.
 
 It supports:
 
@@ -434,7 +434,7 @@ SyncMediaReferenceApplier.apply<Profile>(...)
 The local path is:
 
 ```dart
-StoredMediaPath.app(name: 'profileAvatar')
+StoredMediaFile.app(name: 'profileAvatar')
 ```
 
 The remote path is:

@@ -115,8 +115,8 @@ abstract final class SomethingHelper {
 Examples:
 
 ```dart
-ImageHelper.isRemoteUrl(...)
-MarkdownHelper.resolveMediaSourceUri(...)
+MediaHelper.isRemoteUrl(...)
+MarkdownHelper.resolveAttachmentUrl(...)
 FileHelper.fileNameWithoutExtension(...)
 ```
 
@@ -565,7 +565,7 @@ If a class exists for a specific purpose, name that purpose:
 ```dart
 DeckSyncSession
 SyncMediaReferenceApplier
-StoredMediaPath
+StoredMediaFile
 CardTemplateMediaSyncPreprocessor
 ```
 
@@ -637,7 +637,7 @@ Avoid:
 
 ```text
 controller -> bucket path construction
-page -> StoredMediaPath construction for domain-owned media
+page -> StoredMediaFile construction for domain-owned media
 db -> controller
 helper -> controller
 model -> db/service

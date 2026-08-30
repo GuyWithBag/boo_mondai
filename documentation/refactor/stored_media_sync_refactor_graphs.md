@@ -62,7 +62,7 @@ flowchart TD
     MarkdownAttach --> StoredMedia
     AvatarPick --> StoredMedia
 
-    StoredMedia --> StoredMediaPath["StoredMediaPath / local id"]
+    StoredMedia --> StoredMediaFile["StoredMediaFile / local id"]
     StoredMedia --> RemoteUrl["StoredMedia.remoteUrl"]
 
     subgraph SyncApply["Sync/apply or profile write"]
@@ -92,7 +92,7 @@ flowchart LR
     RefApplier["SyncMediaReferenceApplier"]
     SourceApplier["SyncMediaSourceApplier"]
 
-    RefResolve["resolve StoredMedia by StoredMediaPath"]
+    RefResolve["resolve StoredMedia by StoredMediaFile"]
     SourceResolve["resolve StoredMedia by local:/remote source"]
 
     ReadFile1["read File(storedMedia.localPath)"]
@@ -114,7 +114,7 @@ flowchart LR
     RefApplier["SyncMediaReferenceApplier"]
     SourceApplier["SyncMediaSourceApplier"]
 
-    RefResolve["resolve by StoredMediaPath"]
+    RefResolve["resolve by StoredMediaFile"]
     SourceResolve["resolve by source string"]
 
     UploadService["StoredMediaUploadService.upload"]
@@ -265,8 +265,8 @@ reads.
 flowchart LR
     subgraph LocalPaths["Current local paths"]
         DeckTitlePath["{deckTitle}/media/..."]
-        ProfileAppPath["StoredMediaPath.app(profileAvatar)"]
-        UiAttachmentPath["UI-created StoredMediaPath.folder(...)"]
+        ProfileAppPath["StoredMediaFile.app(profileAvatar)"]
+        UiAttachmentPath["UI-created StoredMediaFile.folder(...)"]
     end
 
     subgraph RemotePaths["Current remote paths"]
@@ -285,13 +285,13 @@ Preferred helpers:
 
 ```mermaid
 flowchart TD
-    StoredMediaPaths["StoredMediaPaths"]
+    DecksDirectoryPaths["DecksDirectoryPaths"]
     MediaRemotePaths["MediaRemotePaths"]
 
-    StoredMediaPaths --> LocalDeckCover["deckCover(deckId/title)"]
-    StoredMediaPaths --> LocalFeatured["deckFeaturedImage(...)"]
-    StoredMediaPaths --> LocalAttachment["deck/card attachment(...)"]
-    StoredMediaPaths --> LocalAvatar["profileAvatar(...)"]
+    DecksDirectoryPaths --> LocalDeckCover["deckCover(deckId/title)"]
+    DecksDirectoryPaths --> LocalFeatured["deckFeaturedImage(...)"]
+    DecksDirectoryPaths --> LocalAttachment["deck/card attachment(...)"]
+    DecksDirectoryPaths --> LocalAvatar["profileAvatar(...)"]
 
     MediaRemotePaths --> RemoteDeckCover["users/{profileId}/decks/{deckId}/cover"]
     MediaRemotePaths --> RemoteFeatured["users/{profileId}/decks/{deckId}/featured/imageN"]
@@ -404,7 +404,7 @@ flowchart TD
     CardPre --> MediaPaths
     ProfileMedia --> MediaPaths
 
-    DeckPre --> StoredPaths["StoredMediaPaths"]
+    DeckPre --> StoredPaths["DecksDirectoryPaths"]
     ListingPre --> StoredPaths
     ProfileMedia --> StoredPaths
 
@@ -435,7 +435,7 @@ gantt
     axisFormat %s
 
     section Phase 1
-    Extract MediaRemotePaths and StoredMediaPaths      :p1, 0, 1
+    Extract MediaRemotePaths and DecksDirectoryPaths      :p1, 0, 1
 
     section Phase 2
     Extract StoredMediaUploadService                  :p2, after p1, 1
