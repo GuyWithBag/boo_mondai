@@ -12,10 +12,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         StreakLocalDB,
         ProfileLocalDB,
         CachedProfileLocalDB,
-        ImportExportBackupsLocalDB,
         UserSettingsLocalDB,
         ProgressCheckpointLocalDB,
-        StoredMediasLocalDB,
         SyncClientLocalDB,
         SyncDeletionLocalDB,
         TagLocalDB,
@@ -24,7 +22,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         UserStudyCardTagsLocalDB,
         StudySessionFlowsLocalDB,
         StudySessionStepRecordsLocalDB,
-        SurveyResponsesLocalDB;
+        SurveyResponsesLocalDB,
+        CachedMediasLocalDB;
 
 class LocalDB {
   static late final DecksLocalDB deck;
@@ -40,10 +39,8 @@ class LocalDB {
   static late final StreakLocalDB streak;
   static late final ProfileLocalDB profile;
   static late final CachedProfileLocalDB cachedProfile;
-  static late final ImportExportBackupsLocalDB importExportBackup;
   static late final UserSettingsLocalDB userSettings;
   static late final ProgressCheckpointLocalDB progressCheckpoint;
-  static late final StoredMediasLocalDB storedMedia;
   static late final SyncClientLocalDB syncClient;
   static late final SyncDeletionLocalDB syncDeletion;
   static late final TagLocalDB tag;
@@ -53,6 +50,7 @@ class LocalDB {
   static late final StudySessionFlowsLocalDB studySessionFlow;
   static late final StudySessionStepRecordsLocalDB studySessionStepRecord;
   static late final SurveyResponsesLocalDB surveyResponse;
+  static late final CachedMediasLocalDB cachedMedias;
 
   static Future<void> init() async {
     profile = await ProfileLocalDB().init() as ProfileLocalDB;
@@ -68,12 +66,10 @@ class LocalDB {
     reviewLog = await ReviewLogsLocalDB().init() as ReviewLogsLocalDB;
     drillAnswer = await DrillAnswersLocalDB().init() as DrillAnswersLocalDB;
     streak = await StreakLocalDB().init() as StreakLocalDB;
-    importExportBackup =
-        await ImportExportBackupsLocalDB().init() as ImportExportBackupsLocalDB;
+
     userSettings = await UserSettingsLocalDB().init() as UserSettingsLocalDB;
     progressCheckpoint =
         await ProgressCheckpointLocalDB().init() as ProgressCheckpointLocalDB;
-    storedMedia = await StoredMediasLocalDB().init() as StoredMediasLocalDB;
     syncClient = await SyncClientLocalDB().init() as SyncClientLocalDB;
     syncDeletion = await SyncDeletionLocalDB().init() as SyncDeletionLocalDB;
     tag = await TagLocalDB().init() as TagLocalDB;
@@ -88,6 +84,7 @@ class LocalDB {
         await StudySessionStepRecordsLocalDB().init()
             as StudySessionStepRecordsLocalDB;
     surveyResponse = await SurveyResponsesLocalDB().init();
+    cachedMedias = await CachedMediasLocalDB().init() as CachedMediasLocalDB;
   }
 
   static Future<void> clearAll() async {
@@ -100,10 +97,8 @@ class LocalDB {
     await drillAnswer.clear();
     await reviewLog.clear();
     await streak.clear();
-    await importExportBackup.clear();
     await userSettings.clear();
     await progressCheckpoint.clear();
-    await storedMedia.clear();
     await syncClient.clear();
     await syncDeletion.clear();
     await tag.clear();
@@ -115,6 +110,7 @@ class LocalDB {
     await surveyResponse.clear();
     await cachedProfile.clear();
     await profile.clear();
+    await cachedMedias.clear();
     profile.getOrCreate();
   }
 }

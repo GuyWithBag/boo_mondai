@@ -5,14 +5,12 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/core/database/bucket_supabase.remote.db.dart';
-import 'package:boo_mondai/env.dart';
-import 'package:flutter/foundation.dart';
+import 'package:boo_mondai/lib.barrel.dart' show Env, BucketSupabaseRemoteDB;
 import 'package:supabase_flutter/supabase_flutter.dart' show SignedUrlResult;
 
 class PrivateBucketRemoteDB extends BucketSupabaseRemoteDB {
   @override
-  String get bucketName => Env.privateMediaBucket;
+  String get name => Env.privateMediaBucket;
 
   @override
   bool get isPublic => false;
@@ -20,7 +18,7 @@ class PrivateBucketRemoteDB extends BucketSupabaseRemoteDB {
   Future<String> createSignedUrl(String path, {int expiresInSeconds = 3600}) =>
       guard(() {
         return client.storage
-            .from(bucketName)
+            .from(name)
             .createSignedUrl(path, expiresInSeconds);
       }, action: 'createSignedUrl($path)');
 
@@ -29,32 +27,7 @@ class PrivateBucketRemoteDB extends BucketSupabaseRemoteDB {
     int expiresInSeconds = 3600,
   }) => guard(() {
     return client.storage
-        .from(bucketName)
+        .from(name)
         .createSignedUrlsResult(paths, expiresInSeconds);
   }, action: 'createSignedUrls(${paths.length} files)');
-
-  /// Uploads private media and returns the storage path.
-  ///
-  /// Private buckets should store paths in Postgres and generate signed URLs
-  /// only when displaying/downloading the media.
-  @override
-  Future<String> uploadBytes(
-    String path,
-    Uint8List bytes, {
-    String? contentType,
-    bool upsert = false,
-  }) => uploadBytesToBucket(
-    path,
-    bytes,
-    contentType: contentType,
-    upsert: upsert,
-  );
-
-  @override
-  Future<String> uploadImage(
-    String path,
-    Uint8List bytes, {
-    String? contentType,
-    bool upsert = false,
-  }) => uploadBytes(path, bytes, contentType: contentType, upsert: upsert);
 }

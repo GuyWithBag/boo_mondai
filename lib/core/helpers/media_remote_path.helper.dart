@@ -1,5 +1,3 @@
-import 'package:boo_mondai/lib.barrel.dart' show StoredMedia;
-
 abstract final class MediaRemotePathHelper {
   /// Returns the public bucket object path for a deck cover image.
   ///
@@ -58,8 +56,8 @@ abstract final class MediaRemotePathHelper {
     return 'users/$profileId/profile/avatar';
   }
 
-  static String fileNameFromStoredMedia(StoredMedia storedMedia, int index) {
-    final uri = Uri.file(storedMedia.localPath);
+  static String fileNameFromLocalPath(String localPath, int index) {
+    final uri = Uri.file(localPath);
     final fileName = uri.pathSegments.isEmpty ? '' : uri.pathSegments.last;
     return fileName.trim().isEmpty ? 'media$index' : fileName;
   }

@@ -1850,61 +1850,6 @@ class UserStudyCardTagAdapter extends TypeAdapter<UserStudyCardTag> {
           typeId == other.typeId;
 }
 
-class ImportExportBackupAdapter extends TypeAdapter<ImportExportBackup> {
-  @override
-  final typeId = 36;
-
-  @override
-  ImportExportBackup read(BinaryReader reader) {
-    final numOfFields = reader.readByte();
-    final fields = <int, dynamic>{
-      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
-    };
-    return ImportExportBackup(
-      id: fields[0] as String,
-      operation: fields[1] as String,
-      type: fields[2] as String,
-      entityId: fields[3] as String?,
-      title: fields[4] as String,
-      payloadJson: fields[5] as String,
-      changeLogsJson: fields[6] as String,
-      createdAt: fields[7] as DateTime,
-    );
-  }
-
-  @override
-  void write(BinaryWriter writer, ImportExportBackup obj) {
-    writer
-      ..writeByte(8)
-      ..writeByte(0)
-      ..write(obj.id)
-      ..writeByte(1)
-      ..write(obj.operation)
-      ..writeByte(2)
-      ..write(obj.type)
-      ..writeByte(3)
-      ..write(obj.entityId)
-      ..writeByte(4)
-      ..write(obj.title)
-      ..writeByte(5)
-      ..write(obj.payloadJson)
-      ..writeByte(6)
-      ..write(obj.changeLogsJson)
-      ..writeByte(7)
-      ..write(obj.createdAt);
-  }
-
-  @override
-  int get hashCode => typeId.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ImportExportBackupAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
-}
-
 class UserSettingsAdapter extends TypeAdapter<UserSettings> {
   @override
   final typeId = 37;
@@ -2394,58 +2339,6 @@ class StudySessionStepRecordAdapter
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is StudySessionStepRecordAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
-}
-
-class StoredMediaAdapter extends TypeAdapter<StoredMedia> {
-  @override
-  final typeId = 51;
-
-  @override
-  StoredMedia read(BinaryReader reader) {
-    final numOfFields = reader.readByte();
-    final fields = <int, dynamic>{
-      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
-    };
-    return StoredMedia(
-      id: fields[0] as String,
-      localPath: fields[1] as String,
-      remoteUrl: fields[2] as String?,
-      mimeType: fields[3] as String?,
-      byteSize: (fields[4] as num?)?.toInt(),
-      createdAt: fields[5] as DateTime,
-      updatedAt: fields[6] as DateTime,
-    );
-  }
-
-  @override
-  void write(BinaryWriter writer, StoredMedia obj) {
-    writer
-      ..writeByte(7)
-      ..writeByte(0)
-      ..write(obj.id)
-      ..writeByte(1)
-      ..write(obj.localPath)
-      ..writeByte(2)
-      ..write(obj.remoteUrl)
-      ..writeByte(3)
-      ..write(obj.mimeType)
-      ..writeByte(4)
-      ..write(obj.byteSize)
-      ..writeByte(5)
-      ..write(obj.createdAt)
-      ..writeByte(6)
-      ..write(obj.updatedAt);
-  }
-
-  @override
-  int get hashCode => typeId.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is StoredMediaAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

@@ -16,14 +16,7 @@ class ProfilesRemoteDB extends SupabaseRemoteDB<Profile> {
   Profile Function(Map<String, dynamic>) get fromMap => ProfileMapper.fromMap;
 
   @override
-  Map<String, dynamic> toMap(Profile item) {
-    final map = item.toMap();
-    final avatarUrl = item.avatarUrl;
-    if (avatarUrl != null && !ImageHelper.isRemoteUrl(avatarUrl)) {
-      map['avatar_url'] = null;
-    }
-    return map;
-  }
+  Map<String, dynamic> toMap(Profile item) => item.toMap();
 
   @override
   Map<String, Object?> primaryKeyFromItem(Profile item) => {'id': item.id};
@@ -34,6 +27,6 @@ class ProfilesRemoteDB extends SupabaseRemoteDB<Profile> {
   @override
   bool get supportsSoftDelete => true;
 
-  Future<Profile?> selectByAuthUserId(String authUserId) =>
-      selectOne(filters: {'profile_id': authUserId});
+  Future<Profile?> selectByUserId(String userId) =>
+      selectOne(filters: {'user_id': userId});
 }

@@ -11,7 +11,6 @@ library;
 import 'package:boo_mondai/lib.barrel.dart'
     show
         CachedProfile,
-        CardTemplate,
         CardTemplateTag,
         CardType,
         CasingType,
@@ -27,8 +26,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         FsrsReviewLog,
         IdentificationAnswer,
         IdentificationTemplate,
-        ImportExportBackup,
-        StoredMedia,
         SyncDeletion,
         MatchMadnessPair,
         MatchMadnessTemplate,
@@ -42,7 +39,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         ReviewSession,
         SessionFlowSnapshot,
         PendingStepSubmission,
-        SessionStep,
         CardSessionStep,
         MessageSessionStep,
         SummarySessionStep,
@@ -55,7 +51,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         UserSettings,
         UserStudyCardTag,
         VisibilityState,
-        WordScrambleTemplate;
+        WordScrambleTemplate,
+        CardTemplate,
+        SessionStep;
 import 'package:fsrs/fsrs.dart';
 import 'package:hive_ce/hive_ce.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -102,12 +100,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
   AdapterSpec<DeckTag>(),
   AdapterSpec<CardTemplateTag>(),
   AdapterSpec<UserStudyCardTag>(),
-  AdapterSpec<ImportExportBackup>(),
   AdapterSpec<UserSettings>(),
   AdapterSpec<ProgressCheckpoint>(),
   AdapterSpec<ProgressCheckpointType>(),
   AdapterSpec<ProgressCheckpointStatus>(),
-  AdapterSpec<StoredMedia>(),
   AdapterSpec<SyncDeletion>(),
   AdapterSpec<SyncClient>(),
 ])

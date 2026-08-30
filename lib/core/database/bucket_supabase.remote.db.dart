@@ -23,7 +23,7 @@ abstract class BucketSupabaseRemoteDB {
   SupabaseClient get client => Supabase.instance.client;
 
   /// Supabase Storage bucket name.
-  String get bucketName;
+  String get name;
 
   /// Whether files in this bucket are expected to be publicly readable.
   bool get isPublic;
@@ -79,7 +79,7 @@ abstract class BucketSupabaseRemoteDB {
     if (!kDebugMode) return;
     developer.log(
       message,
-      name: 'SupabaseBucket[$bucketName]',
+      name: 'SupabaseBucket[$name]',
       error: error,
       stackTrace: stackTrace,
     );
@@ -107,42 +107,26 @@ abstract class BucketSupabaseRemoteDB {
         message.contains('SocketException');
   }
 
-  // ── Bucket Operations ───────────────────────────────────
-
   Future<String> uploadBytes(
-    String path,
-    Uint8List bytes, {
-    String? contentType,
-    bool upsert = false,
-  });
-
-  Future<String> uploadImage(
-    String path,
-    Uint8List bytes, {
-    String? contentType,
-    bool upsert = false,
-  }) => uploadBytes(path, bytes, contentType: contentType, upsert: upsert);
-
-  Future<String> uploadBytesToBucket(
     String path,
     Uint8List bytes, {
     String? contentType,
     bool upsert = false,
   }) => guard(() async {
     await client.storage
-        .from(bucketName)
+        .from(name)
         .uploadBinary(
           path,
           bytes,
           fileOptions: FileOptions(contentType: contentType, upsert: upsert),
         );
-    return path;
+    return client.storage.from(name).getPublicUrl(path);
   }, action: 'uploadBytes($path, ${bytes.length} bytes)');
 
   Future<void> deleteFile(String path) => deleteFiles([path]);
 
   Future<void> deleteFiles(List<String> paths) => guard(() async {
     if (paths.isEmpty) return;
-    await client.storage.from(bucketName).remove(paths);
+    await client.storage.from(name).remove(paths);
   }, action: 'deleteFiles(${paths.length} files)');
 }

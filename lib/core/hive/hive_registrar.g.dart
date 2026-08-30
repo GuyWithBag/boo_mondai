@@ -25,7 +25,6 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(FsrsReviewLogAdapter());
     registerAdapter(IdentificationAnswerAdapter());
     registerAdapter(IdentificationTemplateAdapter());
-    registerAdapter(ImportExportBackupAdapter());
     registerAdapter(MatchMadnessPairAdapter());
     registerAdapter(MatchMadnessTemplateAdapter());
     registerAdapter(MessageSessionStepAdapter());
@@ -42,7 +41,6 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(ReviewSessionAdapter());
     registerAdapter(SessionFlowSnapshotAdapter());
     registerAdapter(StateAdapter());
-    registerAdapter(StoredMediaAdapter());
     registerAdapter(StreakAdapter());
     registerAdapter(StudyCardAdapter());
     registerAdapter(StudyRatingAdapter());
@@ -79,7 +77,6 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(FsrsReviewLogAdapter());
     registerAdapter(IdentificationAnswerAdapter());
     registerAdapter(IdentificationTemplateAdapter());
-    registerAdapter(ImportExportBackupAdapter());
     registerAdapter(MatchMadnessPairAdapter());
     registerAdapter(MatchMadnessTemplateAdapter());
     registerAdapter(MessageSessionStepAdapter());
@@ -96,7 +93,6 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(ReviewSessionAdapter());
     registerAdapter(SessionFlowSnapshotAdapter());
     registerAdapter(StateAdapter());
-    registerAdapter(StoredMediaAdapter());
     registerAdapter(StreakAdapter());
     registerAdapter(StudyCardAdapter());
     registerAdapter(StudyRatingAdapter());

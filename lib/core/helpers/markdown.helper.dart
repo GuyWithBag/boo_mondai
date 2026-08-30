@@ -1,12 +1,5 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show
-        AppTokens,
-        ImageHelper,
-        MediaHelper,
-        StoredMediaKind,
-        StoredMediaPath,
-        StoredMediaService,
-        StringHelper;
+    show AppTokens, MediaHelper, StringHelper;
 import 'package:file_picker/file_picker.dart' show PlatformFile;
 import 'package:flutter/material.dart'
     show
@@ -25,26 +18,21 @@ import 'package:flutter_markdown_plus/flutter_markdown_plus.dart'
 import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
 
 abstract class MarkdownHelper {
-  static String? resolveMediaSourceUri(Uri uri) {
+  static String? resolveAttachmentUrl(Uri uri) {
     final source = uri.toString().trim();
     if (source.isEmpty) return null;
 
+    if (uri.path.isEmpty) return null;
+
     if (uri.scheme == 'local') {
-      final id = uri.path.isNotEmpty ? uri.path : uri.host;
-      return StoredMediaService.getFileById(id)?.path;
+      return uri.path;
     }
 
-    final normalizedSource = normalizeMediaSource(source);
-    if (ImageHelper.isRemoteUrl(normalizedSource)) {
-      return StoredMediaService.getFileByRemoteUrl(normalizedSource)?.path ??
-          normalizedSource;
-    }
-
-    return normalizedSource;
+    return source;
   }
 
   static String normalizeMediaSource(String source) {
-    if (ImageHelper.isRemoteUrl(source)) return source;
+    if (MediaHelper.isRemoteUrl(source)) return source;
 
     final trimmed = source.trim();
     final uri = Uri.tryParse(trimmed);
@@ -58,31 +46,21 @@ abstract class MarkdownHelper {
     return trimmed;
   }
 
-  static Future<String?> toPickedFileMediaMarkdownFormat({
-    required StoredMediaPath path,
+  static Future<String?> fromFileToViewFileSyntax({
+    required String path,
     required PlatformFile file,
-    String? remoteUrl,
   }) async {
-    final storedMedia = await StoredMediaService.storeFile(
-      path: path,
-      file: file,
-      remoteUrl: remoteUrl,
-    );
-    if (storedMedia == null) return null;
+    // final localPath = await FileSystemHandler.storeFile(path: path, file: file);
 
-    final source = 'local:${storedMedia.id}';
-    final mimeType = MediaHelper.mimeTypeFromExtension(file.extension);
-    final mediaKind = MediaHelper.kindFromMimeType(mimeType);
-    return switch (mediaKind) {
-      StoredMediaKind.image || StoredMediaKind.audio => toMediaAttachmentFormat(
-        label: file.name,
-        source: source,
-      ),
-      _ => toLinkFormat(label: file.name, source: source),
-    };
+    final newLocalPath = toLocalUri(path).toString();
+    return toViewLinkSyntax(label: file.name, source: newLocalPath);
   }
 
-  static String toMediaAttachmentFormat({
+  static Uri toLocalUri(String path) {
+    return Uri.parse('local:$path');
+  }
+
+  static String toViewLinkSyntax({
     required String label,
     required String source,
   }) {
@@ -90,7 +68,7 @@ abstract class MarkdownHelper {
     return '![$safeLabel]($source)';
   }
 
-  static String toLinkFormat({required String label, required String source}) {
+  static String toLinkSyntax({required String label, required String source}) {
     final safeLabel = label.replaceAll(RegExp(r'[\]\r\n]'), ' ');
     return '[$safeLabel]($source)';
   }

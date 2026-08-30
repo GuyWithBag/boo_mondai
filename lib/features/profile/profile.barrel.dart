@@ -6,5 +6,4 @@ export 'models/models.barrel.dart';
 export 'cached_profile.local.db.dart';
 export 'profiles.local.db.dart';
 export 'profiles.remote.db.dart';
-export 'profile_media.service.dart';
 export 'profile.service.dart';

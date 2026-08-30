@@ -5,13 +5,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         ProfilesRemoteDB,
         DecksRemoteDB,
         DeckListingsRemoteDB,
-        DeckInteractionsRemoteDB,
-        DeckCommentsRemoteDB,
-        DeckCommentEditLogsRemoteDB,
-        DeckVoteReviewsRemoteDB,
-        DeckVoteReviewEditLogsRemoteDB,
-        DeckVoteReviewCommentsRemoteDB,
-        DeckVoteReviewCommentEditLogsRemoteDB,
+        CommentsRemoteDB,
+        CommentEditLogsRemoteDB,
+        ReviewsRemoteDB,
+        ReviewEditLogsRemoteDB,
+        ReviewCommentsRemoteDB,
+        ReviewCommentEditLogsRemoteDB,
         UserSettingsRemoteDB,
         ReviewSessionsRemoteDB,
         DrillAnswersRemoteDB,
@@ -32,21 +31,23 @@ import 'package:boo_mondai/lib.barrel.dart'
         SurveyBlocksRemoteDB,
         SurveyBlockOptionsRemoteDB,
         SurveyAssignmentsRemoteDB,
-        SurveyResponsesRemoteDB;
+        SurveyResponsesRemoteDB,
+        VotesRemoteDB,
+        DeckFavoritesRemoteDB;
 
 class RemoteDB {
   // ── Remote Data Sources ──────────────────────────
   static late final ProfilesRemoteDB profile;
   static late final DecksRemoteDB deck;
   static late final DeckListingsRemoteDB deckListing;
-  static late final DeckInteractionsRemoteDB deckInteractions;
-  static late final DeckCommentsRemoteDB deckComment;
-  static late final DeckCommentEditLogsRemoteDB deckCommentEditLog;
-  static late final DeckVoteReviewsRemoteDB deckVoteReview;
-  static late final DeckVoteReviewEditLogsRemoteDB deckVoteReviewEditLog;
-  static late final DeckVoteReviewCommentsRemoteDB deckVoteReviewComment;
-  static late final DeckVoteReviewCommentEditLogsRemoteDB
-  deckVoteReviewCommentEditLog;
+  static late final VotesRemoteDB deckVotes;
+  static late final DeckFavoritesRemoteDB deckFavorites;
+  static late final CommentsRemoteDB deckComment;
+  static late final CommentEditLogsRemoteDB deckCommentEditLog;
+  static late final ReviewsRemoteDB deckVoteReview;
+  static late final ReviewEditLogsRemoteDB deckVoteReviewEditLog;
+  static late final ReviewCommentsRemoteDB deckVoteReviewComment;
+  static late final ReviewCommentEditLogsRemoteDB deckVoteReviewCommentEditLog;
   static late final UserSettingsRemoteDB userSettings;
   static late final CardTemplatesRemoteDB card;
   static late final StudyCardsRemoteDB studyCard;
@@ -75,13 +76,14 @@ class RemoteDB {
     profile = ProfilesRemoteDB();
     deck = DecksRemoteDB();
     deckListing = DeckListingsRemoteDB();
-    deckInteractions = DeckInteractionsRemoteDB();
-    deckComment = DeckCommentsRemoteDB();
-    deckCommentEditLog = DeckCommentEditLogsRemoteDB();
-    deckVoteReview = DeckVoteReviewsRemoteDB();
-    deckVoteReviewEditLog = DeckVoteReviewEditLogsRemoteDB();
-    deckVoteReviewComment = DeckVoteReviewCommentsRemoteDB();
-    deckVoteReviewCommentEditLog = DeckVoteReviewCommentEditLogsRemoteDB();
+    deckVotes = VotesRemoteDB();
+    deckFavorites = DeckFavoritesRemoteDB();
+    deckComment = CommentsRemoteDB();
+    deckCommentEditLog = CommentEditLogsRemoteDB();
+    deckVoteReview = ReviewsRemoteDB();
+    deckVoteReviewEditLog = ReviewEditLogsRemoteDB();
+    deckVoteReviewComment = ReviewCommentsRemoteDB();
+    deckVoteReviewCommentEditLog = ReviewCommentEditLogsRemoteDB();
     userSettings = UserSettingsRemoteDB();
     card = CardTemplatesRemoteDB();
     studyCard = StudyCardsRemoteDB();

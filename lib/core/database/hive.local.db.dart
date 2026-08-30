@@ -169,8 +169,6 @@ abstract class HiveLocalDB<T> {
     await box.putAll(map);
   }, action: 'upsertMany(${items.length} items)');
 
-  Future<void> update(T item) => upsert(item);
-
   Future<void> delete(T item) => deleteByPk(primaryKeyFromItem(item));
 
   Future<void> deleteByPk(HivePrimaryKey primaryKey) => guard(

@@ -669,26 +669,6 @@ types:
         index: 2
       profileId:
         index: 3
-  ImportExportBackup:
-    typeId: 36
-    nextIndex: 8
-    fields:
-      id:
-        index: 0
-      operation:
-        index: 1
-      type:
-        index: 2
-      entityId:
-        index: 3
-      title:
-        index: 4
-      payloadJson:
-        index: 5
-      changeLogsJson:
-        index: 6
-      createdAt:
-        index: 7
   UserSettings:
     typeId: 37
     nextIndex: 6
@@ -845,24 +825,6 @@ types:
         index: 10
       fsrsReviewLogId:
         index: 11
-  StoredMedia:
-    typeId: 51
-    nextIndex: 7
-    fields:
-      id:
-        index: 0
-      localPath:
-        index: 1
-      remoteUrl:
-        index: 2
-      mimeType:
-        index: 3
-      byteSize:
-        index: 4
-      createdAt:
-        index: 5
-      updatedAt:
-        index: 6
   SyncDeletion:
     typeId: 52
     nextIndex: 9

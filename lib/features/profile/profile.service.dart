@@ -1,44 +1,62 @@
+import 'dart:typed_data';
+
 import 'package:boo_mondai/lib.barrel.dart'
-    show AuthService, LocalDB, Profile, ProfileMediaService, RemoteDB;
-import 'package:file_picker/file_picker.dart' show PlatformFile;
+    show
+        AuthService,
+        LocalDB,
+        RemoteDB,
+        CachedMedia,
+        MediaHelper,
+        CachedMediaService;
+import 'package:flutter/material.dart';
+import 'package:signals/signals_flutter.dart';
 
 abstract final class ProfileService {
-  static Profile getCurrentProfile() => LocalDB.profile.getOrCreate();
+  static final bucketPathProfileAvatar = 'profileAvatar';
 
-  static Future<void> updateDisplayName(String displayName) async {
+  static final currentProfile = signal(LocalDB.profile.getOrCreate());
+  static final profileEffect = Effect(() {
+    LocalDB.profile.upsert(currentProfile.value);
+
+    if (!AuthService.isAuthenticatedRemote) return;
+    // if (RemoteDB.profile.selectByUserId())
+    RemoteDB.profile.upsert(currentProfile.value);
+  });
+
+  static Future<void> upsertDisplayName(String displayName) async {
     final trimmed = displayName.trim();
     if (trimmed.isEmpty) return;
 
-    final profile = getCurrentProfile();
-    final updated = profile.copyWith(
-      displayName: trimmed,
+    currentProfile.value = currentProfile.value.copyWith(
+      displayName: displayName,
       updatedAt: DateTime.now(),
     );
-    await LocalDB.profile.upsert(updated);
-
-    if (AuthService.isAuthenticatedRemote) {
-      await RemoteDB.profile.upsert(
-        await ProfileMediaService.uploadAvatarIfNeeded(
-          profile: updated,
-          bucket: RemoteDB.publicBucket,
-        ),
-      );
-    }
   }
 
-  static Future<void> updateAvatarImage(PlatformFile file) async {
-    var updated = await ProfileMediaService.saveAvatarImage(
-      profile: getCurrentProfile(),
-      file: file,
+  static Future<void> getAvatar(Function(ImageProvider? image) response) async {
+    await CachedMediaService.getLocalFirstMedia(
+      response: response,
+      path: bucketPathProfileAvatar,
     );
-    if (updated == null) return;
+  }
 
-    if (AuthService.isAuthenticatedRemote) {
-      updated = await ProfileMediaService.uploadAvatarIfNeeded(
-        profile: updated,
-        bucket: RemoteDB.publicBucket,
-      );
-      await RemoteDB.profile.upsert(updated);
-    }
+  static Future<void> upsertAvatar(Uint8List bytes) async {
+    final cachedMedia = CachedMedia(
+      bytes: bytes,
+      path: ProfileService.bucketPathProfileAvatar,
+      profileId: currentProfile.value.id,
+    );
+
+    LocalDB.cachedMedias.upsert(cachedMedia);
+    final remoteUrl = await RemoteDB.publicBucket.uploadBytes(
+      ProfileService.bucketPathProfileAvatar,
+      bytes,
+    );
+    final updatedProfile = currentProfile.value.copyWith(
+      updatedAt: DateTime.now(),
+      avatarUrl: remoteUrl,
+    );
+
+    currentProfile.value = updatedProfile;
   }
 }

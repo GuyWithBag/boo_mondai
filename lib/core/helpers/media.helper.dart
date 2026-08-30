@@ -1,3 +1,8 @@
+import 'dart:typed_data';
+
+import 'package:boo_mondai/core/helpers/file.helper.dart';
+import 'package:http/http.dart' as http;
+
 enum StoredMediaKind { image, audio, video, unknown }
 
 abstract final class MediaHelper {
@@ -83,10 +88,36 @@ abstract final class MediaHelper {
   }
 
   static StoredMediaKind kindFromSource(String source) {
-    final uri = Uri.tryParse(source.trim());
-    final path = uri?.path.trim().isNotEmpty == true ? uri!.path : source;
-    final extension = path.contains('.') ? path.split('.').last : null;
-    return kindFromExtension(extension);
+    return kindFromExtension(FileHelper.getExtension(source));
+  }
+
+  static bool isImage(String filePath) =>
+      imageExtensions.contains(FileHelper.getExtension(filePath));
+
+  static bool isAudio(String filePath) =>
+      audioExtensions.contains(FileHelper.getExtension(filePath));
+
+  static bool isVideo(String filePath) =>
+      videoExtensions.contains(FileHelper.getExtension(filePath));
+
+  static bool isRemoteUrl(String value) {
+    final uri = Uri.tryParse(value.trim());
+    return uri != null && (uri.scheme == 'http' || uri.scheme == 'https');
+  }
+
+  Future<Uint8List?> getBytesFromUrl(String? url) async {
+    if (url == null || url.isEmpty) return null;
+
+    final uri = Uri.tryParse(url);
+    if (uri == null) return null;
+
+    final response = await http.get(uri);
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      return null;
+    }
+
+    return response.bodyBytes;
   }
 
   static bool isImageMimeType(String? mimeType) =>
