@@ -16,4 +16,8 @@ class IdentificationAnswerData with IdentificationAnswerDataMappable {
     required this.answer,
     this.casingType = CasingType.any,
   });
+
+  factory IdentificationAnswerData.createDummy() {
+    return const IdentificationAnswerData(answer: '');
+  }
 }

@@ -11,7 +11,6 @@ import 'package:boo_mondai/features/cards/models/match_madness_pair.dto.dart';
 import 'package:boo_mondai/features/cards/models/match_madness_template.dto.dart';
 import 'package:boo_mondai/features/cards/models/match_pair_data.dto.dart';
 import 'package:boo_mondai/features/cards/models/multiple_choice_option.dto.dart';
-import 'package:boo_mondai/features/cards/models/multiple_choice_option_data.dto.dart';
 import 'package:boo_mondai/features/cards/models/multiple_choice_template.dto.dart';
 import 'package:boo_mondai/features/cards/models/word_scramble_template.dart';
 import 'package:boo_mondai/features/decks/models/deck.dto.dart';
@@ -147,15 +146,9 @@ class CardTemplateDraftFormAdapter implements DraftFormAdapter<CardTemplate> {
         formState.verticallyCentered.value = m.verticallyCentered;
         formState.frontController.text = m.questionPrompt;
         formState.multipleChoiceOptions.value = m.options.isNotEmpty
-            ? m.options
-                  .map(
-                    (option) => MultipleChoiceOptionData(
-                      text: option.optionText,
-                      isCorrect: option.isCorrect,
-                    ),
-                  )
-                  .toList()
-            : [...defaultMultipleChoiceOptions];
+            ? (m.options.toList()
+                ..sort((a, b) => a.displayOrder.compareTo(b.displayOrder)))
+            : defaultMultipleChoiceOptions(m.id);
         break;
 
       case FillInTheBlanksTemplate fb:
@@ -310,20 +303,7 @@ class CardTemplateDraftFormAdapter implements DraftFormAdapter<CardTemplate> {
         updatedAt: now,
         questionPrompt: '',
         verticallyCentered: formState.verticallyCentered.value,
-        options: [
-          for (
-            var index = 0;
-            index < defaultMultipleChoiceOptions.length;
-            index++
-          )
-            MultipleChoiceOption(
-              id: uuid.v7(),
-              templateId: id,
-              optionText: defaultMultipleChoiceOptions[index].text,
-              isCorrect: defaultMultipleChoiceOptions[index].isCorrect,
-              displayOrder: index,
-            ),
-        ],
+        options: [...defaultMultipleChoiceOptions(id)],
       ),
       QuestionType.fillInTheBlanks => FillInTheBlanksTemplate(
         id: id,
@@ -373,14 +353,14 @@ class CardTemplateDraftFormAdapter implements DraftFormAdapter<CardTemplate> {
   }
 
   List<MultipleChoiceOption> _buildOptions(String templateId) {
-    final tuples = formState.multipleChoiceOptions.value;
+    final options = formState.multipleChoiceOptions.value;
     return List.generate(
-      tuples.length,
+      options.length,
       (index) => MultipleChoiceOption(
-        id: uuid.v7(),
+        id: options[index].id,
         templateId: templateId,
-        optionText: tuples[index].text,
-        isCorrect: tuples[index].isCorrect,
+        optionText: options[index].optionText.trim(),
+        isCorrect: options[index].isCorrect,
         displayOrder: index,
       ),
     );

@@ -8,4 +8,8 @@ class MatchPairData with MatchPairDataMappable {
   final String match;
 
   const MatchPairData({required this.term, required this.match});
+
+  factory MatchPairData.createDummy() {
+    return const MatchPairData(term: '', match: '');
+  }
 }

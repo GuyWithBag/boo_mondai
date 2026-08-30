@@ -17,7 +17,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         MarkdownText,
         MarkdownTextMode,
         usePhysicalCardController,
-        PhysicalCardController;
+        PhysicalCardController,
+        MarkdownHelper;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -104,7 +105,7 @@ class MultipleChoiceCard extends HookWidget {
                   mode: MarkdownTextMode.previewSelectable,
                   baseTextStyle: markdownTextStyle,
                   contentScale: contentScale,
-                  resolveAttachmentUrl: template.resolveAttachmentUrl,
+                  resolveAttachmentUrl: MarkdownHelper.resolveAttachmentUrl,
                 ),
               ],
             ),
@@ -135,7 +136,8 @@ class MultipleChoiceCard extends HookWidget {
                         mode: MarkdownTextMode.previewSelectable,
                         baseTextStyle: markdownTextStyle,
                         contentScale: contentScale,
-                        resolveAttachmentUrl: template.resolveAttachmentUrl,
+                        resolveAttachmentUrl:
+                            MarkdownHelper.resolveAttachmentUrl,
                       ),
                     ),
                   ),

@@ -5,6 +5,7 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/core/services/uuid.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 
 part 'match_madness_pair.dto.mapper.dart';
@@ -33,4 +34,18 @@ class MatchMadnessPair with MatchMadnessPairMappable {
     this.isAutoPicked = false, // Default applied here instead of fromJson
     this.displayOrder = 0, // Default applied here instead of fromJson
   });
+
+  factory MatchMadnessPair.createDummy({
+    String? id,
+    String templateId = '',
+    int displayOrder = 0,
+  }) {
+    return MatchMadnessPair(
+      id: id ?? uuid.v7(),
+      templateId: templateId,
+      term: '',
+      match: '',
+      displayOrder: displayOrder,
+    );
+  }
 }

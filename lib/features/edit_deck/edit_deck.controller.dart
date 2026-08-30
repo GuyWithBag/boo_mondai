@@ -3,6 +3,8 @@
 // PURPOSE: Manages the working copy of a Deck, CardTemplates, and Editor Form State
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'dart:io';
+
 import 'package:boo_mondai/lib.barrel.dart'
     show
         Controller,
@@ -14,7 +16,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         EditDeckQuestionTypeHelper,
         CardTemplateDraftFormAdapter,
         DraftFormSession,
-        EditDeckService;
+        EditDeckService,
+        DecksDirectoryPaths;
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart' show TextEditingController;
 
 import 'package:flutter_hooks/flutter_hooks.dart'
@@ -84,6 +88,16 @@ class EditDeckController extends Controller {
           formState.cardType.value,
         );
     notifyListeners();
+  }
+
+  // ToDo: review this.
+  String? createAttachmentPath(PlatformFile file) {
+    if (deck == null || activeTemplateId == null) return null;
+
+    return DecksDirectoryPaths.attachment(
+      deckTitle: deck!.title,
+      fileNameWithoutExtension: file.name,
+    );
   }
 
   void ensureVisibleQuestionType() {

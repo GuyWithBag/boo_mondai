@@ -5,6 +5,7 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/core/services/uuid.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 
 part 'multiple_choice_option.dto.mapper.dart';
@@ -27,4 +28,19 @@ class MultipleChoiceOption with MultipleChoiceOptionMappable {
     required this.isCorrect,
     required this.displayOrder,
   });
+
+  factory MultipleChoiceOption.createDummy({
+    String? id,
+    String templateId = '',
+    bool isCorrect = false,
+    int displayOrder = 0,
+  }) {
+    return MultipleChoiceOption(
+      id: id ?? uuid.v7(),
+      templateId: templateId,
+      optionText: '',
+      isCorrect: isCorrect,
+      displayOrder: displayOrder,
+    );
+  }
 }

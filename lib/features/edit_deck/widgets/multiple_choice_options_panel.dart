@@ -32,7 +32,7 @@ class MultipleChoiceOptionsPanel extends StatelessWidget {
             children: [
               for (final option in options.asMap().entries) ...[
                 EditMultipleChoiceOption(
-                  value: option.value.text,
+                  value: option.value.optionText,
                   correct: option.value.isCorrect,
                   showRadio: true,
                   canRemove: options.length > 2,

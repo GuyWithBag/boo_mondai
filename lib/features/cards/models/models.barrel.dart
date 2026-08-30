@@ -6,7 +6,6 @@ export 'fill_in_the_blank_segment.dto.dart';
 export 'match_madness_pair.dto.dart';
 export 'match_pair_data.dto.dart';
 export 'multiple_choice_option.dto.dart';
-export 'multiple_choice_option_data.dto.dart';
 export 'card_template.dto.dart';
 export 'fill_in_the_blanks_template.dto.dart';
 export 'flashcard_template.dto.dart';

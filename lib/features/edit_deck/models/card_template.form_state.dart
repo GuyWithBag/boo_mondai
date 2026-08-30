@@ -4,12 +4,11 @@
 
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        MultipleChoiceOptionData,
+        MultipleChoiceOption,
         CardType,
         QuestionType,
         IdentificationAnswerData,
         MatchPairData,
-        defaultMultipleChoiceOptions,
         defaultIdentificationAnswers,
         defaultMatchPairs;
 import 'package:flutter/material.dart';
@@ -21,7 +20,7 @@ class CardTemplateFormState {
   final TextEditingController frontController;
   final TextEditingController backController;
   final ValueNotifier<List<IdentificationAnswerData>> identificationAnswers;
-  final ValueNotifier<List<MultipleChoiceOptionData>> multipleChoiceOptions;
+  final ValueNotifier<List<MultipleChoiceOption>> multipleChoiceOptions;
   final TextEditingController fillInTheBlankSentenceController;
   final TextEditingController fillInTheBlankAnswersController;
   final ValueNotifier<List<MatchPairData>> matchPairs;
@@ -53,8 +52,7 @@ class CardTemplateFormState {
       identificationAnswers: ValueNotifier([...defaultIdentificationAnswers]),
       fillInTheBlankSentenceController: TextEditingController(),
       fillInTheBlankAnswersController: TextEditingController(),
-      // Assumes these defaults exist in your types
-      multipleChoiceOptions: ValueNotifier([...defaultMultipleChoiceOptions]),
+      multipleChoiceOptions: ValueNotifier(const []),
       matchPairs: ValueNotifier([...defaultMatchPairs]),
     );
   }

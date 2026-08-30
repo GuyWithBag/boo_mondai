@@ -1,5 +1,6 @@
 import 'package:boo_mondai/features/cards/models/card_template.dto.dart';
 import 'package:boo_mondai/features/cards/models/match_madness_pair.dto.dart';
+import 'package:boo_mondai/core/services/uuid.dart';
 import 'package:boo_mondai/features/tags/models/tag.dto.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 
@@ -23,6 +24,22 @@ class MatchMadnessTemplate extends CardTemplate
     super.verticallyCentered,
     required this.pairs,
   });
+
+  factory MatchMadnessTemplate.createDummy({
+    String? id,
+    String deckId = '',
+    int sortOrder = 0,
+  }) {
+    final now = DateTime.now();
+    return MatchMadnessTemplate(
+      id: id ?? uuid.v7(),
+      deckId: deckId,
+      sortOrder: sortOrder,
+      createdAt: now,
+      updatedAt: now,
+      pairs: const [],
+    );
+  }
 
   @override
   bool checkAnswer(String userAnswer, {bool isReversed = false}) {

@@ -1,7 +1,8 @@
 import 'package:boo_mondai/features/cards/models/card_template.dto.dart';
-import 'package:dart_mappable/dart_mappable.dart';
 import 'package:boo_mondai/features/cards/models/identification_answer.dto.dart';
 import 'package:boo_mondai/features/tags/models/tag.dto.dart';
+import 'package:boo_mondai/core/services/uuid.dart';
+import 'package:dart_mappable/dart_mappable.dart';
 
 part 'identification_template.dto.mapper.dart';
 
@@ -26,6 +27,26 @@ class IdentificationTemplate extends CardTemplate
     required this.promptText,
     required this.acceptedAnswers,
   });
+
+  factory IdentificationTemplate.createDummy({
+    String? id,
+    String deckId = '',
+    int sortOrder = 0,
+  }) {
+    final now = DateTime.now();
+    final resolvedId = id ?? uuid.v7();
+    return IdentificationTemplate(
+      id: resolvedId,
+      deckId: deckId,
+      sortOrder: sortOrder,
+      createdAt: now,
+      updatedAt: now,
+      promptText: '',
+      acceptedAnswers: [
+        IdentificationAnswer.createDummy(templateId: resolvedId),
+      ],
+    );
+  }
 
   @override
   bool checkAnswer(String userAnswer, {bool isReversed = false}) {

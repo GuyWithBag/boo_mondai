@@ -4,7 +4,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         EditDeckQuestionTypeHelper,
         MatchPairData,
         MatchPairHelper,
-        MultipleChoiceOptionData,
+        MultipleChoiceOption,
         MultipleChoiceOptionHelper,
         QuestionType,
         StringHelper;
@@ -14,20 +14,49 @@ void main() {
   group('MultipleChoiceOptionHelper', () {
     test('selectCorrectAt marks only the selected option correct', () {
       final options = [
-        const MultipleChoiceOptionData(text: 'A', isCorrect: true),
-        const MultipleChoiceOptionData(text: 'B', isCorrect: false),
-        const MultipleChoiceOptionData(text: 'C', isCorrect: false),
+        const MultipleChoiceOption(
+          id: 'option-a',
+          templateId: 'template-1',
+          optionText: 'A',
+          isCorrect: true,
+          displayOrder: 0,
+        ),
+        const MultipleChoiceOption(
+          id: 'option-b',
+          templateId: 'template-1',
+          optionText: 'B',
+          isCorrect: false,
+          displayOrder: 1,
+        ),
+        const MultipleChoiceOption(
+          id: 'option-c',
+          templateId: 'template-1',
+          optionText: 'C',
+          isCorrect: false,
+          displayOrder: 2,
+        ),
       ];
 
       final updated = MultipleChoiceOptionHelper.selectCorrectAt(options, 2);
 
       expect(updated.map((option) => option.isCorrect), [false, false, true]);
-      expect(updated.map((option) => option.text), ['A', 'B', 'C']);
+      expect(updated.map((option) => option.optionText), ['A', 'B', 'C']);
+      expect(updated.map((option) => option.id), [
+        'option-a',
+        'option-b',
+        'option-c',
+      ]);
     });
 
     test('updateTextAt preserves correctness', () {
       final options = [
-        const MultipleChoiceOptionData(text: 'A', isCorrect: true),
+        const MultipleChoiceOption(
+          id: 'option-a',
+          templateId: 'template-1',
+          optionText: 'A',
+          isCorrect: true,
+          displayOrder: 0,
+        ),
       ];
 
       final updated = MultipleChoiceOptionHelper.updateTextAt(
@@ -36,8 +65,9 @@ void main() {
         'Answer',
       );
 
-      expect(updated.single.text, 'Answer');
+      expect(updated.single.optionText, 'Answer');
       expect(updated.single.isCorrect, isTrue);
+      expect(updated.single.id, 'option-a');
     });
   });
 

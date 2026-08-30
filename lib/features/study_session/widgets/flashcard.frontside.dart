@@ -12,7 +12,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextColor,
         TextSize,
         TextWeight,
-        StudyCard;
+        StudyCard,
+        MarkdownHelper;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -64,7 +65,7 @@ class FlashcardFrontSide extends StatelessWidget {
                 baseTextStyle: markdownTextStyle,
                 contentScale: contentScale,
                 defaultMarkdownAlignment: WrapAlignment.center,
-                resolveAttachmentUrl: template.resolveAttachmentUrl,
+                resolveAttachmentUrl: MarkdownHelper.resolveAttachmentUrl,
               ),
             ),
           ),

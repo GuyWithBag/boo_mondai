@@ -1,6 +1,7 @@
 import 'package:boo_mondai/features/cards/models/card_template.dto.dart';
 import 'package:boo_mondai/features/cards/models/card_type.dto.dart';
 import 'package:boo_mondai/features/tags/models/tag.dto.dart';
+import 'package:boo_mondai/core/services/uuid.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 
 part 'flashcard_template.dto.mapper.dart';
@@ -31,6 +32,23 @@ class FlashcardTemplate extends CardTemplate with FlashcardTemplateMappable {
     required this.backText,
     this.cardType = CardType.normal,
   });
+
+  factory FlashcardTemplate.createDummy({
+    String? id,
+    String deckId = '',
+    int sortOrder = 0,
+  }) {
+    final now = DateTime.now();
+    return FlashcardTemplate(
+      id: id ?? uuid.v7(),
+      deckId: deckId,
+      sortOrder: sortOrder,
+      createdAt: now,
+      updatedAt: now,
+      frontText: '',
+      backText: '',
+    );
+  }
 
   String getQuestion({bool isReversed = false}) =>
       isReversed ? backText : frontText;

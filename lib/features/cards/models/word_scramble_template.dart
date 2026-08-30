@@ -1,6 +1,7 @@
 import 'package:boo_mondai/features/cards/models/card_template.dto.dart';
-import 'package:dart_mappable/dart_mappable.dart';
+import 'package:boo_mondai/core/services/uuid.dart';
 import 'package:boo_mondai/features/tags/models/tag.dto.dart';
+import 'package:dart_mappable/dart_mappable.dart';
 
 part 'word_scramble_template.mapper.dart';
 
@@ -22,6 +23,22 @@ class WordScrambleTemplate extends CardTemplate
     super.verticallyCentered,
     required this.sentenceToScramble,
   });
+
+  factory WordScrambleTemplate.createDummy({
+    String? id,
+    String deckId = '',
+    int sortOrder = 0,
+  }) {
+    final now = DateTime.now();
+    return WordScrambleTemplate(
+      id: id ?? uuid.v7(),
+      deckId: deckId,
+      sortOrder: sortOrder,
+      createdAt: now,
+      updatedAt: now,
+      sentenceToScramble: '',
+    );
+  }
 
   @override
   bool checkAnswer(String userAnswer, {bool isReversed = false}) {

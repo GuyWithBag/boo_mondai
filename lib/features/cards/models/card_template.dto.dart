@@ -20,7 +20,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         MatchMadnessTemplateMapper,
         MutableEntityMapper,
         WordScrambleTemplateMapper,
-        MarkdownHelper,
         MutableEntityCopyWith,
         TagCopyWith;
 import 'package:dart_mappable/dart_mappable.dart';
@@ -72,10 +71,6 @@ abstract class CardTemplate with CardTemplateMappable implements MutableEntity {
     this.tags = const [],
     this.verticallyCentered = true,
   });
-
-  String? resolveAttachmentUrl(Uri uri) {
-    return MarkdownHelper.resolveMediaSourceUri(uri);
-  }
 
   bool checkAnswer(String userAnswer, {bool isReversed = false});
 }

@@ -1,6 +1,6 @@
 import 'package:boo_mondai/features/cards/models/identification_answer_data.dto.dart';
 import 'package:boo_mondai/features/cards/models/match_pair_data.dto.dart';
-import 'package:boo_mondai/features/cards/models/multiple_choice_option_data.dto.dart';
+import 'package:boo_mondai/features/cards/models/multiple_choice_option.dto.dart';
 
 abstract final class EditDeckFormValidator {
   static String? prompt(String? value) {
@@ -23,13 +23,11 @@ abstract final class EditDeckFormValidator {
     return null;
   }
 
-  static String? multipleChoiceOptions(
-    List<MultipleChoiceOptionData>? options,
-  ) {
+  static String? multipleChoiceOptions(List<MultipleChoiceOption>? options) {
     if (options == null || options.length < 2) {
       return 'Add at least two answer options';
     }
-    if (options.any((option) => option.text.trim().isEmpty)) {
+    if (options.any((option) => option.optionText.trim().isEmpty)) {
       return 'Complete every answer option';
     }
     if (!options.any((option) => option.isCorrect)) {

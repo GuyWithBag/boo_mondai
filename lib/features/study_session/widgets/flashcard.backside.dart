@@ -10,7 +10,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         textStyle,
         TextColor,
         TextSize,
-        TextWeight;
+        TextWeight,
+        MarkdownHelper;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -64,7 +65,7 @@ class FlashcardBackSide extends StatelessWidget {
             data: template.getQuestion(isReversed: studyCard.isReversed),
             baseTextStyle: markdownTextStyle,
             contentScale: contentScale,
-            resolveAttachmentUrl: template.resolveAttachmentUrl,
+            resolveAttachmentUrl: MarkdownHelper.resolveAttachmentUrl,
             defaultMarkdownAlignment: WrapAlignment.center,
           ),
           Divider(height: dividerHeight, thickness: dividerThickness),
@@ -74,7 +75,7 @@ class FlashcardBackSide extends StatelessWidget {
             baseTextStyle: markdownTextStyle,
             contentScale: contentScale,
             defaultMarkdownAlignment: WrapAlignment.center,
-            resolveAttachmentUrl: template.resolveAttachmentUrl,
+            resolveAttachmentUrl: MarkdownHelper.resolveAttachmentUrl,
           ),
         ],
       ),

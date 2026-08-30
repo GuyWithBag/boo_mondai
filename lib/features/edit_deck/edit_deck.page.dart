@@ -11,7 +11,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         EditDeckEditorBody,
         EditDeckSideBar,
         Scaffold,
-        StoredMediaPathHelper,
+        DecksDirectoryPaths,
         ToolBar,
         showSnackbar,
         useEditDeckController,
@@ -91,15 +91,7 @@ class EditDeckPage extends HookWidget {
       toolBar: ToolBar.withActions(
         controller: toolBarController,
         useAttachments: true,
-        createAttachmentPath: (file) {
-          final deck = controller.deck;
-          if (deck == null || controller.activeTemplateId == null) return null;
-
-          return StoredMediaPathHelper.deckAttachment(
-            deckTitle: deck.title,
-            fileName: file.name,
-          );
-        },
+        createAttachmentPath: controller.createAttachmentPath,
         onAttachmentInserted: controller.markDirty,
       ),
       body: Form(
