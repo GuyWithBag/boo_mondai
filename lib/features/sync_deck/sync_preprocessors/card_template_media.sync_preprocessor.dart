@@ -19,14 +19,14 @@ abstract final class CardTemplateMediaSyncPreprocessor {
       final markdown = await SyncMarkdownMediaApplier.uploadAndRewrite(
         markdown: field.getValue(updated),
         bucket: RemoteDB.publicBucket,
-        remotePath: (storedMedia, index) =>
+        remotePath: (localPath, index) =>
             MediaRemotePathHelper.cardMarkdownAttachment(
               profileId: profileId,
               deckId: updated.deckId,
               templateId: updated.id,
               field: field.name,
-              fileName: MediaRemotePathHelper.fileNameFromStoredMedia(
-                storedMedia,
+              fileName: MediaRemotePathHelper.fileNameFromLocalPath(
+                localPath,
                 index,
               ),
             ),

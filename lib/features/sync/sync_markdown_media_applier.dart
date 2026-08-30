@@ -1,8 +1,8 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show BucketSupabaseRemoteDB, StoredMedia, SyncMediaSourceApplier;
+    show BucketSupabaseRemoteDB, SyncMediaSourceApplier;
 
 typedef SyncMarkdownMediaRemotePathBuilder =
-    String Function(StoredMedia storedMedia, int index);
+    String Function(String localPath, int index);
 
 abstract final class SyncMarkdownMediaApplier {
   static final RegExp _markdownMediaPattern = RegExp(
@@ -27,11 +27,11 @@ abstract final class SyncMarkdownMediaApplier {
       final source = match.group(2);
       if (source == null || source.trim().isEmpty) continue;
 
-      var storedMediaIndex = index;
+      var localPathIndex = index;
       final uploadedSource = await SyncMediaSourceApplier.uploadSource(
         source: source,
         bucket: bucket,
-        remotePath: (storedMedia) => remotePath(storedMedia, storedMediaIndex),
+        remotePath: (localPath) => remotePath(localPath, localPathIndex),
         upsert: upsert,
       );
 

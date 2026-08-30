@@ -6,11 +6,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         LocalDB,
         RemoteDB,
         MediaRemotePathHelper,
-        StoredMediaPath,
-        StoredMediaPathHelper,
-        StoredMediaService,
+        DecksDirectoryPaths,
         SyncMediaReference,
-        SyncMediaReferenceApplier;
+        SyncMediaReferenceApplier,
+        MediaHelper;
 
 abstract final class DeckListingMediaSyncPreprocessor {
   /// Uploads deck-listing local media before the listing row is pushed remotely.
@@ -42,7 +41,7 @@ abstract final class DeckListingMediaSyncPreprocessor {
     required int index,
     required String profileId,
   }) {
-    final localPath = StoredMediaPathHelper.deckListingFeaturedImage(
+    final localPath = DecksDirectoryPaths.listingFeaturedImage(
       deckTitle: deck.title,
       index: index,
     );
@@ -57,7 +56,7 @@ abstract final class DeckListingMediaSyncPreprocessor {
       bucket: RemoteDB.publicBucket,
       readValue: (listing) => listing.featuredImages[index],
       shouldUpload: (_, currentValue) =>
-          _shouldUploadStoredMedia(localPath, currentValue),
+          _shouldUploadLocalMedia(localPath, currentValue),
       writeValue: (listing, uploadedValue) {
         final featuredImages = listing.featuredImages.toList();
         featuredImages[index] = uploadedValue;
@@ -66,21 +65,15 @@ abstract final class DeckListingMediaSyncPreprocessor {
     );
   }
 
-  static bool _shouldUploadStoredMedia(
-    StoredMediaPath localPath,
-    String? currentValue,
-  ) {
-    final storedMedia = StoredMediaService.getByPath(localPath);
-    if (storedMedia == null) return false;
-
+  static bool _shouldUploadLocalMedia(String localPath, String? currentValue) {
     final normalizedCurrentValue = currentValue?.trim();
     if (normalizedCurrentValue == null || normalizedCurrentValue.isEmpty) {
       return true;
     }
-    if (!ImageHelper.isRemoteUrl(normalizedCurrentValue)) {
+    if (!MediaHelper.isRemoteUrl(normalizedCurrentValue)) {
       return true;
     }
 
-    return storedMedia.remoteUrl?.trim() != normalizedCurrentValue;
+    return false;
   }
 }

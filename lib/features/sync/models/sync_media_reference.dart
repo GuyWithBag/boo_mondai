@@ -1,5 +1,4 @@
-import 'package:boo_mondai/lib.barrel.dart'
-    show BucketSupabaseRemoteDB, StoredMediaPath;
+import 'package:boo_mondai/lib.barrel.dart' show BucketSupabaseRemoteDB;
 
 typedef SyncMediaUploadPredicate<T> =
     bool Function(T item, String? currentValue);
@@ -15,7 +14,7 @@ class SyncMediaReference<T> {
     this.upsert = true,
   });
 
-  final StoredMediaPath localPath;
+  final String localPath;
   final String remotePath;
   final BucketSupabaseRemoteDB bucket;
   final String? Function(T item) readValue;

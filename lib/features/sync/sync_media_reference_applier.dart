@@ -1,9 +1,10 @@
+import 'package:boo_mondai/core/helpers/media.helper.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         ImageHelper,
-        StoredMediaService,
         StoredMediaUploadService,
-        SyncMediaReference;
+        SyncMediaReference,
+        FileSystemHandler;
 
 abstract final class SyncMediaReferenceApplier {
   static Future<T> apply<T>({
@@ -21,11 +22,14 @@ abstract final class SyncMediaReferenceApplier {
           _shouldUploadMediaReference(currentValue);
       if (!shouldUpload) continue;
 
-      final storedMedia = StoredMediaService.getByPath(reference.localPath);
-      if (storedMedia == null) continue;
+      // ToDo: Need to Re Evaluate
+      final localFile = FileSystemHandler.getFileByRelativePath(
+        reference.localPath,
+      );
+      if (localFile == null) continue;
 
       final uploadedValue = await StoredMediaUploadService.upload(
-        storedMedia: storedMedia,
+        localPath: reference.localPath,
         bucket: reference.bucket,
         remotePath: reference.remotePath,
         upsert: reference.upsert,
@@ -43,8 +47,9 @@ abstract final class SyncMediaReferenceApplier {
     return updated;
   }
 
+  // ToDo: Need Re Evaluate
   static bool _shouldUploadMediaReference(String? currentValue) {
     final value = currentValue?.trim();
-    return value == null || value.isEmpty || !ImageHelper.isRemoteUrl(value);
+    return value == null || value.isEmpty || !MediaHelper.isRemoteUrl(value);
   }
 }

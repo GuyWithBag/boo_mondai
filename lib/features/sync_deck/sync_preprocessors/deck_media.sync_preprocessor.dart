@@ -1,16 +1,14 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         Deck,
-        ImageHelper,
         LocalDB,
         RemoteDB,
         MediaRemotePathHelper,
-        StoredMediaPath,
-        StoredMediaPathHelper,
-        StoredMediaService,
+        DecksDirectoryPaths,
         SyncMarkdownMediaApplier,
         SyncMediaReference,
-        SyncMediaReferenceApplier;
+        SyncMediaReferenceApplier,
+        MediaHelper;
 
 abstract final class DeckMediaSyncPreprocessor {
   /// Uploads deck-owned local media before the deck row is pushed remotely.
@@ -18,9 +16,7 @@ abstract final class DeckMediaSyncPreprocessor {
     required Deck deck,
     required String profileId,
   }) async {
-    final localPath = StoredMediaPathHelper.deckCoverImage(
-      deckTitle: deck.title,
-    );
+    final localPath = DecksDirectoryPaths.coverImage(deckTitle: deck.title);
 
     var updated = await SyncMediaReferenceApplier.apply<Deck>(
       item: deck,
@@ -35,7 +31,7 @@ abstract final class DeckMediaSyncPreprocessor {
           bucket: RemoteDB.publicBucket,
           readValue: (deck) => deck.coverImageUrl,
           shouldUpload: (_, currentValue) =>
-              _shouldUploadStoredMedia(localPath, currentValue),
+              _shouldUploadLocalMedia(localPath, currentValue),
           writeValue: (deck, uploadedValue) =>
               deck.copyWith(coverImageUrl: uploadedValue),
         ),
@@ -45,12 +41,12 @@ abstract final class DeckMediaSyncPreprocessor {
     final longDescription = await SyncMarkdownMediaApplier.uploadAndRewrite(
       markdown: updated.longDescription,
       bucket: RemoteDB.publicBucket,
-      remotePath: (storedMedia, index) =>
+      remotePath: (localPath, index) =>
           MediaRemotePathHelper.deckMarkdownAttachment(
             profileId: profileId,
             deckId: updated.id,
-            fileName: MediaRemotePathHelper.fileNameFromStoredMedia(
-              storedMedia,
+            fileName: MediaRemotePathHelper.fileNameFromLocalPath(
+              localPath,
               index,
             ),
           ),
@@ -64,21 +60,15 @@ abstract final class DeckMediaSyncPreprocessor {
     return updated;
   }
 
-  static bool _shouldUploadStoredMedia(
-    StoredMediaPath localPath,
-    String? currentValue,
-  ) {
-    final storedMedia = StoredMediaService.getByPath(localPath);
-    if (storedMedia == null) return false;
-
+  static bool _shouldUploadLocalMedia(String localPath, String? currentValue) {
     final normalizedCurrentValue = currentValue?.trim();
     if (normalizedCurrentValue == null || normalizedCurrentValue.isEmpty) {
       return true;
     }
-    if (!ImageHelper.isRemoteUrl(normalizedCurrentValue)) {
+    if (!MediaHelper.isRemoteUrl(normalizedCurrentValue)) {
       return true;
     }
 
-    return storedMedia.remoteUrl?.trim() != normalizedCurrentValue;
+    return false;
   }
 }
