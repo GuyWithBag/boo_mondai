@@ -6,8 +6,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         Cube,
         CubeController,
         Deck,
-        DecksDirectoryPaths,
-        DecksService,
         ImageHelper,
         ScaleHelper,
         SurfaceBorder,
@@ -18,11 +16,13 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextSize,
         TextWeight,
         surfaceStyle,
-        textStyle;
+        textStyle,
+        DecksDirectoryPaths;
 import 'package:flutter/material.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-class PhysicalDeck extends StatelessWidget {
+class PhysicalDeck extends SignalHookWidget {
   const PhysicalDeck({
     super.key,
     this.deck,
@@ -68,11 +68,17 @@ class PhysicalDeck extends StatelessWidget {
       textScale,
     );
 
-    // The reason why it needs the image provider is because this can be a network or asset image.
-    final coverImage = ImageHelper.getImageProviderFromSource(
-      deck == null
-          ? null
-          : DecksDirectoryPaths.coverImage(deckTitle: deck!.title),
+    final coverImagePath = deck == null
+        ? null
+        : DecksDirectoryPaths.coverImage(deckTitle: deck!.title);
+    final coverImage = useFutureSignal(
+      () => ImageHelper.getImageProviderFromSource(coverImagePath),
+      keys: [coverImagePath],
+    );
+    final coverImageProvider = coverImage.value.map(
+      data: (value) => value,
+      error: () => null,
+      loading: () => null,
     );
     final visibleTags = deck?.tags.take(8).toList() ?? const [];
 
@@ -101,7 +107,7 @@ class PhysicalDeck extends StatelessWidget {
       front: LayoutBuilder(
         builder: (context, constraints) {
           return BackgroundImageSurface(
-            image: coverImage,
+            image: coverImageProvider,
             isEditable: isCoverImageEditable,
             onImagePicked: onCoverImagePicked,
             clipBehavior: Clip.none,

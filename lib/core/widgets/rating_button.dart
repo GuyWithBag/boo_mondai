@@ -35,7 +35,7 @@ class RatingButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final reviewTime = ctrl.nextIntervals[type] ?? '-';
+    final reviewTime = ctrl.nextIntervals.value[type] ?? '-';
 
     late final String shortcut;
     late final String label;
