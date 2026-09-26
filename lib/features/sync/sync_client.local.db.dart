@@ -10,7 +10,7 @@ class SyncClientLocalDB extends HiveSingleDataLocalDB<SyncClient> {
 
   @override
   SyncClient createValue() {
-    final profileId = LocalDB.profile.getOrCreate().id;
+    final profileId = LocalDB.currentProfile.getOrCreate().id;
     return SyncClient.create(profileId: profileId);
   }
 }

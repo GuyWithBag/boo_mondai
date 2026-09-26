@@ -1,48 +1,57 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show Comment, CommentEditLog, RemoteDB, uuid;
+    show
+        Comment,
+        CommentEditLog,
+        RemoteDB,
+        Content,
+        DiscussionsService,
+        JoinedComment;
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-class CommentsService {
-  const CommentsService._();
-
+class CommentsService implements DiscussionsService {
   static Future<List<Comment>> getByDeck(String deckId) =>
-      RemoteDB.deckComment.getByDeck(deckId);
+      RemoteDB.comments.getByDeck(deckId);
 
-  static Future<List<CommentEditLog>> getEditLogs(String commentId) =>
-      RemoteDB.deckCommentEditLog.getByComment(commentId);
+  static Future<List<CommentEditLog>> getEditLogs(Comment comment) =>
+      RemoteDB.commentEditLogs.getByComment(comment);
 
-  static Future<void> addComment({
-    required String deckId,
-    required String profileId,
-    required String body,
-    String? parentCommentId,
+  static Future<void> add({
+    required Comment comment,
+    required Content content,
   }) async {
-    final trimmedBody = body.trim();
-    if (trimmedBody.isEmpty) return;
-
-    final comment = Comment.createNow(
-      id: uuid.v7(),
-      deckId: deckId,
-      profileId: profileId,
-      parentCommentId: parentCommentId,
-      body: trimmedBody,
-    );
-    await RemoteDB.deckComment.insert(comment);
+    await RemoteDB.comments.upsert(comment.copyWith(body: comment.body.trim()));
+    await RemoteDB.contents.upsert(content);
   }
 
-  static Future<void> updateComment({
-    required String commentId,
+  static Future<int> getReplyCount(Content commentContent) async {
+    final response = await RemoteDB.comments.query
+        .select('id, contents!inner(parent_content_id)')
+        .eq('contents.parent_content_id', commentContent.id)
+        .count(CountOption.exact);
+
+    return response.count;
+  }
+
+  static Future<List<JoinedComment>> getReplies(Content commentContent) async {
+    final response = await RemoteDB.comments.query
+        .select('*, contents!inner(*)')
+        .eq('contents.parent_content_id', commentContent.id);
+
+    return List<Map<String, dynamic>>.from(response).map((row) {
+      return (
+        comment: RemoteDB.comments.fromMap(row),
+        content: RemoteDB.contents.fromMap(row['contents']),
+      );
+    }).toList();
+  }
+
+  static Future<void> upsert({
+    required Comment comment,
     required String body,
   }) async {
     final trimmedBody = body.trim();
     if (trimmedBody.isEmpty) return;
 
-    await RemoteDB.deckComment.updateWhere(
-      filters: {'id': commentId},
-      values: {
-        'body': trimmedBody,
-        'is_deleted': false,
-        'updated_at': DateTime.now().toIso8601String(),
-      },
-    );
+    await RemoteDB.comments.upsert(comment);
   }
 }

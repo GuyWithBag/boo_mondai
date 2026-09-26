@@ -1,235 +1,78 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        Controller,
         Deck,
-        CommentsController,
         DeckDownloadsService,
-        DeckListingController,
-        ReviewsController,
-        DiscussionItem,
         Services,
-        useCommentsController,
-        useReviewsController;
-import 'package:flutter_hooks/flutter_hooks.dart'
-    show useEffect, useListenable, useMemoized;
+        ViewCommentsController,
+        ViewReviewsController,
+        ViewDeckListingSingleController,
+        DeckListing,
+        Content,
+        Profile;
+import 'package:signals/signals_flutter.dart';
 
-ViewDeckListingSinglePreviewController
-useViewDeckListingSinglePreviewController({
-  required String deckId,
-  required Deck initialDeck,
-  required Deck Function() deckReader,
-}) {
-  final controller = useMemoized(
-    () => ViewDeckListingSinglePreviewController(
-      initialDeck: initialDeck,
-      deckReader: deckReader,
-    ),
-    [deckId],
-  );
-
-  useListenable(controller);
-  useEffect(() => controller.dispose, [controller]);
-
-  final deck = deckReader();
-  final commentsController = useCommentsController(
-    deck: deck,
-    enabled: deck.isPublished,
-  );
-  final reviewsController = useReviewsController(
-    deck: deck,
-    currentVoteValue: controller.voteValue,
-    onReviewChanged: controller.loadInteractionState,
-    enabled: deck.isPublished,
-  );
-  controller.bindDiscussionControllers(
-    commentsController: commentsController,
-    reviewsController: reviewsController,
-  );
-
-  return controller;
-}
-
-class ViewDeckListingSinglePreviewController extends Controller {
+class ViewDeckListingSinglePreviewController
+    implements ViewDeckListingSingleController {
   ViewDeckListingSinglePreviewController({
-    required Deck initialDeck,
-    required Deck Function() deckReader,
+    required this.deck,
+    required this.listing,
+    required this.content,
+    required this.profile,
+    required this.sourceProfile,
     DeckDownloadsService? deckDownloadsService,
-  }) : _deckReader = deckReader,
-       _deckDownloadsService = deckDownloadsService ?? Services.deckDownloads,
-       _interactionsController = DeckListingController(deck: initialDeck) {
-    _interactionsController.addListener(notifyListeners);
-    if (_interactionsEnabled) {
-      _interactionsController.loadInteractionState();
-    }
+  }) : deckDownloadsService = deckDownloadsService ?? Services.deckDownloads {
+    comments = ViewCommentsController(content.value);
+    reviews = ViewReviewsController(content.value);
   }
-
-  final Deck Function() _deckReader;
-  final DeckDownloadsService _deckDownloadsService;
-  final DeckListingController _interactionsController;
-  CommentsController? _commentsController;
-  ReviewsController? _reviewsController;
-  bool _isDownloading = false;
-
-  Deck get _deck => _deckReader();
-  bool get _interactionsEnabled => _deck.isPublished && _deck.listing != null;
-
-  int get upvotesCount => _interactionsController.upvotesCount;
-  int get downvotesCount => _interactionsController.downvotesCount;
-  int get favoritesCount => _interactionsController.favoritesCount;
-  int get commentsCount {
-    final commentsController = _commentsController;
-    if (commentsController == null) return _deck.listing?.commentsCount ?? 0;
-
-    return commentsController.isLoading
-        ? _deck.listing?.commentsCount ?? commentsController.count
-        : commentsController.count;
-  }
-
-  int get reviewsCount {
-    final reviewsController = _reviewsController;
-    if (reviewsController == null) return _deck.listing?.reviewsCount ?? 0;
-
-    return reviewsController.isLoading
-        ? _deck.listing?.reviewsCount ?? reviewsController.count
-        : reviewsController.count;
-  }
-
-  int? get voteValue => _interactionsController.voteValue;
-  bool get isFavorite => _interactionsController.isFavorite;
-  bool get isBusy => _interactionsController.isBusy;
-  bool get isDownloading => _isDownloading;
-  bool get isLoadingDiscussion =>
-      (_commentsController?.isLoading ?? false) ||
-      (_reviewsController?.isLoading ?? false);
-  bool get isSubmittingComment => _commentsController?.isSubmitting ?? false;
-  bool get isSubmittingReview =>
-      _reviewsController?.isSubmittingReview ?? false;
-  bool get isSubmittingReviewComment =>
-      _reviewsController?.isSubmittingReviewComment ?? false;
-  List<DiscussionItem> get reviewItems =>
-      _reviewsController?.items ?? const <DiscussionItem>[];
-  List<DiscussionItem> get commentItems =>
-      _commentsController?.items ?? const <DiscussionItem>[];
 
   @override
-  Exception? get error =>
-      _interactionsController.error ??
-      _commentsController?.error ??
-      _reviewsController?.error;
+  final Signal<Deck> deck;
+  @override
+  final Signal<DeckListing> listing;
+  @override
+  final Signal<Content> content;
+  @override
+  final Signal<Profile> profile;
+  @override
+  final Signal<Profile> sourceProfile;
+  @override
+  final error = signal<Exception?>(null);
 
-  Future<void> Function()? get onUpvotePressed =>
-      _interactionsEnabled ? _interactionsController.toggleUpvote : null;
-  Future<void> Function()? get onDownvotePressed =>
-      _interactionsEnabled ? _interactionsController.toggleDownvote : null;
-  Future<void> Function()? get onFavoritePressed =>
-      _interactionsEnabled ? _interactionsController.toggleFavorite : null;
-  Future<void> Function()? get onDownloadPressed =>
-      _deck.isPublished ? downloadDeck : null;
+  final DeckDownloadsService deckDownloadsService;
+  late final ViewCommentsController comments;
+  late final ViewReviewsController reviews;
 
-  List<DiscussionItem> reviewRepliesFor(String itemId) {
-    return _reviewsController?.repliesFor(itemId) ?? const <DiscussionItem>[];
-  }
+  final isDownloading = signal<bool>(false);
 
-  List<DiscussionItem> commentRepliesFor(String itemId) {
-    return _commentsController?.repliesFor(itemId) ?? const <DiscussionItem>[];
-  }
+  final isLoading = signal<bool>(false);
 
-  bool canEditCommentItem(DiscussionItem item) {
-    return _commentsController?.canEditItem(item) ?? false;
-  }
+  // ToDo: refactor favorites
+  late final isFavorite = computed(() {
+    return false;
+  });
 
-  bool canEditReviewItem(DiscussionItem item) {
-    return _reviewsController?.canEditItem(item) ?? false;
-  }
+  late final commentsCount = computed(() => comments.comments.length);
+  late final reviewsCount = computed(() => reviews.comments.length);
 
-  void bindDiscussionControllers({
-    required CommentsController commentsController,
-    required ReviewsController reviewsController,
-  }) {
-    _commentsController = commentsController;
-    _reviewsController = reviewsController;
-  }
+  void onUpvotePressed() {}
+  void onDownvotePressed() {}
+  void onFavoritePressed() {}
+  void onDownloadPressed() {}
 
-  Future<void> loadInteractionState() {
-    return _interactionsController.loadInteractionState();
-  }
+  Future<void> onDownloadDeck() async {
+    if (isDownloading.value) return;
 
-  Future<void> downloadDeck() async {
-    if (_isDownloading) return;
-
-    _isDownloading = true;
-    setError(null);
-    notifyListeners();
+    isDownloading.value = true;
+    error.value = null;
 
     try {
-      await _deckDownloadsService.downloadDeck(_deck);
+      await deckDownloadsService.downloadDeck(deck.value);
     } on Exception catch (e) {
-      setError(e);
+      error.value = e;
     } catch (e) {
-      setError(Exception(e.toString()));
+      error.value = Exception(e.toString());
     } finally {
-      _isDownloading = false;
-      notifyListeners();
+      isDownloading.value = false;
     }
-  }
-
-  Future<bool> submitReview({
-    required int voteValue,
-    required String title,
-    required String body,
-  }) async {
-    return _reviewsController?.addReview(
-          voteValue: voteValue,
-          title: title,
-          body: body,
-        ) ??
-        false;
-  }
-
-  Future<bool> replyToReview(String body, {String? parentCommentId}) async {
-    return _reviewsController?.addReviewReply(
-          body,
-          parentCommentId: parentCommentId,
-        ) ??
-        false;
-  }
-
-  Future<bool> editReview(
-    DiscussionItem item,
-    String body, {
-    String? title,
-  }) async {
-    return _reviewsController?.updateReviewItem(item, body, title: title) ??
-        false;
-  }
-
-  Future<bool> submitComment(String body, {String? parentCommentId}) async {
-    return _commentsController?.addComment(
-          body,
-          parentCommentId: parentCommentId,
-        ) ??
-        false;
-  }
-
-  Future<bool> editComment(
-    DiscussionItem item,
-    String body, {
-    String? title,
-  }) async {
-    return _commentsController?.updateCommentItem(item, body, title: title) ??
-        false;
-  }
-
-  void clearErrors() {
-    _interactionsController.setError(null);
-    _commentsController?.clearError();
-    _reviewsController?.clearError();
-  }
-
-  @override
-  void dispose() {
-    _interactionsController.removeListener(notifyListeners);
-    _interactionsController.dispose();
-    super.dispose();
   }
 }

@@ -18,7 +18,7 @@ class ViewDeckSingleBottomNavBar extends StatelessWidget
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
 
-    final profileId = LocalDB.profile.getOrCreate().id;
+    final profileId = LocalDB.currentProfile.getOrCreate().id;
     final eligibleCards = DrillStudySessionHelper.getEligibleDrillCards(
       deck.id,
       profileId,
@@ -40,10 +40,10 @@ class ViewDeckSingleBottomNavBar extends StatelessWidget
           ),
           Expanded(
             child: Tooltip(
-              message: deck.cardCount == 0
+              message: deck.cardTemplatesCount == 0
                   ? 'No cards yet'
                   : canDrill
-                  ? '$eligibleCards.length cards ready'
+                  ? '${eligibleCards.length} cards ready'
                   : 'Completed',
               child: Button(
                 variants: const [ButtonColor.primary],

@@ -28,14 +28,6 @@ class CardTemplatesRemoteDB extends SupabaseRemoteDB<CardTemplate> {
   @override
   String get defaultSelect => _cardTemplateWithRelationsSelect;
 
-  @override
-  Set<String> get joinedFields => const {
-    'tags',
-    'options',
-    'segments',
-    'pairs',
-  };
-
   Future<List<CardTemplate>> selectManyByDeckId(
     String deckId, {
     bool includeDeleted = false,

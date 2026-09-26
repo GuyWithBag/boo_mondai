@@ -1,5 +1,5 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, CardTemplate, StudyCard, ViewCardsTile, ViewCardsTileSide;
+    show AppTokens, CardTemplate, ViewCardsTile, ViewCardsTileSide;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -8,19 +8,9 @@ class ViewCardsByPairTile extends StatelessWidget {
     required this.template,
     this.tileWidth = 260,
     super.key,
-  }) : frontCard = null,
-       backCard = null;
+  });
 
-  const ViewCardsByPairTile.studyCards({
-    required this.frontCard,
-    required this.backCard,
-    this.tileWidth = 260,
-    super.key,
-  }) : template = null;
-
-  final CardTemplate? template;
-  final StudyCard? frontCard;
-  final StudyCard? backCard;
+  final CardTemplate template;
   final double tileWidth;
 
   @override
@@ -39,33 +29,18 @@ class ViewCardsByPairTile extends StatelessWidget {
         runSpacing: tokens.spaceLayoutGapLg,
         alignment: WrapAlignment.center,
         children: [
-          if (template != null) ...[
-            ViewCardsTile.template(
-              template: template!,
-              width: tileWidth,
-              initialSide: ViewCardsTileSide.front,
-              flippable: false,
-            ),
-            ViewCardsTile.template(
-              template: template!,
-              width: tileWidth,
-              initialSide: ViewCardsTileSide.back,
-              flippable: false,
-            ),
-          ] else ...[
-            ViewCardsTile.studyCard(
-              studyCard: frontCard!,
-              width: tileWidth,
-              initialSide: ViewCardsTileSide.front,
-              flippable: false,
-            ),
-            ViewCardsTile.studyCard(
-              studyCard: backCard!,
-              width: tileWidth,
-              initialSide: ViewCardsTileSide.back,
-              flippable: false,
-            ),
-          ],
+          ViewCardsTile.template(
+            template: template,
+            width: tileWidth,
+            initialSide: ViewCardsTileSide.front,
+            flippable: false,
+          ),
+          ViewCardsTile.template(
+            template: template,
+            width: tileWidth,
+            initialSide: ViewCardsTileSide.back,
+            flippable: false,
+          ),
         ],
       ),
     );

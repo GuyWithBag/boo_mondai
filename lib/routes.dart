@@ -18,7 +18,7 @@ import 'package:go_router/go_router.dart';
 GoRouter createRouter(AuthController authController) {
   return GoRouter(
     initialLocation: Pages.home.url,
-    refreshListenable: authController,
+    refreshListenable: authController.routerRefresh,
     errorBuilder: (context, state) {
       final exception = RouteException(
         'Error 404: The requested page could not be found.',
@@ -47,7 +47,7 @@ GoRouter createRouter(AuthController authController) {
       }
 
       if (loc.startsWith(Pages.researcherDashboard.url) &&
-          !auth.currentProfile.isResearcher) {
+          !auth.currentProfile.value.isResearcher) {
         return Pages.home.url;
       }
 

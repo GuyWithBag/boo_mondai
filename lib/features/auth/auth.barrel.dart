@@ -4,3 +4,4 @@
 export 'auth.service.dart';
 export 'auth.validators.dart';
 export 'auth.controller.dart';
+export 'gay.dart';

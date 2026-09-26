@@ -4,24 +4,34 @@
 
 import 'package:boo_mondai/lib.barrel.dart'
     show
+        ChangeTrackerController,
+        ChangeTrackerRouteArgs,
         DownloadsTile,
         Services,
         StatusLayoutState,
         ViewDeckDownloadsAppBar,
         Scaffold,
-        ViewDeckDownloadsController,
-        useChangeTrackerController;
+        ViewDeckDownloadsController;
 import 'package:flutter/material.dart' hide Scaffold;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
+import 'package:signals/signals_flutter.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
 class ViewDeckDownloadsPage extends HookWidget {
   const ViewDeckDownloadsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final changeTrackerController = useChangeTrackerController(
-      service: Services.deckDownloads.changeTrackerService,
+    final changeTrackerPageArgs = useMemoized(
+      () => signal(const ChangeTrackerRouteArgs.missing(entryId: '')),
+    );
+    final changeTrackerController = useMemoized(
+      () => ChangeTrackerController(
+        service: Services.deckDownloads.changeTrackerService,
+        pageArgs: changeTrackerPageArgs,
+      ),
+      [changeTrackerPageArgs],
     );
     final controller = useMemoized(
       () => ViewDeckDownloadsController(
@@ -30,25 +40,33 @@ class ViewDeckDownloadsPage extends HookWidget {
       ),
       [changeTrackerController],
     );
-    useEffect(() => controller.dispose, [controller]);
+    useEffect(() {
+      return () {
+        controller.dispose();
+        changeTrackerController.dispose();
+        changeTrackerPageArgs.dispose();
+      };
+    }, [controller, changeTrackerController, changeTrackerPageArgs]);
 
-    return ChangeNotifierProvider.value(
+    return Provider.value(
       value: controller,
       child: const _ViewDeckDownloadsView(),
     );
   }
 }
 
-class _ViewDeckDownloadsView extends StatelessWidget {
+class _ViewDeckDownloadsView extends SignalWidget {
   const _ViewDeckDownloadsView();
 
   @override
   Widget build(BuildContext context) {
-    final controller = context.watch<ViewDeckDownloadsController>();
+    final controller = context.read<ViewDeckDownloadsController>();
+    final activeEntries = controller.activeEntries.value;
+    final completedPlans = controller.completedPlans.value;
 
     return Scaffold(
       appBar: const ViewDeckDownloadsAppBar(),
-      body: controller.isEmpty
+      body: controller.isEmpty.value
           ? const Center(
               child: StatusLayoutState(
                 icon: Icons.download_done_rounded,
@@ -59,8 +77,8 @@ class _ViewDeckDownloadsView extends StatelessWidget {
           : ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                if (controller.activeEntries.isNotEmpty) ...[
-                  for (final plan in controller.activeEntries)
+                if (activeEntries.isNotEmpty) ...[
+                  for (final plan in activeEntries)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 16),
                       child: DownloadsTile(
@@ -72,7 +90,7 @@ class _ViewDeckDownloadsView extends StatelessWidget {
                       ),
                     ),
                 ],
-                if (controller.completedPlans.isNotEmpty) ...[
+                if (completedPlans.isNotEmpty) ...[
                   Padding(
                     padding: const EdgeInsets.only(bottom: 12),
                     child: Text(
@@ -80,7 +98,7 @@ class _ViewDeckDownloadsView extends StatelessWidget {
                       style: Theme.of(context).textTheme.titleSmall,
                     ),
                   ),
-                  for (final plan in controller.completedPlans)
+                  for (final plan in completedPlans)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 16),
                       child: DownloadsTile(

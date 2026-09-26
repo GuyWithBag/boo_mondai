@@ -1,11 +1,5 @@
-import 'package:boo_mondai/features/features.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
-    show
-        StringHelper,
-        Deck,
-        StoredMediaService,
-        DecksDirectoryPaths,
-        DeckListingsService;
+    show StringHelper, Deck, DeckListing, LocalDB;
 
 final class ViewDeckListingSingleHelper {
   const ViewDeckListingSingleHelper();
@@ -28,17 +22,10 @@ final class ViewDeckListingSingleHelper {
     );
   }
 
-  List<String> carouselImageUrls(Deck deck) {
-    return DeckListingsService.getFeaturedImages(deck)
-        .map((value) => value.trim())
-        .where((value) => value.isNotEmpty)
-        .toSet()
-        .toList(growable: false);
-  }
-
   String profileName(Deck deck) {
+    final profile = LocalDB.profiles.selectByPk({'id': deck.profileId});
     return StringHelper.toTrimmedOrFallback(
-      deck.userProfile?.username,
+      profile?.username,
       'Unknown author',
     );
   }
@@ -51,12 +38,12 @@ final class ViewDeckListingSingleHelper {
     };
   }
 
-  int downloadsCount(Deck deck) {
-    return deck.listing?.downloadsCount ?? 0;
+  int downloadsCount(DeckListing? listing) {
+    return listing?.downloadsCount ?? 0;
   }
 
-  int forksCount(Deck deck) {
-    return deck.listing?.forksCount ?? 0;
+  int forksCount(DeckListing? listing) {
+    return listing?.forksCount ?? 0;
   }
 
   Deck? deckById(List<Deck> decks, String deckId) {

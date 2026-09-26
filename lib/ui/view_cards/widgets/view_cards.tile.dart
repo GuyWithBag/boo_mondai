@@ -7,7 +7,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         FlashcardTemplate,
         PhysicalCardController,
         ScaleHelper,
-        StudyCard,
         usePhysicalCardController,
         chipStyle,
         ViewCardsTileSide,
@@ -26,22 +25,9 @@ class ViewCardsTile extends HookWidget {
     this.editable = false,
     this.controller,
     super.key,
-  }) : studyCard = null,
-       assert(width > 0);
+  }) : assert(width > 0);
 
-  const ViewCardsTile.studyCard({
-    required this.studyCard,
-    this.width = 280,
-    this.initialSide = ViewCardsTileSide.front,
-    this.flippable = true,
-    this.editable = false,
-    this.controller,
-    super.key,
-  }) : template = null,
-       assert(width > 0);
-
-  final CardTemplate? template;
-  final StudyCard? studyCard;
+  final CardTemplate template;
   final double width;
   final ViewCardsTileSide initialSide;
   final bool flippable;
@@ -62,13 +48,7 @@ class ViewCardsTile extends HookWidget {
       base: tokens.studyCardWidth,
       min: 0.2,
     );
-    final resolvedTemplate = template ?? studyCard?.template;
-    final resolvedStudyCard =
-        studyCard ?? ViewCardsHelper.getPreviewStudyCard(resolvedTemplate);
-    final labels = _buildLabels(
-      resolvedTemplate: resolvedTemplate,
-      studyCard: resolvedStudyCard,
-    );
+    final labels = _buildLabels(template);
     final tileGap = ScaleHelper.getScaledValue(
       tokens.spaceLayoutGapSm,
       contentScale,
@@ -104,16 +84,13 @@ class ViewCardsTile extends HookWidget {
               children: [
                 ViewCardsHelper.getCorrespondingViewCard(
                   tokens,
-                  template: resolvedTemplate,
-                  studyCard: studyCard,
+                  template: template,
                   width: width,
                   side: initialSide,
                   controller: effectiveController,
                   contentScale: contentScale,
                 ),
-                if (resolvedTemplate != null &&
-                    flippable &&
-                    resolvedTemplate is FlashcardTemplate)
+                if (flippable && template is FlashcardTemplate)
                   Positioned(
                     right: flipInset,
                     bottom: flipInset,
@@ -156,20 +133,17 @@ class ViewCardsTile extends HookWidget {
       ),
     );
 
-    if (!editable || resolvedTemplate == null) return tile;
+    if (!editable) return tile;
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: () => onEditCardPressed(context, resolvedTemplate),
+      onTap: () => onEditCardPressed(context, template),
       child: tile,
     );
   }
 }
 
-List<String> _buildLabels({
-  required CardTemplate? resolvedTemplate,
-  required StudyCard? studyCard,
-}) {
+List<String> _buildLabels(CardTemplate template) {
   final labelsByKey = <String, String>{};
 
   void addLabel(String value) {
@@ -178,11 +152,7 @@ List<String> _buildLabels({
     labelsByKey.putIfAbsent(trimmed.toLowerCase(), () => trimmed);
   }
 
-  for (final tag in resolvedTemplate?.tags ?? const []) {
-    addLabel(tag.name);
-  }
-
-  for (final tag in studyCard?.personalTags ?? const []) {
+  for (final tag in template.tags) {
     addLabel(tag.name);
   }
 

@@ -3,18 +3,14 @@ import 'dart:developer' as dev;
 import 'package:boo_mondai/lib.barrel.dart'
     show
         CardTemplate,
-        DrillSessionController,
         FillInTheBlanksTemplate,
         FlashcardTemplate,
         IdentificationTemplate,
         MultipleChoiceTemplate,
         WordScrambleTemplate,
-        ReviewSessionController,
         Services,
         SessionException,
-        SessionMode,
         StudyRating,
-        StudySessionController,
         SubmissionStyle;
 import 'package:fsrs/fsrs.dart' as fsrs;
 
@@ -85,41 +81,6 @@ abstract final class StudySessionHelper {
         stackTrace: stackTrace,
       );
     }
-  }
-
-  static int getCurrentCount(
-    StudySessionController controller,
-    SessionMode mode,
-  ) {
-    if (mode == SessionMode.drill) {
-      return (controller as DrillSessionController).correctCount;
-    }
-    return controller.currentIndex + 1;
-  }
-
-  static int getTotalCount(
-    StudySessionController controller,
-    SessionMode mode,
-  ) {
-    if (mode == SessionMode.drill) {
-      final session = (controller as DrillSessionController).session;
-      if (session == null) {
-        throw const SessionException(
-          'Cannot get total count before a drill session has started.',
-          code: 'DRILL_SESSION_MISSING',
-        );
-      }
-      return session.totalQuestions;
-    }
-
-    final session = (controller as ReviewSessionController).session;
-    if (session == null) {
-      throw const SessionException(
-        'Cannot get total count before a review session has started.',
-        code: 'REVIEW_SESSION_MISSING',
-      );
-    }
-    return session.totalCards;
   }
 
   static String _withoutTrailingZero(String value) {

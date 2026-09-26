@@ -9,3 +9,4 @@ export 'researcher_dashboard.controller.dart';
 export 'researcher_dashboard.page.dart';
 export 'researcher_survey_detail.page.dart';
 export 'researcher_survey_response.page.dart';
+export 'researcher_dashboard.search.dart';

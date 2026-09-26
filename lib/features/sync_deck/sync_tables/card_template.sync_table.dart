@@ -22,7 +22,7 @@ class CardTemplateSyncTable extends SyncTable<CardTemplate> {
         getItemDeletedAt: (template) => template.deletedAt,
         applyPullItem: LocalDB.cardTemplate.upsert,
         applyPushItem: RemoteDB.card.upsert,
-        deleteRemoteItemById: (id) => RemoteDB.card.deleteWhere({'id': id}),
+        deleteRemoteItemById: (id) => RemoteDB.card.delete({'id': id}),
         preprocessPushItem: (template, profileId) =>
             CardTemplateMediaSyncPreprocessor.preprocessPushItem(
               template: template,

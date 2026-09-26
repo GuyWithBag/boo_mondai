@@ -6,8 +6,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         DateHelper,
         EditableTextValue,
         ViewProfileController,
-        ProfileAvatar,
-        controller;
+        ProfileAvatar;
 import 'package:flutter/material.dart'
     show
         BuildContext,
@@ -18,7 +17,7 @@ import 'package:flutter/material.dart'
         Widget,
         CrossAxisAlignment;
 import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
-import 'package:provider/provider.dart' show WatchContext;
+import 'package:provider/provider.dart' show ReadContext;
 import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart'
     show Surface, ThemeVariantsContext;
@@ -30,12 +29,12 @@ class ProfileCard extends SignalWidget {
 
   @override
   Widget build(BuildContext context) {
-    final auth = context.watch<AuthController>();
+    final auth = context.read<AuthController>();
 
     final tokens = context.themeTokens<AppTokens>();
 
     final profile = controller.profile.value;
-    final email = auth.currentEmail;
+    final email = auth.currentEmail.value;
     final displayName = profile.displayName.trim().isEmpty
         ? 'Guest User'
         : profile.displayName.trim();

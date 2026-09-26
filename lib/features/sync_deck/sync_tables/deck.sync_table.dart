@@ -21,14 +21,13 @@ class DeckSyncTable extends SyncTable<Deck> {
         getItemDeletedAt: (deck) => deck.deletedAt,
         applyPullItem: LocalDB.deck.upsert,
         applyPushItem: RemoteDB.deck.upsert,
-        deleteRemoteItemById: (id) => RemoteDB.deck.deleteWhere({'id': id}),
+        deleteRemoteItemById: (id) => RemoteDB.deck.delete({'id': id}),
         preprocessPushItem: (deck, profileId) =>
             DeckMediaSyncPreprocessor.preprocessPushItem(
               deck: deck,
               profileId: profileId,
             ),
-        toMap: (deck) =>
-            RemoteDB.deck.withoutJoinedFields(RemoteDB.deck.toMap(deck)),
+        toMap: (deck) => RemoteDB.deck.toMap(deck),
       );
 
   static Future<List<String>> getDeckIds({

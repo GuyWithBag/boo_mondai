@@ -1,22 +1,16 @@
 import 'dart:typed_data';
 
 import 'package:boo_mondai/lib.barrel.dart'
-    show
-        AuthService,
-        LocalDB,
-        RemoteDB,
-        CachedMedia,
-        MediaHelper,
-        CachedMediaService;
+    show AuthService, LocalDB, RemoteDB, CachedMedia, CachedMediaService;
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
 
 abstract final class ProfileService {
   static final bucketPathProfileAvatar = 'profileAvatar';
 
-  static final currentProfile = signal(LocalDB.profile.getOrCreate());
+  static final currentProfile = signal(LocalDB.currentProfile.getOrCreate());
   static final profileEffect = Effect(() {
-    LocalDB.profile.upsert(currentProfile.value);
+    LocalDB.currentProfile.upsert(currentProfile.value);
 
     if (!AuthService.isAuthenticatedRemote) return;
     // if (RemoteDB.profile.selectByUserId())
@@ -43,7 +37,7 @@ abstract final class ProfileService {
   static Future<void> upsertAvatar(Uint8List bytes) async {
     final cachedMedia = CachedMedia(
       bytes: bytes,
-      path: ProfileService.bucketPathProfileAvatar,
+      filePath: ProfileService.bucketPathProfileAvatar,
       profileId: currentProfile.value.id,
     );
 

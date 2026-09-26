@@ -1,5 +1,6 @@
 import 'package:boo_mondai/features/cards/models/card_template.dto.dart';
 import 'package:boo_mondai/features/cards/models/identification_answer.dto.dart';
+import 'package:boo_mondai/features/study_session/models/study_session.answer.dart';
 import 'package:boo_mondai/features/tags/models/tag.dto.dart';
 import 'package:boo_mondai/core/services/uuid.dart';
 import 'package:dart_mappable/dart_mappable.dart';
@@ -49,7 +50,7 @@ class IdentificationTemplate extends CardTemplate
   }
 
   @override
-  bool checkAnswer(String userAnswer, {bool isReversed = false}) {
-    return acceptedAnswers.any((answer) => answer.accepts(userAnswer));
+  bool checkAnswer(StudySessionAnswer answer, {bool isReversed = false}) {
+    return acceptedAnswers.any((accepted) => accepted.accepts(answer.value));
   }
 }

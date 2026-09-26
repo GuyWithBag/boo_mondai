@@ -28,7 +28,7 @@ abstract class CachedMediaService {
 
     final newCachedMedia = CachedMedia(
       bytes: bytes,
-      path: ProfileService.bucketPathProfileAvatar,
+      filePath: ProfileService.bucketPathProfileAvatar,
       profileId: currentProfile.value.id,
     );
 

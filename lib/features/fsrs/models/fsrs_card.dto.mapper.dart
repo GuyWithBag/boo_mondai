@@ -14,7 +14,6 @@ class FsrsCardMapper extends ClassMapperBase<FsrsCard> {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = FsrsCardMapper._());
       MutableEntityMapper.ensureInitialized();
-      StudyCardMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -44,9 +43,6 @@ class FsrsCardMapper extends ClassMapperBase<FsrsCard> {
       Field('studyCardId', _$studyCardId, key: r'study_card_id');
   static Card _$state(FsrsCard v) => v.state;
   static const Field<FsrsCard, Card> _f$state = Field('state', _$state);
-  static StudyCard? _$studyCard(FsrsCard v) => v.studyCard;
-  static const Field<FsrsCard, StudyCard> _f$studyCard =
-      Field('studyCard', _$studyCard, key: r'study_card', opt: true);
 
   @override
   final MappableFields<FsrsCard> fields = const {
@@ -58,7 +54,6 @@ class FsrsCardMapper extends ClassMapperBase<FsrsCard> {
     #profileId: _f$profileId,
     #studyCardId: _f$studyCardId,
     #state: _f$state,
-    #studyCard: _f$studyCard,
   };
 
   static FsrsCard _instantiate(DecodingData data) {
@@ -70,8 +65,7 @@ class FsrsCardMapper extends ClassMapperBase<FsrsCard> {
         purgeAfter: data.dec(_f$purgeAfter),
         profileId: data.dec(_f$profileId),
         studyCardId: data.dec(_f$studyCardId),
-        state: data.dec(_f$state),
-        studyCard: data.dec(_f$studyCard));
+        state: data.dec(_f$state));
   }
 
   @override
@@ -124,7 +118,6 @@ extension FsrsCardValueCopy<$R, $Out> on ObjectCopyWith<$R, FsrsCard, $Out> {
 
 abstract class FsrsCardCopyWith<$R, $In extends FsrsCard, $Out>
     implements MutableEntityCopyWith<$R, $In, $Out> {
-  StudyCardCopyWith<$R, StudyCard, StudyCard>? get studyCard;
   @override
   $R call(
       {String? id,
@@ -134,8 +127,7 @@ abstract class FsrsCardCopyWith<$R, $In extends FsrsCard, $Out>
       DateTime? purgeAfter,
       String? profileId,
       String? studyCardId,
-      Card? state,
-      StudyCard? studyCard});
+      Card? state});
   FsrsCardCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -148,9 +140,6 @@ class _FsrsCardCopyWithImpl<$R, $Out>
   late final ClassMapperBase<FsrsCard> $mapper =
       FsrsCardMapper.ensureInitialized();
   @override
-  StudyCardCopyWith<$R, StudyCard, StudyCard>? get studyCard =>
-      $value.studyCard?.copyWith.$chain((v) => call(studyCard: v));
-  @override
   $R call(
           {String? id,
           DateTime? createdAt,
@@ -159,8 +148,7 @@ class _FsrsCardCopyWithImpl<$R, $Out>
           Object? purgeAfter = $none,
           String? profileId,
           String? studyCardId,
-          Card? state,
-          Object? studyCard = $none}) =>
+          Card? state}) =>
       $apply(FieldCopyWithData({
         if (id != null) #id: id,
         if (createdAt != null) #createdAt: createdAt,
@@ -169,8 +157,7 @@ class _FsrsCardCopyWithImpl<$R, $Out>
         if (purgeAfter != $none) #purgeAfter: purgeAfter,
         if (profileId != null) #profileId: profileId,
         if (studyCardId != null) #studyCardId: studyCardId,
-        if (state != null) #state: state,
-        if (studyCard != $none) #studyCard: studyCard
+        if (state != null) #state: state
       }));
   @override
   FsrsCard $make(CopyWithData data) => FsrsCard(
@@ -181,8 +168,7 @@ class _FsrsCardCopyWithImpl<$R, $Out>
       purgeAfter: data.get(#purgeAfter, or: $value.purgeAfter),
       profileId: data.get(#profileId, or: $value.profileId),
       studyCardId: data.get(#studyCardId, or: $value.studyCardId),
-      state: data.get(#state, or: $value.state),
-      studyCard: data.get(#studyCard, or: $value.studyCard));
+      state: data.get(#state, or: $value.state));
 
   @override
   FsrsCardCopyWith<$R2, FsrsCard, $Out2> $chain<$R2, $Out2>(

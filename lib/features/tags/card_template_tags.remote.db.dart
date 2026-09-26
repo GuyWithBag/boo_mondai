@@ -29,5 +29,5 @@ class CardTemplateTagsRemoteDB extends SupabaseRemoteDB<CardTemplateTag> {
   Future<void> deleteComposite({
     required String templateId,
     required String tagId,
-  }) => deleteWhere({'template_id': templateId, 'tag_id': tagId});
+  }) => delete({'template_id': templateId, 'tag_id': tagId});
 }

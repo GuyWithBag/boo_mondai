@@ -2,7 +2,6 @@
 // PATH: lib/models/fsrs_card.dart
 // PURPOSE: Tracks a specific user's spaced-repetition progress for a StudyCard
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-import 'package:boo_mondai/features/study_cards/study_card.dto.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         MutableEntity,
@@ -33,7 +32,6 @@ class FsrsCard with FsrsCardMappable implements MutableEntity {
   final String studyCardId;
 
   final Card state;
-  final StudyCard? studyCard;
 
   FsrsCard({
     required this.id,
@@ -44,7 +42,6 @@ class FsrsCard with FsrsCardMappable implements MutableEntity {
     required this.profileId,
     required this.studyCardId,
     required this.state,
-    this.studyCard,
   });
 
   static Future<FsrsCard> create({

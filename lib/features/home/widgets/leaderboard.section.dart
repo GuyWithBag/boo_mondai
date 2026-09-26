@@ -9,13 +9,15 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
         Button,
-        ButtonSize,
         ButtonPadding,
-        LeaderboardEntry,
+        ButtonSize,
         LeaderboardTileWidget,
         SurfaceBorder,
         SurfaceShape,
-        surfaceStyle;
+        TextColor,
+        surfaceStyle,
+        textStyle,
+        JoinedLeaderboardEntry;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -29,14 +31,13 @@ class LeaderboardSection extends StatelessWidget {
     required this.currentUserId,
   });
 
-  final List<LeaderboardEntry> entries;
+  final List<JoinedLeaderboardEntry> entries;
   final bool isLoading;
   final String currentUserId;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final previewEntries = _previewEntries(entries, currentUserId);
 
     return Surface(
       style: surfaceStyle.resolve(tokens, const [
@@ -83,22 +84,20 @@ class LeaderboardSection extends StatelessWidget {
           SizedBox(height: 20.h),
           if (isLoading)
             const Center(child: CircularProgressIndicator())
-          else if (previewEntries.isEmpty)
+          else if (entries.isEmpty)
             Text(
               'No scores yet. Complete a drill to appear here.',
-              style: TextStyle(
-                color: tokens.colorTextMuted,
-                fontWeight: tokens.fontWeightTextStrong,
-              ),
+              style: textStyle.resolve(tokens, const [TextColor.muted]),
             )
           else
-            ...previewEntries.map(
+            ...entries.map(
               (entry) => Padding(
                 padding: EdgeInsets.only(bottom: 10.h),
                 child: LeaderboardTileWidget(
                   rank: entries.indexOf(entry) + 1,
-                  entry: entry,
-                  isCurrentUser: entry.profileId == currentUserId,
+                  entry: entry.entry,
+                  profile: entry.profile,
+                  isCurrentUser: entry.profile.id == currentUserId,
                 ),
               ),
             ),
@@ -115,28 +114,5 @@ class LeaderboardSection extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  List<LeaderboardEntry> _previewEntries(
-    List<LeaderboardEntry> entries,
-    String currentUserId,
-  ) {
-    if (entries.isEmpty) {
-      return const [];
-    }
-
-    final currentIndex = entries.indexWhere(
-      (entry) => entry.profileId == currentUserId,
-    );
-    if (currentIndex == -1) {
-      return [entries.first];
-    }
-
-    final result = <LeaderboardEntry>[entries[currentIndex]];
-    final behindIndex = currentIndex + 1;
-    if (behindIndex < entries.length) {
-      result.add(entries[behindIndex]);
-    }
-    return result;
   }
 }

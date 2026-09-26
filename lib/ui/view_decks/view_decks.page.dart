@@ -15,14 +15,18 @@ import 'package:boo_mondai/lib.barrel.dart'
         AuthService,
         Button,
         ButtonColor,
+        ChangeTrackerController,
+        ChangeTrackerRouteArgs,
+        ChangeTrackerService,
         ChangeTrackerStatus,
         CreateDeckTile,
         Deck,
         DeckListingTile,
-        DeckSearchFilter,
+        DeckWithListingContent,
         DeckTile,
         DeckTileState,
         FilteredSearchBar,
+        FilteredSearchBarController,
         InteractionHandler,
         ListingStatesWrapper,
         ProgressBar,
@@ -38,35 +42,56 @@ import 'package:boo_mondai/lib.barrel.dart'
         SyncButton,
         SyncPage,
         ViewDecksLocalController,
-        ViewDecksSearchScope,
         showViewImportModal,
         showSnackbar,
-        showModal,
-        useSelectionController,
-        useChangeTrackerController;
+        showModal;
+import 'package:boo_mondai/ui/ui.barrel.dart';
 import 'package:flutter/material.dart' hide AppBar, Scaffold;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-class ViewDecksLocalPage extends HookWidget {
+class ViewDecksLocalPage extends SignalHookWidget {
   const ViewDecksLocalPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final controller = context.watch<ViewDecksLocalController>();
-    final changeTrackerController = useChangeTrackerController(
-      inboundLabel: 'pull',
-      outboundLabel: 'push',
+    final controller = context.read<ViewDecksLocalController>();
+    final changeTrackerPageArgs = useMemoized(
+      () => signal(const ChangeTrackerRouteArgs.missing(entryId: '')),
     );
-    final syncController = context.watch<SyncController>();
-    final selectionController = useSelectionController<String>(
-      multiple: true,
-      isEnabled: false,
-      emptySelectionAllowed: true,
+    final changeTrackerController = useMemoized(
+      () => ChangeTrackerController(
+        service: ChangeTrackerService(
+          inboundLabel: 'pull',
+          outboundLabel: 'push',
+        ),
+        pageArgs: changeTrackerPageArgs,
+      ),
+      [changeTrackerPageArgs],
+    );
+    final syncController = context.read<SyncController>();
+    useEffect(() {
+      syncController.bindChangeTracker(changeTrackerController);
+      return () {
+        changeTrackerController.dispose();
+        changeTrackerPageArgs.dispose();
+      };
+    }, [syncController, changeTrackerController]);
+    final syncError = syncController.error.value;
+    final currentSyncEntry = syncController.currentEntry.value;
+    final isSyncing = syncController.isSyncing.value;
+    final isAlreadyUpToDate = syncController.isAlreadyUpToDate.value;
+    final shouldShowSyncPage = syncController.shouldShowSyncPage.value;
+    final selectionController = useMemoized(
+      () => SelectionController<String>(
+        multiple: true,
+        isEnabled: false,
+        emptySelectionAllowed: true,
+      ),
     );
     final syncSnackbarHandle = useRef<SnackbarHandle?>(null);
     final syncProgress = useRef(ValueNotifier(0.0));
@@ -77,8 +102,7 @@ class ViewDecksLocalPage extends HookWidget {
     }, const []);
 
     useEffect(() {
-      final err = syncController.syncError;
-      if (err == null) return null;
+      if (syncError == null) return null;
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!context.mounted) return;
@@ -86,15 +110,15 @@ class ViewDecksLocalPage extends HookWidget {
         syncSnackbarHandle.value = null;
         showSnackbar(
           context,
-          message: 'Sync failed: $err',
+          message: 'Sync failed: ${syncError.toString()}',
           leading: const Icon(Icons.sync_problem_outlined),
           duration: const Duration(seconds: 3),
           color: SnackbarColor.error,
         );
-        syncController.clearSyncError();
+        syncController.clearError();
       });
       return null;
-    }, [syncController.syncError]);
+    }, [syncError]);
 
     useEffect(() {
       return () {
@@ -105,15 +129,14 @@ class ViewDecksLocalPage extends HookWidget {
 
     useEffect(
       () {
-        final syncEntry = syncController.currentEntry;
-        if (syncEntry == null) return null;
-        final progress = syncEntry.progress ?? 0;
+        if (currentSyncEntry == null) return null;
+        final progress = currentSyncEntry.progress ?? 0;
 
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!context.mounted) return;
           syncProgress.value.value = progress.clamp(0.0, 1.0);
 
-          switch (syncEntry.status) {
+          switch (currentSyncEntry.status) {
             case ChangeTrackerStatus.fetching:
               syncSnackbarHandle.value ??= showSnackbar(
                 context,
@@ -177,9 +200,9 @@ class ViewDecksLocalPage extends HookWidget {
         return null;
       },
       [
-        syncController.currentEntry?.id,
-        syncController.currentEntry?.status,
-        ((syncController.currentEntry?.progress ?? 0) * 100).round(),
+        currentSyncEntry?.id,
+        currentSyncEntry?.status,
+        ((currentSyncEntry?.progress ?? 0) * 100).round(),
       ],
     );
 
@@ -189,13 +212,18 @@ class ViewDecksLocalPage extends HookWidget {
       final selectedDeckIds = selection.selectedValues;
       if (selectedDeckIds.isEmpty) return;
 
-      await controller.deleteDecks(selectedDeckIds);
+      final selectedDecks = controller.decks.value
+          .where((deck) => selectedDeckIds.contains(deck.id))
+          .toList(growable: false);
+
+      await controller.deleteDecks(selectedDecks);
       selection.clear();
-      selection.isEnabled = false;
+      selection.isEnabled.value = false;
     }
 
     Future<void> showSandboxFiles() async {
-      final sandboxDirectory = await FileSystemHandler.getAbsolutePath(null);
+      final sandboxDirectory =
+          await FileSystemHandler.getAbsolutePathOfRelativePath(null);
       final output = await _buildDirectoryTree(Directory(sandboxDirectory));
 
       debugPrint(output, wrapWidth: 1024);
@@ -216,46 +244,84 @@ class ViewDecksLocalPage extends HookWidget {
     }
 
     Future<void> showImportDeckModal() async {
-      final importText = await showViewImportModal(context);
-      if (importText == null || importText.trim().isEmpty || !context.mounted) {
-        return;
-      }
-
-      showSnackbar(
-        context,
-        message: 'Import data loaded (${importText.length} characters).',
-        leading: const Icon(Icons.upload_file_outlined),
-        color: SnackbarColor.success,
-      );
+      await showViewImportModal(context);
     }
 
     // If there's an active sync plan, show SyncPage while this page-owned
     // tracker service has reviewable sync work.
     if (AuthService.isAuthenticatedRemote &&
-        !syncController.isAlreadyUpToDate &&
-        syncController.shouldShowSyncPage) {
+        !isAlreadyUpToDate &&
+        shouldShowSyncPage) {
       return SyncPage(syncController: syncController);
     }
 
-    final searchState = controller.activeSearchState;
-    final searchBar = FilteredSearchBar<Deck, DeckSearchFilter>(
-      controller: searchState.controller,
-      filterCodec: searchState.scope.filterCodec,
-      searchResults: searchState.scope.searchResults,
-      items: controller.isDeckScope
-          ? controller.decks
-          : controller.listingDecks,
-      placeholder: 'Search decks',
-      resultLabelBuilder: (deck) => deck.title,
-      onResultSelected: (deck) {
-        if (controller.isDeckScope) {
-          controller.goToDeck(context, deck);
-        } else {
-          controller.goToListing(context, deck);
-        }
-      },
-      onSubmitted: (_) => controller.submitSearch(context, searchState.results),
+    final deckSearchController = useMemoized(
+      () => FilteredSearchBarController<Deck>(
+        tokenShapes: ViewDecksSearch.tokenShapes,
+        searchTextLabel: ViewDecksSearch.deckSearchTextLabel,
+        itemFilter: ViewDecksSearch.deckItemFilter,
+        sorter: ViewDecksSearch.deckSorter,
+        items: controller.decks.value,
+      ),
+      const [],
     );
+    final listingSearchController = useMemoized(
+      () => FilteredSearchBarController<DeckWithListingContent>(
+        tokenShapes: ViewDecksSearch.tokenShapes,
+        searchTextLabel: ViewDecksSearch.listingSearchTextLabel,
+        itemFilter: ViewDecksSearch.listingItemFilter,
+        sorter: ViewDecksSearch.listingSorter,
+        items: controller.listingEntries.value,
+      ),
+      const [],
+    );
+
+    useEffect(() {
+      deckSearchController.setItems(controller.decks.value);
+      return null;
+    }, [controller.decks.value, deckSearchController]);
+
+    useEffect(() {
+      listingSearchController.setItems(controller.listingEntries.value);
+      return null;
+    }, [controller.listingEntries.value, listingSearchController]);
+
+    useEffect(() {
+      return () {
+        deckSearchController.dispose();
+        listingSearchController.dispose();
+      };
+    }, [deckSearchController, listingSearchController]);
+
+    final visibleDecks = deckSearchController.results.value;
+    final visibleListingEntries = listingSearchController.results.value;
+    final hasSearchQuery = controller.isDeckScope.value
+        ? deckSearchController.hasText.value
+        : listingSearchController.hasText.value;
+
+    final searchBar = controller.isDeckScope.value
+        ? FilteredSearchBar<Deck>(
+            controller: deckSearchController,
+            placeholder: 'Search decks',
+            resultLabelBuilder: (deck) => deck.title,
+            onResultSelected: (deck) => controller.goToDeck(context, deck),
+            onSubmitted: (_) {
+              if (visibleDecks.length == 1) {
+                controller.goToDeck(context, visibleDecks.single);
+              }
+            },
+          )
+        : FilteredSearchBar<DeckWithListingContent>(
+            controller: listingSearchController,
+            placeholder: 'Search listings',
+            resultLabelBuilder: (entry) => entry.deck.title,
+            onResultSelected: (entry) => controller.goToListing(context, entry),
+            onSubmitted: (_) {
+              if (visibleListingEntries.length == 1) {
+                controller.goToListing(context, visibleListingEntries.single);
+              }
+            },
+          );
 
     return Scaffold(
       scrollStartAtTheBottom: true,
@@ -281,7 +347,7 @@ class ViewDecksLocalPage extends HookWidget {
             onPressed: () => context.push('/view-cards'),
           ),
           SyncButton(
-            isSyncing: syncController.isSyncing,
+            isSyncing: isSyncing,
             isAuthenticated: AuthService.isAuthenticatedRemote,
             onSync: () => syncController.sync(changeTrackerController),
           ),
@@ -297,33 +363,33 @@ class ViewDecksLocalPage extends HookWidget {
             top: tokens.spaceLayoutGapSm,
           ),
           child: SegmentedControl<ViewDecksSearchScope>(
-            value: controller.activeScope,
+            value: controller.activeScope.value,
             onChanged: controller.setActiveScope,
             options: [
-              for (final option in controller.scopeOptions)
+              for (final option in controller.scopeOptions.value)
                 SegmentOption(value: option.value, label: option.label),
             ],
           ),
         ),
       ),
-      body: controller.isDeckScope
+      body: controller.isDeckScope.value
           ? _DeckListView(
-              error: controller.error,
-              isLoading: controller.isLoading,
+              error: controller.error.value,
+              isLoading: controller.isLoading.value,
               onRetry: controller.load,
               onPressed: controller.goToDeck,
               onCreate: () => controller.createDeck(context),
-              decks: controller.visibleDecks,
-              hasSearchQuery: controller.hasSearchQuery,
+              decks: visibleDecks,
+              hasSearchQuery: hasSearchQuery,
               selectionController: selectionController,
             )
           : _DeckListingListView(
-              error: controller.error,
-              isLoading: controller.isLoading,
+              error: controller.error.value,
+              isLoading: controller.isLoading.value,
               onRetry: controller.load,
               onPressed: controller.goToListing,
-              decks: controller.visibleListingDecks,
-              hasSearchQuery: controller.hasSearchQuery,
+              entries: visibleListingEntries,
+              hasSearchQuery: hasSearchQuery,
             ),
     );
   }
@@ -482,7 +548,7 @@ class _DeckListingListView extends StatelessWidget {
   const _DeckListingListView({
     required this.isLoading,
     required this.error,
-    required this.decks,
+    required this.entries,
     required this.onRetry,
     required this.onPressed,
     required this.hasSearchQuery,
@@ -490,28 +556,57 @@ class _DeckListingListView extends StatelessWidget {
 
   final bool isLoading;
   final Exception? error;
-  final List<Deck> decks;
+  final List<DeckWithListingContent> entries;
   final VoidCallback onRetry;
-  final Function(BuildContext context, Deck deck) onPressed;
+  final Function(BuildContext context, DeckWithListingContent entry) onPressed;
   final bool hasSearchQuery;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
 
-    return ListingStatesWrapper<Deck>.list(
+    return ListingStatesWrapper<DeckWithListingContent>.list(
       isLoading: isLoading,
       exception: error,
-      items: decks,
+      items: entries,
       reverse: true,
       useParentScroll: true,
       onRetry: onRetry,
       skeletonTile: DeckListingTile(
-        deck: Deck.createNow(
-          profileId: 'loading',
-          title: 'Loading listing',
-          shortDescription: 'Loading listing description',
-          isPublished: true,
+        controller: DeckListingTileController(
+          deck: Deck(
+            id: '',
+            updatedAt: DateTime.now(),
+            createdAt: DateTime.now(),
+            profileId: 'loading',
+            title: 'Loading listing',
+            shortDescription: 'Loading listing description',
+            isPublished: true,
+          ),
+          listing: DeckListing(deckId: '', contentId: ''),
+          content: Content(
+            id: '',
+            profileId: '',
+            type: ContentType.deck,
+            createdAt: DateTime.now(),
+            updatedAt: DateTime.now(),
+          ),
+          sourceProfile: Profile(
+            displayName: '',
+            id: '',
+            createdAt: DateTime.now(),
+            updatedAt: DateTime.now(),
+            userId: '',
+            username: '',
+          ),
+          profile: Profile(
+            displayName: '',
+            id: '',
+            createdAt: DateTime.now(),
+            updatedAt: DateTime.now(),
+            userId: '',
+            username: '',
+          ),
         ),
       ),
       emptyState: hasSearchQuery
@@ -528,11 +623,17 @@ class _DeckListingListView extends StatelessWidget {
               disableScaffoldScrollingWhenShown: true,
             ),
       separatorHeight: tokens.spaceLayoutGapMd,
-      itemBuilder: (context, _, deck) {
+      itemBuilder: (context, _, entry) {
         return DeckListingTile(
-          deck: deck,
+          controller: DeckListingTileController(
+            deck: entry.deck,
+            listing: entry.deckListing,
+            content: entry.deckListingContent,
+            profile: entry.profile,
+            sourceProfile: entry.sourceProfile ?? entry.profile,
+          ),
           onPressed: () {
-            onPressed(context, deck);
+            onPressed(context, entry);
           },
         );
       },

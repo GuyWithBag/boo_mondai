@@ -1,11 +1,11 @@
 import 'package:boo_mondai/features/features.barrel.dart';
-import 'package:boo_mondai/lib.barrel.dart'
-    show AuthController, Controller, Pages;
+import 'package:boo_mondai/lib.barrel.dart' show AuthController, Pages;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
+import 'package:signals/signals_flutter.dart';
 
-class RegisterController extends Controller {
+class RegisterController {
   RegisterController({
     required AuthController authController,
     required this.nameController,
@@ -15,11 +15,12 @@ class RegisterController extends Controller {
     required this.emailFocus,
     required this.passwordFocus,
     required this.formKey,
-  }) : _authController = authController {
-    _authController.addListener(notifyListeners);
+  }) : authController = authController {
+    isLoading = computed(() => authController.isLoading.value);
+    error = computed(() => authController.error.value);
   }
 
-  final AuthController _authController;
+  final AuthController authController;
   final TextEditingController nameController;
   final TextEditingController emailController;
   final TextEditingController passwordController;
@@ -27,12 +28,8 @@ class RegisterController extends Controller {
   final FocusNode emailFocus;
   final FocusNode passwordFocus;
   final GlobalKey<FormState> formKey;
-
-  @override
-  bool get isLoading => _authController.isLoading;
-
-  @override
-  Exception? get error => _authController.error;
+  late final Computed<bool> isLoading;
+  late final Computed<Exception?> error;
 
   void requestInitialFocus() {
     nameFocus.requestFocus();
@@ -41,7 +38,7 @@ class RegisterController extends Controller {
   Future<void> signUp(BuildContext context) async {
     if (!(formKey.currentState?.validate() ?? false)) return;
 
-    final response = await _authController.signUp(
+    final response = await authController.signUp(
       context,
       email: emailController.text.trim(),
       password: passwordController.text,
@@ -53,7 +50,7 @@ class RegisterController extends Controller {
     if (response.profile == null) return;
 
     if (response.needsMerge) {
-      final isMergeResolved = await _authController.showPendingGuestMerge(
+      final isMergeResolved = await authController.showPendingGuestMerge(
         context,
         authServiceResponse: response,
       );
@@ -71,10 +68,9 @@ class RegisterController extends Controller {
     context.go(Pages.account.url);
   }
 
-  @override
   void dispose() {
-    _authController.removeListener(notifyListeners);
-    super.dispose();
+    error.dispose();
+    isLoading.dispose();
   }
 }
 
@@ -101,7 +97,6 @@ RegisterController useRegisterController({
     ),
     [authController],
   );
-  useListenable(controller);
   useEffect(() {
     controller.requestInitialFocus();
     return null;

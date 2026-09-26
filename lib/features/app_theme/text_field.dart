@@ -182,7 +182,7 @@ class TextField extends StatelessWidget {
   final bool autofocus;
 
   /// See [material.TextField.statesController].
-  final MaterialStatesController? statesController;
+  final WidgetStatesController? statesController;
 
   /// See [material.TextField.obscuringCharacter].
   final String obscuringCharacter;

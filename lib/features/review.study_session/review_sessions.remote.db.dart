@@ -15,8 +15,7 @@ class ReviewSessionsRemoteDB extends SupabaseRemoteDB<ReviewSession> {
       ReviewSessionMapper.fromMap;
 
   @override
-  Map<String, dynamic> toMap(ReviewSession item) =>
-      item.toMap()..remove('session_type');
+  Map<String, dynamic> toMap(ReviewSession item) => item.toMap();
 
   @override
   Map<String, Object?> primaryKeyFromItem(ReviewSession item) => {
@@ -28,9 +27,6 @@ class ReviewSessionsRemoteDB extends SupabaseRemoteDB<ReviewSession> {
 
   @override
   String get defaultSelect => _reviewSessionWithRelationsSelect;
-
-  @override
-  Set<String> get joinedFields => const {'deck', 'userProfile', 'user_profile'};
 }
 
 const _reviewSessionWithRelationsSelect =

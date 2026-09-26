@@ -14,12 +14,12 @@ import 'package:theme_variants/theme_variants.dart';
 class AnswerResultTile extends StatelessWidget {
   const AnswerResultTile({
     super.key,
-    required this.userAnswer,
+    required this.answerValue,
     required this.type, // <-- Replaced `isCorrect` and `selfRating`
     this.isEjected = false,
   });
 
-  final String userAnswer;
+  final String answerValue;
   final StudyRating type; // <-- The clean enum
   final bool isEjected;
 
@@ -44,7 +44,7 @@ class AnswerResultTile extends StatelessWidget {
               ? tokens.colorActionSuccess
               : tokens.colorActionError,
         ),
-        title: Text(userAnswer.isEmpty ? '(no answer)' : userAnswer),
+        title: Text(answerValue.isEmpty ? '(no answer)' : answerValue),
         trailing: isEjected
             ? Tooltip(
                 message: 'This card was moved to FSRS review',

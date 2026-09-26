@@ -4,18 +4,15 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         Button,
         ButtonColor,
-        CardTemplate,
         ChipTone,
         DateHelper,
-        Deck,
         DeckDetails,
         DeckFormValidator,
-        DeckListingSheetState,
-        DeckProfilesLabel,
         DeckTile,
         DeckTileState,
-        DiscussionSection,
+        ViewDiscussionSection,
         EditableCarousel,
+        EditableCarouselController,
         EditableFeaturedCardsColumn,
         FormField,
         MetaLabel,
@@ -34,100 +31,72 @@ import 'package:boo_mondai/lib.barrel.dart'
         ViewDeckListingSingleEditorController,
         ViewDeckListingSingleHelper,
         ViewDeckListingSinglePreviewController,
-        ViewDeckSingleHelper,
         ViewPaddingSizedBox,
         showBottomSheet,
-        showModal,
-        showSnackbar,
         surfaceStyle,
         useToolBarController,
-        useViewDeckListingSingleEditorController,
-        useViewDeckListingSinglePreviewController;
+        DeckListingsService;
+import 'package:boo_mondai/ui/view_deck_listing_single/view_deck_listing_single.barrel.dart';
 import 'package:flutter/material.dart'
     hide FormField, Scaffold, AppBar, showBottomSheet;
-import 'package:flutter_hooks/flutter_hooks.dart'
-    show HookWidget, useEffect, useMemoized, useState;
+import 'package:flutter_hooks/flutter_hooks.dart' show useEffect, useMemoized;
 
 import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
+import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart'
     show ThemeVariantsContext, Surface;
 
-Future<void> showViewDeckListingSingleSheet(
-  BuildContext context,
-  Deck deck, {
-  DeckListingSheetState initialState = DeckListingSheetState.preview,
-}) {
+Future<void> showViewDeckListingSingleSheet<
+  T extends ViewDeckListingSingleController
+>({required BuildContext context, required T controller}) {
   return showBottomSheet(
     context: context,
-    builder: (_) =>
-        ViewDeckListingSingleSheet(deck: deck, initialState: initialState),
+    builder: (_) => ViewDeckListingSingleSheet(controller: controller),
   );
 }
 
-class ViewDeckListingSingleSheet extends HookWidget {
-  const ViewDeckListingSingleSheet({
-    super.key,
-    required this.deck,
-    this.initialState = DeckListingSheetState.preview,
-  });
+class ViewDeckListingSingleSheet<T extends ViewDeckListingSingleController>
+    extends SignalHookWidget {
+  const ViewDeckListingSingleSheet({super.key, required this.controller});
 
-  final Deck deck;
-  final DeckListingSheetState initialState;
+  final T controller;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
+
     final helper = useMemoized(ViewDeckListingSingleHelper.new);
-    final state = useState(initialState);
-    final deckState = useState(deck);
-    final currentDeck = deckState.value;
-    final deckReader = useMemoized(
-      () =>
-          () => deckState.value,
-      [deckState],
-    );
-    final previewController = useViewDeckListingSinglePreviewController(
-      deckId: deck.id,
-      initialDeck: deck,
-      deckReader: deckReader,
-    );
-    final editorController = useViewDeckListingSingleEditorController(
-      context: context,
-      deckReader: deckReader,
-      onDeckUpdated: (updatedDeck) {
-        if (updatedDeck == null) return;
-        deckState.value = updatedDeck;
-      },
-    );
-    final isEditing = state.value == DeckListingSheetState.editor;
-    final formKey = useMemoized(GlobalKey<FormState>.new);
+
+    final isEditing = controller is ViewDeckListingSingleEditorController;
+
     final toolBarController = useToolBarController();
 
+    // ToDo: Eventually change this.
     useEffect(() {
-      final error = editorController.error ?? previewController.error;
-      if (error == null) return null;
-
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ScaffoldMessenger.maybeOf(context)?.showSnackBar(
           SnackBar(
-            content: Text(error.toString().replaceFirst('Exception: ', '')),
+            content: Text(
+              controller.error.toString().replaceFirst('Exception: ', ''),
+            ),
           ),
         );
-        editorController.setError(null);
-        previewController.clearErrors();
       });
       return null;
-    }, [editorController.error, previewController.error]);
+    }, [controller.error]);
 
     List<Widget> getAppBarActions() {
       final children = <Widget>[];
+
       if (isEditing) {
+        final editorController =
+            controller as ViewDeckListingSingleEditorController;
         children.add(
           Button.icon(
             icon: editorController.getPublishedButtonIcon(),
             color: editorController.getPublishedButtonColor(),
             tokens: tokens,
-            onPressed: () => editorController.togglePublished(),
+            onPressed: () => editorController.togglePublished(context: context),
           ),
         );
         children.add(
@@ -135,22 +104,23 @@ class ViewDeckListingSingleSheet extends HookWidget {
             icon: Icons.delete_outline,
             color: ButtonColor.error,
             tokens: tokens,
-            onPressed: editorController.canEdit && currentDeck.listing != null
-                ? editorController.deleteListing
+            onPressed: editorController.deck.value.isEditable
+                ? () => editorController.deleteListing(context: context)
                 : null,
           ),
         );
       } else {
+        final previewController =
+            controller as ViewDeckListingSinglePreviewController;
+
         children.add(
           Button.icon(
-            icon: previewController.isDownloading
+            icon: previewController.isDownloading.value
                 ? Icons.sync
                 : Icons.cloud_download_outlined,
             color: ButtonColor.primary,
             tokens: tokens,
-            onPressed:
-                previewController.isDownloading ||
-                    previewController.onDownloadPressed == null
+            onPressed: previewController.isDownloading.value
                 ? null
                 : previewController.onDownloadPressed,
           ),
@@ -190,28 +160,25 @@ class ViewDeckListingSingleSheet extends HookWidget {
               controller: toolBarController,
               useAttachments: true,
               createAttachmentPath: (file) => DecksDirectoryPaths.attachment(
-                deckTitle: currentDeck.title,
+                deckTitle: controller.deck.value.title,
                 fileNameWithoutExtension: file.name,
               ),
             ),
             body: isEditing
                 ? Form(
-                    key: formKey,
+                    key: (controller as ViewDeckListingSingleEditorController)
+                        .formKey,
                     child: _Body(
-                      deck: currentDeck,
                       helper: helper,
                       isEditing: isEditing,
-                      editor: editorController,
-                      preview: previewController,
+                      controller: controller,
                       appBarHeight: appBarHeight,
                     ),
                   )
                 : _Body(
-                    deck: currentDeck,
                     helper: helper,
                     isEditing: isEditing,
-                    editor: editorController,
-                    preview: previewController,
+                    controller: controller,
                     appBarHeight: appBarHeight,
                   ),
           ),
@@ -221,29 +188,57 @@ class ViewDeckListingSingleSheet extends HookWidget {
   }
 }
 
-class _Body extends StatelessWidget {
+class _Body<T extends ViewDeckListingSingleController>
+    extends SignalHookWidget {
   const _Body({
-    required this.deck,
     required this.helper,
     required this.isEditing,
-    required this.editor,
-    required this.preview,
     required this.appBarHeight,
+    required this.controller,
   });
 
-  final Deck deck;
   final ViewDeckListingSingleHelper helper;
   final bool isEditing;
-  final ViewDeckListingSingleEditorController editor;
-  final ViewDeckListingSinglePreviewController preview;
+  final T controller;
   final double appBarHeight;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
     final headerHeight = 370.h;
-    final tags = deck.tags.map((tag) => tag.name).toList(growable: false);
-    final carouselImageUrls = helper.carouselImageUrls(deck);
+
+    final tags = controller.deck.value.tags
+        .map((tag) => tag.name)
+        .toList(growable: false);
+
+    final featuredImages = DeckListingsService.getFeaturedImages(
+      deck: controller.deck.value,
+      listing: controller.listing.value,
+    );
+    final carouselController = useMemoized(
+      () => EditableCarouselController(
+        imageSources: featuredImages,
+        isEditable: isEditing,
+        maxImageCount: 5,
+        autoScrollInterval: isEditing ? null : Duration(seconds: 3),
+        shouldLoop: true,
+      ),
+      [isEditing, ...featuredImages],
+    );
+
+    useEffect(() {
+      return carouselController.dispose;
+    }, [carouselController]);
+
+    final previewController =
+        controller as ViewDeckListingSinglePreviewController;
+    final editorController =
+        controller as ViewDeckListingSingleEditorController;
+
+    final deck = controller.deck.value;
+
+    // ToDo: fix
+    final templates = editorController.getFeaturedCardTemplates();
 
     return Column(
       spacing: tokens.spaceLayoutGapXsm,
@@ -259,25 +254,16 @@ class _Body extends StatelessWidget {
             ),
             child: Center(
               child: FormField<List<String>>(
-                value: carouselImageUrls,
-                listenable: isEditing ? editor : preview,
+                value: featuredImages,
                 enabled: isEditing,
-                valueReader: () {
-                  return helper.carouselImageUrls(deck);
-                },
+
                 validator: DeckFormValidator.featuredImages,
                 builder: (_, _) {
                   return AspectRatio(
                     aspectRatio: tokens.deckListingFeaturedImagesAspectRatio,
                     child: EditableCarousel(
-                      imageSources: carouselImageUrls,
-                      maxImageCount: 5,
-                      isEditable: isEditing,
-                      onImagePicked: editor.updateListingFeaturedImage,
-                      shouldLoop: true,
-                      autoScrollInterval: isEditing
-                          ? null
-                          : Duration(seconds: 3),
+                      controller: carouselController,
+                      onImagePicked: editorController.upsertFeaturedImage,
                     ),
                   );
                 },
@@ -301,15 +287,16 @@ class _Body extends StatelessWidget {
                 spacing: tokens.spaceLayoutGapSm,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  DeckProfilesLabel(
-                    profileName: deck.userProfile!.username,
-                    profileAvatarUrl: deck.userProfile!.avatarUrl,
-                    sourceProfileAvatarUrl:
-                        ViewDeckSingleHelper.sourceProfileAvatarUrl(deck),
-                    sourceProfileName: ViewDeckSingleHelper.sourceProfileName(
-                      deck,
-                    ),
-                  ),
+                  // ToDo:
+                  // DeckProfilesLabel(
+                  //   profileName: controller.profile.value.username,
+                  //   profileAvatar: controller.profile.value.avatarUrl,
+                  //   sourceProfileAvatar:
+                  //       ViewDeckSingleHelper.sourceProfileAvatarUrl(deck),
+                  //   sourceProfileName: ViewDeckSingleHelper.sourceProfileName(
+                  //     deck,
+                  //   ),
+                  // ),
                   if (!isEditing)
                     Row(
                       spacing: tokens.spaceLayoutGapSm,
@@ -317,25 +304,25 @@ class _Body extends StatelessWidget {
                         Button.icon(
                           icon: Icons.arrow_upward,
                           tokens: tokens,
-                          onPressed: preview.isBusy
+                          onPressed: previewController.isLoading.value
                               ? null
-                              : preview.onUpvotePressed,
+                              : previewController.onUpvotePressed,
                         ),
                         Button.icon(
                           icon: Icons.arrow_downward,
                           tokens: tokens,
-                          onPressed: preview.isBusy
+                          onPressed: previewController.isLoading.value
                               ? null
-                              : preview.onDownvotePressed,
+                              : previewController.onDownvotePressed,
                         ),
                         Button.icon(
-                          icon: preview.isFavorite
+                          icon: previewController.isFavorite.value
                               ? Icons.favorite
                               : Icons.favorite_border,
                           tokens: tokens,
-                          onPressed: preview.isBusy
+                          onPressed: previewController.isLoading.value
                               ? null
-                              : preview.onFavoritePressed,
+                              : previewController.onFavoritePressed,
                         ),
                       ],
                     ),
@@ -347,25 +334,25 @@ class _Body extends StatelessWidget {
                 children: [
                   MetaLabel(
                     label: NumberHelper.formatAbbreviatedCount(
-                      helper.downloadsCount(deck),
+                      helper.downloadsCount(controller.listing.value),
                     ),
                     icon: Icons.download,
                   ),
                   MetaLabel(
                     label: NumberHelper.formatAbbreviatedCount(
-                      preview.upvotesCount,
+                      previewController.listing.value.upvotesCount,
                     ),
                     icon: Icons.arrow_upward,
                   ),
                   MetaLabel(
                     label: NumberHelper.formatAbbreviatedCount(
-                      preview.downvotesCount,
+                      previewController.listing.value.downvotesCount,
                     ),
                     icon: Icons.arrow_downward,
                   ),
                   MetaLabel(
                     label: NumberHelper.formatAbbreviatedCount(
-                      preview.favoritesCount,
+                      previewController.listing.value.favoritesCount,
                     ),
                     icon: Icons.favorite,
                   ),
@@ -390,10 +377,10 @@ class _Body extends StatelessWidget {
                 areTagsEditable: isEditing && deck.isEditable,
                 tagsPlaceholder: deck.isEditable ? 'Add tags' : 'No tags yet',
                 tagsTone: ChipTone.ghost,
-                onTitleChanged: editor.setTitle,
-                onShortDescriptionChanged: editor.setShortDescription,
-                onLongDescriptionChanged: editor.setLongDescription,
-                onTagsChanged: editor.setTags,
+                onTitleChanged: (value) => editorController.setTitle(value),
+                onShortDescriptionChanged: editorController.setShortDescription,
+                onLongDescriptionChanged: editorController.setLongDescription,
+                onTagsChanged: editorController.setTags,
                 metaLabels: Column(
                   spacing: tokens.spaceLayoutGapSm,
                   children: [
@@ -407,7 +394,7 @@ class _Body extends StatelessWidget {
                         ),
                         MetaLabel(
                           icon: Icons.style_outlined,
-                          label: '${deck.cardCount} cards',
+                          label: '${deck.cardTemplatesCount} cards',
                         ),
                       ],
                     ),
@@ -440,67 +427,54 @@ class _Body extends StatelessWidget {
               SectionEyebrow('Featured Cards'),
               if (isEditing)
                 FormField<List<Map<String, dynamic>>>(
-                  value: deck.listing?.featuredCards ?? const [],
-                  listenable: editor,
-                  valueReader: () {
-                    return deck.listing?.featuredCards ?? const [];
-                  },
+                  value: controller.listing.value.featuredCards,
+
                   validator: DeckFormValidator.featuredCards,
                   builder: (_, _) => EditableFeaturedCardsColumn(
-                    featuredCards: deck.listing?.featuredCards ?? const [],
+                    featuredCards: controller.listing.value.featuredCards,
                     isEditable: true,
-                    onAddPressed: () => _addFeaturedCard(context),
+                    onAddPressed: () => editorController.addFeaturedCard(
+                      context: context,
+                      modalChild: SizedBox(
+                        height: 420,
+                        child: ListView.separated(
+                          itemCount: templates.length,
+                          separatorBuilder: (_, _) => SizedBox(
+                            height: context
+                                .themeTokens<AppTokens>()
+                                .spaceLayoutGapMd,
+                          ),
+                          itemBuilder: (context, index) {
+                            final template = templates[index];
+
+                            return Center(
+                              child: GestureDetector(
+                                onTap: () =>
+                                    Navigator.of(context).pop(template),
+                                child: ViewCardsTile.template(
+                                  template: template,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
                     maxCardCount: 3,
                   ),
                 )
               else
                 EditableFeaturedCardsColumn(
-                  featuredCards: deck.listing?.featuredCards ?? const [],
+                  featuredCards: controller.listing.value.featuredCards,
                 ),
-              if (!isEditing) ...[DiscussionSection(sheet: preview)],
+              if (!isEditing) ...[
+                ViewDiscussionSection(rootContent: controller.content.value),
+              ],
               ViewPaddingSizedBox(side: Side.bottom),
             ],
           ),
         ),
       ],
     );
-  }
-
-  Future<void> _addFeaturedCard(BuildContext context) async {
-    final templates = editor.availableFeaturedCardTemplates();
-    if (templates.isEmpty) {
-      showSnackbar(
-        context,
-        message: 'You do not have any templates available for selection.',
-      );
-      return;
-    }
-
-    final selected = await showModal<CardTemplate>(
-      context: context,
-      title: 'Add featured card',
-      child: SizedBox(
-        height: 420,
-        child: ListView.separated(
-          itemCount: templates.length,
-          separatorBuilder: (_, _) => SizedBox(
-            height: context.themeTokens<AppTokens>().spaceLayoutGapMd,
-          ),
-          itemBuilder: (context, index) {
-            final template = templates[index];
-
-            return Center(
-              child: GestureDetector(
-                onTap: () => Navigator.of(context).pop(template),
-                child: ViewCardsTile.template(template: template),
-              ),
-            );
-          },
-        ),
-      ),
-    );
-    if (selected == null) return;
-
-    await editor.addListingFeaturedCard(selected);
   }
 }

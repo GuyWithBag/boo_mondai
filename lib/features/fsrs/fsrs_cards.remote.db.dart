@@ -42,9 +42,6 @@ class FsrsCardsRemoteDB extends SupabaseRemoteDB<FsrsCard> {
   @override
   String get defaultSelect => _fsrsCardWithRelationsSelect;
 
-  @override
-  Set<String> get joinedFields => const {'studyCard', 'study_cards'};
-
   Future<List<FsrsCard>> selectManyByUserIdAndStudyCardIds({
     required String profileId,
     required Set<String> studyCardIds,
@@ -88,8 +85,6 @@ class FsrsCardsRemoteDB extends SupabaseRemoteDB<FsrsCard> {
         );
 
   FsrsCard _fsrsCardFromMap(Map<String, dynamic> map) {
-    final studyCard = map['study_card'] ?? map['study_cards'];
-
     return FsrsCard(
       id: map['id'] as String,
       createdAt: _dateTimeFromMap(map, 'created_at'),
@@ -99,11 +94,6 @@ class FsrsCardsRemoteDB extends SupabaseRemoteDB<FsrsCard> {
       profileId: map['profile_id'] as String,
       studyCardId: (map['study_card_id'] ?? map['study_cards_id']) as String,
       state: _stateFromMap(map['state']),
-      studyCard: studyCard == null
-          ? null
-          : StudyCardMapper.fromMap(
-              Map<String, dynamic>.from(studyCard as Map),
-            ),
     );
   }
 

@@ -6,7 +6,14 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart'
-    show SupabaseRemoteDB, LeaderboardEntry, LeaderboardEntryMapper;
+    show
+        SupabaseRemoteDB,
+        LeaderboardEntry,
+        LeaderboardEntryMapper,
+        Profile,
+        ProfileMapper;
+
+typedef JoinedLeaderboardEntry = ({LeaderboardEntry entry, Profile profile});
 
 class LeaderboardEntriesRemoteDB extends SupabaseRemoteDB<LeaderboardEntry> {
   @override
@@ -24,24 +31,19 @@ class LeaderboardEntriesRemoteDB extends SupabaseRemoteDB<LeaderboardEntry> {
     'profile_id': item.profileId,
   };
 
-  @override
-  String get defaultSelect => _leaderboardEntryWithRelationsSelect;
+  Future<List<JoinedLeaderboardEntry>> selectJoined() async {
+    final res = await query
+        .select('*, profiles!inner(displayName, avatarUrl)')
+        .limit(5);
+    final typed = res
+        .map(
+          (value) => (
+            entry: LeaderboardEntryMapper.fromMap(value),
+            profile: ProfileMapper.fromMap(value['profiles']),
+          ),
+        )
+        .toList();
 
-  @override
-  Set<String> get joinedFields => const {'userProfile', 'user_profile'};
-
-  /// The view's display_name column is aliased to user_name to match the
-  /// key expected by [LeaderboardEntryMapper].
-  Future<List<LeaderboardEntry>> fetchLeaderboard() => guard(() async {
-    final query = client
-        .from(tableName)
-        .select(_leaderboardEntryWithRelationsSelect);
-    final response = await query.order('drill_score', ascending: false);
-    return List<Map<String, dynamic>>.from(
-      response,
-    ).map(fromJoinedMap).toList();
-  }, action: 'fetchLeaderboard()');
+    return typed;
+  }
 }
-
-const _leaderboardEntryWithRelationsSelect =
-    'profile_id, drill_score, review_count, user_profile';

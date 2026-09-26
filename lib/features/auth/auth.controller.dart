@@ -6,37 +6,60 @@
 import 'package:boo_mondai/features/app_theme/app_theme.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        Controller,
         AuthService,
         AuthServiceResponse,
-        Profile,
         LocalDB,
+        ProfileService,
         showModal,
         ModalTone,
         ModalAction,
         ButtonColor,
         SyncDeckService;
 import 'package:flutter/material.dart';
+import 'package:signals/signals_flutter.dart';
 
-class AuthController extends Controller {
+class AuthController {
+  final currentProfile = ProfileService.currentProfile;
+  final currentEmail = signal<String?>(AuthService.currentUser?.email);
+  final isAuthenticatedRemote = signal(AuthService.isAuthenticatedRemote);
+  final isLoading = signal(false);
+  final error = signal<Exception?>(null);
+
+  late final isAuthenticatedEither = computed(
+    () => isAuthenticatedRemote.value || !currentProfile.value.isAnonymous,
+  );
+
+  late final routerRefresh = computed(
+    () => (
+      profileId: currentProfile.value.id,
+      role: currentProfile.value.role,
+      isResearcher: currentProfile.value.isResearcher,
+      isAnonymous: currentProfile.value.isAnonymous,
+      currentEmail: currentEmail.value,
+      isAuthenticatedRemote: isAuthenticatedRemote.value,
+    ),
+  );
+
   // ── Getters ─────────────────────────────────────────────
 
-  Profile get currentProfile => LocalDB.profile.getOrCreate();
-
-  String? get currentEmail => AuthService.currentUser?.email;
-
-  bool get isAuthenticatedEither => AuthService.isAuthenticatedEither;
+  void refresh() {
+    currentProfile.value = LocalDB.currentProfile.getOrCreate();
+    currentEmail.value = AuthService.currentUser?.email;
+    isAuthenticatedRemote.value = AuthService.isAuthenticatedRemote;
+  }
 
   // ── Actions ─────────────────────────────────────────────
 
   Future<void> restoreSession() async {
-    setLoading(true);
+    isLoading.value = true;
+    error.value = null;
     try {
       await AuthService.restoreSession();
     } on Exception catch (e) {
-      setError(e);
+      error.value = e;
     } finally {
-      setLoading(false);
+      refresh();
+      isLoading.value = false;
     }
   }
 
@@ -45,18 +68,20 @@ class AuthController extends Controller {
     required String email,
     required String password,
   }) async {
-    setLoading(true);
+    isLoading.value = true;
+    error.value = null;
     try {
       final response = await AuthService.signIn(email, password);
       return response;
     } on Exception catch (e) {
-      setError(e);
+      error.value = e;
       if (!context.mounted) {
         return (profile: null, needsMerge: false, guestUserId: null);
       }
       showSnackbar(context, message: e.toString());
     } finally {
-      setLoading(false);
+      refresh();
+      isLoading.value = false;
     }
     return (profile: null, needsMerge: false, guestUserId: null);
   }
@@ -93,7 +118,8 @@ class AuthController extends Controller {
 
     if (guestId == null || remoteProfile == null) return false;
 
-    setLoading(true);
+    isLoading.value = true;
+    error.value = null;
     try {
       await AuthService.executeMergeDecision(
         authServiceResponse.needsMerge,
@@ -101,28 +127,31 @@ class AuthController extends Controller {
         remoteProfile,
       );
     } on Exception catch (e) {
-      setError(e);
+      error.value = e;
       if (!context.mounted) return false;
       showSnackbar(context, message: e.toString());
     } finally {
-      setLoading(false);
+      refresh();
+      isLoading.value = false;
     }
     return true;
   }
 
   Future<AuthServiceResponse> signInWithGoogle(BuildContext context) async {
-    setLoading(true);
+    isLoading.value = true;
+    error.value = null;
     try {
       final response = await AuthService.signInWithGoogle();
       return response;
     } on Exception catch (e) {
-      setError(e);
+      error.value = e;
       if (!context.mounted) {
         return (profile: null, needsMerge: false, guestUserId: null);
       }
       showSnackbar(context, message: e.toString());
     } finally {
-      setLoading(false);
+      refresh();
+      isLoading.value = false;
     }
     return (profile: null, needsMerge: false, guestUserId: null);
   }
@@ -133,24 +162,26 @@ class AuthController extends Controller {
     required String password,
     required String username,
   }) async {
-    setLoading(true);
+    isLoading.value = true;
+    error.value = null;
     try {
       final response = await AuthService.signUp(email, password, username);
       return response;
     } on Exception catch (e) {
-      setError(e);
+      error.value = e;
       if (!context.mounted) {
         return (profile: null, needsMerge: false, guestUserId: null);
       }
       showSnackbar(context, message: e.toString());
     } finally {
-      setLoading(false);
+      refresh();
+      isLoading.value = false;
     }
     return (profile: null, needsMerge: false, guestUserId: null);
   }
 
   Future<bool> hasLocalSyncData() async {
-    final profileId = currentProfile.id;
+    final profileId = currentProfile.value.id;
     final decks = LocalDB.deck.getByCurrentProfile();
 
     if (decks.isEmpty) return false;
@@ -171,7 +202,8 @@ class AuthController extends Controller {
   }
 
   Future<void> onSignOutPressed(BuildContext context) async {
-    setLoading(true);
+    isLoading.value = true;
+    error.value = null;
     if (!await hasLocalSyncData()) {
       if (!context.mounted) return;
       final proceed =
@@ -190,7 +222,7 @@ class AuthController extends Controller {
           false;
       if (!context.mounted) return;
       if (proceed) await signOut(context);
-      setLoading(false);
+      isLoading.value = false;
       return;
     }
 
@@ -222,27 +254,29 @@ class AuthController extends Controller {
     } else {
       signOut(context);
     }
-    setLoading(false);
+    isLoading.value = false;
   }
 
   Future<void> signOut(
     BuildContext context, {
     bool removeLocalData = false,
   }) async {
-    setLoading(true);
+    isLoading.value = true;
+    error.value = null;
 
     try {
       await AuthService.signOut();
-      await LocalDB.cachedProfile.clear();
+      await LocalDB.profiles.clear();
       if (removeLocalData) {
         await LocalDB.clearAll();
       }
     } on Exception catch (e) {
-      setError(e);
+      error.value = e;
       if (!context.mounted) return;
       showSnackbar(context, message: e.toString());
     } finally {
-      setLoading(false);
+      refresh();
+      isLoading.value = false;
     }
   }
 
@@ -253,13 +287,24 @@ class AuthController extends Controller {
   }
 
   Future<void> manualDevSignIn(String url) async {
-    setLoading(true);
+    isLoading.value = true;
+    error.value = null;
     try {
       await AuthService.manualDevLogin(url);
     } catch (e) {
-      setError(e as Exception);
+      error.value = e as Exception;
     } finally {
-      setLoading(false);
+      refresh();
+      isLoading.value = false;
     }
+  }
+
+  void dispose() {
+    routerRefresh.dispose();
+    isAuthenticatedEither.dispose();
+    error.dispose();
+    isLoading.dispose();
+    isAuthenticatedRemote.dispose();
+    currentEmail.dispose();
   }
 }

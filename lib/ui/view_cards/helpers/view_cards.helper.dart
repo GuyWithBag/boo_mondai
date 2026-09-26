@@ -30,19 +30,12 @@ import 'package:theme_variants/theme_variants.dart';
 abstract class ViewCardsHelper {
   static Widget getCorrespondingViewCard(
     AppTokens tokens, {
-    required CardTemplate? template,
-    required StudyCard? studyCard,
+    required CardTemplate template,
     required double width,
     required ViewCardsTileSide side,
     required PhysicalCardController? controller,
     double contentScale = 1,
   }) {
-    if (template == null) {
-      return Surface(
-        style: surfaceStyle.resolve(tokens),
-        child: const Text('Template Null'),
-      );
-    }
     final promptTextStyle = ScaleHelper.getTextStyleWithScaledFontSize(
       textStyle.resolve(tokens, const [
         TextSize.label,
@@ -56,12 +49,10 @@ abstract class ViewCardsHelper {
       FlashcardTemplate t => FlashcardCard(
         controller: controller,
         template: t,
-        studyCard:
-            studyCard ??
-            getPreviewStudyCard(
-              template,
-              isReversed: side == ViewCardsTileSide.back,
-            ),
+        studyCard: _getPreviewStudyCard(
+          template,
+          isReversed: side == ViewCardsTileSide.back,
+        ),
         maxWidth: width,
         contentScale: contentScale,
         isRevealed: side == ViewCardsTileSide.back,
@@ -115,19 +106,18 @@ abstract class ViewCardsHelper {
     };
   }
 
-  static StudyCard getPreviewStudyCard(
-    CardTemplate? template, {
+  static StudyCard _getPreviewStudyCard(
+    CardTemplate template, {
     bool isReversed = false,
   }) {
     final now = DateTime.now();
     return StudyCard(
-      id: '__view_cards_preview__${template?.id ?? 'unknown'}_$isReversed',
+      id: '__view_cards_preview__${template.id}_$isReversed',
       createdAt: now,
       updatedAt: now,
-      templateId: template?.id ?? 'unknown',
-      deckId: template?.deckId ?? 'unknown',
+      templateId: template.id,
+      deckId: template.deckId,
       isReversed: isReversed,
-      template: template,
     );
   }
 }

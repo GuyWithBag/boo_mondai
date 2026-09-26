@@ -12,9 +12,9 @@ class StreakService extends Service {
   Future<Streak> refreshFromReviewLogs({bool syncRemote = false}) async {
     final now = DateTime.now();
     final existing = LocalDB.streak.retrieve();
-    final profile = LocalDB.profile.getOrCreate();
+    final profile = LocalDB.currentProfile.getOrCreate();
     final calculation = StreakHelper.calculateFromActivityDates(
-      activityDates: LocalDB.reviewLog.activityDates(),
+      activityDates: LocalDB.reviewLogs.activityDates(),
       now: now,
     );
 

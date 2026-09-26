@@ -1,41 +1,53 @@
-import 'package:boo_mondai/lib.barrel.dart'
-    show
-        StudySessionRuleRegistry,
-        ConditionalMessageRule,
-        uuid,
-        MessageSessionStep;
 
-abstract class StudySessionRules {
-  static StudySessionRuleRegistry getRules() {
-    return StudySessionRuleRegistry([
-      ConditionalMessageRule(
-        id: 'three-incorrect-v1',
-        when: (context) => context.consecutiveIncorrectAnswers == 3,
-        occurrenceKey: (context) => 'after-step:${context.currentStepId}',
-        buildMessage: (context) => MessageSessionStep(
-          id: uuid.v7(),
-          messageDefinitionId: 'slow-down',
-          title: 'Take your time',
-          message:
-              'Read each prompt carefully. Accuracy matters more than speed.',
-          insertedByRuleId: 'three-incorrect-v1',
-          insertionReason: 'Three consecutive incorrect answers',
-        ),
+import 'package:boo_mondai/lib.barrel.dart' show uuid, StudySessionRule, StudyRating, StudySessionMessageStep;
+
+abstract final class StudySessionRules {
+  static final rules = <StudySessionRule>[
+    StudySessionRule(
+      id: 'three-incorrect-v1',
+      when: (session) {
+        final ratings = session.history
+            .map((entry) => entry.rating)
+            .whereType<StudyRating>();
+        return ratings
+                .toList()
+                .reversed
+                .takeWhile(
+                  (rating) =>
+                      rating == StudyRating.incorrect ||
+                      rating == StudyRating.again,
+                )
+                .length ==
+            3;
+      },
+      build: (session) => StudySessionMessageStep(
+        id: uuid.v7(),
+        messageDefinitionId: 'slow-down',
+        title: 'Take your time',
+        message:
+            'Read each prompt carefully. Accuracy matters more than speed.',
+        insertedByRuleId: 'three-incorrect-v1',
+        insertionReason: 'Three consecutive incorrect answers',
       ),
-      ConditionalMessageRule(
-        id: 'progress-encouragement-v1',
-        when: (context) =>
-            const {5, 10, 20}.contains(context.completedCardCount),
-        occurrenceKey: (context) => 'completed:${context.completedCardCount}',
-        buildMessage: (context) => MessageSessionStep(
+    ),
+    StudySessionRule(
+      id: 'progress-encouragement-v1',
+      when: (session) => const {5, 10, 20}.contains(
+        session.history.where((entry) => entry.rating != null).length,
+      ),
+      build: (session) {
+        final count = session.history
+            .where((entry) => entry.rating != null)
+            .length;
+        return StudySessionMessageStep(
           id: uuid.v7(),
           messageDefinitionId: 'progress-milestone',
           title: 'Good progress',
-          message: '${context.completedCardCount} cards completed.',
+          message: '$count cards completed.',
           insertedByRuleId: 'progress-encouragement-v1',
-          insertionReason: 'Completed ${context.completedCardCount} card steps',
-        ),
-      ),
-    ]);
-  }
+          insertionReason: 'Completed $count card steps',
+        );
+      },
+    ),
+  ];
 }

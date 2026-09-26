@@ -22,8 +22,9 @@ class CachedMediaMapper extends ClassMapperBase<CachedMedia> {
 
   static Uint8List _$bytes(CachedMedia v) => v.bytes;
   static const Field<CachedMedia, Uint8List> _f$bytes = Field('bytes', _$bytes);
-  static String _$path(CachedMedia v) => v.path;
-  static const Field<CachedMedia, String> _f$path = Field('path', _$path);
+  static String _$filePath(CachedMedia v) => v.filePath;
+  static const Field<CachedMedia, String> _f$filePath =
+      Field('filePath', _$filePath, key: r'file_path');
   static String _$profileId(CachedMedia v) => v.profileId;
   static const Field<CachedMedia, String> _f$profileId =
       Field('profileId', _$profileId, key: r'profile_id');
@@ -31,14 +32,14 @@ class CachedMediaMapper extends ClassMapperBase<CachedMedia> {
   @override
   final MappableFields<CachedMedia> fields = const {
     #bytes: _f$bytes,
-    #path: _f$path,
+    #filePath: _f$filePath,
     #profileId: _f$profileId,
   };
 
   static CachedMedia _instantiate(DecodingData data) {
     return CachedMedia(
         bytes: data.dec(_f$bytes),
-        path: data.dec(_f$path),
+        filePath: data.dec(_f$filePath),
         profileId: data.dec(_f$profileId));
   }
 
@@ -94,7 +95,7 @@ extension CachedMediaValueCopy<$R, $Out>
 
 abstract class CachedMediaCopyWith<$R, $In extends CachedMedia, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  $R call({Uint8List? bytes, String? path, String? profileId});
+  $R call({Uint8List? bytes, String? filePath, String? profileId});
   CachedMediaCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -107,16 +108,16 @@ class _CachedMediaCopyWithImpl<$R, $Out>
   late final ClassMapperBase<CachedMedia> $mapper =
       CachedMediaMapper.ensureInitialized();
   @override
-  $R call({Uint8List? bytes, String? path, String? profileId}) =>
+  $R call({Uint8List? bytes, String? filePath, String? profileId}) =>
       $apply(FieldCopyWithData({
         if (bytes != null) #bytes: bytes,
-        if (path != null) #path: path,
+        if (filePath != null) #filePath: filePath,
         if (profileId != null) #profileId: profileId
       }));
   @override
   CachedMedia $make(CopyWithData data) => CachedMedia(
       bytes: data.get(#bytes, or: $value.bytes),
-      path: data.get(#path, or: $value.path),
+      filePath: data.get(#filePath, or: $value.filePath),
       profileId: data.get(#profileId, or: $value.profileId));
 
   @override

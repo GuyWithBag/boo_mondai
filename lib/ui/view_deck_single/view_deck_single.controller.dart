@@ -1,49 +1,97 @@
-import 'package:boo_mondai/features/features.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         ButtonColor,
-        Controller,
+        Content,
+        ContentType,
         Deck,
-        DeckListingSheetState,
+        DeckListing,
+        DeckListingsService,
+        DecksDirectoryPaths,
         DecksService,
+        LocalDB,
         ModalAction,
-        ViewDecksLocalController,
+        ProfileService,
+        ViewDeckListingSingleEditorController,
         showViewDeckListingSingleSheet,
         showModal,
-        ViewDeckSingleHelper;
+        ViewDeckSingleHelper,
+        FileSystemHandler,
+        ImageHelper;
 import 'package:file_picker/file_picker.dart' show PlatformFile;
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class ViewDeckSingleSheetController extends Controller {
+class ViewDeckSingleSheetController {
   ViewDeckSingleSheetController({
-    required Deck initialDeck,
-    required BuildContext context,
-    required ViewDecksLocalController parentController,
-  }) : _context = context,
-       _parentController = parentController,
-       _deck = initialDeck;
+    required this.coverImage,
+    required this.initialDeck,
+  }) : deck = signal(initialDeck);
 
-  Deck _deck;
+  final Deck initialDeck;
+  final Signal<Deck> deck;
+  final Signal<ImageProvider?> coverImage;
 
-  final BuildContext _context;
-  final ViewDecksLocalController _parentController;
+  late final FutureSignal<ImageProvider?> coverImageFuture = futureSignal(
+    () async {
+      return await ImageHelper.getImageProviderFromSource(
+        DecksDirectoryPaths.coverImage(deckTitle: deck.value.title),
+      );
+    },
+  );
 
-  Deck get deck => _deck;
+  late final controllerEffect = effect(() {
+    coverImageFuture.value.map(
+      error: () {},
+      loading: () {},
+      data: (value) {
+        coverImage.value = value;
+      },
+    );
+  });
 
-  void _setDeck(Deck? updatedDeck) {
-    if (updatedDeck == null) return;
+  late final title = computed(
+    () => ViewDeckSingleHelper.getTitle(deck.value.title),
+  );
+  late final shortDescription = computed(
+    () => ViewDeckSingleHelper.getShortDescription(deck.value.shortDescription),
+  );
+  late final longDescription = computed(
+    () => ViewDeckSingleHelper.getLongDescription(deck.value.longDescription),
+  );
+  late final profile = computed(
+    () => LocalDB.profiles.selectByPk({'id': deck.value.profileId}),
+  );
+  late final profileName = computed(
+    () => ViewDeckSingleHelper.getProfileName(profile.value?.displayName),
+  );
+  late final visibilityLabel = computed(
+    () => ViewDeckSingleHelper.getVisibilityLabel(deck.value.visibilityState),
+  );
+  late final tagNames = computed(
+    () => deck.value.tags.map((tag) => tag.name).toList(growable: false),
+  );
+  late final coverImagePath = computed(
+    () => DecksDirectoryPaths.coverImage(deckTitle: deck.value.title),
+  );
 
-    _deck = updatedDeck;
-    notifyListeners();
-    _parentController.load();
+  static Content resolveDeckContent(Deck deck) {
+    final existing = LocalDB.contents.selectByPk({'id': deck.id});
+    if (existing != null) return existing;
+
+    return Content(
+      id: deck.id,
+      profileId: deck.profileId,
+      createdAt: deck.createdAt,
+      updatedAt: deck.updatedAt,
+      type: ContentType.deck,
+    );
   }
 
-  Future<void> onCreateListingPressed() async {
-    if (_deck.isPublished) return;
+  Future<void> onCreateListingPressed(BuildContext context) async {
+    if (deck.value.isPublished) return;
 
     final shouldCreateListing = await showModal<bool>(
-      context: _context,
+      context: context,
       title: 'Create deck listing?',
       subtitle:
           'This will create a listing of this deck to publish online. You will have to publish it in the listing.',
@@ -59,25 +107,41 @@ class ViewDeckSingleSheetController extends Controller {
     );
     if (shouldCreateListing != true) return;
 
-    _setDeck(await DecksService.createAndUpsertListing(deck));
+    final listing = await DeckListingsService.createListing(deck.value);
+    final listingContent =
+        LocalDB.contents.selectByPk({'id': listing.contentId}) ??
+        Content(
+          id: listing.contentId,
+          profileId: deck.value.profileId,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+          type: ContentType.deckListing,
+        );
 
-    if (_context.mounted) {
+    await LocalDB.contents.upsert(listingContent);
+    await LocalDB.deckListing.upsert(listing);
+
+    if (context.mounted) {
       await showViewDeckListingSingleSheet(
-        _context,
-        deck,
-        initialState: DeckListingSheetState.editor,
+        context: context,
+        controller: ViewDeckListingSingleEditorController(
+          deck: deck,
+          content: signal(listingContent),
+          listing: signal<DeckListing>(listing),
+          profile: ProfileService.currentProfile,
+          sourceProfile: ProfileService.currentProfile,
+        ),
       );
     }
   }
 
-  Future<void> showDeckPath() async {
-    final mediaDirectoryPath = await FileSystemHandler.getAbsolutePath(
-      deck.title,
-    );
-    if (!_context.mounted) return;
+  Future<void> showDeckPath(BuildContext context) async {
+    final mediaDirectoryPath =
+        await FileSystemHandler.getAbsolutePathOfRelativePath(deck.value.title);
+    if (!context.mounted) return;
 
     await showModal<void>(
-      context: _context,
+      context: context,
       leading: const Icon(Icons.folder_outlined),
       title: 'Deck path',
       child: SelectableText(
@@ -88,44 +152,87 @@ class ViewDeckSingleSheetController extends Controller {
   }
 
   Future<void> setTitle(String value) async {
-    final updatedDeck = await DecksService.setTitle(deck: _deck, title: value);
-    _setDeck(updatedDeck);
+    // await DecksService.setTitle(
+    //   deck: deck.value,
+    //   content: content.value,
+    //   title: value,
+    // );
+
+    deck.value = deck.value.copyWith(
+      title: value.trim(),
+      updatedAt: DateTime.now(),
+    );
   }
 
   Future<void> setShortDescription(String value) async {
-    final updatedDeck = await DecksService.update(
-      deck: _deck,
-      shortDescription: value,
+    // final updatedDeck = await DecksService.update(
+    //   deck: deck.value,
+    //   content: content.value,
+    //   shortDescription: value,
+    // );
+
+    deck.value = deck.value.copyWith(
+      shortDescription: value.trim(),
+      updatedAt: DateTime.now(),
     );
-    _setDeck(updatedDeck);
   }
 
   Future<void> setLongDescription(String value) async {
-    final updatedDeck = await DecksService.update(
-      deck: _deck,
-      longDescription: value,
+    // final updatedDeck = await DecksService.update(
+    //   deck: deck.value,
+    //   content: content.value,
+    //   longDescription: value,
+    // );
+
+    deck.value = deck.value.copyWith(
+      longDescription: value.trim(),
+      updatedAt: DateTime.now(),
     );
-    _setDeck(updatedDeck);
   }
 
   Future<void> setTags(List<String> tagNames) async {
-    final updatedDeck = await DecksService.setTags(
-      deck: _deck,
-      tagNames: tagNames,
-    );
-    _setDeck(updatedDeck);
+    // final updatedDeck = await DecksService.setTags(
+    //   deck: deck.value,
+    //   content: content.value,
+    //   tagNames: tagNames,
+    // );
+
+    // deck.value = deck.value.copyWith();
   }
 
   Future<void> onCoverImagePicked(PlatformFile file) async {
-    await DecksService.setCoverImageUrlByFile(deck: _deck, file: file);
+    // await DecksService.setCoverImageUrlByFile(
+    //   deck: deck.value,
+    //   content: content.value,
+    //   file: file,
+    // );
+
+    // ToDo: Add error handling
+    if (file.bytes == null) return;
+    coverImage.value = MemoryImage(file.bytes!);
   }
 
-  Future<void> deleteDeck() async {
+  void onExit() {
+    save();
+  }
+
+  void save() {
+    if (initialDeck.title != deck.value.title) {
+      DecksService.setTitle(deck: deck.value, title: deck.value.title);
+    }
+
+    if (initialDeck != deck.value) {
+      DecksService.upsert(deck: deck.value);
+    }
+  }
+
+  Future<void> deleteDeck(BuildContext context) async {
     final confirmed = await showModal<bool>(
-      context: _context,
+      context: context,
       title: 'Delete deck?',
+      // ToDo: fix this
       subtitle:
-          '"${ViewDeckSingleHelper.title(_deck)}" and all its cards will be removed.',
+          '"${ViewDeckSingleHelper.getTitle(deck.value.title)}" and all its cards will be removed.',
       leading: const Icon(Icons.delete_outline),
       actions: [
         const ModalAction<bool>(value: false, label: 'Cancel'),
@@ -138,28 +245,23 @@ class ViewDeckSingleSheetController extends Controller {
     );
     if (confirmed != true) return;
 
-    await _parentController.deleteDeck(_deck.id);
-    if (_context.mounted) {
-      Navigator.of(_context).pop();
+    await DecksService.deleteDeckCascades(deck: deck.value);
+    if (context.mounted) {
+      Navigator.of(context).pop();
     }
   }
-}
 
-ViewDeckSingleSheetController useViewDeckSingleSheet({
-  required BuildContext context,
-  required Deck initialDeck,
-  required ViewDecksLocalController controller,
-}) {
-  final sheetController = useMemoized(
-    () => ViewDeckSingleSheetController(
-      initialDeck: initialDeck,
-      context: context,
-      parentController: controller,
-    ),
-    [initialDeck.id, controller],
-  );
-  useListenable(sheetController);
-  useEffect(() => sheetController.dispose, [sheetController]);
+  void dispose() {
+    onExit();
 
-  return sheetController;
+    coverImagePath.dispose();
+    tagNames.dispose();
+    visibilityLabel.dispose();
+    profileName.dispose();
+    profile.dispose();
+    longDescription.dispose();
+    shortDescription.dispose();
+    title.dispose();
+    deck.dispose();
+  }
 }

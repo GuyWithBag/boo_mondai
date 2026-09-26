@@ -9,7 +9,7 @@ abstract final class Env {
   // Replace with your Supabase project credentials
   static const supabaseUrl = String.fromEnvironment(
     'SUPABASE_URL',
-    defaultValue: 'http://192.168.1.105:54321',
+    defaultValue: 'http://127.0.0.1:54321',
   );
 
   static const supabaseAnonKey = String.fromEnvironment(

@@ -15,20 +15,15 @@ import 'package:boo_mondai/lib.barrel.dart'
         SurfacePadding,
         SurfaceShape,
         SurfaceColor,
-        ViewDecksLocalController,
         ViewDeckSingleSheetController,
         surfaceStyle,
-        useViewDeckSingleSheet,
         Scaffold,
         ViewDeckSingleBottomNavBar,
         BackgroundImageSurface,
         SurfaceBorder,
         SurfaceShadow,
         AppBar,
-        ViewDeckSingleHelper,
         DateHelper,
-        DecksService,
-        ImageHelper,
         FormField,
         DecksDirectoryPaths,
         ToolBar,
@@ -36,10 +31,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         showBottomSheet;
 import 'package:flutter/material.dart'
     hide AppBar, FormField, Scaffold, showBottomSheet;
-import 'package:flutter_hooks/flutter_hooks.dart' show HookWidget;
+import 'package:flutter_hooks/flutter_hooks.dart' show useEffect, useMemoized;
 import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
 import 'package:go_router/go_router.dart' show GoRouterHelper;
-import 'package:provider/provider.dart' show ReadContext;
+import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart'
     show Surface, ThemeVariantsContext;
 
@@ -50,7 +45,7 @@ Future<void> showViewDeckSingleSheet(BuildContext context, Deck deck) {
   );
 }
 
-class ViewDeckSingleSheet extends HookWidget {
+class ViewDeckSingleSheet extends SignalHookWidget {
   const ViewDeckSingleSheet({super.key, required this.deck});
 
   final Deck deck;
@@ -58,14 +53,16 @@ class ViewDeckSingleSheet extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final decksController = context.read<ViewDecksLocalController>();
-    final sheet = useViewDeckSingleSheet(
-      context: context,
-      initialDeck: deck,
-      controller: decksController,
-    );
+    // final decksController = context.read<ViewDecksLocalController>();
+    final controller = useMemoized(() {
+      return ViewDeckSingleSheetController(
+        initialDeck: deck,
+        coverImage: signal(null),
+      );
+    });
+    useEffect(() => controller.dispose, [controller]);
     final toolBarController = useToolBarController();
-    final activeDeck = sheet.deck;
+    final activeDeck = controller.deck.value;
 
     return DraggableScrollableSheet(
       expand: false,
@@ -102,12 +99,12 @@ class ViewDeckSingleSheet extends HookWidget {
                 Button.icon(
                   tokens: tokens,
                   icon: Icons.list,
-                  onPressed: sheet.onCreateListingPressed,
+                  onPressed: () => controller.onCreateListingPressed(context),
                 ),
                 Button.icon(
                   tokens: tokens,
                   icon: Icons.folder_outlined,
-                  onPressed: sheet.showDeckPath,
+                  onPressed: () => controller.showDeckPath(context),
                 ),
                 Button.icon(
                   tokens: tokens,
@@ -120,7 +117,7 @@ class ViewDeckSingleSheet extends HookWidget {
                   tokens: tokens,
                   icon: Icons.delete_outline,
                   color: ButtonColor.error,
-                  onPressed: sheet.deleteDeck,
+                  onPressed: () => controller.deleteDeck(context),
                 ),
               ],
               bottom: Padding(
@@ -142,8 +139,8 @@ class ViewDeckSingleSheet extends HookWidget {
             ),
             padding: EdgeInsets.zero,
             body: activeDeck.isEditable
-                ? Form(child: _Body(sheet: sheet))
-                : _Body(sheet: sheet),
+                ? Form(child: _Body(controller: controller))
+                : _Body(controller: controller),
           ),
         );
       },
@@ -151,14 +148,13 @@ class ViewDeckSingleSheet extends HookWidget {
   }
 }
 
-class _Body extends StatelessWidget {
-  const _Body({required this.sheet});
+class _Body extends SignalHookWidget {
+  const _Body({required this.controller});
 
-  final ViewDeckSingleSheetController sheet;
+  final ViewDeckSingleSheetController controller;
 
   @override
   Widget build(BuildContext context) {
-    final deck = sheet.deck;
     final tokens = context.themeTokens<AppTokens>();
 
     final deckWidth = 160.w;
@@ -175,17 +171,13 @@ class _Body extends StatelessWidget {
           right: 0,
           top: 0,
           height: headerHeight + tokens.radiusSurfaceLg,
-          child: BackgroundImageSurface(
-            image: ImageHelper.getImageProviderFromSource(
-              DecksDirectoryPaths.coverImage(deckTitle: deck.title),
-            ),
-          ),
+          child: BackgroundImageSurface(image: controller.coverImage.value),
         ),
         Column(
           children: [
             SizedBox(height: headerHeight - deckFloatInset),
             _BodySubSection(
-              sheet: sheet,
+              controller: controller,
               deckWidth: deckWidth,
               collapseDistance: headerHeight * 0.55,
               floatingHitInset: deckFloatInset,
@@ -197,23 +189,24 @@ class _Body extends StatelessWidget {
   }
 }
 
-class _BodySubSection extends StatelessWidget {
+class _BodySubSection extends SignalHookWidget {
   const _BodySubSection({
-    required this.sheet,
+    required this.controller,
     required this.deckWidth,
     required this.collapseDistance,
     required this.floatingHitInset,
   });
 
-  final ViewDeckSingleSheetController sheet;
+  final ViewDeckSingleSheetController controller;
   final double deckWidth;
   final double collapseDistance;
   final double floatingHitInset;
 
   @override
   Widget build(BuildContext context) {
-    final deck = sheet.deck;
-    final tags = deck.tags.map((tag) => tag.name).toList(growable: false);
+    final deck = controller.deck;
+    final activeDeck = deck.value;
+    final tags = controller.tagNames.value;
     final tokens = context.themeTokens<AppTokens>();
 
     return SizedBox(
@@ -238,31 +231,22 @@ class _BodySubSection extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       DeckProfilesLabel(
-                        profileName: ViewDeckSingleHelper.profileName(deck),
-                        profileAvatarUrl: ViewDeckSingleHelper.profileAvatarUrl(
-                          deck,
-                        ),
-                        sourceProfileName:
-                            ViewDeckSingleHelper.sourceProfileName(deck),
-                        sourceProfileAvatarUrl:
-                            ViewDeckSingleHelper.sourceProfileAvatarUrl(deck),
+                        profileName: controller.profileName.value,
                       ),
                     ],
                   ),
                   DeckDetails(
-                    title: ViewDeckSingleHelper.title(deck),
-                    shortDescription: ViewDeckSingleHelper.shortDescription(
-                      deck,
-                    ),
-                    longDescription: ViewDeckSingleHelper.longDescription(deck),
-                    onTitleChanged: sheet.setTitle,
-                    onShortDescriptionChanged: sheet.setShortDescription,
-                    onLongDescriptionChanged: sheet.setLongDescription,
+                    title: controller.title.value,
+                    shortDescription: controller.shortDescription.value,
+                    longDescription: controller.longDescription.value,
+                    onTitleChanged: controller.setTitle,
+                    onShortDescriptionChanged: controller.setShortDescription,
+                    onLongDescriptionChanged: controller.setLongDescription,
                     tags: tags,
-                    onTagsChanged: sheet.setTags,
-                    areTagsEditable: deck.isEditable,
-                    isEditable: deck.isEditable,
-                    tagsPlaceholder: deck.isEditable
+                    onTagsChanged: controller.setTags,
+                    areTagsEditable: controller.deck.value.isEditable,
+                    isEditable: controller.deck.value.isEditable,
+                    tagsPlaceholder: controller.deck.value.isEditable
                         ? 'Add tags'
                         : 'No tags yet',
                     tagsTone: ChipTone.ghost,
@@ -272,11 +256,11 @@ class _BodySubSection extends StatelessWidget {
                       children: [
                         MetaLabel(
                           icon: Icons.visibility_outlined,
-                          label: ViewDeckSingleHelper.visibilityLabel(deck),
+                          label: controller.visibilityLabel.value,
                         ),
                         MetaLabel(
                           icon: Icons.style_outlined,
-                          label: '${deck.cardCount} cards',
+                          label: '${activeDeck.cardTemplatesCount} cards',
                         ),
                       ],
                     ),
@@ -288,28 +272,20 @@ class _BodySubSection extends StatelessWidget {
           Positioned(
             left: tokens.spaceLayoutPadding,
             top: 0,
-            child: deck.isEditable
+            child: controller.deck.value.isEditable
                 ? FormField<String?>(
-                    value: DecksDirectoryPaths.coverImage(
-                      deckTitle: deck.title,
-                    ),
-                    listenable: sheet,
-                    valueReader: () {
-                      return DecksDirectoryPaths.coverImage(
-                        deckTitle: sheet.deck.title,
-                      );
-                    },
+                    value: controller.coverImagePath.value,
                     validator: DeckFormValidator.optionalImage,
                     builder: (_, _) => DeckTile(
-                      deck: deck,
+                      deck: activeDeck,
                       width: deckWidth,
                       state: DeckTileState.bare,
                       isImageEditable: true,
-                      onImagePicked: sheet.onCoverImagePicked,
+                      onImagePicked: controller.onCoverImagePicked,
                     ),
                   )
                 : DeckTile(
-                    deck: deck,
+                    deck: activeDeck,
                     width: deckWidth,
                     state: DeckTileState.bare,
                   ),
@@ -327,20 +303,20 @@ class _BodySubSection extends StatelessWidget {
               children: [
                 MetaLabel(
                   icon: Icons.new_releases_outlined,
-                  label: 'v${deck.version}+${deck.buildNumber}',
+                  label: 'v${activeDeck.version}+${activeDeck.buildNumber}',
                   tooltip: 'Deck version and build number',
                 ),
                 MetaLabel(
                   icon: Icons.calendar_today_outlined,
-                  label: DateHelper.formatDateYyyyMmDd(deck.createdAt),
+                  label: DateHelper.formatDateYyyyMmDd(activeDeck.createdAt),
                   tooltip:
-                      'Created ${DateHelper.formatDateYyyyMmDd(deck.createdAt)}',
+                      'Created ${DateHelper.formatDateYyyyMmDd(activeDeck.createdAt)}',
                 ),
                 MetaLabel(
                   icon: Icons.update_outlined,
-                  label: DateHelper.formatDateYyyyMmDd(deck.updatedAt),
+                  label: DateHelper.formatDateYyyyMmDd(activeDeck.updatedAt),
                   tooltip:
-                      'Updated ${DateHelper.formatDateYyyyMmDd(deck.updatedAt)}',
+                      'Updated ${DateHelper.formatDateYyyyMmDd(activeDeck.updatedAt)}',
                 ),
               ],
             ),

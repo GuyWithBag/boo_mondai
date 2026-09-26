@@ -6,52 +6,53 @@
 
 part of 'card_type.dto.dart';
 
-class CardTypeMapper extends EnumMapper<CardType> {
-  CardTypeMapper._();
+class CardTemplateDirectionMapper extends EnumMapper<CardTemplateDirection> {
+  CardTemplateDirectionMapper._();
 
-  static CardTypeMapper? _instance;
-  static CardTypeMapper ensureInitialized() {
+  static CardTemplateDirectionMapper? _instance;
+  static CardTemplateDirectionMapper ensureInitialized() {
     if (_instance == null) {
-      MapperContainer.globals.use(_instance = CardTypeMapper._());
+      MapperContainer.globals.use(_instance = CardTemplateDirectionMapper._());
     }
     return _instance!;
   }
 
-  static CardType fromValue(dynamic value) {
+  static CardTemplateDirection fromValue(dynamic value) {
     ensureInitialized();
     return MapperContainer.globals.fromValue(value);
   }
 
   @override
-  CardType decode(dynamic value) {
+  CardTemplateDirection decode(dynamic value) {
     switch (value) {
       case r'normal':
-        return CardType.normal;
+        return CardTemplateDirection.normal;
       case r'reversed':
-        return CardType.reversed;
+        return CardTemplateDirection.reversed;
       case r'both':
-        return CardType.both;
+        return CardTemplateDirection.both;
       default:
         throw MapperException.unknownEnumValue(value);
     }
   }
 
   @override
-  dynamic encode(CardType self) {
+  dynamic encode(CardTemplateDirection self) {
     switch (self) {
-      case CardType.normal:
+      case CardTemplateDirection.normal:
         return r'normal';
-      case CardType.reversed:
+      case CardTemplateDirection.reversed:
         return r'reversed';
-      case CardType.both:
+      case CardTemplateDirection.both:
         return r'both';
     }
   }
 }
 
-extension CardTypeMapperExtension on CardType {
+extension CardTemplateDirectionMapperExtension on CardTemplateDirection {
   String toValue() {
-    CardTypeMapper.ensureInitialized();
-    return MapperContainer.globals.toValue<CardType>(this) as String;
+    CardTemplateDirectionMapper.ensureInitialized();
+    return MapperContainer.globals.toValue<CardTemplateDirection>(this)
+        as String;
   }
 }

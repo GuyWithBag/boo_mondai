@@ -26,7 +26,7 @@ class AuthService {
   static User? get currentUser => _client.auth.currentUser;
   static bool get isAuthenticatedRemote => _client.auth.currentUser != null;
   static bool get isAuthenticatedLocal =>
-      LocalDB.profile.getOrCreate().isAnonymous == false;
+      LocalDB.currentProfile.getOrCreate().isAnonymous == false;
   static bool get isAuthenticatedEither =>
       isAuthenticatedRemote || isAuthenticatedLocal;
   static bool get isAuthenticatedBoth =>
@@ -127,7 +127,7 @@ class AuthService {
       profileData = await _upsertNewRemoteProfile(user.id, fallbackUsername);
     }
 
-    await LocalDB.profile.upsert(profileData);
+    await LocalDB.currentProfile.upsert(profileData);
     return profileData;
   }
 
@@ -135,7 +135,7 @@ class AuthService {
     String email,
     String password,
   ) async {
-    final guestProfileId = LocalDB.profile.getOrCreate().id;
+    final guestProfileId = LocalDB.currentProfile.getOrCreate().id;
 
     // Wrap the actual auth call in the guard
     await _guard(
@@ -157,7 +157,7 @@ class AuthService {
       );
     }
 
-    await LocalDB.profile.upsert(remoteProfileData);
+    await LocalDB.currentProfile.upsert(remoteProfileData);
 
     final hasLocalData = GuestMigrationService.hasLocalData(guestProfileId);
     final needsMerge =
@@ -172,7 +172,7 @@ class AuthService {
   }
 
   static Future<AuthServiceResponse> signInWithGoogle() async {
-    final guestProfileId = LocalDB.profile.getOrCreate().id;
+    final guestProfileId = LocalDB.currentProfile.getOrCreate().id;
 
     // Check if the app is running natively on mobile (iOS/Android)
     final isMobile = !kIsWeb && (Platform.isIOS || Platform.isAndroid);
@@ -244,7 +244,7 @@ class AuthService {
     String password,
     String username,
   ) async {
-    final guestProfileId = LocalDB.profile.getOrCreate().id;
+    final guestProfileId = LocalDB.currentProfile.getOrCreate().id;
 
     final response = await _guard(
       () => _client.auth.signUp(email: email, password: password),
@@ -267,8 +267,8 @@ class AuthService {
   /// Clears out the session and local profile.
   static Future<void> signOut() async {
     await _client.auth.signOut();
-    await LocalDB.profile.clear();
-    LocalDB.profile.getOrCreate();
+    await LocalDB.currentProfile.clear();
+    LocalDB.currentProfile.getOrCreate();
   }
 
   /// Executes the migration or deletion of guest data based on user choice.
@@ -285,7 +285,7 @@ class AuthService {
     } else {
       await GuestMigrationService.discardGuestData(guestUserId);
     }
-    await LocalDB.profile.upsert(remoteProfile);
+    await LocalDB.currentProfile.upsert(remoteProfile);
   }
 
   // You can stick this in your AuthService or directly in your UI for testing
@@ -353,7 +353,7 @@ class AuthService {
       profileData = await _upsertNewRemoteProfile(user.id, fallbackUsername);
     }
 
-    await LocalDB.profile.upsert(profileData);
+    await LocalDB.currentProfile.upsert(profileData);
 
     final hasLocalData = GuestMigrationService.hasLocalData(guestProfileId);
     final needsMerge =
@@ -379,7 +379,7 @@ class AuthService {
     String newUserId,
     String newUsername,
   ) async {
-    final localProfile = LocalDB.profile.getOrCreate();
+    final localProfile = LocalDB.currentProfile.getOrCreate();
 
     final profile = Profile(
       id: localProfile.id,
@@ -393,7 +393,7 @@ class AuthService {
     );
 
     await RemoteDB.profile.upsert(profile);
-    await LocalDB.profile.upsert(profile);
+    await LocalDB.currentProfile.upsert(profile);
     return profile;
   }
 }

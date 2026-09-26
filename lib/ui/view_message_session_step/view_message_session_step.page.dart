@@ -8,7 +8,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         ProgressBar,
         Button,
         BottomNavBar,
-        MessageSessionStep,
+        StudySessionMessageStep,
         AppTokens,
         SettingsController,
         SettingsService,
@@ -32,11 +32,13 @@ class ViewMessageSessionStepPage extends HookWidget {
 
   final StudySessionController controller;
   final ViewStudySessionController studySessionPageController;
-  final MessageSessionStep step;
+  final StudySessionMessageStep step;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
+    final mediaPackController = context.mediaPackController<AppMediaPack>();
+    final settingsController = context.read<SettingsController>();
     final messageStepSound = StudySessionStepHelper.getMessageStepSound(step);
 
     useEffect(() {
@@ -44,23 +46,27 @@ class ViewMessageSessionStepPage extends HookWidget {
 
       unawaited(
         UiSoundsService.playIfEnabled(
-          context.mediaPackController<AppMediaPack>().resolve(messageStepSound),
-          settingsController: context.read<SettingsController>(),
+          mediaPackController.resolve(messageStepSound),
+          settingsController: settingsController,
           enabledSetting: SettingsService.uiSoundsEnabled,
         ),
       );
       return null;
-    }, [step.id]);
+    }, [step.id, messageStepSound, mediaPackController, settingsController]);
 
     return Scaffold(
       scrollable: false,
       appBar: AppBar(
         onPop: studySessionPageController.onSessionPop,
-        child: ProgressBar(value: controller.getProgressPercentage()),
+        child: ProgressBar(value: controller.stepProgressPercentage.value),
       ),
       bottomNavBar: BottomNavBar(
         child: Button(
-          onPressed: controller.advancePresentationStep,
+          onPressed: () => unawaited(
+            controller.advancePresentationStep().catchError(
+              (Object _, StackTrace _) {},
+            ),
+          ),
           child: const Text('Continue'),
         ),
       ),

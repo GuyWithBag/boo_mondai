@@ -30,7 +30,8 @@ class ProfileMapper extends ClassMapperBase<Profile> {
   static const Field<Profile, String> _f$displayName =
       Field('displayName', _$displayName, key: r'display_name');
   static String? _$role(Profile v) => v.role;
-  static const Field<Profile, String> _f$role = Field('role', _$role);
+  static const Field<Profile, String> _f$role =
+      Field('role', _$role, opt: true);
   static String? _$avatarUrl(Profile v) => v.avatarUrl;
   static const Field<Profile, String> _f$avatarUrl =
       Field('avatarUrl', _$avatarUrl, key: r'avatar_url', opt: true);

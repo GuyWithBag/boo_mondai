@@ -1,9 +1,10 @@
 import 'package:boo_mondai/lib.barrel.dart' show AppTokens;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-class ProgressBar extends StatelessWidget {
+class ProgressBar extends SignalHookWidget {
   const ProgressBar({
     required this.value,
     this.duration = const Duration(milliseconds: 250),

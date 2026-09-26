@@ -19,6 +19,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         FillInTheBlanksTemplateMapper,
         MatchMadnessTemplateMapper,
         MutableEntityMapper,
+        StudySessionAnswer,
         WordScrambleTemplateMapper,
         MutableEntityCopyWith,
         TagCopyWith;
@@ -72,5 +73,5 @@ abstract class CardTemplate with CardTemplateMappable implements MutableEntity {
     this.verticallyCentered = true,
   });
 
-  bool checkAnswer(String userAnswer, {bool isReversed = false});
+  bool checkAnswer(StudySessionAnswer answer, {bool isReversed = false});
 }

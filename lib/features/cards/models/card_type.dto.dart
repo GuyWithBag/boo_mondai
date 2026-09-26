@@ -15,6 +15,6 @@ part 'card_type.dto.mapper.dart';
 /// - [reversed] → one Note flagged is_reverse=true (back→front only)
 /// - [both]     → two Notes: one forward + one reversed
 ///
-/// Only [QuestionType.flashcard] supports [reversed] / [both].
+/// Only [CardTemplateType.flashcard] supports [reversed] / [both].
 @MappableEnum()
-enum CardType { normal, reversed, both }
+enum CardTemplateDirection { normal, reversed, both }

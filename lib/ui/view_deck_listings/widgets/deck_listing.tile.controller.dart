@@ -1,123 +1,130 @@
+import 'dart:async' show Completer;
+
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        Controller,
         Deck,
-        LocalDB,
         AuthService,
         DeckListing,
-        RemoteDB,
-        DeckFavorite,
-        Vote;
+        Content,
+        Profile,
+        DeckListingsService,
+        ImageHelper,
+        ProfileService;
+import 'package:flutter/material.dart' show ImageProvider, NetworkImage;
 import 'package:signals/signals_core.dart';
 
-class DeckListingTileController extends Controller {
-  DeckListingTileController({required Deck deckArg}) {
-    deck.value = deckArg;
-    deckListing.value = deck.value.listing!;
-    favorite.value = deckListing.value.;
-    vote.value = ;
+class DeckListingTileController {
+  DeckListingTileController({
+    required this.deck,
+    required this.listing,
+    required this.content,
+    required this.profile,
+    required this.sourceProfile,
+    this.isUserOwned = true,
+  });
+
+  final Deck deck;
+  final DeckListing listing;
+  final Content content;
+  final Profile profile;
+  final Profile sourceProfile;
+  final bool isUserOwned;
+
+  final isFavorite = computed(() => false);
+  final isLoading = signal(false);
+  final error = signal<Exception?>(null);
+  final backgroundImage = signal<ImageProvider?>(null);
+  final profileAvatar = signal<ImageProvider?>(null);
+
+  late final tags = computed(() => deck.tags.take(8).toList());
+  late final title = computed(
+    () => deck.title.isEmpty ? 'Untitled deck' : deck.title,
+  );
+  late final description = computed(
+    () => deck.shortDescription.isEmpty
+        ? 'No description yet'
+        : deck.shortDescription,
+  );
+  late final version = computed(
+    () => deck.version.isEmpty ? '1.0.0' : deck.version,
+  );
+  late final featuredImageSource = computed(
+    () => DeckListingsService.getFeaturedImage(deck: deck, listing: listing),
+  );
+
+  late final FutureSignal<ImageProvider?> backgroundImageFuture = futureSignal(
+    () => ImageHelper.getImageProviderFromSource(featuredImageSource.value),
+  );
+
+  late final FutureSignal<ImageProvider?> profileAvatarFuture = futureSignal(
+    () async {
+      if (isUserOwned) return NetworkImage(profile.avatarUrl ?? '');
+
+      final avatar = Completer<ImageProvider?>();
+      await ProfileService.getAvatar((image) {
+        if (!avatar.isCompleted) avatar.complete(image);
+      });
+      return avatar.future;
+    },
+  );
+
+  late final backgroundImageEffect = effect(() {
+    backgroundImageFuture.value.map(
+      error: () {},
+      loading: () {},
+      data: (value) {
+        backgroundImage.value = value;
+      },
+    );
+  });
+
+  late final profileAvatarEffect = effect(() {
+    profileAvatarFuture.value.map(
+      error: () {},
+      loading: () {},
+      data: (value) {
+        profileAvatar.value = value;
+      },
+    );
+  });
+
+  Future<void> toggleUpvote() async {
+    if (!_canInteract()) return;
   }
 
-  late final Signal<Deck> deck;
-  late final Signal<DeckListing> deckListing;
-  late final Signal<DeckFavorite> favorite;
-  late final Signal<Vote> vote;
-
-  Future<void> loadInteractionState() async {
-    if (!AuthService.isAuthenticatedRemote) return;
-
-    final profile = LocalDB.profile.getOrCreate();
-    try {
-      // final state = await RemoteDB.deckInteractions.getState(
-      //   deckId: deck.value.id,
-      //   profileId: profile.id,
-      // );
-      voteValue = state.voteValue;
-      isFavorite = state.isFavorite;
-      notifyListeners();
-    } on Exception catch (e) {
-      setError(e);
-    }
+  Future<void> toggleDownvote() async {
+    if (!_canInteract()) return;
   }
-
-  Future<void> toggleUpvote() => _setVote(voteValue == 1 ? null : 1);
-
-  Future<void> toggleDownvote() => _setVote(voteValue == -1 ? null : -1);
 
   Future<void> toggleFavorite() async {
     if (!_canInteract()) return;
-
-    final previousFavorite = isFavorite;
-    final previousFavoritesCount = favoritesCount;
-    final nextFavorite = !isFavorite;
-
-    isFavorite = nextFavorite;
-    favoritesCount += nextFavorite ? 1 : -1;
-    _setBusy(true);
-
-    try {
-      await RemoteDB.deckInteractions.setFavorite(
-        deckId: deck.id,
-        profileId: LocalDB.profile.getOrCreate().id,
-        isFavorite: nextFavorite,
-      );
-    } on Exception catch (e) {
-      isFavorite = previousFavorite;
-      favoritesCount = previousFavoritesCount;
-      setError(e);
-    } finally {
-      _setBusy(false);
-    }
-  }
-
-  Future<void> _setVote(int? nextVoteValue) async {
-    if (!_canInteract()) return;
-
-    final previousVoteValue = voteValue;
-    final previousUpvotesCount = upvotesCount;
-    final previousDownvotesCount = downvotesCount;
-
-    _applyVoteCountChange(from: previousVoteValue, to: nextVoteValue);
-    voteValue = nextVoteValue;
-    _setBusy(true);
-
-    try {
-      await RemoteDB.deckVotes.setVote(
-        deckId: deck.value.id,
-        profileId: LocalDB.profile.getOrCreate().id,
-        voteValue: nextVoteValue,
-      );
-    } on Exception catch (e) {
-      voteValue = previousVoteValue;
-      upvotesCount = previousUpvotesCount;
-      downvotesCount = previousDownvotesCount;
-      setError(e);
-    } finally {
-      _setBusy(false);
-    }
   }
 
   bool _canInteract() {
-    if (isBusy) return false;
+    if (isLoading.value) return false;
 
     if (!AuthService.isAuthenticatedRemote) {
-      setError(Exception('Sign in to vote or favorite decks.'));
+      error.value = Exception('Sign in to vote or favorite decks.');
       return false;
     }
 
     return true;
   }
 
-  void _applyVoteCountChange({required int? from, required int? to}) {
-    if (from == to) return;
-
-    if (from == 1) upvotesCount--;
-    if (from == -1) downvotesCount--;
-    if (to == 1) upvotesCount++;
-    if (to == -1) downvotesCount++;
-  }
-
-  void _setBusy(bool value) {
-    isBusy = value;
+  void dispose() {
+    profileAvatarEffect();
+    backgroundImageEffect();
+    profileAvatarFuture.dispose();
+    backgroundImageFuture.dispose();
+    featuredImageSource.dispose();
+    version.dispose();
+    description.dispose();
+    title.dispose();
+    tags.dispose();
+    profileAvatar.dispose();
+    backgroundImage.dispose();
+    error.dispose();
+    isLoading.dispose();
+    isFavorite.dispose();
   }
 }

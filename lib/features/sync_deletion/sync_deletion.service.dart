@@ -167,27 +167,27 @@ abstract final class SyncDeletionService {
   static Future<void> _applyRemote(SyncDeletion deletion) async {
     switch (deletion.entityType) {
       case decks:
-        await RemoteDB.deck.deleteWhere({'id': deletion.entityId});
+        await RemoteDB.deck.delete({'id': deletion.entityId});
       case deckListings:
-        await RemoteDB.deckListing.deleteWhere({'deck_id': deletion.entityId});
+        await RemoteDB.deckListing.delete({'deck_id': deletion.entityId});
       case cardTemplates:
-        await RemoteDB.card.deleteWhere({'id': deletion.entityId});
+        await RemoteDB.card.delete({'id': deletion.entityId});
       case studyCards:
-        await RemoteDB.studyCard.deleteWhere({'id': deletion.entityId});
+        await RemoteDB.studyCard.delete({'id': deletion.entityId});
       case fsrsCards:
-        await RemoteDB.fsrsSync.deleteWhere({'id': deletion.entityId});
+        await RemoteDB.fsrsSync.delete({'id': deletion.entityId});
       case deckTags:
-        await RemoteDB.deckTag.deleteWhere(_decodeComposite(deletion.entityId));
+        await RemoteDB.deckTag.delete(_decodeComposite(deletion.entityId));
       case cardTemplateTags:
-        await RemoteDB.cardTemplateTag.deleteWhere(
+        await RemoteDB.cardTemplateTag.delete(
           _decodeComposite(deletion.entityId),
         );
       case userStudyCardTags:
-        await RemoteDB.userStudyCardTag.deleteWhere(
+        await RemoteDB.userStudyCardTag.delete(
           _decodeComposite(deletion.entityId),
         );
       case tags:
-        await RemoteDB.tag.deleteWhere({'id': deletion.entityId});
+        await RemoteDB.tag.delete({'id': deletion.entityId});
     }
   }
 

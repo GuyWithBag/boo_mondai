@@ -1,12 +1,9 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
-        Deck,
-        DeckListingsService,
         DeckTile,
         DeckTileState,
         HeaderBadge,
-        ImageHelper,
         MetaLabel,
         NumberHelper,
         ProfileLabel,
@@ -19,55 +16,27 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextWeight,
         surfaceStyle,
         textStyle,
-        ProfileService,
         BackgroundImageSurface,
         DeckListingTileController;
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_hooks/flutter_hooks.dart' show useEffect;
 import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 class DeckListingTile extends SignalHookWidget {
-  const DeckListingTile({
-    super.key,
-    required this.deck,
-    this.onPressed,
-    this.isUserOwned = true,
-  });
+  const DeckListingTile({super.key, this.onPressed, required this.controller});
 
-  final Deck deck;
+  final DeckListingTileController controller;
+
   final VoidCallback? onPressed;
-  final bool isUserOwned;
 
   @override
   Widget build(BuildContext context) {
-    final listing = deck.listing;
-    final interactionsEnabled = listing != null && deck.isPublished;
-    final controller = useMemoized(() => DeckListingTileController());
-    final AppTokens tokens = context.themeTokens<AppTokens>();
-    final tags = deck.tags.take(8).toList();
-    final title = deck.title.isEmpty ? 'Untitled deck' : deck.title;
-    final description = deck.shortDescription.isEmpty
-        ? 'No description yet'
-        : deck.shortDescription;
-    final version = deck.version.isEmpty ? '1.0.0' : deck.version;
-    final backgroundImage = ImageHelper.getImageProviderFromSource(
-      DeckListingsService.getFeaturedImage(deck: deck),
-    );
-    final creatorName = deck.userProfile?.username ?? 'Unknown creator';
-
-    ImageProvider? profileAvatar;
-
-    if (isUserOwned) {
-      // ToDo: Add error handling
-      profileAvatar = NetworkImage(deck.userProfile?.avatarUrl ?? '');
-    } else {
-      ProfileService.getAvatar((image) => profileAvatar = image);
-    }
+    final tokens = context.themeTokens<AppTokens>();
 
     useEffect(() {
       final error = controller.error;
-      if (error == null) return null;
+      if (error.value == null) return null;
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ScaffoldMessenger.maybeOf(context)?.showSnackBar(
@@ -75,11 +44,15 @@ class DeckListingTile extends SignalHookWidget {
             content: Text(error.toString().replaceFirst('Exception: ', '')),
           ),
         );
-        controller.setError(null);
+        controller.error.value = null;
       });
 
       return null;
     }, [controller.error]);
+
+    useEffect(() {
+      return controller.dispose;
+    }, [controller]);
 
     final deckTileWidth = 90.0;
     final deckTileTopPosition =
@@ -99,7 +72,7 @@ class DeckListingTile extends SignalHookWidget {
             AspectRatio(
               aspectRatio: tokens.deckListingFeaturedImagesAspectRatio,
               child: BackgroundImageSurface(
-                image: backgroundImage,
+                image: controller.backgroundImage.value,
                 style: surfaceStyle.resolve(tokens, const [
                   SurfacePadding.none,
                   SurfaceShape.sharp,
@@ -115,24 +88,24 @@ class DeckListingTile extends SignalHookWidget {
                         spacing: tokens.spaceLayoutGapMd,
                         runSpacing: tokens.spaceLayoutGapSm,
                         children: [
-                          if (!deck.isPublished)
+                          if (!controller.deck.isPublished)
                             const HeaderBadge(label: 'Unpublished'),
                           MetaLabel(
                             icon: Icons.download_outlined,
                             label: NumberHelper.formatAbbreviatedCount(
-                              listing?.downloadsCount ?? 0,
+                              controller.listing.downloadsCount,
                             ),
                           ),
                           MetaLabel(
                             icon: Icons.call_split_outlined,
                             label: NumberHelper.formatAbbreviatedCount(
-                              listing?.forksCount ?? 0,
+                              controller.listing.forksCount,
                             ),
                           ),
                           MetaLabel(
                             icon: Icons.chat_bubble_outline,
                             label: NumberHelper.formatAbbreviatedCount(
-                              listing?.commentsCount ?? 0,
+                              controller.listing.commentsCount,
                             ),
                           ),
                         ],
@@ -142,11 +115,9 @@ class DeckListingTile extends SignalHookWidget {
                       right: tokens.spaceLayoutGapLg,
                       bottom: tokens.spaceLayoutGapMd,
                       child: ProfileLabel(
-                        displayName: creatorName,
+                        displayName: controller.profile.username,
                         facingLeft: true,
-
-                        // ToDo: Re Evaluate, because this could be using remote only or local only.
-                        avatar: profileAvatar,
+                        avatar: controller.profileAvatar.value,
                       ),
                     ),
                   ],
@@ -171,7 +142,7 @@ class DeckListingTile extends SignalHookWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              title,
+                              controller.title.value,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: textStyle.resolve(tokens, const [
@@ -181,24 +152,24 @@ class DeckListingTile extends SignalHookWidget {
                             ),
                           ),
                           SizedBox(width: tokens.spaceLayoutGapMd),
-                          if (listing != null)
-                            _FavoriteButton(
-                              count: NumberHelper.formatAbbreviatedCount(
-                                controller.favoritesCount,
-                              ),
-                              isSelected: controller.isFavorite,
-                              onPressed:
-                                  controller.isBusy || !interactionsEnabled
-                                  ? null
-                                  : () {
-                                      controller.toggleFavorite();
-                                    },
+                          _FavoriteButton(
+                            count: NumberHelper.formatAbbreviatedCount(
+                              controller.listing.favoritesCount,
                             ),
+                            isSelected: controller.isFavorite.value,
+                            onPressed:
+                                controller.isLoading.value ||
+                                    !controller.deck.isPublished
+                                ? null
+                                : () {
+                                    controller.toggleFavorite();
+                                  },
+                          ),
                         ],
                       ),
                       SizedBox(height: tokens.spaceLayoutGapSm),
                       Text(
-                        description,
+                        controller.description.value,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: textStyle.resolve(tokens, const [
@@ -217,39 +188,40 @@ class DeckListingTile extends SignalHookWidget {
                               children: [
                                 MetaLabel(
                                   icon: Icons.style_outlined,
-                                  label: '${deck.cardCount} cards',
+                                  label:
+                                      '${controller.deck.cardTemplatesCount} cards',
                                 ),
                                 MetaLabel(
                                   icon: Icons.new_releases_outlined,
-                                  label: 'v$version+${deck.buildNumber}',
+                                  label:
+                                      'v${controller.version.value}+${controller.deck.buildNumber}',
                                 ),
                               ],
                             ),
                           ),
-                          if (listing != null) ...[
-                            _InlineMetric(
-                              icon: Icons.keyboard_arrow_down,
-                              label: NumberHelper.formatAbbreviatedCount(
-                                controller.downvotesCount,
-                              ),
+
+                          _InlineMetric(
+                            icon: Icons.keyboard_arrow_down,
+                            label: NumberHelper.formatAbbreviatedCount(
+                              controller.listing.downvotesCount,
                             ),
-                            SizedBox(width: tokens.spaceLayoutGapMd),
-                            _InlineMetric(
-                              icon: Icons.keyboard_arrow_up,
-                              label: NumberHelper.formatAbbreviatedCount(
-                                controller.upvotesCount,
-                              ),
+                          ),
+                          SizedBox(width: tokens.spaceLayoutGapMd),
+                          _InlineMetric(
+                            icon: Icons.keyboard_arrow_up,
+                            label: NumberHelper.formatAbbreviatedCount(
+                              controller.listing.upvotesCount,
                             ),
-                          ],
+                          ),
                         ],
                       ),
-                      if (tags.isNotEmpty) ...[
+                      if (controller.tags.value.isNotEmpty) ...[
                         SizedBox(height: tokens.spaceLayoutGapMd),
                         Wrap(
                           spacing: tokens.spaceLayoutGapSm,
                           runSpacing: tokens.spaceLayoutGapSm,
                           children: [
-                            for (final tag in tags)
+                            for (final tag in controller.tags.value)
                               HeaderBadge(label: tag.name),
                           ],
                         ),
@@ -261,7 +233,7 @@ class DeckListingTile extends SignalHookWidget {
                   left: tokens.spaceLayoutPadding,
                   top: deckTileTopPosition,
                   child: DeckTile(
-                    deck: deck,
+                    deck: controller.deck,
                     width: deckTileWidth,
                     state: DeckTileState.bare,
                   ),

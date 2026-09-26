@@ -1,17 +1,10 @@
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// PATH: lib/services/fsrs_service.dart
-// PURPOSE: Wraps the fsrs dart package for spaced repetition scheduling
-// PROVIDERS: none
-// HOOKS: none
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 import 'package:boo_mondai/lib.barrel.dart'
     show
         FsrsCard,
         FsrsReviewLog,
         DueFilterThreshold,
         DeckDueStats,
-        DeckHistoricalStats,
+        DeckRatingStats,
         LocalDB,
         Service,
         Services,
@@ -44,12 +37,12 @@ class FsrsService extends Service {
     final newLog = FsrsReviewLog.create(log: res.reviewLog, cardId: newCard.id);
 
     await LocalDB.fsrsCard.upsert(newCard);
-    await LocalDB.reviewLog.upsert(newLog);
+    await LocalDB.reviewLogs.upsert(newLog);
     await Services.streak.refreshFromReviewLogs();
   }
 
   // ── Due Stats (Calculated dynamically based on time/filter) ──
-  Map<String, DeckDueStats> calculateDueStats({
+  static Map<String, DeckDueStats> calculateDueStats({
     required String profileId,
     required DueFilterThreshold dueFilter,
   }) {
@@ -59,7 +52,7 @@ class FsrsService extends Service {
     final rcToDeck = {for (final rc in allStudyCards) rc.id: rc.deckId};
 
     // We only need logs to determine if a card is "New" or "Learning"
-    final studiedCardIds = LocalDB.reviewLog
+    final studiedCardIds = LocalDB.reviewLogs
         .selectMany()
         .map((l) => l.fsrsCardId)
         .toSet();
@@ -104,10 +97,10 @@ class FsrsService extends Service {
   }
 
   // ── Historical Stats (Calculated once, independent of time) ──
-  Map<String, DeckHistoricalStats> calculateHistoricalStats({
+  static Map<String, DeckRatingStats> calculateHistoricalStats({
     required String profileId,
   }) {
-    final allLogs = LocalDB.reviewLog.selectMany();
+    final allLogs = LocalDB.reviewLogs.selectMany();
     // In a real app, you'd want to query logs by profileId, but relying on the card relation works for now
     final allStudyCards = LocalDB.studyCard.selectMany();
     final rcToDeck = {for (final rc in allStudyCards) rc.id: rc.deckId};
@@ -148,7 +141,7 @@ class FsrsService extends Service {
     };
     return {
       for (final id in activeDeckIds)
-        id: DeckHistoricalStats(
+        id: DeckRatingStats(
           again: againMap[id] ?? 0,
           hard: hardMap[id] ?? 0,
           good: goodMap[id] ?? 0,

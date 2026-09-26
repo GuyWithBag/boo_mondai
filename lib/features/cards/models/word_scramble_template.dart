@@ -1,5 +1,6 @@
 import 'package:boo_mondai/features/cards/models/card_template.dto.dart';
 import 'package:boo_mondai/core/services/uuid.dart';
+import 'package:boo_mondai/features/study_session/models/study_session.answer.dart';
 import 'package:boo_mondai/features/tags/models/tag.dto.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 
@@ -41,8 +42,8 @@ class WordScrambleTemplate extends CardTemplate
   }
 
   @override
-  bool checkAnswer(String userAnswer, {bool isReversed = false}) {
-    return userAnswer.trim().toLowerCase() ==
+  bool checkAnswer(StudySessionAnswer answer, {bool isReversed = false}) {
+    return answer.value.trim().toLowerCase() ==
         sentenceToScramble.trim().toLowerCase();
   }
 }

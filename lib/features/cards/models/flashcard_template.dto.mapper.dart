@@ -15,7 +15,7 @@ class FlashcardTemplateMapper extends SubClassMapperBase<FlashcardTemplate> {
       MapperContainer.globals.use(_instance = FlashcardTemplateMapper._());
       CardTemplateMapper.ensureInitialized().addSubMapper(_instance!);
       TagMapper.ensureInitialized();
-      CardTypeMapper.ensureInitialized();
+      CardTemplateDirectionMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -60,10 +60,10 @@ class FlashcardTemplateMapper extends SubClassMapperBase<FlashcardTemplate> {
   static String _$backText(FlashcardTemplate v) => v.backText;
   static const Field<FlashcardTemplate, String> _f$backText =
       Field('backText', _$backText, key: r'back_text');
-  static CardType _$cardType(FlashcardTemplate v) => v.cardType;
-  static const Field<FlashcardTemplate, CardType> _f$cardType = Field(
-      'cardType', _$cardType,
-      key: r'card_type', opt: true, def: CardType.normal);
+  static CardTemplateDirection _$direction(FlashcardTemplate v) => v.direction;
+  static const Field<FlashcardTemplate, CardTemplateDirection> _f$direction =
+      Field('direction', _$direction,
+          opt: true, def: CardTemplateDirection.normal);
 
   @override
   final MappableFields<FlashcardTemplate> fields = const {
@@ -79,7 +79,7 @@ class FlashcardTemplateMapper extends SubClassMapperBase<FlashcardTemplate> {
     #verticallyCentered: _f$verticallyCentered,
     #frontText: _f$frontText,
     #backText: _f$backText,
-    #cardType: _f$cardType,
+    #direction: _f$direction,
   };
 
   @override
@@ -104,7 +104,7 @@ class FlashcardTemplateMapper extends SubClassMapperBase<FlashcardTemplate> {
         verticallyCentered: data.dec(_f$verticallyCentered),
         frontText: data.dec(_f$frontText),
         backText: data.dec(_f$backText),
-        cardType: data.dec(_f$cardType));
+        direction: data.dec(_f$direction));
   }
 
   @override
@@ -179,7 +179,7 @@ abstract class FlashcardTemplateCopyWith<$R, $In extends FlashcardTemplate,
       bool? verticallyCentered,
       String? frontText,
       String? backText,
-      CardType? cardType});
+      CardTemplateDirection? direction});
   FlashcardTemplateCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
       Then<$Out2, $R2> t);
 }
@@ -209,7 +209,7 @@ class _FlashcardTemplateCopyWithImpl<$R, $Out>
           bool? verticallyCentered,
           String? frontText,
           String? backText,
-          CardType? cardType}) =>
+          CardTemplateDirection? direction}) =>
       $apply(FieldCopyWithData({
         if (id != null) #id: id,
         if (deckId != null) #deckId: deckId,
@@ -223,7 +223,7 @@ class _FlashcardTemplateCopyWithImpl<$R, $Out>
         if (verticallyCentered != null) #verticallyCentered: verticallyCentered,
         if (frontText != null) #frontText: frontText,
         if (backText != null) #backText: backText,
-        if (cardType != null) #cardType: cardType
+        if (direction != null) #direction: direction
       }));
   @override
   FlashcardTemplate $make(CopyWithData data) => FlashcardTemplate(
@@ -241,7 +241,7 @@ class _FlashcardTemplateCopyWithImpl<$R, $Out>
           data.get(#verticallyCentered, or: $value.verticallyCentered),
       frontText: data.get(#frontText, or: $value.frontText),
       backText: data.get(#backText, or: $value.backText),
-      cardType: data.get(#cardType, or: $value.cardType));
+      direction: data.get(#direction, or: $value.direction));
 
   @override
   FlashcardTemplateCopyWith<$R2, FlashcardTemplate, $Out2> $chain<$R2, $Out2>(

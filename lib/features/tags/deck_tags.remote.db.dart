@@ -28,5 +28,5 @@ class DeckTagsRemoteDB extends SupabaseRemoteDB<DeckTag> {
   Future<void> deleteComposite({
     required String deckId,
     required String tagId,
-  }) => deleteWhere({'deck_id': deckId, 'tag_id': tagId});
+  }) => delete({'deck_id': deckId, 'tag_id': tagId});
 }

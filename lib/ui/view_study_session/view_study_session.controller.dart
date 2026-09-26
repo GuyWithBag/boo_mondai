@@ -1,92 +1,167 @@
+import 'dart:async';
+
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        Controller,
+        AppMediaPack,
+        DueFilterThreshold,
+        FlashcardTemplate,
+        NotificationsController,
+        SessionException,
         SessionMode,
+        SettingsController,
+        SettingsService,
         StreakController,
+        StudySessionAnswer,
+        StudySessionCardStageController,
         StudySessionController,
-        ViewStudyCardsController;
+        UiSoundsService;
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart' show useEffect, useMemoized;
 import 'package:go_router/go_router.dart' show GoRouterHelper;
+import 'package:media_variants/media_variants.dart';
 import 'package:provider/provider.dart' show ReadContext;
+import 'package:signals/signals_flutter.dart';
 
-final class ViewStudySessionController extends Controller {
+final class ViewStudySessionController {
   ViewStudySessionController({
-    required BuildContext context,
+    required this.context,
+    required String? deckId,
     required SessionMode mode,
-    required StudySessionController sessionController,
-    required ViewStudyCardsController? dashboardController,
-  }) : _context = context,
-       _mode = mode,
-       _sessionController = sessionController,
-       _dashboardController = dashboardController;
-
-  final BuildContext _context;
-  final SessionMode _mode;
-  final StudySessionController _sessionController;
-  final ViewStudyCardsController? _dashboardController;
-
-  bool _didHandleCompletion = false;
-
-  void onCompletion() {
-    if (!_sessionController.isComplete) {
-      _didHandleCompletion = false;
-      return;
+  }) : deckId = signal(deckId),
+       mode = signal(mode),
+       sessionController = StudySessionController(
+         mode: mode,
+         notificationsController: mode == SessionMode.drill
+             ? context.read<NotificationsController>()
+             : null,
+       ) {
+    if (this.deckId.value == null && this.mode.value == SessionMode.drill) {
+      throw SessionException(
+        'A deck is required for drill.',
+        code: 'DRILL_DECK_MISSING',
+      );
     }
 
-    if (_didHandleCompletion) return;
-    _didHandleCompletion = true;
+    settingsController = context.read<SettingsController>();
+    studySessionCompleteSound = context
+        .mediaPackController<AppMediaPack>()
+        .resolve((media) => media.studySessionCompleteSound);
+    cardStageController = signal(
+      StudySessionCardStageController(canReveal: false),
+    );
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!_context.mounted) return;
+    controllerEffect = effect(() {
+      syncCardStageController();
+      handleCompletion();
+    });
 
-      if (_mode == SessionMode.review) {
-        _context.read<StreakController>().recordActivity(DateTime.now());
-        final sessionId = _sessionController.session?.id;
-        if (sessionId == null) return;
-        _context.go('/review/$sessionId/result');
+    startSession();
+  }
+
+  final BuildContext context;
+  final Signal<String?> deckId;
+  final Signal<SessionMode> mode;
+  final StudySessionController sessionController;
+  final currentStepId = signal<String?>(null);
+
+  late final SettingsController settingsController;
+  late final MediaAsset studySessionCompleteSound;
+  late final Signal<StudySessionCardStageController> cardStageController;
+  late final EffectCleanup controllerEffect;
+  final isCompleting = signal(false);
+
+  void startSession() {
+    unawaited(
+      sessionController
+          .startSession(
+            deckId: deckId.value,
+            // ToDo: look into
+            filter: DueFilterThreshold.lookAheadOneDay,
+          )
+          .catchError((Object _, StackTrace _) {}),
+    );
+  }
+
+  void syncCardStageController() {
+    final step = sessionController.currentStep.value;
+    final stepId = step?.id;
+
+    if (currentStepId.value == stepId) return;
+
+    final template = sessionController.currentTemplate.value;
+    final studyCard = sessionController.currentStudyCard.value;
+    final nextController = StudySessionCardStageController(
+      canReveal: template is FlashcardTemplate,
+      answer: template is FlashcardTemplate && studyCard != null
+          ? StudySessionAnswer(
+              value: template.getAnswer(isReversed: studyCard.isReversed),
+            )
+          : null,
+    );
+
+    final previousController = untracked(() => cardStageController.value);
+    untracked(() {
+      currentStepId.value = stepId;
+      cardStageController.value = nextController;
+    });
+    previousController.dispose();
+  }
+
+  void handleCompletion() {
+    final isComplete = sessionController.isComplete.value;
+    final sessionId = sessionController.session.value?.id;
+
+    if (!isComplete || sessionId == null || isCompleting.value) {
+      return;
+    }
+    isCompleting.value = true;
+
+    unawaited(
+      UiSoundsService.playIfEnabled(
+        studySessionCompleteSound,
+        settingsController: settingsController,
+        enabledSetting: SettingsService.uiSoundsEnabled,
+      ),
+    );
+
+    unawaited(() async {
+      try {
+        await sessionController.completeSession();
+      } catch (_) {
+        isCompleting.value = false;
         return;
       }
 
-      if (_mode == SessionMode.drill) {
-        final sessionId = _sessionController.session?.id;
-        if (sessionId == null) return;
-        _context.go('/drill/$sessionId/result');
+      if (!context.mounted) return;
+
+      if (mode.value == SessionMode.review) {
+        context.read<StreakController>().recordActivity(DateTime.now());
+        context.go('/review/$sessionId/result');
+        return;
       }
-    });
+
+      if (mode.value == SessionMode.drill) {
+        context.go('/drill/$sessionId/result');
+      }
+    }());
   }
 
   void onSessionPop() {
-    if (_mode == SessionMode.review) {
-      _dashboardController?.load();
-    }
-    _context.pop();
+    context.pop();
   }
 
   void onReviewCompletePressed() {
-    _sessionController.reset();
-    _dashboardController?.load();
-    _context.pop();
+    sessionController.reset();
+    context.pop();
   }
-}
 
-ViewStudySessionController useStudySessionPageController({
-  required BuildContext context,
-  required SessionMode mode,
-  required StudySessionController sessionController,
-  required ViewStudyCardsController? dashboardController,
-}) {
-  final pageController = useMemoized(
-    () => ViewStudySessionController(
-      context: context,
-      mode: mode,
-      sessionController: sessionController,
-      dashboardController: dashboardController,
-    ),
-    [mode, sessionController, dashboardController],
-  );
-
-  useEffect(() => pageController.dispose, [pageController]);
-
-  return pageController;
+  void dispose() {
+    controllerEffect();
+    cardStageController.value.dispose();
+    cardStageController.dispose();
+    currentStepId.dispose();
+    isCompleting.dispose();
+    sessionController.dispose();
+    mode.dispose();
+    deckId.dispose();
+  }
 }

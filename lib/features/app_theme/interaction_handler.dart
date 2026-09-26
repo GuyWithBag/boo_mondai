@@ -23,7 +23,7 @@ class InteractionHandler<T> extends HookWidget {
   Widget build(BuildContext context) {
     final controller = selectionController;
     final value = selectionValue;
-    final isSelecting = controller?.isEnabled ?? false;
+    final isSelecting = controller?.isEnabled.value ?? false;
     final canSelect = controller != null && value != null;
 
     if (isSelecting) {
@@ -41,7 +41,7 @@ class InteractionHandler<T> extends HookWidget {
       child: GestureDetector(
         onLongPress: canSelect
             ? () {
-                selectionController?.isEnabled = true;
+                selectionController?.isEnabled.value = true;
                 selectionController?.select(value);
               }
             : null,

@@ -5,6 +5,6 @@ export 'models/models.barrel.dart';
 // Other files
 export 'decks.exporter.guard.dart';
 export 'decks.importer.guard.dart';
-export 'decks.importer.service.dart';
 export 'decks.exporter.service.dart';
 export 'deck_map.normalizer.dart';
+export 'decks.importer.service.dart';

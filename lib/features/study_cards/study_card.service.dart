@@ -1,5 +1,11 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show CardTemplate, CardType, FlashcardTemplate, LocalDB, StudyCard, uuid;
+    show
+        CardTemplate,
+        CardTemplateDirection,
+        FlashcardTemplate,
+        LocalDB,
+        StudyCard,
+        uuid;
 
 class StudyCardService {
   const StudyCardService._();
@@ -59,10 +65,12 @@ class StudyCardService {
     final deletableStudyCards = obsoleteStudyCards.where((studyCard) {
       final hasFsrsState =
           LocalDB.fsrsCard.getByStudyCardId(studyCard.id) != null;
-      final hasDrillAnswers = LocalDB.drillAnswer
-          .getByStudyCardId(studyCard.id)
-          .isNotEmpty;
-      return !hasFsrsState && !hasDrillAnswers;
+      // ToDo: Redo this because of the new study session system
+      // final hasDrillAnswers = LocalDB.drillAnswer
+      //     .getByStudyCardId(studyCard.id)
+      //     .isNotEmpty;
+      // return !hasFsrsState && !hasDrillAnswers;
+      return !hasFsrsState;
     }).toList();
 
     if (deletableStudyCards.isNotEmpty) {
@@ -75,9 +83,9 @@ class StudyCardService {
   static Set<_StudyCardKey> _expectedKeysForTemplate(CardTemplate template) {
     if (template is FlashcardTemplate) {
       return {
-        if (template.cardType != CardType.reversed)
+        if (template.direction != CardTemplateDirection.reversed)
           _StudyCardKey(templateId: template.id, isReversed: false),
-        if (template.cardType != CardType.normal)
+        if (template.direction != CardTemplateDirection.normal)
           _StudyCardKey(templateId: template.id, isReversed: true),
       };
     }

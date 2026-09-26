@@ -15,8 +15,7 @@ class StudyCardSyncTable extends SyncTable<StudyCard> {
         getItemDeletedAt: (card) => card.deletedAt,
         applyPullItem: LocalDB.studyCard.upsert,
         applyPushItem: RemoteDB.studyCard.upsert,
-        deleteRemoteItemById: (id) =>
-            RemoteDB.studyCard.deleteWhere({'id': id}),
+        deleteRemoteItemById: (id) => RemoteDB.studyCard.delete({'id': id}),
         toMap: RemoteDB.studyCard.toMap,
       );
 

@@ -9,25 +9,30 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppBar,
         AppTokens,
         Button,
+        Content,
+        ContentType,
         Deck,
+        DeckListing,
         DeckListingTile,
-        DeckSearchFilter,
-        DeckSearchFilterCodec,
-        DeckSearchResults,
-        StatusLayoutState,
+        DeckListingTileController,
+        DeckWithListingContent,
         FilteredSearchBar,
+        FilteredSearchBarController,
         ListingStatesWrapper,
         Pages,
+        Profile,
         Scaffold,
+        StatusLayoutState,
         ViewDeckListingsController,
-        VisibilityState,
-        showViewDeckListingSingleSheet,
-        useFilteredSearchBarController;
+        showViewDeckListingSingleSheet;
+import 'package:boo_mondai/ui/view_deck_listing_single/controllers/controllers.barrel.dart';
+import 'package:boo_mondai/ui/view_deck_listings/view_deck_listings.search.dart';
 import 'package:flutter/material.dart'
     show BuildContext, Widget, StatelessWidget, Icons, Center;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 class ViewDeckListingsPage extends StatelessWidget {
@@ -35,36 +40,56 @@ class ViewDeckListingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Inject the controller at the page level
-    return ChangeNotifierProvider(
-      create: (_) => ViewDeckListingsController()..loadPublicDecks(),
+    return Provider(
+      create: (_) {
+        final controller = ViewDeckListingsController();
+        controller.loadPublicDecks();
+        return controller;
+      },
+      dispose: (_, controller) => controller.dispose(),
       child: const _ViewDeckListingsView(),
     );
   }
 }
 
-class _ViewDeckListingsView extends HookWidget {
+class _ViewDeckListingsView extends SignalHookWidget {
   const _ViewDeckListingsView();
 
   @override
   Widget build(BuildContext context) {
-    final controller = context.watch<ViewDeckListingsController>();
-    final searchController =
-        useFilteredSearchBarController<Deck, DeckSearchFilter>(
-          filterCodec: const DeckSearchFilterCodec(),
-          searchResults: const DeckSearchResults(),
-          items: controller.decks,
-        );
-    final visibleDecks = searchController.results;
-    final hasSearchQuery = searchController.text.trim().isNotEmpty;
+    final controller = context.read<ViewDeckListingsController>();
+    final decks = controller.decks.value;
+    final isLoading = controller.isLoading.value;
+    final error = controller.error.value;
+    final searchController = useMemoized(
+      () => FilteredSearchBarController<DeckWithListingContent>(
+        tokenShapes: ViewDeckListingsSearch.tokenShapes,
+        searchTextLabel: ViewDeckListingsSearch.searchTextLabel,
+        itemFilter: ViewDeckListingsSearch.itemFilter,
+        sorter: ViewDeckListingsSearch.sorter,
+        items: decks,
+      ),
+      const [],
+    );
+
+    useEffect(() {
+      searchController.setItems(decks);
+      return null;
+    }, [decks, searchController]);
+
+    useEffect(() => searchController.dispose, [searchController]);
+
+    final visibleDecks = searchController.results.value;
+    final hasSearchQuery = searchController.hasText.value;
     final tokens = context.themeTokens<AppTokens>();
-    final searchBar = FilteredSearchBar<Deck, DeckSearchFilter>(
+    final searchBar = FilteredSearchBar<DeckWithListingContent>(
       controller: searchController,
-      filterCodec: const DeckSearchFilterCodec(),
-      searchResults: const DeckSearchResults(),
-      items: controller.decks,
       placeholder: 'Search public decks',
-      resultLabelBuilder: (deck) => deck.title,
+      resultLabelBuilder: (entry) => entry.deck.title,
+      onResultSelected: (entry) => showViewDeckListingSingleSheet(
+        context: context,
+        controller: _previewController(entry),
+      ),
     );
 
     return Scaffold(
@@ -80,9 +105,9 @@ class _ViewDeckListingsView extends HookWidget {
         ],
       ),
       scrollable: true,
-      body: ListingStatesWrapper<Deck>.list(
-        isLoading: controller.isLoading,
-        exception: controller.error,
+      body: ListingStatesWrapper<DeckWithListingContent>.list(
+        isLoading: isLoading,
+        exception: error,
         items: visibleDecks,
         emptyState: hasSearchQuery
             ? const StatusLayoutState(
@@ -95,14 +120,17 @@ class _ViewDeckListingsView extends HookWidget {
                 title: 'No public decks yet',
                 message: 'Published community decks will appear here.',
               ),
-        onRetry: controller.loadPublicDecks,
+        onRetry: controller.load,
         useParentScroll: true,
-        skeletonTile: Center(child: DeckListingTile(deck: _skeletonDeck)),
+        skeletonTile: Center(child: _deckListingTile(_dummyEntry())),
         separatorHeight: tokens.spaceLayoutGapMd,
-        itemBuilder: (context, _, deck) {
-          return DeckListingTile(
-            deck: deck,
-            onPressed: () => showViewDeckListingSingleSheet(context, deck),
+        itemBuilder: (context, _, entry) {
+          return _deckListingTile(
+            entry,
+            onPressed: () => showViewDeckListingSingleSheet(
+              context: context,
+              controller: _previewController(entry),
+            ),
           );
         },
       ),
@@ -110,14 +138,55 @@ class _ViewDeckListingsView extends HookWidget {
   }
 }
 
-final Deck _skeletonDeck = Deck(
-  id: 'loading',
-  profileId: 'loading',
-  title: 'Loading deck',
-  shortDescription: 'Loading deck description',
-  visibilityState: VisibilityState.public,
-  isPublished: true,
-  cardCount: 0,
-  createdAt: DateTime(2024),
-  updatedAt: DateTime(2024),
-);
+DeckListingTile _deckListingTile(
+  DeckWithListingContent entry, {
+  void Function()? onPressed,
+}) {
+  return DeckListingTile(
+    controller: DeckListingTileController(
+      deck: entry.deck,
+      listing: entry.deckListing,
+      content: entry.deckListingContent,
+      profile: entry.profile,
+      sourceProfile: entry.sourceProfile ?? entry.profile,
+    ),
+    onPressed: onPressed,
+  );
+}
+
+ViewDeckListingSinglePreviewController _previewController(
+  DeckWithListingContent entry,
+) {
+  return ViewDeckListingSinglePreviewController(
+    deck: signal(entry.deck),
+    listing: signal(entry.deckListing),
+    content: signal(entry.deckListingContent),
+    profile: signal(entry.profile),
+    sourceProfile: signal(entry.sourceProfile ?? entry.profile),
+  );
+}
+
+DeckWithListingContent _dummyEntry() {
+  final now = DateTime.now();
+  final profile = Profile(
+    displayName: '',
+    id: '',
+    createdAt: now,
+    updatedAt: now,
+    userId: '',
+    username: '',
+  );
+  return (
+    deck: Deck.createDummy(title: 'Loading listing'),
+    deckListing: const DeckListing(deckId: '', contentId: ''),
+    deckListingContent: Content(
+      id: '',
+      profileId: '',
+      type: ContentType.deck,
+      createdAt: now,
+      updatedAt: now,
+    ),
+    profile: profile,
+    sourceProfile: profile,
+  );
+}

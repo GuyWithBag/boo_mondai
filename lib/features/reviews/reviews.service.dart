@@ -1,122 +1,29 @@
-import 'package:boo_mondai/lib.barrel.dart' show RemoteDB, uuid;
+import 'package:boo_mondai/lib.barrel.dart'
+    show RemoteDB, Review, ReviewEditLog, DiscussionsService, Content;
 
-class ReviewsService {
-  const ReviewsService._();
+class ReviewsService implements DiscussionsService {
+  static Future<List<Review>> getByDeck(String deckId) async =>
+      await RemoteDB.reviews.getByDeck(deckId);
 
-  static Future<List<Review>> getByDeck(String deckId) =>
-      RemoteDB.deckVoteReview.getByDeck(deckId);
+  static Future<List<ReviewEditLog>> getEditLogs(Review review) async =>
+      RemoteDB.reviewEditLogs.getByReview(review);
 
-  static Future<List<ReviewEditLog>> getEditLogs(String reviewId) =>
-      RemoteDB.deckVoteReviewEditLog.getByReview(reviewId);
-
-  static Future<List<ReviewComment>> getComments(String reviewId) =>
-      RemoteDB.deckVoteReviewComment.getByReview(reviewId);
-
-  static Future<List<ReviewCommentEditLog>> getCommentEditLogs(
-    String commentId,
-  ) => RemoteDB.deckVoteReviewCommentEditLog.getByComment(commentId);
-
-  static Future<void> upsertReview({
-    required String deckId,
-    required String profileId,
-    required int voteValue,
-    required String title,
-    required String body,
+  static Future<void> add({
+    required Review review,
+    required Content content,
   }) async {
-    final trimmedBody = body.trim();
-    if (trimmedBody.isEmpty) return;
-
-    final trimmedTitle = title.trim();
-    await RemoteDB.deckVotes.setVote(
-      deckId: deckId,
-      profileId: profileId,
-      voteValue: voteValue,
-    );
-
-    final review = Review.createNow(
-      id: uuid.v7(),
-      deckId: deckId,
-      profileId: profileId,
-      voteValueAtCreation: voteValue,
-      title: trimmedTitle,
-      body: trimmedBody,
-    );
-
-    final existingReview = await RemoteDB.deckVoteReview.getByDeckAndUser(
-      deckId: deckId,
-      profileId: profileId,
-    );
-    if (existingReview == null) {
-      await RemoteDB.deckVoteReview.insert(review);
-      return;
-    }
-
-    await RemoteDB.deckVoteReview.updateWhere(
-      filters: {'id': existingReview.id},
-      values: {
-        'vote_value_at_creation': voteValue,
-        'title': trimmedTitle,
-        'body': trimmedBody,
-        'is_deleted': false,
-        'updated_at': DateTime.now().toIso8601String(),
-      },
-    );
+    await RemoteDB.comments.upsert(review.copyWith(body: review.body.trim()));
+    await RemoteDB.contents.upsert(content);
   }
 
-  static Future<void> updateReview({
-    required String reviewId,
-    required int voteValue,
-    required String title,
+  // ToDo: Should check if the comment is already deleted
+  static Future<void> upsert({
+    required Review review,
     required String body,
   }) async {
     final trimmedBody = body.trim();
     if (trimmedBody.isEmpty) return;
 
-    await RemoteDB.deckVoteReview.updateWhere(
-      filters: {'id': reviewId},
-      values: {
-        'vote_value_at_creation': voteValue,
-        'title': title.trim(),
-        'body': trimmedBody,
-        'is_deleted': false,
-        'updated_at': DateTime.now().toIso8601String(),
-      },
-    );
-  }
-
-  static Future<void> addComment({
-    required String reviewId,
-    required String profileId,
-    required String body,
-    String? parentCommentId,
-  }) async {
-    final trimmedBody = body.trim();
-    if (trimmedBody.isEmpty) return;
-
-    final comment = ReviewComment.createNow(
-      id: uuid.v7(),
-      reviewId: reviewId,
-      profileId: profileId,
-      parentCommentId: parentCommentId,
-      body: trimmedBody,
-    );
-    await RemoteDB.deckVoteReviewComment.insert(comment);
-  }
-
-  static Future<void> updateComment({
-    required String commentId,
-    required String body,
-  }) async {
-    final trimmedBody = body.trim();
-    if (trimmedBody.isEmpty) return;
-
-    await RemoteDB.deckVoteReviewComment.updateWhere(
-      filters: {'id': commentId},
-      values: {
-        'body': trimmedBody,
-        'is_deleted': false,
-        'updated_at': DateTime.now().toIso8601String(),
-      },
-    );
+    await RemoteDB.reviews.upsert(review);
   }
 }

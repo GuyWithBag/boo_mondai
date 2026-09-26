@@ -2,13 +2,15 @@
 // PATH: lib/models/dtos/deck_listing.dto.dart
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/lib.barrel.dart' show WithContent;
 import 'package:dart_mappable/dart_mappable.dart';
 
 part 'deck_listing.dto.mapper.dart';
 
 @MappableClass()
-class DeckListing with DeckListingMappable {
+class DeckListing with DeckListingMappable implements WithContent {
   final String deckId;
+  @override
   final String contentId;
   final int upvotesCount;
   final int downvotesCount;

@@ -1,5 +1,4 @@
 import 'package:boo_mondai/features/app_theme/app_theme.barrel.dart';
-import 'package:boo_mondai/features/app_theme/surface.variant.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,

@@ -4,84 +4,86 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         ErrorText,
         FilteredSearchBar,
+        FilteredSearchBarController,
         LoadingIndicator,
         Pages,
         ResearcherDashboardController,
-        ResearcherSurveyFilter,
-        ResearcherSurveyFilterCodec,
-        ResearcherSurveySearchResults,
         ResearcherSurveySummary,
         ResearcherSurveyTile,
         Scaffold;
+import 'package:boo_mondai/features/researcher_dashboard/researcher_dashboard.search.dart';
 import 'package:flutter/material.dart' hide AppBar, Scaffold;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-class ResearcherDashboardPage extends HookWidget {
+class ResearcherDashboardPage extends SignalHookWidget {
   const ResearcherDashboardPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     final controller = useMemoized(ResearcherDashboardController.new);
-    final visibleSummaries = useState<List<ResearcherSurveySummary>>(const []);
     final tokens = context.themeTokens<AppTokens>();
+    final summaries = controller.summaries;
+    final searchController = useMemoized(
+      () => FilteredSearchBarController<ResearcherSurveySummary>(
+        tokenShapes: ResearcherSurveySummarySearch.tokenShapes,
+        searchTextLabel: ResearcherSurveySummarySearch.searchTextLabel,
+        sorter: ResearcherSurveySummarySearch.sorter,
+        items: summaries,
+      ),
+      const [],
+    );
+
+    useListenable(controller);
 
     useEffect(() {
       controller.load();
-      return controller.dispose;
-    }, [controller]);
+      return () {
+        searchController.dispose();
+        controller.dispose();
+      };
+    }, [controller, searchController]);
 
-    return ChangeNotifierProvider.value(
-      value: controller,
-      child: Consumer<ResearcherDashboardController>(
-        builder: (context, controller, _) {
-          if (controller.isLoading && controller.surveys.isEmpty) {
-            return const Scaffold(
-              appBar: AppBar(title: 'Researcher Dashboard'),
-              body: Center(child: LoadingIndicator()),
-            );
-          }
+    useEffect(() {
+      searchController.setItems(summaries);
+      return null;
+    }, [summaries, searchController]);
 
-          final summaries = controller.summaries;
+    if (controller.isLoading && controller.surveys.isEmpty) {
+      return const Scaffold(
+        appBar: AppBar(title: 'Researcher Dashboard'),
+        body: Center(child: LoadingIndicator()),
+      );
+    }
 
-          return Scaffold(
-            appBar: const AppBar(title: 'Researcher Dashboard'),
-            body: Column(
-              spacing: tokens.spaceLayoutGapMd,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                FilteredSearchBar<
-                  ResearcherSurveySummary,
-                  ResearcherSurveyFilter
-                >(
-                  filterCodec: const ResearcherSurveyFilterCodec(),
-                  searchResults: const ResearcherSurveySearchResults(),
-                  items: summaries,
-                  placeholder: 'Search surveys',
-                  showFilterButton: false,
-                  onResultsChanged: (results) =>
-                      visibleSummaries.value = results,
-                  resultLabelBuilder: (summary) => summary.title,
-                  onResultSelected: (summary) =>
-                      context.push(Pages.researcherSurveyUrl(summary.id)),
-                ),
-                if (controller.error != null)
-                  ErrorText.exception(controller.error!),
-                for (final summary
-                    in visibleSummaries.value.isEmpty
-                        ? summaries
-                        : visibleSummaries.value)
-                  ResearcherSurveyTile(
-                    summary: summary,
-                    onPressed: () =>
-                        context.push(Pages.researcherSurveyUrl(summary.id)),
-                  ),
-              ],
+    final visibleSummaries = searchController.hasText.value
+        ? searchController.results.value
+        : summaries;
+
+    return Scaffold(
+      appBar: const AppBar(title: 'Researcher Dashboard'),
+      body: Column(
+        spacing: tokens.spaceLayoutGapMd,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          FilteredSearchBar<ResearcherSurveySummary>(
+            controller: searchController,
+            placeholder: 'Search surveys',
+            showFilterButton: false,
+            resultLabelBuilder: (summary) => summary.title,
+            onResultSelected: (summary) =>
+                context.push(Pages.researcherSurveyUrl(summary.id)),
+          ),
+          if (controller.error != null) ErrorText.exception(controller.error!),
+          for (final summary in visibleSummaries)
+            ResearcherSurveyTile(
+              summary: summary,
+              onPressed: () =>
+                  context.push(Pages.researcherSurveyUrl(summary.id)),
             ),
-          );
-        },
+        ],
       ),
     );
   }

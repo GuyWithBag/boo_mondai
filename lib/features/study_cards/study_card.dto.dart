@@ -2,9 +2,6 @@
 // PATH: lib/models/study_cards.dart
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/features/cards/models/card_template.dto.dart';
-import 'package:boo_mondai/features/decks/models/deck.dto.dart';
-import 'package:boo_mondai/features/tags/models/tag.dto.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show MutableEntity, MutableEntityCopyWith, MutableEntityMapper;
 import 'package:dart_mappable/dart_mappable.dart';
@@ -28,9 +25,9 @@ class StudyCard with StudyCardMappable implements MutableEntity {
 
   // Added to support Supabase joins with user_study_cards_tags
   // Note: Only the logged-in user will ever get data populated here due to RLS!
-  final List<Tag> personalTags;
-  final CardTemplate? template;
-  final Deck? deck;
+  // final List<Tag> personalTags;
+  // final CardTemplate? template;
+  // final Deck? deck;
 
   const StudyCard({
     required this.id,
@@ -41,8 +38,8 @@ class StudyCard with StudyCardMappable implements MutableEntity {
     required this.templateId,
     this.isReversed = false,
     required this.deckId,
-    this.personalTags = const [],
-    this.template,
-    this.deck,
+    // this.personalTags = const [],
+    // this.template,
+    // this.deck,
   });
 }

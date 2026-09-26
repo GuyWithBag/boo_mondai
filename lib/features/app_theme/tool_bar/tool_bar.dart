@@ -4,7 +4,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         SurfaceBorder,
         SurfacePadding,
         SurfaceShape,
-        StoredMediaFile,
         surfaceStyle,
         ToolBarController,
         AttachmentToolBarAction,

@@ -31,14 +31,6 @@ class StudyCardsRemoteDB extends SupabaseRemoteDB<StudyCard> {
   @override
   String get defaultSelect => _studyCardWithRelationsSelect;
 
-  @override
-  Set<String> get joinedFields => const {
-    'template',
-    'deck',
-    'personalTags',
-    'personal_tags',
-  };
-
   Future<List<StudyCard>> selectManyByDeckId(
     String deckId, {
     bool includeDeleted = false,

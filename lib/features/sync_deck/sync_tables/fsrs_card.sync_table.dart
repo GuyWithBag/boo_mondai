@@ -21,7 +21,7 @@ class FsrsCardSyncTable extends SyncTable<FsrsCard> {
         getItemDeletedAt: (card) => card.deletedAt,
         applyPullItem: LocalDB.fsrsCard.upsert,
         applyPushItem: RemoteDB.fsrsSync.upsert,
-        deleteRemoteItemById: (id) => RemoteDB.fsrsSync.deleteWhere({'id': id}),
+        deleteRemoteItemById: (id) => RemoteDB.fsrsSync.delete({'id': id}),
         toMap: RemoteDB.fsrsSync.toMap,
       );
 

@@ -4,7 +4,6 @@
 
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        Controller,
         ChangeTrackerController,
         ChangeTrackerEntry,
         ChangeTrackerStatus,
@@ -15,35 +14,51 @@ import 'package:boo_mondai/lib.barrel.dart'
         ProgressCheckpointType,
         Services,
         Deck;
+import 'package:signals/signals_flutter.dart';
 
-class ViewDeckDownloadsController extends Controller {
+class ViewDeckDownloadsController {
   ViewDeckDownloadsController({
     required this.changeTrackerController,
     DeckDownloadsService? downloadsService,
     ProgressCheckpointLocalDB? checkpointDB,
-  }) : _downloadsService = downloadsService ?? Services.deckDownloads,
-       _checkpointDB = checkpointDB ?? LocalDB.progressCheckpoint {
-    changeTrackerController.addListener(_onReviewChanged);
-    _autoResumeInterruptedDownloads();
+  }) : downloadsService = downloadsService ?? Services.deckDownloads,
+       checkpointDB = checkpointDB ?? LocalDB.progressCheckpoint {
+    activeEntries = computed(
+      () => changeTrackerController.entries.value
+          .where(
+            (entry) =>
+                entry.source == ChangeSource.deckDownload && entry.isActive,
+          )
+          .toList(growable: false),
+    );
+    completedPlans = computed(
+      () => changeTrackerController.entries.value
+          .where(
+            (entry) =>
+                entry.source == ChangeSource.deckDownload &&
+                entry.status == ChangeTrackerStatus.completed,
+          )
+          .toList(growable: false),
+    );
+    isEmpty = computed(
+      () => activeEntries.value.isEmpty && completedPlans.value.isEmpty,
+    );
+    autoResumeInterruptedDownloads();
   }
 
   final ChangeTrackerController changeTrackerController;
-  final DeckDownloadsService _downloadsService;
-  final ProgressCheckpointLocalDB _checkpointDB;
-
-  List<ChangeTrackerEntry> _activeEntries = [];
-  List<ChangeTrackerEntry> _completedPlans = [];
-
-  List<ChangeTrackerEntry> get activeEntries => _activeEntries;
-  List<ChangeTrackerEntry> get completedPlans => _completedPlans;
-  bool get isEmpty => _activeEntries.isEmpty && _completedPlans.isEmpty;
+  final DeckDownloadsService downloadsService;
+  final ProgressCheckpointLocalDB checkpointDB;
+  late final Computed<List<ChangeTrackerEntry>> activeEntries;
+  late final Computed<List<ChangeTrackerEntry>> completedPlans;
+  late final Computed<bool> isEmpty;
 
   // ── Auto-resume ───────────────────────────────────────────────────────────
 
   /// On init, finds any checkpoints that were mid-download when the app was
   /// killed and resumes them automatically.
-  void _autoResumeInterruptedDownloads() {
-    final interrupted = _checkpointDB.getActiveByType(
+  void autoResumeInterruptedDownloads() {
+    final interrupted = checkpointDB.getActiveByType(
       ProgressCheckpointType.deckDownloadFetch,
     );
 
@@ -68,35 +83,14 @@ class ViewDeckDownloadsController extends Controller {
         ),
       );
 
-      _downloadsService.downloadDeck(localDeck, resumeEntryId: plan.id);
+      downloadsService.downloadDeck(localDeck, resumeEntryId: plan.id);
     }
   }
-
-  // ── Plan list ─────────────────────────────────────────────────────────────
-
-  void _onReviewChanged() {
-    final all = changeTrackerController.entries
-        .where((p) => p.source == ChangeSource.deckDownload)
-        .toList();
-
-    _activeEntries = all.where((p) => _isActive(p.status)).toList();
-    _completedPlans = all
-        .where((p) => p.status == ChangeTrackerStatus.completed)
-        .toList();
-    notifyListeners();
-  }
-
-  static bool _isActive(ChangeTrackerStatus status) =>
-      status == ChangeTrackerStatus.planning ||
-      status == ChangeTrackerStatus.fetching ||
-      status == ChangeTrackerStatus.applying ||
-      status == ChangeTrackerStatus.paused ||
-      status == ChangeTrackerStatus.reviewing;
 
   // ── Actions ───────────────────────────────────────────────────────────────
 
   void pauseDownload(String entryId) {
-    _downloadsService.pauseDownload(entryId);
+    downloadsService.pauseDownload(entryId);
     changeTrackerController.pause(entryId);
   }
 
@@ -105,7 +99,7 @@ class ViewDeckDownloadsController extends Controller {
     if (plan == null) return;
 
     // Find the source deck via checkpoint
-    final checkpoint = _checkpointDB
+    final checkpoint = checkpointDB
         .getActiveByType(ProgressCheckpointType.deckDownloadFetch)
         .firstOrNull;
     if (checkpoint == null) return;
@@ -119,20 +113,20 @@ class ViewDeckDownloadsController extends Controller {
     if (localDeck == null) return;
 
     changeTrackerController.resume(entryId);
-    _downloadsService.resumeDownload(localDeck, entryId);
+    downloadsService.resumeDownload(localDeck, entryId);
   }
 
   void cancelDownload(String entryId) {
-    _downloadsService.pauseDownload(entryId); // stop the loop first
+    downloadsService.pauseDownload(entryId); // stop the loop first
     changeTrackerController.cancel(entryId);
     changeTrackerController.remove(entryId);
 
     // Clean up checkpoint
-    final checkpoint = _checkpointDB
+    final checkpoint = checkpointDB
         .getActiveByType(ProgressCheckpointType.deckDownloadFetch)
         .firstOrNull;
     if (checkpoint != null) {
-      _checkpointDB.deleteByPk({'id': checkpoint.id});
+      checkpointDB.deleteByPk({'id': checkpoint.id});
     }
   }
 
@@ -160,7 +154,7 @@ class ViewDeckDownloadsController extends Controller {
         .firstOrNull;
     final remoteId = deckChange?.remoteId;
     if (remoteId == null) return 0;
-    return _checkpointDB
+    return checkpointDB
             .getByTypeAndTargetId(
               ProgressCheckpointType.deckDownloadFetch,
               remoteId,
@@ -169,9 +163,9 @@ class ViewDeckDownloadsController extends Controller {
         0;
   }
 
-  @override
   void dispose() {
-    changeTrackerController.removeListener(_onReviewChanged);
-    super.dispose();
+    isEmpty.dispose();
+    completedPlans.dispose();
+    activeEntries.dispose();
   }
 }

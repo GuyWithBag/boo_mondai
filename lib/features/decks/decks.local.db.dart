@@ -14,34 +14,9 @@ class DecksLocalDB extends HiveLocalDB<Deck> {
   @override
   Map<String, Object?> primaryKeyFromItem(Deck item) => {'id': item.id};
 
-  @override
-  DateTime? getDeletedAt(Deck item) => item.deletedAt;
-
-  @override
-  List<Deck> selectMany({
-    bool Function(Deck item)? where,
-    int? limit,
-    int offset = 0,
-    bool includeDeleted = false,
-  }) => super
-      .selectMany(
-        where: where,
-        limit: limit,
-        offset: offset,
-        includeDeleted: includeDeleted,
-      )
-      .map(_withLocalProfile)
-      .toList();
-
-  @override
-  Deck? selectByPk(HivePrimaryKey primaryKey, {bool includeDeleted = false}) {
-    final deck = super.selectByPk(primaryKey, includeDeleted: includeDeleted);
-    return deck == null ? null : _withLocalProfile(deck);
-  }
-
   List<Deck> getByCurrentProfile() => guardSync(
     () => selectMany()
-        .where((d) => d.profileId == LocalDB.profile.getOrCreate().id)
+        .where((d) => d.profileId == LocalDB.currentProfile.getOrCreate().id)
         .toList(),
     action: 'getByCurrentProfile',
   );
@@ -51,18 +26,79 @@ class DecksLocalDB extends HiveLocalDB<Deck> {
     action: 'getByProfileId($profileId)',
   );
 
-  List<Deck> selectManyByProfileIdAndOptionalDeckId({
-    required String profileId,
-    String? deckId,
-  }) => guardSync(
-    () => selectMany(
-      where: (deck) {
-        if (deck.profileId != profileId) return false;
-        return deckId == null || deck.id == deckId;
-      },
-    ),
-    action: 'selectManyByProfileIdAndOptionalDeckId($profileId, $deckId)',
-  );
+  JoinedDeck? selectJoinedByDeck(Deck deck, {bool includeDeleted = false}) =>
+      guardSync(() {
+        final profile = LocalDB.profiles.selectByPk({'id': deck.profileId});
+        if (profile == null) return null;
+
+        final deckListing = LocalDB.deckListing.selectByPk({
+          'deck_id': deck.id,
+        }, includeDeleted: includeDeleted);
+        final sourceDeckId = deck.sourceDeckId;
+        final sourceDeck = sourceDeckId == null
+            ? null
+            : selectByPk({'id': sourceDeckId}, includeDeleted: includeDeleted);
+        final sourceProfile = sourceDeck == null
+            ? null
+            : LocalDB.profiles.selectByPk({'id': sourceDeck.profileId});
+
+        return (
+          deck: deck,
+          deckListing: deckListing,
+          deckListingContent: deckListing == null
+              ? null
+              : LocalDB.deckListing.getContentByListing(
+                  deckListing,
+                  includeDeleted: includeDeleted,
+                ),
+          profile: profile,
+          sourceDeck: sourceDeck,
+          sourceProfile: sourceProfile,
+        );
+      }, action: 'selectJoinedByDeck(${deck.id})');
+
+  DeckWithListingContent? selectWithListingContentByDeck(
+    Deck deck, {
+    bool includeDeleted = false,
+  }) => guardSync(() {
+    final profile = LocalDB.profiles.selectByPk({'id': deck.profileId});
+    if (profile == null) return null;
+
+    final deckListing = LocalDB.deckListing.selectByPk({
+      'deck_id': deck.id,
+    }, includeDeleted: includeDeleted);
+    if (deckListing == null) return null;
+
+    final content = LocalDB.deckListing.getContentByListing(
+      deckListing,
+      includeDeleted: includeDeleted,
+    );
+    if (content == null) return null;
+
+    return (
+      deck: deck,
+      deckListing: deckListing,
+      deckListingContent: content,
+      profile: profile,
+      sourceProfile: getSourceProfileByDeck(
+        deck,
+        includeDeleted: includeDeleted,
+      ),
+    );
+  }, action: 'selectWithListingContentById(${deck.id})');
+
+  Profile? getSourceProfileByDeck(Deck deck, {bool includeDeleted = false}) =>
+      guardSync(() {
+        final sourceDeckId = deck.sourceDeckId;
+        if (sourceDeckId == null) return null;
+
+        final sourceDeck = selectByPk({
+          'id': sourceDeckId,
+        }, includeDeleted: includeDeleted);
+        if (sourceDeck == null) return null;
+
+        return LocalDB.profiles.selectByPk({'id': sourceDeck.profileId});
+      }, action: 'getSourceProfileByDeck(${deck.id})');
 
   List<SyncIndexEntry> selectSyncIndexByProfileIdAndOptionalDeckId({
     required String profileId,
@@ -90,7 +126,7 @@ class DecksLocalDB extends HiveLocalDB<Deck> {
     SearchSortDirection sortDirection = SearchSortDirection.descending,
   }) => guardSync(() {
     final normalizedQuery = query.trim().toLowerCase();
-    final currentProfileId = LocalDB.profile.getOrCreate().id;
+    final currentProfileId = LocalDB.currentProfile.getOrCreate().id;
     final filtered = selectMany().where((deck) {
       if (deck.profileId != currentProfileId) return false;
       if (normalizedQuery.isEmpty) return true;
@@ -122,21 +158,5 @@ class DecksLocalDB extends HiveLocalDB<Deck> {
           : -comparison;
     });
     return sorted;
-  }
-
-  Deck _withLocalProfile(Deck deck) {
-    if (deck.userProfile != null) return deck;
-
-    final profile = LocalDB.profile.getOrCreate();
-    if (deck.profileId != profile.id) return deck;
-
-    return deck.copyWith(
-      userProfile: CachedProfile(
-        id: profile.id,
-        username: profile.username,
-        avatarUrl: profile.avatarUrl,
-        createdAt: profile.createdAt,
-      ),
-    );
   }
 }

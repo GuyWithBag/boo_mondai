@@ -1,148 +1,185 @@
+import 'package:boo_mondai/features/profile/models/profile.dto.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AuthService,
         CardTemplate,
-        Controller,
+        Content,
         Deck,
+        DeckListing,
         DeckListingsService,
         DecksService,
         LocalDB,
         ButtonColor,
         ModalAction,
         showModal,
-        ViewDeckSingleHelper;
+        showSnackbar;
+import 'package:boo_mondai/ui/view_deck_listing_single/controllers/view_deck_listing_single.controller.dart';
 import 'package:file_picker/file_picker.dart' show PlatformFile;
-import 'package:flutter/foundation.dart' show ValueChanged;
-import 'package:flutter/material.dart'
-    show BuildContext, Icon, Icons, Navigator;
-import 'package:flutter/widgets.dart';
-import 'package:flutter_hooks/flutter_hooks.dart'
-    show useEffect, useListenable, useMemoized;
+import 'package:flutter/material.dart';
 
-ViewDeckListingSingleEditorController useViewDeckListingSingleEditorController({
-  required BuildContext context,
-  required Deck Function() deckReader,
-  required ValueChanged<Deck?> onDeckUpdated,
-}) {
-  final controller = useMemoized(
-    () => ViewDeckListingSingleEditorController(
-      context: context,
-      deckReader: deckReader,
-      onDeckUpdated: onDeckUpdated,
-    ),
-    const [],
-  );
+import 'package:signals/signals_flutter.dart';
 
-  useListenable(controller);
-  useEffect(() => controller.dispose, [controller]);
+// ToDo: I need to change this so that it edits the current deck signal then when exited or pressed save, it applies the changes.
 
-  return controller;
-}
-
-class ViewDeckListingSingleEditorController extends Controller {
+class ViewDeckListingSingleEditorController
+    implements ViewDeckListingSingleController {
   ViewDeckListingSingleEditorController({
-    required BuildContext context,
-    required Deck Function() deckReader,
-    required ValueChanged<Deck?> onDeckUpdated,
-  }) : _context = context,
-       _deckReader = deckReader,
-       _onDeckUpdated = onDeckUpdated;
+    required this.deck,
+    required this.content,
+    required this.listing,
+    required this.profile,
+    required this.sourceProfile,
+  });
 
-  final BuildContext _context;
-  final Deck Function() _deckReader;
-  final ValueChanged<Deck?> _onDeckUpdated;
+  @override
+  final error = signal<Exception?>(null);
 
-  Deck get _deck => _deckReader();
+  @override
+  final Signal<Deck> deck;
+  @override
+  final Signal<Content> content;
+  @override
+  final Signal<DeckListing> listing;
+  @override
+  final Signal<Profile> profile;
+  @override
+  final Signal<Profile> sourceProfile;
 
-  bool get canEdit {
-    final localDeck = LocalDB.deck.selectByPk({'id': _deck.id});
-    return localDeck != null && localDeck.isEditable;
-  }
+  final featuredImages = listSignal<ImageProvider?>(List.filled(3, null));
+  final featuredCards = listSignal<CardTemplate>([]);
+
+  final formKey = GlobalKey<FormState>();
 
   Future<void> setTitle(String value) async {
-    final updatedDeck = await DecksService.setTitle(deck: _deck, title: value);
-    _applyUpdatedDeck(updatedDeck);
+    // deck.value = await DecksService.setTitle(
+    //   deck: deck.value,
+    //   content: content.value,
+    //   title: value,
+    // );
+    deck.value = deck.value.copyWith(title: value.trim());
   }
 
   Future<void> setShortDescription(String value) async {
-    final updatedDeck = await DecksService.update(
-      deck: _deck,
-      shortDescription: value,
-    );
-    _applyUpdatedDeck(updatedDeck);
+    // deck.value = await DecksService.setShortDescription(
+    //   deck: deck.value,
+    //   content: content.value,
+    //   shortDescription: value,
+    // );
+    //
+    deck.value = deck.value.copyWith(shortDescription: value.trim());
   }
 
   Future<void> setLongDescription(String value) async {
-    final updatedDeck = await DecksService.update(
-      deck: _deck,
-      longDescription: value,
-    );
-    _applyUpdatedDeck(updatedDeck);
+    // final updatedDeck = await DecksService.setLongDescription(
+    //   deck: deck,
+    //   content: content.value,
+    //   longDescription: value,
+    // );
+    deck.value = deck.value.copyWith(longDescription: value.trim());
   }
 
+  // ToDo: Work on this in the future because right now tags are confusing as heck!
   Future<void> setTags(List<String> tagNames) async {
     final updatedDeck = await DecksService.setTags(
-      deck: _deck,
+      deck: deck.value,
+      content: content.value,
       tagNames: tagNames,
     );
-    _applyUpdatedDeck(updatedDeck);
+    // applyUpdatedDeck(updatedDeck);
+
+    if (updatedDeck != null) deck.value = updatedDeck;
   }
 
-  Future<void> updateListingFeaturedImage(int index, PlatformFile file) async {
-    await DeckListingsService.setFeaturedImageByFile(
-      deck: _deck,
-      index: index,
-      file: file,
-    );
+  Future<void> upsertFeaturedImage(int index, PlatformFile? file) async {
+    // await DeckListingsService.setFeaturedImageByFile(
+    //   deck: deck.value,
+    //   listing: listing.value,
+    //   content: content.value,
+    //   index: index,
+    //   file: file,
+    // );
+
+    // ToDo: Add error handling
+    if (file == null || file.bytes == null) return;
+
+    featuredImages.value[index] = MemoryImage(file.bytes!);
   }
 
-  List<CardTemplate> availableFeaturedCardTemplates() {
+  List<CardTemplate> getFeaturedCardTemplates() {
     final featuredCardIds = {
-      for (final card in _deck.listing?.featuredCards ?? const [])
+      for (final card in listing.value.featuredCards)
         if (card['id'] case final String id) id,
     };
 
     return LocalDB.cardTemplate
-        .getByDeckId(_deck.id)
+        .getByDeckId(deck.value.id)
         .where((template) => !featuredCardIds.contains(template.id))
         .toList(growable: false);
   }
 
-  Future<void> addListingFeaturedCard(CardTemplate template) async {
-    final updatedDeck = await DeckListingsService.addListingFeaturedCard(
-      deck: _deck,
-      template: template,
+  Future<void> addFeaturedCard({
+    required BuildContext context,
+    required Widget modalChild,
+  }) async {
+    final templates = getFeaturedCardTemplates();
+
+    if (templates.isEmpty) {
+      showSnackbar(
+        context,
+        message: 'You do not have any templates available for selection.',
+      );
+      return;
+    }
+
+    final selected = await showModal<CardTemplate>(
+      context: context,
+      title: 'Add featured card',
+      child: modalChild,
     );
-    _applyUpdatedDeck(updatedDeck);
+    if (selected == null) return;
+
+    // final updatedDeck = await DeckListingsService.addListingFeaturedCard(
+    //   deck: deck.value,
+    //   listing: listing.value,
+    //   content: content.value,
+    //   template: template,
+    // );
+
+    // if (updatedDeck != null) deck.value = updatedDeck;
+
+    featuredCards.value = [...featuredCards.value, selected];
   }
 
   ButtonColor getPublishedButtonColor() {
-    if (_deck.isPublished) {
+    if (deck.value.isPublished) {
       return ButtonColor.hard;
     }
     return ButtonColor.error;
   }
 
   IconData getPublishedButtonIcon() {
-    if (_deck.isPublished) {
+    if (deck.value.isPublished) {
       return Icons.public_outlined;
     }
     return Icons.public_off_outlined;
   }
 
-  Future<void> togglePublished() async {
-    await setPublished(!_deck.isPublished);
+  Future<void> togglePublished({required BuildContext context}) async {
+    await setPublished(context: context, isPublished: !deck.value.isPublished);
   }
 
-  Future<void> setPublished(bool isPublished) async {
-    if (!canEdit) return;
+  Future<void> setPublished({
+    required BuildContext context,
+    required bool isPublished,
+  }) async {
+    if (!deck.value.isEditable) return;
     if (!AuthService.isAuthenticatedRemote) {
-      setError(Exception('Sign in to update deck listing publishing.'));
+      error.value = Exception('Sign in to update deck listing publishing.');
       return;
     }
 
     final confirmed = await showModal<bool>(
-      context: _context,
+      context: context,
       title: 'Publish this listing?',
       subtitle:
           'This will make it available for others to download. Sync your changes in order to make this available online.',
@@ -155,21 +192,22 @@ class ViewDeckListingSingleEditorController extends Controller {
 
     if (confirmed != true) return;
 
-    final updatedDeck = await DeckListingsService.setPublished(
-      deck: _deck,
+    final updatedDeck = await DecksService.setPublished(
+      deck: deck.value,
       isPublished: isPublished,
     );
-    _applyUpdatedDeck(updatedDeck);
+
+    if (updatedDeck != null) deck.value = updatedDeck;
   }
 
-  Future<void> deleteListing() async {
-    if (!canEdit || _deck.listing == null) return;
+  Future<void> deleteListing({required BuildContext context}) async {
+    if (!deck.value.isEditable) return;
 
     final confirmed = await showModal<bool>(
-      context: _context,
+      context: context,
       title: 'Delete deck listing?',
       subtitle:
-          '"${ViewDeckSingleHelper.title(_deck)}" will be removed from published listings. The deck and its cards will stay in your library.',
+          '"${deck.value.title}" will be removed from published listings. The deck and its cards will stay in your library.',
       leading: const Icon(Icons.delete_outline),
       actions: [
         const ModalAction<bool>(value: false, label: 'Cancel'),
@@ -182,17 +220,16 @@ class ViewDeckListingSingleEditorController extends Controller {
     );
     if (confirmed != true) return;
 
-    final updatedDeck = await DeckListingsService.deleteListing(_deck);
-    _applyUpdatedDeck(updatedDeck);
-    if (_context.mounted) {
-      Navigator.of(_context).pop();
+    final updatedDeck = await DeckListingsService.deleteListing(
+      deck: deck.value,
+      listing: listing.value,
+      content: content.value,
+    );
+
+    if (updatedDeck != null) deck.value = updatedDeck;
+
+    if (context.mounted) {
+      Navigator.of(context).pop();
     }
-  }
-
-  void _applyUpdatedDeck(Deck? updatedDeck) {
-    if (updatedDeck == null) return;
-
-    _onDeckUpdated(updatedDeck);
-    notifyListeners();
   }
 }

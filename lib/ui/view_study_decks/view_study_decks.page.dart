@@ -9,47 +9,54 @@ import 'package:boo_mondai/lib.barrel.dart'
         StudyAllDecks,
         AppBar,
         StudyDeckTile,
-        ViewStudyCardsController,
+        ViewStudyDecksController,
         StudyDeckEntry,
-        StudyDeckSearchFilter,
-        useFilteredSearchBarController,
         FilteredSearchBar,
+        FilteredSearchBarController,
         Scaffold,
         AppTokens;
+import 'package:boo_mondai/ui/view_study_decks/view_study_decks.search.dart';
 import 'package:flutter/material.dart' hide Scaffold, AppBar;
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:provider/provider.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-class ViewStudyDecksPage extends HookWidget {
+class ViewStudyDecksPage extends SignalHookWidget {
   const ViewStudyDecksPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final ctrl = context.watch<ViewStudyCardsController>();
+    final controller = useMemoized(() => ViewStudyDecksController());
     final tokens = context.themeTokens<AppTokens>();
-    final searchController =
-        useFilteredSearchBarController<StudyDeckEntry, StudyDeckSearchFilter>(
-          filterCodec: ViewStudyCardsController.reviewSearchFilterCodec,
-          searchResults: ViewStudyCardsController.reviewSearchResults,
-          items: ctrl.deckEntries,
-          initialFilter: ctrl.reviewFilter,
-        );
+    final deckEntries = controller.deckEntries.value;
+    final searchController = useMemoized(
+      () => FilteredSearchBarController<StudyDeckEntry>(
+        tokenShapes: ViewStudyDecksSearch.tokenShapes,
+        searchTextLabel: ViewStudyDecksSearch.searchTextLabel,
+        sorter: ViewStudyDecksSearch.sorter,
+        items: deckEntries,
+      ),
+      const [],
+    );
 
     useEffect(() {
-      // Load stats when page opens
-      Future.microtask(() => ctrl.load());
-      return null;
-    }, const []);
+      Future.microtask(() => controller.load());
+      return () {
+        searchController.dispose();
+        controller.dispose();
+      };
+    }, [controller, searchController]);
 
-    final searchBar = FilteredSearchBar<StudyDeckEntry, StudyDeckSearchFilter>(
+    useEffect(() {
+      searchController.setItems(deckEntries);
+      return null;
+    }, [deckEntries, searchController]);
+
+    final searchBar = FilteredSearchBar<StudyDeckEntry>(
       controller: searchController,
-      filterCodec: ViewStudyCardsController.reviewSearchFilterCodec,
-      searchResults: ViewStudyCardsController.reviewSearchResults,
-      items: ctrl.deckEntries,
       placeholder: 'Filter review decks',
       showFilterButton: true,
-      onFilterChanged: ctrl.setReviewFilter,
+      resultLabelBuilder: (entry) => entry.deck.title,
     );
 
     return Scaffold(
@@ -61,13 +68,13 @@ class ViewStudyDecksPage extends HookWidget {
           title: 'No Enrolled Cards Yet',
           message: 'Go take a drill!',
         ),
-        isLoading: ctrl.isLoading,
-        items: searchController.results,
-        onRetry: ctrl.load,
+        isLoading: controller.isLoading.value,
+        items: searchController.results.value,
+        onRetry: () => controller.load(),
         useParentScroll: true,
         skeletonTile: StudyDeckTile(),
         separatorHeight: tokens.spaceLayoutGapMd,
-        leadingItem: StudyAllDecks(dueCount: ctrl.totalDue),
+        leadingItem: StudyAllDecks(dueCount: controller.totalDue.value),
         itemBuilder: (_, _, StudyDeckEntry entry) {
           return StudyDeckTile(deck: entry.deck, stats: entry.stats);
         },

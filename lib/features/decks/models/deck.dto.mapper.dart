@@ -16,8 +16,6 @@ class DeckMapper extends ClassMapperBase<Deck> {
       MutableEntityMapper.ensureInitialized();
       VisibilityStateMapper.ensureInitialized();
       TagMapper.ensureInitialized();
-      CachedProfileMapper.ensureInitialized();
-      DeckListingMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -51,18 +49,21 @@ class DeckMapper extends ClassMapperBase<Deck> {
   static const Field<Deck, bool> _f$isPremade = Field('isPremade', _$isPremade,
       key: r'is_premade', opt: true, def: false);
   static VisibilityState _$visibilityState(Deck v) => v.visibilityState;
-  static const Field<Deck, VisibilityState> _f$visibilityState =
-      Field('visibilityState', _$visibilityState, key: r'visibility_state');
+  static const Field<Deck, VisibilityState> _f$visibilityState = Field(
+      'visibilityState', _$visibilityState,
+      key: r'visibility_state', opt: true, def: VisibilityState.private);
   static bool _$isPublished(Deck v) => v.isPublished;
-  static const Field<Deck, bool> _f$isPublished =
-      Field('isPublished', _$isPublished, key: r'is_published');
+  static const Field<Deck, bool> _f$isPublished = Field(
+      'isPublished', _$isPublished,
+      key: r'is_published', opt: true, def: false);
   static bool _$isEditable(Deck v) => v.isEditable;
   static const Field<Deck, bool> _f$isEditable = Field(
       'isEditable', _$isEditable,
       key: r'is_editable', opt: true, def: true);
-  static int _$cardCount(Deck v) => v.cardCount;
-  static const Field<Deck, int> _f$cardCount =
-      Field('cardCount', _$cardCount, key: r'card_count');
+  static int _$cardTemplatesCount(Deck v) => v.cardTemplatesCount;
+  static const Field<Deck, int> _f$cardTemplatesCount = Field(
+      'cardTemplatesCount', _$cardTemplatesCount,
+      key: r'card_templates_count', opt: true, def: 0);
   static String _$version(Deck v) => v.version;
   static const Field<Deck, String> _f$version =
       Field('version', _$version, opt: true, def: '0.1.0+1');
@@ -70,27 +71,21 @@ class DeckMapper extends ClassMapperBase<Deck> {
   static const Field<Deck, int> _f$buildNumber = Field(
       'buildNumber', _$buildNumber,
       key: r'build_number', opt: true, def: 1);
-  static DateTime _$createdAt(Deck v) => v.createdAt;
-  static const Field<Deck, DateTime> _f$createdAt =
-      Field('createdAt', _$createdAt, key: r'created_at');
+  static List<Tag> _$tags(Deck v) => v.tags;
+  static const Field<Deck, List<Tag>> _f$tags =
+      Field('tags', _$tags, opt: true, def: const []);
   static DateTime _$updatedAt(Deck v) => v.updatedAt;
   static const Field<Deck, DateTime> _f$updatedAt =
       Field('updatedAt', _$updatedAt, key: r'updated_at');
+  static DateTime _$createdAt(Deck v) => v.createdAt;
+  static const Field<Deck, DateTime> _f$createdAt =
+      Field('createdAt', _$createdAt, key: r'created_at');
   static DateTime? _$deletedAt(Deck v) => v.deletedAt;
   static const Field<Deck, DateTime> _f$deletedAt =
       Field('deletedAt', _$deletedAt, key: r'deleted_at', opt: true);
   static DateTime? _$purgeAfter(Deck v) => v.purgeAfter;
   static const Field<Deck, DateTime> _f$purgeAfter =
       Field('purgeAfter', _$purgeAfter, key: r'purge_after', opt: true);
-  static List<Tag> _$tags(Deck v) => v.tags;
-  static const Field<Deck, List<Tag>> _f$tags =
-      Field('tags', _$tags, opt: true, def: const []);
-  static CachedProfile? _$userProfile(Deck v) => v.userProfile;
-  static const Field<Deck, CachedProfile> _f$userProfile =
-      Field('userProfile', _$userProfile, key: r'user_profile', opt: true);
-  static DeckListing? _$listing(Deck v) => v.listing;
-  static const Field<Deck, DeckListing> _f$listing =
-      Field('listing', _$listing, opt: true);
 
   @override
   final MappableFields<Deck> fields = const {
@@ -105,16 +100,14 @@ class DeckMapper extends ClassMapperBase<Deck> {
     #visibilityState: _f$visibilityState,
     #isPublished: _f$isPublished,
     #isEditable: _f$isEditable,
-    #cardCount: _f$cardCount,
+    #cardTemplatesCount: _f$cardTemplatesCount,
     #version: _f$version,
     #buildNumber: _f$buildNumber,
-    #createdAt: _f$createdAt,
+    #tags: _f$tags,
     #updatedAt: _f$updatedAt,
+    #createdAt: _f$createdAt,
     #deletedAt: _f$deletedAt,
     #purgeAfter: _f$purgeAfter,
-    #tags: _f$tags,
-    #userProfile: _f$userProfile,
-    #listing: _f$listing,
   };
 
   static Deck _instantiate(DecodingData data) {
@@ -130,16 +123,14 @@ class DeckMapper extends ClassMapperBase<Deck> {
         visibilityState: data.dec(_f$visibilityState),
         isPublished: data.dec(_f$isPublished),
         isEditable: data.dec(_f$isEditable),
-        cardCount: data.dec(_f$cardCount),
+        cardTemplatesCount: data.dec(_f$cardTemplatesCount),
         version: data.dec(_f$version),
         buildNumber: data.dec(_f$buildNumber),
-        createdAt: data.dec(_f$createdAt),
-        updatedAt: data.dec(_f$updatedAt),
-        deletedAt: data.dec(_f$deletedAt),
-        purgeAfter: data.dec(_f$purgeAfter),
         tags: data.dec(_f$tags),
-        userProfile: data.dec(_f$userProfile),
-        listing: data.dec(_f$listing));
+        updatedAt: data.dec(_f$updatedAt),
+        createdAt: data.dec(_f$createdAt),
+        deletedAt: data.dec(_f$deletedAt),
+        purgeAfter: data.dec(_f$purgeAfter));
   }
 
   @override
@@ -189,8 +180,6 @@ extension DeckValueCopy<$R, $Out> on ObjectCopyWith<$R, Deck, $Out> {
 abstract class DeckCopyWith<$R, $In extends Deck, $Out>
     implements MutableEntityCopyWith<$R, $In, $Out> {
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags;
-  CachedProfileCopyWith<$R, CachedProfile, CachedProfile>? get userProfile;
-  DeckListingCopyWith<$R, DeckListing, DeckListing>? get listing;
   @override
   $R call(
       {String? id,
@@ -204,16 +193,14 @@ abstract class DeckCopyWith<$R, $In extends Deck, $Out>
       VisibilityState? visibilityState,
       bool? isPublished,
       bool? isEditable,
-      int? cardCount,
+      int? cardTemplatesCount,
       String? version,
       int? buildNumber,
-      DateTime? createdAt,
-      DateTime? updatedAt,
-      DateTime? deletedAt,
-      DateTime? purgeAfter,
       List<Tag>? tags,
-      CachedProfile? userProfile,
-      DeckListing? listing});
+      DateTime? updatedAt,
+      DateTime? createdAt,
+      DateTime? deletedAt,
+      DateTime? purgeAfter});
   DeckCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -227,12 +214,6 @@ class _DeckCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Deck, $Out>
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags => ListCopyWith(
       $value.tags, (v, t) => v.copyWith.$chain(t), (v) => call(tags: v));
   @override
-  CachedProfileCopyWith<$R, CachedProfile, CachedProfile>? get userProfile =>
-      $value.userProfile?.copyWith.$chain((v) => call(userProfile: v));
-  @override
-  DeckListingCopyWith<$R, DeckListing, DeckListing>? get listing =>
-      $value.listing?.copyWith.$chain((v) => call(listing: v));
-  @override
   $R call(
           {String? id,
           String? profileId,
@@ -245,16 +226,14 @@ class _DeckCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Deck, $Out>
           VisibilityState? visibilityState,
           bool? isPublished,
           bool? isEditable,
-          int? cardCount,
+          int? cardTemplatesCount,
           String? version,
           int? buildNumber,
-          DateTime? createdAt,
-          DateTime? updatedAt,
-          Object? deletedAt = $none,
-          Object? purgeAfter = $none,
           List<Tag>? tags,
-          Object? userProfile = $none,
-          Object? listing = $none}) =>
+          DateTime? updatedAt,
+          DateTime? createdAt,
+          Object? deletedAt = $none,
+          Object? purgeAfter = $none}) =>
       $apply(FieldCopyWithData({
         if (id != null) #id: id,
         if (profileId != null) #profileId: profileId,
@@ -267,16 +246,14 @@ class _DeckCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Deck, $Out>
         if (visibilityState != null) #visibilityState: visibilityState,
         if (isPublished != null) #isPublished: isPublished,
         if (isEditable != null) #isEditable: isEditable,
-        if (cardCount != null) #cardCount: cardCount,
+        if (cardTemplatesCount != null) #cardTemplatesCount: cardTemplatesCount,
         if (version != null) #version: version,
         if (buildNumber != null) #buildNumber: buildNumber,
-        if (createdAt != null) #createdAt: createdAt,
-        if (updatedAt != null) #updatedAt: updatedAt,
-        if (deletedAt != $none) #deletedAt: deletedAt,
-        if (purgeAfter != $none) #purgeAfter: purgeAfter,
         if (tags != null) #tags: tags,
-        if (userProfile != $none) #userProfile: userProfile,
-        if (listing != $none) #listing: listing
+        if (updatedAt != null) #updatedAt: updatedAt,
+        if (createdAt != null) #createdAt: createdAt,
+        if (deletedAt != $none) #deletedAt: deletedAt,
+        if (purgeAfter != $none) #purgeAfter: purgeAfter
       }));
   @override
   Deck $make(CopyWithData data) => Deck(
@@ -292,16 +269,15 @@ class _DeckCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Deck, $Out>
       visibilityState: data.get(#visibilityState, or: $value.visibilityState),
       isPublished: data.get(#isPublished, or: $value.isPublished),
       isEditable: data.get(#isEditable, or: $value.isEditable),
-      cardCount: data.get(#cardCount, or: $value.cardCount),
+      cardTemplatesCount:
+          data.get(#cardTemplatesCount, or: $value.cardTemplatesCount),
       version: data.get(#version, or: $value.version),
       buildNumber: data.get(#buildNumber, or: $value.buildNumber),
-      createdAt: data.get(#createdAt, or: $value.createdAt),
-      updatedAt: data.get(#updatedAt, or: $value.updatedAt),
-      deletedAt: data.get(#deletedAt, or: $value.deletedAt),
-      purgeAfter: data.get(#purgeAfter, or: $value.purgeAfter),
       tags: data.get(#tags, or: $value.tags),
-      userProfile: data.get(#userProfile, or: $value.userProfile),
-      listing: data.get(#listing, or: $value.listing));
+      updatedAt: data.get(#updatedAt, or: $value.updatedAt),
+      createdAt: data.get(#createdAt, or: $value.createdAt),
+      deletedAt: data.get(#deletedAt, or: $value.deletedAt),
+      purgeAfter: data.get(#purgeAfter, or: $value.purgeAfter));
 
   @override
   DeckCopyWith<$R2, Deck, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>

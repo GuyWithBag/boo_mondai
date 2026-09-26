@@ -11,12 +11,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppBar,
         AppTokens,
         BottomNavBar,
-        ErrorText,
         LocalDB,
         Scaffold,
         StudyRatingBreakdown,
         StudyRating,
-        StudySessionStepRecord,
+        StudySessionSnapshot,
         Button,
         ButtonColor;
 import 'package:flutter/material.dart' hide AppBar, Scaffold;
@@ -31,33 +30,19 @@ class ViewStudySessionResultPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final drillSession = LocalDB.drillSession.selectByPk({'id': sessionId});
-    final reviewSession = drillSession == null
-        ? LocalDB.reviewSession.selectByPk({'id': sessionId})
-        : null;
+    final reviewSession = LocalDB.reviewSession.selectByPk({'id': sessionId});
+
+    // ToDo:
     final isReviewResult = reviewSession != null;
     final tokens = context.themeTokens<AppTokens>();
 
-    if (drillSession == null && reviewSession == null) {
-      return Scaffold(
-        body: Center(child: ErrorText('Study session result was not found.')),
-      );
-    }
-
-    final answers = isReviewResult
-        ? LocalDB.studySessionStepRecord
-              .getBySessionId(sessionId)
-              .map(_AnswerResult.fromStepRecord)
-              .toList()
-        : LocalDB.drillAnswer
-              .getBySessionId(sessionId)
-              .map(
-                (answer) => _AnswerResult(
-                  userAnswer: answer.userAnswer,
-                  type: answer.type,
-                ),
-              )
-              .toList();
+    final answers =
+        LocalDB.studySessionSnapshot.getBySessionId(sessionId).toList()
+          ..sort((a, b) => a.sequenceNumber.compareTo(b.sequenceNumber));
+    final cardAnswers = answers
+        .where((snapshot) => snapshot.rating != null)
+        .map(_AnswerResult.fromSnapshot)
+        .toList();
 
     final scoreAnim = useAnimationController(
       duration: const Duration(milliseconds: 600),
@@ -77,15 +62,16 @@ class ViewStudySessionResultPage extends HookWidget {
     }
 
     void reviewNow() {
-      context.go('/review/${drillSession!.deckId}/session');
+      // context.go('/review/${drillSession!.deckId}/session');
     }
 
-    final enrolledCount = drillSession?.correctCount ?? 0;
+    // ToDo:
+    final enrolledCount = 0;
 
     final breakdown = <StudyRating, int>{
       for (final type in StudyRating.values) type: 0,
     };
-    for (final a in answers) {
+    for (final a in cardAnswers) {
       breakdown[a.type] = (breakdown[a.type] ?? 0) + 1;
     }
 
@@ -97,6 +83,7 @@ class ViewStudySessionResultPage extends HookWidget {
           children: [
             Expanded(
               child: Button(
+                variants: [ButtonColor.primary],
                 onPressed: isReviewResult ? goReviews : goHome,
                 child: Text(
                   isReviewResult
@@ -124,19 +111,18 @@ class ViewStudySessionResultPage extends HookWidget {
           StudyRatingBreakdown(
             animation: scoreAnim,
             breakdown: breakdown,
-            total:
-                drillSession?.totalQuestions ?? reviewSession?.totalCards ?? 0,
+            total: reviewSession?.totalCards ?? 0,
           ),
 
           // The list of individual answers
-          if (answers.isNotEmpty)
+          if (cardAnswers.isNotEmpty)
             ListingStatesWrapper.list(
-              items: answers,
+              items: cardAnswers,
               useParentScroll: true,
               separatorHeight: tokens.spaceLayoutGapSm,
               itemBuilder: (context, _, answer) {
                 return AnswerResultTile(
-                  userAnswer: answer.userAnswer,
+                  answerValue: answer.answerValue,
                   type: answer.type,
                   isEjected: false,
                 );
@@ -151,12 +137,15 @@ class ViewStudySessionResultPage extends HookWidget {
 }
 
 final class _AnswerResult {
-  const _AnswerResult({required this.userAnswer, required this.type});
+  const _AnswerResult({required this.answerValue, required this.type});
 
-  factory _AnswerResult.fromStepRecord(StudySessionStepRecord record) {
-    return _AnswerResult(userAnswer: record.userAnswer, type: record.rating);
+  factory _AnswerResult.fromSnapshot(StudySessionSnapshot snapshot) {
+    return _AnswerResult(
+      answerValue: snapshot.answer!.value,
+      type: snapshot.rating!,
+    );
   }
 
-  final String userAnswer;
+  final String answerValue;
   final StudyRating type;
 }

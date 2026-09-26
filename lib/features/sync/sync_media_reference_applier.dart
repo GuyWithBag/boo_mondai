@@ -1,10 +1,6 @@
 import 'package:boo_mondai/core/helpers/media.helper.dart';
 import 'package:boo_mondai/lib.barrel.dart'
-    show
-        ImageHelper,
-        StoredMediaUploadService,
-        SyncMediaReference,
-        FileSystemHandler;
+    show StoredMediaUploadService, SyncMediaReference, FileSystemHandler;
 
 abstract final class SyncMediaReferenceApplier {
   static Future<T> apply<T>({
@@ -26,7 +22,6 @@ abstract final class SyncMediaReferenceApplier {
       final localFile = FileSystemHandler.getFileByRelativePath(
         reference.localPath,
       );
-      if (localFile == null) continue;
 
       final uploadedValue = await StoredMediaUploadService.upload(
         localPath: reference.localPath,

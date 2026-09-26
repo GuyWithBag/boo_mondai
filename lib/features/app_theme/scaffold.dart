@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
@@ -7,33 +5,29 @@ import 'package:boo_mondai/lib.barrel.dart'
         ButtonColor,
         MainController,
         ScaffoldController,
-        ScaffoldHelper,
+        ScaffoldRefreshBuilder,
         ScaffoldOverlayGeometry,
         ScaffoldScrollLockScope,
         ToolBar,
         ToolBarScope,
-        useScaffoldController,
         ViewPaddingSizedBox,
         Side;
 import 'package:flutter/material.dart' hide Scaffold;
 import 'package:flutter/material.dart' as material show Scaffold;
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:provider/provider.dart' show WatchContext;
+import 'package:provider/provider.dart' show ReadContext;
+import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-typedef ScaffoldRefreshBuilder =
-    Widget Function(
-      BuildContext context,
-      RefreshCallback onRefresh,
-      Widget child,
-    );
-
-class Scaffold extends HookWidget {
+class Scaffold extends SignalHookWidget {
   const Scaffold({
     super.key,
     required this.body,
-    this.controller,
+    this.hideNavigation = false,
+    this.showBottomNavBar = true,
+    this.showAppBar = true,
+    this.isFloatingSideBar = false,
     this.appBar,
     this.sidebar,
     this.sidebarWidth = 280,
@@ -72,7 +66,10 @@ class Scaffold extends HookWidget {
        );
 
   final Widget body;
-  final ScaffoldController? controller;
+  final bool hideNavigation;
+  final bool showBottomNavBar;
+  final bool showAppBar;
+  final bool isFloatingSideBar;
   final PreferredSizeWidget? appBar;
   final bool isFloatingAppBar;
   final Widget? sidebar;
@@ -106,122 +103,134 @@ class Scaffold extends HookWidget {
   final RefreshCallback? onRefresh;
   final ScaffoldRefreshBuilder? refreshBuilder;
 
-  static const _animationDuration = Duration(milliseconds: 220);
-
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
     final mediaQuery = MediaQuery.of(context);
-    final mainController = context.watch<MainController>();
-
-    final internalController = useScaffoldController(
-      isSideBarVisible: floatingSideBarInitiallyOpen,
+    final mainController = context.read<MainController>();
+    final controller = useMemoized(
+      () => ScaffoldController(
+        tokens: tokens,
+        mediaQuery: mediaQuery,
+        mainController: mainController,
+        appBar: appBar,
+        sidebar: sidebar,
+        sidebarWidth: sidebarWidth,
+        bottomNavBar: bottomNavBar,
+        toolBar: toolBar,
+        padding: padding,
+        hideNavigation: hideNavigation,
+        floatingActionButton: floatingActionButton,
+        preferredFloatingActionButtonHeight:
+            preferredFloatingActionButtonHeight,
+        hideAppBarOnScroll: hideAppBarOnScroll,
+        hideBottomNavigationBarOnScroll: hideBottomNavigationBarOnScroll,
+        hideFloatingActionButtonOnScroll: hideFloatingActionButtonOnScroll,
+        isFloatingAppBar: isFloatingAppBar,
+        haveSideBarOpenButton: haveSideBarOpenButton,
+        haveBottomNavBarBottomGap: haveBottomNavBarBottomGap,
+        inheritMainBottomNavBarHeight: inheritMainBottomNavBarHeight,
+        resizeBodyForKeyboard: resizeBodyForKeyboard,
+        scrollable: scrollable,
+        showUnfocusButton: showUnfocusButton,
+        showViewPaddingBottom: showViewPaddingBottom,
+        showViewPaddingTop: showViewPaddingTop,
+        centeredConstraint: centeredConstraint,
+        centeredBody: centeredBody,
+        shouldConstrainWidth: shouldConstrainWidth,
+        safeArea: safeArea,
+        maxWidth: maxWidth,
+        onRefresh: onRefresh,
+        refreshBuilder: refreshBuilder,
+        scrollStartAtTheBottom: scrollStartAtTheBottom,
+        scrollController: scrollController,
+        initialShowBottomNavBar: showBottomNavBar,
+        initialShowAppBar: showAppBar,
+        initialIsFloatingSideBar: isFloatingSideBar,
+        initialFloatingSideBarInitiallyOpen: floatingSideBarInitiallyOpen,
+      ),
+      [
+        tokens,
+        mediaQuery,
+        mainController,
+        appBar,
+        sidebar,
+        sidebarWidth,
+        bottomNavBar,
+        toolBar,
+        padding,
+        hideNavigation,
+        showBottomNavBar,
+        showAppBar,
+        isFloatingSideBar,
+        floatingActionButton,
+        preferredFloatingActionButtonHeight,
+        hideAppBarOnScroll,
+        hideBottomNavigationBarOnScroll,
+        hideFloatingActionButtonOnScroll,
+        isFloatingAppBar,
+        haveSideBarOpenButton,
+        haveBottomNavBarBottomGap,
+        inheritMainBottomNavBarHeight,
+        resizeBodyForKeyboard,
+        scrollable,
+        showUnfocusButton,
+        showViewPaddingBottom,
+        showViewPaddingTop,
+        centeredConstraint,
+        centeredBody,
+        shouldConstrainWidth,
+        safeArea,
+        maxWidth,
+        onRefresh,
+        refreshBuilder,
+        scrollStartAtTheBottom,
+        scrollController,
+        floatingSideBarInitiallyOpen,
+      ],
     );
-    final controller = this.controller ?? internalController;
-    final scrollLockKeys = useState(<Object>{});
-    final isMounted = useRef(true);
 
-    useEffect(() {
-      isMounted.value = true;
-      return () {
-        isMounted.value = false;
-      };
-    }, const []);
-
-    final setScrollLocked = useCallback((Object key, bool value) {
-      if (!isMounted.value) return;
-
-      final next = {...scrollLockKeys.value};
-      final didChange = value ? next.add(key) : next.remove(key);
-
-      if (didChange && isMounted.value) {
-        scrollLockKeys.value = next;
-      }
-    }, [scrollLockKeys, isMounted]);
-
-    final helper = ScaffoldHelper(
-      tokens: tokens,
-      mediaQuery: mediaQuery,
-      mainController: mainController,
-      appBar: appBar,
-      sidebar: sidebar,
-      sidebarWidth: sidebarWidth,
-      bottomNavBar: bottomNavBar,
-      toolBar: toolBar,
-      padding: padding,
-      hideNavigation: controller.hideNavigation,
-      floatingActionButton: floatingActionButton,
-      preferredFloatingActionButtonHeight: preferredFloatingActionButtonHeight,
-      showBottomNavBar: controller.showBottomNavBar,
-      showAppBar: controller.showAppBar,
-      isFloatingSideBar: controller.isFloatingSideBar,
-      isFloatingAppBar: isFloatingAppBar,
-      haveSideBarOpenButton: haveSideBarOpenButton,
-      haveBottomNavBarBottomGap: haveBottomNavBarBottomGap,
-      inheritMainBottomNavBarHeight: inheritMainBottomNavBarHeight,
-      isUserInputFocusing: controller.isUserInputFocusing,
-    );
+    useEffect(() => controller.dispose, [controller]);
 
     useEffect(() {
       if (toolBar == null && !resizeBodyForKeyboard) {
-        controller.isUserInputFocusing = false;
+        controller.isUserInputFocusing.value = false;
         return null;
       }
 
-      void updateUserInputFocus() {
-        final focusedContext = FocusManager.instance.primaryFocus?.context;
-        controller.isUserInputFocusing =
-            focusedContext?.widget is EditableText ||
-            focusedContext?.findAncestorWidgetOfExactType<EditableText>() !=
-                null;
-      }
-
-      FocusManager.instance.addListener(updateUserInputFocus);
-      updateUserInputFocus();
-      return () {
-        FocusManager.instance.removeListener(updateUserInputFocus);
-      };
+      controller.addFocusListener();
+      return controller.removeFocusListener;
     }, [controller, resizeBodyForKeyboard, toolBar]);
 
-    final shouldHaveAppBar = helper.shouldHaveAppBar;
-    final shouldHaveFloatingAppBar = helper.shouldHaveFloatingAppBar;
-    final shouldHaveBottomNavBar = helper.shouldHaveBottomNavBar;
-    final shouldHaveToolBar = helper.shouldHaveToolBar;
+    final shouldHaveAppBar = controller.shouldHaveAppBar.value;
+    final shouldHaveFloatingAppBar = controller.shouldHaveFloatingAppBar.value;
+    final shouldHaveBottomNavBar = controller.shouldHaveBottomNavBar.value;
+    final shouldHaveToolBar = controller.shouldHaveToolBar.value;
     final shouldBodyHaveBottomScaffoldSafeArea =
-        helper.shouldBodyHaveBottomScaffoldSafeArea;
-    final effectiveBottomNavBarHeight = helper.trueBottomNavBarHeight;
-    final effectiveToolBarHeight = helper.trueToolBarHeight;
-    final effectiveAppBarHeight = helper.trueAppBarHeight;
-    final showDockedSideBar = helper.shouldHaveDockedSideBar;
-    final showFloatingSideBar = helper.shouldHaveFloatingSideBar;
-    final effectiveSideBarWidth = helper.trueSideBarWidth;
-    final shouldHaveSideBarButton = helper.shouldHaveSideBarButton;
-    final shouldHaveEitherFab = helper.shouldHaveEitherFab;
-    final scaffoldPadding = helper.scaffoldPadding;
-    final fabBottomPadding = helper.fabBottomPadding;
-    final keyboardBottomInset = resizeBodyForKeyboard
-        ? mediaQuery.viewInsets.bottom
-        : 0.0;
-    final isKeyboardOpen = keyboardBottomInset > 0;
-    final toolbarViewportInset = isKeyboardOpen && shouldHaveToolBar
-        ? effectiveToolBarHeight
-        : 0.0;
-    final contentBottomInset = keyboardBottomInset + toolbarViewportInset;
+        controller.shouldBodyHaveBottomScaffoldSafeArea.value;
+    final effectiveBottomNavBarHeight = controller.trueBottomNavBarHeight.value;
+    final effectiveToolBarHeight = controller.trueToolBarHeight.value;
+    final effectiveAppBarHeight = controller.trueAppBarHeight.value;
+    final showDockedSideBar = controller.shouldHaveDockedSideBar.value;
+    final showFloatingSideBar = controller.shouldHaveFloatingSideBar.value;
+    final effectiveSideBarWidth = controller.trueSideBarWidth.value;
+    final shouldHaveSideBarButton = controller.shouldHaveSideBarButton.value;
+    final shouldHaveEitherFab = controller.shouldHaveEitherFab.value;
+    final scaffoldPadding = controller.scaffoldPadding.value;
+    final fabBottomPadding = controller.fabBottomPadding.value;
+    final isKeyboardOpen = controller.isKeyboardOpen.value;
+    final contentBottomInset = controller.contentBottomInset.value;
     final effectiveBottomScaffoldSafeAreaHeight =
-        isKeyboardOpen && shouldHaveToolBar
-        ? 0.0
-        : helper.bottomScaffoldSafeAreaHeight;
-    final scaffoldOverlayBottomInset = math.max(
-      helper.bottomScaffoldSafeAreaHeight,
-      contentBottomInset,
-    );
+        controller.effectiveBottomScaffoldSafeAreaHeight.value;
+    final scaffoldOverlayBottomInset =
+        controller.scaffoldOverlayBottomInset.value;
     final scaffoldOverlayTopInset = effectiveAppBarHeight;
 
     final toolBarController = toolBar is ToolBar
         ? (toolBar! as ToolBar).controller
         : null;
     final bodyWithScrollLockScope = ScaffoldScrollLockScope(
-      setScrollLocked: setScrollLocked,
+      setScrollLocked: controller.setScrollLockedCallback,
       child: body,
     );
     final scopedBody = toolBarController == null
@@ -230,18 +239,16 @@ class Scaffold extends HookWidget {
             controller: toolBarController,
             child: bodyWithScrollLockScope,
           );
-    final shouldShowUnfocusButton =
-        showUnfocusButton && MediaQuery.viewInsetsOf(context).bottom <= 0;
-    final effectiveScrollable = scrollable && scrollLockKeys.value.isEmpty;
+    final shouldShowUnfocusButton = controller.shouldShowUnfocusButton.value;
+    final effectiveScrollable = controller.effectiveScrollable.value;
 
     Widget innerBody = scopedBody;
 
     if (centeredBody) {
       innerBody = Center(child: scopedBody);
     }
-
     final paddedBody = Padding(
-      padding: helper.contentPadding,
+      padding: controller.contentPadding.value,
       child: innerBody,
     );
 
@@ -273,8 +280,8 @@ class Scaffold extends HookWidget {
                 right: 0,
                 child: SizedBox(
                   height: effectiveAppBarHeight,
-                  child: _AnimatedOverlay(
-                    visible: controller.isEitherAppBarVisible,
+                  child: AnimatedOverlay(
+                    visible: controller.isEitherAppBarVisible.value,
                     hiddenOffset: const Offset(0, -1),
                     child: appBar!,
                   ),
@@ -291,12 +298,12 @@ class Scaffold extends HookWidget {
       ],
     );
 
-    final onRefresh = this.onRefresh;
+    final effectiveOnRefresh = controller.onRefresh;
 
     if (effectiveScrollable) {
       content = SingleChildScrollView(
         padding: EdgeInsets.zero,
-        physics: onRefresh == null
+        physics: effectiveOnRefresh == null
             ? null
             : const AlwaysScrollableScrollPhysics(),
         controller: scrollController,
@@ -305,10 +312,14 @@ class Scaffold extends HookWidget {
       );
     }
 
-    if (onRefresh != null && effectiveScrollable) {
+    if (effectiveOnRefresh != null && effectiveScrollable) {
       content =
-          refreshBuilder?.call(context, onRefresh, content) ??
-          RefreshIndicator(onRefresh: onRefresh, child: content);
+          controller.refreshBuilder?.call(
+            context,
+            effectiveOnRefresh,
+            content,
+          ) ??
+          RefreshIndicator(onRefresh: effectiveOnRefresh, child: content);
     }
 
     if (shouldConstrainWidth) {
@@ -325,11 +336,7 @@ class Scaffold extends HookWidget {
     }
 
     content = NotificationListener<ScrollNotification>(
-      onNotification: (notification) => controller.handleScrollNotification(
-        notification: notification,
-        hideBottomNavigationBarOnScroll: hideBottomNavigationBarOnScroll,
-        hideAppBarOnScroll: hideAppBarOnScroll,
-      ),
+      onNotification: controller.handleScrollNotification,
       child: content,
     );
 
@@ -342,7 +349,7 @@ class Scaffold extends HookWidget {
         child: content,
       ),
       if (showDockedSideBar)
-        _AnimatedOverlay(
+        AnimatedOverlay(
           visible: true,
           hiddenOffset: const Offset(-1, 0),
           child: Align(
@@ -355,8 +362,8 @@ class Scaffold extends HookWidget {
           top: 0,
           left: effectiveSideBarWidth,
           right: 0,
-          child: _AnimatedOverlay(
-            visible: controller.isEitherAppBarVisible,
+          child: AnimatedOverlay(
+            visible: controller.isEitherAppBarVisible.value,
             hiddenOffset: const Offset(0, -1),
             child: SizedBox(height: effectiveAppBarHeight, child: appBar!),
           ),
@@ -366,8 +373,8 @@ class Scaffold extends HookWidget {
           left: 0,
           right: 0,
           bottom: 0,
-          child: _AnimatedOverlay(
-            visible: controller.isBottomNavBarVisible,
+          child: AnimatedOverlay(
+            visible: controller.isBottomNavBarVisible.value,
             // visible: true,
             hiddenOffset: const Offset(0, 1),
             child: SizedBox(
@@ -388,8 +395,8 @@ class Scaffold extends HookWidget {
               if (shouldShowUnfocusButton)
                 Padding(
                   padding: EdgeInsets.only(right: tokens.spaceLayoutPaddingSm),
-                  child: _AnimatedOverlay(
-                    visible: controller.isUserInputFocusing,
+                  child: AnimatedOverlay(
+                    visible: controller.isUserInputFocusing.value,
                     hiddenOffset: const Offset(0, 1),
                     child: Button(
                       onPressed: FocusManager.instance.primaryFocus?.unfocus,
@@ -397,8 +404,8 @@ class Scaffold extends HookWidget {
                     ),
                   ),
                 ),
-              _AnimatedOverlay(
-                visible: controller.isUserInputFocusing,
+              AnimatedOverlay(
+                visible: controller.isUserInputFocusing.value,
                 hiddenOffset: const Offset(0, 1),
                 child: SizedBox(
                   height: effectiveToolBarHeight,
@@ -412,22 +419,22 @@ class Scaffold extends HookWidget {
       if (showFloatingSideBar)
         Positioned.fill(
           child: IgnorePointer(
-            ignoring: !controller.isSideBarVisible,
+            ignoring: !controller.isSideBarVisible.value,
             child: AnimatedOpacity(
-              opacity: controller.isSideBarVisible ? 1 : 0,
-              duration: _animationDuration,
+              opacity: controller.isSideBarVisible.value ? 1 : 0,
+              duration: ScaffoldController.animationDuration,
               child: Stack(
                 children: [
                   Positioned.fill(
                     child: GestureDetector(
-                      onTap: () => controller.isSideBarVisible = false,
+                      onTap: () => controller.isSideBarVisible.value = false,
                       child: ColoredBox(
                         color: Colors.black.withValues(alpha: 0.24),
                       ),
                     ),
                   ),
-                  _AnimatedOverlay(
-                    visible: controller.isSideBarVisible,
+                  AnimatedOverlay(
+                    visible: controller.isSideBarVisible.value,
                     hiddenOffset: const Offset(-1, 0),
                     child: Align(
                       alignment: Alignment.centerLeft,
@@ -447,8 +454,8 @@ class Scaffold extends HookWidget {
         Positioned(
           right: scaffoldPadding.right,
           bottom: fabBottomPadding,
-          child: _AnimatedOverlay(
-            visible: controller.isEitherFabVisible,
+          child: AnimatedOverlay(
+            visible: controller.isEitherFabVisible.value,
             hiddenOffset: const Offset(0, 1),
             child: SizedBox(
               height: preferredFloatingActionButtonHeight,
@@ -485,8 +492,9 @@ class Scaffold extends HookWidget {
   }
 }
 
-class _AnimatedOverlay extends HookWidget {
-  const _AnimatedOverlay({
+class AnimatedOverlay extends HookWidget {
+  const AnimatedOverlay({
+    super.key,
     required this.visible,
     required this.hiddenOffset,
     required this.child,
@@ -517,13 +525,13 @@ class _AnimatedOverlay extends HookWidget {
             },
           )
           .fade(
-            duration: Scaffold._animationDuration,
+            duration: ScaffoldController.animationDuration,
             curve: Curves.easeOutCubic,
             begin: 0,
             end: 1,
           )
           .slide(
-            duration: Scaffold._animationDuration,
+            duration: ScaffoldController.animationDuration,
             curve: Curves.easeOutCubic,
             begin: hiddenOffset,
             end: Offset.zero,

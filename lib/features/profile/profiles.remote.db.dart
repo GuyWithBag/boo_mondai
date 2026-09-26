@@ -6,7 +6,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart'
-    show SupabaseRemoteDB, Profile, ProfileMapper, ImageHelper;
+    show SupabaseRemoteDB, Profile, ProfileMapper;
 
 class ProfilesRemoteDB extends SupabaseRemoteDB<Profile> {
   @override

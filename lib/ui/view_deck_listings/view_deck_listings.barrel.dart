@@ -5,3 +5,4 @@ export 'widgets/widgets.barrel.dart';
 // Other files
 export 'view_deck_listings.page.dart';
 export 'view_deck_listings.controller.dart';
+export 'view_deck_listings.search.dart';

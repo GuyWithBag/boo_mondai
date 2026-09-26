@@ -54,10 +54,10 @@ class DownloadsTile extends StatelessWidget {
   String get _percentLabel => '${(progress * 100).round()}%';
 
   String get _completedLabel {
-    final cardCount = entry.changes
+    final cardTemplatesCount = entry.changes
         .where((c) => c.typeName == 'card_template')
         .length;
-    return 'Downloaded $cardCount card${cardCount == 1 ? '' : 's'}.';
+    return 'Downloaded $cardTemplatesCount card${cardTemplatesCount == 1 ? '' : 's'}.';
   }
 
   bool get _isActive =>

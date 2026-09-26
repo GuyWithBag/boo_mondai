@@ -18,17 +18,18 @@ import 'package:boo_mondai/lib.barrel.dart'
         showModal;
 import 'package:flutter/material.dart' hide Scaffold;
 import 'package:go_router/go_router.dart';
+import 'package:signals/signals_flutter.dart';
 import 'package:theme_variants/theme_variants.dart' show ThemeVariantsContext;
 
-class SyncPage extends StatelessWidget {
+class SyncPage extends SignalWidget {
   const SyncPage({super.key, required this.syncController});
 
   final SyncController syncController;
 
-  ChangeTrackerEntry get entry => syncController.currentEntry!;
+  ChangeTrackerEntry get entry => syncController.currentEntry.value!;
 
   void _viewChanges(BuildContext context) {
-    final service = syncController.changeTrackerService;
+    final service = syncController.changeTrackerService.value;
     if (service == null) return;
 
     context.push(
@@ -69,6 +70,7 @@ class SyncPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
+    final error = syncController.error.value;
     final progress = (entry.progress ?? 0).clamp(0.0, 1.0);
 
     final title = switch (entry.status) {
@@ -174,7 +176,7 @@ class SyncPage extends StatelessWidget {
                   Button(onPressed: _discard, child: const Text('Cancel')),
                 ],
               ),
-              child: isDoneFetching && syncController.error == null
+              child: isDoneFetching && error == null
                   ? ChangeTrackerSummaryChips(entry: entry)
                   : null,
             ),

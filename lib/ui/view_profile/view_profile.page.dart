@@ -19,7 +19,7 @@ import 'package:boo_mondai/lib.barrel.dart'
 import 'package:flutter/material.dart' hide Scaffold;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' show ReadContext;
 import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -29,7 +29,7 @@ class ViewProfilePage extends SignalHookWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final auth = context.watch<AuthController>();
+    final auth = context.read<AuthController>();
     final pages = Pages.appDetails;
 
     final controller = useMemoized(() => ViewProfileController());
@@ -40,7 +40,7 @@ class ViewProfilePage extends SignalHookWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           ProfileCard(controller: controller),
-          if (auth.currentProfile.isResearcher)
+          if (auth.currentProfile.value.isResearcher)
             Button(
               leading: const Icon(Icons.science_outlined),
               onPressed: () => context.push(Pages.researcherDashboard.url),

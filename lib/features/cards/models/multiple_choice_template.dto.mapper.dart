@@ -64,6 +64,15 @@ class MultipleChoiceTemplateMapper
       v.options;
   static const Field<MultipleChoiceTemplate, List<MultipleChoiceOption>>
       _f$options = Field('options', _$options);
+  static bool _$multipleAnswers(MultipleChoiceTemplate v) => v.multipleAnswers;
+  static const Field<MultipleChoiceTemplate, bool> _f$multipleAnswers = Field(
+      'multipleAnswers', _$multipleAnswers,
+      key: r'multiple_answers', opt: true, def: false);
+  static bool _$randomizeOptionsOrdering(MultipleChoiceTemplate v) =>
+      v.randomizeOptionsOrdering;
+  static const Field<MultipleChoiceTemplate, bool> _f$randomizeOptionsOrdering =
+      Field('randomizeOptionsOrdering', _$randomizeOptionsOrdering,
+          key: r'randomize_options_ordering', opt: true, def: false);
 
   @override
   final MappableFields<MultipleChoiceTemplate> fields = const {
@@ -79,6 +88,8 @@ class MultipleChoiceTemplateMapper
     #verticallyCentered: _f$verticallyCentered,
     #questionPrompt: _f$questionPrompt,
     #options: _f$options,
+    #multipleAnswers: _f$multipleAnswers,
+    #randomizeOptionsOrdering: _f$randomizeOptionsOrdering,
   };
 
   @override
@@ -102,7 +113,9 @@ class MultipleChoiceTemplateMapper
         tags: data.dec(_f$tags),
         verticallyCentered: data.dec(_f$verticallyCentered),
         questionPrompt: data.dec(_f$questionPrompt),
-        options: data.dec(_f$options));
+        options: data.dec(_f$options),
+        multipleAnswers: data.dec(_f$multipleAnswers),
+        randomizeOptionsOrdering: data.dec(_f$randomizeOptionsOrdering));
   }
 
   @override
@@ -183,7 +196,9 @@ abstract class MultipleChoiceTemplateCopyWith<
       List<Tag>? tags,
       bool? verticallyCentered,
       String? questionPrompt,
-      List<MultipleChoiceOption>? options});
+      List<MultipleChoiceOption>? options,
+      bool? multipleAnswers,
+      bool? randomizeOptionsOrdering});
   MultipleChoiceTemplateCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
       Then<$Out2, $R2> t);
 }
@@ -220,7 +235,9 @@ class _MultipleChoiceTemplateCopyWithImpl<$R, $Out>
           List<Tag>? tags,
           bool? verticallyCentered,
           String? questionPrompt,
-          List<MultipleChoiceOption>? options}) =>
+          List<MultipleChoiceOption>? options,
+          bool? multipleAnswers,
+          bool? randomizeOptionsOrdering}) =>
       $apply(FieldCopyWithData({
         if (id != null) #id: id,
         if (deckId != null) #deckId: deckId,
@@ -233,7 +250,10 @@ class _MultipleChoiceTemplateCopyWithImpl<$R, $Out>
         if (tags != null) #tags: tags,
         if (verticallyCentered != null) #verticallyCentered: verticallyCentered,
         if (questionPrompt != null) #questionPrompt: questionPrompt,
-        if (options != null) #options: options
+        if (options != null) #options: options,
+        if (multipleAnswers != null) #multipleAnswers: multipleAnswers,
+        if (randomizeOptionsOrdering != null)
+          #randomizeOptionsOrdering: randomizeOptionsOrdering
       }));
   @override
   MultipleChoiceTemplate $make(CopyWithData data) => MultipleChoiceTemplate(
@@ -250,7 +270,10 @@ class _MultipleChoiceTemplateCopyWithImpl<$R, $Out>
       verticallyCentered:
           data.get(#verticallyCentered, or: $value.verticallyCentered),
       questionPrompt: data.get(#questionPrompt, or: $value.questionPrompt),
-      options: data.get(#options, or: $value.options));
+      options: data.get(#options, or: $value.options),
+      multipleAnswers: data.get(#multipleAnswers, or: $value.multipleAnswers),
+      randomizeOptionsOrdering: data.get(#randomizeOptionsOrdering,
+          or: $value.randomizeOptionsOrdering));
 
   @override
   MultipleChoiceTemplateCopyWith<$R2, MultipleChoiceTemplate, $Out2>

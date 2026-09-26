@@ -16,21 +16,23 @@ import 'package:boo_mondai/lib.barrel.dart'
         SurfaceShadow;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart' show GoRouterHelper;
-import 'package:provider/provider.dart' show WatchContext;
+import 'package:provider/provider.dart' show ReadContext;
+import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart'
     show Surface, ThemeVariantsContext;
 
-class AuthCard extends StatelessWidget {
+class AuthCard extends SignalWidget {
   const AuthCard({super.key});
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final auth = context.watch<AuthController>();
+    final auth = context.read<AuthController>();
+    final isLoading = auth.isLoading.value;
     // final viewProfile = context.watch<ViewProfileController>();
     // final profile = viewProfile.currentProfile;
 
-    if (auth.isAuthenticatedEither) {
+    if (auth.isAuthenticatedEither.value) {
       return Column(
         spacing: tokens.spaceLayoutGapSm,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -45,10 +47,10 @@ class AuthCard extends StatelessWidget {
           Button(
             variants: [ButtonColor.error],
             onPressed: () => auth.onSignOutPressed(context),
-            leading: auth.isLoading
+            leading: isLoading
                 ? CircularProgressIndicator()
                 : Icon(Icons.logout),
-            child: auth.isLoading ? null : Text('Sign Out'),
+            child: isLoading ? null : Text('Sign Out'),
           ),
         ],
       );

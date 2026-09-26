@@ -48,7 +48,7 @@ final class ViewSurveyController extends Controller {
       if (definition == null) {
         throw Exception('Survey was not found.');
       }
-      final profileId = LocalDB.profile.getOrCreate().id;
+      final profileId = LocalDB.currentProfile.getOrCreate().id;
       final existingResponse = LocalDB.surveyResponse.selectBySurveyAndProfile(
         surveyId: definition.survey.id,
         profileId: profileId,
@@ -109,7 +109,7 @@ final class ViewSurveyController extends Controller {
       final response = SurveyResponse(
         id: uuid.v7(),
         surveyId: loadedSurvey.id,
-        profileId: LocalDB.profile.getOrCreate().id,
+        profileId: LocalDB.currentProfile.getOrCreate().id,
         answers: _answersWithNullsForInputBlocks(),
         submittedAt: DateTime.now(),
       );

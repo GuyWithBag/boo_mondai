@@ -43,7 +43,7 @@
 
 //   /// Loads settings for the active local profile.
 //   static Future<UserSettings> getOrCreateForCurrentProfile() async {
-//     final profile = LocalDB.profile.getOrCreate();
+//     final profile = LocalDB.currentProfile.getOrCreate();
 //     return getOrCreateForUser(profile.id);
 //   }
 

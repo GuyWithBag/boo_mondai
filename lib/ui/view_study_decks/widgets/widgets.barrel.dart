@@ -2,4 +2,4 @@
 
 // Other files
 export 'study_all.card.dart';
-export 'study_deck_tile.dart';
+export 'study_deck.tile.dart';

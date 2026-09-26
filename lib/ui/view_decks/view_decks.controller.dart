@@ -1,224 +1,153 @@
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// PATH: lib/providers/view_decks.local.controller.dart
-// PURPOSE: Loads and manages the list of user-created decks for My Decks page
-// PROVIDERS: ViewDecksLocalController
-// HOOKS: none
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        DecksLocalDB,
-        LocalDB,
-        Controller,
         Deck,
         DecksService,
-        DeckSearchFilter,
-        SearchScopeOption,
-        SearchState,
-        buildViewDecksDeckScope,
-        buildViewDecksListingScope,
-        DeckListingSheetState,
-        ViewDecksSearchScope,
+        DeckWithListingContent,
+        LocalDB,
+        ViewDeckListingSingleEditorController,
         showViewDeckListingSingleSheet,
         showViewDeckSingleSheet;
+import 'package:boo_mondai/ui/view_decks/view_decks.search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
+import 'package:signals/signals_flutter.dart';
 
-class ViewDecksLocalController extends Controller {
-  final DecksLocalDB _deckDB = LocalDB.deck;
-  late final Listenable _deckListenable;
-  late final Listenable _deckListingListenable;
-  late final SearchState<ViewDecksSearchScope, Deck, DeckSearchFilter>
-  _deckSearchState;
-  late final SearchState<ViewDecksSearchScope, Deck, DeckSearchFilter>
-  _listingSearchState;
-
+class ViewDecksLocalController {
   ViewDecksLocalController() {
-    _deckSearchState =
-        SearchState<ViewDecksSearchScope, Deck, DeckSearchFilter>(
-          scope: buildViewDecksDeckScope(const []),
-          initialText: '',
-        );
-    _listingSearchState =
-        SearchState<ViewDecksSearchScope, Deck, DeckSearchFilter>(
-          scope: buildViewDecksListingScope(const []),
-          initialText: '',
-        );
-
-    _deckListenable = _deckDB.box.listenable();
-    _deckListingListenable = LocalDB.deckListing.box.listenable();
-    _deckListenable.addListener(load);
-    _deckListingListenable.addListener(load);
-    _deckSearchState.controller.addListener(notifyListeners);
-    _listingSearchState.controller.addListener(notifyListeners);
+    deckListenable = LocalDB.deck.box.listenable();
+    deckListingListenable = LocalDB.deckListing.box.listenable();
+    deckListenable.addListener(load);
+    deckListingListenable.addListener(load);
   }
 
-  @override
-  void dispose() {
-    _deckListenable.removeListener(load);
-    _deckListingListenable.removeListener(load);
-    _deckSearchState.controller.removeListener(notifyListeners);
-    _listingSearchState.controller.removeListener(notifyListeners);
-    _deckSearchState.dispose();
-    _listingSearchState.dispose();
-    super.dispose();
+  late final Listenable deckListenable;
+  late final Listenable deckListingListenable;
+
+  final decks = listSignal<Deck>(const []);
+  final listingEntries = listSignal<DeckWithListingContent>(const []);
+  final activeScope = signal(ViewDecksSearchScope.decks);
+  final isLoading = signal(false);
+  final error = signal<Exception?>(null);
+
+  late final scopeOptions = computed(
+    () => const [
+      ViewDecksScopeOption(value: ViewDecksSearchScope.decks, label: 'Decks'),
+      ViewDecksScopeOption(
+        value: ViewDecksSearchScope.listings,
+        label: 'Listings',
+      ),
+    ],
+  );
+
+  late final isDeckScope = computed(
+    () => activeScope.value == ViewDecksSearchScope.decks,
+  );
+
+  void loadOnNextFrame() {
+    SchedulerBinding.instance.addPostFrameCallback((_) => load());
   }
-
-  // ── private state ────────────────────────────────────────
-
-  List<Deck> _decks = [];
-  List<Deck> _listingDecks = [];
-  ViewDecksSearchScope _activeScope = ViewDecksSearchScope.decks;
-
-  // ── public getters ───────────────────────────────────────
-
-  List<Deck> get decks => List.unmodifiable(_decks);
-  List<Deck> get listingDecks => List.unmodifiable(_listingDecks);
-  ViewDecksSearchScope get activeScope => _activeScope;
-  bool get isDeckScope => _activeScope == ViewDecksSearchScope.decks;
-  SearchState<ViewDecksSearchScope, Deck, DeckSearchFilter>
-  get deckSearchState => _deckSearchState;
-  SearchState<ViewDecksSearchScope, Deck, DeckSearchFilter>
-  get listingSearchState => _listingSearchState;
-  SearchState<ViewDecksSearchScope, Deck, DeckSearchFilter>
-  get activeSearchState => isDeckScope ? _deckSearchState : _listingSearchState;
-  List<Deck> get visibleDecks => _deckSearchState.results;
-  List<Deck> get visibleListingDecks => _listingSearchState.results;
-  bool get hasSearchQuery => activeSearchState.hasSearchQuery;
-  List<SearchScopeOption<ViewDecksSearchScope>> get scopeOptions => [
-    _deckSearchState.scope.option,
-    _listingSearchState.scope.option,
-  ];
-
-  void setActiveScope(ViewDecksSearchScope value) {
-    if (_activeScope == value) return;
-
-    _activeScope = value;
-    notifyListeners();
-  }
-
-  // ── methods ──────────────────────────────────────────────
 
   void load() {
-    setLoading(true);
-    setError(null);
-    notifyListeners();
+    isLoading.value = true;
+    error.value = null;
 
     try {
-      _decks = _withLocalListings(_deckDB.filterDecks());
-      _listingDecks = [
-        for (final deck in _decks)
-          if (deck.listing != null) deck,
-      ];
-      _deckSearchState.setItems(_decks);
-      _listingSearchState.setItems(_listingDecks);
+      final loadedDecks = LocalDB.deck.filterDecks();
+      decks.value = List.unmodifiable(loadedDecks);
+      listingEntries.value = List.unmodifiable(
+        _buildListingEntries(loadedDecks),
+      );
     } on Exception catch (e) {
-      setError(e);
+      error.value = e;
     } finally {
-      setLoading(false);
-      notifyListeners();
+      isLoading.value = false;
     }
+  }
+
+  List<DeckWithListingContent> _buildListingEntries(List<Deck> decks) {
+    return [
+      for (final deck in decks)
+        ?LocalDB.deck.selectWithListingContentByDeck(deck),
+    ];
+  }
+
+  void setActiveScope(ViewDecksSearchScope value) {
+    activeScope.value = value;
   }
 
   void goToDeck(BuildContext context, Deck deck) {
     showViewDeckSingleSheet(context, deck);
   }
 
-  void goToListing(BuildContext context, Deck deck) {
+  void goToListing(BuildContext context, DeckWithListingContent entry) {
     showViewDeckListingSingleSheet(
-      context,
-      deck,
-      initialState: DeckListingSheetState.editor,
+      context: context,
+      controller: ViewDeckListingSingleEditorController(
+        deck: signal(entry.deck),
+        content: signal(entry.deckListingContent),
+        listing: signal(entry.deckListing),
+        profile: signal(entry.profile),
+        sourceProfile: signal(entry.sourceProfile ?? entry.profile),
+      ),
     );
   }
 
-  void loadOnNextFrame() {
-    SchedulerBinding.instance.addPostFrameCallback((_) => load());
-  }
-
-  void submitSearch(BuildContext context, List<Deck> visibleDecks) {
-    if (visibleDecks.length != 1) return;
-    if (isDeckScope) {
-      goToDeck(context, visibleDecks.single);
-      return;
-    }
-
-    goToListing(context, visibleDecks.single);
-  }
-
   Future<void> createDeck(BuildContext context) async {
-    setLoading(true);
-    setError(null);
+    isLoading.value = true;
+    error.value = null;
     try {
       final deck = await DecksService.createAndUpsert();
-      load();
 
       if (context.mounted) {
         showViewDeckSingleSheet(context, deck);
       }
     } on Exception catch (e) {
-      setError(e);
-      setLoading(false);
-      notifyListeners();
+      error.value = e;
+      isLoading.value = false;
     }
   }
 
-  Future<void> deleteDeck(String id) async {
-    setLoading(true);
-    setError(null);
+  Future<void> deleteDeck(Deck deck) async {
+    isLoading.value = true;
+    error.value = null;
     try {
-      final deck = _deckDB.selectByPk({'id': id});
-      if (deck == null) {
-        setLoading(false);
-        notifyListeners();
-        return;
-      }
-
-      await DecksService.deleteDeckCascade(deck: deck);
-      load();
+      await DecksService.deleteDeckCascades(deck: deck);
     } on Exception catch (e) {
-      setError(e);
-      setLoading(false);
-      notifyListeners();
+      error.value = e;
+      isLoading.value = false;
     }
   }
 
-  Future<void> deleteDecks(Iterable<String> ids) async {
-    final deckIds = ids.toSet();
-    if (deckIds.isEmpty) return;
+  Future<void> deleteDecks(List<Deck> decks) async {
+    if (decks.isEmpty) return;
 
-    setLoading(true);
-    setError(null);
+    isLoading.value = true;
+    error.value = null;
     try {
-      for (final id in deckIds) {
-        final deck = _deckDB.selectByPk({'id': id});
-        if (deck == null) continue;
-
-        await DecksService.deleteDeckCascade(deck: deck);
+      for (final deck in decks) {
+        await DecksService.deleteDeckCascades(deck: deck);
       }
-      load();
     } on Exception catch (e) {
-      setError(e);
-      setLoading(false);
-      notifyListeners();
+      error.value = e;
+      isLoading.value = false;
     }
   }
 
   void clearError() {
-    setError(null);
-    notifyListeners();
+    error.value = null;
   }
 
-  List<Deck> _withLocalListings(List<Deck> decks) {
-    final listingsByDeckId = {
-      for (final listing in LocalDB.deckListing.selectMany())
-        listing.deckId: listing,
-    };
+  void dispose() {
+    deckListenable.removeListener(load);
+    deckListingListenable.removeListener(load);
 
-    return [
-      for (final deck in decks)
-        deck.copyWith(listing: listingsByDeckId[deck.id] ?? deck.listing),
-    ];
+    isDeckScope.dispose();
+    scopeOptions.dispose();
+    error.dispose();
+    isLoading.dispose();
+    activeScope.dispose();
+    listingEntries.dispose();
+    decks.dispose();
   }
 }

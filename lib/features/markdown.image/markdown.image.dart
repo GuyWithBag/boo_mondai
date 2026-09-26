@@ -3,10 +3,11 @@ import 'package:boo_mondai/lib.barrel.dart'
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:markdown/markdown.dart' as md;
+import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 // It is kept separate from MarkdownImageElementBuilder because it needs to support regular flutter_markdown_plus image and the configurable image
-class MarkdownImage extends StatelessWidget {
+class MarkdownImage extends SignalHookWidget {
   const MarkdownImage({
     super.key,
     required this.uri,
@@ -23,8 +24,15 @@ class MarkdownImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final image = ImageHelper.getImageProviderFromSource(
-      MarkdownHelper.resolveAttachmentUrl(uri),
+    final imageUrl = MarkdownHelper.resolveAttachmentUrl(uri);
+    final imageSignal = useFutureSignal(
+      () => ImageHelper.getImageProviderFromSource(imageUrl),
+      keys: [imageUrl],
+    );
+    final image = imageSignal.value.map(
+      data: (value) => value,
+      error: () => null,
+      loading: () => null,
     );
     if (image == null) return const SizedBox.shrink();
 

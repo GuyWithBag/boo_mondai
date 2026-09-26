@@ -19,10 +19,9 @@ class ReviewLogSyncTable extends SyncTable<FsrsReviewLog> {
         getLocalItemsByIds: getLocalReviewLogsByIds,
         getRemoteItemsByIds: getRemoteReviewLogsByIds,
         getItemId: (log) => log.id,
-        applyPullItem: LocalDB.reviewLog.upsert,
-        applyPushItem: RemoteDB.reviewLog.upsert,
-        deleteRemoteItemById: (id) =>
-            RemoteDB.reviewLog.deleteWhere({'id': id}),
+        applyPullItem: LocalDB.reviewLogs.upsert,
+        applyPushItem: RemoteDB.reviewLogs.upsert,
+        deleteRemoteItemById: (id) => RemoteDB.reviewLogs.delete({'id': id}),
         changeType: ChangeType.added,
       );
 
@@ -34,7 +33,7 @@ class ReviewLogSyncTable extends SyncTable<FsrsReviewLog> {
       profileId: profileId,
       deckId: deckId,
     )).toSet();
-    return LocalDB.reviewLog.selectSyncIndexByFsrsCardIds(fsrsCardIds);
+    return LocalDB.reviewLogs.selectSyncIndexByFsrsCardIds(fsrsCardIds);
   }
 
   static Future<List<SyncIndexEntry>> getRemoteReviewLogIndex({
@@ -45,20 +44,20 @@ class ReviewLogSyncTable extends SyncTable<FsrsReviewLog> {
       profileId: profileId,
       deckId: deckId,
     );
-    return RemoteDB.reviewLog.selectSyncIndexByFsrsCardIds(fsrsCardIds);
+    return RemoteDB.reviewLogs.selectSyncIndexByFsrsCardIds(fsrsCardIds);
   }
 
   static Future<List<FsrsReviewLog>> getLocalReviewLogsByIds(
     String profileId,
     List<String> ids,
   ) async {
-    return LocalDB.reviewLog.selectManyByIds(ids);
+    return LocalDB.reviewLogs.selectManyByIds(ids);
   }
 
   static Future<List<FsrsReviewLog>> getRemoteReviewLogsByIds(
     String profileId,
     List<String> ids,
   ) async {
-    return RemoteDB.reviewLog.selectManyByIds(ids);
+    return RemoteDB.reviewLogs.selectManyByIds(ids);
   }
 }

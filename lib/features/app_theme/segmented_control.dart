@@ -8,8 +8,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         SurfaceShadow,
         SurfaceShape,
         segmentControlOptionStyle,
-        useSelectionController,
-        surfaceStyle;
+        surfaceStyle,
+        SelectionController;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -40,13 +40,21 @@ class SegmentedControl<T> extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final selection = useSelectionController<T>(
-      selectedValues: [value],
-      onSelectionChanged: (selected) {
-        if (selected.isEmpty) return;
-        onChanged(selected.first);
-      },
+    // Todo: Make the constructor accept a controller instead.
+    final selection = useMemoized(
+      () => SelectionController<T>(
+        selectedValues: {value},
+        onSelectionChanged: (selected) {
+          if (selected.isEmpty) return;
+          onChanged(selected.first);
+        },
+      ),
     );
+    useEffect(() {
+      selection.selectedValues.value = {value};
+      return null;
+    }, [selection, value]);
+    useEffect(() => selection.dispose, [selection]);
 
     Widget buildOption({
       required SegmentOption<T> option,

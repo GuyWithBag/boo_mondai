@@ -6,3 +6,4 @@ export 'widgets/widgets.barrel.dart';
 // Other files
 export 'view_study_decks.page.dart';
 export 'view_study_decks.controller.dart';
+export 'view_study_decks.search.dart';

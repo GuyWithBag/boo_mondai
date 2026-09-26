@@ -31,7 +31,7 @@ class UserStudyCardTagsRemoteDB extends SupabaseRemoteDB<UserStudyCardTag> {
     required String profileId,
     required String studyCardId,
     required String tagId,
-  }) => deleteWhere({
+  }) => delete({
     'profile_id': profileId,
     'study_cards_id': studyCardId,
     'tag_id': tagId,

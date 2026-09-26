@@ -1,22 +1,23 @@
-import 'package:boo_mondai/lib.barrel.dart'
-    show SearchFilter, SearchFilterDirective;
+import 'package:boo_mondai/features/search/models/search.token_shape.dart';
+import 'package:boo_mondai/features/search/models/search_tokens.dart';
 import 'package:flutter/material.dart';
 
-typedef SearchFilterFieldBuilder<TFilter extends SearchFilter> =
+typedef SearchTokenFieldBuilder =
     Widget Function(
       BuildContext context,
-      TFilter filter,
-      ValueChanged<TFilter>,
+      SearchTokens tokens,
+      List<String> values,
+      ValueChanged<List<String>> onChanged,
     );
 
-final class SearchFilterModalField<TFilter extends SearchFilter> {
-  const SearchFilterModalField({
-    required this.directive,
+final class SearchTokenModalField {
+  const SearchTokenModalField({
+    required this.tokenShape,
     required this.label,
     required this.buildEditor,
   });
 
-  final SearchFilterDirective directive;
+  final SearchTokenShape tokenShape;
   final String label;
-  final SearchFilterFieldBuilder<TFilter> buildEditor;
+  final SearchTokenFieldBuilder buildEditor;
 }

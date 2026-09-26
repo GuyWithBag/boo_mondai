@@ -62,7 +62,7 @@ class ProfileAvatar extends StatelessWidget {
           Positioned(
             right: 0,
             bottom: 0,
-            child: Container(
+            child: SizedBox(
               width: radius * 0.42,
               height: radius * 0.42,
               // ToDO:

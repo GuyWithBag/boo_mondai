@@ -4,5 +4,5 @@
 export 'models/models.barrel.dart';
 // Other files
 export 'reviews.service.dart';
-export 'reviews.controller.dart';
 export 'reviews.remote.db.dart';
+export 'review.edit_logs.remote.db.dart';

@@ -2,3 +2,7 @@
 
 // Other files
 export 'deck_import.result.dart';
+export 'deck_import.mode.dart';
+export 'deck_import_unsupported_key.dart';
+export 'deck_import_title_conflict.dart';
+export 'deck_import.preview.dart';

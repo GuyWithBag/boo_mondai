@@ -2,23 +2,16 @@
 // PATH: lib/models/dtos/deck.dto.dart
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/core/models/mutable_entity.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        CachedProfile,
-        MutableEntity,
-        DeckListing,
         Tag,
-        VisibilityState,
-        uuid,
-        VisibilityStateMapper,
-        MutableEntityMapper,
-        CachedProfileMapper,
-        TagMapper,
-        DeckListingMapper,
-        MutableEntityCopyWith,
         TagCopyWith,
-        CachedProfileCopyWith,
-        DeckListingCopyWith;
+        TagMapper,
+        VisibilityState,
+        VisibilityStateMapper,
+        uuid,
+        MutableEntity;
 import 'package:dart_mappable/dart_mappable.dart';
 
 part 'deck.dto.mapper.dart';
@@ -26,6 +19,7 @@ part 'deck.dto.mapper.dart';
 @MappableClass()
 class Deck with DeckMappable implements MutableEntity {
   final String id;
+  final String profileId;
   @override
   final DateTime updatedAt;
   @override
@@ -35,12 +29,10 @@ class Deck with DeckMappable implements MutableEntity {
   @override
   final DateTime? purgeAfter;
 
-  final String profileId;
   final String title;
   final String shortDescription;
   final String longDescription;
 
-  // ── Visuals & Provenance ──
   final String? coverImageUrl;
   final String? sourceDeckId;
 
@@ -48,17 +40,11 @@ class Deck with DeckMappable implements MutableEntity {
   final VisibilityState visibilityState;
   final bool isPublished;
   final bool isEditable;
-  final int cardCount;
+  final int cardTemplatesCount;
   final String version;
   final int buildNumber;
 
   final List<Tag> tags;
-
-  // ── Joined Data (Populated by remote deck fetches) ──
-  final CachedProfile? userProfile;
-
-  // ── The Storefront Data (Populated when fetching from online browser) ──
-  final DeckListing? listing;
 
   const Deck({
     required this.id,
@@ -69,74 +55,32 @@ class Deck with DeckMappable implements MutableEntity {
     this.coverImageUrl,
     this.sourceDeckId,
     this.isPremade = false,
-    required this.visibilityState,
-    required this.isPublished,
+    this.visibilityState = VisibilityState.private,
+    this.isPublished = false,
     this.isEditable = true,
-    required this.cardCount,
+    this.cardTemplatesCount = 0,
     this.version = '0.1.0+1',
     this.buildNumber = 1,
-    required this.createdAt,
+    this.tags = const [],
     required this.updatedAt,
+    required this.createdAt,
     this.deletedAt,
     this.purgeAfter,
-    this.tags = const [],
-    this.userProfile,
-    this.listing,
   });
-
-  factory Deck.createNow({
-    required String profileId,
-    required String title,
-    String? shortDescription,
-    String? longDescription,
-    String? coverImageUrl,
-    String? sourceDeckId,
-    VisibilityState visibilityState = VisibilityState.private,
-    bool isPublished = false,
-    bool isPremade = false,
-    bool isEditable = true,
-    String version = '0.1.0+1',
-    List<Tag>? tags,
-  }) {
-    final now = DateTime.now();
-    return Deck(
-      id: uuid.v7(),
-      profileId: profileId,
-      title: title,
-      shortDescription: shortDescription ?? '',
-      longDescription: longDescription ?? '',
-      coverImageUrl: coverImageUrl,
-      sourceDeckId: sourceDeckId,
-      visibilityState: visibilityState,
-      isPublished: isPublished,
-      isPremade: isPremade,
-      isEditable: isEditable,
-      cardCount: 0,
-      version: version,
-      buildNumber: 1,
-      createdAt: now,
-      updatedAt: now,
-      tags: tags ?? const [],
-      userProfile: null,
-      listing: null,
-    );
-  }
 
   factory Deck.createDummy({
     String? id,
     String profileId = '',
     String title = '',
+    String contentId = '',
   }) {
-    final now = DateTime.now();
     return Deck(
       id: id ?? uuid.v7(),
       profileId: profileId,
       title: title,
-      visibilityState: VisibilityState.private,
-      isPublished: false,
-      cardCount: 0,
-      createdAt: now,
-      updatedAt: now,
+      cardTemplatesCount: 0,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
     );
   }
 }

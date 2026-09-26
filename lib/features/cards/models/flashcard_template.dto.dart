@@ -1,5 +1,6 @@
 import 'package:boo_mondai/features/cards/models/card_template.dto.dart';
 import 'package:boo_mondai/features/cards/models/card_type.dto.dart';
+import 'package:boo_mondai/features/study_session/models/study_session.answer.dart';
 import 'package:boo_mondai/features/tags/models/tag.dto.dart';
 import 'package:boo_mondai/core/services/uuid.dart';
 import 'package:dart_mappable/dart_mappable.dart';
@@ -12,10 +13,10 @@ class FlashcardTemplate extends CardTemplate with FlashcardTemplateMappable {
   final String backText;
 
   /// Controls how many StudyCards are generated for this template.
-  /// - [CardType.normal]   → 1 StudyCard (isReversed: false)
-  /// - [CardType.reversed] → 1 StudyCard (isReversed: true)
-  /// - [CardType.both]     → 2 StudyCards (one each)
-  final CardType cardType;
+  /// - [CardTemplateDirection.normal]   → 1 StudyCard (isReversed: false)
+  /// - [CardTemplateDirection.reversed] → 1 StudyCard (isReversed: true)
+  /// - [CardTemplateDirection.both]     → 2 StudyCards (one each)
+  final CardTemplateDirection direction;
 
   const FlashcardTemplate({
     required super.id,
@@ -30,7 +31,7 @@ class FlashcardTemplate extends CardTemplate with FlashcardTemplateMappable {
     super.verticallyCentered,
     required this.frontText,
     required this.backText,
-    this.cardType = CardType.normal,
+    this.direction = CardTemplateDirection.normal,
   });
 
   factory FlashcardTemplate.createDummy({
@@ -56,11 +57,11 @@ class FlashcardTemplate extends CardTemplate with FlashcardTemplateMappable {
       isReversed ? frontText : backText;
 
   @override
-  bool checkAnswer(String userAnswer, {bool isReversed = false}) {
+  bool checkAnswer(StudySessionAnswer answer, {bool isReversed = false}) {
     return getAnswer(isReversed: isReversed)
         .split(',')
         .map((a) => a.trim().toLowerCase())
         .where((a) => a.isNotEmpty)
-        .contains(userAnswer.trim().toLowerCase());
+        .contains(answer.value.trim().toLowerCase());
   }
 }

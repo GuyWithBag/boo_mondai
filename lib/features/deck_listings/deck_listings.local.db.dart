@@ -3,7 +3,13 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart'
-    show DeckListing, HiveLocalDB, HivePrimaryKey, SyncIndexEntry;
+    show
+        Content,
+        DeckListing,
+        HiveLocalDB,
+        HivePrimaryKey,
+        SyncIndexEntry,
+        LocalDB;
 
 class DeckListingsLocalDB extends HiveLocalDB<DeckListing> {
   @override
@@ -15,11 +21,25 @@ class DeckListingsLocalDB extends HiveLocalDB<DeckListing> {
   };
 
   @override
-  DateTime? getDeletedAt(DeckListing item) => item.deletedAt;
+  DateTime? getDeletedAt(DeckListing item) {
+    return LocalDB.contents.selectByPk({
+      'id': item.contentId,
+    }, includeDeleted: true)?.deletedAt;
+  }
 
   DeckListing? selectByPkIncludingDeleted(HivePrimaryKey primaryKey) {
     return selectByPk(primaryKey, includeDeleted: true);
   }
+
+  Content? getContentByListing(
+    DeckListing listing, {
+    bool includeDeleted = false,
+  }) => guardSync(
+    () => LocalDB.contents.selectByPk({
+      'id': listing.contentId,
+    }, includeDeleted: includeDeleted),
+    action: 'getContentByListing(${listing.deckId})',
+  );
 
   List<DeckListing> selectManyByDeckIds(Set<String> deckIds) => guardSync(
     () => selectMany(where: (listing) => deckIds.contains(listing.deckId)),
@@ -47,12 +67,24 @@ class DeckListingsLocalDB extends HiveLocalDB<DeckListing> {
   );
 
   List<SyncIndexEntry> selectSyncIndexByDeckIds(Set<String> deckIds) =>
-      selectSyncIndexWhere(
-        where: (listing) => deckIds.contains(listing.deckId),
-        getId: (listing) => listing.deckId,
-        getUpdatedAt: (listing) => listing.updatedAt,
-        action: 'selectSyncIndexByDeckIds(${deckIds.length} deckIds)',
-      );
+      guardSync(() {
+        return box.values
+            .where((listing) => deckIds.contains(listing.deckId))
+            .map((listing) {
+              final content = LocalDB.contents.selectByPk({
+                'id': listing.contentId,
+              }, includeDeleted: true);
+
+              if (content == null) return null;
+
+              return SyncIndexEntry(
+                id: listing.deckId,
+                updatedAt: content.updatedAt,
+              );
+            })
+            .nonNulls
+            .toList(growable: false);
+      }, action: 'selectSyncIndexByDeckIds(${deckIds.length} deckIds)');
 
   // ── All standard CRUD (put, getById, delete, etc.) is inherited! ──
 }

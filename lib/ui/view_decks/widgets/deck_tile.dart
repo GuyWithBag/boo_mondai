@@ -201,17 +201,5 @@ class DeckTile extends HookWidget {
 }
 
 List<CardTemplate> _featuredCardTemplates(Deck? deck) {
-  final featuredCards = deck?.listing?.featuredCards ?? const [];
-  return featuredCards
-      .map(_decodeFeaturedCard)
-      .nonNulls
-      .toList(growable: false);
-}
-
-CardTemplate? _decodeFeaturedCard(Map<String, dynamic> card) {
-  try {
-    return CardTemplateMapper.fromMap(card);
-  } catch (_) {
-    return null;
-  }
+  return const [];
 }

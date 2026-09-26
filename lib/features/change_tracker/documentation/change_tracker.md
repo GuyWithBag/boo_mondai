@@ -22,9 +22,8 @@ download, and import/export change descriptions.
 - `ChangeTrackerEntry` is the live state for one tracked operation.
 - `ChangeTrackerService` owns entries and deferred apply callbacks without
   depending on Flutter UI notification APIs.
-- `ChangeTrackerController` adapts a `ChangeTrackerService` for UI listeners.
-  `useChangeTrackerController()` creates this adapter around either a default
-  in-memory service or a feature-owned service.
+- `ChangeTrackerController` adapts a `ChangeTrackerService` for signal-based UI
+  consumers. Hook widgets create it directly with `useMemoized`.
 - `ChangeTrackerRouteArgs` carries the routed entry id plus the registered
   `ChangeTrackerService.id` so `ChangeTrackerPage` resolves live entries from
   the correct service through `ServiceRegistry`.
@@ -53,7 +52,6 @@ flowchart LR
         Registry[ServiceRegistry]
         ServiceRuntime[ChangeTrackerService]
         Controller[ChangeTrackerController]
-        Hook[useChangeTrackerController]
         Entry[ChangeTrackerEntry]
         Status[ChangeTrackerStatus]
     end
@@ -79,7 +77,6 @@ flowchart LR
     DeckDownloads --> ServiceRuntime
     Registry --> ServiceRuntime
     Controller --> ServiceRuntime
-    Hook --> Controller
     ServiceRuntime --> Entry
     Entry --> Status
     Entry --> Record
@@ -149,11 +146,11 @@ sequenceDiagram
         Service->>Controller: update(status: alreadyUpToDate, progress: 1)
     else differences found
         Service->>Controller: update(status: reviewing, changes, progress: 1)
-        Controller-->>SyncController: notifyListeners()
+        Controller-->>SyncController: signal update
         SyncController-->>SyncPage: currentEntry + changeTrackerService
         SyncPage->>ReviewPage: context.push('/change-review/:serviceId/:entryId')
         ReviewPage->>Controller: ServiceRegistry.maybeById(serviceId)
-        ReviewPage->>Controller: useChangeTrackerController(service)
+        ReviewPage->>Controller: ChangeTrackerController(service)
         ReviewPage->>Controller: entryById(entryId)
         ReviewPage->>Controller: apply(entryId)
         Controller->>Service: onChangeApply()
@@ -170,22 +167,22 @@ Deck download can use the tracker as a progress surface while the mutation is
 already running. The service still emits `ChangedEntity` values, but the entry
 may move from planning directly into applying and can pause around persisted
 download checkpoints. Unlike sync, deck downloads own their tracker service via
-`DeckDownloadsService.changeTrackerService`; UI pages wrap that feature-owned
-service with `useChangeTrackerController()` when they need to render download
-state.
+`DeckDownloadsService.changeTrackerService`; UI pages create a
+`ChangeTrackerController` directly around that feature-owned service when they
+need to render download state.
 
 ```mermaid
 sequenceDiagram
     participant UI as Deck listing/download UI
-    participant Hook as useChangeTrackerController
+    participant Controller as ChangeTrackerController
     participant Service as DeckDownloadsService
     participant Tracker as ChangeTrackerService
     participant Remote as Published deck tables
     participant Local as LocalDB + checkpoints
 
     UI->>Service: Services.deckDownloads
-    UI->>Hook: useChangeTrackerController(Service.changeTrackerService)
-    Hook-->>UI: ChangeTrackerController for download UI
+    UI->>Controller: ChangeTrackerController(Service.changeTrackerService)
+    Controller-->>UI: controller for download UI
     UI->>Service: downloadDeck(sourceDeck)
     Service->>Tracker: start(entry: ChangeTrackerEntry(deckDownload, planning))
     Service->>Remote: load deck metadata and template count
@@ -210,24 +207,23 @@ sequenceDiagram
 
 ## UI Consumption
 
-Feature screens create a `ChangeTrackerController` with
-`useChangeTrackerController()`. When no service is supplied, the hook creates a
-controller around a fresh in-memory `ChangeTrackerService`. Feature-owned
-trackers, such as deck downloads, pass their long-lived service into the hook
-with `useChangeTrackerController(service: featureService.changeTrackerService)`.
+Feature screens create a `ChangeTrackerController` directly with `useMemoized`.
+When no service is supplied, create it around a fresh in-memory
+`ChangeTrackerService`. Feature-owned trackers, such as deck downloads, pass
+their long-lived service into the controller constructor.
 
 Review routes keep the tracker service id and entry id in the URL. The owning
 service is resolved through `ServiceRegistry`, and `ChangeTrackerPage` wraps
-that service with the hook before resolving `entryById(entryId)`. If the route
+that service in a controller before resolving `entryById(entryId)`. If the route
 is opened without a registered in-memory service or the entry has been removed,
 the page treats it as missing and returns to the previous route.
 
 ```mermaid
 flowchart TD
-    DefaultHook[useChangeTrackerController()]
+    DefaultController[ChangeTrackerController<br/>with new service]
     FeatureService[Feature service-owned<br/>ChangeTrackerService]
     Registry[ServiceRegistry]
-    FeatureHook[useChangeTrackerController(service)]
+    FeatureController[ChangeTrackerController<br/>with feature service]
     Controller[ChangeTrackerController]
     EntryList[entries / activeEntries]
     Entry[entryById(entryId)]
@@ -238,11 +234,11 @@ flowchart TD
     Diff[ChangedPropertyBlock]
     Actions[Discard / Looks Good / Back]
 
-    DefaultHook --> Controller
-    FeatureService --> FeatureHook
+    DefaultController --> Controller
+    FeatureService --> FeatureController
     FeatureService --> Registry
     Registry --> Page
-    FeatureHook --> Controller
+    FeatureController --> Controller
     Controller --> EntryList
     Controller --> Entry
     RouteArgs --> Page

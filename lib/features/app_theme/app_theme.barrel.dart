@@ -3,7 +3,6 @@
 // Barrel files
 export 'models/models.barrel.dart';
 export 'controllers/controllers.barrel.dart';
-export 'helpers/helpers.barrel.dart';
 export 'tool_bar/tool_bar.barrel.dart';
 // Other files
 export 'back_button.dart';

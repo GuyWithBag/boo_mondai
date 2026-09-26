@@ -3,7 +3,7 @@ import 'package:boo_mondai/lib.barrel.dart'
 
 abstract final class SurveyRegistry {
   static List<SurveyDefinition> getAll() {
-    final profileId = LocalDB.profile.getOrCreate().id;
+    final profileId = LocalDB.currentProfile.getOrCreate().id;
     return [FirstDrillSurvey.build(profileId: profileId)];
   }
 

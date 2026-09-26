@@ -5,10 +5,10 @@
 
 import 'package:boo_mondai/lib.barrel.dart';
 import 'package:flutter/material.dart' hide Scaffold;
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class MainScaffold extends HookWidget {
+class MainScaffold extends SignalHookWidget {
   final int currentIndex;
   final Widget child;
 
@@ -20,17 +20,14 @@ class MainScaffold extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final auth = context.watch<AuthController>();
-    final hideNavigation = auth.currentProfile.role == 'group_b_participant';
+    final auth = context.read<AuthController>();
+    final hideNavigation =
+        auth.currentProfile.value.role == 'group_b_participant';
     final controller = context.watch<MainController>();
-    final scaffoldController = useScaffoldController(
+    return Scaffold(
       hideNavigation: hideNavigation,
       showBottomNavBar: controller.isBottomNavBarVisible,
       showAppBar: controller.isAppBarVisible,
-    );
-
-    return Scaffold(
-      controller: scaffoldController,
       body: child,
       sidebar: SideBar(currentPageIndex: currentIndex),
       bottomNavBar: MainBottomNavBar(currentPageIndex: currentIndex),

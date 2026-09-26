@@ -6,11 +6,16 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         SupabaseRemoteDB,
+        ContentMapper,
         Deck,
+        DeckListingMapper,
         SyncIndexEntry,
         DeckSortField,
         SearchSortDirection,
-        DeckMapper;
+        ProfileMapper,
+        LocalDB,
+        DeckMapper,
+        DeckWithListingContent;
 
 class DecksRemoteDB extends SupabaseRemoteDB<Deck> {
   @override
@@ -32,31 +37,8 @@ class DecksRemoteDB extends SupabaseRemoteDB<Deck> {
   bool get supportsSoftDelete => true;
 
   @override
-  String get defaultSelect => _deckWithRelationsSelect;
-
-  @override
-  Set<String> get joinedFields => const {
-    'userProfile',
-    'user_profile',
-    'listing',
-    'tags',
-  };
-
-  @override
-  Deck fromJoinedMap(Map<String, dynamic> map) {
-    final listing = map['listing'];
-    if (listing is List) {
-      final firstListing = listing.isEmpty
-          ? null
-          : Map<String, dynamic>.from(listing.first as Map);
-      map['listing'] =
-          firstListing == null || firstListing['deleted_at'] != null
-          ? null
-          : firstListing;
-    }
-
-    return fromMap(map);
-  }
+  String get defaultSelect =>
+      '*, user_profile:profiles!decks_user_id_fkey(id, username, avatar_url, created_at), listing:deck_listings(*), tags(*)';
 
   /// Fetches decks where visibility_state is 'public'.
   /// Also joins author, storefront listing data, and tags for the online browser.
@@ -75,6 +57,51 @@ class DecksRemoteDB extends SupabaseRemoteDB<Deck> {
 
   Future<Deck?> selectById(String deckId, {bool includeDeleted = false}) =>
       selectOne(filters: {'id': deckId}, includeDeleted: includeDeleted);
+
+  Future<DeckWithListingContent?> selectWithListingContentById(
+    String deckId, {
+    bool includeDeleted = false,
+  }) => guard(() async {
+    const deckListingContentSelect = '''
+      *,
+      profiles!inner(
+        id,
+        username,
+        avatar_url,
+        created_at
+      ),
+      deck_listings!inner(
+        *,
+        contents!inner(*)
+      ),
+      tags(*)
+    ''';
+
+    var query = client.from(tableName).select(deckListingContentSelect);
+    query = applySoftDeleteFilter(query, includeDeleted: includeDeleted);
+
+    final response = await query.eq('id', deckId).maybeSingle();
+    if (response == null) return null;
+
+    final deck = fromMap(response);
+    final listing = DeckListingMapper.fromMap(response['deck_listings']);
+
+    final content = ContentMapper.fromMap(
+      response['deck_listings']['contents'],
+    );
+
+    final profile = ProfileMapper.fromMap(response['profiles']);
+    final cachedProfile = LocalDB.profiles.selectByPk({'id': profile.id});
+
+    return (
+      deck: deck,
+      deckListing: listing,
+      deckListingContent: content,
+      profile: cachedProfile ?? profile,
+      // ToDo: fix
+      sourceProfile: null,
+    );
+  }, action: 'selectWithListingContentById($deckId)');
 
   Future<List<Deck>> selectManyByIds(
     List<String> ids, {
@@ -109,8 +136,13 @@ class DecksRemoteDB extends SupabaseRemoteDB<Deck> {
     required String profileId,
     String? deckId,
   }) => selectSyncIndex(
-    applyQuery: (query) =>
-        applyFilters(query, {'profile_id': profileId, 'id': ?deckId}),
+    applyQuery: (query) {
+      query = query.eq('profile_id', profileId);
+      if (deckId != null) {
+        query = query.eq('id', deckId);
+      }
+      return query;
+    },
     action: 'selectSyncIndexByProfileIdAndOptionalDeckId($profileId, $deckId)',
   );
 
@@ -122,6 +154,3 @@ class DecksRemoteDB extends SupabaseRemoteDB<Deck> {
     };
   }
 }
-
-const _deckWithRelationsSelect =
-    '*, user_profile:profiles!decks_user_id_fkey(id, username, avatar_url, created_at), listing:deck_listings(*), tags(*)';

@@ -3,24 +3,16 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppBar,
         AppTokens,
         CardTemplate,
-        CardTemplateSearchFilter,
-        CardTemplateSearchFilterCodec,
-        CardTemplateSearchResults,
         FilteredSearchBar,
         Scaffold,
         SegmentOption,
         SegmentedControl,
-        StudyCard,
-        StudyCardSearchFilter,
-        StudyCardSearchFilterCodec,
-        StudyCardSearchResults,
         ViewCardsController,
         ViewCardsLayoutMode,
-        ViewCardsSearchScope,
-        ViewCardsStudyCardScopeView,
         ViewCardsTemplateScopeView;
 import 'package:flutter/material.dart' hide AppBar, Scaffold;
 import 'package:provider/provider.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 class ViewCardsPage extends StatelessWidget {
@@ -30,44 +22,40 @@ class ViewCardsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) =>
-          ViewCardsController(queryParameters: queryParameters)..load(),
+    return Provider(
+      create: (_) {
+        final controller = ViewCardsController(
+          queryParameters: queryParameters,
+        );
+        controller.load();
+        return controller;
+      },
+      dispose: (_, controller) => controller.dispose(),
       child: const _ViewCardsView(),
     );
   }
 }
 
-class _ViewCardsView extends StatelessWidget {
+class _ViewCardsView extends SignalHookWidget {
   const _ViewCardsView();
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final controller = context.watch<ViewCardsController>();
-    final searchBar = controller.isTemplateScope
-        ? FilteredSearchBar<CardTemplate, CardTemplateSearchFilter>(
-            controller: controller.templateSearchState.controller,
-            filterCodec: const CardTemplateSearchFilterCodec(),
-            searchResults: const CardTemplateSearchResults(),
-            items: controller.templates,
-            placeholder:
-                'Search ${controller.templateSearchState.scope.label.toLowerCase()}',
-          )
-        : FilteredSearchBar<StudyCard, StudyCardSearchFilter>(
-            controller: controller.studyCardsSearchState.controller,
-            filterCodec: const StudyCardSearchFilterCodec(),
-            searchResults: const StudyCardSearchResults(),
-            items: controller.cards,
-            placeholder:
-                'Search ${controller.studyCardsSearchState.scope.label.toLowerCase()}',
-          );
+    final controller = context.read<ViewCardsController>();
+    final layoutMode = controller.layoutMode.value;
+    final hasSearchQuery = controller.hasSearchQuery.value;
+
+    final searchBar = FilteredSearchBar<CardTemplate>(
+      controller: controller.templateSearchController,
+      placeholder: 'Search templates',
+    );
 
     return Scaffold(
       appBar: AppBar(
         title: 'View Cards',
         header: searchBar,
-        preferredBottomHeight: 154,
+        preferredBottomHeight: 104,
         bottom: Padding(
           padding: EdgeInsets.only(
             left: tokens.spaceScaffoldPadding,
@@ -77,16 +65,8 @@ class _ViewCardsView extends StatelessWidget {
           child: Column(
             spacing: tokens.spaceLayoutGapSm,
             children: [
-              SegmentedControl<ViewCardsSearchScope>(
-                value: controller.activeScope,
-                onChanged: controller.setActiveScope,
-                options: [
-                  for (final option in controller.scopeOptions)
-                    SegmentOption(value: option.value, label: option.label),
-                ],
-              ),
               SegmentedControl<ViewCardsLayoutMode>(
-                value: controller.layoutMode,
+                value: layoutMode,
                 onChanged: controller.setLayoutMode,
                 options: const [
                   SegmentOption(
@@ -103,19 +83,12 @@ class _ViewCardsView extends StatelessWidget {
           ),
         ),
       ),
-      body: controller.isTemplateScope
-          ? ViewCardsTemplateScopeView(
-              controller: controller,
-              searchState: controller.templateSearchState,
-              layoutMode: controller.layoutMode,
-              hasSearchQuery: controller.hasSearchQuery,
-            )
-          : ViewCardsStudyCardScopeView(
-              controller: controller,
-              searchState: controller.studyCardsSearchState,
-              layoutMode: controller.layoutMode,
-              hasSearchQuery: controller.hasSearchQuery,
-            ),
+      body: ViewCardsTemplateScopeView(
+        controller: controller,
+        entries: controller.templateSearchController.results.value,
+        layoutMode: layoutMode,
+        hasSearchQuery: hasSearchQuery,
+      ),
     );
   }
 }

@@ -1,16 +1,11 @@
 import 'package:boo_mondai/features/study_session/session_steps/session_step.dto.dart';
-import 'package:dart_mappable/dart_mappable.dart';
 
-part 'message.session_step.mapper.dart';
-
-@MappableClass(discriminatorValue: 'message')
-final class MessageSessionStep extends SessionStep
-    with MessageSessionStepMappable {
+final class StudySessionMessageStep extends StudySessionStep {
   final String messageDefinitionId;
   final String title;
   final String message;
 
-  const MessageSessionStep({
+  const StudySessionMessageStep({
     required super.id,
     required this.messageDefinitionId,
     required this.title,
@@ -18,7 +13,4 @@ final class MessageSessionStep extends SessionStep
     super.insertedByRuleId,
     super.insertionReason,
   });
-
-  @override
-  bool get producesRecord => false;
 }

@@ -77,7 +77,7 @@ class AppBar<TSelectedType> extends StatelessWidget
   final bool showBottomBorder;
 
   double _getTotalHeight() {
-    final isSelecting = selectionController?.isEnabled ?? false;
+    final isSelecting = selectionController?.isEnabled.value ?? false;
 
     return preferredHeight +
         (!isSelecting && bottom != null ? preferredBottomHeight : 0) +
@@ -111,7 +111,7 @@ class AppBar<TSelectedType> extends StatelessWidget
           )
         : null;
 
-    final isSelectionState = selectionController?.isEnabled ?? false;
+    final isSelectionState = selectionController?.isEnabled.value ?? false;
     final effectiveActions = [for (final action in actions) action];
     final effectiveSelectionActions = <Widget>[
       if (onSelectedDelete != null && selectionController != null)
@@ -175,7 +175,7 @@ class AppBar<TSelectedType> extends StatelessWidget
                                 icon: Icons.cancel,
                                 onPressed: () {
                                   selectionController!.clear();
-                                  selectionController!.isEnabled = false;
+                                  selectionController!.isEnabled.value = false;
                                 },
                               )
                             else

@@ -23,9 +23,6 @@ class VoteMapper extends ClassMapperBase<Vote> {
   static String _$contentId(Vote v) => v.contentId;
   static const Field<Vote, String> _f$contentId =
       Field('contentId', _$contentId, key: r'content_id');
-  static String _$profileId(Vote v) => v.profileId;
-  static const Field<Vote, String> _f$profileId =
-      Field('profileId', _$profileId, key: r'profile_id');
   static DateTime _$createdAt(Vote v) => v.createdAt;
   static const Field<Vote, DateTime> _f$createdAt =
       Field('createdAt', _$createdAt, key: r'created_at');
@@ -36,7 +33,6 @@ class VoteMapper extends ClassMapperBase<Vote> {
   @override
   final MappableFields<Vote> fields = const {
     #contentId: _f$contentId,
-    #profileId: _f$profileId,
     #createdAt: _f$createdAt,
     #isPositive: _f$isPositive,
   };
@@ -44,7 +40,6 @@ class VoteMapper extends ClassMapperBase<Vote> {
   static Vote _instantiate(DecodingData data) {
     return Vote(
         contentId: data.dec(_f$contentId),
-        profileId: data.dec(_f$profileId),
         createdAt: data.dec(_f$createdAt),
         isPositive: data.dec(_f$isPositive));
   }
@@ -95,11 +90,7 @@ extension VoteValueCopy<$R, $Out> on ObjectCopyWith<$R, Vote, $Out> {
 
 abstract class VoteCopyWith<$R, $In extends Vote, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  $R call(
-      {String? contentId,
-      String? profileId,
-      DateTime? createdAt,
-      bool? isPositive});
+  $R call({String? contentId, DateTime? createdAt, bool? isPositive});
   VoteCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -110,21 +101,15 @@ class _VoteCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Vote, $Out>
   @override
   late final ClassMapperBase<Vote> $mapper = VoteMapper.ensureInitialized();
   @override
-  $R call(
-          {String? contentId,
-          String? profileId,
-          DateTime? createdAt,
-          bool? isPositive}) =>
+  $R call({String? contentId, DateTime? createdAt, bool? isPositive}) =>
       $apply(FieldCopyWithData({
         if (contentId != null) #contentId: contentId,
-        if (profileId != null) #profileId: profileId,
         if (createdAt != null) #createdAt: createdAt,
         if (isPositive != null) #isPositive: isPositive
       }));
   @override
   Vote $make(CopyWithData data) => Vote(
       contentId: data.get(#contentId, or: $value.contentId),
-      profileId: data.get(#profileId, or: $value.profileId),
       createdAt: data.get(#createdAt, or: $value.createdAt),
       isPositive: data.get(#isPositive, or: $value.isPositive));
 

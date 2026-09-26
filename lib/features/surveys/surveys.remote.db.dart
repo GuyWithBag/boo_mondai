@@ -7,7 +7,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         SurveyPageMapper,
         SurveyBlock,
         SurveyBlockMapper,
-        SurveyMultipleChoiceInputBlock,
         SurveyChoiceOption,
         SurveyChoiceOptionMapper,
         SurveyAssignment,
@@ -69,30 +68,6 @@ class SurveyBlocksRemoteDB extends SupabaseRemoteDB<SurveyBlock> {
 
   @override
   String get defaultSelect => '*, options:survey_block_options(*)';
-
-  @override
-  Set<String> get joinedFields => const {'options'};
-
-  @override
-  SurveyBlock fromJoinedMap(Map<String, dynamic> map) {
-    final options = map['options'];
-    if (options is List) {
-      map['options'] = List<Map<String, dynamic>>.from(
-        options,
-      )..sort((a, b) => (a['position'] as int).compareTo(b['position'] as int));
-    }
-    return fromMap(map);
-  }
-
-  @override
-  Map<String, dynamic> toWriteMap(SurveyBlock item) {
-    final map = super.toWriteMap(item);
-    if (item is! SurveyMultipleChoiceInputBlock) {
-      map.remove('min_answers');
-      map.remove('max_answers');
-    }
-    return map;
-  }
 }
 
 class SurveyBlockOptionsRemoteDB extends SupabaseRemoteDB<SurveyChoiceOption> {

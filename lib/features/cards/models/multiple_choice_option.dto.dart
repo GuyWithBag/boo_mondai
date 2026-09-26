@@ -10,7 +10,7 @@ import 'package:dart_mappable/dart_mappable.dart';
 
 part 'multiple_choice_option.dto.mapper.dart';
 
-/// A single answer option for a [QuestionType.multipleChoice] card.
+/// A single answer option for a [CardTemplateType.multipleChoice] card.
 ///
 /// Exactly one option per card must have [isCorrect] = true.
 @MappableClass()

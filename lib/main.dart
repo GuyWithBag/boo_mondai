@@ -18,8 +18,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         AuthController,
         ChangeTrackerController,
         ChangeTrackerService,
-        ViewProfileController,
-        ViewStudyCardsController,
+        ViewStudyDecksController,
         ViewDecksLocalController,
         ViewDeckListingsController,
         ViewLeaderboardController,
@@ -29,13 +28,13 @@ import 'package:boo_mondai/lib.barrel.dart'
         NotificationsController,
         SyncController,
         SyncDeckService,
+        ChangeTrackerRouteArgs,
         BooMondaiApp;
 import 'package:flutter/material.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:signals/signals_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:unite_keyboard_visibility/unite_keyboard_visibility.dart'
-    show UniteKeyboardVisibility;
 
 @BarrelConfig(
   exclude: [
@@ -63,7 +62,6 @@ Future<void> main() async {
   await RemoteDB.init();
   await LocalDB.init();
   Services.init();
-  await UniteKeyboardVisibility.instance.initialize();
   // ── Settings (must come before notifications) ───────
   final settingsController = SettingsController();
   await settingsController.init();
@@ -77,10 +75,11 @@ Future<void> main() async {
   final viewDecksLocalController = ViewDecksLocalController();
   final syncChangeTrackerController = ChangeTrackerController(
     service: ChangeTrackerService(inboundLabel: 'pull', outboundLabel: 'push'),
+    pageArgs: signal(const ChangeTrackerRouteArgs.missing(entryId: '')),
   );
   final syncController = SyncController(
     title: 'Sync decks',
-    profileId: () => LocalDB.profile.getOrCreate().id,
+    profileId: () => LocalDB.currentProfile.getOrCreate().id,
     getTables: SyncDeckService.getTables,
     onSynced: viewDecksLocalController.load,
   );
@@ -92,15 +91,13 @@ Future<void> main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider.value(value: authController),
+        Provider.value(value: authController),
         ChangeNotifierProvider.value(value: settingsController),
         ChangeNotifierProvider.value(value: notificationsController),
-        ChangeNotifierProvider.value(value: syncChangeTrackerController),
-        ChangeNotifierProvider.value(value: syncController),
-        ChangeNotifierProvider(create: (_) => ViewStudyCardsController()),
-        ChangeNotifierProvider.value(value: viewDecksLocalController),
-        ChangeNotifierProvider(create: (_) => ViewDeckListingsController()),
-        ChangeNotifierProvider(create: (_) => ViewLeaderboardController()),
+        Provider.value(value: syncChangeTrackerController),
+        Provider.value(value: syncController),
+        Provider.value(value: viewDecksLocalController),
+        Provider(create: (_) => ViewDeckListingsController()),
         ChangeNotifierProvider(create: (_) => StreakController()),
         ChangeNotifierProvider(create: (_) => MainController()),
       ],

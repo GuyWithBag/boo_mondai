@@ -33,7 +33,7 @@ class Profile with ProfileMappable implements MutableEntity {
     required this.id,
     required this.username,
     required this.displayName,
-    required this.role,
+    this.role,
     this.avatarUrl,
     required this.createdAt,
     required this.userId,

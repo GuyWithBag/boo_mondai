@@ -40,10 +40,12 @@ class SyncClientsRemoteDB extends SupabaseRemoteDB<SyncClient> {
       return;
     }
 
-    await updateWhere(
-      filters: primaryKey,
-      values: {'last_seen_at': now.toUtc().toIso8601String()},
-    );
+    await guard(() async {
+      await query
+          .update({'last_seen_at': now.toUtc().toIso8601String()})
+          .eq('id', clientId)
+          .eq('profile_id', profileId);
+    }, action: 'touchSeen($primaryKey)');
   }
 
   Future<void> markSynced({
@@ -66,13 +68,15 @@ class SyncClientsRemoteDB extends SupabaseRemoteDB<SyncClient> {
       return;
     }
 
-    await updateWhere(
-      filters: primaryKey,
-      values: {
-        'last_seen_at': now.toUtc().toIso8601String(),
-        'last_synced_at': now.toUtc().toIso8601String(),
-      },
-    );
+    await guard(() async {
+      await query
+          .update({
+            'last_seen_at': now.toUtc().toIso8601String(),
+            'last_synced_at': now.toUtc().toIso8601String(),
+          })
+          .eq('id', clientId)
+          .eq('profile_id', profileId);
+    }, action: 'markSynced($primaryKey)');
   }
 
   Future<List<SyncClient>> selectActiveByProfileId({

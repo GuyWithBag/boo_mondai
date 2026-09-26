@@ -14,9 +14,6 @@ class StudyCardMapper extends ClassMapperBase<StudyCard> {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = StudyCardMapper._());
       MutableEntityMapper.ensureInitialized();
-      TagMapper.ensureInitialized();
-      CardTemplateMapper.ensureInitialized();
-      DeckMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -48,16 +45,6 @@ class StudyCardMapper extends ClassMapperBase<StudyCard> {
   static String _$deckId(StudyCard v) => v.deckId;
   static const Field<StudyCard, String> _f$deckId =
       Field('deckId', _$deckId, key: r'deck_id');
-  static List<Tag> _$personalTags(StudyCard v) => v.personalTags;
-  static const Field<StudyCard, List<Tag>> _f$personalTags = Field(
-      'personalTags', _$personalTags,
-      key: r'personal_tags', opt: true, def: const []);
-  static CardTemplate? _$template(StudyCard v) => v.template;
-  static const Field<StudyCard, CardTemplate> _f$template =
-      Field('template', _$template, opt: true);
-  static Deck? _$deck(StudyCard v) => v.deck;
-  static const Field<StudyCard, Deck> _f$deck =
-      Field('deck', _$deck, opt: true);
 
   @override
   final MappableFields<StudyCard> fields = const {
@@ -69,9 +56,6 @@ class StudyCardMapper extends ClassMapperBase<StudyCard> {
     #templateId: _f$templateId,
     #isReversed: _f$isReversed,
     #deckId: _f$deckId,
-    #personalTags: _f$personalTags,
-    #template: _f$template,
-    #deck: _f$deck,
   };
 
   static StudyCard _instantiate(DecodingData data) {
@@ -83,10 +67,7 @@ class StudyCardMapper extends ClassMapperBase<StudyCard> {
         purgeAfter: data.dec(_f$purgeAfter),
         templateId: data.dec(_f$templateId),
         isReversed: data.dec(_f$isReversed),
-        deckId: data.dec(_f$deckId),
-        personalTags: data.dec(_f$personalTags),
-        template: data.dec(_f$template),
-        deck: data.dec(_f$deck));
+        deckId: data.dec(_f$deckId));
   }
 
   @override
@@ -140,9 +121,6 @@ extension StudyCardValueCopy<$R, $Out> on ObjectCopyWith<$R, StudyCard, $Out> {
 
 abstract class StudyCardCopyWith<$R, $In extends StudyCard, $Out>
     implements MutableEntityCopyWith<$R, $In, $Out> {
-  ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get personalTags;
-  CardTemplateCopyWith<$R, CardTemplate, CardTemplate>? get template;
-  DeckCopyWith<$R, Deck, Deck>? get deck;
   @override
   $R call(
       {String? id,
@@ -152,10 +130,7 @@ abstract class StudyCardCopyWith<$R, $In extends StudyCard, $Out>
       DateTime? purgeAfter,
       String? templateId,
       bool? isReversed,
-      String? deckId,
-      List<Tag>? personalTags,
-      CardTemplate? template,
-      Deck? deck});
+      String? deckId});
   StudyCardCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -168,16 +143,6 @@ class _StudyCardCopyWithImpl<$R, $Out>
   late final ClassMapperBase<StudyCard> $mapper =
       StudyCardMapper.ensureInitialized();
   @override
-  ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get personalTags =>
-      ListCopyWith($value.personalTags, (v, t) => v.copyWith.$chain(t),
-          (v) => call(personalTags: v));
-  @override
-  CardTemplateCopyWith<$R, CardTemplate, CardTemplate>? get template =>
-      $value.template?.copyWith.$chain((v) => call(template: v));
-  @override
-  DeckCopyWith<$R, Deck, Deck>? get deck =>
-      $value.deck?.copyWith.$chain((v) => call(deck: v));
-  @override
   $R call(
           {String? id,
           DateTime? createdAt,
@@ -186,10 +151,7 @@ class _StudyCardCopyWithImpl<$R, $Out>
           Object? purgeAfter = $none,
           String? templateId,
           bool? isReversed,
-          String? deckId,
-          List<Tag>? personalTags,
-          Object? template = $none,
-          Object? deck = $none}) =>
+          String? deckId}) =>
       $apply(FieldCopyWithData({
         if (id != null) #id: id,
         if (createdAt != null) #createdAt: createdAt,
@@ -198,10 +160,7 @@ class _StudyCardCopyWithImpl<$R, $Out>
         if (purgeAfter != $none) #purgeAfter: purgeAfter,
         if (templateId != null) #templateId: templateId,
         if (isReversed != null) #isReversed: isReversed,
-        if (deckId != null) #deckId: deckId,
-        if (personalTags != null) #personalTags: personalTags,
-        if (template != $none) #template: template,
-        if (deck != $none) #deck: deck
+        if (deckId != null) #deckId: deckId
       }));
   @override
   StudyCard $make(CopyWithData data) => StudyCard(
@@ -212,10 +171,7 @@ class _StudyCardCopyWithImpl<$R, $Out>
       purgeAfter: data.get(#purgeAfter, or: $value.purgeAfter),
       templateId: data.get(#templateId, or: $value.templateId),
       isReversed: data.get(#isReversed, or: $value.isReversed),
-      deckId: data.get(#deckId, or: $value.deckId),
-      personalTags: data.get(#personalTags, or: $value.personalTags),
-      template: data.get(#template, or: $value.template),
-      deck: data.get(#deck, or: $value.deck));
+      deckId: data.get(#deckId, or: $value.deckId));
 
   @override
   StudyCardCopyWith<$R2, StudyCard, $Out2> $chain<$R2, $Out2>(

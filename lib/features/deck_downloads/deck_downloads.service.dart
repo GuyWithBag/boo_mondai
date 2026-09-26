@@ -177,15 +177,13 @@ class DeckDownloadsService extends Service {
       final now = DateTime.now();
       var newLocalDeck = remoteDeck.copyWith(
         id: localDeckId,
-        profileId: LocalDB.profile.getOrCreate().id,
+        profileId: LocalDB.currentProfile.getOrCreate().id,
         sourceDeckId: remoteDeck.id,
         visibilityState: VisibilityState.private,
         isPublished: false,
         isEditable: true,
         createdAt: localDeck?.createdAt ?? now,
         updatedAt: now,
-        userProfile: null,
-        listing: null,
       );
 
       final templateIdMap = {
@@ -457,7 +455,7 @@ class DeckDownloadsService extends Service {
         tags: t.tags,
         frontText: t.frontText,
         backText: t.backText,
-        cardType: t.cardType,
+        direction: t.direction,
       ),
       IdentificationTemplate t => IdentificationTemplate(
         id: localTemplateId,
@@ -483,6 +481,8 @@ class DeckDownloadsService extends Service {
         sourceTemplateId: t.id,
         tags: t.tags,
         questionPrompt: t.questionPrompt,
+        multipleAnswers: t.multipleAnswers,
+        randomizeOptionsOrdering: t.randomizeOptionsOrdering,
         options: [
           for (final option in t.options)
             MultipleChoiceOption(

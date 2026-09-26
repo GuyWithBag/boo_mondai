@@ -23,12 +23,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextField;
 import 'package:flutter/material.dart'
     hide BackButton, FormField, TextField, Scaffold, AppBar;
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart' show ReadContext;
+import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-class RegisterPage extends HookWidget {
+class RegisterPage extends SignalHookWidget {
   const RegisterPage({super.key});
 
   @override
@@ -38,6 +38,8 @@ class RegisterPage extends HookWidget {
     final register = useRegisterController(
       authController: context.read<AuthController>(),
     );
+    final error = register.error.value;
+    final isLoading = register.isLoading.value;
 
     return Scaffold(
       appBar: AppBar(title: 'Create an Account'),
@@ -55,8 +57,6 @@ class RegisterPage extends HookWidget {
             ),
             FormField<String>(
               value: register.nameController.text,
-              listenable: register.nameController,
-              valueReader: () => register.nameController.text,
               validator: AuthValidators.displayName,
               builder: (context, field) => Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -80,8 +80,6 @@ class RegisterPage extends HookWidget {
             ),
             FormField<String>(
               value: register.emailController.text,
-              listenable: register.emailController,
-              valueReader: () => register.emailController.text,
               validator: AuthValidators.email,
               builder: (context, field) => Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -106,8 +104,6 @@ class RegisterPage extends HookWidget {
             ),
             FormField<String>(
               value: register.passwordController.text,
-              listenable: register.passwordController,
-              valueReader: () => register.passwordController.text,
               validator: AuthValidators.password,
               builder: (context, field) => Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -130,16 +126,12 @@ class RegisterPage extends HookWidget {
                 ],
               ),
             ),
-            if (register.error != null) ...[
-              ErrorText.exception(register.error),
-            ],
+            if (error != null) ...[ErrorText.exception(error)],
             Button(
               variants: [ButtonColor.primary],
 
-              onPressed: register.isLoading
-                  ? null
-                  : () => register.signUp(context),
-              child: register.isLoading
+              onPressed: isLoading ? null : () => register.signUp(context),
+              child: isLoading
                   ? const LoadingIndicator()
                   : const Text('Sign Up'),
             ),

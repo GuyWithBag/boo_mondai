@@ -1,16 +1,17 @@
-import 'dart:io';
+import 'dart:io' hide ContentType;
 
 import 'package:boo_mondai/features/filesystem.handler/filesystem.handler.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        Deck,
-        LocalDB,
         AuthService,
+        Deck,
         DecksDirectoryPaths,
+        LocalDB,
+        RemoteDB,
         SyncDeletionPolicy,
         Tag,
-        DeckListingsService,
-        RemoteDB;
+        uuid,
+        Content;
 import 'package:file_picker/file_picker.dart' show PlatformFile;
 
 abstract final class DecksService {
@@ -19,18 +20,26 @@ abstract final class DecksService {
     String? profileId,
     bool isPublished = false,
   }) async {
-    final resolvedTitle = await nextUntitledDeckTitle();
-    final deck = Deck.createNow(
-      profileId: profileId ?? LocalDB.profile.getOrCreate().id,
+    final resolvedTitle = await nextDeckTitle();
+    final resolvedProfileId =
+        profileId ?? LocalDB.currentProfile.getOrCreate().id;
+    final now = DateTime.now();
+
+    final deck = Deck(
+      id: uuid.v7(),
+      profileId: resolvedProfileId,
       title: resolvedTitle.trim(),
-      isPublished: isPublished,
+      updatedAt: now,
+      createdAt: now,
     );
+
     await LocalDB.deck.upsert(deck);
     return deck;
   }
 
-  static Future<String> nextUntitledDeckTitle() async {
-    const baseTitle = 'Untitled Deck';
+  static Future<String> nextDeckTitle({
+    String baseTitle = 'Untitled Deck',
+  }) async {
     // final pathAlreadyExsists = File('');
     final existingTitles = LocalDB.deck
         .selectMany()
@@ -55,66 +64,26 @@ abstract final class DecksService {
     }
   }
 
-  static Future<Deck?> update({
+  static Future<Deck?> upsert({
     required Deck deck,
-    String? title,
-    String? shortDescription,
-    String? longDescription,
-    bool? isPublished,
+    // String? title,
+    // String? shortDescription,
+    // String? longDescription,
+    // bool? isPublished,
   }) async {
-    var updatedDeck = deck;
-    var changed = false;
-
-    if (title != null) {
-      final nextDeck = await setTitle(deck: updatedDeck, title: title);
-      if (nextDeck != null) {
-        updatedDeck = nextDeck;
-        changed = true;
-      }
-    }
-
-    if (shortDescription != null) {
-      final nextDeck = await setShortDescription(
-        deck: updatedDeck,
-        shortDescription: shortDescription,
-      );
-      if (nextDeck != null) {
-        updatedDeck = nextDeck;
-        changed = true;
-      }
-    }
-
-    if (longDescription != null) {
-      final nextDeck = await setLongDescription(
-        deck: updatedDeck,
-        longDescription: longDescription,
-      );
-      if (nextDeck != null) {
-        updatedDeck = nextDeck;
-        changed = true;
-      }
-    }
-
-    if (isPublished != null) {
-      final nextDeck = await setPublished(
-        deck: updatedDeck,
-        isPublished: isPublished,
-      );
-      if (nextDeck != null) {
-        updatedDeck = nextDeck;
-        changed = true;
-      }
-    }
-
-    return changed ? updatedDeck : null;
+    final updatedDeck = deck.copyWith(updatedAt: DateTime.now());
+    LocalDB.deck.upsert(updatedDeck);
+    return updatedDeck;
   }
 
-  static Future<Deck?> setTitle({
+  static Future<void> setTitle({
     required Deck deck,
     required String title,
   }) async {
     final relativePath = DecksDirectoryPaths.root(deckTitle: deck.title);
-    final absolutePath = await FileSystemHandler.getAbsolutePath(relativePath);
+    final absolutePath = await FileSystemHandler.getAbsolutePathOfRelativePath(
+      relativePath,
+    );
 
     var directory = Directory(absolutePath);
     try {
@@ -122,9 +91,9 @@ abstract final class DecksService {
     } catch (e) {
       rethrow;
     }
-    final newDeck = deck.copyWith(title: title, updatedAt: DateTime.now());
-    await LocalDB.deck.upsert(newDeck);
-    return newDeck;
+    final updatedDeck = deck.copyWith(title: title.trim());
+
+    await LocalDB.deck.upsert(updatedDeck);
   }
 
   static Future<Deck?> setShortDescription({
@@ -142,7 +111,6 @@ abstract final class DecksService {
 
     final updatedDeck = deck.copyWith(
       shortDescription: trimmedShortDescription,
-      updatedAt: DateTime.now(),
     );
 
     await LocalDB.deck.upsert(updatedDeck);
@@ -162,11 +130,7 @@ abstract final class DecksService {
       return null;
     }
 
-    final updatedDeck = deck.copyWith(
-      longDescription: trimmedLongDescription,
-      updatedAt: DateTime.now(),
-    );
-
+    final updatedDeck = deck.copyWith(longDescription: trimmedLongDescription);
     await LocalDB.deck.upsert(updatedDeck);
     return updatedDeck;
   }
@@ -179,10 +143,7 @@ abstract final class DecksService {
       return null;
     }
 
-    final updatedDeck = deck.copyWith(
-      isPublished: isPublished,
-      updatedAt: DateTime.now(),
-    );
+    final updatedDeck = deck.copyWith(isPublished: isPublished);
 
     await LocalDB.deck.upsert(updatedDeck);
     return updatedDeck;
@@ -190,6 +151,7 @@ abstract final class DecksService {
 
   static Future<Deck?> setTags({
     required Deck deck,
+    required Content content,
     required List<String> tagNames,
   }) async {
     if (!deck.isEditable) {
@@ -214,17 +176,17 @@ abstract final class DecksService {
         existingTagsByName[tagName.toLowerCase()] ??
             Tag.createNow(name: tagName, profileId: deck.profileId),
     ];
-    final updatedDeck = deck.copyWith(
-      tags: updatedTags,
-      updatedAt: DateTime.now(),
-    );
+    final updatedDeck = deck.copyWith(tags: updatedTags);
+    final updatedContent = content.copyWith(updatedAt: DateTime.now());
 
+    await LocalDB.contents.upsert(updatedContent);
     await LocalDB.deck.upsert(updatedDeck);
     return updatedDeck;
   }
 
   static Future<void> setCoverImageUrlByFile({
     required Deck deck,
+    required Content content,
     required PlatformFile file,
   }) async {
     if (!deck.isEditable) {
@@ -232,16 +194,18 @@ abstract final class DecksService {
     }
 
     final path = DecksDirectoryPaths.coverImage(deckTitle: deck.title);
-    final absolutePath = await FileSystemHandler.getAbsolutePath(path);
+    final absolutePath = await FileSystemHandler.getAbsolutePathOfRelativePath(
+      path,
+    );
     final file = File(absolutePath);
     final bytes = await file.readAsBytes();
     file.writeAsBytes(bytes);
 
     final remoteUrl = await RemoteDB.publicBucket.uploadBytes(path, bytes);
-    final updatedDeck = deck.copyWith(
-      coverImageUrl: remoteUrl,
-      updatedAt: DateTime.now(),
-    );
+    final updatedDeck = deck.copyWith(coverImageUrl: remoteUrl);
+    final updatedContent = content.copyWith(updatedAt: DateTime.now());
+
+    await LocalDB.contents.upsert(updatedContent);
     await LocalDB.deck.upsert(updatedDeck);
     return;
   }
@@ -263,19 +227,10 @@ abstract final class DecksService {
   //   return remoteUrl;
   // }
 
-  static Future<Deck> createAndUpsertListing(Deck deck) async {
-    final listing = await DeckListingsService.createListing(deck);
-
-    final updatedDeck = deck.copyWith(
-      updatedAt: DateTime.now(),
-      listing: listing,
-    );
-
-    return updatedDeck;
-  }
-
-  static Future<void> deleteDeckCascade({
+  // ToDo: Throughly fix this
+  static Future<void> deleteDeckCascades({
     required Deck deck,
+    // required DeckListing listing,
     bool keepReviewLogs = true,
   }) async {
     if (!deck.isEditable) return;
@@ -307,17 +262,22 @@ abstract final class DecksService {
 
     if (!keepReviewLogs) {
       final fsrsCardIds = fsrsCards.map((card) => card.id).toSet();
-      final reviewLogs = LocalDB.reviewLog.selectMany(
+      final reviewLogs = LocalDB.reviewLogs.selectMany(
         where: (log) => fsrsCardIds.contains(log.fsrsCardId),
       );
-      await LocalDB.reviewLog.deleteManyByPk([
+      await LocalDB.reviewLogs.deleteManyByPk([
         for (final log in reviewLogs) {'id': log.id},
       ]);
     }
 
-    final listing =
-        deck.listing ??
-        LocalDB.deckListing.selectByPkIncludingDeleted({'deck_id': deck.id});
+    final listing = LocalDB.deckListing.selectByPkIncludingDeleted({
+      'deck_id': deck.id,
+    });
+    final content = listing == null
+        ? null
+        : LocalDB.contents.selectByPk({
+            'id': listing.contentId,
+          }, includeDeleted: true);
 
     if (shouldSyncDeletion) {
       await LocalDB.fsrsCard.upsertMany([
@@ -336,29 +296,27 @@ abstract final class DecksService {
             purgeAfter: purgeAfter,
           ),
       ]);
-      if (listing != null) {
-        await LocalDB.deckListing.upsert(
-          listing.copyWith(
+      if (listing != null && content != null) {
+        await LocalDB.contents.upsert(
+          content.copyWith(
             updatedAt: now,
             deletedAt: now,
             purgeAfter: purgeAfter,
           ),
         );
+
+        await LocalDB.deckListing.upsert(listing);
       }
+
       await LocalDB.deck.upsert(
-        deck.copyWith(
-          updatedAt: now,
-          deletedAt: now,
-          purgeAfter: purgeAfter,
-          listing: null,
-        ),
+        deck.copyWith(updatedAt: now, deletedAt: now, purgeAfter: purgeAfter),
       );
     } else {
       final fsrsCardIds = fsrsCards.map((card) => card.id).toSet();
-      final reviewLogs = LocalDB.reviewLog.selectMany(
+      final reviewLogs = LocalDB.reviewLogs.selectMany(
         where: (log) => fsrsCardIds.contains(log.fsrsCardId),
       );
-      await LocalDB.reviewLog.deleteManyByPk([
+      await LocalDB.reviewLogs.deleteManyByPk([
         for (final log in reviewLogs) {'id': log.id},
       ]);
       await LocalDB.fsrsCard.deleteManyByPk([
@@ -380,38 +338,38 @@ abstract final class DecksService {
     await LocalDB.cardTemplateTag.deleteByTemplateIds(templateIds);
     await LocalDB.deckTag.deleteByDeckId(deck.id);
 
-    final orphanedTags = _orphanedOwnedTags(tagIdsToCheck, profileId);
-    if (orphanedTags.isEmpty) return;
+    // final orphanedTags = _orphanedOwnedTags(tagIdsToCheck, profileId);
+    // if (orphanedTags.isEmpty) return;
 
-    await LocalDB.tag.deleteManyByPk([
-      for (final tag in orphanedTags) {'id': tag.id},
-    ]);
+    // await LocalDB.tag.deleteManyByPk([
+    //   for (final tag in orphanedTags) {'id': tag.id},
+    // ]);
   }
 
-  static List<Tag> _orphanedOwnedTags(Set<String> tagIds, String profileId) {
-    return LocalDB.tag
-        .selectManyByIds(tagIds)
-        .where((tag) {
-          if (tag.profileId != profileId) return false;
-          return !LocalDB.deckTag.isTagReferenced(tag.id) &&
-              !LocalDB.cardTemplateTag.isTagReferenced(tag.id) &&
-              !LocalDB.userStudyCardTag.isTagReferenced(tag.id) &&
-              !LocalDB.deck.selectMany().any(
-                (deck) => deck.tags.any((deckTag) => deckTag.id == tag.id),
-              ) &&
-              !LocalDB.cardTemplate.selectMany().any(
-                (template) => template.tags.any(
-                  (templateTag) => templateTag.id == tag.id,
-                ),
-              ) &&
-              !LocalDB.studyCard.selectMany().any(
-                (card) => card.personalTags.any(
-                  (personalTag) => personalTag.id == tag.id,
-                ),
-              );
-        })
-        .toList(growable: false);
-  }
+  // static List<Tag> _orphanedOwnedTags(Set<String> tagIds, String profileId) {
+  //   return LocalDB.tag
+  //       .selectManyByIds(tagIds)
+  //       .where((tag) {
+  //         if (tag.profileId != profileId) return false;
+  //         return !LocalDB.deckTag.isTagReferenced(tag.id) &&
+  //             !LocalDB.cardTemplateTag.isTagReferenced(tag.id) &&
+  //             !LocalDB.userStudyCardTag.isTagReferenced(tag.id) &&
+  //             !LocalDB.deck.selectMany().any(
+  //               (deck) => deck.tags.any((deckTag) => deckTag.id == tag.id),
+  //             ) &&
+  //             !LocalDB.cardTemplate.selectMany().any(
+  //               (template) => template.tags.any(
+  //                 (templateTag) => templateTag.id == tag.id,
+  //               ),
+  //             ) &&
+  //             !LocalDB.studyCard.selectMany().any(
+  //               (card) => card.personalTags.any(
+  //                 (personalTag) => personalTag.id == tag.id,
+  //               ),
+  //             );
+  //       })
+  //       .toList(growable: false);
+  // }
 
   static bool _sameTagNames(List<String> left, List<String> right) {
     if (left.length != right.length) {

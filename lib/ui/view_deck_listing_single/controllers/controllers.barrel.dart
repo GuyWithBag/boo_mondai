@@ -3,3 +3,4 @@
 // Other files
 export 'view_deck_listing_single_preview.controller.dart';
 export 'view_deck_listing_single_editor.controller.dart';
+export 'view_deck_listing_single.controller.dart';

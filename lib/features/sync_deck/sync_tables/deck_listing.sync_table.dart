@@ -23,7 +23,7 @@ class DeckListingSyncTable extends SyncTable<DeckListing> {
         applyPullItem: LocalDB.deckListing.upsert,
         applyPushItem: RemoteDB.deckListing.upsert,
         deleteRemoteItemById: (id) =>
-            RemoteDB.deckListing.deleteWhere({'deck_id': id}),
+            RemoteDB.deckListing.delete({'deck_id': id}),
         preprocessPushItem: (listing, profileId) =>
             DeckListingMediaSyncPreprocessor.preprocessPushItem(
               listing: listing,

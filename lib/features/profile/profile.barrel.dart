@@ -3,7 +3,7 @@
 // Barrel files
 export 'models/models.barrel.dart';
 // Other files
-export 'cached_profile.local.db.dart';
-export 'profiles.local.db.dart';
 export 'profiles.remote.db.dart';
 export 'profile.service.dart';
+export 'profiles.local.db.dart';
+export 'current_profile.local.db.dart';

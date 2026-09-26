@@ -1,6 +1,7 @@
 import 'package:boo_mondai/features/cards/models/card_template.dto.dart';
 import 'package:boo_mondai/features/cards/models/fill_in_the_blank_segment.dto.dart';
 import 'package:boo_mondai/core/services/uuid.dart';
+import 'package:boo_mondai/features/study_session/models/study_session.answer.dart';
 import 'package:boo_mondai/features/tags/models/tag.dto.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 
@@ -42,8 +43,8 @@ class FillInTheBlanksTemplate extends CardTemplate
   }
 
   @override
-  bool checkAnswer(String userAnswer, {bool isReversed = false}) {
-    final answers = userAnswer.split('|');
+  bool checkAnswer(StudySessionAnswer answer, {bool isReversed = false}) {
+    final answers = answer.value.split('|');
 
     return segments.isNotEmpty &&
         answers.length == segments.length &&

@@ -2,5 +2,5 @@
 
 // Other files
 export 'cached_media.dart';
-export 'cached_medias.local.db.dart.dart';
 export 'cached_media.service.dart';
+export 'cached_media.local.db.dart';

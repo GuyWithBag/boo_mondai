@@ -4,25 +4,25 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart'
-    show Controller, LeaderboardEntry, AppException, RemoteDB;
+    show RemoteDB, JoinedLeaderboardEntry;
+import 'package:signals_hooks/signals_hooks.dart';
 
-class ViewLeaderboardController extends Controller {
-  List<LeaderboardEntry> _entries = [];
+class ViewLeaderboardController {
+  final entries = listSignal<JoinedLeaderboardEntry>([]);
 
-  List<LeaderboardEntry> get entries => List.unmodifiable(_entries);
+  final error = signal<Exception?>(null);
+  final isLoading = signal(false);
 
-  Future<void> fetchLeaderboard() async {
-    setLoading(true);
-    setError(null);
-    notifyListeners();
+  Future<void> load() async {
+    isLoading.value = true;
+    error.value = null;
 
     try {
-      _entries = await RemoteDB.leaderboard.fetchLeaderboard();
-    } on AppException catch (e) {
-      setError(e);
+      entries.value = await RemoteDB.leaderboard.selectJoined();
+    } on Exception catch (e) {
+      error.value = e;
     } finally {
-      setLoading(false);
-      notifyListeners();
+      isLoading.value = false;
     }
   }
 }

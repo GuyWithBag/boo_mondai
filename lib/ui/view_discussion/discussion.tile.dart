@@ -1,136 +1,69 @@
+// ignore_for_file: dead_code
+
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
         Button,
         ButtonVariant,
-        DiscussionEditCallback,
         DiscussionFormValidator,
-        DiscussionItem,
-        DiscussionLikeCallback,
-        DiscussionPermission,
-        DiscussionRepliesFor,
-        DiscussionReplyCallback,
+        DiscussionTileController,
         FormField,
         MarkdownText,
         MarkdownTextMode,
         MetaLabel,
         ProfileLabel,
-        surfaceStyle,
-        useDiscussionTileController,
+        Review,
         SurfaceBorder,
+        SurfacePadding,
         SurfaceShape,
-        SurfacePadding;
-import 'package:flutter/material.dart'
-    show
-        Align,
-        Alignment,
-        BoxConstraints,
-        BuildContext,
-        CircularProgressIndicator,
-        Column,
-        ConstrainedBox,
-        CrossAxisAlignment,
-        EdgeInsets,
-        Form,
-        FormState,
-        GlobalKey,
-        Icon,
-        Icons,
-        MainAxisAlignment,
-        MainAxisSize,
-        Padding,
-        Row,
-        SelectableText,
-        Text,
-        TextInputAction,
-        Widget;
-import 'package:flutter_hooks/flutter_hooks.dart' show HookWidget, useMemoized;
+        surfaceStyle,
+        DateHelper;
+import 'package:flutter/material.dart' hide FormField;
+import 'package:flutter_hooks/flutter_hooks.dart' show HookWidget;
 import 'package:theme_variants/theme_variants.dart'
     show ThemeVariantsContext, Surface;
 
 class DiscussionTile extends HookWidget {
-  const DiscussionTile({
-    super.key,
-    required this.item,
-    required this.repliesFor,
-    this.onReply,
-    this.onEdit,
-    this.onLike,
-    this.canEdit,
-    this.isSubmitting = false,
-    this.depth = 0,
-  });
+  const DiscussionTile({super.key, required this.controller});
 
-  final DiscussionItem item;
-  final DiscussionRepliesFor repliesFor;
-  final DiscussionReplyCallback? onReply;
-  final DiscussionEditCallback? onEdit;
-  final DiscussionLikeCallback? onLike;
-  final DiscussionPermission? canEdit;
-  final bool isSubmitting;
-  final int depth;
+  final DiscussionTileController controller;
 
   @override
   Widget build(BuildContext context) {
-    final controller = useDiscussionTileController(
-      item: item,
-      repliesFor: repliesFor,
-      onReply: onReply,
-      onEdit: onEdit,
-      onLike: onLike,
-      canEdit: canEdit,
-    );
-    final editFormKey = useMemoized(GlobalKey<FormState>.new);
-    final replyFormKey = useMemoized(GlobalKey<FormState>.new);
-
     final tokens = context.themeTokens<AppTokens>();
-    final isNested = depth > 0;
-    final wasEdited =
-        item.updatedAt.difference(item.createdAt).abs() >
-        const Duration(seconds: 1);
-    final isEditingDiscussion = controller.isEditing;
-    final isReplyingToDiscussion = controller.isReplying;
-    final isLikeSubmitting = controller.isLikeSubmitting;
-    final isReview = controller.item.isReview;
-    final isDeletedDiscussion = item.isDeleted;
-    final shouldDisplayEditTitleField = isEditingDiscussion.value && isReview;
-    final shouldDisplayReviewTitle =
-        isReview && !isDeletedDiscussion && (item.title ?? '').isNotEmpty;
-    final shouldDisplayDeletedDiscussionMessage = isDeletedDiscussion;
-    final shouldDisplayReplyAction = controller.canReply;
-    final shouldDisplayEditAction = controller.canEditItem;
-    final shouldDisplayLikeAction = isReview && controller.onLike != null;
-    final shouldDisableLikeAction = isSubmitting || isLikeSubmitting.value;
-    final editBodyPlaceholder = isReview ? 'Update review' : 'Update comment';
-    final deletedDiscussionLabel = isReview ? 'review' : 'comment';
+    final item = controller.item;
+    final content = item.content;
 
     return Padding(
-      padding: EdgeInsets.only(left: isNested ? tokens.spaceLayoutGapLg : 0),
+      padding: EdgeInsets.only(
+        left: tokens.spaceLayoutGapLg * controller.depth,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: tokens.spaceLayoutGapSm,
         children: [
-          // Header: author + dates
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             spacing: tokens.spaceLayoutGapSm,
             children: [
               ProfileLabel(
                 label: 'By',
-                displayName: item.userProfile?.username ?? 'Unknown author',
-                avatarUrl: item.userProfile?.avatarUrl,
+                displayName: item.profile.username,
+                avatar: item.profile.avatarUrl == null
+                    ? NetworkImage(item.profile.avatarUrl!)
+                    : null,
               ),
               Row(
                 mainAxisSize: MainAxisSize.min,
                 spacing: tokens.spaceLayoutGapSm,
                 children: [
                   MetaLabel(
-                    label: _formatDate(item.createdAt),
+                    label: DateHelper.formatDateDdMmYy(content.createdAt),
                     icon: Icons.calendar_today_outlined,
                   ),
                   MetaLabel(
-                    label: _formatDate(item.updatedAt),
-                    icon: wasEdited
+                    label: DateHelper.formatDateDdMmYy(content.updatedAt),
+                    icon: controller.hasEditLogs
                         ? Icons.edit_calendar_outlined
                         : Icons.update,
                   ),
@@ -140,17 +73,15 @@ class DiscussionTile extends HookWidget {
           ),
 
           // Body: editable or display
-          if (isEditingDiscussion.value)
+          if (controller.isEditing.value)
             Form(
-              key: editFormKey,
+              key: controller.editFormKey,
               child: Column(
                 spacing: tokens.spaceLayoutGapSm,
                 children: [
-                  if (shouldDisplayEditTitleField)
+                  if (controller.shouldDisplayEditTitleField.value)
                     FormField<String>(
                       value: controller.editTitleController.text,
-                      listenable: controller.editTitleController,
-                      valueReader: () => controller.editTitleController.text,
                       validator: DiscussionFormValidator.title,
                       builder: (_, field) => MarkdownText(
                         data: controller.editTitleController.text,
@@ -163,19 +94,17 @@ class DiscussionTile extends HookWidget {
                       ),
                     ),
                   FormField<String>(
-                    value: controller.editBody.value,
-                    listenable: controller.editBody,
-                    valueReader: () => controller.editBody.value,
+                    value: controller.editBodyText.value,
                     validator: DiscussionFormValidator.body,
                     builder: (_, field) => MarkdownText(
-                      data: controller.editBody.value,
+                      data: controller.editBodyText.value,
                       allowAttachments: true,
                       onChanged: (value) {
-                        controller.editBody.value = value;
+                        controller.editBodyText.value = value;
                         field.didChange(value);
                       },
                       mode: MarkdownTextMode.input,
-                      placeholder: editBodyPlaceholder,
+                      placeholder: 'Write here.',
                       maxLines: null,
                     ),
                   ),
@@ -187,7 +116,7 @@ class DiscussionTile extends HookWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               spacing: tokens.spaceLayoutGapSm,
               children: [
-                if (shouldDisplayReviewTitle)
+                if (controller.shouldDisplayReviewTitle.value)
                   Surface(
                     style: surfaceStyle.resolve(tokens, const [
                       SurfaceBorder.none,
@@ -195,7 +124,7 @@ class DiscussionTile extends HookWidget {
                       SurfacePadding.sm,
                     ]),
                     child: MarkdownText(
-                      data: item.title!,
+                      data: (item.content as Review).title,
                       mode: MarkdownTextMode.previewSelectable,
                     ),
                   ),
@@ -205,14 +134,12 @@ class DiscussionTile extends HookWidget {
                     SurfaceShape.roundedXsm,
                     SurfacePadding.sm,
                   ]),
-                  child: shouldDisplayDeletedDiscussionMessage
-                      ? SelectableText(
-                          'This $deletedDiscussionLabel was deleted.',
-                        )
+                  child: controller.shouldDisplayIsDeleted
+                      ? SelectableText('This comment was deleted.')
                       : ConstrainedBox(
                           constraints: BoxConstraints(minHeight: 100),
                           child: MarkdownText(
-                            data: item.body,
+                            data: item.owner.body,
                             mode: MarkdownTextMode.previewSelectable,
                           ),
                         ),
@@ -225,118 +152,51 @@ class DiscussionTile extends HookWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             spacing: tokens.spaceLayoutGapSm,
             children: [
-              if (isEditingDiscussion.value) ...[
+              if (controller.isEditing.value) ...[
                 Button(
-                  onPressed: isSubmitting ? null : controller.cancelEditing,
+                  onPressed: controller.isSubmitting.value
+                      ? null
+                      : controller.onCancelEditPressed,
                   child: const Text('Cancel'),
                 ),
                 Button(
-                  onPressed: isSubmitting
+                  onPressed: controller.isSubmitting.value
                       ? null
-                      : () async {
-                          if (!editFormKey.currentState!.validate()) return;
-                          await controller.submitEdit();
-                        },
-                  leading: isSubmitting
+                      : controller.onSubmitEdit,
+                  leading: controller.isSubmitting.value
                       ? const CircularProgressIndicator()
                       : const Icon(Icons.check),
-                  child: const Text('Save'),
+                  child: const Text('Submit'),
                 ),
               ] else ...[
-                if (shouldDisplayReplyAction)
-                  Button.icon(
-                    icon: Icons.reply,
-                    tokens: tokens,
-                    onPressed: isSubmitting ? null : controller.toggleReplying,
-                  ),
-                if (shouldDisplayEditAction)
+                Button.icon(
+                  icon: Icons.reply,
+                  tokens: tokens,
+                  onPressed: controller.isSubmitting.value
+                      ? null
+                      : controller.onReplyPressed,
+                ),
+                if (controller.shouldDisplayEditAction.value)
                   Button.icon(
                     icon: Icons.edit_outlined,
                     tokens: tokens,
-                    onPressed: isSubmitting ? null : controller.startEditing,
-                  ),
-                if (shouldDisplayLikeAction)
-                  Button.icon(
-                    tokens: tokens,
-                    icon: controller.item.isLiked
-                        ? Icons.thumb_down_alt_outlined
-                        : Icons.thumb_up_alt_outlined,
-                    variant: ButtonVariant.flat,
-                    onPressed: shouldDisableLikeAction
+                    onPressed: controller.isSubmitting.value
                         ? null
-                        : controller.submitLike,
+                        : controller.onEditPressed,
                   ),
+                Button.icon(
+                  tokens: tokens,
+                  icon: controller.isLiked
+                      ? Icons.thumb_down_alt_outlined
+                      : Icons.thumb_up_alt_outlined,
+                  variant: ButtonVariant.flat,
+                  onPressed: controller.onLikePressed,
+                ),
               ],
             ],
           ),
-
-          // Reply composer
-          if (isReplyingToDiscussion.value)
-            Form(
-              key: replyFormKey,
-              child: Column(
-                spacing: tokens.spaceLayoutGapMd,
-                children: [
-                  FormField<String>(
-                    value: controller.replyBody.value,
-                    listenable: controller.replyBody,
-                    valueReader: () => controller.replyBody.value,
-                    validator: DiscussionFormValidator.body,
-                    builder: (_, field) => MarkdownText(
-                      data: controller.replyBody.value,
-                      allowAttachments: true,
-                      onChanged: (value) {
-                        controller.replyBody.value = value;
-                        field.didChange(value);
-                      },
-                      mode: MarkdownTextMode.input,
-                      placeholder: 'Write a reply',
-                      maxLines: null,
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: Button(
-                      onPressed: isSubmitting
-                          ? null
-                          : () async {
-                              if (!replyFormKey.currentState!.validate()) {
-                                return;
-                              }
-                              await controller.submitReply();
-                            },
-                      leading: isSubmitting
-                          ? const CircularProgressIndicator()
-                          : const Icon(Icons.send_outlined),
-                      child: const Text('Post Reply'),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-          // Nested replies
-          for (final reply in controller.replies)
-            DiscussionTile(
-              item: reply,
-              repliesFor: repliesFor,
-              onReply: onReply,
-              onEdit: onEdit,
-              onLike: onLike,
-              canEdit: canEdit,
-              isSubmitting: isSubmitting,
-              depth: depth + 1,
-            ),
         ],
       ),
     );
   }
-}
-
-String _formatDate(DateTime value) {
-  final local = value.toLocal();
-  final day = local.day.toString().padLeft(2, '0');
-  final month = local.month.toString().padLeft(2, '0');
-  final year = (local.year % 100).toString().padLeft(2, '0');
-  return '$day-$month-$year';
 }

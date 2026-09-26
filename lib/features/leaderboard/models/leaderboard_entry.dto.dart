@@ -5,7 +5,6 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/features/profile/models/cached_profile.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 
 part 'leaderboard_entry.dto.mapper.dart';
@@ -15,12 +14,10 @@ class LeaderboardEntry with LeaderboardEntryMappable {
   final String profileId;
   final int drillScore;
   final int reviewCount;
-  final CachedProfile? userProfile;
 
   const LeaderboardEntry({
     required this.profileId,
     required this.drillScore,
     required this.reviewCount,
-    this.userProfile,
   });
 }

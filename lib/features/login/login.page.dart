@@ -17,12 +17,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextField;
 import 'package:flutter/material.dart'
     hide FormField, TextField, Scaffold, AppBar;
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart' show ReadContext;
+import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-class LoginPage extends HookWidget {
+class LoginPage extends SignalHookWidget {
   const LoginPage({super.key});
 
   @override
@@ -31,6 +31,8 @@ class LoginPage extends HookWidget {
       authController: context.read<AuthController>(),
     );
     final tokens = context.themeTokens<AppTokens>();
+    final error = login.error.value;
+    final isLoading = login.isLoading.value;
 
     return Scaffold(
       appBar: AppBar(title: 'Login'),
@@ -48,8 +50,6 @@ class LoginPage extends HookWidget {
             ),
             FormField<String>(
               value: login.emailController.text,
-              listenable: login.emailController,
-              valueReader: () => login.emailController.text,
               validator: AuthValidators.email,
               builder: (context, field) => Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -74,8 +74,6 @@ class LoginPage extends HookWidget {
             ),
             FormField<String>(
               value: login.passwordController.text,
-              listenable: login.passwordController,
-              valueReader: () => login.passwordController.text,
               validator: AuthValidators.password,
               builder: (context, field) => Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -98,12 +96,12 @@ class LoginPage extends HookWidget {
                 ],
               ),
             ),
-            if (login.error != null) ...[ErrorText.exception(login.error)],
+            if (error != null) ...[ErrorText.exception(error)],
             Button(
               variants: const [ButtonColor.primary],
 
-              onPressed: login.isLoading ? null : () => login.signIn(context),
-              child: login.isLoading
+              onPressed: isLoading ? null : () => login.signIn(context),
+              child: isLoading
                   ? const LoadingIndicator()
                   : const Text('Sign In'),
             ),

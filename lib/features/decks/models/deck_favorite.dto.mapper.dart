@@ -14,7 +14,6 @@ class DeckFavoriteMapper extends ClassMapperBase<DeckFavorite> {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = DeckFavoriteMapper._());
       DeckMapper.ensureInitialized();
-      CachedProfileMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -34,9 +33,6 @@ class DeckFavoriteMapper extends ClassMapperBase<DeckFavorite> {
   static Deck? _$deck(DeckFavorite v) => v.deck;
   static const Field<DeckFavorite, Deck> _f$deck =
       Field('deck', _$deck, opt: true);
-  static CachedProfile? _$userProfile(DeckFavorite v) => v.userProfile;
-  static const Field<DeckFavorite, CachedProfile> _f$userProfile =
-      Field('userProfile', _$userProfile, key: r'user_profile', opt: true);
 
   @override
   final MappableFields<DeckFavorite> fields = const {
@@ -44,7 +40,6 @@ class DeckFavoriteMapper extends ClassMapperBase<DeckFavorite> {
     #profileId: _f$profileId,
     #createdAt: _f$createdAt,
     #deck: _f$deck,
-    #userProfile: _f$userProfile,
   };
 
   static DeckFavorite _instantiate(DecodingData data) {
@@ -52,8 +47,7 @@ class DeckFavoriteMapper extends ClassMapperBase<DeckFavorite> {
         deckId: data.dec(_f$deckId),
         profileId: data.dec(_f$profileId),
         createdAt: data.dec(_f$createdAt),
-        deck: data.dec(_f$deck),
-        userProfile: data.dec(_f$userProfile));
+        deck: data.dec(_f$deck));
   }
 
   @override
@@ -110,13 +104,7 @@ extension DeckFavoriteValueCopy<$R, $Out>
 abstract class DeckFavoriteCopyWith<$R, $In extends DeckFavorite, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   DeckCopyWith<$R, Deck, Deck>? get deck;
-  CachedProfileCopyWith<$R, CachedProfile, CachedProfile>? get userProfile;
-  $R call(
-      {String? deckId,
-      String? profileId,
-      DateTime? createdAt,
-      Deck? deck,
-      CachedProfile? userProfile});
+  $R call({String? deckId, String? profileId, DateTime? createdAt, Deck? deck});
   DeckFavoriteCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -132,29 +120,23 @@ class _DeckFavoriteCopyWithImpl<$R, $Out>
   DeckCopyWith<$R, Deck, Deck>? get deck =>
       $value.deck?.copyWith.$chain((v) => call(deck: v));
   @override
-  CachedProfileCopyWith<$R, CachedProfile, CachedProfile>? get userProfile =>
-      $value.userProfile?.copyWith.$chain((v) => call(userProfile: v));
-  @override
   $R call(
           {String? deckId,
           String? profileId,
           DateTime? createdAt,
-          Object? deck = $none,
-          Object? userProfile = $none}) =>
+          Object? deck = $none}) =>
       $apply(FieldCopyWithData({
         if (deckId != null) #deckId: deckId,
         if (profileId != null) #profileId: profileId,
         if (createdAt != null) #createdAt: createdAt,
-        if (deck != $none) #deck: deck,
-        if (userProfile != $none) #userProfile: userProfile
+        if (deck != $none) #deck: deck
       }));
   @override
   DeckFavorite $make(CopyWithData data) => DeckFavorite(
       deckId: data.get(#deckId, or: $value.deckId),
       profileId: data.get(#profileId, or: $value.profileId),
       createdAt: data.get(#createdAt, or: $value.createdAt),
-      deck: data.get(#deck, or: $value.deck),
-      userProfile: data.get(#userProfile, or: $value.userProfile));
+      deck: data.get(#deck, or: $value.deck));
 
   @override
   DeckFavoriteCopyWith<$R2, DeckFavorite, $Out2> $chain<$R2, $Out2>(

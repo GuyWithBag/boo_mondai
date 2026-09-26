@@ -2,3 +2,4 @@
 
 // Other files
 export 'filesystem.handler.dart';
+export 'deck_directory.paths.dart';

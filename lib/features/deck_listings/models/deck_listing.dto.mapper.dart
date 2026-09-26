@@ -60,12 +60,6 @@ class DeckListingMapper extends ClassMapperBase<DeckListing> {
   static const Field<DeckListing, List<String>> _f$featuredImages = Field(
       'featuredImages', _$featuredImages,
       key: r'featured_images', opt: true, def: const []);
-  static DateTime _$updatedAt(DeckListing v) => v.updatedAt;
-  static const Field<DeckListing, DateTime> _f$updatedAt =
-      Field('updatedAt', _$updatedAt, key: r'updated_at');
-  static DateTime _$createdAt(DeckListing v) => v.createdAt;
-  static const Field<DeckListing, DateTime> _f$createdAt =
-      Field('createdAt', _$createdAt, key: r'created_at');
   static DateTime? _$deletedAt(DeckListing v) => v.deletedAt;
   static const Field<DeckListing, DateTime> _f$deletedAt =
       Field('deletedAt', _$deletedAt, key: r'deleted_at', opt: true);
@@ -75,6 +69,9 @@ class DeckListingMapper extends ClassMapperBase<DeckListing> {
   static String _$deckId(DeckListing v) => v.deckId;
   static const Field<DeckListing, String> _f$deckId =
       Field('deckId', _$deckId, key: r'deck_id');
+  static String _$contentId(DeckListing v) => v.contentId;
+  static const Field<DeckListing, String> _f$contentId =
+      Field('contentId', _$contentId, key: r'content_id');
 
   @override
   final MappableFields<DeckListing> fields = const {
@@ -88,11 +85,10 @@ class DeckListingMapper extends ClassMapperBase<DeckListing> {
     #reportsCount: _f$reportsCount,
     #featuredCards: _f$featuredCards,
     #featuredImages: _f$featuredImages,
-    #updatedAt: _f$updatedAt,
-    #createdAt: _f$createdAt,
     #deletedAt: _f$deletedAt,
     #purgeAfter: _f$purgeAfter,
     #deckId: _f$deckId,
+    #contentId: _f$contentId,
   };
 
   static DeckListing _instantiate(DecodingData data) {
@@ -107,11 +103,10 @@ class DeckListingMapper extends ClassMapperBase<DeckListing> {
         reportsCount: data.dec(_f$reportsCount),
         featuredCards: data.dec(_f$featuredCards),
         featuredImages: data.dec(_f$featuredImages),
-        updatedAt: data.dec(_f$updatedAt),
-        createdAt: data.dec(_f$createdAt),
         deletedAt: data.dec(_f$deletedAt),
         purgeAfter: data.dec(_f$purgeAfter),
-        deckId: data.dec(_f$deckId));
+        deckId: data.dec(_f$deckId),
+        contentId: data.dec(_f$contentId));
   }
 
   @override
@@ -182,11 +177,10 @@ abstract class DeckListingCopyWith<$R, $In extends DeckListing, $Out>
       int? reportsCount,
       List<Map<String, dynamic>>? featuredCards,
       List<String>? featuredImages,
-      DateTime? updatedAt,
-      DateTime? createdAt,
       DateTime? deletedAt,
       DateTime? purgeAfter,
-      String? deckId});
+      String? deckId,
+      String? contentId});
   DeckListingCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -223,11 +217,10 @@ class _DeckListingCopyWithImpl<$R, $Out>
           int? reportsCount,
           List<Map<String, dynamic>>? featuredCards,
           List<String>? featuredImages,
-          DateTime? updatedAt,
-          DateTime? createdAt,
           Object? deletedAt = $none,
           Object? purgeAfter = $none,
-          String? deckId}) =>
+          String? deckId,
+          String? contentId}) =>
       $apply(FieldCopyWithData({
         if (upvotesCount != null) #upvotesCount: upvotesCount,
         if (downvotesCount != null) #downvotesCount: downvotesCount,
@@ -239,11 +232,10 @@ class _DeckListingCopyWithImpl<$R, $Out>
         if (reportsCount != null) #reportsCount: reportsCount,
         if (featuredCards != null) #featuredCards: featuredCards,
         if (featuredImages != null) #featuredImages: featuredImages,
-        if (updatedAt != null) #updatedAt: updatedAt,
-        if (createdAt != null) #createdAt: createdAt,
         if (deletedAt != $none) #deletedAt: deletedAt,
         if (purgeAfter != $none) #purgeAfter: purgeAfter,
-        if (deckId != null) #deckId: deckId
+        if (deckId != null) #deckId: deckId,
+        if (contentId != null) #contentId: contentId
       }));
   @override
   DeckListing $make(CopyWithData data) => DeckListing(
@@ -257,11 +249,10 @@ class _DeckListingCopyWithImpl<$R, $Out>
       reportsCount: data.get(#reportsCount, or: $value.reportsCount),
       featuredCards: data.get(#featuredCards, or: $value.featuredCards),
       featuredImages: data.get(#featuredImages, or: $value.featuredImages),
-      updatedAt: data.get(#updatedAt, or: $value.updatedAt),
-      createdAt: data.get(#createdAt, or: $value.createdAt),
       deletedAt: data.get(#deletedAt, or: $value.deletedAt),
       purgeAfter: data.get(#purgeAfter, or: $value.purgeAfter),
-      deckId: data.get(#deckId, or: $value.deckId));
+      deckId: data.get(#deckId, or: $value.deckId),
+      contentId: data.get(#contentId, or: $value.contentId));
 
   @override
   DeckListingCopyWith<$R2, DeckListing, $Out2> $chain<$R2, $Out2>(

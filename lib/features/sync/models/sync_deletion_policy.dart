@@ -17,7 +17,7 @@ class SyncDeletionPolicy {
   DateTime purgeAfter(DateTime deletedAt) => deletedAt.add(retention);
 
   static SyncDeletionPolicy current() {
-    final profileId = LocalDB.profile.getOrCreate().id;
+    final profileId = LocalDB.currentProfile.getOrCreate().id;
     final settings = LocalDB.userSettings.getOrCreateByProfileId(profileId);
     final retentionDays = settings.get(
       SettingsService.syncDeletionRetentionDays,

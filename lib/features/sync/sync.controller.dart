@@ -3,15 +3,13 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppException,
         ChangeSource,
         ChangeTrackerController,
-        ChangeTrackerEntry,
-        ChangeTrackerService,
         ChangeTrackerStatus,
-        Controller,
         SyncService,
         SyncTable;
 import 'package:flutter/foundation.dart';
+import 'package:signals/signals_flutter.dart';
 
-class SyncController extends Controller {
+class SyncController {
   SyncController({
     required this.title,
     required this.profileId,
@@ -26,22 +24,21 @@ class SyncController extends Controller {
   final VoidCallback onSynced;
   final Future<void> Function()? beforeSync;
 
-  bool _isSyncing = false;
-  String? _syncError;
-  ChangeTrackerController? _changeTrackerController;
+  final isSyncing = signal(false);
+  final error = signal<Exception?>(null);
+  final changeTrackerController = signal<ChangeTrackerController?>(null);
+  final changeTrackerRevision = signal(0);
 
-  bool get isSyncing => _isSyncing;
+  late final changeTrackerService = computed(
+    () => changeTrackerController.value?.service,
+  );
 
-  String? get syncError => _syncError;
+  late final currentEntry = computed(() {
+    final controller = changeTrackerController.value;
+    changeTrackerRevision.value;
+    if (controller == null) return null;
 
-  ChangeTrackerService? get changeTrackerService =>
-      _changeTrackerController?.service;
-
-  ChangeTrackerEntry? get currentEntry {
-    final changeTrackerController = _changeTrackerController;
-    if (changeTrackerController == null) return null;
-
-    for (final entry in changeTrackerController.entries) {
+    for (final entry in controller.entries.value) {
       if (entry.source != ChangeSource.sync) continue;
       if (entry.status == ChangeTrackerStatus.canceled ||
           entry.status == ChangeTrackerStatus.idle) {
@@ -50,88 +47,89 @@ class SyncController extends Controller {
       return entry;
     }
     return null;
-  }
+  });
 
-  bool get isAlreadyUpToDate =>
-      currentEntry?.status == ChangeTrackerStatus.alreadyUpToDate;
+  late final isAlreadyUpToDate = computed(
+    () => currentEntry.value?.status == ChangeTrackerStatus.alreadyUpToDate,
+  );
 
-  bool get shouldShowSyncPage {
-    return switch (currentEntry?.status) {
+  late final shouldShowSyncPage = computed(() {
+    return switch (currentEntry.value?.status) {
       ChangeTrackerStatus.reviewing ||
       ChangeTrackerStatus.applying ||
       ChangeTrackerStatus.completed ||
       ChangeTrackerStatus.paused ||
-      ChangeTrackerStatus.failed => !isAlreadyUpToDate,
+      ChangeTrackerStatus.failed => !isAlreadyUpToDate.value,
       _ => false,
     };
-  }
+  });
 
-  void _bindChangeTracker(ChangeTrackerController changeTrackerController) {
-    if (identical(_changeTrackerController, changeTrackerController)) return;
-    _changeTrackerController?.removeListener(_handleChangeTrackerChanged);
-    _changeTrackerController = changeTrackerController;
-    _changeTrackerController?.addListener(_handleChangeTrackerChanged);
+  ChangeTrackerController? _boundChangeTrackerController;
+
+  void bindChangeTracker(ChangeTrackerController controller) {
+    if (identical(_boundChangeTrackerController, controller)) return;
+    _boundChangeTrackerController?.service.removeOnChangedListener(
+      _handleChangeTrackerChanged,
+    );
+    _boundChangeTrackerController = controller;
+    changeTrackerController.value = controller;
+    controller.service.addOnChangedListener(_handleChangeTrackerChanged);
+    changeTrackerRevision.value++;
   }
 
   void _handleChangeTrackerChanged() {
-    notifyListeners();
+    changeTrackerRevision.value++;
   }
 
-  void clearSyncError() {
-    _syncError = null;
-    notifyListeners();
+  void clearError() {
+    error.value = null;
   }
 
   void applyCurrentEntry() {
-    final entry = currentEntry;
-    final changeTrackerController = _changeTrackerController;
-    if (entry == null || changeTrackerController == null) return;
-    _isSyncing = false;
-    notifyListeners();
-    changeTrackerController.apply(entry.id);
+    final entry = currentEntry.value;
+    final controller = changeTrackerController.value;
+    if (entry == null || controller == null) return;
+    isSyncing.value = false;
+    controller.apply(entry.id);
   }
 
   void dismissCurrentEntry() {
-    final entry = currentEntry;
-    final changeTrackerController = _changeTrackerController;
-    _isSyncing = false;
-    _syncError = null;
-    if (entry != null && changeTrackerController != null) {
-      changeTrackerController.cancel(entry.id);
-      changeTrackerController.remove(entry.id);
+    final entry = currentEntry.value;
+    final controller = changeTrackerController.value;
+    isSyncing.value = false;
+    error.value = null;
+    if (entry != null && controller != null) {
+      controller.cancel(entry.id);
+      controller.remove(entry.id);
     }
-    notifyListeners();
   }
 
   void discardRemoteChangesForCurrentEntry() {
-    final entry = currentEntry;
-    final changeTrackerController = _changeTrackerController;
-    if (entry == null || changeTrackerController == null) return;
-    _isSyncing = false;
-    notifyListeners();
-    changeTrackerController.discard(entry.id);
+    final entry = currentEntry.value;
+    final controller = changeTrackerController.value;
+    if (entry == null || controller == null) return;
+    isSyncing.value = false;
+    controller.discard(entry.id);
   }
 
   void clearAlreadyUpToDate() {
-    final entry = currentEntry;
-    final changeTrackerController = _changeTrackerController;
-    _isSyncing = false;
-    if (entry != null && changeTrackerController != null) {
-      changeTrackerController.remove(entry.id);
+    final entry = currentEntry.value;
+    final controller = changeTrackerController.value;
+    isSyncing.value = false;
+    if (entry != null && controller != null) {
+      controller.remove(entry.id);
     }
-    notifyListeners();
   }
 
-  Future<void> sync(ChangeTrackerController changeTrackerController) async {
-    _bindChangeTracker(changeTrackerController);
-    final alreadyActive = changeTrackerController.activeEntries.any(
+  Future<void> sync(ChangeTrackerController controller) async {
+    bindChangeTracker(controller);
+    final alreadyActive = controller.activeEntries.value.any(
       (plan) => plan.source == ChangeSource.sync,
     );
     if (alreadyActive) return;
 
-    _isSyncing = true;
-    _syncError = null;
-    notifyListeners();
+    isSyncing.value = true;
+    error.value = null;
 
     try {
       await beforeSync?.call();
@@ -139,23 +137,29 @@ class SyncController extends Controller {
         title: title,
         profileId: profileId(),
         tables: getTables(),
-        changeTrackerController: changeTrackerController,
+        changeTrackerController: controller,
       );
       onSynced();
-      _isSyncing = false;
+      isSyncing.value = false;
     } on AppException catch (e) {
-      if (_isSyncing) {
-        _syncError = e.message;
-      }
-      _isSyncing = false;
+      error.value = e;
+      isSyncing.value = false;
     } finally {
-      notifyListeners();
+      changeTrackerRevision.value++;
     }
   }
 
-  @override
   void dispose() {
-    _changeTrackerController?.removeListener(_handleChangeTrackerChanged);
-    super.dispose();
+    _boundChangeTrackerController?.service.removeOnChangedListener(
+      _handleChangeTrackerChanged,
+    );
+    isSyncing.dispose();
+    error.dispose();
+    changeTrackerController.dispose();
+    changeTrackerRevision.dispose();
+    changeTrackerService.dispose();
+    currentEntry.dispose();
+    isAlreadyUpToDate.dispose();
+    shouldShowSyncPage.dispose();
   }
 }
