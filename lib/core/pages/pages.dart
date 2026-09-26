@@ -24,9 +24,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         ViewDeckDownloadsPage,
         ViewTestPage,
         ViewTestPlainPage,
-        ViewCardsPage;
+        ViewCardsPage,
+        ChangeTrackerController;
 
 import 'package:flutter/material.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
 class Pages {
   static final home = AppPage(
@@ -241,12 +243,16 @@ class Pages {
         }) {
           final args = extra;
           return ChangeTrackerPage(
-            args: args is ChangeTrackerRouteArgs
-                ? args
-                : ChangeTrackerRouteArgs.missing(
-                    entryId: pathParameters['entryId']!,
-                    serviceId: pathParameters['serviceId'],
-                  ),
+            controller: ChangeTrackerController(
+              pageArgs: signal(
+                args is ChangeTrackerRouteArgs
+                    ? args
+                    : ChangeTrackerRouteArgs.missing(
+                        entryId: pathParameters['entryId']!,
+                        serviceId: pathParameters['serviceId'],
+                      ),
+              ),
+            ),
           );
         },
   );
