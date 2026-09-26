@@ -105,7 +105,7 @@ abstract final class MediaHelper {
     return uri != null && (uri.scheme == 'http' || uri.scheme == 'https');
   }
 
-  Future<Uint8List?> getBytesFromUrl(String? url) async {
+  static Future<Uint8List?> getBytesFromUrl(String? url) async {
     if (url == null || url.isEmpty) return null;
 
     final uri = Uri.tryParse(url);

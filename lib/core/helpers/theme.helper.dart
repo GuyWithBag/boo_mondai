@@ -1,7 +1,5 @@
-import 'package:boo_mondai/core/helpers/study_rating.helper.dart';
-import 'package:boo_mondai/core/models/study_rating_color_set.dart';
-import 'package:boo_mondai/core/theme/app_tokens.model.dart';
-import 'package:boo_mondai/features/study_session/models/study_rating.dto.dart';
+
+import 'package:boo_mondai/lib.barrel.dart' show StudyRating, AppTokens, StudyRatingColorSet, StudyRatingHelper;
 import 'package:flutter/material.dart' show Color;
 
 abstract class ThemeHelper {

@@ -1,11 +1,14 @@
 import 'dart:convert';
 
+import 'package:boo_mondai/features/features.barrel.dart';
 import 'package:file_picker/file_picker.dart' show PlatformFile;
 import 'package:flutter/material.dart';
 import 'package:boo_mondai/core/helpers/media.helper.dart';
 
 abstract final class ImageHelper {
-  static ImageProvider? getImageProviderFromSource(String? source) {
+  static Future<ImageProvider?> getImageProviderFromSource(
+    String? source,
+  ) async {
     final value = source?.trim();
     if (value == null) return null;
 
@@ -13,6 +16,9 @@ abstract final class ImageHelper {
       return NetworkImage(value);
     }
 
+    if (!await FileSystemHandler.doesFileExistsByRelativePath(value)) {
+      return null;
+    }
     return AssetImage(value);
   }
 

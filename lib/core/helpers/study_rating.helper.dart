@@ -1,8 +1,5 @@
-import 'package:boo_mondai/core/models/media_selector.dart';
-import 'package:boo_mondai/core/models/study_rating_color_set.dart';
-import 'package:boo_mondai/core/theme/app_media_pack.model.dart';
-import 'package:boo_mondai/core/theme/app_tokens.model.dart';
-import 'package:boo_mondai/features/study_session/models/study_rating.dto.dart';
+
+import 'package:boo_mondai/lib.barrel.dart' show StudyRating, StudyRatingColorSet, AppTokens, AppMediaPack, MediaSelector;
 
 abstract class StudyRatingHelper {
   static StudyRatingColorSet getColorSet(AppTokens tokens, StudyRating rating) {

@@ -18,6 +18,39 @@ abstract final class CasingHelper {
     };
   }
 
+  static String toCamelCase(String text) {
+    final words = _caseWords(text);
+    if (words.isEmpty) return text;
+    return [
+      words.first,
+      for (final word in words.skip(1)) _capitalize(word),
+    ].join();
+  }
+
+  static String toPascalCase(String text) {
+    final words = _caseWords(text);
+    if (words.isEmpty) return text;
+    return words.map(_capitalize).join();
+  }
+
+  static String toSnakeCase(String text) {
+    final words = _caseWords(text);
+    if (words.isEmpty) return text;
+    return words.join('_');
+  }
+
+  static String toKebabCase(String text) {
+    final words = _caseWords(text);
+    if (words.isEmpty) return text;
+    return words.join('-');
+  }
+
+  static String toTitleCase(String text) {
+    final words = _caseWords(text);
+    if (words.isEmpty) return text;
+    return words.map(_capitalize).join(' ');
+  }
+
   static bool isCamelCase(String text) {
     if (text.isEmpty || text.contains(RegExp(r'[\s_-]'))) return false;
     if (!RegExp(r'^[a-z][A-Za-z0-9]*$').hasMatch(text)) return false;
@@ -51,6 +84,11 @@ abstract final class CasingHelper {
 
   static String normalizedWords(String text) {
     return _caseWords(text).join(' ');
+  }
+
+  static String _capitalize(String word) {
+    if (word.isEmpty) return word;
+    return '${word[0].toUpperCase()}${word.substring(1)}';
   }
 
   static List<String> _caseWords(String text) {

@@ -4,7 +4,7 @@ import 'package:boo_mondai/features/study_session/session_steps/message.session_
 
 abstract class StudySessionStepHelper {
   static MediaSelector<AppMediaPack>? getMessageStepSound(
-    MessageSessionStep step,
+    StudySessionMessageStep step,
   ) {
     return switch (step.messageDefinitionId) {
       'slow-down' => (media) => media.studySessionSlowDownSound,
