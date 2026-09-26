@@ -216,7 +216,7 @@ flowchart TD
     AuthController --> StoreFile["StoredMediaService.storeFile"]
     AuthController --> BuildReference["construct SyncMediaReference<Profile>"]
     AuthController --> ApplyUpload["SyncMediaReferenceApplier.apply"]
-    AuthController --> LocalProfile["LocalDB.profile.upsert"]
+    AuthController --> LocalProfile["LocalDB.currentProfile.upsert"]
     AuthController --> RemoteProfile["RemoteDB.profile.upsert"]
     ApplyUpload --> PublicBucket["RemoteDB.publicBucket"]
     ApplyUpload --> StoredMedia["StoredMedia.remoteUrl update"]
@@ -231,7 +231,7 @@ flowchart TD
     AvatarStore["saveAvatar(file)"]
     AvatarUpload["uploadAvatarIfAuthenticated(profile)"]
     UploadService["StoredMediaUploadService"]
-    LocalProfile["LocalDB.profile"]
+    LocalProfile["LocalDB.currentProfile"]
     RemoteProfile["RemoteDB.profile"]
 
     AuthController --> ProfileService
@@ -328,7 +328,7 @@ flowchart TD
     StoredMediaFacade --> MediaPicker["MediaPickerService"]
     StoredMediaFacade --> FileStore["StoredMediaFileStore"]
     StoredMediaFacade --> MetadataRepo["StoredMediaLocalDB / repository"]
-    StoredMediaFacade --> CacheService["StoredMediaCacheService"]
+    StoredMediaFacade --> CacheService["StoredCachedMediaService"]
     StoredMediaFacade --> PathService["StoredMediaPathService"]
 ```
 

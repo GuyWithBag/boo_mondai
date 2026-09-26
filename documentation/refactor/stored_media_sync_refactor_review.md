@@ -638,7 +638,7 @@ Potential split:
 | file picker | `MediaPickerService` |
 | local file storage | `StoredMediaFileStore` |
 | DB metadata | `StoredMediaRepository` / existing local DB |
-| remote download to cache | `StoredMediaCacheService` |
+| remote download to cache | `StoredCachedMediaService` |
 | semantic operations | `StoredMediaService` facade |
 
 You may keep the facade, but the internals are currently tightly coupled.

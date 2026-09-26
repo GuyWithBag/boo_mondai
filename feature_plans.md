@@ -186,4 +186,4 @@ CREATE INDEX ON comments (parent_id);
 
 ## Manually written improvements
 - Make it so that you can create a local account if you want for absolute privacy and so that you do not need to be connected to the internet.
-- Currently, both (CardType) does not create 2 fsrs cards
+- Currently, both (CardTemplateDirection) does not create 2 fsrs cards

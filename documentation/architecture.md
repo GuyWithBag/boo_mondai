@@ -77,7 +77,7 @@ classDiagram
         +bool isPublic
         +bool isPublished
         +bool isEditable
-        +int cardCount
+        +int cardTemplatesCount
         +String version
         +int buildNumber
         +DateTime createdAt
@@ -286,7 +286,7 @@ classDiagram
 | `is_premade` | `"isPremade"` | Renamed |
 | `is_public` | `"isPublic"` | Renamed |
 | `is_uneditable bool DEFAULT false` | `"isEditable" bool DEFAULT true` | Renamed + logic inverted |
-| `card_count` | `"cardCount"` | Renamed |
+| `card_count` | `"cardTemplatesCount"` | Renamed |
 | `build_number` | `"buildNumber"` | Renamed |
 | `source_deck_id` | `"sourceDeckId"` | Renamed |
 | *(missing)* | `"sourceAuthorId"` | Added |

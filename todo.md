@@ -13,7 +13,7 @@ Then it makes the `StudyCard`s line up with the templates:
 
 Example:
 
-A flashcard template has `CardType.both`.
+A flashcard template has `CardTemplateDirection.both`.
 
 That means the app needs:
 
@@ -22,7 +22,7 @@ template A, normal direction
 template A, reversed direction
 ```
 
-Later the user changes it to `CardType.normal`.
+Later the user changes it to `CardTemplateDirection.normal`.
 
 Now the app only needs:
 

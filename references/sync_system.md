@@ -188,7 +188,7 @@ User                  DeckProvider / UI         Hive          Supabase
  │                         │   deck.copyWith(     │               │
  │                         │   isPublished:true)) │               │
  │                         │ ─────────────────────►               │
- │                         │ saveDeck(deck)       │               │
+ │                         │ save(deck)       │               │
  │                         │                     │               │
  │                         │ CardProvider         │               │
  │                         │ .markDirty(deckId)   │               │

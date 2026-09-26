@@ -71,7 +71,7 @@ Use verbs for functions when the function performs an action:
 getCoverImageUrl(...)
 setDisplayName(...)
 uploadBytes(...)
-deleteWhere(...)
+delete(...)
 selectMany(...)
 createSignedUrl(...)
 ```
@@ -85,7 +85,7 @@ selectMany(...)
 insert(...)
 update(...)
 upsert(...)
-deleteWhere(...)
+delete(...)
 ```
 
 ## Common File Types

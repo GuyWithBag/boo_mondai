@@ -416,7 +416,7 @@ Avoid rebuilding one large app-wide MutableEntity mapper layer. Keep mappers bes
 
 ## DAO Naming
 
-DAO method names should reflect SQL commands and query shape. Avoid vague repository names like `getDecks`, `saveDeck`, `removeDeck`, or `loadCards`.
+DAO method names should reflect SQL commands and query shape. Avoid vague repository names like `getDecks`, `save`, `removeDeck`, or `loadCards`.
 
 Preferred naming:
 
