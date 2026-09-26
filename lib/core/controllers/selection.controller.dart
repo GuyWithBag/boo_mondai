@@ -1,167 +1,118 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class SelectionController<T> extends ChangeNotifier {
+class SelectionController<T> {
   SelectionController({
-    Iterable<T> selectedValues = const [],
-    bool multiple = false,
+    Set<T> selectedValues = const {},
+    this.onSelectionChanged,
     int? maxSelected,
-    bool emptySelectionAllowed = false,
-    ValueChanged<Set<T>>? onSelectionChanged,
+    bool multiple = false,
     bool isEnabled = true,
-  }) : _selectedValues = _normalize(
-         selectedValues,
-         multiple: multiple,
-         maxSelected: maxSelected,
-       ),
-       _isEnabled = isEnabled,
-       _multiple = multiple,
-       _maxSelected = maxSelected,
-       _emptySelectionAllowed = emptySelectionAllowed,
-       _onSelectionChanged = onSelectionChanged;
+    bool emptySelectionAllowed = true,
+  }) : maxSelected = signal(null),
+       multiple = signal(multiple),
+       emptySelectionAllowed = signal(emptySelectionAllowed),
+       isEnabled = signal(isEnabled),
+       selectedValues = signal(selectedValues);
 
-  Set<T> _selectedValues;
-  bool _multiple;
-  int? _maxSelected;
-  bool _emptySelectionAllowed;
-  ValueChanged<Set<T>>? _onSelectionChanged;
-  bool _isEnabled;
+  final void Function(Set<T> selection)? onSelectionChanged;
+  final Signal<Set<T>> selectedValues;
 
-  bool get isEnabled => _isEnabled;
-  set isEnabled(bool value) {
-    _isEnabled = value;
-    notifyListeners();
-  }
+  late final Signal<bool> multiple;
+  late final Signal<int?> maxSelected;
+  late final Signal<bool> emptySelectionAllowed;
+  late final Signal<bool> isEnabled;
 
-  Set<T> get selectedValues => Set.unmodifiable(_selectedValues);
-  bool get multiple => _multiple;
-  int? get maxSelected => _maxSelected;
-  bool get emptySelectionAllowed => _emptySelectionAllowed;
+  late final Computed<Set<T>> normalizedSelectedValues = computed(
+    () => clampSelection(
+      selectedValues.value,
+      multiple: multiple.value,
+      maxSelected: maxSelected.value,
+    ),
+  );
+  late final Computed<T?> selectedValue = computed(
+    () => selectedValues.value.isEmpty ? null : selectedValues.value.first,
+  );
+  late final EffectCleanup selectionEffect = effect(() {
+    final normalized = normalizedSelectedValues.value;
+    final current = untracked(() => selectedValues.value);
 
-  T? get selectedValue =>
-      _selectedValues.isEmpty ? null : _selectedValues.first;
+    if (setEquals(current, normalized)) return;
 
-  bool isSelected(T value) => _selectedValues.contains(value) && isEnabled;
+    selectedValues.value = normalized;
+  });
 
-  void update({
-    required Iterable<T> selectedValues,
-    required bool multiple,
-    required int? maxSelected,
-    required bool emptySelectionAllowed,
-    required ValueChanged<Set<T>>? onSelectionChanged,
-    bool notify = true,
-  }) {
-    _multiple = multiple;
-    _maxSelected = maxSelected;
-    _emptySelectionAllowed = emptySelectionAllowed;
-    _onSelectionChanged = onSelectionChanged;
-
-    final normalized = _normalize(
-      selectedValues,
-      multiple: multiple,
-      maxSelected: maxSelected,
-    );
-    if (_setEquals(_selectedValues, normalized)) return;
-
-    _selectedValues = normalized;
-    if (notify) {
-      notifyListeners();
-    }
-  }
+  bool isSelected(T value) =>
+      selectedValues.value.contains(value) && isEnabled.value;
 
   void select(T value) {
-    if (!_isEnabled) return;
-    final next = _multiple ? {..._selectedValues, value} : {value};
-    _setSelected(next);
+    if (!isEnabled.value) return;
+
+    final next = multiple.value ? {...selectedValues.value, value} : {value};
+    setSelected(next);
   }
 
   void toggle(T value) {
-    if (!_isEnabled) return;
-    if (!_selectedValues.contains(value)) {
+    if (!isEnabled.value) return;
+
+    if (!selectedValues.value.contains(value)) {
       select(value);
       return;
     }
 
-    if (!_emptySelectionAllowed && _selectedValues.length == 1) return;
+    if (!emptySelectionAllowed.value && selectedValues.value.length == 1) {
+      return;
+    }
 
-    _setSelected({..._selectedValues}..remove(value));
+    setSelected({...selectedValues.value}..remove(value));
   }
 
   void clear() {
-    if (!_emptySelectionAllowed) return;
-    _setSelected(const {});
+    if (!emptySelectionAllowed.value) return;
+
+    setSelected(const {});
   }
 
-  void _setSelected(Iterable<T> values) {
-    if (!_isEnabled) return;
-    final normalized = _normalize(
+  void setSelected(Iterable<T> values) {
+    if (!isEnabled.value) return;
+
+    final normalized = clampSelection(
       values,
-      multiple: _multiple,
-      maxSelected: _maxSelected,
+      multiple: multiple.value,
+      maxSelected: maxSelected.value,
     );
-    if (_setEquals(_selectedValues, normalized)) return;
-    if (!_emptySelectionAllowed && normalized.isEmpty) return;
+    if (setEquals(selectedValues.value, normalized)) return;
+    if (!emptySelectionAllowed.value && normalized.isEmpty) return;
 
-    _selectedValues = normalized;
-    notifyListeners();
-    _onSelectionChanged?.call(Set.unmodifiable(_selectedValues));
-  }
-
-  static Set<T> _normalize<T>(
-    Iterable<T> values, {
-    required bool multiple,
-    required int? maxSelected,
-  }) {
-    final selected = <T>{};
-    final limit = multiple ? maxSelected : 1;
-
-    for (final value in values) {
-      if (limit != null && selected.length >= limit) break;
-      selected.add(value);
+    selectedValues.value = normalized;
+    if (onSelectionChanged != null) {
+      onSelectionChanged!(Set.unmodifiable(selectedValues.value));
     }
+  }
 
-    return selected;
+  void dispose() {
+    selectionEffect();
+    selectedValue.dispose();
+    normalizedSelectedValues.dispose();
   }
 }
 
-SelectionController<T> useSelectionController<T>({
-  Iterable<T>? selectedValues,
-  bool multiple = false,
-  int? maxSelected,
-  bool emptySelectionAllowed = false,
-  ValueChanged<Set<T>>? onSelectionChanged,
-  bool isEnabled = true,
-  List<Object?> keys = const [],
+Set<T> clampSelection<T>(
+  Iterable<T> values, {
+  required bool multiple,
+  required int? maxSelected,
 }) {
-  final controller = useMemoized(
-    () => SelectionController<T>(
-      selectedValues: selectedValues ?? const [],
-      multiple: multiple,
-      maxSelected: maxSelected,
-      emptySelectionAllowed: emptySelectionAllowed,
-      onSelectionChanged: onSelectionChanged,
-      isEnabled: isEnabled,
-    ),
-    keys,
-  );
+  final selected = <T>{};
+  final limit = multiple ? maxSelected : 1;
 
-  if (selectedValues != null) {
-    controller.update(
-      selectedValues: selectedValues,
-      multiple: multiple,
-      maxSelected: maxSelected,
-      emptySelectionAllowed: emptySelectionAllowed,
-      onSelectionChanged: onSelectionChanged,
-      notify: false,
-    );
+  for (final value in values) {
+    if (limit != null && selected.length >= limit) break;
+    selected.add(value);
   }
-  useListenable(controller);
-  useEffect(() => controller.dispose, [controller]);
 
-  return controller;
+  return selected;
 }
 
-bool _setEquals<T>(Set<T> a, Set<T> b) {
+bool setEquals<T>(Set<T> a, Set<T> b) {
   if (a.length != b.length) return false;
 
   for (final value in a) {
