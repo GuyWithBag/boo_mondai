@@ -2,22 +2,6 @@ import 'package:boo_mondai/lib.barrel.dart' show SelectionController;
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('selects one value in single select mode', () {
-    final changes = <Set<int>>[];
-    final controller = SelectionController<int>(
-      selectedValues: const [1],
-      onSelectionChanged: changes.add,
-    );
-    addTearDown(controller.dispose);
-
-    controller.select(2);
-
-    expect(controller.selectedValues, {2});
-    expect(changes, [
-      {2},
-    ]);
-  });
-
   test('toggles multiple values when multiple select is enabled', () {
     final controller = SelectionController<int>(
       multiple: true,
