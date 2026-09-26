@@ -1,17 +1,13 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/database/remote/supabase.remote.db.dart
-// PURPOSE: Abstract Supabase table repository — shared client, guard, and generic CRUD
+// PURPOSE: Abstract Supabase table repository — shared client, SupabaseRemoteGuard.guard, and generic CRUD
 // PROVIDERS: none
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'dart:async';
-import 'dart:developer' as developer;
-import 'dart:io';
-import 'package:boo_mondai/core/exceptions/app_exception.dart'
-    show AppException;
-import 'package:boo_mondai/lib.barrel.dart' show SyncIndexEntry;
-import 'package:flutter/foundation.dart';
+import 'package:boo_mondai/lib.barrel.dart'
+    show SyncIndexEntry, SupabaseRemoteGuard;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 typedef DbPrimaryKey = Map<String, Object?>;
@@ -23,6 +19,10 @@ abstract class SupabaseRemoteDB<T> {
 
   /// Supabase table or view name.
   String get tableName;
+
+  Future<U> guard<U>(Future<U> Function() fn, {required String action}) {
+    return SupabaseRemoteGuard.guard(fn, action: action, tableName: tableName);
+  }
 
   /// Deserializes a raw DB row into [T].
   T Function(Map<String, dynamic>) get fromMap;
@@ -44,151 +44,11 @@ abstract class SupabaseRemoteDB<T> {
 
   String get deletedAtColumn => 'deleted_at';
 
-  /// Map keys that are populated by joined selects and must not be written.
-  Set<String> get joinedFields => const {};
-
-  /// Deserializes a DB map that may include joined relation data.
-  T fromJoinedMap(Map<String, dynamic> map) => fromMap(map);
-
-  /// Serializes [item] for insert/update/upsert, excluding joined data.
-  Map<String, dynamic> toWriteMap(T item) {
-    final map = Map<String, dynamic>.from(toMap(item));
-    return withoutJoinedFields(map);
-  }
-
-  Map<String, dynamic> withoutJoinedFields(Map<String, dynamic> map) {
-    final values = Map<String, dynamic>.from(map);
-    for (final field in joinedFields) {
-      values.remove(field);
-    }
-    return values;
-  }
-
-  // ── Error, Logging & Crashlytics Wrapper ───────────────────
-
-  /// Wraps DB calls to handle exceptions, log results locally,
-  /// and silently report crashes to Firebase.
-  Future<U> guard<U>(Future<U> Function() fn, {required String action}) async {
-    _debugLog('Starts: $action');
-
-    try {
-      final result = await fn();
-      _logResult(result, action);
-      return result;
-    } on AuthException catch (e) {
-      _debugLog('AuthException: ${e.message}', error: e);
-
-      // Send to Firebase Crashlytics silently
-      // FirebaseCrashlytics.instance.recordError(
-      //   e, stack,
-      //   reason: 'Supabase Auth Error during $action in $tableName',
-      //   fatal: false,
-      // );
-
-      throw AppException(e.message, code: e.statusCode);
-    } on PostgrestException catch (e) {
-      _debugLog('PostgrestException: ${e.message}', error: e);
-
-      // Send to Firebase Crashlytics silently
-      // FirebaseCrashlytics.instance.recordError(
-      //   e, stack,
-      //   reason: 'Supabase Database Error during $action in $tableName',
-      //   fatal: false,
-      // );
-
-      throw AppException(e.message, code: e.code);
-    } on SocketException catch (e, stack) {
-      _debugLog('SocketException: $e', error: e, stackTrace: stack);
-      throw AppException(
-        'Unable to reach the server. Check your network connection and try again.',
-        code: 'NETWORK_ERROR',
-        originalError: e,
-        stackTrace: stack,
-      );
-    } on TimeoutException catch (e, stack) {
-      _debugLog('TimeoutException: $e', error: e, stackTrace: stack);
-      throw AppException(
-        'The request timed out. Please try again.',
-        code: 'TIMEOUT',
-        originalError: e,
-        stackTrace: stack,
-      );
-    } catch (e, stack) {
-      if (_isNetworkTransportError(e)) {
-        _debugLog('Network transport error: $e', error: e, stackTrace: stack);
-        throw AppException(
-          'Unable to reach the server. Check your network connection and try again.',
-          code: 'NETWORK_ERROR',
-          originalError: e,
-          stackTrace: stack,
-        );
-      }
-
-      _debugLog('Unknown Exception: $e', error: e, stackTrace: stack);
-
-      // Catch unexpected app crashes (e.g., mapping errors, null pointers)
-      // FirebaseCrashlytics.instance.recordError(
-      //   e, stack,
-      //   reason: 'Unknown Error during $action in $tableName',
-      //   fatal: true,
-      // );
-
-      rethrow;
-    }
-  }
-
-  void _debugLog(String message, {Object? error, StackTrace? stackTrace}) {
-    if (!kDebugMode) return;
-    developer.log(
-      message,
-      name: 'SupabaseDB[$tableName]',
-      error: error,
-      stackTrace: stackTrace,
-    );
-  }
-
-  void _logResult<U>(U result, String action) {
-    if (result == null) {
-      _debugLog('Result is NULL: $action');
-    } else if (result is List && result.isEmpty) {
-      _debugLog('Result is an EMPTY LIST: $action');
-    } else {
-      final countStr = result is List
-          ? ' (Returned ${result.length} items)'
-          : '';
-      _debugLog('Success: $action$countStr');
-    }
-  }
-
-  dynamic applyFilters(dynamic query, Map<String, Object?> filters) {
-    for (final entry in filters.entries) {
-      query = entry.value == null
-          ? query.isFilter(entry.key, null)
-          : query.eq(entry.key, entry.value);
-    }
-    return query;
-  }
+  SupabaseQueryBuilder get query => client.from(tableName);
 
   dynamic applySoftDeleteFilter(dynamic query, {required bool includeDeleted}) {
     if (!supportsSoftDelete || includeDeleted) return query;
     return query.isFilter(deletedAtColumn, null);
-  }
-
-  Map<String, dynamic> _updatesWithoutPrimaryKey(T item) {
-    final updates = toWriteMap(item);
-    for (final key in primaryKeyFromItem(item).keys) {
-      updates.remove(key);
-    }
-    return updates;
-  }
-
-  bool _isNetworkTransportError(Object e) {
-    final typeName = e.runtimeType.toString();
-    final message = e.toString();
-    return typeName == 'ClientException' ||
-        message.contains('ClientException') ||
-        message.contains('Failed host lookup') ||
-        message.contains('SocketException');
   }
 
   // ── Primary-table CRUD ───────────────────────────────────
@@ -206,7 +66,11 @@ abstract class SupabaseRemoteDB<T> {
     query = applySoftDeleteFilter(query, includeDeleted: includeDeleted);
 
     if (filters.isNotEmpty) {
-      query = applyFilters(query, filters);
+      for (final entry in filters.entries) {
+        query = entry.value == null
+            ? query.isFilter(entry.key, null)
+            : query.eq(entry.key, entry.value);
+      }
     }
     if (orderBy != null) {
       query = query.order(orderBy, ascending: ascending);
@@ -218,9 +82,7 @@ abstract class SupabaseRemoteDB<T> {
     }
 
     final response = await query;
-    return List<Map<String, dynamic>>.from(
-      response,
-    ).map(fromJoinedMap).toList();
+    return List<Map<String, dynamic>>.from(response).map(fromMap).toList();
   }, action: 'selectMany');
 
   Future<List<SyncIndexEntry>> selectSyncIndex({
@@ -280,7 +142,11 @@ abstract class SupabaseRemoteDB<T> {
     dynamic query = client.from(tableName).count(CountOption.exact);
     query = applySoftDeleteFilter(query, includeDeleted: includeDeleted);
     if (filters.isNotEmpty) {
-      query = applyFilters(query, filters);
+      for (final entry in filters.entries) {
+        query = entry.value == null
+            ? query.isFilter(entry.key, null)
+            : query.eq(entry.key, entry.value);
+      }
     }
     return await query;
   }, action: 'count');
@@ -292,41 +158,19 @@ abstract class SupabaseRemoteDB<T> {
   }) => guard(() async {
     dynamic query = client.from(tableName).select(select ?? defaultSelect);
     query = applySoftDeleteFilter(query, includeDeleted: includeDeleted);
-    final row = await applyFilters(query, filters).maybeSingle();
-    return row == null ? null : fromJoinedMap(row);
+    for (final entry in filters.entries) {
+      query = entry.value == null
+          ? query.isFilter(entry.key, null)
+          : query.eq(entry.key, entry.value);
+    }
+    final row = await query.maybeSingle();
+    return row == null ? null : fromMap(row);
   }, action: 'selectOne($filters)');
-
-  Future<T> insert(T item, {String select = '*'}) => guard(() async {
-    final response = await client
-        .from(tableName)
-        .insert(toWriteMap(item))
-        .select(select)
-        .single();
-    return fromJoinedMap(response);
-  }, action: 'insert');
-
-  Future<void> update(T item) => updateWhere(
-    filters: primaryKeyFromItem(item),
-    values: _updatesWithoutPrimaryKey(item),
-  );
-
-  Future<void> updateWhere({
-    required Map<String, Object?> filters,
-    required Map<String, dynamic> values,
-  }) => guard(() async {
-    await applyFilters(
-      client.from(tableName).update(withoutJoinedFields(values)),
-      filters,
-    );
-  }, action: 'updateWhere($filters)');
 
   Future<void> upsert(T item, {String? onConflict}) => guard(() async {
     await client
         .from(tableName)
-        .upsert(
-          toWriteMap(item),
-          onConflict: onConflict ?? upsertConflictTarget,
-        );
+        .upsert(toMap(item), onConflict: onConflict ?? upsertConflictTarget);
   }, action: 'upsert(${primaryKeyFromItem(item)})');
 
   Future<void> upsertMany(List<T> items, {String? onConflict}) =>
@@ -335,14 +179,18 @@ abstract class SupabaseRemoteDB<T> {
         await client
             .from(tableName)
             .upsert(
-              items.map(toWriteMap).toList(),
+              items.map(toMap).toList(),
               onConflict: onConflict ?? upsertConflictTarget,
             );
       }, action: 'upsertMany(${items.length} items)');
 
-  Future<void> delete(T item) => deleteWhere(primaryKeyFromItem(item));
-
-  Future<void> deleteWhere(Map<String, Object?> filters) => guard(() async {
-    await applyFilters(client.from(tableName).delete(), filters);
-  }, action: 'deleteWhere($filters)');
+  Future<void> delete(Map<String, Object?> filters) => guard(() async {
+    dynamic query = client.from(tableName).delete();
+    for (final entry in filters.entries) {
+      query = entry.value == null
+          ? query.isFilter(entry.key, null)
+          : query.eq(entry.key, entry.value);
+    }
+    await query;
+  }, action: 'delete($filters)');
 }

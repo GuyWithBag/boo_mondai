@@ -1,14 +1,6 @@
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// PATH: lib/database/local/hive.local.db.dart
-// PURPOSE: Abstract Hive table repository — shared select, insert, upsert, delete, clear
-// PROVIDERS: none
-// HOOKS: none
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 import 'dart:convert';
-import 'dart:developer' as developer;
-import 'package:boo_mondai/lib.barrel.dart' show HiveException, SyncIndexEntry;
-import 'package:flutter/foundation.dart';
+import 'package:boo_mondai/lib.barrel.dart'
+    show HiveException, SyncIndexEntry, HiveLocalGuard;
 import 'package:hive_ce/hive.dart';
 
 typedef HivePrimaryKey = Map<String, Object?>;
@@ -26,6 +18,14 @@ abstract class HiveLocalDB<T> {
     return this;
   }
 
+  Future<U> guard<U>(Future<U> Function() fn, {required String action}) {
+    return HiveLocalGuard.guard(fn, action: action, boxName: boxName);
+  }
+
+  U guardSync<U>(U Function() fn, {required String action}) {
+    return HiveLocalGuard.guardSync(fn, action: action, boxName: boxName);
+  }
+
   /// Extracts the real primary key for [item].
   HivePrimaryKey primaryKeyFromItem(T item);
 
@@ -40,65 +40,6 @@ abstract class HiveLocalDB<T> {
     final orderedKeys = primaryKey.keys.toList()..sort();
     return jsonEncode({for (final key in orderedKeys) key: primaryKey[key]});
   }
-
-  // ── Error, Logging & Crashlytics Wrapper ───────────────────
-
-  /// Wraps async Hive calls to handle exceptions and log results locally.
-  Future<U> guard<U>(Future<U> Function() fn, {required String action}) async {
-    _debugLog('Starts: $action');
-    try {
-      final result = await fn();
-      _logResult(result, action);
-      return result;
-    } on HiveError catch (e) {
-      _debugLog('HiveError: ${e.message}', error: e);
-      throw HiveException(e.message, code: 'HIVE_ERROR', originalError: e);
-    } catch (e, stack) {
-      _debugLog('Unknown Exception: $e', error: e, stackTrace: stack);
-      rethrow;
-    }
-  }
-
-  /// Wraps synchronous Hive calls to handle exceptions and log results locally.
-  U guardSync<U>(U Function() fn, {required String action}) {
-    _debugLog('Starts: $action');
-    try {
-      final result = fn();
-      _logResult(result, action);
-      return result;
-    } on HiveError catch (e) {
-      _debugLog('HiveError: ${e.message}', error: e);
-      throw HiveException(e.message, code: 'HIVE_ERROR', originalError: e);
-    } catch (e, stack) {
-      _debugLog('Unknown Exception: $e', error: e, stackTrace: stack);
-      rethrow;
-    }
-  }
-
-  void _debugLog(String message, {Object? error, StackTrace? stackTrace}) {
-    if (!kDebugMode) return;
-    developer.log(
-      message,
-      name: 'HiveLocalDB[$boxName]',
-      error: error,
-      stackTrace: stackTrace,
-    );
-  }
-
-  void _logResult<U>(U result, String action) {
-    if (result == null) {
-      _debugLog('Result is NULL: $action');
-    } else if (result is List && result.isEmpty) {
-      _debugLog('Result is an EMPTY LIST: $action');
-    } else {
-      final countStr = result is List
-          ? ' (Returned ${result.length} items)'
-          : '';
-      _debugLog('Success: $action$countStr');
-    }
-  }
-
-  // ── CRUD ────────────────────────────────────────────────
 
   List<T> selectMany({
     bool Function(T item)? where,

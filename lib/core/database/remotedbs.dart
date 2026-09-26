@@ -8,9 +8,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         CommentsRemoteDB,
         CommentEditLogsRemoteDB,
         ReviewsRemoteDB,
+        ReviewLogsRemoteDB,
         ReviewEditLogsRemoteDB,
-        ReviewCommentsRemoteDB,
-        ReviewCommentEditLogsRemoteDB,
         UserSettingsRemoteDB,
         ReviewSessionsRemoteDB,
         DrillAnswersRemoteDB,
@@ -25,7 +24,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         DeckTagsRemoteDB,
         CardTemplateTagsRemoteDB,
         UserStudyCardTagsRemoteDB,
-        ReviewLogsRemoteDB,
         SurveysRemoteDB,
         SurveyPagesRemoteDB,
         SurveyBlocksRemoteDB,
@@ -33,28 +31,26 @@ import 'package:boo_mondai/lib.barrel.dart'
         SurveyAssignmentsRemoteDB,
         SurveyResponsesRemoteDB,
         VotesRemoteDB,
-        DeckFavoritesRemoteDB;
+        DeckFavoritesRemoteDB,
+        ContentsRemoteDB;
 
 class RemoteDB {
-  // ── Remote Data Sources ──────────────────────────
   static late final ProfilesRemoteDB profile;
   static late final DecksRemoteDB deck;
   static late final DeckListingsRemoteDB deckListing;
   static late final VotesRemoteDB deckVotes;
   static late final DeckFavoritesRemoteDB deckFavorites;
-  static late final CommentsRemoteDB deckComment;
-  static late final CommentEditLogsRemoteDB deckCommentEditLog;
+  static late final CommentsRemoteDB comments;
+  static late final CommentEditLogsRemoteDB commentEditLogs;
   static late final ReviewsRemoteDB deckVoteReview;
-  static late final ReviewEditLogsRemoteDB deckVoteReviewEditLog;
-  static late final ReviewCommentsRemoteDB deckVoteReviewComment;
-  static late final ReviewCommentEditLogsRemoteDB deckVoteReviewCommentEditLog;
+  static late final ReviewLogsRemoteDB deckVoteReviewEditLog;
+  static late final ReviewsRemoteDB reviews;
+  static late final ReviewEditLogsRemoteDB reviewEditLogs;
   static late final UserSettingsRemoteDB userSettings;
   static late final CardTemplatesRemoteDB card;
   static late final StudyCardsRemoteDB studyCard;
-  static late final DrillSessionsRemoteDB drill;
   static late final ReviewSessionsRemoteDB reviewSession;
-  static late final ReviewLogsRemoteDB reviewLog;
-  static late final DrillAnswersRemoteDB drillAnswer;
+  static late final ReviewLogsRemoteDB reviewLogs;
   static late final FsrsCardsRemoteDB fsrsSync;
   static late final LeaderboardEntriesRemoteDB leaderboard;
   static late final PublicBucketRemoteDB publicBucket;
@@ -71,6 +67,7 @@ class RemoteDB {
   static late final SurveyBlockOptionsRemoteDB surveyBlockOption;
   static late final SurveyAssignmentsRemoteDB surveyAssignment;
   static late final SurveyResponsesRemoteDB surveyResponse;
+  static late final ContentsRemoteDB contents;
 
   static Future<void> init() async {
     profile = ProfilesRemoteDB();
@@ -78,19 +75,18 @@ class RemoteDB {
     deckListing = DeckListingsRemoteDB();
     deckVotes = VotesRemoteDB();
     deckFavorites = DeckFavoritesRemoteDB();
-    deckComment = CommentsRemoteDB();
-    deckCommentEditLog = CommentEditLogsRemoteDB();
+    comments = CommentsRemoteDB();
+    contents = ContentsRemoteDB();
+    commentEditLogs = CommentEditLogsRemoteDB();
     deckVoteReview = ReviewsRemoteDB();
-    deckVoteReviewEditLog = ReviewEditLogsRemoteDB();
-    deckVoteReviewComment = ReviewCommentsRemoteDB();
-    deckVoteReviewCommentEditLog = ReviewCommentEditLogsRemoteDB();
+    deckVoteReviewEditLog = ReviewLogsRemoteDB();
+    reviews = ReviewsRemoteDB();
+    reviewEditLogs = ReviewEditLogsRemoteDB();
     userSettings = UserSettingsRemoteDB();
     card = CardTemplatesRemoteDB();
     studyCard = StudyCardsRemoteDB();
-    drill = DrillSessionsRemoteDB();
     reviewSession = ReviewSessionsRemoteDB();
-    reviewLog = ReviewLogsRemoteDB();
-    drillAnswer = DrillAnswersRemoteDB();
+    reviewLogs = ReviewLogsRemoteDB();
     fsrsSync = FsrsCardsRemoteDB();
     leaderboard = LeaderboardEntriesRemoteDB();
     publicBucket = PublicBucketRemoteDB();
