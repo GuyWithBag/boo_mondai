@@ -1,9 +1,3 @@
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// PATH: lib/main.dart
-// PURPOSE: Entry point — Hive init, Supabase init, provider registration, runApp
-// PROVIDERS: all
-// HOOKS: none
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 import 'dart:developer' as developer;
 import 'package:app_links/app_links.dart';
 import 'package:barrel_annotation/barrel_annotation.dart';
@@ -18,13 +12,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         AuthController,
         ChangeTrackerController,
         ChangeTrackerService,
-        ViewStudyDecksController,
         ViewDecksLocalController,
         ViewDeckListingsController,
-        ViewLeaderboardController,
         StreakController,
         MainController,
-        SettingsController,
+        SettingsStore,
         NotificationsController,
         SyncController,
         SyncDeckService,
@@ -63,10 +55,10 @@ Future<void> main() async {
   await LocalDB.init();
   Services.init();
   // ── Settings (must come before notifications) ───────
-  final settingsController = SettingsController();
-  await settingsController.init();
+  final settingsStore = SettingsStore.instance;
+  await settingsStore.init();
   // ── Notifications ────────────────────────────────────
-  final notificationsController = NotificationsController(settingsController);
+  final notificationsController = NotificationsController(settingsStore);
   await notificationsController.init();
   // ── Restore session ─────────────────────────────────
   final authController = AuthController();
@@ -92,7 +84,6 @@ Future<void> main() async {
     MultiProvider(
       providers: [
         Provider.value(value: authController),
-        ChangeNotifierProvider.value(value: settingsController),
         ChangeNotifierProvider.value(value: notificationsController),
         Provider.value(value: syncChangeTrackerController),
         Provider.value(value: syncController),
@@ -101,10 +92,7 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => StreakController()),
         ChangeNotifierProvider(create: (_) => MainController()),
       ],
-      child: BooMondaiApp(
-        authController: authController,
-        settingsController: settingsController,
-      ),
+      child: BooMondaiApp(authController: authController),
     ),
   );
 }

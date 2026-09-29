@@ -23,22 +23,18 @@ bool _scaleScreenUtilForSmallAndMediumWidth() {
 
 class BooMondaiApp extends HookWidget {
   final AuthController authController;
-  final SettingsController settingsController;
 
-  const BooMondaiApp({
-    super.key,
-    required this.authController,
-    required this.settingsController,
-  });
+  const BooMondaiApp({super.key, required this.authController});
 
   @override
   Widget build(BuildContext context) {
     final router = useMemoized(() => createRouter(authController), [
       authController,
     ]);
+    final settings = SettingsStore.instance;
     final controller = useMemoized(
-      () => UserSettingsThemeBridge.createController(settingsController),
-      [settingsController],
+      () => UserSettingsThemeBridge.createController(settings),
+      [settings],
     );
     final mediaPackController = useMemoized(createAppMediaPackController);
     useListenable(controller);
