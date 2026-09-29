@@ -3,9 +3,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         ListHelper,
         PathHelper,
         StringHelper,
-        SettingsController,
-        SettingTileEntry,
-        SettingsService,
+        SettingPath,
+        SettingsStore,
         SettingsTile,
         SettingsSection,
         ListingStatesWrapper,
@@ -15,6 +14,7 @@ import 'package:boo_mondai/lib.barrel.dart'
 import 'package:flutter/material.dart' hide Scaffold, AppBar;
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:signals/signals_flutter.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 class SettingsPage extends StatelessWidget {
@@ -25,43 +25,40 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pagePath = this.pagePath;
-    if (pagePath == null) {
-      return const _SettingsIndexPage();
-    }
-    final tokens = context.themeTokens<AppTokens>();
-    // Watch so the page rebuilds when any setting changes.
-    final controller = context.watch<SettingsController>();
-    final entries = SettingsService.uiForPage(pagePath);
-    final sections = ListHelper.groupBy<SettingTileEntry<dynamic>, String>(
-      entries,
-      (entry) => entry.path.section,
-    );
+    if (pagePath == null) return const _SettingsIndexPage();
 
-    return Scaffold(
-      appBar: AppBar(
-        title: StringHelper.toTitleCase(
-          PathHelper.getLastPathSegmentOrFallback(pagePath, 'settings'),
-        ),
-      ),
-      body: ListingStatesWrapper.list(
-        useParentScroll: true,
-        padding: EdgeInsets.zero,
-        separatorHeight: tokens.spaceLayoutGapSm,
-        items: sections.entries.toList(),
-        itemBuilder: (context, _, section) {
-          return SettingsSection(
-            title: StringHelper.toTitleCase(section.key),
-            children: [
-              for (final entry in section.value)
-                if (entry.visibleWhen?.call(controller) ?? true)
-                  SettingsTile(
-                    settingTileEntry: entry,
-                    settingsController: controller,
-                  ),
-            ],
-          );
-        },
-      ),
+    final tokens = context.themeTokens<AppTokens>();
+    final store = context.read<SettingsStore>();
+    return SignalBuilder(
+      builder: (context) {
+        final paths = store.pathsForPage(pagePath);
+        final sections = ListHelper.groupBy<SettingPath, String>(
+          paths,
+          (path) => path.section,
+        );
+
+        return Scaffold(
+          appBar: AppBar(
+            title: StringHelper.toTitleCase(
+              PathHelper.getLastPathSegmentOrFallback(pagePath, 'settings'),
+            ),
+          ),
+          body: ListingStatesWrapper.list(
+            useParentScroll: true,
+            padding: EdgeInsets.zero,
+            separatorHeight: tokens.spaceLayoutGapSm,
+            items: sections.entries.toList(),
+            itemBuilder: (context, _, section) => SettingsSection(
+              title: StringHelper.toTitleCase(section.key),
+              children: [
+                for (final path in section.value)
+                  if (store.isVisible(path) && store.hasAccess(path))
+                    SettingsTile(path: path, settingsStore: store),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -71,26 +68,20 @@ class _SettingsIndexPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pagePaths = SettingsService.pagePaths;
-
+    final pagePaths = context.read<SettingsStore>().pagePaths;
     return Scaffold(
       appBar: AppBar(title: 'Settings'),
       body: ListingStatesWrapper.list(
         useParentScroll: true,
         separatorHeight: 0,
         items: pagePaths,
-        itemBuilder: (context, _, pagePath) {
-          return ListTile(
-            title: Text(
-              StringHelper.toTitleCase(
-                PathHelper.getLastPathSegmentOrFallback(pagePath, pagePath),
-              ),
-            ),
-            subtitle: Text(pagePath),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => context.push(SettingsService.pageUrl(pagePath)),
-          );
-        },
+        itemBuilder: (context, _, pagePath) => ListTile(
+          title: Text(StringHelper.toTitleCase(pagePath)),
+          subtitle: Text(pagePath),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () =>
+              context.push('/settings/${Uri.encodeComponent(pagePath)}'),
+        ),
       ),
     );
   }

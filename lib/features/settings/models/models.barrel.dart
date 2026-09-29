@@ -4,4 +4,5 @@
 export 'setting.path.dart';
 export 'setting.tile_entry.dart';
 export 'setting.dart';
+export 'settings.registry.dart';
 export 'user_settings.dart';

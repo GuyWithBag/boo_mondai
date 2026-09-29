@@ -1,43 +1,31 @@
-/// Parsed representation of a setting key.
-///
-/// UI-visible setting keys follow:
-/// `<page-path>/<section>.<name>`
-///
-/// Example:
-/// `study_session/card_stage.use_card_as_container`
-class SettingPath {
-  const SettingPath({
-    required this.key,
-    required this.pagePath,
-    required this.section,
-    required this.name,
-  });
+/// Stable, serialisable identifiers for application settings.
+enum SettingPath {
+  reviewRemindersEnabled('notifications/review/reminders_enabled'),
+  reviewReminderHour('notifications/review/reminder_hour'),
+  reviewReminderMinute('notifications/review/reminder_minute'),
+  streakRemindersEnabled('notifications/streak/reminders_enabled'),
+  streakReminderHour('notifications/streak/reminder_hour'),
+  streakReminderMinute('notifications/streak/reminder_minute'),
+  themeMode('appearance/theme/mode'),
+  lightThemePresetId('appearance/theme/light_preset_id'),
+  darkThemePresetId('appearance/theme/dark_preset_id'),
+  themeOverride('appearance/theme/override'),
+  customThemePresets('appearance/theme/custom_presets'),
+  syncDeletionRetentionDays('sync/deletion/retention_days'),
+  syncActiveClientWindowDays('sync/deletion/active_client_window_days'),
+  studySessionCardStageUseCardAsContainer(
+    'study_session/card_stage/use_card_as_container',
+  ),
+  uiSoundsEnabled('media/ui_sounds/enabled'),
+  buttonDownSoundEnabled('media/ui_sounds/button_down_enabled'),
+  buttonUpSoundEnabled('media/ui_sounds/button_up_enabled'),
+  studySessionSoundsEnabled('media/study_session/sounds_enabled'),
+  disableOnlineFeatures('developer/disabled_online_features');
 
-  final String key;
-  final String pagePath;
-  final String section;
-  final String name;
+  const SettingPath(this.value);
 
-  static SettingPath parse(String key) {
-    final slashIndex = key.lastIndexOf('/');
-    final pagePath = slashIndex < 0 ? '' : key.substring(0, slashIndex);
-    final settingPath = slashIndex < 0 ? key : key.substring(slashIndex + 1);
-    final dotIndex = settingPath.indexOf('.');
-
-    if (dotIndex < 0) {
-      return SettingPath(
-        key: key,
-        pagePath: pagePath,
-        section: settingPath,
-        name: settingPath,
-      );
-    }
-
-    return SettingPath(
-      key: key,
-      pagePath: pagePath,
-      section: settingPath.substring(0, dotIndex),
-      name: settingPath.substring(dotIndex + 1),
-    );
-  }
+  final String value;
+  String get pagePath => value.split('/').first;
+  String get section => value.split('/')[1];
+  String get name => value.split('/').last;
 }

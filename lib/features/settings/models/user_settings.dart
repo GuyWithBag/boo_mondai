@@ -1,11 +1,9 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show IdentifiableEntity, TimestampedEntity, UserOwnedEntity, Setting, uuid;
+    show IdentifiableEntity, TimestampedEntity, UserOwnedEntity, uuid;
 import 'package:dart_mappable/dart_mappable.dart';
+
 part 'user_settings.mapper.dart';
 
-/// Single settings row per profile, stored as a typed key-value map.
-///
-/// Add new settings via [Setting] constants — no model changes required.
 @MappableClass()
 class UserSettings
     with
@@ -30,27 +28,9 @@ class UserSettings
   @override
   final DateTime updatedAt;
 
-  /// All user preferences as a flat key-value map.
-  /// Keys follow the `namespace/key` convention defined on [Setting].
+  /// Complete persisted setting values, keyed by [SettingPath.value].
   final Map<String, dynamic> preferences;
 
-  // ---------------------------------------------------------------------------
-  // Typed accessors
-  // ---------------------------------------------------------------------------
-
-  /// Returns the current value for [setting], or its default if absent.
-  T get<T>(Setting<T> setting) =>
-      preferences[setting.key] as T? ?? setting.defaultValue;
-
-  /// Returns a new [UserSettings] with [value] written for [setting].
-  UserSettings set<T>(Setting<T> setting, T value) =>
-      copyWith(preferences: {...preferences, setting.key: value});
-
-  // ---------------------------------------------------------------------------
-  // Factory
-  // ---------------------------------------------------------------------------
-
-  /// Creates a defaults row for [profileId] with an empty preferences map.
   factory UserSettings.defaults({required String profileId}) {
     final now = DateTime.now();
     return UserSettings(

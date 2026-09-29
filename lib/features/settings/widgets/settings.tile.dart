@@ -1,69 +1,45 @@
-import 'package:boo_mondai/lib.barrel.dart' show PathHelper, StringHelper;
+import 'package:boo_mondai/lib.barrel.dart'
+    show PathHelper, StringHelper, SettingPath, SettingsStore;
 import 'package:flutter/material.dart';
 
-import '../settings.barrel.dart'
-    show Setting, SettingTileEntry, SettingsController;
-
-class SettingsTile<T> extends StatelessWidget {
+class SettingsTile extends StatelessWidget {
   const SettingsTile({
     super.key,
-    required this.settingTileEntry,
-    required this.settingsController,
+    required this.path,
+    required this.settingsStore,
   });
 
-  final SettingTileEntry<T> settingTileEntry;
-  final SettingsController settingsController;
+  final SettingPath path;
+  final SettingsStore settingsStore;
 
   @override
   Widget build(BuildContext context) {
-    final builder = settingTileEntry.builder;
-    if (builder != null) {
-      return builder(context, settingsController, settingTileEntry.setting);
-    }
-
-    final value = settingsController.get(settingTileEntry.setting);
+    final setting = settingsStore.registry.get<dynamic>(path);
+    final value = settingsStore.get<dynamic>(path);
     final label = StringHelper.toTitleCase(
       PathHelper.getLastPathSegmentOrFallback(
-        settingTileEntry.setting.key,
-        settingTileEntry.setting.key,
-        separator: '.',
+        setting.tileEntry?.label ?? path.name,
+        path.name,
       ),
     );
 
     if (value is bool) {
       return SwitchListTile(
         title: Text(label),
-        subtitle: Text(settingTileEntry.description),
+        subtitle: Text(setting.description),
         value: value,
         contentPadding: EdgeInsets.zero,
-        onChanged: (next) => settingsController.set(
-          settingTileEntry.setting as Setting<bool>,
-          next,
-        ),
-      );
-    }
-
-    if (value is int) {
-      return ListTile(
-        title: Text(label),
-        subtitle: Text(settingTileEntry.description),
-        contentPadding: EdgeInsets.zero,
-        trailing: Text(value.toString()),
-      );
-    }
-
-    if (value is String) {
-      return ListTile(
-        title: Text(label),
-        subtitle: Text(settingTileEntry.description),
-        contentPadding: EdgeInsets.zero,
-        trailing: Text(value),
+        onChanged: setting.disabled
+            ? null
+            : (next) => settingsStore.set<bool>(path, next),
       );
     }
 
     return ListTile(
       title: Text(label),
-      subtitle: Text(settingTileEntry.description),
+      subtitle: Text(setting.description),
+      contentPadding: EdgeInsets.zero,
+      trailing: value == null ? null : Text(value.toString()),
     );
   }
 }
