@@ -8,10 +8,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         usePhysicalCardController;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart'
     show ThemeVariantsContext, Surface;
 
-class PhysicalCard extends HookWidget {
+class PhysicalCard extends SignalHookWidget {
   const PhysicalCard({
     super.key,
     this.controller,

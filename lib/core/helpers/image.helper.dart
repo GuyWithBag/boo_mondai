@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io' show File;
 
 import 'package:boo_mondai/features/features.barrel.dart';
 import 'package:file_picker/file_picker.dart' show PlatformFile;
@@ -12,14 +13,24 @@ abstract final class ImageHelper {
     final value = source?.trim();
     if (value == null) return null;
 
+    if (value.startsWith('data:image/')) {
+      final commaIndex = value.indexOf(',');
+      if (commaIndex < 0) return null;
+
+      return MemoryImage(base64Decode(value.substring(commaIndex + 1)));
+    }
+
     if (MediaHelper.isRemoteUrl(value)) {
       return NetworkImage(value);
     }
 
-    if (!await FileSystemHandler.doesFileExistsByRelativePath(value)) {
+    final file = value.startsWith('/')
+        ? File(value)
+        : await FileSystemHandler.getFileByRelativePath(value);
+    if (file == null || !await file.exists()) {
       return null;
     }
-    return AssetImage(value);
+    return FileImage(file);
   }
 
   static String? getImageSourceFromPickedFile(PlatformFile file) {

@@ -1,6 +1,6 @@
 import 'package:dart_mappable/dart_mappable.dart';
 
-part 'casing_type.mapper.dart';
+part 'casing.type.mapper.dart';
 
 @MappableEnum(caseStyle: CaseStyle.snakeCase)
 enum CasingType {

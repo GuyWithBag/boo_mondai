@@ -1,4 +1,4 @@
-import 'package:boo_mondai/core/helpers/casing_type.dart';
+import 'package:boo_mondai/core/helpers/casing.type.dart';
 
 abstract final class CasingHelper {
   static bool matches(String input, String expected, CasingType casingType) {

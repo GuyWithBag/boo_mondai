@@ -1,12 +1,11 @@
 import 'dart:async' show Timer;
 
-import 'package:boo_mondai/lib.barrel.dart' show ImageHelper;
 import 'package:flutter/material.dart' show CarouselController, ImageProvider;
 import 'package:signals_hooks/signals_hooks.dart';
 
 class EditableCarouselController {
   EditableCarouselController({
-    required List<String> imageSources,
+    required this.imageSources,
     required bool isEditable,
     required int? maxImageCount,
     required Duration? autoScrollInterval,
@@ -16,20 +15,19 @@ class EditableCarouselController {
          autoScrollInterval == null || autoScrollInterval > Duration.zero,
          'autoScrollInterval must be greater than zero.',
        ),
-       imageSources = signal(imageSources),
        isEditable = signal(isEditable),
        maxImageCount = signal(maxImageCount),
        autoScrollInterval = signal(autoScrollInterval),
        shouldLoop = signal(shouldLoop);
 
   final carouselController = CarouselController();
-  final Signal<List<String>> imageSources;
+  final Signal<List<ImageProvider>> imageSources;
   final Signal<bool> isEditable;
   final Signal<int?> maxImageCount;
   final Signal<Duration?> autoScrollInterval;
   final Signal<bool> shouldLoop;
   final autoScrollIndex = signal(0);
-  final images = signal(<ImageProvider?>[]);
+  bool _isDisposed = false;
 
   late final canAddImage = computed(
     () =>
@@ -59,23 +57,6 @@ class EditableCarouselController {
         visibleItemCount.value > 1,
   );
 
-  late final FutureSignal<List<ImageProvider?>> imagesFuture = futureSignal(
-    () async {
-      final sources = imageSources.value;
-      return Future.wait(sources.map(ImageHelper.getImageProviderFromSource));
-    },
-  );
-
-  late final imagesEffect = effect(() {
-    imagesFuture.value.map(
-      error: () {},
-      loading: () {},
-      data: (value) {
-        images.value = value;
-      },
-    );
-  });
-
   late final autoScrollEffect = effect(() {
     final interval = autoScrollInterval.value;
     final count = visibleItemCount.value;
@@ -85,6 +66,8 @@ class EditableCarouselController {
 
     Timer? timer;
     timer = Timer.periodic(interval, (_) {
+      if (_isDisposed || !carouselController.hasClients) return;
+
       final nextIndex = autoScrollIndex.value + 1;
       if (nextIndex >= count) {
         if (!loop) {
@@ -105,21 +88,20 @@ class EditableCarouselController {
   });
 
   void dispose() {
+    if (_isDisposed) return;
+    _isDisposed = true;
+
     autoScrollEffect();
-    imagesEffect();
     isInfinite.dispose();
     flexWeights.dispose();
     visibleItemCount.dispose();
     itemCount.dispose();
     canAddImage.dispose();
-    imagesFuture.dispose();
-    images.dispose();
     autoScrollIndex.dispose();
     shouldLoop.dispose();
     autoScrollInterval.dispose();
     maxImageCount.dispose();
     isEditable.dispose();
-    imageSources.dispose();
     carouselController.dispose();
   }
 }

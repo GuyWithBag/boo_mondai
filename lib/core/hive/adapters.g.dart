@@ -8,7 +8,7 @@ part of 'adapters.dart';
 
 class ProfileAdapter extends TypeAdapter<Profile> {
   @override
-  final typeId = 57;
+  final typeId = 0;
 
   @override
   Profile read(BinaryReader reader) {
@@ -72,7 +72,7 @@ class ProfileAdapter extends TypeAdapter<Profile> {
 
 class DeckAdapter extends TypeAdapter<Deck> {
   @override
-  final typeId = 58;
+  final typeId = 1;
 
   @override
   Deck read(BinaryReader reader) {
@@ -162,7 +162,7 @@ class DeckAdapter extends TypeAdapter<Deck> {
 
 class MultipleChoiceOptionAdapter extends TypeAdapter<MultipleChoiceOption> {
   @override
-  final typeId = 59;
+  final typeId = 2;
 
   @override
   MultipleChoiceOption read(BinaryReader reader) {
@@ -209,7 +209,7 @@ class MultipleChoiceOptionAdapter extends TypeAdapter<MultipleChoiceOption> {
 class FillInTheBlanksTemplateAdapter
     extends TypeAdapter<FillInTheBlanksTemplate> {
   @override
-  final typeId = 60;
+  final typeId = 3;
 
   @override
   FillInTheBlanksTemplate read(BinaryReader reader) {
@@ -218,45 +218,48 @@ class FillInTheBlanksTemplateAdapter
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return FillInTheBlanksTemplate(
-      id: fields[1] as String,
-      deckId: fields[6] as String,
-      sortOrder: (fields[7] as num).toInt(),
-      createdAt: fields[2] as DateTime,
-      updatedAt: fields[3] as DateTime,
-      deletedAt: fields[4] as DateTime?,
-      purgeAfter: fields[5] as DateTime?,
-      sourceTemplateId: fields[8] as String?,
-      tags: fields[9] == null ? const [] : (fields[9] as List).cast<Tag>(),
-      verticallyCentered: fields[10] == null ? true : fields[10] as bool,
-      segments: (fields[0] as List).cast<FillInTheBlankSegment>(),
+      id: fields[2] as String,
+      deckId: fields[7] as String,
+      sortOrder: (fields[8] as num).toInt(),
+      createdAt: fields[3] as DateTime,
+      updatedAt: fields[4] as DateTime,
+      deletedAt: fields[5] as DateTime?,
+      purgeAfter: fields[6] as DateTime?,
+      sourceTemplateId: fields[9] as String?,
+      tags: fields[10] == null ? const [] : (fields[10] as List).cast<Tag>(),
+      verticallyCentered: fields[11] == null ? true : fields[11] as bool,
+      promptText: fields[0] as String,
+      answerKeys: (fields[1] as List).cast<FillInTheBlankAnswerKey>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, FillInTheBlanksTemplate obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(12)
       ..writeByte(0)
-      ..write(obj.segments)
+      ..write(obj.promptText)
       ..writeByte(1)
-      ..write(obj.id)
+      ..write(obj.answerKeys)
       ..writeByte(2)
-      ..write(obj.createdAt)
+      ..write(obj.id)
       ..writeByte(3)
-      ..write(obj.updatedAt)
+      ..write(obj.createdAt)
       ..writeByte(4)
-      ..write(obj.deletedAt)
+      ..write(obj.updatedAt)
       ..writeByte(5)
-      ..write(obj.purgeAfter)
+      ..write(obj.deletedAt)
       ..writeByte(6)
-      ..write(obj.deckId)
+      ..write(obj.purgeAfter)
       ..writeByte(7)
-      ..write(obj.sortOrder)
+      ..write(obj.deckId)
       ..writeByte(8)
-      ..write(obj.sourceTemplateId)
+      ..write(obj.sortOrder)
       ..writeByte(9)
-      ..write(obj.tags)
+      ..write(obj.sourceTemplateId)
       ..writeByte(10)
+      ..write(obj.tags)
+      ..writeByte(11)
       ..write(obj.verticallyCentered);
   }
 
@@ -274,7 +277,7 @@ class FillInTheBlanksTemplateAdapter
 class MultipleChoiceTemplateAdapter
     extends TypeAdapter<MultipleChoiceTemplate> {
   @override
-  final typeId = 61;
+  final typeId = 4;
 
   @override
   MultipleChoiceTemplate read(BinaryReader reader) {
@@ -283,20 +286,20 @@ class MultipleChoiceTemplateAdapter
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return MultipleChoiceTemplate(
-      id: fields[2] as String,
-      deckId: fields[7] as String,
-      sortOrder: (fields[8] as num).toInt(),
-      createdAt: fields[3] as DateTime,
-      updatedAt: fields[4] as DateTime,
-      deletedAt: fields[5] as DateTime?,
-      purgeAfter: fields[6] as DateTime?,
-      sourceTemplateId: fields[9] as String?,
-      tags: fields[10] == null ? const [] : (fields[10] as List).cast<Tag>(),
-      verticallyCentered: fields[11] == null ? true : fields[11] as bool,
+      id: fields[4] as String,
+      deckId: fields[9] as String,
+      sortOrder: (fields[10] as num).toInt(),
+      createdAt: fields[5] as DateTime,
+      updatedAt: fields[6] as DateTime,
+      deletedAt: fields[7] as DateTime?,
+      purgeAfter: fields[8] as DateTime?,
+      sourceTemplateId: fields[11] as String?,
+      tags: fields[12] == null ? const [] : (fields[12] as List).cast<Tag>(),
+      verticallyCentered: fields[13] == null ? true : fields[13] as bool,
       questionPrompt: fields[0] as String,
       options: (fields[1] as List).cast<MultipleChoiceOption>(),
-      multipleAnswers: fields[12] == null ? false : fields[12] as bool,
-      randomizeOptionsOrdering: fields[13] == null ? false : fields[13] as bool,
+      multipleAnswers: fields[2] == null ? false : fields[2] as bool,
+      randomizedOptionsOrdering: fields[3] == null ? false : fields[3] as bool,
     );
   }
 
@@ -309,29 +312,29 @@ class MultipleChoiceTemplateAdapter
       ..writeByte(1)
       ..write(obj.options)
       ..writeByte(2)
-      ..write(obj.id)
-      ..writeByte(3)
-      ..write(obj.createdAt)
-      ..writeByte(4)
-      ..write(obj.updatedAt)
-      ..writeByte(5)
-      ..write(obj.deletedAt)
-      ..writeByte(6)
-      ..write(obj.purgeAfter)
-      ..writeByte(7)
-      ..write(obj.deckId)
-      ..writeByte(8)
-      ..write(obj.sortOrder)
-      ..writeByte(9)
-      ..write(obj.sourceTemplateId)
-      ..writeByte(10)
-      ..write(obj.tags)
-      ..writeByte(11)
-      ..write(obj.verticallyCentered)
-      ..writeByte(12)
       ..write(obj.multipleAnswers)
+      ..writeByte(3)
+      ..write(obj.randomizedOptionsOrdering)
+      ..writeByte(4)
+      ..write(obj.id)
+      ..writeByte(5)
+      ..write(obj.createdAt)
+      ..writeByte(6)
+      ..write(obj.updatedAt)
+      ..writeByte(7)
+      ..write(obj.deletedAt)
+      ..writeByte(8)
+      ..write(obj.purgeAfter)
+      ..writeByte(9)
+      ..write(obj.deckId)
+      ..writeByte(10)
+      ..write(obj.sortOrder)
+      ..writeByte(11)
+      ..write(obj.sourceTemplateId)
+      ..writeByte(12)
+      ..write(obj.tags)
       ..writeByte(13)
-      ..write(obj.randomizeOptionsOrdering);
+      ..write(obj.verticallyCentered);
   }
 
   @override
@@ -347,7 +350,7 @@ class MultipleChoiceTemplateAdapter
 
 class FlashcardTemplateAdapter extends TypeAdapter<FlashcardTemplate> {
   @override
-  final typeId = 62;
+  final typeId = 5;
 
   @override
   FlashcardTemplate read(BinaryReader reader) {
@@ -417,57 +420,62 @@ class FlashcardTemplateAdapter extends TypeAdapter<FlashcardTemplate> {
           typeId == other.typeId;
 }
 
-class MatchMadnessTemplateAdapter extends TypeAdapter<MatchMadnessTemplate> {
+class MatchingTypeTemplateAdapter extends TypeAdapter<MatchingTypeTemplate> {
   @override
-  final typeId = 63;
+  final typeId = 6;
 
   @override
-  MatchMadnessTemplate read(BinaryReader reader) {
+  MatchingTypeTemplate read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return MatchMadnessTemplate(
-      id: fields[1] as String,
-      deckId: fields[6] as String,
-      sortOrder: (fields[7] as num).toInt(),
-      createdAt: fields[2] as DateTime,
-      updatedAt: fields[3] as DateTime,
-      deletedAt: fields[4] as DateTime?,
-      purgeAfter: fields[5] as DateTime?,
-      sourceTemplateId: fields[8] as String?,
-      tags: fields[9] == null ? const [] : (fields[9] as List).cast<Tag>(),
-      verticallyCentered: fields[10] == null ? true : fields[10] as bool,
-      pairs: (fields[0] as List).cast<MatchMadnessPair>(),
+    return MatchingTypeTemplate(
+      id: fields[2] as String,
+      deckId: fields[7] as String,
+      sortOrder: (fields[8] as num).toInt(),
+      createdAt: fields[3] as DateTime,
+      updatedAt: fields[4] as DateTime,
+      deletedAt: fields[5] as DateTime?,
+      purgeAfter: fields[6] as DateTime?,
+      sourceTemplateId: fields[9] as String?,
+      tags: fields[10] == null ? const [] : (fields[10] as List).cast<Tag>(),
+      verticallyCentered: fields[11] == null ? true : fields[11] as bool,
+      values: (fields[0] as List).cast<MatchingTypeValue>(),
+      maxIncorrectAnswers: fields[12] == null
+          ? -1
+          : (fields[12] as num).toInt(),
     );
   }
 
   @override
-  void write(BinaryWriter writer, MatchMadnessTemplate obj) {
+  void write(BinaryWriter writer, MatchingTypeTemplate obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(12)
       ..writeByte(0)
-      ..write(obj.pairs)
-      ..writeByte(1)
-      ..write(obj.id)
+      ..write(obj.values)
       ..writeByte(2)
-      ..write(obj.createdAt)
+      ..write(obj.id)
       ..writeByte(3)
-      ..write(obj.updatedAt)
+      ..write(obj.createdAt)
       ..writeByte(4)
-      ..write(obj.deletedAt)
+      ..write(obj.updatedAt)
       ..writeByte(5)
-      ..write(obj.purgeAfter)
+      ..write(obj.deletedAt)
       ..writeByte(6)
-      ..write(obj.deckId)
+      ..write(obj.purgeAfter)
       ..writeByte(7)
-      ..write(obj.sortOrder)
+      ..write(obj.deckId)
       ..writeByte(8)
-      ..write(obj.sourceTemplateId)
+      ..write(obj.sortOrder)
       ..writeByte(9)
-      ..write(obj.tags)
+      ..write(obj.sourceTemplateId)
       ..writeByte(10)
-      ..write(obj.verticallyCentered);
+      ..write(obj.tags)
+      ..writeByte(11)
+      ..write(obj.verticallyCentered)
+      ..writeByte(12)
+      ..write(obj.maxIncorrectAnswers);
   }
 
   @override
@@ -476,32 +484,33 @@ class MatchMadnessTemplateAdapter extends TypeAdapter<MatchMadnessTemplate> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is MatchMadnessTemplateAdapter &&
+      other is MatchingTypeTemplateAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
 
-class IdentificationAnswerAdapter extends TypeAdapter<IdentificationAnswer> {
+class IdentificationAnswerKeyAdapter
+    extends TypeAdapter<IdentificationAnswerKey> {
   @override
-  final typeId = 64;
+  final typeId = 7;
 
   @override
-  IdentificationAnswer read(BinaryReader reader) {
+  IdentificationAnswerKey read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return IdentificationAnswer(
+    return IdentificationAnswerKey(
       id: fields[0] as String,
       templateId: fields[1] as String,
       displayOrder: (fields[2] as num).toInt(),
-      answer: fields[3] as String,
+      value: fields[3] as String,
       casingType: fields[4] == null ? CasingType.any : fields[4] as CasingType,
     );
   }
 
   @override
-  void write(BinaryWriter writer, IdentificationAnswer obj) {
+  void write(BinaryWriter writer, IdentificationAnswerKey obj) {
     writer
       ..writeByte(5)
       ..writeByte(0)
@@ -511,7 +520,7 @@ class IdentificationAnswerAdapter extends TypeAdapter<IdentificationAnswer> {
       ..writeByte(2)
       ..write(obj.displayOrder)
       ..writeByte(3)
-      ..write(obj.answer)
+      ..write(obj.value)
       ..writeByte(4)
       ..write(obj.casingType);
   }
@@ -522,7 +531,7 @@ class IdentificationAnswerAdapter extends TypeAdapter<IdentificationAnswer> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is IdentificationAnswerAdapter &&
+      other is IdentificationAnswerKeyAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
@@ -530,7 +539,7 @@ class IdentificationAnswerAdapter extends TypeAdapter<IdentificationAnswer> {
 class IdentificationTemplateAdapter
     extends TypeAdapter<IdentificationTemplate> {
   @override
-  final typeId = 65;
+  final typeId = 8;
 
   @override
   IdentificationTemplate read(BinaryReader reader) {
@@ -550,7 +559,7 @@ class IdentificationTemplateAdapter
       tags: fields[10] == null ? const [] : (fields[10] as List).cast<Tag>(),
       verticallyCentered: fields[11] == null ? true : fields[11] as bool,
       promptText: fields[0] as String,
-      acceptedAnswers: (fields[1] as List).cast<IdentificationAnswer>(),
+      answers: (fields[1] as List).cast<IdentificationAnswerKey>(),
     );
   }
 
@@ -561,7 +570,7 @@ class IdentificationTemplateAdapter
       ..writeByte(0)
       ..write(obj.promptText)
       ..writeByte(1)
-      ..write(obj.acceptedAnswers)
+      ..write(obj.answers)
       ..writeByte(2)
       ..write(obj.id)
       ..writeByte(3)
@@ -597,7 +606,7 @@ class IdentificationTemplateAdapter
 
 class StudyCardAdapter extends TypeAdapter<StudyCard> {
   @override
-  final typeId = 66;
+  final typeId = 9;
 
   @override
   StudyCard read(BinaryReader reader) {
@@ -650,42 +659,34 @@ class StudyCardAdapter extends TypeAdapter<StudyCard> {
           typeId == other.typeId;
 }
 
-class FillInTheBlankSegmentAdapter extends TypeAdapter<FillInTheBlankSegment> {
+class FillInTheBlankAnswerKeyAdapter
+    extends TypeAdapter<FillInTheBlankAnswerKey> {
   @override
-  final typeId = 67;
+  final typeId = 10;
 
   @override
-  FillInTheBlankSegment read(BinaryReader reader) {
+  FillInTheBlankAnswerKey read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return FillInTheBlankSegment(
-      id: fields[0] as String,
-      cardId: fields[1] as String,
-      fullText: fields[2] as String,
-      blankStart: (fields[3] as num).toInt(),
-      blankEnd: (fields[4] as num).toInt(),
-      correctAnswer: fields[5] as String,
+    return FillInTheBlankAnswerKey(
+      casingType: fields[0] as CasingType,
+      value: fields[1] as String,
+      order: (fields[2] as num).toInt(),
     );
   }
 
   @override
-  void write(BinaryWriter writer, FillInTheBlankSegment obj) {
+  void write(BinaryWriter writer, FillInTheBlankAnswerKey obj) {
     writer
-      ..writeByte(6)
-      ..writeByte(0)
-      ..write(obj.id)
-      ..writeByte(1)
-      ..write(obj.cardId)
-      ..writeByte(2)
-      ..write(obj.fullText)
       ..writeByte(3)
-      ..write(obj.blankStart)
-      ..writeByte(4)
-      ..write(obj.blankEnd)
-      ..writeByte(5)
-      ..write(obj.correctAnswer);
+      ..writeByte(0)
+      ..write(obj.casingType)
+      ..writeByte(1)
+      ..write(obj.value)
+      ..writeByte(2)
+      ..write(obj.order);
   }
 
   @override
@@ -694,14 +695,14 @@ class FillInTheBlankSegmentAdapter extends TypeAdapter<FillInTheBlankSegment> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is FillInTheBlankSegmentAdapter &&
+      other is FillInTheBlankAnswerKeyAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
 
 class WordScrambleTemplateAdapter extends TypeAdapter<WordScrambleTemplate> {
   @override
-  final typeId = 68;
+  final typeId = 11;
 
   @override
   WordScrambleTemplate read(BinaryReader reader) {
@@ -763,45 +764,33 @@ class WordScrambleTemplateAdapter extends TypeAdapter<WordScrambleTemplate> {
           typeId == other.typeId;
 }
 
-class MatchMadnessPairAdapter extends TypeAdapter<MatchMadnessPair> {
+class MatchingTypeValueAdapter extends TypeAdapter<MatchingTypeValue> {
   @override
-  final typeId = 69;
+  final typeId = 12;
 
   @override
-  MatchMadnessPair read(BinaryReader reader) {
+  MatchingTypeValue read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return MatchMadnessPair(
-      id: fields[0] as String,
-      templateId: fields[1] as String,
-      sourceTemplateId: fields[2] as String?,
-      term: fields[3] as String,
-      match: fields[4] as String,
-      isAutoPicked: fields[5] == null ? false : fields[5] as bool,
-      displayOrder: fields[6] == null ? 0 : (fields[6] as num).toInt(),
+    return MatchingTypeValue(
+      text: fields[0] as String,
+      matchPosition: fields[1] as Vector2Hive,
+      position: fields[2] as Vector2Hive,
     );
   }
 
   @override
-  void write(BinaryWriter writer, MatchMadnessPair obj) {
+  void write(BinaryWriter writer, MatchingTypeValue obj) {
     writer
-      ..writeByte(7)
-      ..writeByte(0)
-      ..write(obj.id)
-      ..writeByte(1)
-      ..write(obj.templateId)
-      ..writeByte(2)
-      ..write(obj.sourceTemplateId)
       ..writeByte(3)
-      ..write(obj.term)
-      ..writeByte(4)
-      ..write(obj.match)
-      ..writeByte(5)
-      ..write(obj.isAutoPicked)
-      ..writeByte(6)
-      ..write(obj.displayOrder);
+      ..writeByte(0)
+      ..write(obj.text)
+      ..writeByte(1)
+      ..write(obj.matchPosition)
+      ..writeByte(2)
+      ..write(obj.position);
   }
 
   @override
@@ -810,14 +799,63 @@ class MatchMadnessPairAdapter extends TypeAdapter<MatchMadnessPair> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is MatchMadnessPairAdapter &&
+      other is MatchingTypeValueAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class StudyRatingAdapter extends TypeAdapter<StudyRating> {
+  @override
+  final typeId = 13;
+
+  @override
+  StudyRating read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return StudyRating.incorrect;
+      case 1:
+        return StudyRating.again;
+      case 2:
+        return StudyRating.easy;
+      case 3:
+        return StudyRating.good;
+      case 4:
+        return StudyRating.hard;
+      default:
+        return StudyRating.incorrect;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, StudyRating obj) {
+    switch (obj) {
+      case StudyRating.incorrect:
+        writer.writeByte(0);
+      case StudyRating.again:
+        writer.writeByte(1);
+      case StudyRating.easy:
+        writer.writeByte(2);
+      case StudyRating.good:
+        writer.writeByte(3);
+      case StudyRating.hard:
+        writer.writeByte(4);
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is StudyRatingAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
 
 class CardAdapter extends TypeAdapter<Card> {
   @override
-  final typeId = 71;
+  final typeId = 14;
 
   @override
   Card read(BinaryReader reader) {
@@ -869,7 +907,7 @@ class CardAdapter extends TypeAdapter<Card> {
 
 class FsrsCardAdapter extends TypeAdapter<FsrsCard> {
   @override
-  final typeId = 72;
+  final typeId = 15;
 
   @override
   FsrsCard read(BinaryReader reader) {
@@ -924,7 +962,7 @@ class FsrsCardAdapter extends TypeAdapter<FsrsCard> {
 
 class ReviewLogAdapter extends TypeAdapter<ReviewLog> {
   @override
-  final typeId = 73;
+  final typeId = 16;
 
   @override
   ReviewLog read(BinaryReader reader) {
@@ -967,7 +1005,7 @@ class ReviewLogAdapter extends TypeAdapter<ReviewLog> {
 
 class ReviewSessionAdapter extends TypeAdapter<ReviewSession> {
   @override
-  final typeId = 74;
+  final typeId = 17;
 
   @override
   ReviewSession read(BinaryReader reader) {
@@ -1022,7 +1060,7 @@ class ReviewSessionAdapter extends TypeAdapter<ReviewSession> {
 
 class StudySessionCardStepAdapter extends TypeAdapter<StudySessionCardStep> {
   @override
-  final typeId = 75;
+  final typeId = 18;
 
   @override
   StudySessionCardStep read(BinaryReader reader) {
@@ -1069,7 +1107,7 @@ class StudySessionCardStepAdapter extends TypeAdapter<StudySessionCardStep> {
 class StudySessionMessageStepAdapter
     extends TypeAdapter<StudySessionMessageStep> {
   @override
-  final typeId = 76;
+  final typeId = 19;
 
   @override
   StudySessionMessageStep read(BinaryReader reader) {
@@ -1116,9 +1154,46 @@ class StudySessionMessageStepAdapter
           typeId == other.typeId;
 }
 
+class StudySessionAnswerAdapter extends TypeAdapter<StudySessionAnswer> {
+  @override
+  final typeId = 20;
+
+  @override
+  StudySessionAnswer read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return StudySessionAnswer(
+      value: fields[0] as String,
+      id: fields[1] as String?,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, StudySessionAnswer obj) {
+    writer
+      ..writeByte(2)
+      ..writeByte(0)
+      ..write(obj.value)
+      ..writeByte(1)
+      ..write(obj.id);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is StudySessionAnswerAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
 class StudySessionSnapshotAdapter extends TypeAdapter<StudySessionSnapshot> {
   @override
-  final typeId = 77;
+  final typeId = 21;
 
   @override
   StudySessionSnapshot read(BinaryReader reader) {
@@ -1182,7 +1257,7 @@ class StudySessionSnapshotAdapter extends TypeAdapter<StudySessionSnapshot> {
 
 class FsrsReviewLogAdapter extends TypeAdapter<FsrsReviewLog> {
   @override
-  final typeId = 78;
+  final typeId = 22;
 
   @override
   FsrsReviewLog read(BinaryReader reader) {
@@ -1225,7 +1300,7 @@ class FsrsReviewLogAdapter extends TypeAdapter<FsrsReviewLog> {
 
 class StateAdapter extends TypeAdapter<State> {
   @override
-  final typeId = 79;
+  final typeId = 23;
 
   @override
   State read(BinaryReader reader) {
@@ -1266,7 +1341,7 @@ class StateAdapter extends TypeAdapter<State> {
 
 class StreakAdapter extends TypeAdapter<Streak> {
   @override
-  final typeId = 80;
+  final typeId = 24;
 
   @override
   Streak read(BinaryReader reader) {
@@ -1324,7 +1399,7 @@ class StreakAdapter extends TypeAdapter<Streak> {
 
 class RatingAdapter extends TypeAdapter<Rating> {
   @override
-  final typeId = 81;
+  final typeId = 25;
 
   @override
   Rating read(BinaryReader reader) {
@@ -1369,7 +1444,7 @@ class RatingAdapter extends TypeAdapter<Rating> {
 
 class CardTemplateDirectionAdapter extends TypeAdapter<CardTemplateDirection> {
   @override
-  final typeId = 82;
+  final typeId = 26;
 
   @override
   CardTemplateDirection read(BinaryReader reader) {
@@ -1410,7 +1485,7 @@ class CardTemplateDirectionAdapter extends TypeAdapter<CardTemplateDirection> {
 
 class CasingTypeAdapter extends TypeAdapter<CasingType> {
   @override
-  final typeId = 83;
+  final typeId = 27;
 
   @override
   CasingType read(BinaryReader reader) {
@@ -1467,7 +1542,7 @@ class CasingTypeAdapter extends TypeAdapter<CasingType> {
 
 class CardTemplateTypeAdapter extends TypeAdapter<CardTemplateType> {
   @override
-  final typeId = 84;
+  final typeId = 28;
 
   @override
   CardTemplateType read(BinaryReader reader) {
@@ -1520,7 +1595,7 @@ class CardTemplateTypeAdapter extends TypeAdapter<CardTemplateType> {
 
 class UserAdapter extends TypeAdapter<User> {
   @override
-  final typeId = 85;
+  final typeId = 29;
 
   @override
   User read(BinaryReader reader) {
@@ -1617,7 +1692,7 @@ class UserAdapter extends TypeAdapter<User> {
 
 class VisibilityStateAdapter extends TypeAdapter<VisibilityState> {
   @override
-  final typeId = 86;
+  final typeId = 30;
 
   @override
   VisibilityState read(BinaryReader reader) {
@@ -1658,7 +1733,7 @@ class VisibilityStateAdapter extends TypeAdapter<VisibilityState> {
 
 class TagAdapter extends TypeAdapter<Tag> {
   @override
-  final typeId = 87;
+  final typeId = 31;
 
   @override
   Tag read(BinaryReader reader) {
@@ -1701,7 +1776,7 @@ class TagAdapter extends TypeAdapter<Tag> {
 
 class DeckListingAdapter extends TypeAdapter<DeckListing> {
   @override
-  final typeId = 88;
+  final typeId = 32;
 
   @override
   DeckListing read(BinaryReader reader) {
@@ -1720,9 +1795,7 @@ class DeckListingAdapter extends TypeAdapter<DeckListing> {
       reportsCount: fields[9] == null ? 0 : (fields[9] as num).toInt(),
       featuredCards: fields[10] == null
           ? const []
-          : (fields[10] as List)
-                .map((e) => (e as Map).cast<String, dynamic>())
-                .toList(),
+          : (fields[10] as List).cast<CardTemplate>(),
       featuredImages: fields[11] == null
           ? const []
           : (fields[11] as List).cast<String>(),
@@ -1780,7 +1853,7 @@ class DeckListingAdapter extends TypeAdapter<DeckListing> {
 
 class DeckTagAdapter extends TypeAdapter<DeckTag> {
   @override
-  final typeId = 89;
+  final typeId = 33;
 
   @override
   DeckTag read(BinaryReader reader) {
@@ -1814,7 +1887,7 @@ class DeckTagAdapter extends TypeAdapter<DeckTag> {
 
 class CardTemplateTagAdapter extends TypeAdapter<CardTemplateTag> {
   @override
-  final typeId = 90;
+  final typeId = 34;
 
   @override
   CardTemplateTag read(BinaryReader reader) {
@@ -1851,7 +1924,7 @@ class CardTemplateTagAdapter extends TypeAdapter<CardTemplateTag> {
 
 class UserStudyCardTagAdapter extends TypeAdapter<UserStudyCardTag> {
   @override
-  final typeId = 91;
+  final typeId = 35;
 
   @override
   UserStudyCardTag read(BinaryReader reader) {
@@ -1891,7 +1964,7 @@ class UserStudyCardTagAdapter extends TypeAdapter<UserStudyCardTag> {
 
 class UserSettingsAdapter extends TypeAdapter<UserSettings> {
   @override
-  final typeId = 92;
+  final typeId = 36;
 
   @override
   UserSettings read(BinaryReader reader) {
@@ -1902,7 +1975,7 @@ class UserSettingsAdapter extends TypeAdapter<UserSettings> {
     return UserSettings(
       id: fields[0] as String,
       profileId: fields[1] as String,
-      preferences: (fields[23] as Map).cast<String, dynamic>(),
+      preferences: (fields[4] as Map).cast<String, dynamic>(),
       createdAt: fields[2] as DateTime,
       updatedAt: fields[3] as DateTime,
     );
@@ -1920,7 +1993,7 @@ class UserSettingsAdapter extends TypeAdapter<UserSettings> {
       ..write(obj.createdAt)
       ..writeByte(3)
       ..write(obj.updatedAt)
-      ..writeByte(23)
+      ..writeByte(4)
       ..write(obj.preferences);
   }
 
@@ -1937,7 +2010,7 @@ class UserSettingsAdapter extends TypeAdapter<UserSettings> {
 
 class ProgressCheckpointAdapter extends TypeAdapter<ProgressCheckpoint> {
   @override
-  final typeId = 93;
+  final typeId = 37;
 
   @override
   ProgressCheckpoint read(BinaryReader reader) {
@@ -1996,7 +2069,7 @@ class ProgressCheckpointAdapter extends TypeAdapter<ProgressCheckpoint> {
 class ProgressCheckpointTypeAdapter
     extends TypeAdapter<ProgressCheckpointType> {
   @override
-  final typeId = 94;
+  final typeId = 38;
 
   @override
   ProgressCheckpointType read(BinaryReader reader) {
@@ -2038,7 +2111,7 @@ class ProgressCheckpointTypeAdapter
 class ProgressCheckpointStatusAdapter
     extends TypeAdapter<ProgressCheckpointStatus> {
   @override
-  final typeId = 95;
+  final typeId = 39;
 
   @override
   ProgressCheckpointStatus read(BinaryReader reader) {
@@ -2087,7 +2160,7 @@ class ProgressCheckpointStatusAdapter
 
 class SyncDeletionAdapter extends TypeAdapter<SyncDeletion> {
   @override
-  final typeId = 96;
+  final typeId = 40;
 
   @override
   SyncDeletion read(BinaryReader reader) {
@@ -2142,7 +2215,7 @@ class SyncDeletionAdapter extends TypeAdapter<SyncDeletion> {
 
 class SyncClientAdapter extends TypeAdapter<SyncClient> {
   @override
-  final typeId = 97;
+  final typeId = 41;
 
   @override
   SyncClient read(BinaryReader reader) {
@@ -2191,7 +2264,7 @@ class SyncClientAdapter extends TypeAdapter<SyncClient> {
 
 class CachedMediaAdapter extends TypeAdapter<CachedMedia> {
   @override
-  final typeId = 98;
+  final typeId = 42;
 
   @override
   CachedMedia read(BinaryReader reader) {
@@ -2231,7 +2304,7 @@ class CachedMediaAdapter extends TypeAdapter<CachedMedia> {
 
 class ContentAdapter extends TypeAdapter<Content> {
   @override
-  final typeId = 99;
+  final typeId = 43;
 
   @override
   Content read(BinaryReader reader) {
@@ -2287,9 +2360,54 @@ class ContentAdapter extends TypeAdapter<Content> {
           typeId == other.typeId;
 }
 
+class ContentTypeAdapter extends TypeAdapter<ContentType> {
+  @override
+  final typeId = 44;
+
+  @override
+  ContentType read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return ContentType.deckListing;
+      case 1:
+        return ContentType.review;
+      case 2:
+        return ContentType.comment;
+      case 3:
+        return ContentType.deck;
+      default:
+        return ContentType.deckListing;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, ContentType obj) {
+    switch (obj) {
+      case ContentType.deckListing:
+        writer.writeByte(0);
+      case ContentType.review:
+        writer.writeByte(1);
+      case ContentType.comment:
+        writer.writeByte(2);
+      case ContentType.deck:
+        writer.writeByte(3);
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ContentTypeAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
 class SurveyResponseAdapter extends TypeAdapter<SurveyResponse> {
   @override
-  final typeId = 100;
+  final typeId = 45;
 
   @override
   SurveyResponse read(BinaryReader reader) {
@@ -2336,79 +2454,30 @@ class SurveyResponseAdapter extends TypeAdapter<SurveyResponse> {
           typeId == other.typeId;
 }
 
-class StudyRatingAdapter extends TypeAdapter<StudyRating> {
+class Vector2HiveAdapter extends TypeAdapter<Vector2Hive> {
   @override
-  final typeId = 101;
+  final typeId = 46;
 
   @override
-  StudyRating read(BinaryReader reader) {
-    switch (reader.readByte()) {
-      case 0:
-        return StudyRating.incorrect;
-      case 1:
-        return StudyRating.again;
-      case 2:
-        return StudyRating.easy;
-      case 3:
-        return StudyRating.good;
-      case 4:
-        return StudyRating.hard;
-      default:
-        return StudyRating.incorrect;
-    }
-  }
-
-  @override
-  void write(BinaryWriter writer, StudyRating obj) {
-    switch (obj) {
-      case StudyRating.incorrect:
-        writer.writeByte(0);
-      case StudyRating.again:
-        writer.writeByte(1);
-      case StudyRating.easy:
-        writer.writeByte(2);
-      case StudyRating.good:
-        writer.writeByte(3);
-      case StudyRating.hard:
-        writer.writeByte(4);
-    }
-  }
-
-  @override
-  int get hashCode => typeId.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is StudyRatingAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
-}
-
-class StudySessionAnswerAdapter extends TypeAdapter<StudySessionAnswer> {
-  @override
-  final typeId = 102;
-
-  @override
-  StudySessionAnswer read(BinaryReader reader) {
+  Vector2Hive read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return StudySessionAnswer(
-      value: fields[0] as String,
-      id: fields[1] as String?,
+    return Vector2Hive(
+      (fields[0] as num).toDouble(),
+      (fields[1] as num).toDouble(),
     );
   }
 
   @override
-  void write(BinaryWriter writer, StudySessionAnswer obj) {
+  void write(BinaryWriter writer, Vector2Hive obj) {
     writer
       ..writeByte(2)
       ..writeByte(0)
-      ..write(obj.value)
+      ..write(obj.x)
       ..writeByte(1)
-      ..write(obj.id);
+      ..write(obj.y);
   }
 
   @override
@@ -2417,7 +2486,7 @@ class StudySessionAnswerAdapter extends TypeAdapter<StudySessionAnswer> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is StudySessionAnswerAdapter &&
+      other is Vector2HiveAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

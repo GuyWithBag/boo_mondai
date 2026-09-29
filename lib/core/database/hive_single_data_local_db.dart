@@ -5,11 +5,15 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'dart:async';
 import 'dart:developer' as developer;
+import 'dart:convert';
 import 'package:boo_mondai/core/exceptions/hive_exception.dart'
     show HiveException;
 import 'package:flutter/foundation.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
+
+typedef HiveSinglePrimaryKey = Map<String, Object?>;
 
 abstract class HiveSingleDataLocalDB<T> {
   String get boxName;
@@ -17,13 +21,22 @@ abstract class HiveSingleDataLocalDB<T> {
   late final Box<T> box;
 
   Future<HiveSingleDataLocalDB<T>> init() async {
-    // Hive.deleteBoxFromDisk(boxName);
+    // if (await Hive.boxExists(boxName)) {
+    //   await Hive.deleteBoxFromDisk(boxName);
+    // }
     box = await Hive.openBox<T>(boxName);
     return this;
   }
 
-  /// Extracts the String key used for Hive put/get from an item.
-  String getId(T item);
+  /// Extracts the primary key used for Hive put/get from an item.
+  HiveSinglePrimaryKey primaryKeyFromItem(T item);
+
+  String encodePrimaryKey(HiveSinglePrimaryKey primaryKey) {
+    final orderedKeys = primaryKey.keys.toList()..sort();
+    return jsonEncode({for (final key in orderedKeys) key: primaryKey[key]});
+  }
+
+  String keyFromItem(T item) => encodePrimaryKey(primaryKeyFromItem(item));
 
   T createValue();
 
@@ -88,18 +101,23 @@ abstract class HiveSingleDataLocalDB<T> {
 
   T getOrCreate() {
     final value = retrieve();
-    if (value == null) {
-      final newValue = createValue();
-      box.put(getId(newValue), newValue);
-      return newValue;
+    if (value != null) {
+      final key = keyFromItem(value);
+      if (!box.containsKey(key)) {
+        unawaited(box.put(key, value));
+      }
+      return value;
     }
-    return value;
+
+    final newValue = createValue();
+    unawaited(box.put(keyFromItem(newValue), newValue));
+    return newValue;
   }
 
   Future<void> upsert(T item) => guard(() async {
     await box.clear();
-    await box.putAll({getId(item): item});
-  }, action: 'upsert(${getId(item)})');
+    await box.putAll({keyFromItem(item): item});
+  }, action: 'upsert(${primaryKeyFromItem(item)})');
 
   Future<void> clear() => guard(() => box.clear(), action: 'clear');
 }

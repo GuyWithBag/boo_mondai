@@ -13,7 +13,9 @@ abstract class HiveLocalDB<T> {
   late final Box<T> box;
 
   Future<HiveLocalDB<T>> init() async {
-    // Hive.deleteBoxFromDisk(boxName);
+    // if (await Hive.boxExists(boxName)) {
+    //   await Hive.deleteBoxFromDisk(boxName);
+    // }
     box = await Hive.openBox<T>(boxName);
     return this;
   }

@@ -2,20 +2,23 @@ library;
 
 import 'dart:typed_data';
 
-import 'package:boo_mondai/core/helpers/casing_type.dart';
+// Danger: None of this generating adapters work unless you import the file directly.
+//Importing from lib will cause the generator to get confused and will not generate the proper files.
+import 'package:boo_mondai/core/helpers/casing.type.dart';
+import 'package:boo_mondai/core/models/vector2.hive.dart';
 import 'package:boo_mondai/features/cached_media/cached_media.dart';
-import 'package:boo_mondai/features/cards/models/card_template.dto.dart';
-import 'package:boo_mondai/features/cards/models/card_type.dto.dart';
-import 'package:boo_mondai/features/cards/models/fill_in_the_blank_segment.dto.dart';
-import 'package:boo_mondai/features/cards/models/fill_in_the_blanks_template.dto.dart';
-import 'package:boo_mondai/features/cards/models/flashcard_template.dto.dart';
-import 'package:boo_mondai/features/cards/models/identification_answer.dto.dart';
-import 'package:boo_mondai/features/cards/models/identification_template.dto.dart';
-import 'package:boo_mondai/features/cards/models/match_madness_pair.dto.dart';
-import 'package:boo_mondai/features/cards/models/match_madness_template.dto.dart';
-import 'package:boo_mondai/features/cards/models/multiple_choice_option.dto.dart';
-import 'package:boo_mondai/features/cards/models/multiple_choice_template.dto.dart';
-import 'package:boo_mondai/features/cards/models/word_scramble_template.dart';
+import 'package:boo_mondai/features/cards/models/card.template.dto.dart';
+import 'package:boo_mondai/features/cards/models/card.type.dto.dart';
+import 'package:boo_mondai/features/cards/models/fill_in_the_blank.answer_key.dto.dart';
+import 'package:boo_mondai/features/cards/models/fill_in_the_blanks.template.dto.dart';
+import 'package:boo_mondai/features/cards/models/flashcard.template.dto.dart';
+import 'package:boo_mondai/features/cards/models/identification.answer_key.dto.dart';
+import 'package:boo_mondai/features/cards/models/identification.template.dto.dart';
+import 'package:boo_mondai/features/cards/models/matching_type.value.dto.dart';
+import 'package:boo_mondai/features/cards/models/matching_type.template.dto.dart';
+import 'package:boo_mondai/features/cards/models/multiple_choice.option.dto.dart';
+import 'package:boo_mondai/features/cards/models/multiple_choice.template.dto.dart';
+import 'package:boo_mondai/features/cards/models/word_scramble.template.dart';
 import 'package:boo_mondai/features/content/models/content.dto.dart';
 import 'package:boo_mondai/features/content/models/content.type.dart';
 import 'package:boo_mondai/features/deck_listings/models/deck_listing.dto.dart';
@@ -48,22 +51,23 @@ import 'package:fsrs/fsrs.dart';
 import 'package:hive_ce/hive_ce.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-// ToDo: for some reason the StudyRating in StudySessionSnapshot is InvalidType
-
 @GenerateAdapters([
   AdapterSpec<Profile>(),
   AdapterSpec<Deck>(),
-  AdapterSpec<MultipleChoiceOption>(),
+
   AdapterSpec<FillInTheBlanksTemplate>(),
   AdapterSpec<MultipleChoiceTemplate>(),
   AdapterSpec<FlashcardTemplate>(),
-  AdapterSpec<MatchMadnessTemplate>(),
-  AdapterSpec<IdentificationAnswer>(),
+  AdapterSpec<MatchingTypeTemplate>(),
   AdapterSpec<IdentificationTemplate>(),
-  AdapterSpec<StudyCard>(),
-  AdapterSpec<FillInTheBlankSegment>(),
   AdapterSpec<WordScrambleTemplate>(),
-  AdapterSpec<MatchMadnessPair>(),
+
+  AdapterSpec<IdentificationAnswerKey>(),
+  AdapterSpec<MultipleChoiceOption>(),
+  AdapterSpec<FillInTheBlankAnswerKey>(),
+  AdapterSpec<MatchingTypeValue>(),
+
+  AdapterSpec<StudyCard>(),
   AdapterSpec<StudyRating>(),
   AdapterSpec<Card>(),
 
@@ -100,9 +104,11 @@ import 'package:supabase_flutter/supabase_flutter.dart';
   AdapterSpec<SyncDeletion>(),
   AdapterSpec<SyncClient>(),
 
-  // ToDo: FOR SOME REASON THIS DOESNT FUCING WORK, BUT NONE OF THE FIELDS ARE THE PROBLEM??
   AdapterSpec<CachedMedia>(),
   AdapterSpec<Content>(),
+  AdapterSpec<ContentType>(),
   AdapterSpec<SurveyResponse>(),
+
+  AdapterSpec<Vector2Hive>(),
 ])
 part 'adapters.g.dart';

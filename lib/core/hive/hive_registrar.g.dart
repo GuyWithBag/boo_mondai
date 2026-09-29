@@ -14,18 +14,19 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(CardTemplateTypeAdapter());
     registerAdapter(CasingTypeAdapter());
     registerAdapter(ContentAdapter());
+    registerAdapter(ContentTypeAdapter());
     registerAdapter(DeckAdapter());
     registerAdapter(DeckListingAdapter());
     registerAdapter(DeckTagAdapter());
-    registerAdapter(FillInTheBlankSegmentAdapter());
+    registerAdapter(FillInTheBlankAnswerKeyAdapter());
     registerAdapter(FillInTheBlanksTemplateAdapter());
     registerAdapter(FlashcardTemplateAdapter());
     registerAdapter(FsrsCardAdapter());
     registerAdapter(FsrsReviewLogAdapter());
-    registerAdapter(IdentificationAnswerAdapter());
+    registerAdapter(IdentificationAnswerKeyAdapter());
     registerAdapter(IdentificationTemplateAdapter());
-    registerAdapter(MatchMadnessPairAdapter());
-    registerAdapter(MatchMadnessTemplateAdapter());
+    registerAdapter(MatchingTypeTemplateAdapter());
+    registerAdapter(MatchingTypeValueAdapter());
     registerAdapter(MultipleChoiceOptionAdapter());
     registerAdapter(MultipleChoiceTemplateAdapter());
     registerAdapter(ProfileAdapter());
@@ -50,6 +51,7 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(UserAdapter());
     registerAdapter(UserSettingsAdapter());
     registerAdapter(UserStudyCardTagAdapter());
+    registerAdapter(Vector2HiveAdapter());
     registerAdapter(VisibilityStateAdapter());
     registerAdapter(WordScrambleTemplateAdapter());
   }
@@ -64,18 +66,19 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(CardTemplateTypeAdapter());
     registerAdapter(CasingTypeAdapter());
     registerAdapter(ContentAdapter());
+    registerAdapter(ContentTypeAdapter());
     registerAdapter(DeckAdapter());
     registerAdapter(DeckListingAdapter());
     registerAdapter(DeckTagAdapter());
-    registerAdapter(FillInTheBlankSegmentAdapter());
+    registerAdapter(FillInTheBlankAnswerKeyAdapter());
     registerAdapter(FillInTheBlanksTemplateAdapter());
     registerAdapter(FlashcardTemplateAdapter());
     registerAdapter(FsrsCardAdapter());
     registerAdapter(FsrsReviewLogAdapter());
-    registerAdapter(IdentificationAnswerAdapter());
+    registerAdapter(IdentificationAnswerKeyAdapter());
     registerAdapter(IdentificationTemplateAdapter());
-    registerAdapter(MatchMadnessPairAdapter());
-    registerAdapter(MatchMadnessTemplateAdapter());
+    registerAdapter(MatchingTypeTemplateAdapter());
+    registerAdapter(MatchingTypeValueAdapter());
     registerAdapter(MultipleChoiceOptionAdapter());
     registerAdapter(MultipleChoiceTemplateAdapter());
     registerAdapter(ProfileAdapter());
@@ -100,6 +103,7 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(UserAdapter());
     registerAdapter(UserSettingsAdapter());
     registerAdapter(UserStudyCardTagAdapter());
+    registerAdapter(Vector2HiveAdapter());
     registerAdapter(VisibilityStateAdapter());
     registerAdapter(WordScrambleTemplateAdapter());
   }

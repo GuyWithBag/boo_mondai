@@ -19,3 +19,4 @@ export 'aligned_scroll_view.dart';
 export 'elevated.dart';
 export 'editable_text_value.dart';
 export 'editable_carousel.controller.dart';
+export 'feature_disabled.modal.dart';

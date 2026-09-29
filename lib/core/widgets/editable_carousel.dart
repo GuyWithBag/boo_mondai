@@ -32,13 +32,10 @@ class EditableCarousel extends SignalHookWidget {
       children: List<Widget>.generate(controller.visibleItemCount.value, (
         int index,
       ) {
-        final imageSource = index < controller.imageSources.value.length
+        final image = index < controller.imageSources.value.length
             ? controller.imageSources.value[index]
             : null;
-        final image = index < controller.images.value.length
-            ? controller.images.value[index]
-            : null;
-        final isAddItem = imageSource == null && controller.canAddImage.value;
+        final isAddItem = image == null && controller.canAddImage.value;
 
         return BackgroundImageSurface(
           border: SurfaceBorder.baseline,
