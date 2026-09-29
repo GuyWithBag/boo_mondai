@@ -506,12 +506,20 @@ class AnimatedOverlay extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isMounted = useRef(true);
     final shouldBuild = useState(visible);
 
     useEffect(() {
-      if (visible) shouldBuild.value = true;
+      isMounted.value = true;
+      return () {
+        isMounted.value = false;
+      };
+    }, const []);
+
+    useEffect(() {
+      if (visible && isMounted.value) shouldBuild.value = true;
       return null;
-    }, [visible]);
+    }, [visible, isMounted]);
 
     if (!shouldBuild.value) return const SizedBox.shrink();
 
@@ -521,7 +529,7 @@ class AnimatedOverlay extends HookWidget {
           .animate(
             target: visible ? 1 : 0,
             onComplete: (_) {
-              if (!visible) shouldBuild.value = false;
+              if (isMounted.value && !visible) shouldBuild.value = false;
             },
           )
           .fade(

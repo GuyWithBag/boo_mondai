@@ -1,38 +1,38 @@
 import 'package:boo_mondai/core/helpers/casing.helper.dart';
-import 'package:boo_mondai/core/helpers/casing_type.dart';
+import 'package:boo_mondai/core/helpers/casing.type.dart';
 import 'package:boo_mondai/core/services/uuid.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 
-part 'identification_answer.dto.mapper.dart';
+part 'identification.answer_key.dto.mapper.dart';
 
 @MappableClass()
-class IdentificationAnswer with IdentificationAnswerMappable {
+class IdentificationAnswerKey with IdentificationAnswerKeyMappable {
   final String id;
   final String templateId;
   final int displayOrder;
-  final String answer;
+  final String value;
   final CasingType casingType;
 
-  const IdentificationAnswer({
+  const IdentificationAnswerKey({
     required this.id,
     required this.templateId,
     required this.displayOrder,
-    required this.answer,
+    required this.value,
     this.casingType = CasingType.any,
   });
 
-  factory IdentificationAnswer.createDummy({
+  factory IdentificationAnswerKey.createDummy({
     String? id,
     String templateId = '',
     int displayOrder = 0,
   }) {
-    return IdentificationAnswer(
+    return IdentificationAnswerKey(
       id: id ?? uuid.v7(),
       templateId: templateId,
       displayOrder: displayOrder,
-      answer: '',
+      value: '',
     );
   }
 
-  bool accepts(String input) => CasingHelper.matches(input, answer, casingType);
+  bool accepts(String input) => CasingHelper.matches(input, value, casingType);
 }

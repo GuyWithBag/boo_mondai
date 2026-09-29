@@ -8,7 +8,7 @@
 import 'package:boo_mondai/core/services/uuid.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 
-part 'multiple_choice_option.dto.mapper.dart';
+part 'multiple_choice.option.dto.mapper.dart';
 
 /// A single answer option for a [CardTemplateType.multipleChoice] card.
 ///

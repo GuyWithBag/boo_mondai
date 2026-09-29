@@ -1,11 +1,11 @@
-import 'package:boo_mondai/features/cards/models/card_template.dto.dart';
-import 'package:boo_mondai/features/cards/models/card_type.dto.dart';
+import 'package:boo_mondai/features/cards/models/card.template.dto.dart';
+import 'package:boo_mondai/features/cards/models/card.type.dto.dart';
 import 'package:boo_mondai/features/study_session/models/study_session.answer.dart';
 import 'package:boo_mondai/features/tags/models/tag.dto.dart';
 import 'package:boo_mondai/core/services/uuid.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 
-part 'flashcard_template.dto.mapper.dart';
+part 'flashcard.template.dto.mapper.dart';
 
 @MappableClass(discriminatorValue: 'flashcard')
 class FlashcardTemplate extends CardTemplate with FlashcardTemplateMappable {

@@ -12,9 +12,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         Elevated,
         MediaSelector,
         ScaleHelper,
-        Setting,
-        SettingsController,
-        SettingsService;
+        SettingPath,
+        SettingsStore;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -54,8 +53,8 @@ class Button extends HookWidget {
   final bool elevated;
   final MediaSelector<AppMediaPack>? buttonDownSound;
   final MediaSelector<AppMediaPack>? buttonUpSound;
-  final Setting<bool>? buttonDownSoundEnabledSetting;
-  final Setting<bool>? buttonUpSoundEnabledSetting;
+  final SettingPath? buttonDownSoundEnabledSetting;
+  final SettingPath? buttonUpSoundEnabledSetting;
   final bool _isDashed;
 
   static Button icon({
@@ -212,7 +211,7 @@ class Button extends HookWidget {
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
     final mediaPackController = context.mediaPackController<AppMediaPack>();
-    final settingsController = context.read<SettingsController>();
+    final settingsStore = SettingsStore.instance;
     final state = useState(getState());
     useEffect(() {
       state.value = getState();
@@ -317,10 +316,10 @@ class Button extends HookWidget {
                   mediaPackController.resolve(
                     buttonDownSound ?? (media) => media.buttonDownSound,
                   ),
-                  settingsController: settingsController,
+                  settingsStore: settingsStore,
                   enabledSetting:
                       buttonDownSoundEnabledSetting ??
-                      SettingsService.buttonDownSoundEnabled,
+                      SettingPath.buttonDownSoundEnabled,
                   volume: 2,
                 );
               },
@@ -336,10 +335,10 @@ class Button extends HookWidget {
                   mediaPackController.resolve(
                     buttonUpSound ?? (media) => media.buttonUpSound,
                   ),
-                  settingsController: settingsController,
+                  settingsStore: settingsStore,
                   enabledSetting:
                       buttonUpSoundEnabledSetting ??
-                      SettingsService.buttonUpSoundEnabled,
+                      SettingPath.buttonUpSoundEnabled,
                   volume: 2,
                 );
               },

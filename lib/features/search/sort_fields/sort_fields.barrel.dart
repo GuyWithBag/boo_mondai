@@ -3,4 +3,4 @@
 // Other files
 export 'deck_listing.search_sort_field.dart';
 export 'deck.search_sort_field.dart';
-export 'card_template.search_sort_field.dart';
+export 'card.template.search_sort_field.dart';

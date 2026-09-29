@@ -7,7 +7,7 @@
 
 import 'package:dart_mappable/dart_mappable.dart';
 
-part 'card_type.dto.mapper.dart';
+part 'card.type.dto.mapper.dart';
 
 /// Whether the card is reviewed in one direction or both.
 ///

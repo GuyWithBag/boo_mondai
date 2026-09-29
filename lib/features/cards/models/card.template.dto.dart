@@ -1,5 +1,5 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// PATH: lib/models/templates/card_template.dart
+// PATH: lib/models/templates/card.template.dart
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart'
@@ -11,13 +11,13 @@ import 'package:boo_mondai/lib.barrel.dart'
         IdentificationTemplate,
         MultipleChoiceTemplate,
         FillInTheBlanksTemplate,
-        MatchMadnessTemplate,
+        MatchingTypeTemplate,
         TagMapper,
         FlashcardTemplateMapper,
         IdentificationTemplateMapper,
         MultipleChoiceTemplateMapper,
         FillInTheBlanksTemplateMapper,
-        MatchMadnessTemplateMapper,
+        MatchingTypeTemplateMapper,
         MutableEntityMapper,
         StudySessionAnswer,
         WordScrambleTemplateMapper,
@@ -25,7 +25,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         TagCopyWith;
 import 'package:dart_mappable/dart_mappable.dart';
 
-part 'card_template.dto.mapper.dart';
+part 'card.template.dto.mapper.dart';
 
 @MappableClass(
   discriminatorKey: 'type',
@@ -34,7 +34,7 @@ part 'card_template.dto.mapper.dart';
     IdentificationTemplate,
     MultipleChoiceTemplate,
     FillInTheBlanksTemplate,
-    MatchMadnessTemplate,
+    MatchingTypeTemplate,
     WordScrambleTemplate,
   ],
 )

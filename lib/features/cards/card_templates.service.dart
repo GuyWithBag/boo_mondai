@@ -6,12 +6,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         FillInTheBlanksTemplate,
         FlashcardTemplate,
         IdentificationTemplate,
-        MatchMadnessPair,
-        MatchMadnessTemplate,
+        MatchingTypeValue,
+        MatchingTypeTemplate,
         MultipleChoiceTemplate,
         WordScrambleTemplate,
-        defaultMatchPairs,
         defaultMultipleChoiceOptions,
+        Vector2Hive,
         uuid;
 
 abstract final class CardTemplatesService {
@@ -22,7 +22,7 @@ abstract final class CardTemplatesService {
       MultipleChoiceTemplate _ => CardTemplateType.multipleChoice,
       FillInTheBlanksTemplate _ => CardTemplateType.fillInTheBlanks,
       WordScrambleTemplate _ => CardTemplateType.wordScramble,
-      MatchMadnessTemplate _ => CardTemplateType.matchMadness,
+      MatchingTypeTemplate _ => CardTemplateType.matchMadness,
       _ => CardTemplateType.flashcard,
     };
   }
@@ -59,7 +59,7 @@ abstract final class CardTemplatesService {
         updatedAt: now,
         sourceTemplateId: sourceTemplateId,
         promptText: '',
-        acceptedAnswers: const [],
+        answers: const [],
       ),
       CardTemplateType.multipleChoice => MultipleChoiceTemplate(
         id: templateId,
@@ -78,7 +78,8 @@ abstract final class CardTemplatesService {
         createdAt: created,
         updatedAt: now,
         sourceTemplateId: sourceTemplateId,
-        segments: const [],
+        promptText: '',
+        answerKeys: const [],
       ),
       CardTemplateType.wordScramble => WordScrambleTemplate(
         id: templateId,
@@ -89,22 +90,24 @@ abstract final class CardTemplatesService {
         sourceTemplateId: sourceTemplateId,
         sentenceToScramble: '',
       ),
-      CardTemplateType.matchMadness => MatchMadnessTemplate(
+      CardTemplateType.matchMadness => MatchingTypeTemplate(
         id: templateId,
         deckId: deckId,
         sortOrder: sortOrder,
         createdAt: created,
         updatedAt: now,
         sourceTemplateId: sourceTemplateId,
-        pairs: [
-          for (var index = 0; index < defaultMatchPairs.length; index++)
-            MatchMadnessPair(
-              id: uuid.v7(),
-              templateId: templateId,
-              term: defaultMatchPairs[index].term,
-              match: defaultMatchPairs[index].match,
-              displayOrder: index,
-            ),
+        values: [
+          MatchingTypeValue(
+            text: '',
+            position: Vector2Hive(0, 0),
+            matchPosition: Vector2Hive(1, 0),
+          ),
+          MatchingTypeValue(
+            text: '',
+            position: Vector2Hive(1, 0),
+            matchPosition: Vector2Hive(0, 0),
+          ),
         ],
       ),
     };

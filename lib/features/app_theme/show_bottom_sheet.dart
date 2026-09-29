@@ -11,6 +11,8 @@ Future<T?> showBottomSheet<T>({
   bool isScrollControlled = true,
   bool useSafeArea = true,
   bool useRootNavigator = true,
+  bool isDismissible = true,
+  bool enableDrag = true,
 }) async {
   final mainController = context.read<MainController>();
   if (hideBottomNavBar) {
@@ -23,6 +25,8 @@ Future<T?> showBottomSheet<T>({
     useSafeArea: useSafeArea,
     backgroundColor: Colors.transparent,
     useRootNavigator: useRootNavigator,
+    isDismissible: isDismissible,
+    enableDrag: enableDrag,
     builder: builder,
   );
   mainController.setBottomNavBarVisible(true);

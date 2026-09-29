@@ -4,7 +4,7 @@
 // ignore_for_file: unused_element, unnecessary_cast, override_on_non_overriding_member
 // ignore_for_file: strict_raw_type, inference_failure_on_untyped_parameter
 
-part of 'identification_template.dto.dart';
+part of 'identification.template.dto.dart';
 
 class IdentificationTemplateMapper
     extends SubClassMapperBase<IdentificationTemplate> {
@@ -16,7 +16,7 @@ class IdentificationTemplateMapper
       MapperContainer.globals.use(_instance = IdentificationTemplateMapper._());
       CardTemplateMapper.ensureInitialized().addSubMapper(_instance!);
       TagMapper.ensureInitialized();
-      IdentificationAnswerMapper.ensureInitialized();
+      IdentificationAnswerKeyMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -60,12 +60,10 @@ class IdentificationTemplateMapper
   static String _$promptText(IdentificationTemplate v) => v.promptText;
   static const Field<IdentificationTemplate, String> _f$promptText =
       Field('promptText', _$promptText, key: r'prompt_text');
-  static List<IdentificationAnswer> _$acceptedAnswers(
-          IdentificationTemplate v) =>
-      v.acceptedAnswers;
-  static const Field<IdentificationTemplate, List<IdentificationAnswer>>
-      _f$acceptedAnswers =
-      Field('acceptedAnswers', _$acceptedAnswers, key: r'accepted_answers');
+  static List<IdentificationAnswerKey> _$answers(IdentificationTemplate v) =>
+      v.answers;
+  static const Field<IdentificationTemplate, List<IdentificationAnswerKey>>
+      _f$answers = Field('answers', _$answers);
 
   @override
   final MappableFields<IdentificationTemplate> fields = const {
@@ -80,7 +78,7 @@ class IdentificationTemplateMapper
     #tags: _f$tags,
     #verticallyCentered: _f$verticallyCentered,
     #promptText: _f$promptText,
-    #acceptedAnswers: _f$acceptedAnswers,
+    #answers: _f$answers,
   };
 
   @override
@@ -104,7 +102,7 @@ class IdentificationTemplateMapper
         tags: data.dec(_f$tags),
         verticallyCentered: data.dec(_f$verticallyCentered),
         promptText: data.dec(_f$promptText),
-        acceptedAnswers: data.dec(_f$acceptedAnswers));
+        answers: data.dec(_f$answers));
   }
 
   @override
@@ -169,9 +167,9 @@ abstract class IdentificationTemplateCopyWith<
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags;
   ListCopyWith<
       $R,
-      IdentificationAnswer,
-      IdentificationAnswerCopyWith<$R, IdentificationAnswer,
-          IdentificationAnswer>> get acceptedAnswers;
+      IdentificationAnswerKey,
+      IdentificationAnswerKeyCopyWith<$R, IdentificationAnswerKey,
+          IdentificationAnswerKey>> get answers;
   @override
   $R call(
       {String? id,
@@ -185,7 +183,7 @@ abstract class IdentificationTemplateCopyWith<
       List<Tag>? tags,
       bool? verticallyCentered,
       String? promptText,
-      List<IdentificationAnswer>? acceptedAnswers});
+      List<IdentificationAnswerKey>? answers});
   IdentificationTemplateCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
       Then<$Out2, $R2> t);
 }
@@ -205,12 +203,10 @@ class _IdentificationTemplateCopyWithImpl<$R, $Out>
   @override
   ListCopyWith<
       $R,
-      IdentificationAnswer,
-      IdentificationAnswerCopyWith<$R, IdentificationAnswer,
-          IdentificationAnswer>> get acceptedAnswers => ListCopyWith(
-      $value.acceptedAnswers,
-      (v, t) => v.copyWith.$chain(t),
-      (v) => call(acceptedAnswers: v));
+      IdentificationAnswerKey,
+      IdentificationAnswerKeyCopyWith<$R, IdentificationAnswerKey,
+          IdentificationAnswerKey>> get answers => ListCopyWith(
+      $value.answers, (v, t) => v.copyWith.$chain(t), (v) => call(answers: v));
   @override
   $R call(
           {String? id,
@@ -224,7 +220,7 @@ class _IdentificationTemplateCopyWithImpl<$R, $Out>
           List<Tag>? tags,
           bool? verticallyCentered,
           String? promptText,
-          List<IdentificationAnswer>? acceptedAnswers}) =>
+          List<IdentificationAnswerKey>? answers}) =>
       $apply(FieldCopyWithData({
         if (id != null) #id: id,
         if (deckId != null) #deckId: deckId,
@@ -237,7 +233,7 @@ class _IdentificationTemplateCopyWithImpl<$R, $Out>
         if (tags != null) #tags: tags,
         if (verticallyCentered != null) #verticallyCentered: verticallyCentered,
         if (promptText != null) #promptText: promptText,
-        if (acceptedAnswers != null) #acceptedAnswers: acceptedAnswers
+        if (answers != null) #answers: answers
       }));
   @override
   IdentificationTemplate $make(CopyWithData data) => IdentificationTemplate(
@@ -254,7 +250,7 @@ class _IdentificationTemplateCopyWithImpl<$R, $Out>
       verticallyCentered:
           data.get(#verticallyCentered, or: $value.verticallyCentered),
       promptText: data.get(#promptText, or: $value.promptText),
-      acceptedAnswers: data.get(#acceptedAnswers, or: $value.acceptedAnswers));
+      answers: data.get(#answers, or: $value.answers));
 
   @override
   IdentificationTemplateCopyWith<$R2, IdentificationTemplate, $Out2>

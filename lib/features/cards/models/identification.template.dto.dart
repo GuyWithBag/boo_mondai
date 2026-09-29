@@ -1,18 +1,17 @@
-import 'package:boo_mondai/features/cards/models/card_template.dto.dart';
-import 'package:boo_mondai/features/cards/models/identification_answer.dto.dart';
+import 'package:boo_mondai/features/cards/models/card.template.dto.dart';
+import 'package:boo_mondai/features/cards/models/identification.answer_key.dto.dart';
 import 'package:boo_mondai/features/study_session/models/study_session.answer.dart';
 import 'package:boo_mondai/features/tags/models/tag.dto.dart';
 import 'package:boo_mondai/core/services/uuid.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 
-part 'identification_template.dto.mapper.dart';
+part 'identification.template.dto.mapper.dart';
 
 @MappableClass(discriminatorValue: 'identification')
 class IdentificationTemplate extends CardTemplate
     with IdentificationTemplateMappable {
   final String promptText;
-  @MappableField(key: 'accepted_answers')
-  final List<IdentificationAnswer> acceptedAnswers;
+  final List<IdentificationAnswerKey> answers;
 
   const IdentificationTemplate({
     required super.id,
@@ -26,7 +25,7 @@ class IdentificationTemplate extends CardTemplate
     super.tags,
     super.verticallyCentered,
     required this.promptText,
-    required this.acceptedAnswers,
+    required this.answers,
   });
 
   factory IdentificationTemplate.createDummy({
@@ -43,14 +42,12 @@ class IdentificationTemplate extends CardTemplate
       createdAt: now,
       updatedAt: now,
       promptText: '',
-      acceptedAnswers: [
-        IdentificationAnswer.createDummy(templateId: resolvedId),
-      ],
+      answers: [IdentificationAnswerKey.createDummy(templateId: resolvedId)],
     );
   }
 
   @override
   bool checkAnswer(StudySessionAnswer answer, {bool isReversed = false}) {
-    return acceptedAnswers.any((accepted) => accepted.accepts(answer.value));
+    return answers.any((accepted) => accepted.accepts(answer.value));
   }
 }

@@ -1,17 +1,19 @@
-import 'package:boo_mondai/features/cards/models/card_template.dto.dart';
+import 'package:boo_mondai/features/cards/models/card.template.dto.dart';
+import 'package:boo_mondai/features/cards/models/matching_type.value.dto.dart';
 import 'package:boo_mondai/core/services/uuid.dart';
 import 'package:boo_mondai/features/study_session/models/study_session.answer.dart';
 import 'package:boo_mondai/features/tags/models/tag.dto.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 
-part 'word_scramble_template.mapper.dart';
+part 'matching_type.template.dto.mapper.dart';
 
-@MappableClass(discriminatorValue: 'word_scramble')
-class WordScrambleTemplate extends CardTemplate
-    with WordScrambleTemplateMappable {
-  final String sentenceToScramble;
+@MappableClass(discriminatorValue: 'matching_type')
+class MatchingTypeTemplate extends CardTemplate
+    with MatchingTypeTemplateMappable {
+  final List<MatchingTypeValue> values;
+  final int maxIncorrectAnswers;
 
-  const WordScrambleTemplate({
+  const MatchingTypeTemplate({
     required super.id,
     required super.deckId,
     required super.sortOrder,
@@ -22,28 +24,28 @@ class WordScrambleTemplate extends CardTemplate
     super.sourceTemplateId,
     super.tags,
     super.verticallyCentered,
-    required this.sentenceToScramble,
+    required this.values,
+    this.maxIncorrectAnswers = -1,
   });
 
-  factory WordScrambleTemplate.createDummy({
+  factory MatchingTypeTemplate.createDummy({
     String? id,
     String deckId = '',
     int sortOrder = 0,
   }) {
     final now = DateTime.now();
-    return WordScrambleTemplate(
+    return MatchingTypeTemplate(
       id: id ?? uuid.v7(),
       deckId: deckId,
       sortOrder: sortOrder,
       createdAt: now,
       updatedAt: now,
-      sentenceToScramble: '',
+      values: const [],
     );
   }
 
   @override
   bool checkAnswer(StudySessionAnswer answer, {bool isReversed = false}) {
-    return answer.value.trim().toLowerCase() ==
-        sentenceToScramble.trim().toLowerCase();
+    return false;
   }
 }

@@ -1,11 +1,11 @@
-import 'package:boo_mondai/features/cards/models/card_template.dto.dart';
-import 'package:boo_mondai/features/cards/models/multiple_choice_option.dto.dart';
+import 'package:boo_mondai/features/cards/models/card.template.dto.dart';
+import 'package:boo_mondai/features/cards/models/multiple_choice.option.dto.dart';
 import 'package:boo_mondai/features/study_session/models/study_session.answer.dart';
 import 'package:boo_mondai/features/tags/models/tag.dto.dart';
 import 'package:boo_mondai/core/services/uuid.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 
-part 'multiple_choice_template.dto.mapper.dart';
+part 'multiple_choice.template.dto.mapper.dart';
 
 @MappableClass(discriminatorValue: 'multiple_choice')
 class MultipleChoiceTemplate extends CardTemplate
@@ -13,7 +13,7 @@ class MultipleChoiceTemplate extends CardTemplate
   final String questionPrompt;
   final List<MultipleChoiceOption> options;
   final bool multipleAnswers;
-  final bool randomizeOptionsOrdering;
+  final bool randomizedOptionsOrdering;
 
   const MultipleChoiceTemplate({
     required super.id,
@@ -29,7 +29,7 @@ class MultipleChoiceTemplate extends CardTemplate
     required this.questionPrompt,
     required this.options,
     this.multipleAnswers = false,
-    this.randomizeOptionsOrdering = false,
+    this.randomizedOptionsOrdering = false,
   });
 
   factory MultipleChoiceTemplate.createDummy({

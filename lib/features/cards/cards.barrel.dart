@@ -2,6 +2,7 @@
 
 // Barrel files
 export 'models/models.barrel.dart';
+export 'helpers/helpers.barrel.dart';
 // Other files
 export 'card_templates.remote.db.dart';
 export 'card_templates.local.db.dart';

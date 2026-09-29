@@ -1,45 +1,57 @@
-import 'package:boo_mondai/lib.barrel.dart' show Controller, ToolBarAction;
+import 'package:boo_mondai/lib.barrel.dart' show ToolBarAction;
 import 'package:flutter/material.dart';
+import 'package:signals/signals_flutter.dart';
 
-class ToolBarController extends Controller {
-  TextEditingController? _activeTextController;
-  bool _activeTextAllowsAttachments = false;
+class ToolBarController {
+  final activeTextController = signal<TextEditingController?>(null);
+  final activeTextAllowsAttachments = signal(false);
+  final isDisposed = signal(false);
 
-  TextEditingController? get activeTextController => _activeTextController;
-  bool get hasActiveTextController => _activeTextController != null;
-  bool get activeTextAllowsAttachments =>
-      hasActiveTextController && _activeTextAllowsAttachments;
+  late final hasActiveTextController = computed(
+    () => activeTextController.value != null,
+  );
+  late final canUseAttachments = computed(
+    () => hasActiveTextController.value && activeTextAllowsAttachments.value,
+  );
 
   void setActiveTextController(
     TextEditingController controller, {
     bool allowAttachments = false,
   }) {
-    if (_activeTextController == controller &&
-        _activeTextAllowsAttachments == allowAttachments) {
+    if (isDisposed.value) return;
+    if (activeTextController.value == controller &&
+        activeTextAllowsAttachments.value == allowAttachments) {
       return;
     }
-    _activeTextController = controller;
-    _activeTextAllowsAttachments = allowAttachments;
-    notifyListeners();
+    activeTextController.value = controller;
+    activeTextAllowsAttachments.value = allowAttachments;
   }
 
   void clearActiveTextController(TextEditingController controller) {
-    if (_activeTextController != controller) return;
+    if (isDisposed.value) return;
+    if (activeTextController.value != controller) return;
 
-    _activeTextController = null;
-    _activeTextAllowsAttachments = false;
-    notifyListeners();
+    activeTextController.value = null;
+    activeTextAllowsAttachments.value = false;
   }
 
   bool canPerform(ToolBarAction action) {
-    if (!hasActiveTextController) return false;
-    return !action.requiresAttachmentSupport || activeTextAllowsAttachments;
+    if (!hasActiveTextController.value) return false;
+    return !action.requiresAttachmentSupport || canUseAttachments.value;
   }
 
   Future<void> perform(ToolBarAction action) async {
-    final controller = _activeTextController;
+    final controller = activeTextController.value;
     if (controller == null || !canPerform(action)) return;
 
     await action.perform(controller);
+  }
+
+  void dispose() {
+    if (isDisposed.value) return;
+    isDisposed.value = true;
+
+    activeTextController.value = null;
+    activeTextAllowsAttachments.value = false;
   }
 }

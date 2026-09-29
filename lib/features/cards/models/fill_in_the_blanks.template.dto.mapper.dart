@@ -4,7 +4,7 @@
 // ignore_for_file: unused_element, unnecessary_cast, override_on_non_overriding_member
 // ignore_for_file: strict_raw_type, inference_failure_on_untyped_parameter
 
-part of 'fill_in_the_blanks_template.dto.dart';
+part of 'fill_in_the_blanks.template.dto.dart';
 
 class FillInTheBlanksTemplateMapper
     extends SubClassMapperBase<FillInTheBlanksTemplate> {
@@ -17,7 +17,7 @@ class FillInTheBlanksTemplateMapper
           .use(_instance = FillInTheBlanksTemplateMapper._());
       CardTemplateMapper.ensureInitialized().addSubMapper(_instance!);
       TagMapper.ensureInitialized();
-      FillInTheBlankSegmentMapper.ensureInitialized();
+      FillInTheBlankAnswerKeyMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -58,10 +58,14 @@ class FillInTheBlanksTemplateMapper
   static const Field<FillInTheBlanksTemplate, bool> _f$verticallyCentered =
       Field('verticallyCentered', _$verticallyCentered,
           key: r'vertically_centered', opt: true, def: true);
-  static List<FillInTheBlankSegment> _$segments(FillInTheBlanksTemplate v) =>
-      v.segments;
-  static const Field<FillInTheBlanksTemplate, List<FillInTheBlankSegment>>
-      _f$segments = Field('segments', _$segments);
+  static String _$promptText(FillInTheBlanksTemplate v) => v.promptText;
+  static const Field<FillInTheBlanksTemplate, String> _f$promptText =
+      Field('promptText', _$promptText, key: r'prompt_text');
+  static List<FillInTheBlankAnswerKey> _$answerKeys(
+          FillInTheBlanksTemplate v) =>
+      v.answerKeys;
+  static const Field<FillInTheBlanksTemplate, List<FillInTheBlankAnswerKey>>
+      _f$answerKeys = Field('answerKeys', _$answerKeys, key: r'answer_keys');
 
   @override
   final MappableFields<FillInTheBlanksTemplate> fields = const {
@@ -75,7 +79,8 @@ class FillInTheBlanksTemplateMapper
     #sourceTemplateId: _f$sourceTemplateId,
     #tags: _f$tags,
     #verticallyCentered: _f$verticallyCentered,
-    #segments: _f$segments,
+    #promptText: _f$promptText,
+    #answerKeys: _f$answerKeys,
   };
 
   @override
@@ -98,7 +103,8 @@ class FillInTheBlanksTemplateMapper
         sourceTemplateId: data.dec(_f$sourceTemplateId),
         tags: data.dec(_f$tags),
         verticallyCentered: data.dec(_f$verticallyCentered),
-        segments: data.dec(_f$segments));
+        promptText: data.dec(_f$promptText),
+        answerKeys: data.dec(_f$answerKeys));
   }
 
   @override
@@ -163,9 +169,9 @@ abstract class FillInTheBlanksTemplateCopyWith<
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags;
   ListCopyWith<
       $R,
-      FillInTheBlankSegment,
-      FillInTheBlankSegmentCopyWith<$R, FillInTheBlankSegment,
-          FillInTheBlankSegment>> get segments;
+      FillInTheBlankAnswerKey,
+      FillInTheBlankAnswerKeyCopyWith<$R, FillInTheBlankAnswerKey,
+          FillInTheBlankAnswerKey>> get answerKeys;
   @override
   $R call(
       {String? id,
@@ -178,7 +184,8 @@ abstract class FillInTheBlanksTemplateCopyWith<
       String? sourceTemplateId,
       List<Tag>? tags,
       bool? verticallyCentered,
-      List<FillInTheBlankSegment>? segments});
+      String? promptText,
+      List<FillInTheBlankAnswerKey>? answerKeys});
   FillInTheBlanksTemplateCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
       Then<$Out2, $R2> t);
 }
@@ -198,10 +205,12 @@ class _FillInTheBlanksTemplateCopyWithImpl<$R, $Out>
   @override
   ListCopyWith<
       $R,
-      FillInTheBlankSegment,
-      FillInTheBlankSegmentCopyWith<$R, FillInTheBlankSegment,
-          FillInTheBlankSegment>> get segments => ListCopyWith($value.segments,
-      (v, t) => v.copyWith.$chain(t), (v) => call(segments: v));
+      FillInTheBlankAnswerKey,
+      FillInTheBlankAnswerKeyCopyWith<$R, FillInTheBlankAnswerKey,
+          FillInTheBlankAnswerKey>> get answerKeys => ListCopyWith(
+      $value.answerKeys,
+      (v, t) => v.copyWith.$chain(t),
+      (v) => call(answerKeys: v));
   @override
   $R call(
           {String? id,
@@ -214,7 +223,8 @@ class _FillInTheBlanksTemplateCopyWithImpl<$R, $Out>
           Object? sourceTemplateId = $none,
           List<Tag>? tags,
           bool? verticallyCentered,
-          List<FillInTheBlankSegment>? segments}) =>
+          String? promptText,
+          List<FillInTheBlankAnswerKey>? answerKeys}) =>
       $apply(FieldCopyWithData({
         if (id != null) #id: id,
         if (deckId != null) #deckId: deckId,
@@ -226,7 +236,8 @@ class _FillInTheBlanksTemplateCopyWithImpl<$R, $Out>
         if (sourceTemplateId != $none) #sourceTemplateId: sourceTemplateId,
         if (tags != null) #tags: tags,
         if (verticallyCentered != null) #verticallyCentered: verticallyCentered,
-        if (segments != null) #segments: segments
+        if (promptText != null) #promptText: promptText,
+        if (answerKeys != null) #answerKeys: answerKeys
       }));
   @override
   FillInTheBlanksTemplate $make(CopyWithData data) => FillInTheBlanksTemplate(
@@ -242,7 +253,8 @@ class _FillInTheBlanksTemplateCopyWithImpl<$R, $Out>
       tags: data.get(#tags, or: $value.tags),
       verticallyCentered:
           data.get(#verticallyCentered, or: $value.verticallyCentered),
-      segments: data.get(#segments, or: $value.segments));
+      promptText: data.get(#promptText, or: $value.promptText),
+      answerKeys: data.get(#answerKeys, or: $value.answerKeys));
 
   @override
   FillInTheBlanksTemplateCopyWith<$R2, FillInTheBlanksTemplate, $Out2>

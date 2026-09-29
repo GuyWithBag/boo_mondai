@@ -4,7 +4,7 @@
 // ignore_for_file: unused_element, unnecessary_cast, override_on_non_overriding_member
 // ignore_for_file: strict_raw_type, inference_failure_on_untyped_parameter
 
-part of 'multiple_choice_template.dto.dart';
+part of 'multiple_choice.template.dto.dart';
 
 class MultipleChoiceTemplateMapper
     extends SubClassMapperBase<MultipleChoiceTemplate> {
@@ -68,11 +68,12 @@ class MultipleChoiceTemplateMapper
   static const Field<MultipleChoiceTemplate, bool> _f$multipleAnswers = Field(
       'multipleAnswers', _$multipleAnswers,
       key: r'multiple_answers', opt: true, def: false);
-  static bool _$randomizeOptionsOrdering(MultipleChoiceTemplate v) =>
-      v.randomizeOptionsOrdering;
-  static const Field<MultipleChoiceTemplate, bool> _f$randomizeOptionsOrdering =
-      Field('randomizeOptionsOrdering', _$randomizeOptionsOrdering,
-          key: r'randomize_options_ordering', opt: true, def: false);
+  static bool _$randomizedOptionsOrdering(MultipleChoiceTemplate v) =>
+      v.randomizedOptionsOrdering;
+  static const Field<MultipleChoiceTemplate, bool>
+      _f$randomizedOptionsOrdering = Field(
+          'randomizedOptionsOrdering', _$randomizedOptionsOrdering,
+          key: r'randomized_options_ordering', opt: true, def: false);
 
   @override
   final MappableFields<MultipleChoiceTemplate> fields = const {
@@ -89,7 +90,7 @@ class MultipleChoiceTemplateMapper
     #questionPrompt: _f$questionPrompt,
     #options: _f$options,
     #multipleAnswers: _f$multipleAnswers,
-    #randomizeOptionsOrdering: _f$randomizeOptionsOrdering,
+    #randomizedOptionsOrdering: _f$randomizedOptionsOrdering,
   };
 
   @override
@@ -115,7 +116,7 @@ class MultipleChoiceTemplateMapper
         questionPrompt: data.dec(_f$questionPrompt),
         options: data.dec(_f$options),
         multipleAnswers: data.dec(_f$multipleAnswers),
-        randomizeOptionsOrdering: data.dec(_f$randomizeOptionsOrdering));
+        randomizedOptionsOrdering: data.dec(_f$randomizedOptionsOrdering));
   }
 
   @override
@@ -198,7 +199,7 @@ abstract class MultipleChoiceTemplateCopyWith<
       String? questionPrompt,
       List<MultipleChoiceOption>? options,
       bool? multipleAnswers,
-      bool? randomizeOptionsOrdering});
+      bool? randomizedOptionsOrdering});
   MultipleChoiceTemplateCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
       Then<$Out2, $R2> t);
 }
@@ -237,7 +238,7 @@ class _MultipleChoiceTemplateCopyWithImpl<$R, $Out>
           String? questionPrompt,
           List<MultipleChoiceOption>? options,
           bool? multipleAnswers,
-          bool? randomizeOptionsOrdering}) =>
+          bool? randomizedOptionsOrdering}) =>
       $apply(FieldCopyWithData({
         if (id != null) #id: id,
         if (deckId != null) #deckId: deckId,
@@ -252,8 +253,8 @@ class _MultipleChoiceTemplateCopyWithImpl<$R, $Out>
         if (questionPrompt != null) #questionPrompt: questionPrompt,
         if (options != null) #options: options,
         if (multipleAnswers != null) #multipleAnswers: multipleAnswers,
-        if (randomizeOptionsOrdering != null)
-          #randomizeOptionsOrdering: randomizeOptionsOrdering
+        if (randomizedOptionsOrdering != null)
+          #randomizedOptionsOrdering: randomizedOptionsOrdering
       }));
   @override
   MultipleChoiceTemplate $make(CopyWithData data) => MultipleChoiceTemplate(
@@ -272,8 +273,8 @@ class _MultipleChoiceTemplateCopyWithImpl<$R, $Out>
       questionPrompt: data.get(#questionPrompt, or: $value.questionPrompt),
       options: data.get(#options, or: $value.options),
       multipleAnswers: data.get(#multipleAnswers, or: $value.multipleAnswers),
-      randomizeOptionsOrdering: data.get(#randomizeOptionsOrdering,
-          or: $value.randomizeOptionsOrdering));
+      randomizedOptionsOrdering: data.get(#randomizedOptionsOrdering,
+          or: $value.randomizedOptionsOrdering));
 
   @override
   MultipleChoiceTemplateCopyWith<$R2, MultipleChoiceTemplate, $Out2>

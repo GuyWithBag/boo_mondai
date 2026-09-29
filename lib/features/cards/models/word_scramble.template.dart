@@ -1,18 +1,17 @@
-import 'package:boo_mondai/features/cards/models/card_template.dto.dart';
-import 'package:boo_mondai/features/cards/models/fill_in_the_blank_segment.dto.dart';
+import 'package:boo_mondai/features/cards/models/card.template.dto.dart';
 import 'package:boo_mondai/core/services/uuid.dart';
 import 'package:boo_mondai/features/study_session/models/study_session.answer.dart';
 import 'package:boo_mondai/features/tags/models/tag.dto.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 
-part 'fill_in_the_blanks_template.dto.mapper.dart';
+part 'word_scramble.template.mapper.dart';
 
-@MappableClass(discriminatorValue: 'fill_in_the_blanks')
-class FillInTheBlanksTemplate extends CardTemplate
-    with FillInTheBlanksTemplateMappable {
-  final List<FillInTheBlankSegment> segments;
+@MappableClass(discriminatorValue: 'word_scramble')
+class WordScrambleTemplate extends CardTemplate
+    with WordScrambleTemplateMappable {
+  final String sentenceToScramble;
 
-  const FillInTheBlanksTemplate({
+  const WordScrambleTemplate({
     required super.id,
     required super.deckId,
     required super.sortOrder,
@@ -23,33 +22,28 @@ class FillInTheBlanksTemplate extends CardTemplate
     super.sourceTemplateId,
     super.tags,
     super.verticallyCentered,
-    required this.segments,
+    required this.sentenceToScramble,
   });
 
-  factory FillInTheBlanksTemplate.createDummy({
+  factory WordScrambleTemplate.createDummy({
     String? id,
     String deckId = '',
     int sortOrder = 0,
   }) {
     final now = DateTime.now();
-    return FillInTheBlanksTemplate(
+    return WordScrambleTemplate(
       id: id ?? uuid.v7(),
       deckId: deckId,
       sortOrder: sortOrder,
       createdAt: now,
       updatedAt: now,
-      segments: const [],
+      sentenceToScramble: '',
     );
   }
 
   @override
   bool checkAnswer(StudySessionAnswer answer, {bool isReversed = false}) {
-    final answers = answer.value.split('|');
-
-    return segments.isNotEmpty &&
-        answers.length == segments.length &&
-        segments.asMap().entries.every((entry) {
-          return entry.value.checkAnswer(answers[entry.key]);
-        });
+    return answer.value.trim().toLowerCase() ==
+        sentenceToScramble.trim().toLowerCase();
   }
 }

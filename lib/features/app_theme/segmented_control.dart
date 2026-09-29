@@ -27,6 +27,8 @@ class SegmentedControl<T> extends HookWidget {
     required this.value,
     required this.onChanged,
     this.enabled = true,
+    this.isOptionEnabled,
+    this.onDisabledOptionPressed,
     super.key,
     this.isScrollable = false,
   });
@@ -35,6 +37,8 @@ class SegmentedControl<T> extends HookWidget {
   final T value;
   final ValueChanged<T> onChanged;
   final bool enabled;
+  final bool Function(T value)? isOptionEnabled;
+  final ValueChanged<T>? onDisabledOptionPressed;
   final bool isScrollable;
 
   @override
@@ -60,7 +64,7 @@ class SegmentedControl<T> extends HookWidget {
       required SegmentOption<T> option,
       required bool selected,
       required bool enabled,
-      required VoidCallback onTap,
+      required VoidCallback? onTap,
     }) {
       if (isScrollable) {
         return _SegmentedControlOption<T>(
@@ -88,8 +92,12 @@ class SegmentedControl<T> extends HookWidget {
           buildOption(
             option: option,
             selected: selection.isSelected(option.value),
-            enabled: enabled,
-            onTap: () => selection.select(option.value),
+            enabled: enabled && (isOptionEnabled?.call(option.value) ?? true),
+            onTap: !enabled
+                ? null
+                : (isOptionEnabled?.call(option.value) ?? true)
+                ? () => selection.select(option.value)
+                : () => onDisabledOptionPressed?.call(option.value),
           ),
       ],
     );
@@ -128,7 +136,7 @@ class _SegmentedControlOption<T> extends StatelessWidget {
   final SegmentOption<T> option;
   final bool selected;
   final bool enabled;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -144,7 +152,7 @@ class _SegmentedControlOption<T> extends StatelessWidget {
       borderRadius:
           style.decoration.borderRadius as BorderRadius? ??
           BorderRadius.circular(tokens.radiusSurfaceXsm),
-      onTap: enabled ? onTap : null,
+      onTap: onTap,
       child: Surface(
         style: style,
         child: Center(child: Text(option.label)),
