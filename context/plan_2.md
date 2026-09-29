@@ -277,7 +277,7 @@ For card templates, support at least:
 - `backText`
 - `promptText`
 - `questionPrompt`
-- `acceptedAnswers`
+- `answers`
 - `options`
 - `segments`
 - `pairs`

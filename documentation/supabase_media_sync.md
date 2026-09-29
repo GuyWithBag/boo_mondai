@@ -398,7 +398,7 @@ Current sync usage:
 | `MultipleChoiceTemplate` | `questionPrompt`, `options.optionText` |
 | `WordScrambleTemplate` | `sentenceToScramble` |
 | `FillInTheBlanksTemplate` | `segments.fullText` |
-| `MatchMadnessTemplate` | `pairs.term`, `pairs.match` |
+| `MatchingTypeTemplate` | `pairs.term`, `pairs.match` |
 
 ## Card Template Media
 

@@ -274,7 +274,7 @@ CardTemplates table row + joined child rows
     ├── IdentificationTemplate.checkAnswer()
     ├── MultipleChoiceTemplate.checkAnswer()
     ├── FillInTheBlanksTemplate.checkAnswer()
-    ├── MatchMadnessTemplate.checkAnswer()
+    ├── MatchingTypeTemplate.checkAnswer()
     └── WordScrambleTemplate.checkAnswer()
 ```
 

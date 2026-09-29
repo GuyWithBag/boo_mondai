@@ -32,7 +32,7 @@ flowchart TD
     CardMedia --> MultipleChoiceTemplate["MultipleChoiceTemplate"]
     CardMedia --> WordScrambleTemplate["WordScrambleTemplate"]
     CardMedia --> FillInTheBlanksTemplate["FillInTheBlanksTemplate"]
-    CardMedia --> MatchMadnessTemplate["MatchMadnessTemplate"]
+    CardMedia --> MatchingTypeTemplate["MatchingTypeTemplate"]
 
     StrategyFactory --> Decks["Decks"]
     StrategyFactory --> DeckListings["DeckListings"]
@@ -140,14 +140,14 @@ flowchart TD
     Switch --> MultipleChoice["_preprocessMultipleChoiceTemplate"]
     Switch --> WordScramble["_preprocessWordScrambleTemplate"]
     Switch --> FillBlanks["_preprocessFillInTheBlanksTemplate"]
-    Switch --> MatchMadness["_preprocessMatchMadnessTemplate"]
+    Switch --> MatchingType["_preprocessMatchingTypeTemplate"]
 
     Flashcard --> CardMarkdown["upload markdown fields"]
     Identification --> CardMarkdown
     MultipleChoice --> CardMarkdown
     WordScramble --> CardMarkdown
     FillBlanks --> CardMarkdown
-    MatchMadness --> CardMarkdown
+    MatchingType --> CardMarkdown
 
     Flashcard --> CardSource["upload explicit media source fields"]
     Identification --> CardSource

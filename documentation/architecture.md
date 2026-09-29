@@ -100,7 +100,7 @@ classDiagram
     class IdentificationTemplate { }
     class FillInTheBlanksTemplate { }
     class MultipleChoiceTemplate { }
-    class MatchMadnessTemplate { }
+    class MatchingTypeTemplate { }
     class WordScrambleTemplate { }
 
     class StudyCard {
@@ -248,7 +248,7 @@ classDiagram
     CardTemplate <|-- IdentificationTemplate
     CardTemplate <|-- FillInTheBlanksTemplate
     CardTemplate <|-- MultipleChoiceTemplate
-    CardTemplate <|-- MatchMadnessTemplate
+    CardTemplate <|-- MatchingTypeTemplate
     CardTemplate <|-- WordScrambleTemplate
 
     StudySession <|-- DrillSession

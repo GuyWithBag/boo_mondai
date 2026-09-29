@@ -307,10 +307,10 @@ Sorting uses listing metrics for downloads, favorites, upvotes, comments, and re
 
 Files:
 
-- `filters/card_template.search_filter.dart`
-- `filter_codecs/card_template.search_filter_codec.dart`
-- `results/card_template.search_results.dart`
-- `sort_fields/card_template.search_sort_field.dart`
+- `filters/card.template.search_filter.dart`
+- `filter_codecs/card.template.search_filter_codec.dart`
+- `results/card.template.search_results.dart`
+- `sort_fields/card.template.search_sort_field.dart`
 
 Directives:
 

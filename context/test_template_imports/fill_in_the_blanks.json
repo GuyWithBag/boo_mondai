@@ -1,63 +1,30 @@
 [
   {
     "type": "fill_in_the_blanks",
-    "segments": [
-      {
-        "fullText": "Je parle francais.",
-        "blankStart": 9,
-        "blankEnd": 17,
-        "correctAnswer": "francais"
-      }
+    "prompt_text": "Je parle francais.",
+    "answer_keys": [{"value": "francais", "casing_type": "any"}]
+  },
+  {
+    "type": "fill_in_the_blanks",
+    "prompt_text": "Nous allons au marche.",
+    "answer_keys": [{"value": "marche", "casing_type": "any"}]
+  },
+  {
+    "type": "fill_in_the_blanks",
+    "prompt_text": "Elle boit de l'eau.",
+    "answer_keys": [{"value": "eau", "casing_type": "any"}]
+  },
+  {
+    "type": "fill_in_the_blanks",
+    "prompt_text": "Le chat dort sur la chaise.",
+    "answer_keys": [
+      {"value": "chat", "casing_type": "any"},
+      {"value": "chaise", "casing_type": "any"}
     ]
   },
   {
     "type": "fill_in_the_blanks",
-    "segments": [
-      {
-        "fullText": "Nous allons au marche.",
-        "blankStart": 16,
-        "blankEnd": 22,
-        "correctAnswer": "marche"
-      }
-    ]
-  },
-  {
-    "type": "fill_in_the_blanks",
-    "segments": [
-      {
-        "fullText": "Elle boit de l'eau.",
-        "blankStart": 16,
-        "blankEnd": 19,
-        "correctAnswer": "eau"
-      }
-    ]
-  },
-  {
-    "type": "fill_in_the_blanks",
-    "segments": [
-      {
-        "fullText": "Le chat dort sur la chaise.",
-        "blankStart": 3,
-        "blankEnd": 7,
-        "correctAnswer": "chat"
-      },
-      {
-        "fullText": "Le chat dort sur la chaise.",
-        "blankStart": 20,
-        "blankEnd": 26,
-        "correctAnswer": "chaise"
-      }
-    ]
-  },
-  {
-    "type": "fill_in_the_blanks",
-    "segments": [
-      {
-        "fullText": "Je voudrais un cafe.",
-        "blankStart": 15,
-        "blankEnd": 19,
-        "correctAnswer": "cafe"
-      }
-    ]
+    "prompt_text": "Je voudrais un cafe.",
+    "answer_keys": [{"value": "cafe", "casing_type": "any"}]
   }
 ]

@@ -1,0 +1,71 @@
+{
+  "type": "Deck",
+  "title": "All 6",
+  "templates": [
+    {
+      "type": "match_madness",
+      "pairs": [
+        {
+          "term": "bonjour",
+          "match": "hello"
+        },
+        {
+          "term": "merci",
+          "match": "thank you"
+        },
+        {
+          "term": "eau",
+          "match": "water"
+        }
+      ]
+    },
+    {
+      "type": "flashcard",
+      "frontText": "bonjour",
+      "backText": "hello",
+      "direction": "normal"
+    },
+    {
+      "type": "word_scramble",
+      "sentenceToScramble": "Je parle francais"
+    },
+    {
+      "type": "identification",
+      "prompt_text": "Translate: hello",
+      "answers": [
+        {
+          "answer": "bonjour",
+          "casing_type": "any"
+        }
+      ]
+    },
+    {
+      "type": "fill_in_the_blanks",
+      "prompt_text": "Je parle francais.",
+      "answer_keys": [
+        {
+          "value": "francais",
+          "casing_type": "any"
+        }
+      ]
+    },
+    {
+      "type": "multiple_choice",
+      "questionPrompt": "Which word means hello?",
+      "options": [
+        {
+          "optionText": "bonjour",
+          "isCorrect": true
+        },
+        {
+          "optionText": "fromage",
+          "isCorrect": false
+        },
+        {
+          "optionText": "rouge",
+          "isCorrect": false
+        }
+      ]
+    }
+  ]
+}

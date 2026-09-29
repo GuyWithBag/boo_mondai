@@ -2,7 +2,7 @@
   {
     "type": "identification",
     "promptText": "Translate: hello",
-    "acceptedAnswers": [
+    "answers": [
       {
         "answer": "bonjour",
         "casingType": "any"
@@ -12,7 +12,7 @@
   {
     "type": "identification",
     "promptText": "Translate: good night",
-    "acceptedAnswers": [
+    "answers": [
       {
         "answer": "bonne nuit",
         "casingType": "any"
@@ -22,7 +22,7 @@
   {
     "type": "identification",
     "promptText": "Type the language name exactly: French",
-    "acceptedAnswers": [
+    "answers": [
       {
         "answer": "French",
         "casingType": "exact"
@@ -32,7 +32,7 @@
   {
     "type": "identification",
     "promptText": "Translate: thank you",
-    "acceptedAnswers": [
+    "answers": [
       {
         "answer": "merci",
         "casingType": "any"
@@ -46,7 +46,7 @@
   {
     "type": "identification",
     "promptText": "Translate: see you tomorrow",
-    "acceptedAnswers": [
+    "answers": [
       {
         "answer": "a demain",
         "casingType": "any"

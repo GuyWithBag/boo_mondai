@@ -73,7 +73,7 @@ becomes the sync god object.
 - `MultipleChoiceTemplate`
 - `WordScrambleTemplate`
 - `FillInTheBlanksTemplate`
-- `MatchMadnessTemplate`
+- `MatchingTypeTemplate`
 
 That means every new card type requires editing deck sync internals.
 
@@ -674,7 +674,7 @@ Examples in `DeckSyncSession`:
 - `_preprocessMultipleChoiceTemplate`
 - `_preprocessWordScrambleTemplate`
 - `_preprocessFillInTheBlanksTemplate`
-- `_preprocessMatchMadnessTemplate`
+- `_preprocessMatchingTypeTemplate`
 
 They repeat this pattern:
 
@@ -916,7 +916,7 @@ Better:
 ```dart
 final options = <MultipleChoiceOption>[];
 final segments = <FillInTheBlankSegment>[];
-final pairs = <MatchMadnessPair>[];
+final pairs = <MatchingTypeValue>[];
 ```
 
 If imports become noisy, that is another sign this code belongs near the card
