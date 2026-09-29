@@ -5,8 +5,7 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/lib.barrel.dart'
-    show MultipleChoiceOption, MatchPairData, uuid;
+import 'package:boo_mondai/lib.barrel.dart' show MultipleChoiceOption, uuid;
 
 /// A collection of controllers and notifiers that represent the state of the
 /// card editor form. This allows us to pass the entire form state between
@@ -26,10 +25,3 @@ List<MultipleChoiceOption> defaultMultipleChoiceOptions(String templateId) =>
         displayOrder: index,
       ),
     );
-
-/// Default pairs provided when creating a new matching card.
-const List<MatchPairData> defaultMatchPairs = [
-  MatchPairData(term: '', match: ''),
-  MatchPairData(term: '', match: ''),
-  MatchPairData(term: '', match: ''),
-];

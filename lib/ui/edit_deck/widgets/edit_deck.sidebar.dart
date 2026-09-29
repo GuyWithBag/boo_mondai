@@ -4,7 +4,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         FlashcardTemplate,
         MultipleChoiceTemplate,
         FillInTheBlanksTemplate,
-        MatchMadnessTemplate,
+        MatchingTypeTemplate,
         IdentificationTemplate,
         WordScrambleTemplate,
         AppTokens,
@@ -28,7 +28,7 @@ class EditDeckSideBar extends SignalWidget {
       FlashcardTemplate _ => Icons.slideshow_outlined,
       MultipleChoiceTemplate _ => Icons.list,
       FillInTheBlanksTemplate _ => Icons.draw,
-      MatchMadnessTemplate _ => Icons.shuffle,
+      MatchingTypeTemplate _ => Icons.shuffle,
       IdentificationTemplate _ => Icons.border_color_outlined,
       WordScrambleTemplate _ => Icons.sort_by_alpha,
       _ => Icons.help_outline,
@@ -39,11 +39,10 @@ class EditDeckSideBar extends SignalWidget {
     final text = switch (template) {
       FlashcardTemplate f => f.frontText,
       MultipleChoiceTemplate m => m.questionPrompt,
-      FillInTheBlanksTemplate fb =>
-        fb.segments.isNotEmpty ? fb.segments.first.fullText : '',
-      MatchMadnessTemplate mm =>
-        mm.pairs.isNotEmpty
-            ? '${mm.pairs.first.term} / ${mm.pairs.first.match}'
+      FillInTheBlanksTemplate fb => fb.promptText,
+      MatchingTypeTemplate mm =>
+        mm.values.isNotEmpty
+            ? '${mm.values.first.text} / ${mm.values[1].text}'
             : '',
       IdentificationTemplate i => i.promptText,
       WordScrambleTemplate ws => ws.sentenceToScramble,
@@ -57,7 +56,7 @@ class EditDeckSideBar extends SignalWidget {
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
     final templates = controller.templates.value;
-    final activeTemplateId = controller.activeTemplateId.value;
+    final selectedTemplateId = controller.selectedTemplateId.value;
 
     return Container(
       width: 288.w,
@@ -80,18 +79,18 @@ class EditDeckSideBar extends SignalWidget {
             child: ListView(
               padding: EdgeInsets.all(16.w),
               children: [
-                for (final template in templates) ...[
+                for (final entry in templates.asMap().entries) ...[
                   Button(
                     elevated: false,
-                    selected: template.id == activeTemplateId,
-                    onPressed: template.id == activeTemplateId
+                    selected: entry.value.id == selectedTemplateId,
+                    onPressed: entry.value.id == selectedTemplateId
                         ? null
-                        : () => controller.onTemplateSelected(template.id),
-                    leading: Icon(_iconFor(template)),
+                        : () => controller.selectTemplate(entry.value.id),
+                    leading: Icon(_iconFor(entry.value)),
                     mainAxisAlignment: MainAxisAlignment.start,
                     variants: const [ButtonVariant.text, ButtonColor.baseline],
                     child: Text(
-                      _labelFor(template),
+                      _labelFor(entry.value),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),

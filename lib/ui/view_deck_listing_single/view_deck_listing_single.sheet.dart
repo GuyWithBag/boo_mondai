@@ -4,6 +4,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         Button,
         ButtonColor,
+        CardTemplate,
         ChipTone,
         DateHelper,
         DeckDetails,
@@ -27,19 +28,19 @@ import 'package:boo_mondai/lib.barrel.dart'
         SurfaceShadow,
         SurfaceShape,
         ToolBar,
+        ToolBarController,
         ViewCardsTile,
         ViewDeckListingSingleEditorController,
         ViewDeckListingSingleHelper,
         ViewDeckListingSinglePreviewController,
         ViewPaddingSizedBox,
         showBottomSheet,
-        surfaceStyle,
-        useToolBarController,
-        DeckListingsService;
+        surfaceStyle;
 import 'package:boo_mondai/ui/view_deck_listing_single/view_deck_listing_single.barrel.dart';
 import 'package:flutter/material.dart'
     hide FormField, Scaffold, AppBar, showBottomSheet;
-import 'package:flutter_hooks/flutter_hooks.dart' show useEffect, useMemoized;
+import 'package:flutter_hooks/flutter_hooks.dart'
+    show useEffect, useMemoized, useRef;
 
 import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
 import 'package:signals_hooks/signals_hooks.dart';
@@ -51,6 +52,8 @@ Future<void> showViewDeckListingSingleSheet<
 >({required BuildContext context, required T controller}) {
   return showBottomSheet(
     context: context,
+    enableDrag: false,
+    isDismissible: false,
     builder: (_) => ViewDeckListingSingleSheet(controller: controller),
   );
 }
@@ -69,31 +72,57 @@ class ViewDeckListingSingleSheet<T extends ViewDeckListingSingleController>
 
     final isEditing = controller is ViewDeckListingSingleEditorController;
 
-    final toolBarController = useToolBarController();
+    final toolBarController = useMemoized(() => ToolBarController());
+    useEffect(() => toolBarController.dispose, [toolBarController]);
+
+    final error = controller.error.value;
+    final editorController = controller is ViewDeckListingSingleEditorController
+        ? controller as ViewDeckListingSingleEditorController
+        : null;
+    final isRequestingClose = useRef(false);
+
+    Future<void> requestClose() async {
+      if (isRequestingClose.value) return;
+      isRequestingClose.value = true;
+
+      final editor = editorController;
+      if (editor == null) {
+        Navigator.of(context).pop();
+        return;
+      }
+
+      final shouldClose = await editor.onClose(context);
+      if (!context.mounted) return;
+      if (!shouldClose) {
+        isRequestingClose.value = false;
+        return;
+      }
+
+      editor.canClose.value = true;
+      Navigator.of(context).pop();
+    }
 
     // ToDo: Eventually change this.
     useEffect(() {
+      if (error == null) return null;
+
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ScaffoldMessenger.maybeOf(context)?.showSnackBar(
           SnackBar(
-            content: Text(
-              controller.error.toString().replaceFirst('Exception: ', ''),
-            ),
+            content: Text(error.toString().replaceFirst('Exception: ', '')),
           ),
         );
       });
       return null;
-    }, [controller.error]);
+    }, [error]);
 
     List<Widget> getAppBarActions() {
       final children = <Widget>[];
 
       if (isEditing) {
-        final editorController =
-            controller as ViewDeckListingSingleEditorController;
         children.add(
           Button.icon(
-            icon: editorController.getPublishedButtonIcon(),
+            icon: editorController!.getPublishedButtonIcon(),
             color: editorController.getPublishedButtonColor(),
             tokens: tokens,
             onPressed: () => editorController.togglePublished(context: context),
@@ -129,61 +158,81 @@ class ViewDeckListingSingleSheet<T extends ViewDeckListingSingleController>
       return children;
     }
 
-    return DraggableScrollableSheet(
-      expand: false,
-      initialChildSize: 1,
-      minChildSize: 0.4,
-      maxChildSize: 1,
-      builder: (context, scrollController) {
-        final appBar = AppBar(
-          transparentBackground: true,
-          actions: getAppBarActions(),
-          preferredHeight: 80,
-        );
-        final appBarHeight =
-            appBar.preferredSize.height + MediaQuery.viewPaddingOf(context).top;
+    return PopScope<void>(
+      canPop: editorController?.canClose.value ?? true,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) return;
+        requestClose();
+      },
+      child: DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: 1,
+        minChildSize: 0.4,
+        maxChildSize: 1,
+        shouldCloseOnMinExtent: false,
+        builder: (context, scrollController) {
+          final appBar = AppBar(
+            transparentBackground: true,
+            actions: getAppBarActions(),
+            preferredHeight: 80,
+            onPop: requestClose,
+          );
+          final appBarHeight =
+              appBar.preferredSize.height +
+              MediaQuery.viewPaddingOf(context).top;
 
-        return Surface(
-          style: surfaceStyle
-              .resolve(tokens, const [SurfacePadding.none])
-              .copyWith(clipBehavior: Clip.antiAlias),
-          child: Scaffold(
-            backgroundColor: Colors.transparent,
-            scrollable: true,
-            scrollController: scrollController,
-            isFloatingAppBar: true,
-            inheritMainBottomNavBarHeight: false,
-            showViewPaddingBottom: false,
-            padding: EdgeInsets.zero,
-            appBar: appBar,
-            toolBar: ToolBar.withActions(
-              controller: toolBarController,
-              useAttachments: true,
-              createAttachmentPath: (file) => DecksDirectoryPaths.attachment(
-                deckTitle: controller.deck.value.title,
-                fileNameWithoutExtension: file.name,
+          return NotificationListener<DraggableScrollableNotification>(
+            onNotification: (notification) {
+              if (notification.extent > notification.minExtent) return false;
+
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (context.mounted) requestClose();
+              });
+              return false;
+            },
+            child: Surface(
+              style: surfaceStyle
+                  .resolve(tokens, const [SurfacePadding.none])
+                  .copyWith(clipBehavior: Clip.antiAlias),
+              child: Scaffold(
+                backgroundColor: Colors.transparent,
+                scrollable: true,
+                scrollController: scrollController,
+                isFloatingAppBar: true,
+                inheritMainBottomNavBarHeight: false,
+                showViewPaddingBottom: false,
+                padding: EdgeInsets.zero,
+                appBar: appBar,
+                toolBar: ToolBar.withActions(
+                  controller: toolBarController,
+                  useAttachments: true,
+                  createAttachmentPath: (file) =>
+                      DecksDirectoryPaths.attachment(
+                        deckTitle: controller.deck.value.title,
+                        fileNameWithoutExtension: file.name,
+                      ),
+                ),
+                body: isEditing
+                    ? Form(
+                        key: editorController!.formKey,
+                        child: _Body(
+                          helper: helper,
+                          isEditing: isEditing,
+                          controller: controller,
+                          appBarHeight: appBarHeight,
+                        ),
+                      )
+                    : _Body(
+                        helper: helper,
+                        isEditing: isEditing,
+                        controller: controller,
+                        appBarHeight: appBarHeight,
+                      ),
               ),
             ),
-            body: isEditing
-                ? Form(
-                    key: (controller as ViewDeckListingSingleEditorController)
-                        .formKey,
-                    child: _Body(
-                      helper: helper,
-                      isEditing: isEditing,
-                      controller: controller,
-                      appBarHeight: appBarHeight,
-                    ),
-                  )
-                : _Body(
-                    helper: helper,
-                    isEditing: isEditing,
-                    controller: controller,
-                    appBarHeight: appBarHeight,
-                  ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }
@@ -211,10 +260,26 @@ class _Body<T extends ViewDeckListingSingleController>
         .map((tag) => tag.name)
         .toList(growable: false);
 
-    final featuredImages = DeckListingsService.getFeaturedImages(
-      deck: controller.deck.value,
-      listing: controller.listing.value,
+    final previewController =
+        controller is ViewDeckListingSinglePreviewController
+        ? controller as ViewDeckListingSinglePreviewController
+        : null;
+    final editorController = controller is ViewDeckListingSingleEditorController
+        ? controller as ViewDeckListingSingleEditorController
+        : null;
+    final previewFeaturedImages = useMemoized(
+      () => listSignal<ImageProvider>(
+        previewController?.listing.value.featuredImages
+                .map((url) => NetworkImage(url))
+                .toList(growable: false) ??
+            const <ImageProvider>[],
+      ),
+      [previewController?.listing.value.featuredImages],
     );
+    useEffect(() => previewFeaturedImages.dispose, [previewFeaturedImages]);
+    final featuredImages =
+        editorController?.featuredImages ?? previewFeaturedImages;
+
     final carouselController = useMemoized(
       () => EditableCarouselController(
         imageSources: featuredImages,
@@ -223,22 +288,20 @@ class _Body<T extends ViewDeckListingSingleController>
         autoScrollInterval: isEditing ? null : Duration(seconds: 3),
         shouldLoop: true,
       ),
-      [isEditing, ...featuredImages],
+      [isEditing, featuredImages],
     );
 
     useEffect(() {
       return carouselController.dispose;
     }, [carouselController]);
 
-    final previewController =
-        controller as ViewDeckListingSinglePreviewController;
-    final editorController =
-        controller as ViewDeckListingSingleEditorController;
-
     final deck = controller.deck.value;
+    final featuredCardTemplates =
+        editorController?.listing.value.featuredCards ??
+        controller.listing.value.featuredCards;
 
-    // ToDo: fix
-    final templates = editorController.getFeaturedCardTemplates();
+    final templates =
+        editorController?.listing.value.featuredCards ?? const <CardTemplate>[];
 
     return Column(
       spacing: tokens.spaceLayoutGapXsm,
@@ -253,17 +316,25 @@ class _Body<T extends ViewDeckListingSingleController>
               right: tokens.spaceScaffoldPaddingXsm,
             ),
             child: Center(
-              child: FormField<List<String>>(
-                value: featuredImages,
+              child: FormField<List<ImageProvider>>(
+                value: featuredImages.value,
                 enabled: isEditing,
 
-                validator: DeckFormValidator.featuredImages,
+                validator: (images) {
+                  if (images == null || images.isEmpty) {
+                    return 'Add at least one featured image';
+                  }
+                  if (images.length > 5) {
+                    return 'Use no more than 5 featured images';
+                  }
+                  return null;
+                },
                 builder: (_, _) {
                   return AspectRatio(
                     aspectRatio: tokens.deckListingFeaturedImagesAspectRatio,
                     child: EditableCarousel(
                       controller: carouselController,
-                      onImagePicked: editorController.upsertFeaturedImage,
+                      onImagePicked: editorController?.upsertFeaturedImage,
                     ),
                   );
                 },
@@ -297,7 +368,7 @@ class _Body<T extends ViewDeckListingSingleController>
                   //     deck,
                   //   ),
                   // ),
-                  if (!isEditing)
+                  if (previewController != null)
                     Row(
                       spacing: tokens.spaceLayoutGapSm,
                       children: [
@@ -340,19 +411,19 @@ class _Body<T extends ViewDeckListingSingleController>
                   ),
                   MetaLabel(
                     label: NumberHelper.formatAbbreviatedCount(
-                      previewController.listing.value.upvotesCount,
+                      controller.listing.value.upvotesCount,
                     ),
                     icon: Icons.arrow_upward,
                   ),
                   MetaLabel(
                     label: NumberHelper.formatAbbreviatedCount(
-                      previewController.listing.value.downvotesCount,
+                      controller.listing.value.downvotesCount,
                     ),
                     icon: Icons.arrow_downward,
                   ),
                   MetaLabel(
                     label: NumberHelper.formatAbbreviatedCount(
-                      previewController.listing.value.favoritesCount,
+                      controller.listing.value.favoritesCount,
                     ),
                     icon: Icons.favorite,
                   ),
@@ -377,10 +448,11 @@ class _Body<T extends ViewDeckListingSingleController>
                 areTagsEditable: isEditing && deck.isEditable,
                 tagsPlaceholder: deck.isEditable ? 'Add tags' : 'No tags yet',
                 tagsTone: ChipTone.ghost,
-                onTitleChanged: (value) => editorController.setTitle(value),
-                onShortDescriptionChanged: editorController.setShortDescription,
-                onLongDescriptionChanged: editorController.setLongDescription,
-                onTagsChanged: editorController.setTags,
+                onTitleChanged: editorController?.setTitle,
+                onShortDescriptionChanged:
+                    editorController?.setShortDescription,
+                onLongDescriptionChanged: editorController?.setLongDescription,
+                onTagsChanged: editorController?.setTags,
                 metaLabels: Column(
                   spacing: tokens.spaceLayoutGapSm,
                   children: [
@@ -425,13 +497,13 @@ class _Body<T extends ViewDeckListingSingleController>
                 ),
               ),
               SectionEyebrow('Featured Cards'),
-              if (isEditing)
-                FormField<List<Map<String, dynamic>>>(
-                  value: controller.listing.value.featuredCards,
+              if (editorController != null)
+                FormField<List<CardTemplate>>(
+                  value: featuredCardTemplates,
 
                   validator: DeckFormValidator.featuredCards,
                   builder: (_, _) => EditableFeaturedCardsColumn(
-                    featuredCards: controller.listing.value.featuredCards,
+                    featuredCards: featuredCardTemplates,
                     isEditable: true,
                     onAddPressed: () => editorController.addFeaturedCard(
                       context: context,
@@ -465,7 +537,7 @@ class _Body<T extends ViewDeckListingSingleController>
                 )
               else
                 EditableFeaturedCardsColumn(
-                  featuredCards: controller.listing.value.featuredCards,
+                  featuredCards: featuredCardTemplates,
                 ),
               if (!isEditing) ...[
                 ViewDiscussionSection(rootContent: controller.content.value),

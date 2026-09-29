@@ -107,28 +107,17 @@ class ViewDeckSingleSheetController {
     );
     if (shouldCreateListing != true) return;
 
-    final listing = await DeckListingsService.createListing(deck.value);
-    final listingContent =
-        LocalDB.contents.selectByPk({'id': listing.contentId}) ??
-        Content(
-          id: listing.contentId,
-          profileId: deck.value.profileId,
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-          type: ContentType.deckListing,
-        );
-
-    await LocalDB.contents.upsert(listingContent);
-    await LocalDB.deckListing.upsert(listing);
+    final result = await DeckListingsService.createListing(deck.value);
 
     if (context.mounted) {
       await showViewDeckListingSingleSheet(
         context: context,
         controller: ViewDeckListingSingleEditorController(
           deck: deck,
-          content: signal(listingContent),
-          listing: signal<DeckListing>(listing),
+          content: signal(result.deckListingContent),
+          listing: signal<DeckListing>(result.deckListing),
           profile: ProfileService.currentProfile,
+          // ToDo: isnt this supposed to be nullable?
           sourceProfile: ProfileService.currentProfile,
         ),
       );

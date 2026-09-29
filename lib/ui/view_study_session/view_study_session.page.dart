@@ -4,7 +4,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         BottomNavBar,
         ProgressBar,
-        RatingArea,
         Scaffold,
         SessionException,
         SessionMode,
@@ -17,6 +16,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         ViewMessageSessionStepPage,
         ViewStudySessionController,
         textStyle;
+import 'package:boo_mondai/ui/view_study_session/view_study_session.bottom_nav_bar_body.dart';
 import 'package:flutter/material.dart' hide AppBar, Scaffold;
 import 'package:flutter_hooks/flutter_hooks.dart' show useEffect, useMemoized;
 import 'package:signals_hooks/signals_hooks.dart';
@@ -116,8 +116,12 @@ class ViewStudySessionPage extends SignalHookWidget {
         ),
       ),
       bottomNavBar: BottomNavBar(
-        preferredHeight: 130,
-        child: RatingArea(
+        preferredHeight: ViewStudySessionBottomNavBarBody.preferredHeight(
+          template: template,
+          cardStageController: cardStageController,
+        ),
+        child: ViewStudySessionBottomNavBarBody(
+          template: template,
           studySessionController: studySessionController,
           cardStageController: cardStageController,
           isCompleting: controller.isCompleting.value,

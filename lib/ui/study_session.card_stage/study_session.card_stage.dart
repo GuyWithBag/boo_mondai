@@ -7,7 +7,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         CardTemplate,
         MultipleChoiceTemplate,
         FillInTheBlanksTemplate,
-        MatchMadnessTemplate,
+        MatchingTypeTemplate,
         WordScrambleTemplate,
         FlashcardCard,
         MultipleChoiceCard,
@@ -34,7 +34,7 @@ class StudySessionCardStage extends HookWidget {
         template is MultipleChoiceTemplate ||
         template is IdentificationTemplate ||
         template is FillInTheBlanksTemplate ||
-        template is MatchMadnessTemplate ||
+        template is MatchingTypeTemplate ||
         template is WordScrambleTemplate;
   }
 
@@ -65,7 +65,7 @@ class StudySessionCardStage extends HookWidget {
         template: fb,
         cardStageController: cardStageController,
       ),
-      MatchMadnessTemplate mm => MatchingTypeCard(
+      MatchingTypeTemplate mm => MatchingTypeCard(
         template: mm,
         cardStageController: cardStageController,
       ),

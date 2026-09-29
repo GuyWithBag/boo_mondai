@@ -3,13 +3,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         BottomNavBar,
         Button,
-        CardTemplateType,
         EditDeckController,
-        EditDeckQuestionTypeHelper,
-        useSelectionController,
-        SelectionController;
+        EditDeckQuestionTypeHelper;
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -27,15 +23,6 @@ class EditDeckBottomNavBar extends SignalHookWidget
     final tokens = context.themeTokens<AppTokens>();
     final formats = EditDeckQuestionTypeHelper.visibleQuestionTypes;
     final selectedType = editor.selectedCardTemplateType.value;
-    final selection = useMemoized(
-      () => SelectionController<CardTemplateType>(
-        selectedValues: {selectedType},
-        onSelectionChanged: (selected) {
-          if (selected.isEmpty) return;
-          editor.onCardTemplateTypeSelected(selected.first);
-        },
-      ),
-    );
 
     return BottomNavBar(
       child: SingleChildScrollView(
@@ -46,8 +33,8 @@ class EditDeckBottomNavBar extends SignalHookWidget
             for (final format in formats) ...[
               Button(
                 leading: Icon(EditDeckQuestionTypeHelper.iconFor(format)),
-                selected: selection.isSelected(format),
-                onPressed: () => selection.select(format),
+                selected: format == selectedType,
+                onPressed: () => editor.changeSelectedTemplateType(format),
                 child: Text(
                   EditDeckQuestionTypeHelper.labelFor(format),
                   maxLines: 1,

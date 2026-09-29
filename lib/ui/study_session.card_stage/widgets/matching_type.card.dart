@@ -1,26 +1,31 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        MatchMadnessTemplate,
+        MatchingTypeTemplate,
         StudySessionCardStageController,
-        StudySessionAnswer,
         AppTokens,
+        ButtonColor,
+        ButtonVariant,
         textStyle,
         TextSize,
         TextWeight,
         TextColor,
         MarkdownText,
         MarkdownTextMode,
+        MarkdownHelper,
         PhysicalCard,
         ScaleHelper,
         Button,
+        AlignedScrollView,
         usePhysicalCardController,
         PhysicalCardController;
+import 'package:boo_mondai/ui/study_session.card_stage/widgets/matching_type.controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-class MatchingTypeCard extends HookWidget {
+class MatchingTypeCard extends SignalHookWidget {
   const MatchingTypeCard({
     super.key,
     required this.template,
@@ -31,7 +36,7 @@ class MatchingTypeCard extends HookWidget {
     this.controller,
   });
 
-  final MatchMadnessTemplate template;
+  final MatchingTypeTemplate template;
   final StudySessionCardStageController? cardStageController;
   final bool isRevealed;
   final double? maxWidth;
@@ -41,6 +46,17 @@ class MatchingTypeCard extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
+    final matchingTypeController = useMemoized(
+      () => MatchingTypeController(
+        template: template,
+        cardStageController: cardStageController,
+      ),
+      [template.id, cardStageController],
+    );
+    useEffect(() => matchingTypeController.dispose, [matchingTypeController]);
+    final effectiveIsRevealed =
+        isRevealed || cardStageController?.isRevealed.value == true;
+
     final eyebrowStyle = ScaleHelper.getTextStyleWithScaledFontSize(
       textStyle.resolve(tokens, const [
         TextSize.labelSmall,
@@ -65,60 +81,22 @@ class MatchingTypeCard extends HookWidget {
       tokens.spaceLayoutGapSm,
       contentScale,
     );
-    final itemGap = ScaleHelper.getScaledValue(14.h, contentScale);
     final padding = ScaleHelper.getScaledEdgeInsets(
       EdgeInsets.all(tokens.spaceLayoutPaddingSm),
       contentScale,
     );
-    final terms = template.pairs.map((pair) => pair.term).toList();
-    final matches = template.pairs.map((pair) => pair.match).toList();
-    final selectedMatch = useState<String?>(null);
-    final matchedItems = useState<Set<String>>({});
-    final effectiveIsRevealed =
-        isRevealed || cardStageController?.isRevealed.value == true;
+
     final fallbackPhysicalCardController = usePhysicalCardController(
       context,
       width: maxWidth,
     );
     final physicalCardController = controller ?? fallbackPhysicalCardController;
 
-    useEffect(() {
-      selectedMatch.value = null;
-      matchedItems.value = {};
-      return null;
-    }, [template.id, cardStageController]);
-
-    void handleMatchTap(String item) {
-      if (effectiveIsRevealed) return;
-      final selected = selectedMatch.value;
-      if (selected == null) {
-        selectedMatch.value = item;
-        return;
-      }
-
-      final isPair = template.pairs.any(
-        (pair) =>
-            (pair.term == selected && pair.match == item) ||
-            (pair.match == selected && pair.term == item),
-      );
-
-      if (isPair) {
-        final nextMatched = {...matchedItems.value, selected, item};
-        matchedItems.value = nextMatched;
-        if (nextMatched.length == template.pairs.length * 2) {
-          cardStageController?.revealWithAnswer(
-            const StudySessionAnswer(value: 'Matched all pairs'),
-          );
-        }
-      }
-
-      selectedMatch.value = null;
-    }
-
     return PhysicalCard(
       controller: physicalCardController,
       padding: EdgeInsets.zero,
-      front: Padding(
+      front: AlignedScrollView(
+        verticallyCentered: template.verticallyCentered,
         padding: padding,
         child: Column(
           spacing: gap,
@@ -129,33 +107,26 @@ class MatchingTypeCard extends HookWidget {
               textAlign: TextAlign.center,
               style: eyebrowStyle,
             ),
-
             Row(
               spacing: columnGap,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: _MatchColumn(
-                    items: terms,
-                    selectedMatch: selectedMatch.value,
-                    matchedItems: matchedItems.value,
-                    isRevealed: effectiveIsRevealed,
-                    textStyle: itemTextStyle,
-                    itemGap: itemGap,
+                  child: _MatchingColumn(
+                    items: matchingTypeController.leftItems.value,
+                    controller: matchingTypeController,
+                    locked: effectiveIsRevealed,
+                    itemTextStyle: itemTextStyle,
                     contentScale: contentScale,
-                    onItemPressed: handleMatchTap,
                   ),
                 ),
                 Expanded(
-                  child: _MatchColumn(
-                    items: matches,
-                    selectedMatch: selectedMatch.value,
-                    matchedItems: matchedItems.value,
-                    isRevealed: effectiveIsRevealed,
-                    textStyle: itemTextStyle,
-                    itemGap: itemGap,
+                  child: _MatchingColumn(
+                    items: matchingTypeController.rightItems.value,
+                    controller: matchingTypeController,
+                    locked: effectiveIsRevealed,
+                    itemTextStyle: itemTextStyle,
                     contentScale: contentScale,
-                    onItemPressed: handleMatchTap,
                   ),
                 ),
               ],
@@ -167,88 +138,63 @@ class MatchingTypeCard extends HookWidget {
   }
 }
 
-class _MatchColumn extends StatelessWidget {
-  const _MatchColumn({
+class _MatchingColumn extends SignalWidget {
+  const _MatchingColumn({
     required this.items,
-    required this.selectedMatch,
-    required this.matchedItems,
-    required this.isRevealed,
-    required this.textStyle,
-    required this.itemGap,
+    required this.controller,
+    required this.locked,
+    required this.itemTextStyle,
     required this.contentScale,
-    required this.onItemPressed,
   });
 
-  final List<String> items;
-  final String? selectedMatch;
-  final Set<String> matchedItems;
-  final bool isRevealed;
-  final TextStyle textStyle;
-  final double itemGap;
+  final List<MatchingTypeItem> items;
+  final MatchingTypeController controller;
+  final bool locked;
+  final TextStyle itemTextStyle;
   final double contentScale;
-  final ValueChanged<String>? onItemPressed;
 
   @override
   Widget build(BuildContext context) {
+    final gap = ScaleHelper.getScaledValue(10.h, contentScale);
+
     return Column(
+      spacing: gap,
       children: [
-        for (final item in items) ...[
-          _MatchButton(
-            value: item,
-            selected: selectedMatch == item,
-            matched: isRevealed ? false : matchedItems.contains(item),
-            textStyle: textStyle,
-            contentScale: contentScale,
-            onPressed: isRevealed || onItemPressed == null
-                ? null
-                : () => onItemPressed!(item),
+        for (final item in items)
+          SizedBox(
+            width: double.infinity,
+            child: Button(
+              elevated: false,
+              contentScale: contentScale,
+              selected: controller.isSelected(item),
+              variants: [..._itemVariants(item), ButtonVariant.flat],
+              mainAxisAlignment: MainAxisAlignment.center,
+              onPressed: locked || controller.isMatched(item)
+                  ? null
+                  : () => controller.select(item),
+              child: MarkdownText(
+                data: item.value.text,
+                mode: MarkdownTextMode.previewSelectable,
+                baseTextStyle: itemTextStyle,
+                contentScale: contentScale,
+                resolveAttachmentUrl: MarkdownHelper.resolveAttachmentUrl,
+              ),
+            ),
           ),
-          if (item != items.last) SizedBox(height: itemGap),
-        ],
       ],
     );
   }
-}
 
-class _MatchButton extends StatelessWidget {
-  const _MatchButton({
-    required this.value,
-    required this.selected,
-    required this.matched,
-    required this.textStyle,
-    required this.contentScale,
-    required this.onPressed,
-  });
-
-  final String value;
-  final bool selected;
-  final bool matched;
-  final TextStyle textStyle;
-  final double contentScale;
-  final VoidCallback? onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return IgnorePointer(
-      ignoring: matched,
-      child: Opacity(
-        opacity: matched ? 0 : 1,
-        child: SizedBox(
-          width: double.infinity,
-          child: Button(
-            selected: selected,
-            contentScale: contentScale,
-            mainAxisAlignment: MainAxisAlignment.center,
-            onPressed: onPressed,
-            child: MarkdownText(
-              data: value,
-              mode: MarkdownTextMode.preview,
-              baseTextStyle: textStyle,
-              contentScale: contentScale,
-            ),
-          ),
-        ),
-      ),
-    );
+  List<Object> _itemVariants(MatchingTypeItem item) {
+    if (controller.isMatched(item)) {
+      return const [ButtonColor.success];
+    }
+    if (controller.isIncorrect(item)) {
+      return const [ButtonColor.error];
+    }
+    if (controller.isSelected(item)) {
+      return const [ButtonColor.primary];
+    }
+    return const [ButtonColor.baseline];
   }
 }

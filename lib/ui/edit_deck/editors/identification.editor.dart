@@ -4,11 +4,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         Button,
         CardVerticalAlignmentControl,
         CasingType,
+        EditDeckController,
         EditDeckFormValidator,
         FormField,
-        IdentificationAnswerData,
         IdentificationEditorController,
-        IdentificationTemplate,
         MarkdownText,
         MarkdownTextMode,
         SectionEyebrow,
@@ -25,31 +24,26 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextSize,
         TextWeight,
         surfaceStyle,
-        textStyle;
+        textStyle,
+        IdentificationAnswerKey;
 import 'package:flutter/material.dart' hide FormField;
 import 'package:flutter_hooks/flutter_hooks.dart' show useEffect, useMemoized;
 import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 class IdentificationEditor extends SignalHookWidget {
-  const IdentificationEditor({
-    required this.template,
-    required this.onChanged,
-    super.key,
-  });
+  const IdentificationEditor({required this.editDeckController, super.key});
 
-  final IdentificationTemplate template;
-  final ValueChanged<IdentificationTemplate> onChanged;
+  final EditDeckController editDeckController;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
     final controller = useMemoized(
       () => IdentificationEditorController(
-        template: template,
-        onChanged: onChanged,
+        editDeckController: editDeckController,
       ),
-      [template.id],
+      [editDeckController.selectedTemplateKey.value],
     );
     useEffect(() => controller.dispose, [controller]);
     final answers = controller.answers.value;
@@ -59,8 +53,8 @@ class IdentificationEditor extends SignalHookWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         CardVerticalAlignmentControl(
-          value: controller.verticallyCentered,
-          onChanged: controller.updateVerticallyCentered,
+          value: controller.template.verticallyCentered,
+          onChanged: controller.onVerticalAlignmentControlChanged,
         ),
         FormField<String>(
           value: controller.promptController.text,
@@ -75,7 +69,7 @@ class IdentificationEditor extends SignalHookWidget {
             },
           ),
         ),
-        FormField<List<IdentificationAnswerData>>(
+        FormField<List<IdentificationAnswerKey>>(
           value: answers,
           validator: EditDeckFormValidator.identificationAnswers,
           builder: (_, _) => Surface(
@@ -102,9 +96,9 @@ class IdentificationEditor extends SignalHookWidget {
                   spacing: tokens.spaceLayoutGapMd,
                   children: [
                     for (final entry in answers.asMap().entries)
-                      _IdentificationAnswerRow(
+                      _IdentificationAnswerKeyRow(
                         index: entry.key,
-                        value: entry.value,
+                        answerKey: entry.value,
                         canMoveUp: entry.key > 0,
                         canMoveDown: entry.key < answers.length - 1,
                         canRemove: answers.length > 1,
@@ -133,10 +127,10 @@ class IdentificationEditor extends SignalHookWidget {
   }
 }
 
-class _IdentificationAnswerRow extends StatelessWidget {
-  const _IdentificationAnswerRow({
+class _IdentificationAnswerKeyRow extends StatelessWidget {
+  const _IdentificationAnswerKeyRow({
     required this.index,
-    required this.value,
+    required this.answerKey,
     required this.canMoveUp,
     required this.canMoveDown,
     required this.canRemove,
@@ -148,7 +142,7 @@ class _IdentificationAnswerRow extends StatelessWidget {
   });
 
   final int index;
-  final IdentificationAnswerData value;
+  final IdentificationAnswerKey answerKey;
   final bool canMoveUp;
   final bool canMoveDown;
   final bool canRemove;
@@ -188,7 +182,7 @@ class _IdentificationAnswerRow extends StatelessWidget {
               ),
               Expanded(
                 child: MarkdownText(
-                  data: value.answer,
+                  data: answerKey.value,
                   onChanged: onAnswerChanged,
                   mode: MarkdownTextMode.input,
                   placeholder: 'Accepted answer...',
@@ -217,7 +211,7 @@ class _IdentificationAnswerRow extends StatelessWidget {
           ),
           SegmentedControl<CasingType>(
             isScrollable: true,
-            value: value.casingType,
+            value: answerKey.casingType,
             options: [
               for (final type in CasingType.values)
                 SegmentOption(value: type, label: type.label),

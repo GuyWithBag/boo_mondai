@@ -23,8 +23,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         ButtonColor,
         MediaSelector,
         RatingButton,
-        SettingsController,
-        SettingsService;
+        SettingPath,
+        SettingsStore;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -53,6 +53,8 @@ class RatingArea extends SignalHookWidget {
   final StudySessionCardStageController cardStageController;
   final bool isCompleting;
 
+  static const double preferredHeight = 130.0;
+
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
@@ -69,14 +71,14 @@ class RatingArea extends SignalHookWidget {
         StudySessionHelper.getSubmissionStyle(template);
     final StudySessionAnswer? answer = cardStageController.answer.value;
     final mediaPackController = context.mediaPackController<AppMediaPack>();
-    final settingsController = context.read<SettingsController>();
+    final settingsStore = SettingsStore.instance;
 
     void playStudySessionSound(MediaSelector<AppMediaPack> sound) {
       unawaited(
         UiSoundsService.playIfEnabled(
           mediaPackController.resolve(sound),
-          settingsController: settingsController,
-          enabledSetting: SettingsService.uiSoundsEnabled,
+          settingsStore: settingsStore,
+          enabledSetting: SettingPath.uiSoundsEnabled,
         ),
       );
     }
@@ -91,7 +93,12 @@ class RatingArea extends SignalHookWidget {
           playStudySessionSound(
             StudyRatingHelper.getSound(StudyRating.incorrect),
           );
-          cardStageController.reveal(pendingRating: StudyRating.incorrect);
+          cardStageController.reveal(
+            pendingRating:
+                studySessionController.config.autoRateIncorrectAnswers
+                ? StudyRating.incorrect
+                : null,
+          );
           return;
         }
 
@@ -127,7 +134,8 @@ class RatingArea extends SignalHookWidget {
 
       final effectiveType =
           StudySessionHelper.isAutoGraded(template) &&
-              !template.checkAnswer(answer)
+              !template.checkAnswer(answer) &&
+              studySessionController.config.autoRateIncorrectAnswers
           ? StudyRating.incorrect
           : type;
 

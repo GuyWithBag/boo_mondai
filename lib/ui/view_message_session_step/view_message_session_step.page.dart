@@ -10,8 +10,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         BottomNavBar,
         StudySessionMessageStep,
         AppTokens,
-        SettingsController,
-        SettingsService,
+        SettingPath,
+        SettingsStore,
         StudySessionStepHelper,
         StudySessionController,
         ViewStudySessionController,
@@ -19,7 +19,6 @@ import 'package:boo_mondai/lib.barrel.dart'
 import 'package:flutter/material.dart' hide Scaffold, AppBar;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:media_variants/media_variants.dart';
-import 'package:provider/provider.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 class ViewMessageSessionStepPage extends HookWidget {
@@ -38,7 +37,7 @@ class ViewMessageSessionStepPage extends HookWidget {
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
     final mediaPackController = context.mediaPackController<AppMediaPack>();
-    final settingsController = context.read<SettingsController>();
+    final settingsStore = SettingsStore.instance;
     final messageStepSound = StudySessionStepHelper.getMessageStepSound(step);
 
     useEffect(() {
@@ -47,12 +46,12 @@ class ViewMessageSessionStepPage extends HookWidget {
       unawaited(
         UiSoundsService.playIfEnabled(
           mediaPackController.resolve(messageStepSound),
-          settingsController: settingsController,
-          enabledSetting: SettingsService.uiSoundsEnabled,
+          settingsStore: settingsStore,
+          enabledSetting: SettingPath.uiSoundsEnabled,
         ),
       );
       return null;
-    }, [step.id, messageStepSound, mediaPackController, settingsController]);
+    }, [step.id, messageStepSound, mediaPackController, settingsStore]);
 
     return Scaffold(
       scrollable: false,

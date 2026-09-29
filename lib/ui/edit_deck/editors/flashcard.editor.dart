@@ -1,9 +1,9 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         CardVerticalAlignmentControl,
+        EditDeckController,
         EditDeckFormValidator,
         FlashcardEditorController,
-        FlashcardTemplate,
         FormField,
         TextFieldCard,
         AppTokens,
@@ -23,20 +23,15 @@ import 'package:theme_variants/theme_variants.dart'
     show ThemeVariantsContext, Surface;
 
 class FlashcardEditor extends SignalHookWidget {
-  const FlashcardEditor({
-    required this.template,
-    required this.onChanged,
-    super.key,
-  });
+  const FlashcardEditor({required this.editDeckController, super.key});
 
-  final FlashcardTemplate template;
-  final ValueChanged<FlashcardTemplate> onChanged;
+  final EditDeckController editDeckController;
 
   @override
   Widget build(BuildContext context) {
     final editor = useMemoized(
-      () => FlashcardEditorController(template: template, onChanged: onChanged),
-      [template.id],
+      () => FlashcardEditorController(editDeckController: editDeckController),
+      [editDeckController.selectedTemplateKey.value],
     );
     useEffect(() => editor.dispose, [editor]);
     final tokens = context.themeTokens<AppTokens>();
@@ -87,8 +82,8 @@ class FlashcardEditor extends SignalHookWidget {
           ),
         ),
         CardVerticalAlignmentControl(
-          value: editor.verticallyCentered,
-          onChanged: editor.updateVerticallyCentered,
+          value: editor.template.verticallyCentered,
+          onChanged: editor.onVerticalAlignmentControlChanged,
         ),
         FormField<String>(
           value: editor.frontController.text,

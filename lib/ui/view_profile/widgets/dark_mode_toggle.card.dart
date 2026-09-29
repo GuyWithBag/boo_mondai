@@ -12,8 +12,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         surfaceStyle,
         textStyle,
         TextSize,
-        SettingsController,
-        SettingsService;
+        SettingPath,
+        SettingsStore;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart'
     show HookWidget, useEffect, useRef, useState;
@@ -47,7 +47,7 @@ class DarkModeToggleCard extends HookWidget {
 
     final tokens = context.themeTokens<AppTokens>();
     final uiSounds = context.mediaPackController<AppMediaPack>();
-    final settingsController = context.read<SettingsController>();
+    final settingsStore = SettingsStore.instance;
 
     final contrastTextPaint = Paint()
       ..color = Colors.white
@@ -87,15 +87,15 @@ class DarkModeToggleCard extends HookWidget {
             controller.setThemeMode(nextMode);
             await UiSoundsService.playIfEnabled(
               uiSounds.resolve((media) => media.buttonDownSound),
-              settingsController: settingsController,
-              enabledSetting: SettingsService.buttonDownSoundEnabled,
+              settingsStore: settingsStore,
+              enabledSetting: SettingPath.buttonDownSoundEnabled,
               volume: 2,
             );
             await Future.delayed(Duration(milliseconds: 460));
             await UiSoundsService.playIfEnabled(
               uiSounds.resolve((media) => media.buttonUpSound),
-              settingsController: settingsController,
-              enabledSetting: SettingsService.buttonUpSoundEnabled,
+              settingsStore: settingsStore,
+              enabledSetting: SettingPath.buttonUpSoundEnabled,
               volume: 2,
             );
           },

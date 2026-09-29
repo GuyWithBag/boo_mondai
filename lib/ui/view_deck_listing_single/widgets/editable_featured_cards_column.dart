@@ -4,7 +4,6 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
         CardTemplate,
-        CardTemplateMapper,
         CreateDeckTile,
         ViewCardsTile,
         surfaceStyle,
@@ -22,7 +21,7 @@ class EditableFeaturedCardsColumn extends StatelessWidget {
     this.onAddPressed,
   }) : assert(maxCardCount == null || maxCardCount > 0);
 
-  final List<Map<String, dynamic>> featuredCards;
+  final List<CardTemplate> featuredCards;
   final bool isEditable;
   final int? maxCardCount;
   final VoidCallback? onAddPressed;
@@ -30,16 +29,12 @@ class EditableFeaturedCardsColumn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final templates = featuredCards
-        .map(_tryDecodeTemplate)
-        .nonNulls
-        .toList(growable: false);
     final canAddCard =
         isEditable &&
         onAddPressed != null &&
         (maxCardCount == null || featuredCards.length < maxCardCount!);
 
-    final body = templates.isEmpty && !canAddCard
+    final body = featuredCards.isEmpty && !canAddCard
         ? const Text('This deck contains no cards featured.')
         : LayoutBuilder(
             builder: (context, constraints) {
@@ -53,7 +48,7 @@ class EditableFeaturedCardsColumn extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  for (final template in templates)
+                  for (final template in featuredCards)
                     ViewCardsTile.template(
                       template: template,
                       width: tileWidth,
@@ -72,13 +67,5 @@ class EditableFeaturedCardsColumn extends StatelessWidget {
       ]),
       child: body,
     );
-  }
-
-  CardTemplate? _tryDecodeTemplate(Map<String, dynamic> card) {
-    try {
-      return CardTemplateMapper.fromMap(card);
-    } on Object {
-      return null;
-    }
   }
 }

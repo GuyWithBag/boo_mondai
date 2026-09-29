@@ -12,8 +12,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         EditDeckSideBar,
         Scaffold,
         ToolBar,
+        ToolBarController,
         showSnackbar,
-        useToolBarController,
         EditDeckController;
 import 'package:flutter/material.dart' hide Scaffold;
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -38,8 +38,10 @@ class EditDeckPage extends SignalHookWidget {
         initialTemplateId: initialTemplateId,
       ),
     );
+    useEffect(() => controller.dispose, [controller]);
 
-    final toolBarController = useToolBarController();
+    final toolBarController = useMemoized(() => ToolBarController());
+    useEffect(() => toolBarController.dispose, [toolBarController]);
 
     final tokens = context.themeTokens<AppTokens>();
     final isSaving = controller.isLoading.value;
@@ -57,11 +59,11 @@ class EditDeckPage extends SignalHookWidget {
       ),
       floatingActionButton: Button.icon(
         icon: Icons.add,
-        onPressed: controller.onAddTemplatePressed,
+        onPressed: controller.addTemplate,
         tokens: tokens,
       ),
       sidebar: EditDeckSideBar(controller: controller),
-      bottomNavBar: controller.hasCurrentTemplate.value
+      bottomNavBar: controller.hasSelectedTemplate.value
           ? EditDeckBottomNavBar(editor: controller)
           : null,
       // bottomNavBar: EditDeckBottomNavBar(editor: controller),

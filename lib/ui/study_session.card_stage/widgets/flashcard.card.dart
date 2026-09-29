@@ -10,8 +10,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         PhysicalCardController;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class FlashcardCard extends HookWidget {
+class FlashcardCard extends SignalHookWidget {
   const FlashcardCard({
     super.key,
     required this.template,

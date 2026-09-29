@@ -8,13 +8,15 @@ import 'package:boo_mondai/lib.barrel.dart'
         NotificationsController,
         SessionException,
         SessionMode,
-        SettingsController,
-        SettingsService,
+        SettingPath,
+        SettingsStore,
         StreakController,
         StudySessionAnswer,
         StudySessionCardStageController,
+        StudySessionConfig,
         StudySessionController,
-        UiSoundsService;
+        UiSoundsService,
+        WordScrambleTemplate;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart' show GoRouterHelper;
 import 'package:media_variants/media_variants.dart';
@@ -29,7 +31,12 @@ final class ViewStudySessionController {
   }) : deckId = signal(deckId),
        mode = signal(mode),
        sessionController = StudySessionController(
-         mode: mode,
+         config: switch (mode) {
+           SessionMode.drill => const StudySessionConfig.drill(),
+           SessionMode.review => const StudySessionConfig.spacedRepitition(
+             requeueAgainWhenIntervalLessThan: Duration(minutes: 10),
+           ),
+         },
          notificationsController: mode == SessionMode.drill
              ? context.read<NotificationsController>()
              : null,
@@ -41,7 +48,6 @@ final class ViewStudySessionController {
       );
     }
 
-    settingsController = context.read<SettingsController>();
     studySessionCompleteSound = context
         .mediaPackController<AppMediaPack>()
         .resolve((media) => media.studySessionCompleteSound);
@@ -63,7 +69,7 @@ final class ViewStudySessionController {
   final StudySessionController sessionController;
   final currentStepId = signal<String?>(null);
 
-  late final SettingsController settingsController;
+  final SettingsStore settingsStore = SettingsStore.instance;
   late final MediaAsset studySessionCompleteSound;
   late final Signal<StudySessionCardStageController> cardStageController;
   late final EffectCleanup controllerEffect;
@@ -96,6 +102,7 @@ final class ViewStudySessionController {
               value: template.getAnswer(isReversed: studyCard.isReversed),
             )
           : null,
+      wordScrambleTemplate: template is WordScrambleTemplate ? template : null,
     );
 
     final previousController = untracked(() => cardStageController.value);
@@ -118,8 +125,8 @@ final class ViewStudySessionController {
     unawaited(
       UiSoundsService.playIfEnabled(
         studySessionCompleteSound,
-        settingsController: settingsController,
-        enabledSetting: SettingsService.uiSoundsEnabled,
+        settingsStore: settingsStore,
+        enabledSetting: SettingPath.uiSoundsEnabled,
       ),
     );
 

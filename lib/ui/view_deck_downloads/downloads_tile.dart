@@ -55,7 +55,7 @@ class DownloadsTile extends StatelessWidget {
 
   String get _completedLabel {
     final cardTemplatesCount = entry.changes
-        .where((c) => c.typeName == 'card_template')
+        .where((c) => c.typeName == 'card.template')
         .length;
     return 'Downloaded $cardTemplatesCount card${cardTemplatesCount == 1 ? '' : 's'}.';
   }

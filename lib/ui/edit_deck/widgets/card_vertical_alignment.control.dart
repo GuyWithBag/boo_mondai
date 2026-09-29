@@ -10,23 +10,21 @@ import 'package:boo_mondai/lib.barrel.dart'
         surfaceStyle,
         textStyle;
 import 'package:flutter/material.dart';
-import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-class CardVerticalAlignmentControl extends SignalHookWidget {
+class CardVerticalAlignmentControl extends StatelessWidget {
   const CardVerticalAlignmentControl({
     required this.value,
     required this.onChanged,
     super.key,
   });
 
-  final Signal<bool> value;
+  final bool value;
   final ValueChanged<bool> onChanged;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final verticallyCentered = value.value;
 
     return Surface(
       style: surfaceStyle.resolve(tokens, const [SurfaceColor.baseline]),
@@ -61,7 +59,7 @@ class CardVerticalAlignmentControl extends SignalHookWidget {
               SegmentOption(value: false, label: 'Top'),
               SegmentOption(value: true, label: 'Center'),
             ],
-            value: verticallyCentered,
+            value: value,
             onChanged: onChanged,
           ),
         ],

@@ -7,7 +7,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         FlashcardCard,
         FlashcardTemplate,
         IdentificationTemplate,
-        MatchMadnessTemplate,
+        MatchingTypeTemplate,
         MarkdownText,
         MarkdownTextMode,
         MatchingTypeCard,
@@ -72,7 +72,7 @@ abstract class ViewCardsHelper {
         contentScale: contentScale,
         isRevealed: true,
       ),
-      MatchMadnessTemplate t => MatchingTypeCard(
+      MatchingTypeTemplate t => MatchingTypeCard(
         controller: controller,
         template: t,
         maxWidth: width,

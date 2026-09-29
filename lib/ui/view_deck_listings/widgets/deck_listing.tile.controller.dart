@@ -114,8 +114,8 @@ class DeckListingTileController {
   void dispose() {
     profileAvatarEffect();
     backgroundImageEffect();
-    profileAvatarFuture.dispose();
-    backgroundImageFuture.dispose();
+    // FutureSignal can complete after this controller is disposed. Its
+    // effects are detached above; do not dispose an in-flight FutureSignal.
     featuredImageSource.dispose();
     version.dispose();
     description.dispose();

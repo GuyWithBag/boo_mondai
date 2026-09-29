@@ -1,89 +1,81 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         MultipleChoiceOption,
-        MultipleChoiceOptionHelper,
-        MultipleChoiceTemplate;
+        MultipleChoiceTemplate,
+        CardTemplateEditorController;
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
 
-class MultipleChoiceEditorController {
-  MultipleChoiceEditorController({
-    required this.template,
-    required this.onChanged,
-  }) {
+class MultipleChoiceEditorController
+    extends CardTemplateEditorController<MultipleChoiceTemplate> {
+  MultipleChoiceEditorController({required super.editDeckController}) {
     promptController.text = template.questionPrompt;
-    options.value = template.options;
-    verticallyCentered.value = template.verticallyCentered;
   }
 
-  final MultipleChoiceTemplate template;
-  final ValueChanged<MultipleChoiceTemplate> onChanged;
-
   final promptController = TextEditingController();
-  final options = signal<List<MultipleChoiceOption>>(const []);
-  final verticallyCentered = signal(true);
+  late final Computed<List<MultipleChoiceOption>> options = computed(
+    () => template.options,
+  );
 
-  void updatePrompt(String value) => emit(questionPrompt: value);
-
-  void updateVerticallyCentered(bool value) {
-    verticallyCentered.value = value;
-    emit(verticallyCentered: value);
+  void updatePrompt(String value) {
+    template = template.copyWith(questionPrompt: value);
   }
 
   void addOption() {
-    options.value = MultipleChoiceOptionHelper.add(
-      options.value,
-      templateId: template.id,
+    final current = template;
+    template = current.copyWith(
+      options: [
+        ...current.options,
+        MultipleChoiceOption.createDummy(
+          templateId: current.id,
+          displayOrder: current.options.length,
+        ),
+      ],
     );
-    emit();
   }
 
   void removeOption(int index) {
-    options.value = MultipleChoiceOptionHelper.removeAt(options.value, index);
-    emit();
+    final current = template;
+    if (index < 0 || index >= current.options.length) return;
+    template = current.copyWith(
+      options: [
+        for (final entry in current.options.asMap().entries)
+          if (entry.key != index)
+            entry.value.copyWith(
+              displayOrder: entry.key < index ? entry.key : entry.key - 1,
+            ),
+      ],
+    );
   }
 
   void updateOptionText(int index, String text) {
-    options.value = MultipleChoiceOptionHelper.updateTextAt(
-      options.value,
-      index,
-      text,
+    final current = template;
+    if (index < 0 || index >= current.options.length) return;
+    template = current.copyWith(
+      options: [
+        for (final entry in current.options.asMap().entries)
+          entry.key == index
+              ? entry.value.copyWith(optionText: text)
+              : entry.value,
+      ],
     );
-    emit();
   }
 
   void selectCorrectOption(int index) {
-    options.value = MultipleChoiceOptionHelper.selectCorrectAt(
-      options.value,
-      index,
-    );
-    emit();
-  }
-
-  void emit({String? questionPrompt, bool? verticallyCentered}) {
-    onChanged(
-      MultipleChoiceTemplate(
-        id: template.id,
-        deckId: template.deckId,
-        sortOrder: template.sortOrder,
-        createdAt: template.createdAt,
-        updatedAt: DateTime.now(),
-        deletedAt: template.deletedAt,
-        purgeAfter: template.purgeAfter,
-        sourceTemplateId: template.sourceTemplateId,
-        tags: template.tags,
-        verticallyCentered: verticallyCentered ?? this.verticallyCentered.value,
-        questionPrompt: questionPrompt ?? promptController.text,
-        options: options.value,
-        multipleAnswers: template.multipleAnswers,
-        randomizeOptionsOrdering: template.randomizeOptionsOrdering,
-      ),
+    final current = template;
+    if (index < 0 || index >= current.options.length) return;
+    template = current.copyWith(
+      options: [
+        for (final entry in current.options.asMap().entries)
+          entry.value.copyWith(isCorrect: entry.key == index),
+      ],
     );
   }
 
+  @override
   void dispose() {
     promptController.dispose();
     options.dispose();
-    verticallyCentered.dispose();
+    super.dispose();
   }
 }

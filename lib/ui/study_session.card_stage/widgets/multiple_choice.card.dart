@@ -75,7 +75,7 @@ class MultipleChoiceCard extends SignalHookWidget {
     final displayedOptions = useMemoized(() => _orderedOptions(template), [
       template.id,
       template.options,
-      template.randomizeOptionsOrdering,
+      template.randomizedOptionsOrdering,
     ]);
     final selectedOptionIds = useState<Set<String>>({});
     final effectiveIsRevealed =
@@ -214,7 +214,7 @@ class MultipleChoiceCard extends SignalHookWidget {
   List<MultipleChoiceOption> _orderedOptions(MultipleChoiceTemplate template) {
     final options = [...template.options]
       ..sort((a, b) => a.displayOrder.compareTo(b.displayOrder));
-    if (!template.randomizeOptionsOrdering) return options;
+    if (!template.randomizedOptionsOrdering) return options;
 
     return options..shuffle(Random(_stableSeed(template.id)));
   }

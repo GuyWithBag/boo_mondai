@@ -1,6 +1,4 @@
-import 'package:boo_mondai/features/cards/models/identification_answer_data.dto.dart';
-import 'package:boo_mondai/features/cards/models/match_pair_data.dto.dart';
-import 'package:boo_mondai/features/cards/models/multiple_choice_option.dto.dart';
+import 'package:boo_mondai/features/features.barrel.dart';
 
 abstract final class EditDeckFormValidator {
   static String? prompt(String? value) {
@@ -11,13 +9,11 @@ abstract final class EditDeckFormValidator {
     return _required(value, 'Enter an answer');
   }
 
-  static String? identificationAnswers(
-    List<IdentificationAnswerData>? answers,
-  ) {
+  static String? identificationAnswers(List<IdentificationAnswerKey>? answers) {
     if (answers == null || answers.isEmpty) {
       return 'Add at least one accepted answer';
     }
-    if (!answers.any((answer) => answer.answer.trim().isNotEmpty)) {
+    if (!answers.any((answer) => answer.value.trim().isNotEmpty)) {
       return 'Add at least one accepted answer';
     }
     return null;
@@ -40,16 +36,20 @@ abstract final class EditDeckFormValidator {
     if (answers == null || answers.isEmpty) {
       return 'Create at least one blank';
     }
+    if (!answers.any((answer) => answer.trim().isNotEmpty)) {
+      return 'Create at least one blank';
+    }
     return null;
   }
 
-  static String? matchingPairs(List<MatchPairData>? pairs) {
-    if (pairs == null || pairs.length < 2) {
-      return 'Add at least two matching pairs';
+  static String? matchingPairs(List<MatchingTypeValue>? values) {
+    if (values == null || values.length < 2) {
+      return 'Add at least two matching values';
     }
-    if (pairs.any((pair) {
-      return pair.term.trim().isEmpty || pair.match.trim().isEmpty;
-    })) {
+    if (values.length.isOdd) {
+      return 'Every matching row needs two values';
+    }
+    if (values.any((value) => value.text.trim().isEmpty)) {
       return 'Complete every matching pair';
     }
     return null;

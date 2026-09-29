@@ -18,10 +18,13 @@ import 'package:boo_mondai/lib.barrel.dart'
         DeckWithListingContent,
         FilteredSearchBar,
         FilteredSearchBarController,
+        FeatureDisabledState,
         ListingStatesWrapper,
         Pages,
         Profile,
         Scaffold,
+        SettingPath,
+        SettingsStore,
         StatusLayoutState,
         ViewDeckListingsController,
         showViewDeckListingSingleSheet;
@@ -40,6 +43,14 @@ class ViewDeckListingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final settingsStore = SettingsStore.instance;
+    if (settingsStore.get<bool>(SettingPath.disableOnlineFeatures)) {
+      return const Scaffold(
+        appBar: AppBar(title: 'Browse Decks'),
+        body: FeatureDisabledState(),
+      );
+    }
+
     return Provider(
       create: (_) {
         final controller = ViewDeckListingsController();

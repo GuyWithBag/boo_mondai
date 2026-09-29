@@ -4,7 +4,7 @@
 export 'edit_deck.editor_body.dart';
 export 'flashcard.editor.dart';
 export 'multiple_choice.editor.dart';
+export 'fill_in_the_blanks.editor.dart';
 export 'identification.editor.dart';
 export 'matching_type.editor.dart';
 export 'word_scramble.editor.dart';
-export 'fill_in_the_blanks.editor.dart';

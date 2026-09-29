@@ -4,7 +4,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         FillInTheBlanksTemplate,
         FlashcardTemplate,
         IdentificationTemplate,
-        MatchMadnessTemplate,
+        MatchingTypeTemplate,
         MultipleChoiceTemplate,
         SearchTokenShape,
         SearchTokens,
@@ -47,21 +47,18 @@ abstract final class ViewCardsSearch {
       FlashcardTemplate() => [template.frontText, template.backText],
       IdentificationTemplate() => [
         template.promptText,
-        for (final answer in template.acceptedAnswers) answer.answer,
+        for (final answer in template.answers) answer.value,
       ],
       MultipleChoiceTemplate() => [
         template.questionPrompt,
         for (final option in template.options) option.optionText,
       ],
       FillInTheBlanksTemplate() => [
-        for (final segment in template.segments) ...[
-          segment.fullText,
-          segment.correctAnswer,
-        ],
+        template.promptText,
+        for (final key in template.answerKeys) key.value,
       ],
-      MatchMadnessTemplate() => [
-        for (final pair in template.pairs) pair.term,
-        for (final pair in template.pairs) pair.match,
+      MatchingTypeTemplate() => [
+        for (final value in template.values) value.text,
       ],
       WordScrambleTemplate() => [template.sentenceToScramble],
       _ => const [],

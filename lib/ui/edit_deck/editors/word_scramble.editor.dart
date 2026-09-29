@@ -2,35 +2,29 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
         CardVerticalAlignmentControl,
+        EditDeckController,
         EditDeckFormValidator,
         FormField,
         TextFieldCard,
-        WordScrambleEditorController,
-        WordScrambleTemplate;
+        WordScrambleEditorController;
 import 'package:flutter/material.dart' hide FormField;
 import 'package:flutter_hooks/flutter_hooks.dart' show useEffect, useMemoized;
 import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
+// ToDo: Add functionality to add extra words, and more functionality to be able to add submit or not even when not all words are used.
 class WordScrambleEditor extends SignalHookWidget {
-  const WordScrambleEditor({
-    required this.template,
-    required this.onChanged,
-    super.key,
-  });
+  const WordScrambleEditor({required this.editDeckController, super.key});
 
-  final WordScrambleTemplate template;
-  final ValueChanged<WordScrambleTemplate> onChanged;
+  final EditDeckController editDeckController;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
     final editor = useMemoized(
-      () => WordScrambleEditorController(
-        template: template,
-        onChanged: onChanged,
-      ),
-      [template.id],
+      () =>
+          WordScrambleEditorController(editDeckController: editDeckController),
+      [editDeckController.selectedTemplateKey.value],
     );
     useEffect(() => editor.dispose, [editor]);
 
@@ -39,8 +33,8 @@ class WordScrambleEditor extends SignalHookWidget {
       spacing: tokens.spaceLayoutGapMd,
       children: [
         CardVerticalAlignmentControl(
-          value: editor.verticallyCentered,
-          onChanged: editor.updateVerticallyCentered,
+          value: editor.template.verticallyCentered,
+          onChanged: editor.onVerticalAlignmentControlChanged,
         ),
         FormField<String>(
           value: editor.sentenceController.text,

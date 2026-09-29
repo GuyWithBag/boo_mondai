@@ -27,7 +27,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         FormField,
         DecksDirectoryPaths,
         ToolBar,
-        useToolBarController,
+        ToolBarController,
         showBottomSheet;
 import 'package:flutter/material.dart'
     hide AppBar, FormField, Scaffold, showBottomSheet;
@@ -61,7 +61,8 @@ class ViewDeckSingleSheet extends SignalHookWidget {
       );
     });
     useEffect(() => controller.dispose, [controller]);
-    final toolBarController = useToolBarController();
+    final toolBarController = useMemoized(() => ToolBarController());
+    useEffect(() => toolBarController.dispose, [toolBarController]);
     final activeDeck = controller.deck.value;
 
     return DraggableScrollableSheet(

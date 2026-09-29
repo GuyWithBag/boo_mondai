@@ -1,16 +1,14 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         FillInTheBlanksTemplate,
+        FillInTheBlanksController,
         StudySessionCardStageController,
         AppTokens,
         textStyle,
         TextSize,
         TextWeight,
         TextColor,
-        FillInTheBlankAnswerInput,
-        MarkdownText,
-        MarkdownTextMode,
-        StudySessionAnswer,
+        FillInTheBlankTextField,
         ScaleHelper,
         PhysicalCard,
         AlignedScrollView,
@@ -19,9 +17,10 @@ import 'package:boo_mondai/lib.barrel.dart'
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-class FillInTheBlanksCard extends HookWidget {
+class FillInTheBlanksCard extends SignalHookWidget {
   const FillInTheBlanksCard({
     super.key,
     required this.template,
@@ -39,14 +38,25 @@ class FillInTheBlanksCard extends HookWidget {
   final double contentScale;
   final PhysicalCardController? controller;
 
-  bool _isCorrect(int index, List<String> blankInputs) {
-    final answer = index < blankInputs.length ? blankInputs[index] : '';
-    return template.segments[index].checkAnswer(answer);
-  }
-
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
+    final fillInTheBlanksController = useMemoized(
+      () => FillInTheBlanksController(
+        template: template,
+        cardStageController: cardStageController,
+      ),
+      [
+        template.id,
+        template.promptText,
+        template.answerKeys,
+        cardStageController,
+      ],
+    );
+    useEffect(() => fillInTheBlanksController.dispose, [
+      fillInTheBlanksController,
+    ]);
+
     final eyebrowStyle = ScaleHelper.getTextStyleWithScaledFontSize(
       textStyle.resolve(tokens, const [
         TextSize.labelSmall,
@@ -55,13 +65,13 @@ class FillInTheBlanksCard extends HookWidget {
       ]),
       contentScale,
     );
-    final blankTextStyle = ScaleHelper.getTextStyleWithScaledFontSize(
-      textStyle.resolve(tokens, const [TextSize.bodyLarge, TextWeight.heavy]),
+    final promptTextStyle = ScaleHelper.getTextStyleWithScaledFontSize(
+      textStyle.resolve(tokens, const [TextSize.body, TextWeight.heavy]),
       contentScale,
     );
-    final markdownTextStyle = ScaleHelper.getTextStyleWithScaledFontSize(
+    final answerTextStyle = ScaleHelper.getTextStyleWithScaledFontSize(
       textStyle.resolve(tokens, const [
-        TextSize.label,
+        TextSize.body,
         TextWeight.body,
         TextColor.baseline,
       ]),
@@ -71,12 +81,6 @@ class FillInTheBlanksCard extends HookWidget {
       EdgeInsets.all(tokens.spaceLayoutPaddingSm),
       contentScale,
     );
-    final promptGap = ScaleHelper.getScaledValue(48.h, contentScale);
-    final segmentSpacing = ScaleHelper.getScaledValue(12.w, contentScale);
-    final segmentRunSpacing = ScaleHelper.getScaledValue(16.h, contentScale);
-    final blankInputs = useState<List<String>>(
-      List.filled(template.segments.length, ''),
-    );
     final effectiveIsRevealed =
         isRevealed || cardStageController?.isRevealed.value == true;
     final fallbackPhysicalCardController = usePhysicalCardController(
@@ -84,27 +88,6 @@ class FillInTheBlanksCard extends HookWidget {
       width: maxWidth,
     );
     final physicalCardController = controller ?? fallbackPhysicalCardController;
-
-    useEffect(() {
-      blankInputs.value = List.filled(template.segments.length, '');
-      return null;
-    }, [template.id, cardStageController]);
-
-    void updateBlankInput(int index, String value) {
-      final inputs = [...blankInputs.value];
-      if (index >= inputs.length) return;
-      inputs[index] = value;
-      blankInputs.value = inputs;
-
-      cardStageController?.answer.value = StudySessionAnswer(
-        value: inputs.join('|'),
-      );
-      cardStageController?.canReveal.value =
-          template.segments.isNotEmpty &&
-          inputs.length == template.segments.length &&
-          inputs.every((answer) => answer.trim().isNotEmpty);
-    }
-
     return PhysicalCard(
       controller: physicalCardController,
       padding: EdgeInsets.zero,
@@ -114,77 +97,46 @@ class FillInTheBlanksCard extends HookWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              'Fill in the blank'.toUpperCase(),
-              textAlign: TextAlign.center,
-              style: eyebrowStyle,
-            ),
-            SizedBox(height: promptGap),
-            for (final entry in template.segments.asMap().entries) ...[
-              Wrap(
-                alignment: WrapAlignment.center,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                spacing: segmentSpacing,
-                runSpacing: segmentRunSpacing,
-                children: [
-                  Text(entry.value.prefix, style: blankTextStyle),
-                  effectiveIsRevealed
-                      ? _PreviewAnswer(
-                          label: entry.value.correctAnswer,
-                          contentScale: contentScale,
-                          textStyle: markdownTextStyle,
-                        )
-                      : FillInTheBlankAnswerInput(
-                          revealed:
-                              cardStageController?.isRevealed.value ?? false,
-                          correct: _isCorrect(entry.key, blankInputs.value),
-                          correctAnswer: entry.value.correctAnswer,
-                          contentScale: contentScale,
-                          textStyle: markdownTextStyle,
-                          onChanged: (value) =>
-                              updateBlankInput(entry.key, value),
+            Text('Fill in the blank'.toUpperCase(), style: eyebrowStyle),
+            SizedBox(height: ScaleHelper.getScaledValue(48.h, contentScale)),
+            Wrap(
+              alignment: WrapAlignment.start,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: ScaleHelper.getScaledValue(8.w, contentScale),
+              runSpacing: ScaleHelper.getScaledValue(16.h, contentScale),
+              children: [
+                for (final entry
+                    in fillInTheBlanksController.segments.value.indexed)
+                  if (entry.$2.key case final key?)
+                    FillInTheBlankTextField(
+                      revealed: effectiveIsRevealed,
+                      correct: fillInTheBlanksController.isCorrect(
+                        fillInTheBlanksController.blankIndexForSegment(
+                          entry.$1,
                         ),
-                  Text(entry.value.suffix, style: blankTextStyle),
-                ],
-              ),
-            ],
+                      ),
+                      value:
+                          fillInTheBlanksController
+                              .answers
+                              .value[fillInTheBlanksController
+                              .blankIndexForSegment(entry.$1)],
+                      correctAnswer: key.value,
+                      onChanged: (value) =>
+                          fillInTheBlanksController.updateAnswer(
+                            fillInTheBlanksController.blankIndexForSegment(
+                              entry.$1,
+                            ),
+                            value,
+                          ),
+                      contentScale: contentScale,
+                      textStyle: answerTextStyle,
+                    )
+                  else
+                    Text(entry.$2.text!, style: promptTextStyle),
+              ],
+            ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _PreviewAnswer extends StatelessWidget {
-  const _PreviewAnswer({
-    required this.label,
-    required this.contentScale,
-    required this.textStyle,
-  });
-
-  final String label;
-  final double contentScale;
-  final TextStyle textStyle;
-
-  @override
-  Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
-
-    return Container(
-      padding: ScaleHelper.getScaledEdgeInsets(
-        EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-        contentScale,
-      ),
-      decoration: BoxDecoration(
-        color: tokens.colorActionSuccess.withValues(alpha: 0.12),
-        border: Border.all(color: tokens.colorActionSuccess),
-        borderRadius: BorderRadius.circular(10.r * contentScale),
-      ),
-      child: MarkdownText(
-        data: label,
-        mode: MarkdownTextMode.preview,
-        baseTextStyle: textStyle,
-        contentScale: contentScale,
       ),
     );
   }

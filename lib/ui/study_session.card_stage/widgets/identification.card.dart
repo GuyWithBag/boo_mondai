@@ -1,6 +1,6 @@
 import 'package:boo_mondai/core/helpers/casing.helper.dart';
-import 'package:boo_mondai/core/helpers/casing_type.dart';
-import 'package:boo_mondai/features/cards/models/identification_answer.dto.dart';
+import 'package:boo_mondai/core/helpers/casing.type.dart';
+import 'package:boo_mondai/features/cards/models/identification.answer_key.dto.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AlignedScrollView,
@@ -189,7 +189,7 @@ class _AcceptedAnswersPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final answers = template.acceptedAnswers.toList()
+    final answers = template.answers.toList()
       ..sort((a, b) => a.displayOrder.compareTo(b.displayOrder));
 
     final visibleSubmittedAnswer = submittedAnswer?.trim();
@@ -230,7 +230,7 @@ class _AcceptedAnswersPreview extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10.r * contentScale),
                 ),
                 child: MarkdownText(
-                  data: answer.answer,
+                  data: answer.value,
                   mode: MarkdownTextMode.preview,
                   baseTextStyle: textStyle,
                   contentScale: contentScale,
@@ -260,7 +260,7 @@ class _WrongAnswerInsight extends StatelessWidget {
     required this.contentScale,
   });
 
-  final List<IdentificationAnswer> answers;
+  final List<IdentificationAnswerKey> answers;
   final String submittedAnswer;
   final TextStyle textStyle;
   final double contentScale;
@@ -292,7 +292,7 @@ class _WrongAnswerInsight extends StatelessWidget {
 }
 
 String _answerGuidance(IdentificationTemplate template) {
-  final answers = template.acceptedAnswers;
+  final answers = template.answers;
   final casingLabels = answers
       .map((answer) => _casingInstruction(answer.casingType))
       .toSet()
@@ -308,24 +308,24 @@ String _answerGuidance(IdentificationTemplate template) {
 }
 
 String? _wrongAnswerInsight(
-  List<IdentificationAnswer> answers,
+  List<IdentificationAnswerKey> answers,
   String submittedAnswer,
 ) {
   final normalizedSubmitted = CasingHelper.normalizedWords(submittedAnswer);
   if (normalizedSubmitted.isEmpty) return null;
 
   for (final answer in answers) {
-    if (CasingHelper.normalizedWords(answer.answer) != normalizedSubmitted) {
+    if (CasingHelper.normalizedWords(answer.value) != normalizedSubmitted) {
       continue;
     }
 
-    return 'The wording matches "${answer.answer}", but the casing should be ${_casingRequirement(answer.casingType)}.';
+    return 'The wording matches "${answer.value}", but the casing should be ${_casingRequirement(answer.casingType)}.';
   }
 
   final closest = _closestAnswer(answers, submittedAnswer);
   if (closest == null) return null;
 
-  return 'Closest accepted answer: "${closest.answer}".';
+  return 'Closest accepted answer: "${closest.value}".';
 }
 
 String _casingRequirement(CasingType casingType) {
@@ -340,18 +340,18 @@ String _casingRequirement(CasingType casingType) {
   };
 }
 
-IdentificationAnswer? _closestAnswer(
-  List<IdentificationAnswer> answers,
+IdentificationAnswerKey? _closestAnswer(
+  List<IdentificationAnswerKey> answers,
   String submittedAnswer,
 ) {
   const cutoff = 70;
-  IdentificationAnswer? closest;
+  IdentificationAnswerKey? closest;
   var bestScore = 0;
 
   for (final answer in answers) {
     final score = ratio(
       CasingHelper.normalizedWords(submittedAnswer),
-      CasingHelper.normalizedWords(answer.answer),
+      CasingHelper.normalizedWords(answer.value),
     );
     if (score > bestScore) {
       closest = answer;

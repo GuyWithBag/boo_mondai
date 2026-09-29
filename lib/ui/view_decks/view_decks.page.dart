@@ -14,35 +14,30 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         AuthService,
         Button,
-        ButtonColor,
         ChangeTrackerController,
         ChangeTrackerRouteArgs,
         ChangeTrackerService,
         ChangeTrackerStatus,
-        CreateDeckTile,
         Deck,
-        DeckListingTile,
         DeckWithListingContent,
-        DeckTile,
-        DeckTileState,
         FilteredSearchBar,
         FilteredSearchBarController,
-        InteractionHandler,
-        ListingStatesWrapper,
         ProgressBar,
         Scaffold,
         SegmentOption,
         SegmentedControl,
         SelectionController,
+        SettingPath,
+        SettingsStore,
         SnackbarHandle,
         SnackbarColor,
         SnackbarVariant,
-        StatusLayoutState,
         SyncController,
         SyncButton,
         SyncPage,
         ViewDecksLocalController,
         showViewImportModal,
+        showFeatureDisabledModal,
         showSnackbar,
         showModal;
 import 'package:boo_mondai/ui/ui.barrel.dart';
@@ -60,6 +55,10 @@ class ViewDecksLocalPage extends SignalHookWidget {
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
     final controller = context.read<ViewDecksLocalController>();
+    final settingsStore = SettingsStore.instance;
+    final areOnlineFeaturesDisabled = settingsStore.get<bool>(
+      SettingPath.disableOnlineFeatures,
+    );
     final changeTrackerPageArgs = useMemoized(
       () => signal(const ChangeTrackerRouteArgs.missing(entryId: '')),
     );
@@ -249,7 +248,8 @@ class ViewDecksLocalPage extends SignalHookWidget {
 
     // If there's an active sync plan, show SyncPage while this page-owned
     // tracker service has reviewable sync work.
-    if (AuthService.isAuthenticatedRemote &&
+    if (!areOnlineFeaturesDisabled &&
+        AuthService.isAuthenticatedRemote &&
         !isAlreadyUpToDate &&
         shouldShowSyncPage) {
       return SyncPage(syncController: syncController);
@@ -295,11 +295,17 @@ class ViewDecksLocalPage extends SignalHookWidget {
 
     final visibleDecks = deckSearchController.results.value;
     final visibleListingEntries = listingSearchController.results.value;
-    final hasSearchQuery = controller.isDeckScope.value
+    final isDeckScope =
+        areOnlineFeaturesDisabled || controller.isDeckScope.value;
+    final hasSearchQuery = isDeckScope
         ? deckSearchController.hasText.value
         : listingSearchController.hasText.value;
 
-    final searchBar = controller.isDeckScope.value
+    void showOnlineFeatureDisabled() {
+      showFeatureDisabledModal(context);
+    }
+
+    final searchBar = isDeckScope
         ? FilteredSearchBar<Deck>(
             controller: deckSearchController,
             placeholder: 'Search decks',
@@ -349,6 +355,8 @@ class ViewDecksLocalPage extends SignalHookWidget {
           SyncButton(
             isSyncing: isSyncing,
             isAuthenticated: AuthService.isAuthenticatedRemote,
+            isDisabled: areOnlineFeaturesDisabled,
+            onFeatureDisabledPressed: showOnlineFeatureDisabled,
             onSync: () => syncController.sync(changeTrackerController),
           ),
         ],
@@ -363,8 +371,21 @@ class ViewDecksLocalPage extends SignalHookWidget {
             top: tokens.spaceLayoutGapSm,
           ),
           child: SegmentedControl<ViewDecksSearchScope>(
-            value: controller.activeScope.value,
-            onChanged: controller.setActiveScope,
+            value: areOnlineFeaturesDisabled
+                ? ViewDecksSearchScope.decks
+                : controller.activeScope.value,
+            onChanged: (value) {
+              if (value == ViewDecksSearchScope.listings &&
+                  areOnlineFeaturesDisabled) {
+                showOnlineFeatureDisabled();
+                return;
+              }
+              controller.setActiveScope(value);
+            },
+            isOptionEnabled: (value) =>
+                value != ViewDecksSearchScope.listings ||
+                !areOnlineFeaturesDisabled,
+            onDisabledOptionPressed: (_) => showOnlineFeatureDisabled(),
             options: [
               for (final option in controller.scopeOptions.value)
                 SegmentOption(value: option.value, label: option.label),
@@ -372,8 +393,8 @@ class ViewDecksLocalPage extends SignalHookWidget {
           ),
         ),
       ),
-      body: controller.isDeckScope.value
-          ? _DeckListView(
+      body: isDeckScope
+          ? DeckListView(
               error: controller.error.value,
               isLoading: controller.isLoading.value,
               onRetry: controller.load,
@@ -383,7 +404,7 @@ class ViewDecksLocalPage extends SignalHookWidget {
               hasSearchQuery: hasSearchQuery,
               selectionController: selectionController,
             )
-          : _DeckListingListView(
+          : DeckListingListView(
               error: controller.error.value,
               isLoading: controller.isLoading.value,
               onRetry: controller.load,
@@ -454,202 +475,4 @@ String _entityName(FileSystemEntity entity) {
       .toList(growable: false);
   if (segments.isEmpty) return entity.path;
   return segments.last;
-}
-
-class _DeckListView extends StatelessWidget {
-  const _DeckListView({
-    required this.isLoading,
-    required this.error,
-    required this.decks,
-    required this.onRetry,
-    required this.onPressed,
-    required this.onCreate,
-    required this.hasSearchQuery,
-    required this.selectionController,
-  });
-
-  final bool isLoading;
-  final Exception? error;
-  final List<Deck> decks;
-  final VoidCallback onRetry;
-  final Function(BuildContext context, Deck deck) onPressed;
-  final VoidCallback onCreate;
-  final bool hasSearchQuery;
-  final SelectionController<String> selectionController;
-
-  @override
-  Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
-    const spacing = 16.0;
-
-    return ListingStatesWrapper<Deck>.grid(
-      isLoading: isLoading,
-      exception: error,
-      items: decks,
-      reverse: true,
-      useParentScroll: true,
-      textDirection: TextDirection.rtl,
-      onRetry: onRetry,
-      skeletonTile: _GridTileMaxWidthConstraints(
-        builder: (width) => DeckTile(deck: null, width: width, hasTags: true),
-      ),
-      emptyState: hasSearchQuery
-          ? const StatusLayoutState(
-              icon: Icons.search_off,
-              title: 'No decks found',
-              message: 'Try another search or remove filters',
-              disableScaffoldScrollingWhenShown: true,
-            )
-          : StatusLayoutState(
-              icon: Icons.layers,
-              title: 'No decks yet',
-              message: 'Create your first deck to get started',
-              actions: [
-                Button(
-                  onPressed: onCreate,
-                  variants: const [ButtonColor.primary],
-                  child: Text('Create Deck'),
-                ),
-              ],
-              disableScaffoldScrollingWhenShown: true,
-            ),
-      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-        maxCrossAxisExtent: tokens.studyCardWidth,
-        mainAxisSpacing: spacing,
-        crossAxisSpacing: spacing,
-        childAspectRatio: tokens.studyCardAspectRatio,
-      ),
-      leadingItem: _GridTileMaxWidthConstraints(
-        builder: (width) => CreateDeckTile(width: width, onPressed: onCreate),
-      ),
-      itemBuilder: (_, _, deck) {
-        return _GridTileMaxWidthConstraints(
-          builder: (width) => InteractionHandler(
-            onPressed: () {
-              onPressed(context, deck);
-            },
-            selectionController: selectionController,
-            selectionValue: deck.id,
-            child: DeckTile(
-              deck: deck,
-              width: width,
-              hasTags: true,
-              state: DeckTileState.defaultView,
-              isSelected: selectionController.isSelected(deck.id),
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _DeckListingListView extends StatelessWidget {
-  const _DeckListingListView({
-    required this.isLoading,
-    required this.error,
-    required this.entries,
-    required this.onRetry,
-    required this.onPressed,
-    required this.hasSearchQuery,
-  });
-
-  final bool isLoading;
-  final Exception? error;
-  final List<DeckWithListingContent> entries;
-  final VoidCallback onRetry;
-  final Function(BuildContext context, DeckWithListingContent entry) onPressed;
-  final bool hasSearchQuery;
-
-  @override
-  Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
-
-    return ListingStatesWrapper<DeckWithListingContent>.list(
-      isLoading: isLoading,
-      exception: error,
-      items: entries,
-      reverse: true,
-      useParentScroll: true,
-      onRetry: onRetry,
-      skeletonTile: DeckListingTile(
-        controller: DeckListingTileController(
-          deck: Deck(
-            id: '',
-            updatedAt: DateTime.now(),
-            createdAt: DateTime.now(),
-            profileId: 'loading',
-            title: 'Loading listing',
-            shortDescription: 'Loading listing description',
-            isPublished: true,
-          ),
-          listing: DeckListing(deckId: '', contentId: ''),
-          content: Content(
-            id: '',
-            profileId: '',
-            type: ContentType.deck,
-            createdAt: DateTime.now(),
-            updatedAt: DateTime.now(),
-          ),
-          sourceProfile: Profile(
-            displayName: '',
-            id: '',
-            createdAt: DateTime.now(),
-            updatedAt: DateTime.now(),
-            userId: '',
-            username: '',
-          ),
-          profile: Profile(
-            displayName: '',
-            id: '',
-            createdAt: DateTime.now(),
-            updatedAt: DateTime.now(),
-            userId: '',
-            username: '',
-          ),
-        ),
-      ),
-      emptyState: hasSearchQuery
-          ? const StatusLayoutState(
-              icon: Icons.search_off,
-              title: 'No listings found',
-              message: 'Try another search or remove filters',
-              disableScaffoldScrollingWhenShown: true,
-            )
-          : const StatusLayoutState(
-              icon: Icons.public,
-              title: 'No listings yet',
-              message: 'Create a deck listing to manage it here',
-              disableScaffoldScrollingWhenShown: true,
-            ),
-      separatorHeight: tokens.spaceLayoutGapMd,
-      itemBuilder: (context, _, entry) {
-        return DeckListingTile(
-          controller: DeckListingTileController(
-            deck: entry.deck,
-            listing: entry.deckListing,
-            content: entry.deckListingContent,
-            profile: entry.profile,
-            sourceProfile: entry.sourceProfile ?? entry.profile,
-          ),
-          onPressed: () {
-            onPressed(context, entry);
-          },
-        );
-      },
-    );
-  }
-}
-
-class _GridTileMaxWidthConstraints extends StatelessWidget {
-  const _GridTileMaxWidthConstraints({required this.builder});
-
-  final Widget Function(double width) builder;
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) => builder(constraints.maxWidth),
-    );
-  }
 }

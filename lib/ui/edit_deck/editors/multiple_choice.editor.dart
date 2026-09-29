@@ -1,11 +1,11 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         CardVerticalAlignmentControl,
+        EditDeckController,
         EditDeckFormValidator,
         FormField,
         MultipleChoiceEditorController,
         MultipleChoiceOptionsPanel,
-        MultipleChoiceTemplate,
         TextFieldCard,
         AppTokens;
 import 'package:flutter/material.dart' hide FormField;
@@ -14,23 +14,17 @@ import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 class MultipleChoiceEditor extends SignalHookWidget {
-  const MultipleChoiceEditor({
-    required this.template,
-    required this.onChanged,
-    super.key,
-  });
+  const MultipleChoiceEditor({required this.editDeckController, super.key});
 
-  final MultipleChoiceTemplate template;
-  final ValueChanged<MultipleChoiceTemplate> onChanged;
+  final EditDeckController editDeckController;
 
   @override
   Widget build(BuildContext context) {
     final editor = useMemoized(
       () => MultipleChoiceEditorController(
-        template: template,
-        onChanged: onChanged,
+        editDeckController: editDeckController,
       ),
-      [template.id],
+      [editDeckController.selectedTemplateKey.value],
     );
     useEffect(() => editor.dispose, [editor]);
     final options = editor.options.value;
@@ -40,8 +34,8 @@ class MultipleChoiceEditor extends SignalHookWidget {
       spacing: tokens.spaceLayoutGapMd,
       children: [
         CardVerticalAlignmentControl(
-          value: editor.verticallyCentered,
-          onChanged: editor.updateVerticallyCentered,
+          value: editor.template.verticallyCentered,
+          onChanged: editor.onVerticalAlignmentControlChanged,
         ),
         FormField<String>(
           value: editor.promptController.text,

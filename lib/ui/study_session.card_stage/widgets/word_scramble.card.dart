@@ -1,28 +1,20 @@
-import 'dart:math';
-
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AlignedScrollView,
         AppTokens,
-        Button,
-        ButtonColor,
-        ButtonVariant,
-        MarkdownText,
-        MarkdownTextMode,
         PhysicalCard,
         PhysicalCardController,
         ScaleHelper,
         StudySessionCardStageController,
-        StudySessionAnswer,
         TextColor,
         TextSize,
         TextWeight,
         WordScrambleTemplate,
         textStyle,
-        usePhysicalCardController,
-        ScrambledWord;
+        usePhysicalCardController;
+import 'package:boo_mondai/ui/study_session.card_stage/widgets/word_scramble.chip.dart';
+import 'package:boo_mondai/ui/study_session.card_stage/widgets/word_scramble.controller.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -31,7 +23,7 @@ class WordScrambleCard extends SignalHookWidget {
   const WordScrambleCard({
     super.key,
     required this.template,
-    this.cardStageController,
+    required this.cardStageController,
     this.isRevealed = false,
     this.maxWidth,
     this.contentScale = 1,
@@ -39,7 +31,7 @@ class WordScrambleCard extends SignalHookWidget {
   });
 
   final WordScrambleTemplate template;
-  final StudySessionCardStageController? cardStageController;
+  final StudySessionCardStageController cardStageController;
   final bool isRevealed;
   final double? maxWidth;
   final double contentScale;
@@ -48,14 +40,9 @@ class WordScrambleCard extends SignalHookWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final words = useMemoized(
-      () => _scrambleWords(template.sentenceToScramble, template.id),
-      [template.id, template.sentenceToScramble],
-    );
-    final placed = useState<List<ScrambledWord>>([]);
-    final remaining = useState<List<ScrambledWord>>(words);
+    final wordScrambleController = cardStageController.wordScrambleController!;
     final effectiveIsRevealed =
-        isRevealed || cardStageController?.isRevealed.value == true;
+        isRevealed || cardStageController.isRevealed.value == true;
     final fallbackPhysicalCardController = usePhysicalCardController(
       context,
       width: maxWidth,
@@ -69,11 +56,11 @@ class WordScrambleCard extends SignalHookWidget {
       ]),
       contentScale,
     );
-    final markdownTextStyle = ScaleHelper.getTextStyleWithScaledFontSize(
+    final placeholderStyle = ScaleHelper.getTextStyleWithScaledFontSize(
       textStyle.resolve(tokens, const [
         TextSize.label,
         TextWeight.body,
-        TextColor.baseline,
+        TextColor.muted,
       ]),
       contentScale,
     );
@@ -85,40 +72,7 @@ class WordScrambleCard extends SignalHookWidget {
       tokens.spaceLayoutGapMd,
       contentScale,
     );
-
-    useEffect(() {
-      placed.value = [];
-      remaining.value = words;
-      cardStageController?.answer.value = null;
-      cardStageController?.canReveal.value = false;
-      return null;
-    }, [template.id, words, cardStageController]);
-
-    void syncAnswer(List<ScrambledWord> nextPlaced) {
-      final answer = nextPlaced.map((word) => word.value).join(' ');
-      cardStageController?.answer.value = answer.isEmpty
-          ? null
-          : StudySessionAnswer(value: answer);
-      cardStageController?.canReveal.value = answer.trim().isNotEmpty;
-    }
-
-    void moveToPlaced(ScrambledWord word) {
-      if (effectiveIsRevealed) return;
-      final nextRemaining = [...remaining.value]..remove(word);
-      final nextPlaced = [...placed.value, word];
-      remaining.value = nextRemaining;
-      placed.value = nextPlaced;
-      syncAnswer(nextPlaced);
-    }
-
-    void moveToRemaining(ScrambledWord word) {
-      if (effectiveIsRevealed) return;
-      final nextPlaced = [...placed.value]..remove(word);
-      final nextRemaining = [...remaining.value, word];
-      placed.value = nextPlaced;
-      remaining.value = nextRemaining;
-      syncAnswer(nextPlaced);
-    }
+    final selectedWords = wordScrambleController.selectedWords.value;
 
     return PhysicalCard(
       controller: physicalCardController,
@@ -135,139 +89,189 @@ class WordScrambleCard extends SignalHookWidget {
               textAlign: TextAlign.center,
               style: eyebrowStyle,
             ),
-            _WordArea(
-              label: 'Your answer',
-              words: effectiveIsRevealed
-                  ? _sentenceWords(template.sentenceToScramble)
-                  : placed.value,
-              emptyText: 'Tap words below to build the sentence.',
-              textStyle: markdownTextStyle,
-              contentScale: contentScale,
-              onWordPressed: effectiveIsRevealed ? null : moveToRemaining,
-            ),
-            if (!effectiveIsRevealed)
-              _WordArea(
-                label: 'Word bank',
-                words: remaining.value,
-                emptyText: 'All words used.',
-                textStyle: markdownTextStyle,
-                contentScale: contentScale,
-                color: ButtonColor.muted,
-                onWordPressed: moveToPlaced,
+            DragTarget<WordScrambleDragPayload>(
+              onWillAcceptWithDetails: (_) => !wordScrambleController.isLocked,
+              onAcceptWithDetails: (details) => _acceptDropAt(
+                wordScrambleController,
+                details.data,
+                selectedWords.length,
               ),
+              builder: (context, candidateData, rejectedData) {
+                final isHovering = candidateData.isNotEmpty;
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 160),
+                  width: double.infinity,
+                  constraints: BoxConstraints(
+                    minHeight: ScaleHelper.getScaledValue(140.h, contentScale),
+                  ),
+                  padding: ScaleHelper.getScaledEdgeInsets(
+                    EdgeInsets.all(tokens.spaceLayoutPaddingSm),
+                    contentScale,
+                  ),
+                  decoration: BoxDecoration(
+                    color: tokens.colorPrimary.withValues(
+                      alpha: isHovering ? 0.10 : 0.04,
+                    ),
+                    border: Border.all(
+                      color: isHovering
+                          ? tokens.colorPrimary
+                          : tokens.colorBorderNeutralSubtle,
+                    ),
+                    borderRadius: BorderRadius.circular(14.r * contentScale),
+                  ),
+                  child: selectedWords.isEmpty
+                      ? Center(
+                          child: Text(
+                            'Tap or drag words here',
+                            style: placeholderStyle,
+                            textAlign: TextAlign.center,
+                          ),
+                        )
+                      : Wrap(
+                          alignment: WrapAlignment.center,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          spacing: ScaleHelper.getScaledValue(
+                            8.w,
+                            contentScale,
+                          ),
+                          runSpacing: ScaleHelper.getScaledValue(
+                            12.h,
+                            contentScale,
+                          ),
+                          children: [
+                            _WordInsertionTarget(
+                              index: 0,
+                              locked: wordScrambleController.isLocked,
+                              contentScale: contentScale,
+                              onAccept: (payload) => _acceptDropAt(
+                                wordScrambleController,
+                                payload,
+                                0,
+                              ),
+                            ),
+                            for (final entry in selectedWords.indexed) ...[
+                              _SelectedWordChip(
+                                index: entry.$1,
+                                value: entry.$2.text,
+                                correct: effectiveIsRevealed
+                                    ? wordScrambleController.isCorrectWordAt(
+                                        entry.$1,
+                                      )
+                                    : null,
+                                locked: wordScrambleController.isLocked,
+                                contentScale: contentScale,
+                                onDeleted: () => wordScrambleController
+                                    .removeSelectedWordAt(entry.$1),
+                              ),
+                              _WordInsertionTarget(
+                                index: entry.$1 + 1,
+                                locked: wordScrambleController.isLocked,
+                                contentScale: contentScale,
+                                onAccept: (payload) => _acceptDropAt(
+                                  wordScrambleController,
+                                  payload,
+                                  entry.$1 + 1,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                );
+              },
+            ),
           ],
         ),
       ),
     );
   }
 
-  List<ScrambledWord> _scrambleWords(String sentence, String seed) {
-    final words = _sentenceWords(sentence);
-    if (words.length < 2) return words;
-    final shuffled = [...words];
-    shuffled.shuffle(Random(_stableSeed(seed)));
-    if (_sameOrder(shuffled, words)) {
-      final first = shuffled.removeAt(0);
-      shuffled.add(first);
+  void _acceptDropAt(
+    WordScrambleController controller,
+    WordScrambleDragPayload payload,
+    int index,
+  ) {
+    switch (payload) {
+      case WordScrambleBankWordDragPayload(:final word):
+        controller.insertWordAt(word, index);
+      case WordScrambleSelectedWordDragPayload(index: final from):
+        controller.moveSelectedWord(from, index);
     }
-    return shuffled;
-  }
-
-  List<ScrambledWord> _sentenceWords(String sentence) {
-    final parts = sentence
-        .trim()
-        .split(RegExp(r'\s+'))
-        .where((word) => word.isNotEmpty)
-        .toList();
-    return [
-      for (final entry in parts.asMap().entries)
-        ScrambledWord(id: entry.key, value: entry.value),
-    ];
-  }
-
-  int _stableSeed(String value) {
-    return value.codeUnits.fold<int>(0, (seed, unit) => seed * 31 + unit);
-  }
-
-  bool _sameOrder(List<ScrambledWord> a, List<ScrambledWord> b) {
-    if (a.length != b.length) return false;
-    for (var i = 0; i < a.length; i++) {
-      if (a[i].id != b[i].id) return false;
-    }
-    return true;
   }
 }
 
-class _WordArea extends StatelessWidget {
-  const _WordArea({
-    required this.label,
-    required this.words,
-    required this.emptyText,
-    required this.textStyle,
+class _SelectedWordChip extends StatelessWidget {
+  const _SelectedWordChip({
+    required this.index,
+    required this.value,
+    required this.locked,
     required this.contentScale,
-    required this.onWordPressed,
-    this.color = ButtonColor.baseline,
+    required this.onDeleted,
+    this.correct,
   });
 
-  final String label;
-  final List<ScrambledWord> words;
-  final String emptyText;
-  final TextStyle textStyle;
+  final int index;
+  final String value;
+  final bool locked;
   final double contentScale;
-  final ValueChanged<ScrambledWord>? onWordPressed;
-  final ButtonColor color;
+  final bool? correct;
+  final VoidCallback onDeleted;
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
-    final gap = ScaleHelper.getScaledValue(
-      tokens.spaceLayoutGapSm,
-      contentScale,
+    final chip = WordScrambleChip(
+      value: value,
+      selected: true,
+      correct: correct,
+      contentScale: contentScale,
+      onDeleted: locked ? null : onDeleted,
     );
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(
-          label.toUpperCase(),
-          textAlign: TextAlign.center,
-          style: textStyle,
-        ),
-        SizedBox(height: gap),
-        if (words.isEmpty)
-          Padding(
-            padding: EdgeInsets.symmetric(
-              vertical: ScaleHelper.getScaledValue(12.h, contentScale),
-            ),
-            child: Text(
-              emptyText,
-              textAlign: TextAlign.center,
-              style: textStyle,
-            ),
-          )
-        else
-          Wrap(
-            alignment: WrapAlignment.center,
-            spacing: gap,
-            runSpacing: gap,
-            children: [
-              for (final word in words)
-                Button(
-                  contentScale: contentScale,
-                  variants: [color, ButtonVariant.flat],
-                  onPressed: onWordPressed == null
-                      ? null
-                      : () => onWordPressed!(word),
-                  child: MarkdownText(
-                    data: word.value,
-                    mode: MarkdownTextMode.previewSelectable,
-                    baseTextStyle: textStyle,
-                    contentScale: contentScale,
-                  ),
-                ),
-            ],
+    if (locked) return chip;
+
+    return LongPressDraggable<WordScrambleDragPayload>(
+      data: WordScrambleSelectedWordDragPayload(index),
+      feedback: Material(color: Colors.transparent, child: chip),
+      childWhenDragging: Opacity(opacity: 0.35, child: chip),
+      child: chip,
+    );
+  }
+}
+
+class _WordInsertionTarget extends StatelessWidget {
+  const _WordInsertionTarget({
+    required this.index,
+    required this.locked,
+    required this.contentScale,
+    required this.onAccept,
+  });
+
+  final int index;
+  final bool locked;
+  final double contentScale;
+  final ValueChanged<WordScrambleDragPayload> onAccept;
+
+  @override
+  Widget build(BuildContext context) {
+    return DragTarget<WordScrambleDragPayload>(
+      onWillAcceptWithDetails: (_) => !locked,
+      onAcceptWithDetails: (details) => onAccept(details.data),
+      builder: (context, candidateData, rejectedData) {
+        final active = candidateData.isNotEmpty;
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 120),
+          width: ScaleHelper.getScaledValue(active ? 28.w : 10.w, contentScale),
+          height: ScaleHelper.getScaledValue(42.h, contentScale),
+          decoration: BoxDecoration(
+            color: active
+                ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.18)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(999),
+            border: active
+                ? Border.all(color: Theme.of(context).colorScheme.primary)
+                : null,
           ),
-      ],
+        );
+      },
     );
   }
 }

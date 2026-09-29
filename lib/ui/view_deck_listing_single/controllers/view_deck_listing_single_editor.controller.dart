@@ -2,15 +2,15 @@ import 'package:boo_mondai/features/profile/models/profile.dto.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AuthService,
+        ButtonColor,
         CardTemplate,
         Content,
         Deck,
         DeckListing,
         DeckListingsService,
         DecksService,
-        LocalDB,
-        ButtonColor,
         ModalAction,
+        ModalDraftActionType,
         showModal,
         showSnackbar;
 import 'package:boo_mondai/ui/view_deck_listing_single/controllers/view_deck_listing_single.controller.dart';
@@ -29,7 +29,15 @@ class ViewDeckListingSingleEditorController
     required this.listing,
     required this.profile,
     required this.sourceProfile,
-  });
+  }) : initialDeck = deck.value,
+       initialContent = content.value,
+       initialListing = listing.value {
+    initializeDraft();
+  }
+
+  final Deck initialDeck;
+  final Content initialContent;
+  final DeckListing initialListing;
 
   @override
   final error = signal<Exception?>(null);
@@ -45,10 +53,19 @@ class ViewDeckListingSingleEditorController
   @override
   final Signal<Profile> sourceProfile;
 
-  final featuredImages = listSignal<ImageProvider?>(List.filled(3, null));
-  final featuredCards = listSignal<CardTemplate>([]);
+  late final List<MemoryImage> initialFeaturedImages;
+  final featuredImages = listSignal<MemoryImage>([]);
+  final canClose = signal(false);
 
   final formKey = GlobalKey<FormState>();
+
+  Future<void> initializeDraft() async {
+    initialFeaturedImages = await DeckListingsService.getFeaturedMemoryImages(
+      deck: initialDeck,
+      listing: initialListing,
+    );
+    featuredImages.value = initialFeaturedImages;
+  }
 
   Future<void> setTitle(String value) async {
     // deck.value = await DecksService.setTitle(
@@ -91,37 +108,25 @@ class ViewDeckListingSingleEditorController
   }
 
   Future<void> upsertFeaturedImage(int index, PlatformFile? file) async {
-    // await DeckListingsService.setFeaturedImageByFile(
-    //   deck: deck.value,
-    //   listing: listing.value,
-    //   content: content.value,
-    //   index: index,
-    //   file: file,
-    // );
-
-    // ToDo: Add error handling
     if (file == null || file.bytes == null) return;
 
-    featuredImages.value[index] = MemoryImage(file.bytes!);
-  }
+    final image = MemoryImage(file.bytes!);
+    final newImages = featuredImages.value.toList();
 
-  List<CardTemplate> getFeaturedCardTemplates() {
-    final featuredCardIds = {
-      for (final card in listing.value.featuredCards)
-        if (card['id'] case final String id) id,
-    };
+    if (index < newImages.length) {
+      newImages[index] = image;
+    } else {
+      newImages.add(image);
+    }
 
-    return LocalDB.cardTemplate
-        .getByDeckId(deck.value.id)
-        .where((template) => !featuredCardIds.contains(template.id))
-        .toList(growable: false);
+    featuredImages.value = newImages;
   }
 
   Future<void> addFeaturedCard({
     required BuildContext context,
     required Widget modalChild,
   }) async {
-    final templates = getFeaturedCardTemplates();
+    final templates = listing.value.featuredCards;
 
     if (templates.isEmpty) {
       showSnackbar(
@@ -138,16 +143,73 @@ class ViewDeckListingSingleEditorController
     );
     if (selected == null) return;
 
-    // final updatedDeck = await DeckListingsService.addListingFeaturedCard(
-    //   deck: deck.value,
-    //   listing: listing.value,
-    //   content: content.value,
-    //   template: template,
-    // );
+    listing.value = listing.value.copyWith(
+      featuredCards: [...listing.value.featuredCards, selected],
+    );
+  }
 
-    // if (updatedDeck != null) deck.value = updatedDeck;
+  Future<void> save() async {
+    final now = DateTime.now();
+    final updatedDeck = deck.value.copyWith(updatedAt: now);
+    final result = await DeckListingsService.upsertFeaturedImagesFromImages(
+      deck: deck.value,
+      listing: listing.value,
+      content: content.value,
+      images: featuredImages.value,
+    );
 
-    featuredCards.value = [...featuredCards.value, selected];
+    await DeckListingsService.upsertListing(
+      deck: updatedDeck,
+      listing: result.listing,
+      content: result.content,
+    );
+
+    deck.value = updatedDeck;
+    content.value = result.content;
+    listing.value = result.listing;
+  }
+
+  Future<bool> onClose(BuildContext context) async {
+    if ((initialDeck == deck.value) &&
+        (initialFeaturedImages == featuredImages.value)) {
+      return true;
+    }
+
+    final action = await showModal<ModalDraftActionType>(
+      context: context,
+      title: 'Save listing changes?',
+      subtitle: 'You have unsaved changes in this listing.',
+      leading: const Icon(Icons.save_outlined),
+      showCancelButton: true,
+      actions: [
+        const ModalAction<ModalDraftActionType>(
+          value: ModalDraftActionType.discard,
+          label: 'Discard',
+        ),
+        const ModalAction<ModalDraftActionType>(
+          value: ModalDraftActionType.action,
+          label: 'Save',
+          color: ButtonColor.primary,
+        ),
+      ],
+    );
+
+    switch (action ?? ModalDraftActionType.cancel) {
+      case ModalDraftActionType.action:
+        await save();
+        return true;
+      case ModalDraftActionType.discard:
+        discard();
+        return true;
+      case ModalDraftActionType.cancel:
+        return false;
+    }
+  }
+
+  void discard() {
+    deck.value = initialDeck;
+    listing.value = initialListing;
+    content.value = initialContent;
   }
 
   ButtonColor getPublishedButtonColor() {
@@ -229,6 +291,7 @@ class ViewDeckListingSingleEditorController
     if (updatedDeck != null) deck.value = updatedDeck;
 
     if (context.mounted) {
+      canClose.value = true;
       Navigator.of(context).pop();
     }
   }
