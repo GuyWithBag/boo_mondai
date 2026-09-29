@@ -4,7 +4,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         FillInTheBlanksTemplate,
         FlashcardTemplate,
         IdentificationTemplate,
-        MatchMadnessTemplate,
+        MatchingTypeTemplate,
         MultipleChoiceTemplate,
         WordScrambleTemplate,
         MarkdownMediaField;
@@ -59,48 +59,42 @@ abstract final class MarkdownMediaFieldsHelper {
           setValue: _setWordScrambleSentenceToScramble,
         ),
       ],
-      FillInTheBlanksTemplate(:final segments) => [
-        for (var index = 0; index < segments.length; index++)
-          MarkdownMediaField(
-            name: 'segment-${segments[index].id}',
-            getValue: (template) =>
-                (template as FillInTheBlanksTemplate).segments[index].fullText,
-            setValue: (template, value) {
-              final fillInTheBlanks = template as FillInTheBlanksTemplate;
-              final updatedSegments = fillInTheBlanks.segments.toList();
-              updatedSegments[index] = updatedSegments[index].copyWith(
-                fullText: value,
-              );
-              return fillInTheBlanks.copyWith(segments: updatedSegments);
-            },
-          ),
+      FillInTheBlanksTemplate() => [
+        MarkdownMediaField(
+          name: 'prompt-text',
+          getValue: (template) =>
+              (template as FillInTheBlanksTemplate).promptText,
+          setValue: (template, value) =>
+              (template as FillInTheBlanksTemplate).copyWith(promptText: value),
+        ),
       ],
-      MatchMadnessTemplate(:final pairs) => [
-        for (var index = 0; index < pairs.length; index++) ...[
-          MarkdownMediaField(
-            name: 'pair-${pairs[index].id}-term',
-            getValue: (template) =>
-                (template as MatchMadnessTemplate).pairs[index].term,
-            setValue: (template, value) {
-              final matchMadness = template as MatchMadnessTemplate;
-              final updatedPairs = matchMadness.pairs.toList();
-              updatedPairs[index] = updatedPairs[index].copyWith(term: value);
-              return matchMadness.copyWith(pairs: updatedPairs);
-            },
-          ),
-          MarkdownMediaField(
-            name: 'pair-${pairs[index].id}-match',
-            getValue: (template) =>
-                (template as MatchMadnessTemplate).pairs[index].match,
-            setValue: (template, value) {
-              final matchMadness = template as MatchMadnessTemplate;
-              final updatedPairs = matchMadness.pairs.toList();
-              updatedPairs[index] = updatedPairs[index].copyWith(match: value);
-              return matchMadness.copyWith(pairs: updatedPairs);
-            },
-          ),
-        ],
-      ],
+      // ToDo:
+      // MatchingTypeTemplate(:final values) => [
+      //   for (var index = 0; index < values.length; index++) ...[
+      //     MarkdownMediaField(
+      //       name: 'pair-${values[index].text}-term',
+      //       getValue: (template) =>
+      //           (template as MatchingTypeTemplate).values[index].text,
+      //       setValue: (template, value) {
+      //         final matchMadness = template as MatchingTypeTemplate;
+      //         final updatedPairs = matchMadness.values.toList();
+      //         updatedPairs[index] = updatedPairs[index].copyWith(text: value);
+      //         return matchMadness.copyWith(values: updatedPairs);
+      //       },
+      //     ),
+      //     MarkdownMediaField(
+      //       name: 'pair-${values[index].id}-match',
+      //       getValue: (template) =>
+      //           (template as MatchingTypeTemplate).values[index].match,
+      //       setValue: (template, value) {
+      //         final matchMadness = template as MatchingTypeTemplate;
+      //         final updatedPairs = matchMadness.values.toList();
+      //         updatedPairs[index] = updatedPairs[index].copyWith(match: value);
+      //         return matchMadness.copyWith(values: updatedPairs);
+      //       },
+      //     ),
+      //   ],
+      // ],
       _ => const [],
     };
   }

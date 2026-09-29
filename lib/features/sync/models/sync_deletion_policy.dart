@@ -1,4 +1,4 @@
-import 'package:boo_mondai/lib.barrel.dart' show SettingsService, LocalDB;
+import 'package:boo_mondai/lib.barrel.dart' show SettingPath, SettingsStore;
 
 class SyncDeletionPolicy {
   const SyncDeletionPolicy({
@@ -17,13 +17,12 @@ class SyncDeletionPolicy {
   DateTime purgeAfter(DateTime deletedAt) => deletedAt.add(retention);
 
   static SyncDeletionPolicy current() {
-    final profileId = LocalDB.currentProfile.getOrCreate().id;
-    final settings = LocalDB.userSettings.getOrCreateByProfileId(profileId);
-    final retentionDays = settings.get(
-      SettingsService.syncDeletionRetentionDays,
+    final settingsStore = SettingsStore.instance;
+    final retentionDays = settingsStore.get<int>(
+      SettingPath.syncDeletionRetentionDays,
     );
-    final activeClientWindowDays = settings.get(
-      SettingsService.syncActiveClientWindowDays,
+    final activeClientWindowDays = settingsStore.get<int>(
+      SettingPath.syncActiveClientWindowDays,
     );
 
     return SyncDeletionPolicy(

@@ -224,9 +224,13 @@ ON CONFLICT (id) DO NOTHING;
 
 -- N5 deck — fill_in_the_blanks type (sakana)
 INSERT INTO card_templates (
-  id, deck_id, type, sort_order, created_at, updated_at
+  id, deck_id, type, sort_order, prompt_text, fill_in_the_blank_keys,
+  created_at, updated_at
 ) VALUES
-  (ct_sakana, deck_n5, 'fill_in_the_blanks', 3, now(), now())
+  (ct_sakana, deck_n5, 'fill_in_the_blanks', 3,
+   '魚 means fish in English',
+   '[{"casing_type":"any","value":"fish"}]'::jsonb,
+   now(), now())
 ON CONFLICT (id) DO NOTHING;
 
 -- N5 deck — flashcard type (hana)
@@ -269,13 +273,6 @@ VALUES
   (ct_tori, 'fish',   false, 1),
   (ct_tori, 'flower', false, 2),
   (ct_tori, 'dog',    false, 3);
-
--- ── Fill-in-the-Blank Segments (sakana — 魚) ──────────
--- '魚 means fish in English' — blank covers 'fish' at char positions 8–12
-INSERT INTO fill_in_the_blank_segments
-  (card_id, full_text, blank_start, blank_end, correct_answer)
-VALUES
-  (ct_sakana, '魚 means fish in English', 8, 12, 'fish');
 
 -- ── Review Cards ──────────────────────────────────────
 INSERT INTO study_cards (id, template_id, is_reversed, deck_id) VALUES

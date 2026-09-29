@@ -6,7 +6,7 @@ class SyncClientLocalDB extends HiveSingleDataLocalDB<SyncClient> {
   String get boxName => 'sync_client';
 
   @override
-  String getId(SyncClient item) => item.id;
+  Map<String, Object?> primaryKeyFromItem(SyncClient item) => {'id': item.id};
 
   @override
   SyncClient createValue() {

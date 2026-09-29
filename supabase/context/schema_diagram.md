@@ -110,13 +110,6 @@ erDiagram
         bool is_correct
     }
 
-    fill_in_the_blank_segments {
-        uuid id PK
-        uuid card_id FK
-        text full_text
-        text correct_answer
-    }
-
     match_madness_pairs {
         uuid id PK
         uuid template_id FK
@@ -145,7 +138,6 @@ erDiagram
     decks ||--o{ card_templates : "contains"
     card_templates ||--o{ card_templates : "forks from (source)"
     card_templates ||--o{ multiple_choice_options : "has options (if MCQ)"
-    card_templates ||--o{ fill_in_the_blank_segments : "has segments (if FITB)"
     card_templates ||--o{ match_madness_pairs : "has pairs (if Match)"
     card_templates ||--o{ card_template_tags : "has"
     card_templates ||--o{ card_template_attachments : "has media"
