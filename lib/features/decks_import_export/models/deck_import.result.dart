@@ -4,7 +4,6 @@ final class DeckImportResult {
     this.cardTemplates = const [],
     this.multipleChoiceOptions = const [],
     this.identificationAnswers = const [],
-    this.fillInTheBlankSegments = const [],
     this.matchMadnessPairs = const [],
   });
 
@@ -14,7 +13,6 @@ final class DeckImportResult {
   final List<Map<String, dynamic>> cardTemplates;
   final List<Map<String, dynamic>> multipleChoiceOptions;
   final List<Map<String, dynamic>> identificationAnswers;
-  final List<Map<String, dynamic>> fillInTheBlankSegments;
   final List<Map<String, dynamic>> matchMadnessPairs;
 
   DeckImportResult merge(DeckImportResult other) {
@@ -28,10 +26,6 @@ final class DeckImportResult {
       identificationAnswers: [
         ...identificationAnswers,
         ...other.identificationAnswers,
-      ],
-      fillInTheBlankSegments: [
-        ...fillInTheBlankSegments,
-        ...other.fillInTheBlankSegments,
       ],
       matchMadnessPairs: [...matchMadnessPairs, ...other.matchMadnessPairs],
     );

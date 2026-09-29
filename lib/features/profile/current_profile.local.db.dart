@@ -8,7 +8,7 @@ class CurrentProfileLocalDB extends HiveSingleDataLocalDB<Profile> {
   String get boxName => 'profiles';
 
   @override
-  String getId(Profile item) => item.id;
+  Map<String, Object?> primaryKeyFromItem(Profile item) => {'id': item.id};
 
   @override
   Profile createValue() {

@@ -39,7 +39,7 @@ class ChangedEntity<T> with ChangedEntityMappable<T> {
   /// Direction the changed data moves in the owning workflow.
   final ChangeDirection direction;
 
-  /// Storage or domain entity name, such as `deck` or `card_template`.
+  /// Storage or domain entity name, such as `deck` or `card.template`.
   String get typeName =>
       (afterChange ?? beforeChange)?.runtimeType.toString() ?? 'unknown';
 

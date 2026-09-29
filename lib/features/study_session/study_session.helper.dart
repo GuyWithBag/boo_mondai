@@ -6,6 +6,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         FillInTheBlanksTemplate,
         FlashcardTemplate,
         IdentificationTemplate,
+        MatchingTypeTemplate,
         MultipleChoiceTemplate,
         WordScrambleTemplate,
         Services,
@@ -18,6 +19,9 @@ abstract final class StudySessionHelper {
   static SubmissionStyle getSubmissionStyle(CardTemplate template) {
     if (template is FlashcardTemplate) {
       return SubmissionStyle.showAnswer;
+    }
+    if (template is MatchingTypeTemplate) {
+      return SubmissionStyle.none;
     }
     return SubmissionStyle.submitAnswer;
   }

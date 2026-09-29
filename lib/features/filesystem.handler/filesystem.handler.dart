@@ -104,6 +104,6 @@ abstract class FileSystemHandler {
     if (suffix[0] == '/') {
       resolvedSuffix = suffix.substring(1);
     }
-    return '$documentsPath/$resolvedSuffix';
+    return '${documentsPath.path}/$resolvedSuffix';
   }
 }

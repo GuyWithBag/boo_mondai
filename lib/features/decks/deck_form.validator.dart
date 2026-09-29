@@ -1,3 +1,5 @@
+import 'package:boo_mondai/lib.barrel.dart' show CardTemplate;
+
 abstract final class DeckFormValidator {
   static String? title(String? value) {
     if (value == null || value.trim().isEmpty) {
@@ -27,7 +29,7 @@ abstract final class DeckFormValidator {
     return null;
   }
 
-  static String? featuredCards(List<Map<String, dynamic>>? cards) {
+  static String? featuredCards(List<CardTemplate>? cards) {
     if (cards == null || cards.isEmpty) {
       return 'Add at least one featured card';
     }

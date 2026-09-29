@@ -18,13 +18,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         Deck,
         DeckDownloadPayload,
         DecksRemoteDB,
-        FillInTheBlankSegment,
         FillInTheBlanksTemplate,
         FlashcardTemplate,
         IdentificationTemplate,
         LocalDB,
-        MatchMadnessPair,
-        MatchMadnessTemplate,
+        MatchingTypeValue,
+        MatchingTypeTemplate,
         MultipleChoiceOption,
         MultipleChoiceTemplate,
         ProgressCheckpointService,
@@ -467,8 +466,8 @@ class DeckDownloadsService extends Service {
         tags: t.tags,
         verticallyCentered: t.verticallyCentered,
         promptText: t.promptText,
-        acceptedAnswers: [
-          for (final answer in t.acceptedAnswers)
+        answers: [
+          for (final answer in t.answers)
             answer.copyWith(id: uuid.v7(), templateId: localTemplateId),
         ],
       ),
@@ -482,7 +481,7 @@ class DeckDownloadsService extends Service {
         tags: t.tags,
         questionPrompt: t.questionPrompt,
         multipleAnswers: t.multipleAnswers,
-        randomizeOptionsOrdering: t.randomizeOptionsOrdering,
+        randomizedOptionsOrdering: t.randomizedOptionsOrdering,
         options: [
           for (final option in t.options)
             MultipleChoiceOption(
@@ -502,42 +501,34 @@ class DeckDownloadsService extends Service {
         updatedAt: now,
         sourceTemplateId: t.id,
         tags: t.tags,
-        segments: [
-          for (final segment in t.segments)
-            FillInTheBlankSegment(
-              id: uuid.v7(),
-              cardId: localTemplateId,
-              fullText: segment.fullText,
-              blankStart: segment.blankStart,
-              blankEnd: segment.blankEnd,
-              correctAnswer: segment.correctAnswer,
-            ),
-        ],
+        promptText: t.promptText,
+        answerKeys: t.answerKeys,
       ),
-      MatchMadnessTemplate t => MatchMadnessTemplate(
-        id: localTemplateId,
-        deckId: localDeckId,
-        sortOrder: t.sortOrder,
-        createdAt: now,
-        updatedAt: now,
-        sourceTemplateId: t.id,
-        tags: t.tags,
-        pairs: [
-          for (final pair in t.pairs)
-            MatchMadnessPair(
-              id: uuid.v7(),
-              templateId: localTemplateId,
-              sourceTemplateId: pair.sourceTemplateId == null
-                  ? null
-                  : templateIdMap[pair.sourceTemplateId] ??
-                        pair.sourceTemplateId,
-              term: pair.term,
-              match: pair.match,
-              isAutoPicked: pair.isAutoPicked,
-              displayOrder: pair.displayOrder,
-            ),
-        ],
-      ),
+      // ToDo:
+      // MatchingTypeTemplate t => MatchingTypeTemplate(
+      //   id: localTemplateId,
+      //   deckId: localDeckId,
+      //   sortOrder: t.sortOrder,
+      //   createdAt: now,
+      //   updatedAt: now,
+      //   sourceTemplateId: t.id,
+      //   tags: t.tags,
+      //   values: [
+      //     for (final pair in t.pairs)
+      //       MatchingTypeValue(
+      //         id: uuid.v7(),
+      //         templateId: localTemplateId,
+      //         sourceTemplateId: pair.sourceTemplateId == null
+      //             ? null
+      //             : templateIdMap[pair.sourceTemplateId] ??
+      //                   pair.sourceTemplateId,
+      //         term: pair.term,
+      //         match: pair.match,
+      //         isAutoPicked: pair.isAutoPicked,
+      //         displayOrder: pair.displayOrder,
+      //       ),
+      //   ],
+      // ),
       WordScrambleTemplate t => WordScrambleTemplate(
         id: localTemplateId,
         deckId: localDeckId,

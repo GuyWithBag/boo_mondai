@@ -12,7 +12,9 @@ class StreakLocalDB extends HiveSingleDataLocalDB<Streak> {
   String get boxName => 'streaks';
 
   @override
-  String getId(Streak item) => item.profileId;
+  Map<String, Object?> primaryKeyFromItem(Streak item) => {
+    'profile_id': item.profileId,
+  };
 
   // This is not used.
   @override

@@ -1,32 +1,34 @@
 import 'dart:io' hide ContentType;
 
+import 'package:boo_mondai/features/decks/models/deck_with_listing_content.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        Deck,
-        DecksDirectoryPaths,
-        LocalDB,
-        CardTemplate,
-        DeckListing,
-        VisibilityState,
+        AppException,
         AuthService,
-        SyncDeletionPolicy,
-        RemoteDB,
-        FileSystemHandler,
+        CardTemplate,
         Content,
-        uuid,
-        ContentType;
-import 'package:file_picker/file_picker.dart';
+        ContentType,
+        Deck,
+        DeckListing,
+        DecksDirectoryPaths,
+        FileSystemHandler,
+        LocalDB,
+        SyncDeletionPolicy,
+        VisibilityState,
+        uuid;
+import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:flutter/material.dart';
 
 abstract final class DeckListingsService {
-  static String getFeaturedImage({
+  static String? getFeaturedImage({
     required Deck deck,
     required DeckListing listing,
     int index = 0,
   }) {
-    return DecksDirectoryPaths.listingFeaturedImage(
-      deckTitle: deck.title,
-      index: index,
-    );
+    if (index < 0 || index >= listing.featuredImages.length) return null;
+
+    final source = listing.featuredImages[index].trim();
+    return source.isEmpty ? null : source;
   }
 
   static List<String> getFeaturedImages({
@@ -42,26 +44,65 @@ abstract final class DeckListingsService {
         index: index,
         listing: listing,
       );
+      if (image == null) continue;
       images = [...images, image];
     }
 
     return images;
   }
 
-  static Future<DeckListing> createListing(Deck deck) async {
+  static Future<List<MemoryImage>> getFeaturedMemoryImages({
+    required Deck deck,
+    required DeckListing listing,
+  }) async {
+    final images = <MemoryImage>[];
+
+    for (final source in getFeaturedImages(deck: deck, listing: listing)) {
+      final absolutePath =
+          await FileSystemHandler.getAbsolutePathOfRelativePath(source);
+      final file = File(absolutePath);
+      if (!await file.exists()) continue;
+
+      images.add(MemoryImage(await file.readAsBytes()));
+    }
+
+    return images;
+  }
+
+  static Future<DeckWithListingContent> createListing(Deck deck) async {
     final now = DateTime.now();
+    final profile = LocalDB.currentProfile.getOrCreate();
     final content = Content(
       createdAt: now,
       updatedAt: now,
       id: uuid.v7(),
-      profileId: LocalDB.currentProfile.getOrCreate().id,
+      profileId: profile.id,
       type: ContentType.deckListing,
     );
     final listing = DeckListing(contentId: content.id, deckId: deck.id);
 
+    await LocalDB.contents.upsert(content);
     await LocalDB.deckListing.upsert(listing);
 
-    return listing;
+    return (
+      deck: deck,
+      deckListing: listing,
+      deckListingContent: content,
+      profile: profile,
+      sourceProfile: null,
+    );
+  }
+
+  static List<CardTemplate> getFeaturedCardTemplates({
+    required Deck deck,
+    required List<CardTemplate> featuredCards,
+  }) {
+    final featuredCardIds = {for (final card in featuredCards) card.id};
+
+    return LocalDB.cardTemplate
+        .getByDeckId(deck.id)
+        .where((template) => !featuredCardIds.contains(template.id))
+        .toList(growable: false);
   }
 
   static Future<void> upsertListing({
@@ -70,7 +111,7 @@ abstract final class DeckListingsService {
     required Content content,
   }) async {
     await LocalDB.deck.upsert(deck);
-
+    await LocalDB.contents.upsert(content);
     await LocalDB.deckListing.upsert(listing);
   }
 
@@ -104,82 +145,63 @@ abstract final class DeckListingsService {
     return updatedDeck;
   }
 
-  static Future<void> setFeaturedImageByFile({
+  static Future<({DeckListing listing, Content content})>
+  upsertFeaturedImagesFromImages({
     required Deck deck,
     required DeckListing listing,
     required Content content,
-    required int index,
-    required PlatformFile file,
+    required List<MemoryImage> images,
   }) async {
+    // ToDo: Add proper error handling
     if (!deck.isEditable) {
-      return;
-    }
-    if (!deck.isEditable) {
-      return;
+      throw AppException('Deck is not editable');
     }
 
-    final path = DecksDirectoryPaths.listingFeaturedImage(
-      deckTitle: deck.title,
-      index: index,
-    );
+    // ToDo: Add error handling
 
-    final absolutePath = await FileSystemHandler.getAbsolutePathOfRelativePath(
-      path,
-    );
-    final file = File(absolutePath);
-    final bytes = await file.readAsBytes();
-    file.writeAsBytes(bytes);
+    // var remoteUrls = <String>[];
+    var localUrls = <String>[];
 
-    final remoteUrl = await RemoteDB.publicBucket.uploadBytes(path, bytes);
+    for (int i = 0; i < images.length; i++) {
+      final path = DecksDirectoryPaths.listingFeaturedImage(
+        deckTitle: deck.title,
+        index: i,
+      );
 
-    final feauturedImages = listing.featuredImages.toList();
-    feauturedImages[index] = remoteUrl;
+      final image = images[i];
 
-    final updatedDeckListing = listing.copyWith(
-      featuredImages: feauturedImages,
-    );
+      final webpBytes = await FlutterImageCompress.compressWithList(
+        image.bytes,
+        format: CompressFormat.webp,
+        quality: 90,
+      );
+
+      final absolutePath =
+          await FileSystemHandler.getAbsolutePathOfRelativePath(path);
+
+      final file = File(absolutePath);
+      await file.parent.create(recursive: true);
+      await file.writeAsBytes(webpBytes, flush: true);
+
+      // final remoteUrl = await RemoteDB.publicBucket.uploadBytes(
+      //   path,
+      //   webpBytes,
+      // );
+      // remoteUrls.add(remoteUrl);
+      // ToDo: so isPublished = false, it stores the local url. then
+      // publishing then syncing will replace these with the remote url.
+      // Now when it is synced from remote, it should download the bytes then write it, then replace the urls to local.
+      localUrls.add(path);
+    }
+
+    // final updatedDeckListing = listing.copyWith(featuredImages: remoteUrls);
+    final updatedDeckListing = listing.copyWith(featuredImages: localUrls);
 
     final updatedContent = content.copyWith(updatedAt: DateTime.now());
 
     await LocalDB.contents.upsert(updatedContent);
     await LocalDB.deckListing.upsert(updatedDeckListing);
-  }
-
-  static Future<void> setFeaturedImagesByFile({
-    required Deck deck,
-    required DeckListing listing,
-    required Content content,
-    required List<PlatformFile> files,
-  }) async {
-    if (!deck.isEditable) {
-      return;
-    }
-
-    final paths = DecksDirectoryPaths.listingFeaturedImages(
-      deckTitle: deck.title,
-    );
-
-    // ToDo: Add error handling
-    for (int i = 0; i < listing.featuredImages.length; i++) {
-      final path = paths[i];
-
-      final absolutePath =
-          await FileSystemHandler.getAbsolutePathOfRelativePath(path);
-      final file = File(absolutePath);
-      final bytes = await file.readAsBytes();
-      file.writeAsBytes(bytes);
-
-      final remoteUrl = await RemoteDB.publicBucket.uploadBytes(path, bytes);
-
-      final updatedDeckListing = listing.copyWith(
-        featuredImages: [...listing.featuredImages, remoteUrl],
-      );
-
-      final updatedContent = content.copyWith(updatedAt: DateTime.now());
-
-      await LocalDB.contents.upsert(updatedContent);
-      await LocalDB.deckListing.upsert(updatedDeckListing);
-    }
+    return (listing: updatedDeckListing, content: updatedContent);
   }
 
   static Future<Deck?> addListingFeaturedCard({
@@ -195,14 +217,11 @@ abstract final class DeckListingsService {
     final now = DateTime.now();
 
     final featuredCards = listing.featuredCards.toList();
-    final hasTemplate = featuredCards.any((card) => card['id'] == template.id);
-    if (hasTemplate) {
-      return null;
-    }
 
     final updatedListing = listing.copyWith(
-      featuredCards: [...featuredCards, template.toMap()],
+      featuredCards: [...featuredCards, template],
     );
+
     final updatedDeck = deck.copyWith(updatedAt: now);
     final updatedContent = content.copyWith(updatedAt: DateTime.now());
 

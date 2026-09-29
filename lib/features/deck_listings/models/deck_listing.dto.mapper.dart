@@ -13,6 +13,7 @@ class DeckListingMapper extends ClassMapperBase<DeckListing> {
   static DeckListingMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = DeckListingMapper._());
+      CardTemplateMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -51,11 +52,10 @@ class DeckListingMapper extends ClassMapperBase<DeckListing> {
   static const Field<DeckListing, int> _f$reportsCount = Field(
       'reportsCount', _$reportsCount,
       key: r'reports_count', opt: true, def: 0);
-  static List<Map<String, dynamic>> _$featuredCards(DeckListing v) =>
-      v.featuredCards;
-  static const Field<DeckListing, List<Map<String, dynamic>>> _f$featuredCards =
-      Field('featuredCards', _$featuredCards,
-          key: r'featured_cards', opt: true, def: const []);
+  static List<CardTemplate> _$featuredCards(DeckListing v) => v.featuredCards;
+  static const Field<DeckListing, List<CardTemplate>> _f$featuredCards = Field(
+      'featuredCards', _$featuredCards,
+      key: r'featured_cards', opt: true, def: const []);
   static List<String> _$featuredImages(DeckListing v) => v.featuredImages;
   static const Field<DeckListing, List<String>> _f$featuredImages = Field(
       'featuredImages', _$featuredImages,
@@ -161,9 +161,8 @@ extension DeckListingValueCopy<$R, $Out>
 
 abstract class DeckListingCopyWith<$R, $In extends DeckListing, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  ListCopyWith<$R, Map<String, dynamic>,
-          ObjectCopyWith<$R, Map<String, dynamic>, Map<String, dynamic>>>
-      get featuredCards;
+  ListCopyWith<$R, CardTemplate,
+      CardTemplateCopyWith<$R, CardTemplate, CardTemplate>> get featuredCards;
   ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>>
       get featuredImages;
   $R call(
@@ -175,7 +174,7 @@ abstract class DeckListingCopyWith<$R, $In extends DeckListing, $Out>
       int? commentsCount,
       int? reviewsCount,
       int? reportsCount,
-      List<Map<String, dynamic>>? featuredCards,
+      List<CardTemplate>? featuredCards,
       List<String>? featuredImages,
       DateTime? deletedAt,
       DateTime? purgeAfter,
@@ -193,12 +192,10 @@ class _DeckListingCopyWithImpl<$R, $Out>
   late final ClassMapperBase<DeckListing> $mapper =
       DeckListingMapper.ensureInitialized();
   @override
-  ListCopyWith<$R, Map<String, dynamic>,
-          ObjectCopyWith<$R, Map<String, dynamic>, Map<String, dynamic>>>
-      get featuredCards => ListCopyWith(
-          $value.featuredCards,
-          (v, t) => ObjectCopyWith(v, $identity, t),
-          (v) => call(featuredCards: v));
+  ListCopyWith<$R, CardTemplate,
+          CardTemplateCopyWith<$R, CardTemplate, CardTemplate>>
+      get featuredCards => ListCopyWith($value.featuredCards,
+          (v, t) => v.copyWith.$chain(t), (v) => call(featuredCards: v));
   @override
   ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>>
       get featuredImages => ListCopyWith(
@@ -215,7 +212,7 @@ class _DeckListingCopyWithImpl<$R, $Out>
           int? commentsCount,
           int? reviewsCount,
           int? reportsCount,
-          List<Map<String, dynamic>>? featuredCards,
+          List<CardTemplate>? featuredCards,
           List<String>? featuredImages,
           Object? deletedAt = $none,
           Object? purgeAfter = $none,

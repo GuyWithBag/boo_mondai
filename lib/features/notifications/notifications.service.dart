@@ -9,7 +9,7 @@ import 'package:timezone/timezone.dart' as tz;
 /// Low-level, static wrapper around [FlutterLocalNotificationsPlugin].
 ///
 /// Callers should prefer [NotificationsController] for high-level scheduling
-/// that reads from [SettingsController]. Use this class directly only for
+/// that reads from [SettingsStore]. Use this class directly only for
 /// one-off fire-and-forget events (download complete, sync complete).
 class NotificationsService {
   NotificationsService._();

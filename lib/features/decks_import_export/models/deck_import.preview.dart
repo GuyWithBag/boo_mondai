@@ -25,7 +25,6 @@ final class DeckImportPreview {
       result.cardTemplates.isNotEmpty ||
       result.multipleChoiceOptions.isNotEmpty ||
       result.identificationAnswers.isNotEmpty ||
-      result.fillInTheBlankSegments.isNotEmpty ||
       result.matchMadnessPairs.isNotEmpty;
 
   bool get hasTitleConflicts => titleConflicts.isNotEmpty;
@@ -47,7 +46,6 @@ final class DeckImportPreview {
         cardTemplates: result.cardTemplates,
         multipleChoiceOptions: result.multipleChoiceOptions,
         identificationAnswers: result.identificationAnswers,
-        fillInTheBlankSegments: result.fillInTheBlankSegments,
         matchMadnessPairs: result.matchMadnessPairs,
       ),
       titleConflicts: [

@@ -18,6 +18,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         StudySessionHelper,
         uuid,
         StudySession,
+        StudySessionConfig,
         StudySessionSnapshot,
         StudySessionRule,
         StudySessionStep,
@@ -29,9 +30,9 @@ import 'package:fsrs/fsrs.dart' as fsrs;
 import 'package:signals/signals_flutter.dart';
 
 final class StudySessionController {
-  StudySessionController({required this.mode, this.notificationsController});
+  StudySessionController({required this.config, this.notificationsController});
 
-  final SessionMode mode;
+  final StudySessionConfig config;
   final NotificationsController? notificationsController;
   final session = signal<StudySession?>(null);
   final error = signal<Exception?>(null);
@@ -40,6 +41,8 @@ final class StudySessionController {
   final cards = signal(<String, StudyCard>{});
   final templates = signal(<String, CardTemplate>{});
   final fsrsCards = signal(<String, FsrsCard>{});
+
+  SessionMode get mode => config.mode;
 
   late final currentStep = computed<StudySessionStep?>(
     () => session.value?.currentStep,
@@ -210,15 +213,14 @@ final class StudySessionController {
       }
       FsrsCard? after;
       FsrsReviewLog? log;
+      DateTime? reviewTime;
       if (mode == SessionMode.review ||
           (rating != StudyRating.incorrect && rating != StudyRating.again)) {
         before ??= await FsrsCard.create(
           studyCardId: card.id,
           profileId: active.profileId,
         );
-        final reviewTime = before.state.due.isAfter(now)
-            ? before.state.due
-            : now;
+        reviewTime = before.state.due.isAfter(now) ? before.state.due : now;
         final result = fsrs.Scheduler().reviewCard(
           before.state,
           FsrsHelper.studyRatingToFSRSRating(rating),
@@ -245,8 +247,11 @@ final class StudySessionController {
         fsrsCardAfter: after,
         fsrsReviewLog: log,
       );
-      final requeue =
-          rating == StudyRating.incorrect || rating == StudyRating.again;
+      final requeue = _shouldRequeue(
+        rating: rating,
+        reviewTime: reviewTime,
+        fsrsCardAfter: after,
+      );
       final attempts = active.steps
           .whereType<StudySessionCardStep>()
           .where((candidate) => candidate.studyCardId == card.id)
@@ -279,6 +284,31 @@ final class StudySessionController {
     } finally {
       isSubmitting.value = false;
     }
+  }
+
+  bool _shouldRequeue({
+    required StudyRating rating,
+    required DateTime? reviewTime,
+    required FsrsCard? fsrsCardAfter,
+  }) {
+    if (rating == StudyRating.incorrect && config.requeueIncorrectAnswers) {
+      return true;
+    }
+
+    if (rating != StudyRating.again) {
+      return false;
+    }
+
+    if (config.requeueIncorrectAnswers) {
+      return true;
+    }
+
+    final threshold = config.requeueAgainWhenIntervalLessThan;
+    if (threshold == null || reviewTime == null || fsrsCardAfter == null) {
+      return false;
+    }
+
+    return fsrsCardAfter.state.due.difference(reviewTime) < threshold;
   }
 
   Future<void> advancePresentationStep() async {

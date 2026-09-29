@@ -27,12 +27,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         IdentificationTemplate,
         MultipleChoiceTemplate,
         FillInTheBlanksTemplate,
-        MatchMadnessTemplate,
+        MatchingTypeTemplate,
         WordScrambleTemplate,
         MultipleChoiceOption,
-        IdentificationAnswer,
-        FillInTheBlankSegment,
-        MatchMadnessPair;
+        IdentificationAnswerKey,
+        MatchingTypeValue;
 import 'package:cross_file/cross_file.dart';
 import 'package:file_picker/file_picker.dart';
 
@@ -250,10 +249,6 @@ final class DecksImporterService {
       result.identificationAnswers,
       'template_id',
     );
-    final segmentsByTemplateId = groupByParentId(
-      result.fillInTheBlankSegments,
-      'card_id',
-    );
     final pairsByTemplateId = groupByParentId(
       result.matchMadnessPairs,
       'template_id',
@@ -266,7 +261,6 @@ final class DecksImporterService {
             template,
             optionsByTemplateId: optionsByTemplateId,
             answersByTemplateId: answersByTemplateId,
-            segmentsByTemplateId: segmentsByTemplateId,
             pairsByTemplateId: pairsByTemplateId,
           ),
         ),
@@ -277,7 +271,6 @@ final class DecksImporterService {
     Map<String, dynamic> template, {
     required Map<String, List<Map<String, dynamic>>> optionsByTemplateId,
     required Map<String, List<Map<String, dynamic>>> answersByTemplateId,
-    required Map<String, List<Map<String, dynamic>>> segmentsByTemplateId,
     required Map<String, List<Map<String, dynamic>>> pairsByTemplateId,
   }) {
     final templateId = template['id']?.toString();
@@ -292,10 +285,7 @@ final class DecksImporterService {
         ...template,
         'accepted_answers': answersByTemplateId[templateId] ?? const [],
       },
-      'fill_in_the_blanks' => {
-        ...template,
-        'segments': segmentsByTemplateId[templateId] ?? const [],
-      },
+      'fill_in_the_blanks' => {...template},
       'match_madness' => {
         ...template,
         'pairs': pairsByTemplateId[templateId] ?? const [],
@@ -482,7 +472,7 @@ final class DecksImporterService {
         FillInTheBlanksTemplate.createDummy().toMap(),
       ),
       'match_madness' => keysWithType(
-        MatchMadnessTemplate.createDummy().toMap(),
+        MatchingTypeTemplate.createDummy().toMap(),
       ),
       'word_scramble' => keysWithType(
         WordScrambleTemplate.createDummy().toMap(),
@@ -531,15 +521,17 @@ final class DecksImporterService {
     ...keysWithType(IdentificationTemplate.createDummy().toMap()),
     ...keysWithType(MultipleChoiceTemplate.createDummy().toMap()),
     ...keysWithType(FillInTheBlanksTemplate.createDummy().toMap()),
-    ...keysWithType(MatchMadnessTemplate.createDummy().toMap()),
+    ...keysWithType(MatchingTypeTemplate.createDummy().toMap()),
     ...keysWithType(WordScrambleTemplate.createDummy().toMap()),
   };
 
   Map<String, Set<String>> get templateChildKeys => {
     'options': MultipleChoiceOption.createDummy().toMap().keys.toSet(),
-    'accepted_answers': IdentificationAnswer.createDummy().toMap().keys.toSet(),
-    'segments': FillInTheBlankSegment.createDummy().toMap().keys.toSet(),
-    'pairs': MatchMadnessPair.createDummy().toMap().keys.toSet(),
+    'accepted_answers': IdentificationAnswerKey.createDummy()
+        .toMap()
+        .keys
+        .toSet(),
+    'pairs': MatchingTypeValue.createDummy().toMap().keys.toSet(),
   };
 
   Set<String> get generatedKeys => const {

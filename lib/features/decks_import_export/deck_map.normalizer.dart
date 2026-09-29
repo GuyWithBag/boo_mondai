@@ -7,13 +7,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         FlashcardTemplate,
         WordScrambleTemplate,
         IdentificationTemplate,
-        IdentificationAnswer,
+        IdentificationAnswerKey,
         MultipleChoiceTemplate,
         MultipleChoiceOption,
         FillInTheBlanksTemplate,
-        FillInTheBlankSegment,
-        MatchMadnessTemplate,
-        MatchMadnessPair;
+        MatchingTypeTemplate,
+        MatchingTypeValue;
 
 abstract class DeckMapNormalizer {
   static DeckImportResult flattenDeckMap(Map<String, dynamic> imported) {
@@ -100,7 +99,7 @@ abstract class DeckMapNormalizer {
         templateId: templateId,
         injectValues: injectValues,
       ),
-      'match_madness' => _flattenMatchMadnessTemplate(
+      'match_madness' => _flattenMatchingTypeTemplate(
         imported,
         templateId: templateId,
         injectValues: injectValues,
@@ -142,7 +141,7 @@ abstract class DeckMapNormalizer {
       identificationAnswers: [
         for (final entry in answers.asMap().entries)
           MapHelper.normalizeWithBaseMap(
-            base: IdentificationAnswer.createDummy(
+            base: IdentificationAnswerKey.createDummy(
               templateId: templateId,
             ).toMap(),
             imported: entry.value,
@@ -200,39 +199,19 @@ abstract class DeckMapNormalizer {
     required String templateId,
     required Map<String, dynamic> injectValues,
   }) {
-    final segments = MapHelper.requireNestedMaps(
-      imported,
-      'segments',
-      'Fill in the blanks template segments',
-    );
     return DeckImportResult(
       cardTemplates: [
         MapHelper.normalizeWithBaseMap(
           base: FillInTheBlanksTemplate.createDummy(id: templateId).toMap(),
           imported: imported,
           injectValues: injectValues,
-          removeKeys: const {'segments'},
-          requiredKeys: const {'type', 'segments'},
+          requiredKeys: const {'type', 'prompt_text', 'answer_keys', 'order'},
         ),
-      ],
-      fillInTheBlankSegments: [
-        for (final segment in segments)
-          MapHelper.normalizeWithBaseMap(
-            base: FillInTheBlankSegment.createDummy(cardId: templateId).toMap(),
-            imported: segment,
-            injectValues: {'id': uuid.v7(), 'card_id': templateId},
-            requiredKeys: const {
-              'full_text',
-              'blank_start',
-              'blank_end',
-              'correct_answer',
-            },
-          ),
       ],
     );
   }
 
-  static DeckImportResult _flattenMatchMadnessTemplate(
+  static DeckImportResult _flattenMatchingTypeTemplate(
     Map<String, dynamic> imported, {
     required String templateId,
     required Map<String, dynamic> injectValues,
@@ -245,26 +224,23 @@ abstract class DeckMapNormalizer {
     return DeckImportResult(
       cardTemplates: [
         MapHelper.normalizeWithBaseMap(
-          base: MatchMadnessTemplate.createDummy(id: templateId).toMap(),
+          base: MatchingTypeTemplate.createDummy(id: templateId).toMap(),
           imported: imported,
           injectValues: injectValues,
           removeKeys: const {'pairs'},
           requiredKeys: const {'type', 'pairs'},
         ),
       ],
-      matchMadnessPairs: [
-        for (final entry in pairs.asMap().entries)
-          MapHelper.normalizeWithBaseMap(
-            base: MatchMadnessPair.createDummy(templateId: templateId).toMap(),
-            imported: entry.value,
-            injectValues: {
-              'id': uuid.v7(),
-              'template_id': templateId,
-              'display_order': entry.key,
-            },
-            requiredKeys: const {'term', 'match'},
-          ),
-      ],
+      // ToDo:
+      // matchMadnessPairs: [
+      //   for (final entry in pairs.asMap().entries)
+      //     MapHelper.normalizeWithBaseMap(
+      //       base: MatchingTypeValue.createDummy().toMap(),
+      //       imported: entry.value,
+      //       injectValues: {'id': uuid.v7(), 'display_order': entry.key},
+      //       requiredKeys: const {'term', 'match'},
+      //     ),
+      // ],
     );
   }
 }

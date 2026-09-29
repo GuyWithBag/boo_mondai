@@ -5,3 +5,4 @@ export 'study_session.dart';
 export 'study_session.snapshot.dart';
 export 'study_session.rule.dart';
 export 'study_session.answer.dart';
+export 'study_session.config.dart';

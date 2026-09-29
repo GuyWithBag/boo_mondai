@@ -1,4 +1,4 @@
-import 'package:boo_mondai/lib.barrel.dart' show Setting, SettingsController;
+import 'package:boo_mondai/lib.barrel.dart' show SettingPath, SettingsStore;
 import 'package:flutter_soloud/flutter_soloud.dart';
 import 'package:media_variants/media_variants.dart';
 
@@ -13,11 +13,11 @@ class UiSoundsService {
 
   static Future<void> playIfEnabled(
     MediaAsset asset, {
-    required SettingsController settingsController,
-    required Setting<bool> enabledSetting,
+    required SettingsStore settingsStore,
+    required SettingPath enabledSetting,
     double volume = 1,
   }) async {
-    if (!settingsController.get(enabledSetting)) return;
+    if (!settingsStore.get<bool>(enabledSetting)) return;
     if (asset.type != MediaType.audio || asset.isEmpty) return;
 
     final source = await switch (asset.source) {

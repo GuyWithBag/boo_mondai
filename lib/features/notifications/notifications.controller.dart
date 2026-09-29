@@ -3,32 +3,32 @@ import 'dart:developer' as developer;
 import 'package:boo_mondai/lib.barrel.dart'
     show
         Controller,
-        SettingsController,
-        NotificationsService,
-        SettingsService,
-        LocalDB,
         DateHelper,
+        LocalDB,
         NotificationIntent,
         NotificationIds,
         NotificationRecurrence,
-        Notifications;
+        Notifications,
+        NotificationsService,
+        SettingPath,
+        SettingsStore;
 
 /// High-level notification manager.
 ///
-/// Reads [SettingsController] to know what to schedule, delegates all
+/// Reads [SettingsStore] to know what to schedule, delegates all
 /// plugin calls to [NotificationsService].
 ///
 /// **Provider placement:** above the router, alongside [ChangeTrackerController]
-/// and [SettingsController].
+/// and [SettingsStore].
 ///
-/// **Wiring [SettingsController]:**
+/// **Wiring [SettingsStore]:**
 /// When the user toggles a reminder or changes a time, call the relevant
-/// `schedule*` method from [SettingsController.set]'s callsite so the new
+/// `schedule*` method from [SettingsStore.set]'s callsite so the new
 /// schedule takes effect immediately without waiting for an app restart.
 class NotificationsController extends Controller {
   NotificationsController(this._settings);
 
-  final SettingsController _settings;
+  final SettingsStore _settings;
   final List<NotificationIntent> _notifications = [];
 
   List<NotificationIntent> get notifications =>
@@ -40,9 +40,9 @@ class NotificationsController extends Controller {
   // -------------------------------------------------------------------------
 
   /// Initialise the plugin and re-schedule all active reminders from the
-  /// current [SettingsController] state.
+  /// current [SettingsStore] state.
   ///
-  /// Call once from `main.dart` after [SettingsController.init()] resolves.
+  /// Call once from `main.dart` after [SettingsStore.init()] resolves.
   Future<void> init() async {
     await NotificationsService.init();
     await scheduleReviewReminder();
@@ -55,7 +55,7 @@ class NotificationsController extends Controller {
 
   /// Schedule (or cancel) the daily review reminder based on current settings.
   Future<void> scheduleReviewReminder() async {
-    final enabled = _settings.get(SettingsService.reviewRemindersEnabled);
+    final enabled = _settings.get<bool>(SettingPath.reviewRemindersEnabled);
     if (!enabled) {
       await NotificationsService.cancel(NotificationIds.reviewReminder);
       return;
@@ -64,8 +64,8 @@ class NotificationsController extends Controller {
     await notify(
       Notifications.reviewReminder(
         recurrence: NotificationRecurrence.daily(
-          hour: _settings.get(SettingsService.reviewReminderHour),
-          minute: _settings.get(SettingsService.reviewReminderMinute),
+          hour: _settings.get<int>(SettingPath.reviewReminderHour),
+          minute: _settings.get<int>(SettingPath.reviewReminderMinute),
         ),
       ),
     );
@@ -76,7 +76,7 @@ class NotificationsController extends Controller {
   /// Also checks whether the user has already completed a review session
   /// today — if they have, the reminder is suppressed even if enabled.
   Future<void> scheduleStreakReminder() async {
-    final enabled = _settings.get(SettingsService.streakRemindersEnabled);
+    final enabled = _settings.get<bool>(SettingPath.streakRemindersEnabled);
     if (!enabled) {
       await NotificationsService.cancel(NotificationIds.streakReminder);
       return;
@@ -92,8 +92,8 @@ class NotificationsController extends Controller {
     await notify(
       Notifications.streakReminder(
         recurrence: NotificationRecurrence.daily(
-          hour: _settings.get(SettingsService.streakReminderHour),
-          minute: _settings.get(SettingsService.streakReminderMinute),
+          hour: _settings.get<int>(SettingPath.streakReminderHour),
+          minute: _settings.get<int>(SettingPath.streakReminderMinute),
         ),
       ),
     );

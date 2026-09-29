@@ -93,13 +93,6 @@ abstract final class DecksHelper {
     );
     _hydrateChildListForImport(
       template,
-      key: 'segments',
-      parentKey: 'card_id',
-      parentId: templateId,
-      includeDisplayOrder: false,
-    );
-    _hydrateChildListForImport(
-      template,
       key: 'pairs',
       parentKey: 'template_id',
       parentId: templateId,

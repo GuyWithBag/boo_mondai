@@ -2,7 +2,8 @@
 // PATH: lib/models/dtos/deck_listing.dto.dart
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/lib.barrel.dart' show WithContent;
+import 'package:boo_mondai/features/cards/models/card.template.dto.dart';
+import 'package:boo_mondai/lib.barrel.dart' show CardTemplate, WithContent;
 import 'package:dart_mappable/dart_mappable.dart';
 
 part 'deck_listing.dto.mapper.dart';
@@ -22,7 +23,7 @@ class DeckListing with DeckListingMappable implements WithContent {
   final int reportsCount;
 
   // Store the snippets as simple maps to match Supabase JSONB
-  final List<Map<String, dynamic>> featuredCards;
+  final List<CardTemplate> featuredCards;
   final List<String> featuredImages;
 
   final DateTime? deletedAt;
