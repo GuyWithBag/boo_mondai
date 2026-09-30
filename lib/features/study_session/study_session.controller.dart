@@ -19,6 +19,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         uuid,
         StudySession,
         StudySessionConfig,
+        StudySessionNotificationsService,
         StudySessionSnapshot,
         StudySessionRule,
         StudySessionStep,
@@ -30,10 +31,10 @@ import 'package:fsrs/fsrs.dart' as fsrs;
 import 'package:signals/signals_flutter.dart';
 
 final class StudySessionController {
-  StudySessionController({required this.config, this.notificationsController});
+  StudySessionController({required this.config});
 
   final StudySessionConfig config;
-  final NotificationsController? notificationsController;
+  final notificationsController = NotificationsController.instance;
   final session = signal<StudySession?>(null);
   final error = signal<Exception?>(null);
   final isLoading = signal(false);
@@ -446,8 +447,13 @@ final class StudySessionController {
             );
       throw error.value!;
     }
-    if (mode == SessionMode.review) {
-      await Services.streak.refreshFromReviewLogs();
+    await Services.streak.refreshFromReviewLogs();
+    final decks = LocalDB.deck.getByProfileId(active.profileId);
+    for (final deck in decks) {
+      await StudySessionNotificationsService.rescheduleDeck(
+        profileId: active.profileId,
+        deckId: deck.id,
+      );
     }
   }
 

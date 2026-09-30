@@ -54,15 +54,6 @@ class MainBottomNavBar extends StatelessWidget implements PreferredSizeWidget {
               ),
             );
           }),
-          Expanded(
-            child: Button.iconWithLabel(
-              color: ButtonColor.baseline,
-              variant: ButtonVariant.selectedElevatedText,
-              icon: Icons.open_in_new_outlined,
-              label: 'Plain',
-              onPressed: () => context.push(Pages.viewTestPlain.url),
-            ),
-          ),
         ],
       ),
     );

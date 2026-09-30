@@ -26,6 +26,10 @@ class SettingsRegistry {
       description: 'When to send the streak reminder.',
     ),
     SettingPath.streakReminderMinute: Setting<int>(defaultValue: 0),
+    SettingPath.studyDeckNotificationsEnabled: Setting<bool>(
+      defaultValue: false,
+      description: 'Notify when cards from a studied deck become available.',
+    ),
     SettingPath.themeMode: Setting<String>(
       defaultValue: 'system',
       description: 'Use the system theme, light theme, or dark theme.',

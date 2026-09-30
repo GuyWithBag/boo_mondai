@@ -58,7 +58,7 @@ class AppBar<TSelectedType> extends StatelessWidget
   final double? actionsSpacing;
   final bool automaticallyImplyPopButton;
   final IconData? popButton;
-  final VoidCallback? onPop;
+  final FutureOr<void> Function()? onPop;
   final bool collapsible;
   final ScrollController? scrollController;
   final double collapseDistance;
@@ -102,11 +102,15 @@ class AppBar<TSelectedType> extends StatelessWidget
     final effectivePopButton = canPop
         ? Button.icon(
             icon: popButton ?? inferredPopButton,
-            onPressed:
-                onPop ??
-                () {
-                  context.pop();
-                },
+            onPressed: () async {
+              final pop = onPop;
+              if (pop == null) {
+                context.pop();
+                return;
+              }
+
+              await pop();
+            },
             tokens: tokens,
           )
         : null;

@@ -6,6 +6,7 @@ enum SettingPath {
   streakRemindersEnabled('notifications/streak/reminders_enabled'),
   streakReminderHour('notifications/streak/reminder_hour'),
   streakReminderMinute('notifications/streak/reminder_minute'),
+  studyDeckNotificationsEnabled('notifications/study_deck/enabled'),
   themeMode('appearance/theme/mode'),
   lightThemePresetId('appearance/theme/light_preset_id'),
   darkThemePresetId('appearance/theme/dark_preset_id'),

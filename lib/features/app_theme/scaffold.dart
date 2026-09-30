@@ -107,7 +107,7 @@ class Scaffold extends SignalHookWidget {
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
     final mediaQuery = MediaQuery.of(context);
-    final mainController = context.read<MainController>();
+    final mainController = MainController.instance;
     final controller = useMemoized(
       () => ScaffoldController(
         tokens: tokens,

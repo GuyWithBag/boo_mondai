@@ -23,11 +23,11 @@ class MainScaffold extends SignalHookWidget {
     final auth = context.read<AuthController>();
     final hideNavigation =
         auth.currentProfile.value.role == 'group_b_participant';
-    final controller = context.watch<MainController>();
+    final controller = MainController.instance;
     return Scaffold(
       hideNavigation: hideNavigation,
-      showBottomNavBar: controller.isBottomNavBarVisible,
-      showAppBar: controller.isAppBarVisible,
+      showBottomNavBar: controller.isBottomNavBarVisible.value,
+      showAppBar: controller.isAppBarVisible.value,
       body: child,
       sidebar: SideBar(currentPageIndex: currentIndex),
       bottomNavBar: MainBottomNavBar(currentPageIndex: currentIndex),

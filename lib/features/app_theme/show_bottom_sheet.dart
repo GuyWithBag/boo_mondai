@@ -14,9 +14,9 @@ Future<T?> showBottomSheet<T>({
   bool isDismissible = true,
   bool enableDrag = true,
 }) async {
-  final mainController = context.read<MainController>();
+  final mainController = MainController.instance;
   if (hideBottomNavBar) {
-    mainController.setBottomNavBarVisible(false);
+    mainController.isBottomNavBarVisible.value = false;
   }
 
   final result = await showModalBottomSheet<T>(
@@ -29,6 +29,6 @@ Future<T?> showBottomSheet<T>({
     enableDrag: enableDrag,
     builder: builder,
   );
-  mainController.setBottomNavBarVisible(true);
+  mainController.isBottomNavBarVisible.value = true;
   return result;
 }

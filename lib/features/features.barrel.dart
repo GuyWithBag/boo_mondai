@@ -14,6 +14,7 @@ export 'profile/profile.barrel.dart';
 export 'review.study_session/review.study_session.barrel.dart';
 export 'search/search.barrel.dart';
 export 'study_session/study_session.barrel.dart';
+export 'study_session_notifications/study_session_notifications.barrel.dart';
 export 'tags/tags.barrel.dart';
 export 'sync/sync.barrel.dart';
 export 'deck_downloads/deck_downloads.barrel.dart';

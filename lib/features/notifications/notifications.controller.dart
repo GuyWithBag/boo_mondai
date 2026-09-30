@@ -2,16 +2,18 @@ import 'dart:developer' as developer;
 
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        Controller,
         DateHelper,
         LocalDB,
+        DailySchedule,
         NotificationIntent,
         NotificationIds,
-        NotificationRecurrence,
+        NotificationSchedule,
         Notifications,
         NotificationsService,
         SettingPath,
-        SettingsStore;
+        SettingsStore,
+        Time;
+import 'package:signals/signals_flutter.dart';
 
 /// High-level notification manager.
 ///
@@ -25,15 +27,13 @@ import 'package:boo_mondai/lib.barrel.dart'
 /// When the user toggles a reminder or changes a time, call the relevant
 /// `schedule*` method from [SettingsStore.set]'s callsite so the new
 /// schedule takes effect immediately without waiting for an app restart.
-class NotificationsController extends Controller {
-  NotificationsController(this._settings);
+class NotificationsController {
+  static final instance = NotificationsController();
 
-  final SettingsStore _settings;
-  final List<NotificationIntent> _notifications = [];
+  final SettingsStore settings = SettingsStore.instance;
+  final notifications = ListSignal<NotificationIntent>(const []);
 
-  List<NotificationIntent> get notifications =>
-      List.unmodifiable(_notifications);
-  int get unreadCount => _notifications.length;
+  late final unreadCount = computed(() => notifications.value.length);
 
   // -------------------------------------------------------------------------
   // Init
@@ -55,17 +55,18 @@ class NotificationsController extends Controller {
 
   /// Schedule (or cancel) the daily review reminder based on current settings.
   Future<void> scheduleReviewReminder() async {
-    final enabled = _settings.get<bool>(SettingPath.reviewRemindersEnabled);
+    final enabled = settings.get<bool>(SettingPath.reviewRemindersEnabled);
     if (!enabled) {
       await NotificationsService.cancel(NotificationIds.reviewReminder);
       return;
     }
 
     await notify(
-      Notifications.reviewReminder(
-        recurrence: NotificationRecurrence.daily(
-          hour: _settings.get<int>(SettingPath.reviewReminderHour),
-          minute: _settings.get<int>(SettingPath.reviewReminderMinute),
+      Notifications.reviewReminder(),
+      DailySchedule(
+        time: Time(
+          hour: settings.get<int>(SettingPath.reviewReminderHour),
+          minute: settings.get<int>(SettingPath.reviewReminderMinute),
         ),
       ),
     );
@@ -76,24 +77,25 @@ class NotificationsController extends Controller {
   /// Also checks whether the user has already completed a review session
   /// today — if they have, the reminder is suppressed even if enabled.
   Future<void> scheduleStreakReminder() async {
-    final enabled = _settings.get<bool>(SettingPath.streakRemindersEnabled);
+    final enabled = settings.get<bool>(SettingPath.streakRemindersEnabled);
     if (!enabled) {
       await NotificationsService.cancel(NotificationIds.streakReminder);
       return;
     }
 
     // Suppress if the user already reviewed today.
-    final reviewedToday = await _hasReviewedToday();
+    final reviewedToday = await hasReviewedToday();
     if (reviewedToday) {
       await NotificationsService.cancel(NotificationIds.streakReminder);
       return;
     }
 
     await notify(
-      Notifications.streakReminder(
-        recurrence: NotificationRecurrence.daily(
-          hour: _settings.get<int>(SettingPath.streakReminderHour),
-          minute: _settings.get<int>(SettingPath.streakReminderMinute),
+      Notifications.streakReminder(),
+      DailySchedule(
+        time: Time(
+          hour: settings.get<int>(SettingPath.streakReminderHour),
+          minute: settings.get<int>(SettingPath.streakReminderMinute),
         ),
       ),
     );
@@ -103,22 +105,21 @@ class NotificationsController extends Controller {
   // Event notifications (fire-and-forget)
   // -------------------------------------------------------------------------
 
-  Future<void> notify(NotificationIntent notification) async {
+  Future<void> notify(
+    NotificationIntent notification,
+    NotificationSchedule schedule,
+  ) async {
     if (notification.persistInInbox) {
-      _notifications.insert(0, notification);
-      notifyListeners();
+      notifications.value = List.unmodifiable([
+        notification,
+        ...notifications.value,
+      ]);
     }
 
     if (!notification.showSystemNotification) return;
 
     try {
-      final recurrence = notification.recurrence;
-      if (recurrence != null) {
-        await NotificationsService.scheduleDaily(notification);
-        return;
-      }
-
-      await NotificationsService.showImmediate(notification);
+      await NotificationsService.show(notification, schedule);
     } catch (error, stackTrace) {
       developer.log(
         'Failed to show system notification.',
@@ -131,19 +132,22 @@ class NotificationsController extends Controller {
 
   /// Show an immediate notification when a deck download finishes.
   // Future<void> notifyDownloadComplete(String deckTitle) async {
-  //   await notify(Notifications.downloadComplete(deckTitle: deckTitle));
+  //   await notify(
+  //     Notifications.downloadComplete(deckTitle: deckTitle),
+  //     const ImmediateSchedule.now(),
+  //   );
   // }
 
   // /// Show an immediate notification when a raw sync finishes.
   // Future<void> notifyRawSyncComplete() async {
-  //   await notify(Notifications.syncComplete());
+  //   await notify(Notifications.syncComplete(), const ImmediateSchedule.now());
   // }
 
   // -------------------------------------------------------------------------
   // Helpers
   // -------------------------------------------------------------------------
 
-  Future<bool> _hasReviewedToday() async {
+  Future<bool> hasReviewedToday() async {
     final sessions = LocalDB.reviewSession.selectMany(
       where: (s) =>
           s.completedAt != null &&

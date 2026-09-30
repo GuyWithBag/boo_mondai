@@ -18,7 +18,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:media_variants/media_variants.dart';
-import 'package:provider/provider.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 class Button extends HookWidget {
@@ -64,6 +63,7 @@ class Button extends HookWidget {
     ButtonVariant variant = ButtonVariant.elevated,
     bool selected = false,
     double contentScale = 1,
+    bool elevated = true,
     required AppTokens tokens,
   }) {
     return Button(
@@ -71,6 +71,7 @@ class Button extends HookWidget {
       leading: icon == null ? null : Icon(icon),
       selected: selected,
       contentScale: contentScale,
+      elevated: elevated,
       dashed: variant == ButtonVariant.dashed,
       variants: [color, ButtonSize.icon, ButtonPadding.none, variant],
     );
@@ -83,12 +84,14 @@ class Button extends HookWidget {
     ButtonVariant variant = ButtonVariant.elevated,
     bool selected = false,
     double contentScale = 1,
+    bool elevated = true,
   }) {
     return Button(
       onPressed: onPressed,
       leading: icon == null ? null : Icon(icon),
       selected: selected,
       contentScale: contentScale,
+      elevated: elevated,
       dashed: variant == ButtonVariant.dashed,
       variants: [color, ButtonSize.iconSmall, ButtonPadding.none, variant],
     );
@@ -102,6 +105,7 @@ class Button extends HookWidget {
     Widget? trailing,
     bool selected = false,
     double contentScale = 1,
+    bool elevated = true,
     MainAxisAlignment mainAxisAlignment = MainAxisAlignment.center,
     Axis axis = Axis.horizontal,
   }) {
@@ -111,6 +115,7 @@ class Button extends HookWidget {
       trailing: trailing,
       selected: selected,
       contentScale: contentScale,
+      elevated: elevated,
       mainAxisAlignment: mainAxisAlignment,
       axis: axis,
       variants: const [ButtonVariant.dashed, ButtonColor.dashed],
@@ -126,12 +131,14 @@ class Button extends HookWidget {
     ButtonVariant variant = ButtonVariant.textShadowed,
     bool selected = false,
     double contentScale = 1,
+    bool elevated = false,
   }) {
     return Button(
       onPressed: onPressed,
       leading: icon == null ? null : Icon(icon),
       selected: selected,
       contentScale: contentScale,
+      elevated: elevated,
       dashed: variant == ButtonVariant.dashed,
       variants: [color, ButtonSize.iconOnly, ButtonPadding.none, variant],
     );
@@ -144,12 +151,14 @@ class Button extends HookWidget {
     ButtonVariant variant = ButtonVariant.textShadowed,
     bool selected = false,
     double contentScale = 1,
+    bool elevated = false,
   }) {
     return Button(
       onPressed: onPressed,
       leading: icon == null ? null : Icon(icon),
       selected: selected,
       contentScale: contentScale,
+      elevated: elevated,
       dashed: variant == ButtonVariant.dashed,
       variants: [color, ButtonSize.iconOnlySmall, ButtonPadding.none, variant],
     );

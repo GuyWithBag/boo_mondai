@@ -163,7 +163,7 @@ class ScaffoldController {
     shouldInheritMainBottomNavBarHeight = computed(() {
       final isKeyboardOpen = mediaQuery.viewInsets.bottom > 0;
       return inheritMainBottomNavBarHeight &&
-          mainController.isBottomNavBarVisible &&
+          mainController.isBottomNavBarVisible.value &&
           !isKeyboardOpen;
     });
     trueBottomNavBarHeight = computed(() {

@@ -2,6 +2,5 @@
 
 // Other files
 export 'notification.ids.dart';
-export 'notification.recurrence_type.dart';
-export 'notification.recurrence.dart';
+export 'notification.schedule.dart';
 export 'notification.intent.dart';

@@ -1,14 +1,11 @@
-import 'notification.recurrence.dart';
-
 class NotificationIntent {
   final int id;
-  final String type;
+  final NotificationIntentType type;
   final String title;
   final String body;
   final String? route;
   final bool persistInInbox;
   final bool showSystemNotification;
-  final NotificationRecurrence? recurrence;
 
   const NotificationIntent({
     required this.id,
@@ -18,6 +15,14 @@ class NotificationIntent {
     this.route,
     this.persistInInbox = false,
     this.showSystemNotification = true,
-    this.recurrence,
   });
+}
+
+enum NotificationIntentType {
+  reviewReminder,
+  streakReminder,
+  downloadComplete,
+  syncComplete,
+  firstDrillSurvey,
+  studyDeckReview,
 }

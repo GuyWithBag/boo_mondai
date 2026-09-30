@@ -1,6 +1,7 @@
 import 'dart:ui' show BoxHeightStyle, BoxWidthStyle;
 
 import 'package:boo_mondai/lib.barrel.dart' show AppTokens, textFieldStyle;
+import 'package:boo_mondai/ui/text.context_menu/text.context_menu.controller.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart'
     as material
@@ -409,7 +410,10 @@ class TextField extends StatelessWidget {
       selectionControls: selectionControls,
       onTap: onTap,
       onTapAlwaysCalled: onTapAlwaysCalled,
-      onTapOutside: onTapOutside,
+      onTapOutside: (event) {
+        TextContextMenuController.instance.dismiss();
+        onTapOutside?.call(event);
+      },
       onTapUpOutside: onTapUpOutside,
       mouseCursor: mouseCursor,
       buildCounter: buildCounter,
@@ -422,11 +426,26 @@ class TextField extends StatelessWidget {
       stylusHandwritingEnabled: stylusHandwritingEnabled,
       enableIMEPersonalizedLearning: enableIMEPersonalizedLearning,
       enableInlinePrediction: enableInlinePrediction,
-      contextMenuBuilder: contextMenuBuilder,
+      contextMenuBuilder: contextMenuBuilder ?? _buildTextContextMenu,
       canRequestFocus: canRequestFocus,
       spellCheckConfiguration: spellCheckConfiguration,
       magnifierConfiguration: magnifierConfiguration,
       hintLocales: hintLocales,
     );
   }
+}
+
+Widget _buildTextContextMenu(
+  BuildContext context,
+  EditableTextState editableTextState,
+) {
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    if (!context.mounted) return;
+    TextContextMenuController.instance.show(
+      context: context,
+      editableTextState: editableTextState,
+    );
+  });
+
+  return const SizedBox.shrink();
 }

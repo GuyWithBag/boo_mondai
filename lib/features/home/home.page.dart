@@ -15,7 +15,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         ReadyToReviewCard,
         Scaffold,
         StreaksCard,
-        NotificationButton,
+        NotificationsButton,
         ViewLeaderboardController,
         ViewStudyDecksController;
 import 'package:flutter/material.dart' hide Scaffold, AppBar;
@@ -45,7 +45,7 @@ class HomePage extends SignalHookWidget {
     }, []);
 
     return Scaffold(
-      appBar: AppBar(title: 'Home', actions: const [NotificationButton()]),
+      appBar: AppBar(title: 'Home', actions: const [NotificationsButton()]),
       scrollable: true,
       body: RefreshIndicator(
         onRefresh: () async {
