@@ -16,7 +16,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         StudySessionConfig,
         StudySessionController,
         UiSoundsService,
-        WordScrambleTemplate;
+        WordScrambleTemplate,
+        showModal,
+        ModalAction,
+        ButtonColor;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart' show GoRouterHelper;
 import 'package:media_variants/media_variants.dart';
@@ -37,9 +40,6 @@ final class ViewStudySessionController {
              requeueAgainWhenIntervalLessThan: Duration(minutes: 10),
            ),
          },
-         notificationsController: mode == SessionMode.drill
-             ? context.read<NotificationsController>()
-             : null,
        ) {
     if (this.deckId.value == null && this.mode.value == SessionMode.drill) {
       throw SessionException(
@@ -152,7 +152,22 @@ final class ViewStudySessionController {
     }());
   }
 
-  void onSessionPop() {
+  Future<void> onSessionPop(BuildContext context) async {
+    final res = await showModal(
+      context: context,
+      leading: Icon(Icons.dangerous),
+      title: 'Exit Session?',
+      subtitle: 'Exiting will discard your current progress.',
+      actionsMainAxisAlignment: MainAxisAlignment.spaceBetween,
+      actions: [
+        ModalAction(label: 'Go Back', value: false),
+        ModalAction(label: 'Exit', value: true, color: ButtonColor.primary),
+      ],
+    );
+    if (res != true) {
+      return;
+    }
+    if (!context.mounted) return;
     context.pop();
   }
 

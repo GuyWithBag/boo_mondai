@@ -13,7 +13,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         Scaffold,
         ToolBar,
         ToolBarController,
-        showSnackbar,
         EditDeckController;
 import 'package:flutter/material.dart' hide Scaffold;
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -44,22 +43,13 @@ class EditDeckPage extends SignalHookWidget {
     useEffect(() => toolBarController.dispose, [toolBarController]);
 
     final tokens = context.themeTokens<AppTokens>();
-    final isSaving = controller.isLoading.value;
 
     return Scaffold(
       isFloatingSideBar: true,
-      appBar: EditDeckAppBar(
-        titleController: controller.titleController,
-        onSave: () async {
-          await controller.save();
-          if (!context.mounted) return;
-          showSnackbar(context, message: 'Deck Saved');
-        },
-        isSaving: isSaving,
-      ),
+      appBar: EditDeckAppBar(controller: controller),
       floatingActionButton: Button.icon(
         icon: Icons.add,
-        onPressed: controller.addTemplate,
+        onPressed: () => controller.addTemplate(context),
         tokens: tokens,
       ),
       sidebar: EditDeckSideBar(controller: controller),
@@ -79,7 +69,7 @@ class EditDeckPage extends SignalHookWidget {
       ),
       body: Form(
         key: controller.formKey,
-        child: EditDeckEditorBody(editor: controller),
+        child: EditDeckEditorBody(controller: controller),
       ),
     );
   }

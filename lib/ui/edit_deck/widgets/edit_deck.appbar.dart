@@ -9,20 +9,15 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextFieldFrame,
         TextFieldSize,
         ButtonSize,
-        BottomNavBar;
+        BottomNavBar,
+        EditDeckController;
 import 'package:flutter/material.dart' hide AppBar;
+import 'package:signals_hooks/signals_hooks.dart';
 
-class EditDeckAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const EditDeckAppBar({
-    required this.titleController,
-    required this.onSave,
-    this.isSaving = false,
-    super.key,
-  });
+class EditDeckAppBar extends SignalHookWidget implements PreferredSizeWidget {
+  const EditDeckAppBar({super.key, required this.controller});
 
-  final TextEditingController titleController;
-  final Future<void> Function() onSave;
-  final bool isSaving;
+  final EditDeckController controller;
 
   @override
   Size get preferredSize => Size(0, BottomNavBar.preferredHeightDefault);
@@ -30,6 +25,7 @@ class EditDeckAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      onPop: () => controller.onPop(context),
       actions: [
         Button(
           variants: const [
@@ -37,8 +33,13 @@ class EditDeckAppBar extends StatelessWidget implements PreferredSizeWidget {
             ButtonSize.icon,
             ButtonPadding.none,
           ],
-          onPressed: isSaving ? null : onSave,
-          leading: isSaving
+          onPressed:
+              controller.isLoading.value || controller.isDirty.value == false
+              ? null
+              : () async {
+                  await controller.save(context);
+                },
+          leading: controller.isLoading.value
               ? const SizedBox.square(
                   dimension: 18,
                   child: CircularProgressIndicator(strokeWidth: 2),
@@ -48,8 +49,8 @@ class EditDeckAppBar extends StatelessWidget implements PreferredSizeWidget {
       ],
       child: MarkdownText(
         allowAttachments: true,
-        data: titleController.text,
-        controller: titleController,
+        data: controller.titleController.text,
+        controller: controller.titleController,
         placeholder: 'Deck Title...',
         mode: MarkdownTextMode.input,
         variants: const [TextFieldSize.bodyLarge, TextFieldFrame.none],

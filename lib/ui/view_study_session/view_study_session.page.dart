@@ -95,7 +95,7 @@ class ViewStudySessionPage extends SignalHookWidget {
     return Scaffold(
       scrollable: false,
       appBar: AppBar(
-        onPop: controller.onSessionPop,
+        onPop: () => controller.onSessionPop(context),
         child: Row(
           spacing: tokens.spaceLayoutGapMd,
           children: [
@@ -115,18 +115,20 @@ class ViewStudySessionPage extends SignalHookWidget {
           ],
         ),
       ),
-      bottomNavBar: BottomNavBar(
-        preferredHeight: ViewStudySessionBottomNavBarBody.preferredHeight(
-          template: template,
-          cardStageController: cardStageController,
-        ),
-        child: ViewStudySessionBottomNavBarBody(
-          template: template,
-          studySessionController: studySessionController,
-          cardStageController: cardStageController,
-          isCompleting: controller.isCompleting.value,
-        ),
-      ),
+      bottomNavBar: !cardStageController.isBottomNavBarHidden.value
+          ? BottomNavBar(
+              preferredHeight: ViewStudySessionBottomNavBarBody.preferredHeight(
+                template: template,
+                cardStageController: cardStageController,
+              ),
+              child: ViewStudySessionBottomNavBarBody(
+                template: template,
+                studySessionController: studySessionController,
+                cardStageController: cardStageController,
+                isCompleting: controller.isCompleting.value,
+              ),
+            )
+          : null,
       inheritMainBottomNavBarHeight: false,
       body: getBody(),
     );

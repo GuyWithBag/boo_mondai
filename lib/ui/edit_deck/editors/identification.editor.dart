@@ -52,10 +52,6 @@ class IdentificationEditor extends SignalHookWidget {
       spacing: tokens.spaceLayoutGapMd,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        CardVerticalAlignmentControl(
-          value: controller.template.verticallyCentered,
-          onChanged: controller.onVerticalAlignmentControlChanged,
-        ),
         FormField<String>(
           value: controller.promptController.text,
           validator: EditDeckFormValidator.prompt,
@@ -121,6 +117,10 @@ class IdentificationEditor extends SignalHookWidget {
               ],
             ),
           ),
+        ),
+        CardVerticalAlignmentControl(
+          value: controller.template.verticallyCentered,
+          onChanged: controller.onVerticalAlignmentControlChanged,
         ),
       ],
     );

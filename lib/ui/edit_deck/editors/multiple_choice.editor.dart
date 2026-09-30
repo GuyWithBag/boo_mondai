@@ -33,10 +33,6 @@ class MultipleChoiceEditor extends SignalHookWidget {
     return Column(
       spacing: tokens.spaceLayoutGapMd,
       children: [
-        CardVerticalAlignmentControl(
-          value: editor.template.verticallyCentered,
-          onChanged: editor.onVerticalAlignmentControlChanged,
-        ),
         FormField<String>(
           value: editor.promptController.text,
           validator: EditDeckFormValidator.prompt,
@@ -54,6 +50,10 @@ class MultipleChoiceEditor extends SignalHookWidget {
           value: options,
           validator: EditDeckFormValidator.multipleChoiceOptions,
           builder: (_, _) => MultipleChoiceOptionsPanel(controller: editor),
+        ),
+        CardVerticalAlignmentControl(
+          value: editor.template.verticallyCentered,
+          onChanged: editor.onVerticalAlignmentControlChanged,
         ),
       ],
     );

@@ -20,14 +20,14 @@ import 'package:flutter/material.dart';
 import 'package:signals_hooks/signals_hooks.dart';
 
 class EditDeckEditorBody extends SignalHookWidget {
-  const EditDeckEditorBody({required this.editor, super.key});
+  const EditDeckEditorBody({required this.controller, super.key});
 
-  final EditDeckController editor;
+  final EditDeckController controller;
 
   @override
   Widget build(BuildContext context) {
-    final activeTemplate = editor.selectedTemplate.value;
-    final error = editor.error.value;
+    final activeTemplate = controller.selectedTemplate.value;
+    final error = controller.error.value;
 
     if (activeTemplate == null) {
       return StatusLayoutState(
@@ -37,7 +37,7 @@ class EditDeckEditorBody extends SignalHookWidget {
         actions: [
           Button(
             leading: const Icon(Icons.add),
-            onPressed: editor.addTemplate,
+            onPressed: () => controller.addTemplate(context),
             child: const Text('Add Card'),
           ),
         ],
@@ -49,25 +49,25 @@ class EditDeckEditorBody extends SignalHookWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           KeyedSubtree(
-            key: ValueKey(editor.selectedTemplateKey.value),
+            key: ValueKey(controller.selectedTemplateKey.value),
             child: switch (activeTemplate) {
               FlashcardTemplate _ => FlashcardEditor(
-                editDeckController: editor,
+                editDeckController: controller,
               ),
               MultipleChoiceTemplate _ => MultipleChoiceEditor(
-                editDeckController: editor,
+                editDeckController: controller,
               ),
               FillInTheBlanksTemplate _ => FillInTheBlanksEditor(
-                editDeckController: editor,
+                editDeckController: controller,
               ),
               IdentificationTemplate _ => IdentificationEditor(
-                editDeckController: editor,
+                editDeckController: controller,
               ),
               MatchingTypeTemplate _ => MatchingTypeEditor(
-                editDeckController: editor,
+                editDeckController: controller,
               ),
               WordScrambleTemplate _ => WordScrambleEditor(
-                editDeckController: editor,
+                editDeckController: controller,
               ),
               _ => StatusLayoutState(
                 icon: Icons.help_outline,

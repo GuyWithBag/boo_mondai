@@ -46,10 +46,6 @@ class MatchingTypeEditor extends SignalHookWidget {
     return Column(
       spacing: tokens.spaceLayoutGapMd,
       children: [
-        CardVerticalAlignmentControl(
-          value: controller.template.verticallyCentered,
-          onChanged: controller.onVerticalAlignmentControlChanged,
-        ),
         FormField(
           value: values,
           validator: EditDeckFormValidator.matchingPairs,
@@ -57,6 +53,10 @@ class MatchingTypeEditor extends SignalHookWidget {
             controller: controller,
             onChanged: field.didChange,
           ),
+        ),
+        CardVerticalAlignmentControl(
+          value: controller.template.verticallyCentered,
+          onChanged: controller.onVerticalAlignmentControlChanged,
         ),
       ],
     );

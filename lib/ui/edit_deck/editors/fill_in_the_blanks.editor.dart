@@ -53,10 +53,6 @@ class FillInTheBlanksEditor extends SignalHookWidget {
       spacing: tokens.spaceLayoutGapMd,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        CardVerticalAlignmentControl(
-          value: editor.template.verticallyCentered,
-          onChanged: editor.onVerticalAlignmentControlChanged,
-        ),
         FormField<String>(
           value: editor.promptController.text,
           validator: EditDeckFormValidator.prompt,
@@ -155,6 +151,10 @@ class FillInTheBlanksEditor extends SignalHookWidget {
               ],
             ),
           ),
+        ),
+        CardVerticalAlignmentControl(
+          value: editor.template.verticallyCentered,
+          onChanged: editor.onVerticalAlignmentControlChanged,
         ),
       ],
     );

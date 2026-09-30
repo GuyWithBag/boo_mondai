@@ -28,6 +28,7 @@ class StudySessionCardStageController {
   final Signal<bool> canReveal;
 
   final Signal<bool> isRevealed = signal(false);
+  final isBottomNavBarHidden = signal(false);
 
   void reveal({StudyRating? pendingRating}) {
     if (!canReveal.value || isRevealed.value) return;

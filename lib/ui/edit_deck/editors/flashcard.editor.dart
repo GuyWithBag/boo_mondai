@@ -45,6 +45,32 @@ class FlashcardEditor extends SignalHookWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: tokens.spaceLayoutGapMd,
       children: [
+        FormField<String>(
+          value: editor.frontController.text,
+          validator: EditDeckFormValidator.prompt,
+          builder: (_, field) => TextFieldCard(
+            title: 'Front (Prompt)',
+            placeholder: 'Type a word...',
+            controller: editor.frontController,
+            onChanged: (value) {
+              field.didChange(value);
+              editor.updateFront(value);
+            },
+          ),
+        ),
+        FormField<String>(
+          value: editor.backController.text,
+          validator: EditDeckFormValidator.answer,
+          builder: (_, field) => TextFieldCard(
+            title: 'Back (Answer)',
+            placeholder: 'Type the translation...',
+            controller: editor.backController,
+            onChanged: (value) {
+              field.didChange(value);
+              editor.updateBack(value);
+            },
+          ),
+        ),
         Surface(
           style: surfaceStyle.resolve(tokens, const [SurfaceColor.baseline]),
           child: Column(
@@ -84,32 +110,6 @@ class FlashcardEditor extends SignalHookWidget {
         CardVerticalAlignmentControl(
           value: editor.template.verticallyCentered,
           onChanged: editor.onVerticalAlignmentControlChanged,
-        ),
-        FormField<String>(
-          value: editor.frontController.text,
-          validator: EditDeckFormValidator.prompt,
-          builder: (_, field) => TextFieldCard(
-            title: 'Front (Prompt)',
-            placeholder: 'Type a word...',
-            controller: editor.frontController,
-            onChanged: (value) {
-              field.didChange(value);
-              editor.updateFront(value);
-            },
-          ),
-        ),
-        FormField<String>(
-          value: editor.backController.text,
-          validator: EditDeckFormValidator.answer,
-          builder: (_, field) => TextFieldCard(
-            title: 'Back (Answer)',
-            placeholder: 'Type the translation...',
-            controller: editor.backController,
-            onChanged: (value) {
-              field.didChange(value);
-              editor.updateBack(value);
-            },
-          ),
         ),
       ],
     );

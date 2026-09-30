@@ -12,6 +12,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         HeaderBadge,
         MetaLabel,
         DeckTileState,
+        SettingPath,
+        SettingsStore,
         SurfacePadding,
         SurfaceShape,
         SurfaceColor,
@@ -28,6 +30,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         DecksDirectoryPaths,
         ToolBar,
         ToolBarController,
+        showFeatureDisabledModal,
         showBottomSheet;
 import 'package:flutter/material.dart'
     hide AppBar, FormField, Scaffold, showBottomSheet;
@@ -64,6 +67,9 @@ class ViewDeckSingleSheet extends SignalHookWidget {
     final toolBarController = useMemoized(() => ToolBarController());
     useEffect(() => toolBarController.dispose, [toolBarController]);
     final activeDeck = controller.deck.value;
+    final areOnlineFeaturesDisabled = SettingsStore.instance.get<bool>(
+      SettingPath.disableOnlineFeatures,
+    );
 
     return DraggableScrollableSheet(
       expand: false,
@@ -99,16 +105,6 @@ class ViewDeckSingleSheet extends SignalHookWidget {
               actions: [
                 Button.icon(
                   tokens: tokens,
-                  icon: Icons.list,
-                  onPressed: () => controller.onCreateListingPressed(context),
-                ),
-                Button.icon(
-                  tokens: tokens,
-                  icon: Icons.folder_outlined,
-                  onPressed: () => controller.showDeckPath(context),
-                ),
-                Button.icon(
-                  tokens: tokens,
                   icon: Icons.edit,
                   onPressed: activeDeck.isEditable
                       ? () => context.push('/decks-local/${activeDeck.id}/edit')
@@ -120,23 +116,60 @@ class ViewDeckSingleSheet extends SignalHookWidget {
                   color: ButtonColor.error,
                   onPressed: () => controller.deleteDeck(context),
                 ),
-              ],
-              bottom: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: tokens.spaceScaffoldPadding,
-                ),
-                child: Wrap(
-                  alignment: WrapAlignment.end,
-                  spacing: tokens.spaceLayoutGapSm,
-                  runSpacing: tokens.spaceLayoutGapSm,
-                  children: [
-                    if (activeDeck.isPremade)
-                      const HeaderBadge(label: 'Premade'),
-                    if (!activeDeck.isEditable)
-                      const Chip(label: Text('Locked')),
+                MenuAnchor(
+                  menuChildren: [
+                    MenuItemButton(
+                      leadingIcon: const Icon(Icons.list),
+                      onPressed: () {
+                        if (areOnlineFeaturesDisabled) {
+                          showFeatureDisabledModal(context);
+                          return;
+                        }
+
+                        controller.onCreateListingPressed(context);
+                      },
+                      child: const Text('Create listing'),
+                    ),
+                    MenuItemButton(
+                      leadingIcon: const Icon(Icons.folder_outlined),
+                      onPressed: () => controller.showDeckPath(context),
+                      child: const Text('Show folder'),
+                    ),
                   ],
+                  builder: (_, menuController, _) {
+                    return Button.iconOnly(
+                      icon: Icons.more_vert,
+                      onPressed: () {
+                        if (menuController.isOpen) {
+                          menuController.close();
+                          return;
+                        }
+
+                        menuController.open();
+                      },
+                    );
+                  },
                 ),
-              ),
+              ],
+              bottom: activeDeck.isPremade || !activeDeck.isEditable
+                  ? Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: tokens.spaceScaffoldPadding,
+                      ),
+                      child: Wrap(
+                        alignment: WrapAlignment.end,
+                        spacing: tokens.spaceLayoutGapSm,
+                        runSpacing: tokens.spaceLayoutGapSm,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          if (activeDeck.isPremade)
+                            const HeaderBadge(label: 'Premade'),
+                          if (!activeDeck.isEditable)
+                            const Chip(label: Text('Locked')),
+                        ],
+                      ),
+                    )
+                  : null,
             ),
             padding: EdgeInsets.zero,
             body: activeDeck.isEditable

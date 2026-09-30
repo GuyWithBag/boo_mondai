@@ -72,7 +72,7 @@ class EditDeckSideBar extends SignalWidget {
             title: 'Cards (${templates.length})',
             trailing: Button(
               leading: const Icon(Icons.add),
-              onPressed: controller.addTemplate,
+              onPressed: () => controller.addTemplate(context),
             ),
           ),
           Expanded(

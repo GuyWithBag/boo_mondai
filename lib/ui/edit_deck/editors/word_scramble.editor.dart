@@ -32,10 +32,6 @@ class WordScrambleEditor extends SignalHookWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: tokens.spaceLayoutGapMd,
       children: [
-        CardVerticalAlignmentControl(
-          value: editor.template.verticallyCentered,
-          onChanged: editor.onVerticalAlignmentControlChanged,
-        ),
         FormField<String>(
           value: editor.sentenceController.text,
           validator: EditDeckFormValidator.prompt,
@@ -48,6 +44,10 @@ class WordScrambleEditor extends SignalHookWidget {
               editor.updateSentence(value);
             },
           ),
+        ),
+        CardVerticalAlignmentControl(
+          value: editor.template.verticallyCentered,
+          onChanged: editor.onVerticalAlignmentControlChanged,
         ),
       ],
     );

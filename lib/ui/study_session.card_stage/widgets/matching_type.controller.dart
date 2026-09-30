@@ -13,6 +13,9 @@ import 'package:signals/signals_flutter.dart';
 
 class MatchingTypeController {
   MatchingTypeController({required this.template, this.cardStageController}) {
+    if (cardStageController != null) {
+      cardStageController!.isBottomNavBarHidden.value = true;
+    }
     final random = Random();
     final pairs = _matchingRows(template);
 

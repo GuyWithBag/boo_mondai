@@ -1,16 +1,30 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
+        ButtonColor,
         CardTemplate,
         CardTemplateType,
         CardTemplatesService,
         Deck,
         DecksDirectoryPaths,
         DecksService,
+        ListHelper,
         LocalDB,
-        StudyCardService;
+        ModalAction,
+        SnackbarColor,
+        StudyCardService,
+        showModal,
+        showSnackbar;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart'
-    show FormState, GlobalKey, TextEditingController;
+    show
+        FormState,
+        GlobalKey,
+        TextEditingController,
+        BuildContext,
+        Icons,
+        Icon,
+        MainAxisAlignment;
+import 'package:go_router/go_router.dart';
 import 'package:signals_hooks/signals_hooks.dart';
 
 /// State shared by the card list and the active card editor.
@@ -18,16 +32,36 @@ import 'package:signals_hooks/signals_hooks.dart';
 /// [selectedTemplateId] is the single source of truth for selection. Both
 /// the sidebar and editor derive their state from it.
 class EditDeckController {
-  EditDeckController({required String deckId, String? initialTemplateId}) {
+  EditDeckController({required String deckId, String? initialTemplateId})
+    : titleController = TextEditingController() {
     _load(deckId, initialTemplateId: initialTemplateId);
+    titleController.addListener(
+      () => deck.value = deck.value.copyWith(title: titleController.text),
+    );
   }
 
-  late final Deck initialDeck;
-  late final List<CardTemplate> initialTemplates;
+  late final Signal<Deck> initialDeck;
+  late final ListSignal<CardTemplate> initialTemplates;
   late final Signal<Deck> deck;
+  final TextEditingController titleController;
+
+  late final deckEffect = effect(() {
+    deck.value = deck.value.copyWith(
+      cardTemplatesCount: templates.value.length,
+    );
+  });
+
+  late final isDirty = computed(
+    () =>
+        initialDeck.value != deck.value ||
+        !ListHelper.equal(initialTemplates.value, templates.value),
+  );
 
   final templates = signal<List<CardTemplate>>(const []);
   final selectedTemplateId = signal<String?>(null);
+
+  final formKey = GlobalKey<FormState>();
+  final isValidated = signal(true);
 
   late final selectedTemplate = computed<CardTemplate?>(() {
     final id = selectedTemplateId.value;
@@ -62,10 +96,8 @@ class EditDeckController {
         : CardTemplatesService.typeFor(template);
   });
 
-  final formKey = GlobalKey<FormState>();
   final isLoading = signal(false);
   final error = signal<Exception?>(null);
-  final TextEditingController titleController = TextEditingController();
 
   void _load(String deckId, {String? initialTemplateId}) {
     final profileId = LocalDB.currentProfile.getOrCreate().id;
@@ -74,8 +106,8 @@ class EditDeckController {
         Deck.createDummy(id: deckId, profileId: profileId);
     final loadedTemplates = LocalDB.cardTemplate.getByDeckId(deckId);
 
-    initialDeck = loadedDeck;
-    initialTemplates = List.unmodifiable(loadedTemplates);
+    initialDeck = signal(loadedDeck);
+    initialTemplates = listSignal(loadedTemplates);
     deck = signal(loadedDeck);
     templates.value = [...loadedTemplates];
     selectedTemplateId.value =
@@ -92,9 +124,22 @@ class EditDeckController {
     );
   }
 
-  bool validate() => formKey.currentState?.validate() ?? true;
+  bool validate(BuildContext context) {
+    final valid = formKey.currentState?.validate() ?? true;
+    isValidated.value = valid;
 
-  void addTemplate() {
+    if (!valid) {
+      showSnackbar(
+        context,
+        message: 'You have invalid fields.',
+        color: SnackbarColor.error,
+      );
+    }
+
+    return valid;
+  }
+
+  void addTemplate(BuildContext context) {
     final template = CardTemplatesService.create(
       type: selectedCardTemplateType.value,
       deckId: deck.value.id,
@@ -102,6 +147,7 @@ class EditDeckController {
     );
     templates.value = [...templates.value, template];
     selectedTemplateId.value = template.id;
+    showSnackbar(context, message: 'New Card Template Created');
   }
 
   void selectTemplate(String id) {
@@ -144,39 +190,54 @@ class EditDeckController {
     );
   }
 
-  Future<void> save() async {
-    if (!validate()) return;
+  Future<void> onPop(BuildContext context) async {
+    if (isDirty.value == false) {
+      context.pop();
+      return;
+    }
+
+    final res = await showModal(
+      context: context,
+      leading: Icon(Icons.dangerous),
+      title: 'You have unsaved changes.',
+      subtitle: 'If you don\'t save, you will lose your changes.',
+      actionsMainAxisAlignment: MainAxisAlignment.spaceBetween,
+      actions: [
+        ModalAction(label: 'Go Back', value: false),
+        ModalAction(label: 'Exit', value: true, color: ButtonColor.primary),
+      ],
+    );
+    if (res != true) {
+      return;
+    }
+    if (!context.mounted) return;
+    context.pop();
+  }
+
+  Future<void> save(BuildContext context) async {
+    if (!validate(context)) return;
     isLoading.value = true;
     error.value = null;
     try {
-      final updatedDeck = deck.value.copyWith(
-        cardTemplatesCount: templates.value.length,
-      );
-      deck.value = (await DecksService.upsert(deck: updatedDeck))!;
+      deck.value = (await DecksService.upsert(deck: deck.value))!;
       await LocalDB.cardTemplate.upsertMany(templates.value);
       await StudyCardService.syncDeckStudyCards(
-        deckId: updatedDeck.id,
+        deckId: deck.value.id,
         templates: templates.value,
       );
-      deck.value = updatedDeck;
     } on Exception catch (e) {
       error.value = e;
     } finally {
       isLoading.value = false;
     }
+    if (!context.mounted) return;
+    showSnackbar(context, message: 'Deck Saved', color: SnackbarColor.success);
+    initialDeck.value = deck.value;
+    initialTemplates.value = templates.value;
   }
 
   void dispose() {
     titleController.dispose();
-    deck.dispose();
-    templates.dispose();
-    selectedTemplate.dispose();
-    selectedTemplateIndex.dispose();
-    selectedTemplateKey.dispose();
-    hasSelectedTemplate.dispose();
-    selectedCardTemplateType.dispose();
-    selectedTemplateId.dispose();
-    isLoading.dispose();
-    error.dispose();
+    deckEffect();
   }
 }
