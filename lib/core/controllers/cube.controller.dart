@@ -1,8 +1,9 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:signals/signals_flutter.dart';
 
-class CubeController extends ChangeNotifier {
+class CubeController {
   CubeController({
     required double width,
     required double height,
@@ -15,184 +16,57 @@ class CubeController extends ChangeNotifier {
     Offset position = Offset.zero,
     Duration animationDuration = const Duration(milliseconds: 260),
     Curve animationCurve = Curves.easeOutCubic,
-  }) : _width = width,
-       _height = height,
-       _depth = depth,
-       _pitch = pitch,
-       _yaw = yaw,
-       _roll = roll,
-       _scale = scale,
-       _perspective = perspective,
-       _position = position,
-       _animationDuration = animationDuration,
-       _animationCurve = animationCurve;
+  }) : width = signal(width),
+       height = signal(height),
+       depth = signal(depth),
+       pitch = signal(pitch),
+       yaw = signal(yaw),
+       roll = signal(roll),
+       scale = signal(scale),
+       perspective = signal(perspective),
+       position = signal(position),
+       animationDuration = signal(animationDuration),
+       animationCurve = signal(animationCurve);
 
-  double _width;
-  double _height;
-  double _depth;
-  double _pitch;
-  double _yaw;
-  double _roll;
-  double _scale;
-  double _perspective;
-  Offset _position;
-  Duration _animationDuration;
-  Curve _animationCurve;
+  final Signal<double> width;
+  final Signal<double> height;
+  final Signal<double> depth;
+  final Signal<double> pitch;
+  final Signal<double> yaw;
+  final Signal<double> roll;
+  final Signal<double> scale;
+  final Signal<double> perspective;
+  final Signal<Offset> position;
+  final Signal<Duration> animationDuration;
+  final Signal<Curve> animationCurve;
 
-  double get width => _width;
-  double get height => _height;
-  double get depth => _depth;
-  double get pitch => _pitch;
-  double get yaw => _yaw;
-  double get roll => _roll;
-  double get scale => _scale;
-  double get perspective => _perspective;
-  Offset get position => _position;
-  Duration get animationDuration => _animationDuration;
-  Curve get animationCurve => _animationCurve;
-  bool get isBack =>
-      _normalizedYaw >= math.pi / 2 && _normalizedYaw < 3 * math.pi / 2;
+  late final normalizedYaw = computed(() {
+    final normalized = yaw.value % (2 * math.pi);
+    return normalized < 0 ? normalized + (2 * math.pi) : normalized;
+  });
 
-  set width(double value) {
-    if (_width == value) {
-      return;
-    }
-
-    _width = value;
-    notifyListeners();
-  }
-
-  set height(double value) {
-    if (_height == value) {
-      return;
-    }
-
-    _height = value;
-    notifyListeners();
-  }
-
-  set depth(double value) {
-    if (_depth == value) {
-      return;
-    }
-
-    _depth = value;
-    notifyListeners();
-  }
-
-  set pitch(double value) {
-    if (_pitch == value) {
-      return;
-    }
-
-    _pitch = value;
-    notifyListeners();
-  }
-
-  set yaw(double value) {
-    if (_yaw == value) {
-      return;
-    }
-
-    _yaw = value;
-    notifyListeners();
-  }
-
-  set roll(double value) {
-    if (_roll == value) {
-      return;
-    }
-
-    _roll = value;
-    notifyListeners();
-  }
-
-  set scale(double value) {
-    if (_scale == value) {
-      return;
-    }
-
-    _scale = value;
-    notifyListeners();
-  }
-
-  set perspective(double value) {
-    if (_perspective == value) {
-      return;
-    }
-
-    _perspective = value;
-    notifyListeners();
-  }
-
-  set position(Offset value) {
-    if (_position == value) {
-      return;
-    }
-
-    _position = value;
-    notifyListeners();
-  }
-
-  set animationDuration(Duration value) {
-    if (_animationDuration == value) {
-      return;
-    }
-
-    _animationDuration = value;
-    notifyListeners();
-  }
-
-  set animationCurve(Curve value) {
-    if (_animationCurve == value) {
-      return;
-    }
-
-    _animationCurve = value;
-    notifyListeners();
-  }
+  late final isBack = computed(
+    () =>
+        normalizedYaw.value >= math.pi / 2 &&
+        normalizedYaw.value < 3 * math.pi / 2,
+  );
 
   void setDimensions({double? width, double? height, double? depth}) {
-    final nextWidth = width ?? _width;
-    final nextHeight = height ?? _height;
-    final nextDepth = depth ?? _depth;
-
-    if (_width == nextWidth && _height == nextHeight && _depth == nextDepth) {
-      return;
-    }
-
-    _width = nextWidth;
-    _height = nextHeight;
-    _depth = nextDepth;
-    notifyListeners();
+    this.width.value = width ?? this.width.value;
+    this.height.value = height ?? this.height.value;
+    this.depth.value = depth ?? this.depth.value;
   }
 
   void setRotation({double? pitch, double? yaw, double? roll}) {
-    final nextRotationX = pitch ?? _pitch;
-    final nextRotationY = yaw ?? _yaw;
-    final nextRotationZ = roll ?? _roll;
-
-    if (_pitch == nextRotationX &&
-        _yaw == nextRotationY &&
-        _roll == nextRotationZ) {
-      return;
-    }
-
-    _pitch = nextRotationX;
-    _yaw = nextRotationY;
-    _roll = nextRotationZ;
-    notifyListeners();
+    this.pitch.value = pitch ?? this.pitch.value;
+    this.yaw.value = yaw ?? this.yaw.value;
+    this.roll.value = roll ?? this.roll.value;
   }
 
   void rotateBy({double pitch = 0, double yaw = 0, double roll = 0}) {
-    if (pitch == 0 && yaw == 0 && roll == 0) {
-      return;
-    }
-
-    _pitch += pitch;
-    _yaw += yaw;
-    _roll += roll;
-    notifyListeners();
+    this.pitch.value += pitch;
+    this.yaw.value += yaw;
+    this.roll.value += roll;
   }
 
   void resetRotation({double pitch = 0, double yaw = 0, double roll = 0}) {
@@ -200,47 +74,31 @@ class CubeController extends ChangeNotifier {
   }
 
   void setScale(double value) {
-    scale = value;
+    scale.value = value;
   }
 
   void scaleBy(double factor) {
-    if (factor == 1) {
-      return;
-    }
-
-    _scale *= factor;
-    notifyListeners();
+    scale.value *= factor;
   }
 
   void resetScale() {
-    scale = 1.0;
+    scale.value = 1.0;
   }
 
   void resetPosition() {
-    setPosition(x: 0, y: 0);
+    position.value = Offset.zero;
   }
 
   void setPosition({double? x, double? y}) {
-    final next = Offset(x ?? _position.dx, y ?? _position.dy);
-    if (next == _position) {
-      return;
-    }
-
-    _position = next;
-    notifyListeners();
+    position.value = Offset(x ?? position.value.dx, y ?? position.value.dy);
   }
 
   void moveBy({double x = 0, double y = 0}) {
-    if (x == 0 && y == 0) {
-      return;
-    }
-
-    _position = _position.translate(x, y);
-    notifyListeners();
+    position.value = position.value.translate(x, y);
   }
 
   void flip({bool animated = true}) {
-    showBack(!isBack, animated: animated);
+    showBack(!isBack.value, animated: animated);
   }
 
   void showFront({bool animated = true}) {
@@ -251,8 +109,19 @@ class CubeController extends ChangeNotifier {
     setRotation(yaw: value ? math.pi : 0);
   }
 
-  double get _normalizedYaw {
-    final normalized = _yaw % (2 * math.pi);
-    return normalized < 0 ? normalized + (2 * math.pi) : normalized;
+  void dispose() {
+    isBack.dispose();
+    normalizedYaw.dispose();
+    animationCurve.dispose();
+    animationDuration.dispose();
+    position.dispose();
+    perspective.dispose();
+    scale.dispose();
+    roll.dispose();
+    yaw.dispose();
+    pitch.dispose();
+    depth.dispose();
+    height.dispose();
+    width.dispose();
   }
 }

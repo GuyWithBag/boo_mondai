@@ -36,8 +36,26 @@ PhysicalCardController usePhysicalCardController(
       animationDuration: animationDuration,
       animationCurve: animationCurve,
     ),
+  );
+
+  useEffect(
+    () {
+      controller
+        ..setAspectRatio(aspectRatio)
+        ..setWidth(resolvedWidth)
+        ..setDepth(depth)
+        ..setRotation(pitch: pitch, yaw: yaw, roll: roll);
+      controller.controller
+        ..scale.value = scale
+        ..perspective.value = perspective
+        ..position.value = position
+        ..animationDuration.value = animationDuration
+        ..animationCurve.value = animationCurve;
+
+      return null;
+    },
     [
-      context,
+      controller,
       resolvedWidth,
       aspectRatio,
       depth,
@@ -51,8 +69,6 @@ PhysicalCardController usePhysicalCardController(
       animationCurve,
     ],
   );
-
-  useListenable(controller);
   useEffect(() => controller.dispose, [controller]);
 
   return controller;

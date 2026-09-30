@@ -38,13 +38,15 @@ class PhysicalCard extends SignalHookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveController =
-        controller ?? usePhysicalCardController(context);
-    useListenable(controller);
+    final fallbackController = usePhysicalCardController(context);
+    final effectiveController = useMemoized(
+      () => controller ?? fallbackController,
+      [controller, fallbackController],
+    );
     final tokens = context.themeTokens<AppTokens>();
     final radius = ScaleHelper.getScaledRadiusFromBase(
       radius: tokens.studyCardRadius,
-      current: effectiveController.width,
+      current: effectiveController.width.value,
       base: tokens.studyCardWidth,
     );
     final resolvedFrontStyle = surfaceStyle.resolve(tokens, frontVariants);
@@ -72,7 +74,7 @@ class PhysicalCard extends SignalHookWidget {
         style: scaledBackStyle.copyWith(padding: padding),
         child: back,
       ),
-      depth: effectiveController.depth,
+      depth: effectiveController.depth.value,
     );
 
     if (!tapToFlip && onTap == null) {

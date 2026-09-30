@@ -334,32 +334,6 @@ class Pages {
         }) => const ViewLeaderboardPage(),
   );
 
-  static final viewTest = AppPage(
-    url: '/view-test',
-    icon: Icons.text_fields_outlined,
-    name: 'Test',
-    builder:
-        (
-          context, {
-          pathParameters = const {},
-          queryParameters = const {},
-          extra,
-        }) => const ViewTestPage(),
-  );
-
-  static final viewTestPlain = AppPage(
-    url: '/view-test-plain',
-    icon: Icons.open_in_new_outlined,
-    name: 'Plain View Test',
-    builder:
-        (
-          context, {
-          pathParameters = const {},
-          queryParameters = const {},
-          extra,
-        }) => const ViewTestPlainPage(),
-  );
-
   static final settings = AppPage(
     url: '/settings',
     icon: Icons.settings_outlined,
@@ -418,7 +392,6 @@ class Pages {
     decksLocal,
     reviews,
     account,
-    viewTest,
   ];
   static final auth = <AppPage>[login, register];
   static final appDetails = <AppPage>[
@@ -441,7 +414,6 @@ class Pages {
     researcherSurveyResponse,
     researcherSurvey,
     leaderboard,
-    viewTestPlain,
     downloads,
   ];
 }

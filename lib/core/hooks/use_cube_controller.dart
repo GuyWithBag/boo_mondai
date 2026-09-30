@@ -31,7 +31,6 @@ CubeController useCubeController({
     ),
   );
 
-  useListenable(controller);
   useEffect(
     () {
       controller
@@ -41,11 +40,11 @@ CubeController useCubeController({
           depth: depth ?? 0,
         )
         ..setRotation(pitch: pitch, yaw: yaw, roll: roll)
-        ..scale = scale
-        ..perspective = perspective
-        ..position = position
-        ..animationDuration = animationDuration
-        ..animationCurve = animationCurve;
+        ..scale.value = scale
+        ..perspective.value = perspective
+        ..position.value = position
+        ..animationDuration.value = animationDuration
+        ..animationCurve.value = animationCurve;
 
       return null;
     },

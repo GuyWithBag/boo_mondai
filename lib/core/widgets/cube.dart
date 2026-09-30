@@ -5,9 +5,10 @@ import 'package:boo_mondai/lib.barrel.dart'
     show CubeController, useCubeController;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 import 'package:vector_math/vector_math_64.dart' show Vector3;
 
-class Cube extends HookWidget {
+class Cube extends SignalHookWidget {
   const Cube({
     super.key,
     this.width = 0,
@@ -64,9 +65,10 @@ class Cube extends HookWidget {
       perspective: perspective,
       position: position,
     );
-    final activeController = controller ?? fallbackController;
-
-    useListenable(activeController);
+    final activeController = useMemoized(
+      () => controller ?? fallbackController,
+      [controller, fallbackController],
+    );
 
     useEffect(
       () {
@@ -74,9 +76,9 @@ class Cube extends HookWidget {
           activeController
             ..setDimensions(width: width, height: height, depth: depth)
             ..setRotation(pitch: pitch, yaw: yaw, roll: roll)
-            ..scale = scale
-            ..perspective = perspective
-            ..position = position;
+            ..scale.value = scale
+            ..perspective.value = perspective
+            ..position.value = position;
         }
         return null;
       },
@@ -96,23 +98,23 @@ class Cube extends HookWidget {
     );
 
     final targetState = _CubeTransformState(
-      width: activeController.width,
-      height: activeController.height,
-      depth: activeController.depth,
-      pitch: activeController.pitch,
-      yaw: activeController.yaw,
-      roll: activeController.roll,
-      scale: activeController.scale,
-      perspective: activeController.perspective,
-      position: activeController.position,
+      width: activeController.width.value,
+      height: activeController.height.value,
+      depth: activeController.depth.value,
+      pitch: activeController.pitch.value,
+      yaw: activeController.yaw.value,
+      roll: activeController.roll.value,
+      scale: activeController.scale.value,
+      perspective: activeController.perspective.value,
+      position: activeController.position.value,
     );
 
     final cube = TweenAnimationBuilder<_CubeTransformState>(
       tween: _CubeTransformTween(end: targetState),
       duration: animateChanges
-          ? activeController.animationDuration
+          ? activeController.animationDuration.value
           : Duration.zero,
-      curve: activeController.animationCurve,
+      curve: activeController.animationCurve.value,
       builder: (context, animatedState, _) {
         return _CubeBody(
           width: animatedState.width,

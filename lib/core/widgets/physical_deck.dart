@@ -50,7 +50,7 @@ class PhysicalDeck extends SignalHookWidget {
     final effectiveTextScaleBaseWidth =
         textScaleBaseWidth ?? tokens.studyCardWidth;
     final textScale = ScaleHelper.getClampedSizeRatio(
-      current: controller.width,
+      current: controller.width.value,
       base: effectiveTextScaleBaseWidth,
       min: 0.6,
       max: 1.4,
@@ -122,9 +122,9 @@ class PhysicalDeck extends SignalHookWidget {
                     clipBehavior: Clip.none,
                     children: [
                       Positioned(
-                        left: -controller.width * 0.03,
-                        right: -controller.width * 0.03,
-                        bottom: -controller.height * 0.03,
+                        left: -controller.width.value * 0.03,
+                        right: -controller.width.value * 0.03,
+                        bottom: -controller.height.value * 0.03,
                         child: ConstrainedBox(
                           constraints: BoxConstraints(
                             minHeight: constraints.maxHeight * 0.34,
@@ -147,11 +147,13 @@ class PhysicalDeck extends SignalHookWidget {
                                   style: titleStyle,
                                 ),
                                 if (hasTags && visibleTags.isNotEmpty) ...[
-                                  SizedBox(height: controller.height * 0.025),
+                                  SizedBox(
+                                    height: controller.height.value * 0.025,
+                                  ),
                                   Wrap(
                                     alignment: WrapAlignment.center,
-                                    spacing: controller.width * 0.025,
-                                    runSpacing: controller.height * 0.015,
+                                    spacing: controller.width.value * 0.025,
+                                    runSpacing: controller.height.value * 0.015,
                                     children: [
                                       for (final tag in visibleTags)
                                         Surface(
@@ -164,9 +166,11 @@ class PhysicalDeck extends SignalHookWidget {
                                           child: Padding(
                                             padding: EdgeInsets.symmetric(
                                               horizontal:
-                                                  controller.width * 0.035,
+                                                  controller.width.value *
+                                                  0.035,
                                               vertical:
-                                                  controller.height * 0.01,
+                                                  controller.height.value *
+                                                  0.01,
                                             ),
                                             child: Text(
                                               tag.name,
@@ -182,7 +186,9 @@ class PhysicalDeck extends SignalHookWidget {
                                 if ((deck?.shortDescription ?? '')
                                     .trim()
                                     .isNotEmpty) ...[
-                                  SizedBox(height: controller.height * 0.025),
+                                  SizedBox(
+                                    height: controller.height.value * 0.025,
+                                  ),
                                   Text(
                                     deck!.shortDescription,
                                     maxLines: 2,
