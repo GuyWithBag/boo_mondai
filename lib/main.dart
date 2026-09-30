@@ -15,7 +15,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         ViewDecksLocalController,
         ViewDeckListingsController,
         StreakController,
-        MainController,
         SettingsStore,
         NotificationsController,
         SyncController,
@@ -57,9 +56,8 @@ Future<void> main() async {
   // ── Settings (must come before notifications) ───────
   final settingsStore = SettingsStore.instance;
   await settingsStore.init();
-  // ── Notifications ────────────────────────────────────
-  final notificationsController = NotificationsController(settingsStore);
-  await notificationsController.init();
+
+  await NotificationsController.instance.init();
   // ── Restore session ─────────────────────────────────
   final authController = AuthController();
   await authController.restoreSession();
@@ -84,13 +82,11 @@ Future<void> main() async {
     MultiProvider(
       providers: [
         Provider.value(value: authController),
-        ChangeNotifierProvider.value(value: notificationsController),
         Provider.value(value: syncChangeTrackerController),
         Provider.value(value: syncController),
         Provider.value(value: viewDecksLocalController),
         Provider(create: (_) => ViewDeckListingsController()),
         ChangeNotifierProvider(create: (_) => StreakController()),
-        ChangeNotifierProvider(create: (_) => MainController()),
       ],
       child: BooMondaiApp(authController: authController),
     ),

@@ -10,7 +10,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:media_variants/media_variants.dart';
 import 'package:theme_variants/theme_variants.dart';
-import 'package:boo_mondai/lib.barrel.dart';
+import 'package:boo_mondai/lib.barrel.dart' hide TextField;
 
 bool _scaleScreenUtilForSmallAndMediumWidth() {
   if (PlatformService.isDesktop) {
@@ -38,17 +38,18 @@ class BooMondaiApp extends HookWidget {
     );
     final mediaPackController = useMemoized(createAppMediaPackController);
     useListenable(controller);
-
     return ThemeVariantsProvider<AppTokens>(
       controller: controller,
       child: MediaPackProvider<AppMediaPack>(
         controller: mediaPackController,
         child: ScreenUtilInit(
           designSize: Breakpoints.baseMobileSize,
-          minTextAdapt: true,
-          splitScreenMode: true,
-          enableScaleWH: _scaleScreenUtilForSmallAndMediumWidth,
-          enableScaleText: _scaleScreenUtilForSmallAndMediumWidth,
+          minTextAdapt: false,
+          splitScreenMode: false,
+          // enableScaleWH: _scaleScreenUtilForSmallAndMediumWidth,
+          enableScaleWH: () => false,
+          // enableScaleText: _scaleScreenUtilForSmallAndMediumWidth,
+          enableScaleText: () => false,
           builder: (context, child) => MaterialApp.router(
             title: 'BooMondai',
             debugShowCheckedModeBanner: false,
