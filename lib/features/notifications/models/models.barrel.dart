@@ -2,5 +2,5 @@
 
 // Other files
 export 'notification.ids.dart';
-export 'notification.schedule.dart';
 export 'notification.intent.dart';
+export 'notification.schedule.dart';

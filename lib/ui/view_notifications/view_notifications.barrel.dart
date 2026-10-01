@@ -5,3 +5,5 @@ export 'widgets/widgets.barrel.dart';
 // Other files
 export 'view_notifications.controller.dart';
 export 'view_notifications.modal.dart';
+export 'view_notifications.debug.controller.dart';
+export 'view_notifications.debug.dart';

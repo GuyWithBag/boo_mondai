@@ -3,6 +3,7 @@ import 'dart:io';
 import 'models/notification.intent.dart';
 import 'models/notification.schedule.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -27,6 +28,8 @@ class NotificationsService {
   // -------------------------------------------------------------------------
 
   static final _plugin = FlutterLocalNotificationsPlugin();
+  static ValueChanged<String>? _routeHandler;
+  static String? _pendingRoute;
 
   // -------------------------------------------------------------------------
   // Init
@@ -54,7 +57,16 @@ class NotificationsService {
       linux: linuxInit,
     );
 
-    await _plugin.initialize(settings: initSettings);
+    await _plugin.initialize(
+      settings: initSettings,
+      onDidReceiveNotificationResponse: _handleNotificationResponse,
+    );
+
+    final launchDetails = await _plugin.getNotificationAppLaunchDetails();
+    final launchResponse = launchDetails?.notificationResponse;
+    if (launchDetails?.didNotificationLaunchApp ?? false) {
+      _handleNotificationPayload(launchResponse?.payload);
+    }
 
     if (Platform.isAndroid) {
       await _plugin
@@ -76,6 +88,36 @@ class NotificationsService {
         importance: Importance.low,
       );
     }
+  }
+
+  static void setRouteHandler(ValueChanged<String> handler) {
+    _routeHandler = handler;
+    final route = _pendingRoute;
+    if (route == null) return;
+
+    _pendingRoute = null;
+    WidgetsBinding.instance.addPostFrameCallback((_) => handler(route));
+  }
+
+  static void clearRouteHandler() {
+    _routeHandler = null;
+  }
+
+  static void _handleNotificationResponse(NotificationResponse response) {
+    _handleNotificationPayload(response.payload);
+  }
+
+  static void _handleNotificationPayload(String? payload) {
+    final route = payload?.trim();
+    if (route == null || route.isEmpty) return;
+
+    final handler = _routeHandler;
+    if (handler == null) {
+      _pendingRoute = route;
+      return;
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) => handler(route));
   }
 
   static Future<void> _createAndroidChannel({

@@ -1,10 +1,14 @@
 import 'models/notification.ids.dart';
 import 'models/notification.intent.dart';
+import 'package:boo_mondai/lib.barrel.dart' show LocalDB;
 
 abstract final class Notifications {
+  static String get currentProfileId => LocalDB.currentProfile.getOrCreate().id;
+
   static NotificationIntent reviewReminder() {
-    return const NotificationIntent(
+    return NotificationIntent.create(
       id: NotificationIds.reviewReminder,
+      profileId: currentProfileId,
       type: NotificationIntentType.reviewReminder,
       title: 'Time to review 🗂️',
       body: 'Your cards are waiting. Keep your streak going!',
@@ -13,8 +17,9 @@ abstract final class Notifications {
   }
 
   static NotificationIntent streakReminder() {
-    return const NotificationIntent(
+    return NotificationIntent.create(
       id: NotificationIds.streakReminder,
+      profileId: currentProfileId,
       type: NotificationIntentType.streakReminder,
       title: "Don't break your streak 🔥",
       body: 'A quick review is all it takes to keep it alive.',
@@ -26,8 +31,9 @@ abstract final class Notifications {
     required String deckTitle,
     String? route,
   }) {
-    return NotificationIntent(
+    return NotificationIntent.create(
       id: NotificationIds.downloadComplete,
+      profileId: currentProfileId,
       type: NotificationIntentType.downloadComplete,
       title: 'Download complete',
       body: deckTitle,
@@ -36,8 +42,9 @@ abstract final class Notifications {
   }
 
   static NotificationIntent syncComplete() {
-    return const NotificationIntent(
+    return NotificationIntent.create(
       id: NotificationIds.syncComplete,
+      profileId: currentProfileId,
       type: NotificationIntentType.syncComplete,
       title: 'Sync complete',
       body: 'Your decks are up to date.',
@@ -45,8 +52,9 @@ abstract final class Notifications {
   }
 
   static NotificationIntent firstDrillSurvey({required String surveyId}) {
-    return NotificationIntent(
+    return NotificationIntent.create(
       id: NotificationIds.firstDrillSurvey,
+      profileId: currentProfileId,
       type: NotificationIntentType.firstDrillSurvey,
       title: 'Quick question',
       body: 'Tell us how your first drill felt.',
@@ -60,8 +68,9 @@ abstract final class Notifications {
     required String deckTitle,
     required String body,
   }) {
-    return NotificationIntent(
+    return NotificationIntent.create(
       id: id,
+      profileId: currentProfileId,
       type: NotificationIntentType.studyDeckReview,
       title: deckTitle,
       body: body,

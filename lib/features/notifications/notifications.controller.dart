@@ -13,7 +13,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         SettingPath,
         SettingsStore,
         Time;
-import 'package:signals/signals_flutter.dart';
 
 /// High-level notification manager.
 ///
@@ -31,9 +30,26 @@ class NotificationsController {
   static final instance = NotificationsController();
 
   final SettingsStore settings = SettingsStore.instance;
-  final notifications = ListSignal<NotificationIntent>(const []);
 
-  late final unreadCount = computed(() => notifications.value.length);
+  String get profileId => LocalDB.currentProfile.getOrCreate().id;
+
+  List<NotificationIntent> get allNotifications {
+    return LocalDB.notifications.selectAllNotifications(profileId);
+  }
+
+  List<NotificationIntent> get unreadNotifications {
+    return LocalDB.notifications.selectUnreadNotifications(profileId);
+  }
+
+  List<NotificationIntent> get readNotifications {
+    return LocalDB.notifications.selectReadNotifications(profileId);
+  }
+
+  List<NotificationIntent> get deletedNotifications {
+    return LocalDB.notifications.selectDeletedNotifications(profileId);
+  }
+
+  int get unreadCount => unreadNotifications.length;
 
   // -------------------------------------------------------------------------
   // Init
@@ -109,12 +125,7 @@ class NotificationsController {
     NotificationIntent notification,
     NotificationSchedule schedule,
   ) async {
-    if (notification.persistInInbox) {
-      notifications.value = List.unmodifiable([
-        notification,
-        ...notifications.value,
-      ]);
-    }
+    await LocalDB.notifications.upsert(notification);
 
     if (!notification.showSystemNotification) return;
 
@@ -130,18 +141,33 @@ class NotificationsController {
     }
   }
 
-  /// Show an immediate notification when a deck download finishes.
-  // Future<void> notifyDownloadComplete(String deckTitle) async {
-  //   await notify(
-  //     Notifications.downloadComplete(deckTitle: deckTitle),
-  //     const ImmediateSchedule.now(),
-  //   );
-  // }
+  Future<void> markRead(int id) async {
+    final notification = LocalDB.notifications.selectByPk({
+      'id': id,
+    }, includeDeleted: true);
+    if (notification == null ||
+        notification.deletedAt != null ||
+        notification.readAt != null) {
+      return;
+    }
 
-  // /// Show an immediate notification when a raw sync finishes.
-  // Future<void> notifyRawSyncComplete() async {
-  //   await notify(Notifications.syncComplete(), const ImmediateSchedule.now());
-  // }
+    final now = DateTime.now();
+    await LocalDB.notifications.upsert(
+      notification.copyWith(readAt: now, updatedAt: now),
+    );
+  }
+
+  Future<void> deleteNotification(int id) async {
+    final notification = LocalDB.notifications.selectByPk({
+      'id': id,
+    }, includeDeleted: true);
+    if (notification == null || notification.deletedAt != null) return;
+
+    final now = DateTime.now();
+    await LocalDB.notifications.upsert(
+      notification.copyWith(deletedAt: now, updatedAt: now),
+    );
+  }
 
   // -------------------------------------------------------------------------
   // Helpers

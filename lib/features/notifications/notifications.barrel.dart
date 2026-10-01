@@ -6,3 +6,4 @@ export 'models/models.barrel.dart';
 export 'notifications.service.dart';
 export 'notifications.controller.dart';
 export 'notifications.dart';
+export 'notifications.local.db.dart';

@@ -2,4 +2,4 @@
 
 // Other files
 export 'notifications.button.dart';
-export 'notification.block.dart';
+export 'view_notifications.tile.dart';

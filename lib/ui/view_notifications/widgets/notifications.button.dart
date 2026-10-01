@@ -1,7 +1,11 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, Button, NotificationsController, showNotificationsModal;
+    show
+        AppTokens,
+        Button,
+        LocalDB,
+        NotificationsController,
+        showNotificationsModal;
 import 'package:flutter/material.dart';
-import 'package:signals/signals_flutter.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 class NotificationsButton extends StatelessWidget {
@@ -12,9 +16,10 @@ class NotificationsButton extends StatelessWidget {
     final tokens = context.themeTokens<AppTokens>();
     final controller = NotificationsController.instance;
 
-    return SignalBuilder(
-      builder: (context) {
-        final count = controller.unreadCount.value;
+    return StreamBuilder(
+      stream: LocalDB.notifications.watch(),
+      builder: (context, snapshot) {
+        final count = controller.unreadCount;
 
         return Badge(
           isLabelVisible: count > 0,
