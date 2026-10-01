@@ -26,6 +26,7 @@ import 'package:boo_mondai/features/decks/models/deck.dto.dart';
 import 'package:boo_mondai/features/decks/models/visibility_state.dto.dart';
 import 'package:boo_mondai/features/fsrs/models/fsrs_card.dto.dart';
 import 'package:boo_mondai/features/fsrs/models/fsrs_review_log.dto.dart';
+import 'package:boo_mondai/features/notifications/models/notification.intent.dart';
 import 'package:boo_mondai/features/profile/models/profile.dto.dart';
 import 'package:boo_mondai/features/progress_checkpoints/models/progress_checkpoint.dto.dart';
 import 'package:boo_mondai/features/review.study_session/models/review_session.dto.dart';
@@ -108,6 +109,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
   AdapterSpec<Content>(),
   AdapterSpec<ContentType>(),
   AdapterSpec<SurveyResponse>(),
+  AdapterSpec<NotificationIntent>(),
+  AdapterSpec<NotificationIntentType>(),
 
   AdapterSpec<Vector2Hive>(),
 ])

@@ -31,6 +31,10 @@ class BooMondaiApp extends HookWidget {
     final router = useMemoized(() => createRouter(authController), [
       authController,
     ]);
+    useEffect(() {
+      NotificationsService.setRouteHandler(router.push);
+      return NotificationsService.clearRouteHandler;
+    }, [router]);
     final settings = SettingsStore.instance;
     final controller = useMemoized(
       () => UserSettingsThemeBridge.createController(settings),

@@ -20,5 +20,7 @@ export 'edit_deck/edit_deck.barrel.dart';
 export 'view_reviews/view_reviews.barrel.dart';
 export 'view_comments/view_comments.barrel.dart';
 export 'filtered_search_bar/filtered_search_bar.barrel.dart';
-export 'text.context_menu/text.context_menu.barrel.dart';
 export 'study_session.card_stage/study_session.card_stage.barrel.dart';
+export 'text.context_menu/text.context_menu.barrel.dart';
+export 'view_card_single/view_card_single.barrel.dart';
+export 'view_notification_intent/view_notification_intent.barrel.dart';

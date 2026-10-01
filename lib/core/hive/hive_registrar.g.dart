@@ -29,6 +29,8 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(MatchingTypeValueAdapter());
     registerAdapter(MultipleChoiceOptionAdapter());
     registerAdapter(MultipleChoiceTemplateAdapter());
+    registerAdapter(NotificationIntentAdapter());
+    registerAdapter(NotificationIntentTypeAdapter());
     registerAdapter(ProfileAdapter());
     registerAdapter(ProgressCheckpointAdapter());
     registerAdapter(ProgressCheckpointStatusAdapter());
@@ -81,6 +83,8 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(MatchingTypeValueAdapter());
     registerAdapter(MultipleChoiceOptionAdapter());
     registerAdapter(MultipleChoiceTemplateAdapter());
+    registerAdapter(NotificationIntentAdapter());
+    registerAdapter(NotificationIntentTypeAdapter());
     registerAdapter(ProfileAdapter());
     registerAdapter(ProgressCheckpointAdapter());
     registerAdapter(ProgressCheckpointStatusAdapter());

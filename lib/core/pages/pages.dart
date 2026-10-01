@@ -22,9 +22,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         ResearcherSurveyResponsePage,
         ViewSurveyPage,
         ViewDeckDownloadsPage,
-        ViewTestPage,
-        ViewTestPlainPage,
         ViewCardsPage,
+        ViewCardSinglePage,
+        ViewNotificationIntentPage,
+        CardTemplate,
         ChangeTrackerController;
 
 import 'package:flutter/material.dart';
@@ -160,6 +161,21 @@ class Pages {
           queryParameters = const {},
           extra,
         }) => ViewCardsPage(queryParameters: queryParameters),
+  );
+
+  static final viewCardSingle = AppPage(
+    url: '/cards/:templateId/preview',
+    name: 'Card Preview',
+    builder:
+        (
+          context, {
+          pathParameters = const {},
+          queryParameters = const {},
+          extra,
+        }) => ViewCardSinglePage(
+          templateId: pathParameters['templateId']!,
+          initialTemplate: extra is CardTemplate ? extra : null,
+        ),
   );
 
   static final drillSession = AppPage(
@@ -360,6 +376,22 @@ class Pages {
         }) => const PlaceholderAppPage(title: 'Notifications'),
   );
 
+  static final viewNotificationIntent = AppPage(
+    url: '/view-notification-intent/:id',
+    icon: Icons.notifications_outlined,
+    name: 'Notification',
+    builder:
+        (
+          context, {
+          pathParameters = const {},
+          queryParameters = const {},
+          extra,
+        }) => ViewNotificationIntentPage(id: int.parse(pathParameters['id']!)),
+  );
+
+  static String notificationIntentUrl(int id) =>
+      '/view-notification-intent/$id';
+
   static final privacyPolicy = AppPage(
     url: '/privacy-policy',
     icon: Icons.privacy_tip_outlined,
@@ -403,12 +435,14 @@ class Pages {
   static final nonShell = <AppPage>[
     editDeck,
     viewCards,
+    viewCardSingle,
     drillSession,
     drillResult,
     reviewSession,
     reviewResult,
     reviewDeckSession,
     changeReview,
+    viewNotificationIntent,
     viewSurvey,
     researcherDashboard,
     researcherSurveyResponse,

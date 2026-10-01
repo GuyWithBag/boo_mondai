@@ -2490,3 +2490,130 @@ class Vector2HiveAdapter extends TypeAdapter<Vector2Hive> {
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
+
+class NotificationIntentAdapter extends TypeAdapter<NotificationIntent> {
+  @override
+  final typeId = 47;
+
+  @override
+  NotificationIntent read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return NotificationIntent(
+      id: (fields[0] as num).toInt(),
+      profileId: fields[12] as String,
+      type: fields[1] as NotificationIntentType,
+      title: fields[2] as String,
+      body: fields[3] as String,
+      createdAt: fields[7] as DateTime,
+      updatedAt: fields[8] as DateTime,
+      purgeAt: fields[10] as DateTime,
+      route: fields[4] as String?,
+      persistInInbox: fields[5] == null ? false : fields[5] as bool,
+      showSystemNotification: fields[6] == null ? true : fields[6] as bool,
+      readAt: fields[13] as DateTime?,
+      deletedAt: fields[9] as DateTime?,
+      purgeAfterDays: fields[11] == null ? 30 : (fields[11] as num).toInt(),
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, NotificationIntent obj) {
+    writer
+      ..writeByte(14)
+      ..writeByte(0)
+      ..write(obj.id)
+      ..writeByte(1)
+      ..write(obj.type)
+      ..writeByte(2)
+      ..write(obj.title)
+      ..writeByte(3)
+      ..write(obj.body)
+      ..writeByte(4)
+      ..write(obj.route)
+      ..writeByte(5)
+      ..write(obj.persistInInbox)
+      ..writeByte(6)
+      ..write(obj.showSystemNotification)
+      ..writeByte(7)
+      ..write(obj.createdAt)
+      ..writeByte(8)
+      ..write(obj.updatedAt)
+      ..writeByte(9)
+      ..write(obj.deletedAt)
+      ..writeByte(10)
+      ..write(obj.purgeAt)
+      ..writeByte(11)
+      ..write(obj.purgeAfterDays)
+      ..writeByte(12)
+      ..write(obj.profileId)
+      ..writeByte(13)
+      ..write(obj.readAt);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is NotificationIntentAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class NotificationIntentTypeAdapter
+    extends TypeAdapter<NotificationIntentType> {
+  @override
+  final typeId = 48;
+
+  @override
+  NotificationIntentType read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return NotificationIntentType.reviewReminder;
+      case 1:
+        return NotificationIntentType.streakReminder;
+      case 2:
+        return NotificationIntentType.downloadComplete;
+      case 3:
+        return NotificationIntentType.syncComplete;
+      case 4:
+        return NotificationIntentType.firstDrillSurvey;
+      case 5:
+        return NotificationIntentType.studyDeckReview;
+      default:
+        return NotificationIntentType.reviewReminder;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, NotificationIntentType obj) {
+    switch (obj) {
+      case NotificationIntentType.reviewReminder:
+        writer.writeByte(0);
+      case NotificationIntentType.streakReminder:
+        writer.writeByte(1);
+      case NotificationIntentType.downloadComplete:
+        writer.writeByte(2);
+      case NotificationIntentType.syncComplete:
+        writer.writeByte(3);
+      case NotificationIntentType.firstDrillSurvey:
+        writer.writeByte(4);
+      case NotificationIntentType.studyDeckReview:
+        writer.writeByte(5);
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is NotificationIntentTypeAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}

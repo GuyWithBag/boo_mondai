@@ -5,9 +5,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         DecksLocalDB,
         DeckListingsLocalDB,
         CardTemplatesLocalDB,
-        DrillSessionsLocalDB,
         ReviewSessionsLocalDB,
-        DrillAnswersLocalDB,
         ReviewLogsLocalDB,
         StreakLocalDB,
         CurrentProfileLocalDB,
@@ -22,6 +20,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         StudySessionSnapshotsLocalDB,
         SurveyResponsesLocalDB,
         CachedMediaLocalDB,
+        NotificationsLocalDB,
         ProfilesLocalDB,
         ContentsLocalDB;
 
@@ -48,6 +47,7 @@ class LocalDB {
   static late final StudySessionSnapshotsLocalDB studySessionSnapshot;
   static late final SurveyResponsesLocalDB surveyResponse;
   static late final CachedMediaLocalDB cachedMedias;
+  static late final NotificationsLocalDB notifications;
   static late final ContentsLocalDB contents;
 
   static Future<void> init() async {
@@ -80,6 +80,7 @@ class LocalDB {
             as StudySessionSnapshotsLocalDB;
     surveyResponse = await SurveyResponsesLocalDB().init();
     cachedMedias = await CachedMediaLocalDB().init() as CachedMediaLocalDB;
+    notifications = await NotificationsLocalDB().init() as NotificationsLocalDB;
     contents = await ContentsLocalDB().init() as ContentsLocalDB;
   }
 
@@ -104,6 +105,7 @@ class LocalDB {
     await profiles.clear();
     await currentProfile.clear();
     await cachedMedias.clear();
+    await notifications.clear();
     await contents.clear();
     currentProfile.getOrCreate();
   }
