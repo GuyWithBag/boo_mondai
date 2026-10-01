@@ -10,9 +10,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextFieldSize,
         ButtonSize,
         BottomNavBar,
-        EditDeckController;
+        EditDeckController,
+        AppTokens;
 import 'package:flutter/material.dart' hide AppBar;
+import 'package:go_router/go_router.dart' show GoRouterHelper;
 import 'package:signals_hooks/signals_hooks.dart';
+import 'package:theme_variants/theme_variants.dart';
 
 class EditDeckAppBar extends SignalHookWidget implements PreferredSizeWidget {
   const EditDeckAppBar({super.key, required this.controller});
@@ -24,9 +27,30 @@ class EditDeckAppBar extends SignalHookWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final selectedTemplate = controller.selectedTemplate.value;
+    final tokens = context.themeTokens<AppTokens>();
+
     return AppBar(
       onPop: () => controller.onPop(context),
       actions: [
+        Button.icon(
+          tokens: tokens,
+          icon: Icons.delete_outline,
+          color: ButtonColor.error,
+          onPressed: controller.isLoading.value || selectedTemplate == null
+              ? null
+              : () => controller.deleteSelectedCard(context),
+        ),
+        Button.icon(
+          tokens: tokens,
+          icon: Icons.visibility_outlined,
+          onPressed: selectedTemplate == null
+              ? null
+              : () => context.push(
+                  '/cards/${selectedTemplate.id}/preview',
+                  extra: selectedTemplate,
+                ),
+        ),
         Button(
           variants: const [
             ButtonColor.primary,
@@ -53,7 +77,7 @@ class EditDeckAppBar extends SignalHookWidget implements PreferredSizeWidget {
         controller: controller.titleController,
         placeholder: 'Deck Title...',
         mode: MarkdownTextMode.input,
-        variants: const [TextFieldSize.bodyLarge, TextFieldFrame.none],
+        variants: const [TextFieldSize.header, TextFieldFrame.none],
       ),
     );
   }

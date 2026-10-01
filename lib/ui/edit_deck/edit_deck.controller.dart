@@ -12,6 +12,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         ModalAction,
         SnackbarColor,
         StudyCardService,
+        AuthService,
+        SyncDeletionPolicy,
         showModal,
         showSnackbar;
 import 'package:file_picker/file_picker.dart';
@@ -234,6 +236,146 @@ class EditDeckController {
     showSnackbar(context, message: 'Deck Saved', color: SnackbarColor.success);
     initialDeck.value = deck.value;
     initialTemplates.value = templates.value;
+  }
+
+  Future<void> deleteSelectedCard(BuildContext context) async {
+    final template = selectedTemplate.value;
+    final templateIndex = selectedTemplateIndex.value;
+    if (template == null || templateIndex == null) return;
+
+    final confirmed = await showModal<bool>(
+      context: context,
+      title: 'Delete card?',
+      subtitle: 'This card and its study progress will be removed.',
+      leading: const Icon(Icons.delete_outline),
+      actions: [
+        const ModalAction<bool>(value: false, label: 'Cancel'),
+        const ModalAction<bool>(
+          value: true,
+          label: 'Delete',
+          color: ButtonColor.error,
+        ),
+      ],
+    );
+    if (confirmed != true) return;
+
+    isLoading.value = true;
+    error.value = null;
+    final previousTemplates = templates.value;
+    final previousSelectedTemplateId = selectedTemplateId.value;
+    final previousDeck = deck.value;
+    try {
+      final nextTemplates = [
+        for (final item in templates.value)
+          if (item.id != template.id) item,
+      ];
+      templates.value = [
+        for (final (index, item) in nextTemplates.indexed)
+          item.copyWith(sortOrder: index),
+      ];
+      selectedTemplateId.value = templates.value.isEmpty
+          ? null
+          : templates
+                .value[templateIndex.clamp(0, templates.value.length - 1)]
+                .id;
+
+      final initialTemplateExists = initialTemplates.value.any(
+        (item) => item.id == template.id,
+      );
+      if (initialTemplateExists) {
+        await _deleteCardTemplate(template);
+      }
+      final persistedDeck = (await DecksService.upsert(
+        deck: initialDeck.value.copyWith(
+          cardTemplatesCount: templates.value.length,
+        ),
+      ))!;
+      deck.value = deck.value.copyWith(
+        cardTemplatesCount: persistedDeck.cardTemplatesCount,
+        updatedAt: persistedDeck.updatedAt,
+      );
+      initialDeck.value = persistedDeck;
+    } on Exception catch (e) {
+      templates.value = previousTemplates;
+      selectedTemplateId.value = previousSelectedTemplateId;
+      deck.value = previousDeck;
+      error.value = e;
+      if (!context.mounted) return;
+      showSnackbar(
+        context,
+        message: 'Could not delete card.',
+        color: SnackbarColor.error,
+      );
+      return;
+    } finally {
+      isLoading.value = false;
+    }
+
+    if (!context.mounted) return;
+    showSnackbar(
+      context,
+      message: 'Card Deleted',
+      color: SnackbarColor.success,
+    );
+    final currentSortOrders = {
+      for (final template in templates.value) template.id: template.sortOrder,
+    };
+    initialTemplates.value = [
+      for (final item in initialTemplates.value)
+        if (item.id != template.id)
+          item.copyWith(
+            sortOrder: currentSortOrders[item.id] ?? item.sortOrder,
+          ),
+    ];
+  }
+
+  Future<void> _deleteCardTemplate(CardTemplate template) async {
+    final studyCards = LocalDB.studyCard
+        .getByDeckId(template.deckId)
+        .where((card) => card.templateId == template.id)
+        .toList();
+    final studyCardIds = studyCards.map((card) => card.id).toSet();
+    final fsrsCards = LocalDB.fsrsCard.selectMany(
+      where: (card) => studyCardIds.contains(card.studyCardId),
+    );
+    final now = DateTime.now();
+
+    if (AuthService.isAuthenticatedRemote) {
+      final purgeAfter = SyncDeletionPolicy.current().purgeAfter(now);
+      await LocalDB.fsrsCard.upsertMany([
+        for (final card in fsrsCards)
+          card.copyWith(updatedAt: now, deletedAt: now, purgeAfter: purgeAfter),
+      ]);
+      await LocalDB.studyCard.upsertMany([
+        for (final card in studyCards)
+          card.copyWith(updatedAt: now, deletedAt: now, purgeAfter: purgeAfter),
+      ]);
+      await LocalDB.cardTemplate.upsert(
+        template.copyWith(
+          updatedAt: now,
+          deletedAt: now,
+          purgeAfter: purgeAfter,
+        ),
+      );
+    } else {
+      final fsrsCardIds = fsrsCards.map((card) => card.id).toSet();
+      final reviewLogs = LocalDB.reviewLogs.selectMany(
+        where: (log) => fsrsCardIds.contains(log.fsrsCardId),
+      );
+      await LocalDB.reviewLogs.deleteManyByPk([
+        for (final log in reviewLogs) {'id': log.id},
+      ]);
+      await LocalDB.fsrsCard.deleteManyByPk([
+        for (final card in fsrsCards) {'id': card.id},
+      ]);
+      await LocalDB.studyCard.deleteManyByPk([
+        for (final card in studyCards) {'id': card.id},
+      ]);
+      await LocalDB.cardTemplate.deleteByPk({'id': template.id});
+    }
+
+    await LocalDB.userStudyCardTag.deleteByStudyCardIds(studyCardIds);
+    await LocalDB.cardTemplateTag.deleteByTemplateIds({template.id});
   }
 
   void dispose() {
