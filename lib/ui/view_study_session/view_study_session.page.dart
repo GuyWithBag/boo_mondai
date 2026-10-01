@@ -95,8 +95,9 @@ class ViewStudySessionPage extends SignalHookWidget {
     return Scaffold(
       scrollable: false,
       appBar: AppBar(
-        onPop: () => controller.onSessionPop(context),
-        child: Row(
+        onPop: () => controller.onPop(context),
+        title: controller.title.value,
+        header: Row(
           spacing: tokens.spaceLayoutGapMd,
           children: [
             Expanded(

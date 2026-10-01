@@ -4,11 +4,12 @@ import 'package:boo_mondai/features/cards/helpers/fill_in_the_blanks_prompt.help
 import 'package:boo_mondai/lib.barrel.dart'
     show
         FillInTheBlanksTemplate,
+        CardTemplateController,
         StudySessionAnswer,
         StudySessionCardStageController;
 import 'package:signals/signals.dart';
 
-class FillInTheBlanksController {
+class FillInTheBlanksController implements CardTemplateController {
   FillInTheBlanksController({
     required this.template,
     this.cardStageController,
@@ -27,7 +28,8 @@ class FillInTheBlanksController {
   }
 
   final FillInTheBlanksTemplate template;
-  final StudySessionCardStageController? cardStageController;
+  final StudySessionCardStageController<CardTemplateController>?
+  cardStageController;
 
   final answers = signal<List<String>>(<String>[]);
 
@@ -68,6 +70,7 @@ class FillInTheBlanksController {
     return index < answers.value.length && key.accepts(answers.value[index]);
   }
 
+  @override
   void dispose() {
     answerEffect();
     encodedAnswer.dispose();

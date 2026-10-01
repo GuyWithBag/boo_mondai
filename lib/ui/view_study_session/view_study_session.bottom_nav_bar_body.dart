@@ -3,7 +3,8 @@ import 'package:boo_mondai/features/app_theme/bottom_nav_bar.dart'
 import 'package:boo_mondai/features/cards/models/card.template.dto.dart';
 import 'package:boo_mondai/features/cards/models/word_scramble.template.dart';
 import 'package:boo_mondai/features/study_session/study_session.controller.dart';
-import 'package:boo_mondai/lib.barrel.dart' show AppTokens;
+import 'package:boo_mondai/lib.barrel.dart'
+    show AppTokens, CardTemplateController, WordScrambleController;
 import 'package:boo_mondai/ui/study_session.card_stage/study_session.card_stage.controller.dart';
 import 'package:boo_mondai/ui/study_session.card_stage/widgets/rating_area.dart';
 import 'package:boo_mondai/ui/study_session.card_stage/widgets/word_bank.dart';
@@ -22,12 +23,14 @@ class ViewStudySessionBottomNavBarBody extends SignalHookWidget {
 
   final CardTemplate? template;
   final StudySessionController studySessionController;
-  final StudySessionCardStageController cardStageController;
+  final StudySessionCardStageController<CardTemplateController>
+  cardStageController;
   final bool isCompleting;
 
   static double preferredHeight({
     required CardTemplate? template,
-    required StudySessionCardStageController cardStageController,
+    required StudySessionCardStageController<CardTemplateController>
+    cardStageController,
   }) {
     if (_shouldShowWordBank(template, cardStageController)) {
       return WordBank.preferredHeight + RatingArea.preferredHeight;
@@ -37,7 +40,10 @@ class ViewStudySessionBottomNavBarBody extends SignalHookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final wordController = cardStageController.wordScrambleController;
+    final wordController =
+        cardStageController.cardController is WordScrambleController
+        ? cardStageController.cardController! as WordScrambleController
+        : null;
     final tokens = context.themeTokens<AppTokens>();
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -57,7 +63,7 @@ class ViewStudySessionBottomNavBarBody extends SignalHookWidget {
 
   static bool _shouldShowWordBank(
     CardTemplate? template,
-    StudySessionCardStageController cardStageController,
+    StudySessionCardStageController<CardTemplateController> cardStageController,
   ) {
     return template is WordScrambleTemplate &&
         !cardStageController.isRevealed.value;

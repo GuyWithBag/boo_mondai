@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppMediaPack,
+        CardTemplateController,
         DueFilterThreshold,
         FlashcardTemplate,
         NotificationsController,
@@ -16,6 +17,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         StudySessionConfig,
         StudySessionController,
         UiSoundsService,
+        WordScrambleController,
         WordScrambleTemplate,
         showModal,
         ModalAction,
@@ -52,7 +54,10 @@ final class ViewStudySessionController {
         .mediaPackController<AppMediaPack>()
         .resolve((media) => media.studySessionCompleteSound);
     cardStageController = signal(
-      StudySessionCardStageController(canReveal: false),
+      StudySessionCardStageController<CardTemplateController>(
+        template: null,
+        canReveal: false,
+      ),
     );
 
     controllerEffect = effect(() {
@@ -71,9 +76,12 @@ final class ViewStudySessionController {
 
   final SettingsStore settingsStore = SettingsStore.instance;
   late final MediaAsset studySessionCompleteSound;
-  late final Signal<StudySessionCardStageController> cardStageController;
+  late final Signal<StudySessionCardStageController<CardTemplateController>>
+  cardStageController;
   late final EffectCleanup controllerEffect;
   final isCompleting = signal(false);
+
+  late final title = computed(() => mode.name);
 
   void startSession() {
     unawaited(
@@ -95,15 +103,24 @@ final class ViewStudySessionController {
 
     final template = sessionController.currentTemplate.value;
     final studyCard = sessionController.currentStudyCard.value;
-    final nextController = StudySessionCardStageController(
-      canReveal: template is FlashcardTemplate,
-      answer: template is FlashcardTemplate && studyCard != null
-          ? StudySessionAnswer(
-              value: template.getAnswer(isReversed: studyCard.isReversed),
-            )
-          : null,
-      wordScrambleTemplate: template is WordScrambleTemplate ? template : null,
-    );
+    final nextController =
+        StudySessionCardStageController<CardTemplateController>(
+          template: template,
+          canReveal: template is FlashcardTemplate,
+          answer: template is FlashcardTemplate && studyCard != null
+              ? StudySessionAnswer(
+                  value: template.getAnswer(isReversed: studyCard.isReversed),
+                )
+              : null,
+          createCardController: template is WordScrambleTemplate
+              ? (stage) => WordScrambleController(
+                  template: template,
+                  answer: stage.answer,
+                  canReveal: stage.canReveal,
+                  isRevealed: stage.isRevealed,
+                )
+              : null,
+        );
 
     final previousController = untracked(() => cardStageController.value);
     untracked(() {
@@ -152,7 +169,7 @@ final class ViewStudySessionController {
     }());
   }
 
-  Future<void> onSessionPop(BuildContext context) async {
+  Future<void> onPop(BuildContext context) async {
     final res = await showModal(
       context: context,
       leading: Icon(Icons.dangerous),

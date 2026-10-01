@@ -1,27 +1,22 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show StudyRating, StudySessionAnswer, WordScrambleTemplate;
-import 'package:boo_mondai/ui/study_session.card_stage/widgets/word_scramble.controller.dart';
+    show CardTemplate, StudyRating, StudySessionAnswer;
+import 'package:boo_mondai/ui/study_session.card_stage/widgets/card_template.controller.dart';
 import 'package:signals_hooks/signals_hooks.dart';
 
-class StudySessionCardStageController {
+class StudySessionCardStageController<T extends CardTemplateController> {
   StudySessionCardStageController({
+    required this.template,
     required bool canReveal,
     StudySessionAnswer? answer,
-    WordScrambleTemplate? wordScrambleTemplate,
+    T Function(StudySessionCardStageController<T> stage)? createCardController,
   }) : answer = signal(answer),
        canReveal = signal(canReveal) {
-    wordScrambleController = wordScrambleTemplate == null
-        ? null
-        : WordScrambleController(
-            template: wordScrambleTemplate,
-            answer: this.answer,
-            canReveal: this.canReveal,
-            isRevealed: isRevealed,
-          );
+    cardController = createCardController?.call(this);
   }
 
+  final CardTemplate? template;
   final Signal<StudySessionAnswer?> answer;
-  late final WordScrambleController? wordScrambleController;
+  late final T? cardController;
 
   ///  is the rating that has already been decided, but has not been submitted yet.
   final Signal<StudyRating?> pendingRating = signal(null);
@@ -44,7 +39,7 @@ class StudySessionCardStageController {
   }
 
   void dispose() {
-    wordScrambleController?.dispose();
+    cardController?.dispose();
     canReveal.dispose();
     pendingRating.dispose();
     isRevealed.dispose();

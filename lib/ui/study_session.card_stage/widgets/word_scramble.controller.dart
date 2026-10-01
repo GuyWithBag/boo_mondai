@@ -2,9 +2,10 @@ import 'dart:math';
 
 import 'package:boo_mondai/features/cards/models/word_scramble.template.dart';
 import 'package:boo_mondai/features/study_session/models/study_session.answer.dart';
+import 'package:boo_mondai/ui/study_session.card_stage/widgets/card_template.controller.dart';
 import 'package:signals/signals_flutter.dart';
 
-class WordScrambleController {
+class WordScrambleController implements CardTemplateController {
   WordScrambleController({
     required this.template,
     required this.answer,
@@ -88,6 +89,7 @@ class WordScrambleController {
     return selectedWords.value[index].sourceIndex == index;
   }
 
+  @override
   void dispose() {
     answerEffect();
     isComplete.dispose();

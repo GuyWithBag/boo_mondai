@@ -12,6 +12,7 @@ import 'package:boo_mondai/features/ui_sounds/ui_sounds.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppMediaPack,
+        CardTemplateController,
         StudyRating,
         StudySessionAnswer,
         StudySessionController,
@@ -50,7 +51,8 @@ class RatingArea extends SignalHookWidget {
   });
 
   final StudySessionController studySessionController;
-  final StudySessionCardStageController cardStageController;
+  final StudySessionCardStageController<CardTemplateController>
+  cardStageController;
   final bool isCompleting;
 
   static const double preferredHeight = 130.0;

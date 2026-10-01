@@ -56,7 +56,7 @@ class ViewMessageSessionStepPage extends HookWidget {
     return Scaffold(
       scrollable: false,
       appBar: AppBar(
-        onPop: () => studySessionPageController.onSessionPop(context),
+        onPop: () => studySessionPageController.onPop(context),
         child: ProgressBar(value: controller.stepProgressPercentage.value),
       ),
       bottomNavBar: BottomNavBar(

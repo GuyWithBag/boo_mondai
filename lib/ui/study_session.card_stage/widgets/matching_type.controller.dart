@@ -5,13 +5,14 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         MatchingTypeTemplate,
         MatchingTypeValue,
+        CardTemplateController,
         StudyRating,
         StudySessionAnswer,
         StudySessionCardStageController,
         Vector2Hive;
 import 'package:signals/signals_flutter.dart';
 
-class MatchingTypeController {
+class MatchingTypeController implements CardTemplateController {
   MatchingTypeController({required this.template, this.cardStageController}) {
     if (cardStageController != null) {
       cardStageController!.isBottomNavBarHidden.value = true;
@@ -37,7 +38,8 @@ class MatchingTypeController {
   }
 
   final MatchingTypeTemplate template;
-  final StudySessionCardStageController? cardStageController;
+  final StudySessionCardStageController<CardTemplateController>?
+  cardStageController;
 
   final leftItems = listSignal<MatchingTypeItem>(const []);
   final rightItems = listSignal<MatchingTypeItem>(const []);
@@ -117,6 +119,7 @@ class MatchingTypeController {
     return null;
   }
 
+  @override
   void dispose() {
     isComplete.dispose();
     incorrectAnswers.dispose();
