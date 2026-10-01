@@ -38,12 +38,21 @@ class MarkdownTextBody extends StatelessWidget {
       defaultAlignment,
     );
 
+    Uri? resolveExternalUri(String? href) {
+      final value = href?.trim() ?? '';
+      if (value.isEmpty) return null;
+
+      final uri = Uri.tryParse(value);
+      if (uri == null) return null;
+      if (uri.hasScheme) return uri;
+
+      return Uri.tryParse('https://$value');
+    }
+
     Future<void> launchLink(String? href) async {
-      final uri = Uri.tryParse(href ?? '');
+      final uri = resolveExternalUri(href);
       if (uri == null) return;
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
-      }
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
 
     void onTapLink(String text, String? href, String title) {

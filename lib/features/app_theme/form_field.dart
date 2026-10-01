@@ -1,7 +1,8 @@
 import 'package:boo_mondai/core/theme/app_tokens.model.dart';
-import 'package:boo_mondai/lib.barrel.dart' show TextSize, textStyle;
+import 'package:boo_mondai/lib.barrel.dart' show TextSize, textStyle, TextColor;
 import 'package:flutter/material.dart' as material;
 import 'package:flutter/material.dart' hide FormField;
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 typedef FormFieldBuilder<T> =
@@ -42,14 +43,22 @@ class FormField<T> extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            builder(context, field),
             if (field.errorText case final error?) ...[
-              SizedBox(height: tokens.spaceLayoutGapXsm),
               Text(
+                key: ValueKey(error),
                 error,
-                style: textStyle.resolve(tokens, const [TextSize.labelSmall]),
+                style: textStyle.resolve(tokens, const [
+                  TextSize.labelSmall,
+                  TextColor.error,
+                ]),
+              ).animate().shakeX(
+                duration: 350.ms,
+                curve: Curves.easeOutCubic,
+                amount: 6,
               ),
+              SizedBox(height: tokens.spaceLayoutGapXsm),
             ],
+            builder(context, field),
           ],
         );
       },

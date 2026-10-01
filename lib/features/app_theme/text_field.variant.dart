@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-enum TextFieldSize { labelLarge, bodyLarge, normal }
+enum TextFieldSize { labelLarge, bodyLarge, normal, header }
 
 enum TextFieldFrame { none, outline, underline }
 
@@ -120,6 +120,12 @@ final textFieldStyle = VariantStyle.textFieldParts<AppTokens>(
     },
     TextFieldAlign.center: (_) => {
       TextFieldStylePart.textAlign(TextAlign.center),
+    },
+    TextFieldSize.header: (tokens) => {
+      TextFieldStylePart.text({
+        TextStylePart.fontSize(tokens.textSizeHeader.sp),
+        TextStylePart.fontWeight(tokens.fontWeightTextHeavy),
+      }),
     },
     TextFieldSize.labelLarge: (tokens) => {
       TextFieldStylePart.text({
