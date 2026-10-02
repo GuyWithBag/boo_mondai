@@ -1,5 +1,14 @@
-
-import 'package:boo_mondai/lib.barrel.dart' show SessionException, StudySessionCardStep, SessionMode, StudySessionStep, StudySessionSnapshot, StudySessionCompletedResults, FsrsCard, FsrsReviewLog, StudyRating;
+import 'package:boo_mondai/lib.barrel.dart'
+    show
+        SessionException,
+        StudySessionCardStep,
+        SessionMode,
+        StudySessionStep,
+        StudySessionSnapshot,
+        StudySessionCompletedResults,
+        FsrsCard,
+        FsrsReviewLog,
+        StudyRating;
 
 /// Pure, immutable snapshot of a study session's state.
 ///
@@ -69,6 +78,11 @@ final class StudySession {
       if (log != null) fsrsLogs.add(log);
     }
     return StudySessionCompletedResults(
+      profileId: profileId,
+      sessionId: id,
+      deckId: deckId,
+      mode: mode,
+      startedAt: startedAt,
       snapshots: history,
       fsrsCards: List.unmodifiable(fsrsCards.values),
       fsrsLogs: List.unmodifiable(fsrsLogs),

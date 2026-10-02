@@ -1,7 +1,7 @@
 // Contains Cache of profiles and source profiles for deck type
 
 import 'package:boo_mondai/lib.barrel.dart'
-    show HiveSingleDataLocalDB, Profile, uuid;
+    show HiveSingleDataLocalDB, Profile, uuid, ProfileRole;
 
 class CurrentProfileLocalDB extends HiveSingleDataLocalDB<Profile> {
   @override
@@ -16,7 +16,7 @@ class CurrentProfileLocalDB extends HiveSingleDataLocalDB<Profile> {
       id: uuid.v7(),
       // This will be replaced by supabase's auth.user auto generated uuid.
       userId: uuid.v7(),
-      role: '',
+      role: ProfileRole.user,
       updatedAt: DateTime.now(),
       createdAt: DateTime.now(),
       username: 'Anonymous',

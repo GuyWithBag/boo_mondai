@@ -6,3 +6,4 @@ export 'study_session.snapshot.dart';
 export 'study_session.rule.dart';
 export 'study_session.answer.dart';
 export 'study_session.config.dart';
+export 'study_session.completed_results.dart';

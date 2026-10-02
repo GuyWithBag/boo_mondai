@@ -14,6 +14,7 @@ class ProfileMapper extends ClassMapperBase<Profile> {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = ProfileMapper._());
       MutableEntityMapper.ensureInitialized();
+      ProfileRoleMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -29,9 +30,9 @@ class ProfileMapper extends ClassMapperBase<Profile> {
   static String _$displayName(Profile v) => v.displayName;
   static const Field<Profile, String> _f$displayName =
       Field('displayName', _$displayName, key: r'display_name');
-  static String? _$role(Profile v) => v.role;
-  static const Field<Profile, String> _f$role =
-      Field('role', _$role, opt: true);
+  static ProfileRole _$role(Profile v) => v.role;
+  static const Field<Profile, ProfileRole> _f$role =
+      Field('role', _$role, opt: true, def: ProfileRole.user);
   static String? _$avatarUrl(Profile v) => v.avatarUrl;
   static const Field<Profile, String> _f$avatarUrl =
       Field('avatarUrl', _$avatarUrl, key: r'avatar_url', opt: true);
@@ -140,7 +141,7 @@ abstract class ProfileCopyWith<$R, $In extends Profile, $Out>
       {String? id,
       String? username,
       String? displayName,
-      String? role,
+      ProfileRole? role,
       String? avatarUrl,
       DateTime? createdAt,
       String? userId,
@@ -164,7 +165,7 @@ class _ProfileCopyWithImpl<$R, $Out>
           {String? id,
           String? username,
           String? displayName,
-          Object? role = $none,
+          ProfileRole? role,
           Object? avatarUrl = $none,
           DateTime? createdAt,
           String? userId,
@@ -176,7 +177,7 @@ class _ProfileCopyWithImpl<$R, $Out>
         if (id != null) #id: id,
         if (username != null) #username: username,
         if (displayName != null) #displayName: displayName,
-        if (role != $none) #role: role,
+        if (role != null) #role: role,
         if (avatarUrl != $none) #avatarUrl: avatarUrl,
         if (createdAt != null) #createdAt: createdAt,
         if (userId != null) #userId: userId,

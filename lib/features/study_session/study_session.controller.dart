@@ -425,6 +425,7 @@ final class StudySessionController {
     if (active.isSaved) return;
     try {
       final results = active.completedResults;
+      await LocalDB.studySessionCompletedResults.upsert(results);
       for (final log in results.fsrsLogs) {
         await LocalDB.reviewLogs.upsert(log);
       }

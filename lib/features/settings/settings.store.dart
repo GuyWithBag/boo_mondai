@@ -62,7 +62,7 @@ class SettingsStore {
   bool hasAccess(SettingPath path) {
     final setting = registry.get<dynamic>(path);
     if (setting.rolesWithAccess.isEmpty) return true;
-    final role = LocalDB.currentProfile.getOrCreate().profileRole;
+    final role = LocalDB.currentProfile.getOrCreate().role;
     return setting.rolesWithAccess.contains(role);
   }
 

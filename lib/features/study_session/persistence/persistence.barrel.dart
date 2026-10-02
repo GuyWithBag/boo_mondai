@@ -2,3 +2,4 @@
 
 // Other files
 export 'study_session_snapshots.local.db.dart';
+export 'study_session_completed_results.local.db.dart';

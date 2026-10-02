@@ -2,4 +2,4 @@
 
 // Other files
 export 'profile.dto.dart';
-export 'profile.roles.dart';
+export 'profile.role.dto.dart';

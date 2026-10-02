@@ -68,6 +68,7 @@ abstract class FileSystemHandler {
     required Uint8List bytes,
   }) async {
     final file = File(path);
+    await file.create();
     await file.writeAsBytes(bytes, flush: true);
 
     return file;

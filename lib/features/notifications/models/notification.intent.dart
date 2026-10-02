@@ -1,3 +1,4 @@
+import 'package:boo_mondai/features/notifications/models/notification.intent.type.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 
 part 'notification.intent.mapper.dart';
@@ -14,6 +15,7 @@ class NotificationIntent with NotificationIntentMappable {
     required this.updatedAt,
     required this.purgeAt,
     this.route,
+    this.ifRouteNullPushToView = false,
     this.persistInInbox = false,
     this.showSystemNotification = true,
     this.readAt,
@@ -28,6 +30,7 @@ class NotificationIntent with NotificationIntentMappable {
     required String title,
     required String body,
     String? route,
+    bool ifRouteNullPushToView = false,
     bool persistInInbox = false,
     bool showSystemNotification = true,
     DateTime? createdAt,
@@ -46,6 +49,7 @@ class NotificationIntent with NotificationIntentMappable {
       title: title,
       body: body,
       route: route,
+      ifRouteNullPushToView: ifRouteNullPushToView,
       persistInInbox: persistInInbox,
       showSystemNotification: showSystemNotification,
       createdAt: resolvedCreatedAt,
@@ -63,6 +67,7 @@ class NotificationIntent with NotificationIntentMappable {
   final String title;
   final String body;
   final String? route;
+  final bool ifRouteNullPushToView;
   final bool persistInInbox;
   final bool showSystemNotification;
   final DateTime createdAt;
@@ -71,14 +76,4 @@ class NotificationIntent with NotificationIntentMappable {
   final DateTime? deletedAt;
   final DateTime purgeAt;
   final int purgeAfterDays;
-}
-
-@MappableEnum()
-enum NotificationIntentType {
-  reviewReminder,
-  streakReminder,
-  downloadComplete,
-  syncComplete,
-  firstDrillSurvey,
-  studyDeckReview,
 }

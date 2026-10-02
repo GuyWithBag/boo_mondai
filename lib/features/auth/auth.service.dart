@@ -7,6 +7,7 @@ import 'dart:async';
 import 'dart:developer' as developer;
 import 'dart:io';
 
+import 'package:boo_mondai/features/profile/profile.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show Profile, LocalDB, AppException, RemoteDB, GuestMigrationService;
 import 'package:flutter/foundation.dart';
@@ -384,7 +385,7 @@ class AuthService {
     final profile = Profile(
       id: localProfile.id,
       userId: newUserId,
-      role: null,
+      role: ProfileRole.user,
       username: newUsername,
       displayName: newUsername,
       updatedAt: DateTime.now(),

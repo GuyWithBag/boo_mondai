@@ -85,19 +85,3 @@ final class StudySessionSnapshot {
   final StudyRating? rating;
   final DateTime completedAt;
 }
-
-final class StudySessionCompletedResults {
-  const StudySessionCompletedResults({
-    required this.snapshots,
-    required this.fsrsCards,
-    required this.fsrsLogs,
-    required this.correctCount,
-    required this.cardCount,
-  });
-
-  final List<StudySessionSnapshot> snapshots;
-  final List<FsrsCard> fsrsCards;
-  final List<FsrsReviewLog> fsrsLogs;
-  final int correctCount;
-  final int cardCount;
-}

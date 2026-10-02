@@ -17,6 +17,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         StreakController,
         SettingsStore,
         NotificationsController,
+        ResearchPariticipantPortalStore,
         SyncController,
         SyncDeckService,
         ChangeTrackerRouteArgs,
@@ -58,6 +59,7 @@ Future<void> main() async {
   await settingsStore.init();
 
   await NotificationsController.instance.init();
+  ResearchPariticipantPortalStore.instance.init();
   // ── Restore session ─────────────────────────────────
   final authController = AuthController();
   // ── App-level sync ──────────────────────────────────

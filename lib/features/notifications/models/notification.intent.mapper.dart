@@ -6,69 +6,6 @@
 
 part of 'notification.intent.dart';
 
-class NotificationIntentTypeMapper extends EnumMapper<NotificationIntentType> {
-  NotificationIntentTypeMapper._();
-
-  static NotificationIntentTypeMapper? _instance;
-  static NotificationIntentTypeMapper ensureInitialized() {
-    if (_instance == null) {
-      MapperContainer.globals.use(_instance = NotificationIntentTypeMapper._());
-    }
-    return _instance!;
-  }
-
-  static NotificationIntentType fromValue(dynamic value) {
-    ensureInitialized();
-    return MapperContainer.globals.fromValue(value);
-  }
-
-  @override
-  NotificationIntentType decode(dynamic value) {
-    switch (value) {
-      case r'review_reminder':
-        return NotificationIntentType.reviewReminder;
-      case r'streak_reminder':
-        return NotificationIntentType.streakReminder;
-      case r'download_complete':
-        return NotificationIntentType.downloadComplete;
-      case r'sync_complete':
-        return NotificationIntentType.syncComplete;
-      case r'first_drill_survey':
-        return NotificationIntentType.firstDrillSurvey;
-      case r'study_deck_review':
-        return NotificationIntentType.studyDeckReview;
-      default:
-        throw MapperException.unknownEnumValue(value);
-    }
-  }
-
-  @override
-  dynamic encode(NotificationIntentType self) {
-    switch (self) {
-      case NotificationIntentType.reviewReminder:
-        return r'review_reminder';
-      case NotificationIntentType.streakReminder:
-        return r'streak_reminder';
-      case NotificationIntentType.downloadComplete:
-        return r'download_complete';
-      case NotificationIntentType.syncComplete:
-        return r'sync_complete';
-      case NotificationIntentType.firstDrillSurvey:
-        return r'first_drill_survey';
-      case NotificationIntentType.studyDeckReview:
-        return r'study_deck_review';
-    }
-  }
-}
-
-extension NotificationIntentTypeMapperExtension on NotificationIntentType {
-  String toValue() {
-    NotificationIntentTypeMapper.ensureInitialized();
-    return MapperContainer.globals.toValue<NotificationIntentType>(this)
-        as String;
-  }
-}
-
 class NotificationIntentMapper extends ClassMapperBase<NotificationIntent> {
   NotificationIntentMapper._();
 
@@ -110,6 +47,11 @@ class NotificationIntentMapper extends ClassMapperBase<NotificationIntent> {
   static String? _$route(NotificationIntent v) => v.route;
   static const Field<NotificationIntent, String> _f$route =
       Field('route', _$route, opt: true);
+  static bool _$ifRouteNullPushToView(NotificationIntent v) =>
+      v.ifRouteNullPushToView;
+  static const Field<NotificationIntent, bool> _f$ifRouteNullPushToView = Field(
+      'ifRouteNullPushToView', _$ifRouteNullPushToView,
+      key: r'if_route_null_push_to_view', opt: true, def: false);
   static bool _$persistInInbox(NotificationIntent v) => v.persistInInbox;
   static const Field<NotificationIntent, bool> _f$persistInInbox = Field(
       'persistInInbox', _$persistInInbox,
@@ -141,6 +83,7 @@ class NotificationIntentMapper extends ClassMapperBase<NotificationIntent> {
     #updatedAt: _f$updatedAt,
     #purgeAt: _f$purgeAt,
     #route: _f$route,
+    #ifRouteNullPushToView: _f$ifRouteNullPushToView,
     #persistInInbox: _f$persistInInbox,
     #showSystemNotification: _f$showSystemNotification,
     #readAt: _f$readAt,
@@ -159,6 +102,7 @@ class NotificationIntentMapper extends ClassMapperBase<NotificationIntent> {
         updatedAt: data.dec(_f$updatedAt),
         purgeAt: data.dec(_f$purgeAt),
         route: data.dec(_f$route),
+        ifRouteNullPushToView: data.dec(_f$ifRouteNullPushToView),
         persistInInbox: data.dec(_f$persistInInbox),
         showSystemNotification: data.dec(_f$showSystemNotification),
         readAt: data.dec(_f$readAt),
@@ -231,6 +175,7 @@ abstract class NotificationIntentCopyWith<$R, $In extends NotificationIntent,
       DateTime? updatedAt,
       DateTime? purgeAt,
       String? route,
+      bool? ifRouteNullPushToView,
       bool? persistInInbox,
       bool? showSystemNotification,
       DateTime? readAt,
@@ -259,6 +204,7 @@ class _NotificationIntentCopyWithImpl<$R, $Out>
           DateTime? updatedAt,
           DateTime? purgeAt,
           Object? route = $none,
+          bool? ifRouteNullPushToView,
           bool? persistInInbox,
           bool? showSystemNotification,
           Object? readAt = $none,
@@ -274,6 +220,8 @@ class _NotificationIntentCopyWithImpl<$R, $Out>
         if (updatedAt != null) #updatedAt: updatedAt,
         if (purgeAt != null) #purgeAt: purgeAt,
         if (route != $none) #route: route,
+        if (ifRouteNullPushToView != null)
+          #ifRouteNullPushToView: ifRouteNullPushToView,
         if (persistInInbox != null) #persistInInbox: persistInInbox,
         if (showSystemNotification != null)
           #showSystemNotification: showSystemNotification,
@@ -292,6 +240,8 @@ class _NotificationIntentCopyWithImpl<$R, $Out>
       updatedAt: data.get(#updatedAt, or: $value.updatedAt),
       purgeAt: data.get(#purgeAt, or: $value.purgeAt),
       route: data.get(#route, or: $value.route),
+      ifRouteNullPushToView:
+          data.get(#ifRouteNullPushToView, or: $value.ifRouteNullPushToView),
       persistInInbox: data.get(#persistInInbox, or: $value.persistInInbox),
       showSystemNotification:
           data.get(#showSystemNotification, or: $value.showSystemNotification),

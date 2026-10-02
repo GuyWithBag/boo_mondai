@@ -5,6 +5,7 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/features/profile/models/profile.role.dto.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show MutableEntity, MutableEntityCopyWith, MutableEntityMapper, ProfileRole;
 import 'package:dart_mappable/dart_mappable.dart';
@@ -17,7 +18,7 @@ class Profile with ProfileMappable implements MutableEntity {
   final String userId;
   final String username;
   final String displayName;
-  final String? role;
+  final ProfileRole role;
   final String? avatarUrl;
   @override
   final DateTime createdAt;
@@ -33,7 +34,7 @@ class Profile with ProfileMappable implements MutableEntity {
     required this.id,
     required this.username,
     required this.displayName,
-    this.role,
+    this.role = ProfileRole.user,
     this.avatarUrl,
     required this.createdAt,
     required this.userId,
@@ -43,7 +44,6 @@ class Profile with ProfileMappable implements MutableEntity {
     this.isAnonymous = true,
   });
 
-  ProfileRole get profileRole => ProfileRole.fromString(role);
-
-  bool get isResearcher => profileRole == ProfileRole.researcher;
+  bool get isResearcher => role == ProfileRole.researcher;
+  bool get isParticipant => ProfileRole.isParticipant(role);
 }

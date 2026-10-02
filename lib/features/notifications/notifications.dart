@@ -1,6 +1,7 @@
 import 'models/notification.ids.dart';
 import 'models/notification.intent.dart';
-import 'package:boo_mondai/lib.barrel.dart' show LocalDB;
+import 'package:boo_mondai/lib.barrel.dart'
+    show LocalDB, NotificationIntentType;
 
 abstract final class Notifications {
   static String get currentProfileId => LocalDB.currentProfile.getOrCreate().id;
@@ -51,15 +52,16 @@ abstract final class Notifications {
     );
   }
 
-  static NotificationIntent firstDrillSurvey({required String surveyId}) {
+  static NotificationIntent firstDrillSurvey() {
     return NotificationIntent.create(
       id: NotificationIds.firstDrillSurvey,
       profileId: currentProfileId,
       type: NotificationIntentType.firstDrillSurvey,
       title: 'Quick question',
       body: 'Tell us how your first drill felt.',
-      route: '/view-survey/$surveyId',
+      ifRouteNullPushToView: true,
       persistInInbox: true,
+      showSystemNotification: true,
     );
   }
 
