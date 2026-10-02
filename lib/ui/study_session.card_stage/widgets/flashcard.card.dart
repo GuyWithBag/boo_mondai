@@ -1,9 +1,8 @@
 import 'package:boo_mondai/core/core.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        FlashcardTemplate,
         StudyCard,
-        CardTemplateController,
+        FlashcardTemplate,
         StudySessionCardStageController,
         FlashcardFrontSide,
         FlashcardBackSide,
@@ -28,8 +27,7 @@ class FlashcardCard extends SignalHookWidget {
 
   final FlashcardTemplate template;
   final StudyCard studyCard;
-  final StudySessionCardStageController<CardTemplateController>?
-  cardStageController;
+  final StudySessionCardStageController? cardStageController;
   final bool isRevealed;
   final bool showRevealButton;
   final double? maxWidth;

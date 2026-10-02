@@ -5,7 +5,6 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         AlignedScrollView,
         AppTokens,
-        CardTemplateController,
         IdentificationTemplate,
         MarkdownText,
         MarkdownTextMode,
@@ -42,8 +41,7 @@ class IdentificationCard extends SignalHookWidget {
   });
 
   final IdentificationTemplate template;
-  final StudySessionCardStageController<CardTemplateController>?
-  cardStageController;
+  final StudySessionCardStageController? cardStageController;
   final bool isRevealed;
   final double? maxWidth;
   final double contentScale;

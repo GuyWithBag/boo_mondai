@@ -28,8 +28,7 @@ class FillInTheBlanksController implements CardTemplateController {
   }
 
   final FillInTheBlanksTemplate template;
-  final StudySessionCardStageController<CardTemplateController>?
-  cardStageController;
+  final StudySessionCardStageController? cardStageController;
 
   final answers = signal<List<String>>(<String>[]);
 

@@ -1,7 +1,6 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         MatchingTypeTemplate,
-        CardTemplateController,
         StudySessionCardStageController,
         AppTokens,
         ButtonColor,
@@ -38,8 +37,7 @@ class MatchingTypeCard extends SignalHookWidget {
   });
 
   final MatchingTypeTemplate template;
-  final StudySessionCardStageController<CardTemplateController>?
-  cardStageController;
+  final StudySessionCardStageController? cardStageController;
   final bool isRevealed;
   final double? maxWidth;
   final double contentScale;

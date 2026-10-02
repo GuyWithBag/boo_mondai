@@ -6,7 +6,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         FilteredSearchBarController,
         LocalDB,
         ViewCardsSearch,
-        ViewCardsLayoutMode;
+        ViewCardsLayoutModeView,
+        StatusLayoutState;
 import 'package:flutter/material.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:signals/signals_flutter.dart';
@@ -35,14 +36,28 @@ class ViewCardsController {
 
   late final Listenable deckListenable;
   late final Listenable templateListenable;
-  final layoutMode = signal(ViewCardsLayoutMode.compact);
+  final layoutMode = signal(ViewCardsLayoutModeView.wrap);
   final isLoading = signal(false);
   final error = signal<Exception?>(null);
   final templates = listSignal<CardTemplate>(const []);
   late final FilteredSearchBarController<CardTemplate> templateSearchController;
   late final Computed<bool> hasSearchQuery;
 
-  void setLayoutMode(ViewCardsLayoutMode value) {
+  late final emptyState = computed(() {
+    return hasSearchQuery.value
+        ? const StatusLayoutState(
+            icon: Icons.search_off,
+            title: 'No templates found',
+            message: 'Try a different query or remove filters.',
+          )
+        : const StatusLayoutState(
+            icon: Icons.view_carousel_outlined,
+            title: 'No templates yet',
+            message: 'Add card templates to your decks to browse them.',
+          );
+  });
+
+  void setLayoutMode(ViewCardsLayoutModeView value) {
     layoutMode.value = value;
   }
 

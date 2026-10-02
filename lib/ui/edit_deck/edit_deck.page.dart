@@ -6,14 +6,14 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
         Button,
-        EditDeckAppBar,
         EditDeckBottomNavBar,
         EditDeckEditorBody,
         EditDeckSideBar,
         Scaffold,
         ToolBar,
         ToolBarController,
-        EditDeckController;
+        EditDeckController,
+        buildEditDeckAppBar;
 import 'package:flutter/material.dart' hide Scaffold;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:signals_hooks/signals_hooks.dart';
@@ -46,7 +46,7 @@ class EditDeckPage extends SignalHookWidget {
 
     return Scaffold(
       isFloatingSideBar: true,
-      appBar: EditDeckAppBar(controller: controller),
+      appBar: buildEditDeckAppBar(context: context, controller: controller),
       floatingActionButton: Button.icon(
         icon: Icons.add,
         onPressed: () => controller.addTemplate(context),

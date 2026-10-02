@@ -10,8 +10,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         DecksService,
         LocalDB,
         ModalAction,
+        ModalDraftActionType,
         ProfileService,
+        SettingPath,
+        SettingsStore,
         ViewDeckListingSingleEditorController,
+        showFeatureDisabledModal,
         showViewDeckListingSingleSheet,
         showModal,
         ViewDeckSingleHelper,
@@ -19,6 +23,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         ImageHelper;
 import 'package:file_picker/file_picker.dart' show PlatformFile;
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart' show GoRouterHelper;
 import 'package:signals_hooks/signals_hooks.dart';
 
 class ViewDeckSingleSheetController {
@@ -27,9 +32,13 @@ class ViewDeckSingleSheetController {
     required this.initialDeck,
   }) : deck = signal(initialDeck);
 
-  final Deck initialDeck;
+  Deck initialDeck;
   final Signal<Deck> deck;
   final Signal<ImageProvider?> coverImage;
+  final pickedCoverImageFile = signal<PlatformFile?>(null);
+  final isLoading = signal(false);
+  final canClose = signal(false);
+  bool _isRequestingClose = false;
 
   late final FutureSignal<ImageProvider?> coverImageFuture = futureSignal(
     () async {
@@ -52,6 +61,14 @@ class ViewDeckSingleSheetController {
   late final title = computed(
     () => ViewDeckSingleHelper.getTitle(deck.value.title),
   );
+  late final isDirty = computed(
+    () => initialDeck != deck.value || pickedCoverImageFile.value != null,
+  );
+  late final canEdit = computed(() => deck.value.isEditable);
+  late final shouldShowSaveButton = computed(
+    () => isDirty.value || isLoading.value,
+  );
+  late final canSave = computed(() => isDirty.value && !isLoading.value);
   late final shortDescription = computed(
     () => ViewDeckSingleHelper.getShortDescription(deck.value.shortDescription),
   );
@@ -87,7 +104,35 @@ class ViewDeckSingleSheetController {
     );
   }
 
+  Future<void> requestClose(BuildContext context) async {
+    if (_isRequestingClose) return;
+    _isRequestingClose = true;
+
+    final shouldClose = await onClose(context);
+    if (!context.mounted) return;
+    if (!shouldClose) {
+      _isRequestingClose = false;
+      return;
+    }
+
+    canClose.value = true;
+    Navigator.of(context).pop();
+  }
+
+  void onEditPressed(BuildContext context) {
+    if (!deck.value.isEditable) return;
+    context.push('/decks-local/${deck.value.id}/edit');
+  }
+
   Future<void> onCreateListingPressed(BuildContext context) async {
+    final areOnlineFeaturesDisabled = SettingsStore.instance.get<bool>(
+      SettingPath.disableOnlineFeatures,
+    );
+    if (areOnlineFeaturesDisabled) {
+      showFeatureDisabledModal(context);
+      return;
+    }
+
     if (deck.value.isPublished) return;
 
     final shouldCreateListing = await showModal<bool>(
@@ -147,10 +192,7 @@ class ViewDeckSingleSheetController {
     //   title: value,
     // );
 
-    deck.value = deck.value.copyWith(
-      title: value.trim(),
-      updatedAt: DateTime.now(),
-    );
+    deck.value = deck.value.copyWith(title: value.trim());
   }
 
   Future<void> setShortDescription(String value) async {
@@ -160,10 +202,7 @@ class ViewDeckSingleSheetController {
     //   shortDescription: value,
     // );
 
-    deck.value = deck.value.copyWith(
-      shortDescription: value.trim(),
-      updatedAt: DateTime.now(),
-    );
+    deck.value = deck.value.copyWith(shortDescription: value.trim());
   }
 
   Future<void> setLongDescription(String value) async {
@@ -173,10 +212,7 @@ class ViewDeckSingleSheetController {
     //   longDescription: value,
     // );
 
-    deck.value = deck.value.copyWith(
-      longDescription: value.trim(),
-      updatedAt: DateTime.now(),
-    );
+    deck.value = deck.value.copyWith(longDescription: value.trim());
   }
 
   Future<void> setTags(List<String> tagNames) async {
@@ -198,21 +234,84 @@ class ViewDeckSingleSheetController {
 
     // ToDo: Add error handling
     if (file.bytes == null) return;
+    pickedCoverImageFile.value = file;
     coverImage.value = MemoryImage(file.bytes!);
   }
 
-  void onExit() {
-    save();
+  Future<void> save() async {
+    if (!isDirty.value || isLoading.value) return;
+
+    isLoading.value = true;
+    try {
+      final draft = deck.value.copyWith(updatedAt: DateTime.now());
+      if (initialDeck.title != draft.title) {
+        await DecksService.setTitle(deck: initialDeck, title: draft.title);
+      }
+
+      final pickedCover = pickedCoverImageFile.value;
+      if (pickedCover != null) {
+        final coverImagePath = DecksDirectoryPaths.coverImage(
+          deckTitle: draft.title,
+        );
+        final absolutePath =
+            await FileSystemHandler.getAbsolutePathOfRelativePath(
+              coverImagePath,
+            );
+        await FileSystemHandler.storeFile(
+          path: absolutePath,
+          file: pickedCover,
+        );
+      }
+
+      await DecksService.upsert(deck: draft);
+      deck.value = draft;
+      initialDeck = draft;
+      pickedCoverImageFile.value = null;
+    } finally {
+      isLoading.value = false;
+    }
   }
 
-  void save() {
-    if (initialDeck.title != deck.value.title) {
-      DecksService.setTitle(deck: deck.value, title: deck.value.title);
-    }
+  Future<void> onSavePressed() => save();
 
-    if (initialDeck != deck.value) {
-      DecksService.upsert(deck: deck.value);
+  Future<bool> onClose(BuildContext context) async {
+    if (!isDirty.value) return true;
+
+    final action = await showModal<ModalDraftActionType>(
+      context: context,
+      title: 'Save deck changes?',
+      subtitle: 'You have unsaved changes in this deck.',
+      leading: const Icon(Icons.save_outlined),
+      showCancelButton: true,
+      actions: [
+        const ModalAction<ModalDraftActionType>(
+          value: ModalDraftActionType.discard,
+          label: 'Discard',
+        ),
+        const ModalAction<ModalDraftActionType>(
+          value: ModalDraftActionType.action,
+          label: 'Save',
+          color: ButtonColor.primary,
+        ),
+      ],
+    );
+
+    switch (action ?? ModalDraftActionType.cancel) {
+      case ModalDraftActionType.action:
+        await save();
+        return true;
+      case ModalDraftActionType.discard:
+        discard();
+        return true;
+      case ModalDraftActionType.cancel:
+        return false;
     }
+  }
+
+  void discard() {
+    deck.value = initialDeck;
+    pickedCoverImageFile.value = null;
+    coverImageFuture.refresh();
   }
 
   Future<void> deleteDeck(BuildContext context) async {
@@ -241,8 +340,13 @@ class ViewDeckSingleSheetController {
   }
 
   void dispose() {
-    onExit();
-
+    canClose.dispose();
+    isLoading.dispose();
+    pickedCoverImageFile.dispose();
+    canEdit.dispose();
+    canSave.dispose();
+    shouldShowSaveButton.dispose();
+    isDirty.dispose();
     coverImagePath.dispose();
     tagNames.dispose();
     visibilityLabel.dispose();

@@ -1,8 +1,6 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         CardTemplate,
-        CardTemplateController,
-        FlashcardTemplate,
         LocalDB,
         StudyCard,
         StudySessionCardStageController,
@@ -21,8 +19,7 @@ final class ViewCardSingleController {
   final String templateId;
   final template = signal<CardTemplate?>(null);
   final error = signal<Exception?>(null);
-  final cardStageController =
-      signal<StudySessionCardStageController<CardTemplateController>?>(null);
+  final cardStageController = signal<StudySessionCardStageController?>(null);
 
   late final isRevealed = computed(
     () => cardStageController.value?.isRevealed.value ?? false,
@@ -72,9 +69,10 @@ final class ViewCardSingleController {
       ..isRevealed.value = !stage.isRevealed.value;
   }
 
-  StudySessionCardStageController<CardTemplateController>
-  _createCardStageController(CardTemplate template) {
-    return StudySessionCardStageController<CardTemplateController>(
+  StudySessionCardStageController _createCardStageController(
+    CardTemplate template,
+  ) {
+    return StudySessionCardStageController(
       template: template,
       canReveal: true,
       createCardController: template is WordScrambleTemplate

@@ -48,7 +48,7 @@ class ViewDeckSingleBottomNavBar extends StatelessWidget
               child: Button(
                 variants: const [ButtonColor.primary],
                 onPressed: canDrill
-                    ? () => context.push('/drill/${deck.id}/session')
+                    ? () => context.push('/drill/${deck.id}/onboarding')
                     : null,
                 child: const Text('Study'),
               ),

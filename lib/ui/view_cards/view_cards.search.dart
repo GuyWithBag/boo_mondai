@@ -10,13 +10,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         SearchTokens,
         WordScrambleTemplate;
 
-enum ViewCardsLayoutMode { compact, paired }
-
 abstract final class ViewCardsSearch {
+  static const deck = SearchTokenShape(name: 'deck', aliases: ['deck_id']);
   static const tag = SearchTokenShape(name: 'tag', aliases: ['tags']);
   static const fuzzy = SearchTokenShape(name: 'fuzzy', aliases: ['cutoff']);
 
-  static const tokenShapes = [tag, fuzzy];
+  static const tokenShapes = [deck, tag, fuzzy];
 
   static String templateSearchTextLabel(CardTemplate template) {
     return [
@@ -29,6 +28,15 @@ abstract final class ViewCardsSearch {
   }
 
   static bool templateItemFilter(CardTemplate template, SearchTokens tokens) {
+    final selectedDecks = tokens
+        .getAll(deck)
+        .map((value) => value.trim())
+        .where((value) => value.isNotEmpty)
+        .toSet();
+    if (selectedDecks.isNotEmpty && !selectedDecks.contains(template.deckId)) {
+      return false;
+    }
+
     final selectedTags = tokens
         .getAll(tag)
         .map((value) => value.trim().toLowerCase())

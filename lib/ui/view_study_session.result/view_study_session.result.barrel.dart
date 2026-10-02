@@ -3,4 +3,4 @@
 // Barrel files
 export 'widgets/widgets.barrel.dart';
 // Other files
-export 'view_study_session_result.page.dart';
+export 'view_study_session.result.page.dart';

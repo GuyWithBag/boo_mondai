@@ -3,10 +3,14 @@ import 'dart:async';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppMediaPack,
-        CardTemplateController,
+        Deck,
+        DeckDueStats,
+        DeckRatingStats,
+        DeckReviewStats,
         DueFilterThreshold,
         FlashcardTemplate,
-        NotificationsController,
+        MatchingTypeTemplate,
+        MediaSelector,
         SessionException,
         SessionMode,
         SettingPath,
@@ -16,17 +20,23 @@ import 'package:boo_mondai/lib.barrel.dart'
         StudySessionCardStageController,
         StudySessionConfig,
         StudySessionController,
+        StudyRating,
+        StudyRatingHelper,
+        StudySessionHelper,
         UiSoundsService,
         WordScrambleController,
         WordScrambleTemplate,
         showModal,
         ModalAction,
-        ButtonColor;
+        ButtonColor,
+        CasingHelper;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart' show GoRouterHelper;
 import 'package:media_variants/media_variants.dart';
 import 'package:provider/provider.dart' show ReadContext;
 import 'package:signals/signals_flutter.dart';
+
+enum SubmissionStyle { showAnswer, submitAnswer, none }
 
 final class ViewStudySessionController {
   ViewStudySessionController({
@@ -53,15 +63,13 @@ final class ViewStudySessionController {
     studySessionCompleteSound = context
         .mediaPackController<AppMediaPack>()
         .resolve((media) => media.studySessionCompleteSound);
-    cardStageController = signal(
-      StudySessionCardStageController<CardTemplateController>(
-        template: null,
-        canReveal: false,
-      ),
+    cardStageController = StudySessionCardStageController(
+      template: null,
+      canReveal: false,
     );
 
     controllerEffect = effect(() {
-      syncCardStageController();
+      resetCardStageForStep();
       handleCompletion();
     });
 
@@ -76,12 +84,61 @@ final class ViewStudySessionController {
 
   final SettingsStore settingsStore = SettingsStore.instance;
   late final MediaAsset studySessionCompleteSound;
-  late final Signal<StudySessionCardStageController<CardTemplateController>>
-  cardStageController;
+  late final StudySessionCardStageController cardStageController;
   late final EffectCleanup controllerEffect;
   final isCompleting = signal(false);
 
-  late final title = computed(() => mode.name);
+  late final title = computed(() => CasingHelper.toTitleCase(mode.value.name));
+  late final isBottomNavBarHidden = computed(() {
+    final template = sessionController.currentTemplate.value;
+    return template is MatchingTypeTemplate &&
+        !cardStageController.isRevealed.value;
+  });
+  late final reviewStats = computed<DeckReviewStats?>(() {
+    final session = sessionController.session.value;
+    if (session == null || session.mode != SessionMode.review) return null;
+
+    var again = 0;
+    var hard = 0;
+    var good = 0;
+    var easy = 0;
+    for (final snapshot in session.history) {
+      switch (snapshot.rating) {
+        case StudyRating.again:
+        case StudyRating.incorrect:
+          again++;
+        case StudyRating.hard:
+          hard++;
+        case StudyRating.good:
+          good++;
+        case StudyRating.easy:
+          easy++;
+        case null:
+          break;
+      }
+    }
+
+    final total = session.steps.length;
+    final remaining = (total - session.history.length).clamp(0, total).toInt();
+    final now = DateTime.now();
+
+    return DeckReviewStats(
+      deck: Deck(
+        id: session.deckId ?? session.id,
+        profileId: session.profileId,
+        title: 'Review',
+        createdAt: session.startedAt,
+        updatedAt: now,
+      ),
+      due: DeckDueStats(dueReview: remaining),
+      ratingStats: DeckRatingStats(
+        again: again,
+        hard: hard,
+        good: good,
+        easy: easy,
+      ),
+    );
+  });
 
   void startSession() {
     unawaited(
@@ -95,7 +152,13 @@ final class ViewStudySessionController {
     );
   }
 
-  void syncCardStageController() {
+  SubmissionStyle get submissionStyle {
+    final template = sessionController.currentTemplate.value;
+    if (template == null) return SubmissionStyle.none;
+    return StudySessionHelper.getSubmissionStyle(template);
+  }
+
+  void resetCardStageForStep() {
     final step = sessionController.currentStep.value;
     final stepId = step?.id;
 
@@ -103,31 +166,101 @@ final class ViewStudySessionController {
 
     final template = sessionController.currentTemplate.value;
     final studyCard = sessionController.currentStudyCard.value;
-    final nextController =
-        StudySessionCardStageController<CardTemplateController>(
-          template: template,
-          canReveal: template is FlashcardTemplate,
-          answer: template is FlashcardTemplate && studyCard != null
-              ? StudySessionAnswer(
-                  value: template.getAnswer(isReversed: studyCard.isReversed),
-                )
-              : null,
-          createCardController: template is WordScrambleTemplate
-              ? (stage) => WordScrambleController(
-                  template: template,
-                  answer: stage.answer,
-                  canReveal: stage.canReveal,
-                  isRevealed: stage.isRevealed,
-                )
-              : null,
-        );
 
-    final previousController = untracked(() => cardStageController.value);
     untracked(() {
       currentStepId.value = stepId;
-      cardStageController.value = nextController;
+      cardStageController.reset(
+        template: template,
+        canReveal: template is FlashcardTemplate,
+        answer: template is FlashcardTemplate && studyCard != null
+            ? StudySessionAnswer(
+                value: template.getAnswer(isReversed: studyCard.isReversed),
+              )
+            : null,
+        createCardController: template is WordScrambleTemplate
+            ? (stage) => WordScrambleController(
+                template: template,
+                answer: stage.answer,
+                canReveal: stage.canReveal,
+                isRevealed: stage.isRevealed,
+              )
+            : null,
+      );
     });
-    previousController.dispose();
+  }
+
+  void playStudySessionSound(MediaSelector<AppMediaPack> sound) {
+    unawaited(
+      UiSoundsService.playIfEnabled(
+        context.mediaPackController<AppMediaPack>().resolve(sound),
+        settingsStore: settingsStore,
+        enabledSetting: SettingPath.uiSoundsEnabled,
+      ),
+    );
+  }
+
+  void submitCurrentAnswer() {
+    final template = sessionController.currentTemplate.value;
+    if (template == null || !cardStageController.canReveal.value) return;
+
+    final answer = cardStageController.answer.value;
+    if (answer != null && StudySessionHelper.isAutoGraded(template)) {
+      if (!template.checkAnswer(answer)) {
+        playStudySessionSound(
+          StudyRatingHelper.getSound(StudyRating.incorrect),
+        );
+        cardStageController.reveal(
+          pendingRating: sessionController.config.autoRateIncorrectAnswers
+              ? StudyRating.incorrect
+              : null,
+        );
+        return;
+      }
+
+      playStudySessionSound((media) => media.studySessionCorrectSound);
+      cardStageController.reveal();
+      return;
+    }
+
+    playStudySessionSound((media) => media.studySessionRevealSound);
+    cardStageController.reveal();
+  }
+
+  void continuePendingRating() {
+    if (sessionController.isSubmitting.value) return;
+    final answer = cardStageController.answer.value;
+    final pendingRating = cardStageController.pendingRating.value;
+    if (answer == null || pendingRating == null) return;
+
+    playStudySessionSound((media) => media.studySessionContinueSound);
+    unawaited(
+      sessionController
+          .submitAnswer(answer, pendingRating)
+          .catchError((Object _, StackTrace _) {}),
+    );
+  }
+
+  void rateCurrentAnswer(StudyRating type, {bool playSound = true}) {
+    if (sessionController.isSubmitting.value) return;
+    final template = sessionController.currentTemplate.value;
+    final answer = cardStageController.answer.value;
+    if (template == null || answer == null) return;
+
+    final effectiveType =
+        StudySessionHelper.isAutoGraded(template) &&
+            !template.checkAnswer(answer) &&
+            sessionController.config.autoRateIncorrectAnswers
+        ? StudyRating.incorrect
+        : type;
+
+    if (playSound) {
+      playStudySessionSound(StudyRatingHelper.getSound(effectiveType));
+    }
+    unawaited(
+      sessionController
+          .submitAnswer(answer, effectiveType)
+          .catchError((Object _, StackTrace _) {}),
+    );
   }
 
   void handleCompletion() {
@@ -195,9 +328,10 @@ final class ViewStudySessionController {
 
   void dispose() {
     controllerEffect();
-    cardStageController.value.dispose();
     cardStageController.dispose();
     currentStepId.dispose();
+    isBottomNavBarHidden.dispose();
+    reviewStats.dispose();
     isCompleting.dispose();
     sessionController.dispose();
     mode.dispose();

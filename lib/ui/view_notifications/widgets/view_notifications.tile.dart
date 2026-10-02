@@ -30,8 +30,11 @@ class ViewNotificationsTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
     final route =
-        notification.route ?? Pages.notificationIntentUrl(notification.id);
-    final canOpen = route.isNotEmpty;
+        notification.route ??
+        (notification.ifRouteNullPushToView
+            ? Pages.notificationIntentUrl(notification.id)
+            : null);
+    final canOpen = route != null && route.isNotEmpty;
     final isRead = notification.readAt != null;
     final style = surfaceStyle.resolve(tokens, [
       isRead ? SurfaceColor.baseline : SurfaceColor.muted,

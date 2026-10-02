@@ -3,6 +3,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         Button,
         ButtonColor,
+        ButtonPadding,
+        ButtonSize,
         ChipTone,
         DeckDetails,
         DeckFormValidator,
@@ -12,8 +14,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         HeaderBadge,
         MetaLabel,
         DeckTileState,
-        SettingPath,
-        SettingsStore,
         SurfacePadding,
         SurfaceShape,
         SurfaceColor,
@@ -30,13 +30,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         DecksDirectoryPaths,
         ToolBar,
         ToolBarController,
-        showFeatureDisabledModal,
         showBottomSheet;
 import 'package:flutter/material.dart'
     hide AppBar, FormField, Scaffold, showBottomSheet;
 import 'package:flutter_hooks/flutter_hooks.dart' show useEffect, useMemoized;
 import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
-import 'package:go_router/go_router.dart' show GoRouterHelper;
 import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart'
     show Surface, ThemeVariantsContext;
@@ -44,6 +42,8 @@ import 'package:theme_variants/theme_variants.dart'
 Future<void> showViewDeckSingleSheet(BuildContext context, Deck deck) {
   return showBottomSheet(
     context: context,
+    enableDrag: false,
+    isDismissible: false,
     builder: (_) => ViewDeckSingleSheet(deck: deck),
   );
 }
@@ -67,117 +67,148 @@ class ViewDeckSingleSheet extends SignalHookWidget {
     final toolBarController = useMemoized(() => ToolBarController());
     useEffect(() => toolBarController.dispose, [toolBarController]);
     final activeDeck = controller.deck.value;
-    final areOnlineFeaturesDisabled = SettingsStore.instance.get<bool>(
-      SettingPath.disableOnlineFeatures,
-    );
+    return PopScope<void>(
+      canPop: controller.canClose.value,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) return;
+        controller.requestClose(context);
+      },
+      child: DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: 1,
+        minChildSize: 0.4,
+        maxChildSize: 1,
+        shouldCloseOnMinExtent: false,
+        builder: (context, scrollController) {
+          return NotificationListener<DraggableScrollableNotification>(
+            onNotification: (notification) {
+              if (notification.extent > notification.minExtent) return false;
 
-    return DraggableScrollableSheet(
-      expand: false,
-      initialChildSize: 1,
-      minChildSize: 0.4,
-      maxChildSize: 1,
-      builder: (context, scrollController) {
-        return Surface(
-          style: surfaceStyle
-              .resolve(tokens, const [SurfacePadding.none, SurfaceColor.muted])
-              .copyWith(clipBehavior: Clip.antiAlias),
-          child: Scaffold(
-            backgroundColor: Colors.transparent,
-            bottomNavBar: ViewDeckSingleBottomNavBar(deck: activeDeck),
-            scrollable: true,
-            shouldConstrainWidth: false,
-            inheritMainBottomNavBarHeight: false,
-            isFloatingAppBar: true,
-            scrollController: scrollController,
-            toolBar: activeDeck.isEditable
-                ? ToolBar.withActions(
-                    controller: toolBarController,
-                    useAttachments: true,
-                    createAttachmentPath: (file) =>
-                        DecksDirectoryPaths.attachment(
-                          deckTitle: activeDeck.title,
-                          fileNameWithoutExtension: file.name,
-                        ),
-                  )
-                : null,
-            appBar: AppBar(
-              transparentBackground: true,
-              actions: [
-                Button.icon(
-                  tokens: tokens,
-                  icon: Icons.edit,
-                  onPressed: activeDeck.isEditable
-                      ? () => context.push('/decks-local/${activeDeck.id}/edit')
-                      : null,
-                ),
-                Button.icon(
-                  tokens: tokens,
-                  icon: Icons.delete_outline,
-                  color: ButtonColor.error,
-                  onPressed: () => controller.deleteDeck(context),
-                ),
-                MenuAnchor(
-                  menuChildren: [
-                    MenuItemButton(
-                      leadingIcon: const Icon(Icons.list),
-                      onPressed: () {
-                        if (areOnlineFeaturesDisabled) {
-                          showFeatureDisabledModal(context);
-                          return;
-                        }
-
-                        controller.onCreateListingPressed(context);
-                      },
-                      child: const Text('Create listing'),
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (context.mounted) controller.requestClose(context);
+              });
+              return false;
+            },
+            child: Surface(
+              style: surfaceStyle
+                  .resolve(tokens, const [
+                    SurfacePadding.none,
+                    SurfaceColor.muted,
+                  ])
+                  .copyWith(clipBehavior: Clip.antiAlias),
+              child: Scaffold(
+                backgroundColor: Colors.transparent,
+                bottomNavBar: ViewDeckSingleBottomNavBar(deck: activeDeck),
+                scrollable: true,
+                shouldConstrainWidth: false,
+                inheritMainBottomNavBarHeight: false,
+                isFloatingAppBar: true,
+                scrollController: scrollController,
+                toolBar: activeDeck.isEditable
+                    ? ToolBar.withActions(
+                        controller: toolBarController,
+                        useAttachments: true,
+                        createAttachmentPath: (file) =>
+                            DecksDirectoryPaths.attachment(
+                              deckTitle: activeDeck.title,
+                              fileNameWithoutExtension: file.name,
+                            ),
+                      )
+                    : null,
+                appBar: AppBar(
+                  transparentBackground: true,
+                  onPop: () => controller.requestClose(context),
+                  actions: [
+                    Button.icon(
+                      tokens: tokens,
+                      icon: Icons.edit,
+                      onPressed: controller.canEdit.value
+                          ? () => controller.onEditPressed(context)
+                          : null,
                     ),
-                    MenuItemButton(
-                      leadingIcon: const Icon(Icons.folder_outlined),
-                      onPressed: () => controller.showDeckPath(context),
-                      child: const Text('Show folder'),
+                    Button.icon(
+                      tokens: tokens,
+                      icon: Icons.delete_outline,
+                      color: ButtonColor.error,
+                      onPressed: () => controller.deleteDeck(context),
+                    ),
+                    if (controller.shouldShowSaveButton.value)
+                      Button(
+                        variants: const [
+                          ButtonColor.primary,
+                          ButtonSize.icon,
+                          ButtonPadding.none,
+                        ],
+                        onPressed: controller.canSave.value
+                            ? controller.onSavePressed
+                            : null,
+                        leading: controller.isLoading.value
+                            ? const SizedBox.square(
+                                dimension: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Icon(Icons.save),
+                      ),
+                    MenuAnchor(
+                      menuChildren: [
+                        MenuItemButton(
+                          leadingIcon: const Icon(Icons.list),
+                          onPressed: () =>
+                              controller.onCreateListingPressed(context),
+                          child: const Text('Create listing'),
+                        ),
+                        MenuItemButton(
+                          leadingIcon: const Icon(Icons.folder_outlined),
+                          onPressed: () => controller.showDeckPath(context),
+                          child: const Text('Show folder'),
+                        ),
+                      ],
+                      builder: (_, menuController, _) {
+                        return Button.iconOnly(
+                          icon: Icons.more_vert,
+                          onPressed: () {
+                            if (menuController.isOpen) {
+                              menuController.close();
+                              return;
+                            }
+
+                            menuController.open();
+                          },
+                        );
+                      },
                     ),
                   ],
-                  builder: (_, menuController, _) {
-                    return Button.iconOnly(
-                      icon: Icons.more_vert,
-                      onPressed: () {
-                        if (menuController.isOpen) {
-                          menuController.close();
-                          return;
-                        }
-
-                        menuController.open();
-                      },
-                    );
-                  },
+                  bottom: activeDeck.isPremade || !activeDeck.isEditable
+                      ? Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: tokens.spaceScaffoldPadding,
+                          ),
+                          child: Wrap(
+                            alignment: WrapAlignment.end,
+                            spacing: tokens.spaceLayoutGapSm,
+                            runSpacing: tokens.spaceLayoutGapSm,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              if (activeDeck.isPremade)
+                                const HeaderBadge(label: 'Premade'),
+                              if (!activeDeck.isEditable)
+                                const Chip(label: Text('Locked')),
+                            ],
+                          ),
+                        )
+                      : null,
                 ),
-              ],
-              bottom: activeDeck.isPremade || !activeDeck.isEditable
-                  ? Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: tokens.spaceScaffoldPadding,
-                      ),
-                      child: Wrap(
-                        alignment: WrapAlignment.end,
-                        spacing: tokens.spaceLayoutGapSm,
-                        runSpacing: tokens.spaceLayoutGapSm,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          if (activeDeck.isPremade)
-                            const HeaderBadge(label: 'Premade'),
-                          if (!activeDeck.isEditable)
-                            const Chip(label: Text('Locked')),
-                        ],
-                      ),
-                    )
-                  : null,
+                padding: EdgeInsets.zero,
+                body: activeDeck.isEditable
+                    ? Form(child: _Body(controller: controller))
+                    : _Body(controller: controller),
+              ),
             ),
-            padding: EdgeInsets.zero,
-            body: activeDeck.isEditable
-                ? Form(child: _Body(controller: controller))
-                : _Body(controller: controller),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }

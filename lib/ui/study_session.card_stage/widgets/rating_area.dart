@@ -1,36 +1,16 @@
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// PATH: lib/pages/drill_session/rating_area.dart
-// PURPOSE: Shared rating area shown after answering, with optional feedback
-// PROVIDERS: StudySessionController
-// HOOKS: none
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-import 'dart:async';
-
 import 'package:boo_mondai/features/app_theme/app_theme.barrel.dart';
-import 'package:boo_mondai/features/ui_sounds/ui_sounds.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        AppMediaPack,
-        CardTemplateController,
         StudyRating,
-        StudySessionAnswer,
-        StudySessionController,
-        StudySessionCardStageController,
         AppTokens,
-        StudyRatingHelper,
-        StudySessionHelper,
         Button,
         ButtonColor,
-        MediaSelector,
         RatingButton,
-        SettingPath,
-        SettingsStore;
+        SubmissionStyle,
+        ViewStudySessionController;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:media_variants/media_variants.dart';
-import 'package:provider/provider.dart';
 import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -40,115 +20,25 @@ class RateIntent extends Intent {
   const RateIntent(this.type);
 }
 
-enum SubmissionStyle { showAnswer, submitAnswer, none }
-
 class RatingArea extends SignalHookWidget {
-  const RatingArea({
-    required this.studySessionController,
-    required this.cardStageController,
-    required this.isCompleting,
-    super.key,
-  });
+  const RatingArea({required this.controller, super.key});
 
-  final StudySessionController studySessionController;
-  final StudySessionCardStageController<CardTemplateController>
-  cardStageController;
-  final bool isCompleting;
+  final ViewStudySessionController controller;
 
   static const double preferredHeight = 130.0;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
+    final studySessionController = controller.sessionController;
+    final cardStageController = controller.cardStageController;
 
     final bool isRevealed = cardStageController.isRevealed.value;
     final template = studySessionController.currentTemplate.value;
     if (template == null) {
-      return isCompleting
+      return controller.isCompleting.value
           ? const Center(child: CircularProgressIndicator())
           : const SizedBox.shrink();
-    }
-
-    final SubmissionStyle submissionStyle =
-        StudySessionHelper.getSubmissionStyle(template);
-    final StudySessionAnswer? answer = cardStageController.answer.value;
-    final mediaPackController = context.mediaPackController<AppMediaPack>();
-    final settingsStore = SettingsStore.instance;
-
-    void playStudySessionSound(MediaSelector<AppMediaPack> sound) {
-      unawaited(
-        UiSoundsService.playIfEnabled(
-          mediaPackController.resolve(sound),
-          settingsStore: settingsStore,
-          enabledSetting: SettingPath.uiSoundsEnabled,
-        ),
-      );
-    }
-
-    void onSubmit() {
-      if (!cardStageController.canReveal.value) {
-        return;
-      }
-
-      if (answer != null && StudySessionHelper.isAutoGraded(template)) {
-        if (!template.checkAnswer(answer)) {
-          playStudySessionSound(
-            StudyRatingHelper.getSound(StudyRating.incorrect),
-          );
-          cardStageController.reveal(
-            pendingRating:
-                studySessionController.config.autoRateIncorrectAnswers
-                ? StudyRating.incorrect
-                : null,
-          );
-          return;
-        }
-
-        playStudySessionSound((media) => media.studySessionCorrectSound);
-        cardStageController.reveal();
-        return;
-      }
-
-      playStudySessionSound((media) => media.studySessionRevealSound);
-      cardStageController.reveal();
-    }
-
-    void onContinue() {
-      if (studySessionController.isSubmitting.value) return;
-      final pendingRating = cardStageController.pendingRating.value;
-      if (answer == null || pendingRating == null) {
-        return;
-      }
-
-      playStudySessionSound((media) => media.studySessionContinueSound);
-      unawaited(
-        studySessionController
-            .submitAnswer(answer, pendingRating)
-            .catchError((Object _, StackTrace _) {}),
-      );
-    }
-
-    void onRatingTap(StudyRating type, {bool playSound = true}) {
-      if (studySessionController.isSubmitting.value) return;
-      if (answer == null) {
-        return;
-      }
-
-      final effectiveType =
-          StudySessionHelper.isAutoGraded(template) &&
-              !template.checkAnswer(answer) &&
-              studySessionController.config.autoRateIncorrectAnswers
-          ? StudyRating.incorrect
-          : type;
-
-      if (playSound) {
-        playStudySessionSound(StudyRatingHelper.getSound(effectiveType));
-      }
-      unawaited(
-        studySessionController
-            .submitAnswer(answer, effectiveType)
-            .catchError((Object _, StackTrace _) {}),
-      );
     }
 
     Widget getWidget() {
@@ -161,26 +51,26 @@ class RatingArea extends SignalHookWidget {
             actions: {
               ActivateIntent: CallbackAction<ActivateIntent>(
                 onInvoke: (_) {
-                  onSubmit();
+                  controller.submitCurrentAnswer();
                   return null;
                 },
               ),
             },
             child: SizedBox(
               width: double.infinity,
-              child: submissionStyle == SubmissionStyle.none
+              child: controller.submissionStyle == SubmissionStyle.none
                   ? const SizedBox(height: 54)
-                  : submissionStyle == SubmissionStyle.showAnswer
+                  : controller.submissionStyle == SubmissionStyle.showAnswer
                   ? Button(
                       onPressed: cardStageController.canReveal.value
-                          ? onSubmit
+                          ? controller.submitCurrentAnswer
                           : null,
                       leading: const Icon(Icons.visibility_outlined),
                       child: const Text('Show Answer'),
                     )
                   : Button(
                       onPressed: cardStageController.canReveal.value
-                          ? onSubmit
+                          ? controller.submitCurrentAnswer
                           : null,
                       leading: const Icon(Icons.check),
                       variants: const [ButtonColor.primary],
@@ -201,7 +91,7 @@ class RatingArea extends SignalHookWidget {
             actions: {
               ActivateIntent: CallbackAction<ActivateIntent>(
                 onInvoke: (_) {
-                  onContinue();
+                  controller.continuePendingRating();
                   return null;
                 },
               ),
@@ -209,7 +99,7 @@ class RatingArea extends SignalHookWidget {
             child: SizedBox(
               width: double.infinity,
               child: Button(
-                onPressed: onContinue,
+                onPressed: controller.continuePendingRating,
                 leading: const Icon(Icons.arrow_forward),
                 variants: [ButtonColor.primary],
                 child: const Text('Continue'),
@@ -251,7 +141,7 @@ class RatingArea extends SignalHookWidget {
           actions: {
             RateIntent: CallbackAction<RateIntent>(
               onInvoke: (intent) {
-                onRatingTap(intent.type);
+                controller.rateCurrentAnswer(intent.type);
                 return null;
               },
             ),
@@ -267,26 +157,34 @@ class RatingArea extends SignalHookWidget {
                   RatingButton(
                     StudyRating.again,
                     ctrl: studySessionController,
-                    onTap: () =>
-                        onRatingTap(StudyRating.again, playSound: false),
+                    onTap: () => controller.rateCurrentAnswer(
+                      StudyRating.again,
+                      playSound: false,
+                    ),
                   ),
                   RatingButton(
                     StudyRating.hard,
                     ctrl: studySessionController,
-                    onTap: () =>
-                        onRatingTap(StudyRating.hard, playSound: false),
+                    onTap: () => controller.rateCurrentAnswer(
+                      StudyRating.hard,
+                      playSound: false,
+                    ),
                   ),
                   RatingButton(
                     ctrl: studySessionController,
                     StudyRating.good,
-                    onTap: () =>
-                        onRatingTap(StudyRating.good, playSound: false),
+                    onTap: () => controller.rateCurrentAnswer(
+                      StudyRating.good,
+                      playSound: false,
+                    ),
                   ),
                   RatingButton(
                     StudyRating.easy,
                     ctrl: studySessionController,
-                    onTap: () =>
-                        onRatingTap(StudyRating.easy, playSound: false),
+                    onTap: () => controller.rateCurrentAnswer(
+                      StudyRating.easy,
+                      playSound: false,
+                    ),
                   ),
                 ],
               ),

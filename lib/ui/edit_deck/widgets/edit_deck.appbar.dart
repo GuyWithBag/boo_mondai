@@ -9,30 +9,37 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextFieldFrame,
         TextFieldSize,
         ButtonSize,
-        BottomNavBar,
         EditDeckController,
         AppTokens;
 import 'package:flutter/material.dart' hide AppBar;
 import 'package:go_router/go_router.dart' show GoRouterHelper;
-import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-class EditDeckAppBar extends SignalHookWidget implements PreferredSizeWidget {
-  const EditDeckAppBar({super.key, required this.controller});
+AppBar buildEditDeckAppBar({
+  required BuildContext context,
+  required EditDeckController controller,
+}) {
+  final selectedTemplate = controller.selectedTemplate.value;
+  final tokens = context.themeTokens<AppTokens>();
 
-  final EditDeckController controller;
-
-  @override
-  Size get preferredSize => Size(0, BottomNavBar.preferredHeightDefault);
-
-  @override
-  Widget build(BuildContext context) {
-    final selectedTemplate = controller.selectedTemplate.value;
-    final tokens = context.themeTokens<AppTokens>();
-
-    return AppBar(
-      onPop: () => controller.onPop(context),
-      actions: [
+  return AppBar(
+    onPop: () => controller.onPop(context),
+    actions: [Button.iconOnly(icon: Icons.more_vert)],
+    preferredHeaderHeight: 58,
+    header: Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      spacing: tokens.spaceLayoutGapSm,
+      children: [
+        Button.icon(
+          tokens: tokens,
+          icon: Icons.visibility_outlined,
+          onPressed: selectedTemplate == null
+              ? null
+              : () => context.push(
+                  '/view-cards/${selectedTemplate.id}',
+                  extra: selectedTemplate,
+                ),
+        ),
         Button.icon(
           tokens: tokens,
           icon: Icons.delete_outline,
@@ -40,16 +47,6 @@ class EditDeckAppBar extends SignalHookWidget implements PreferredSizeWidget {
           onPressed: controller.isLoading.value || selectedTemplate == null
               ? null
               : () => controller.deleteSelectedCard(context),
-        ),
-        Button.icon(
-          tokens: tokens,
-          icon: Icons.visibility_outlined,
-          onPressed: selectedTemplate == null
-              ? null
-              : () => context.push(
-                  '/cards/${selectedTemplate.id}/preview',
-                  extra: selectedTemplate,
-                ),
         ),
         Button(
           variants: const [
@@ -71,14 +68,14 @@ class EditDeckAppBar extends SignalHookWidget implements PreferredSizeWidget {
               : const Icon(Icons.save),
         ),
       ],
-      child: MarkdownText(
-        allowAttachments: true,
-        data: controller.titleController.text,
-        controller: controller.titleController,
-        placeholder: 'Deck Title...',
-        mode: MarkdownTextMode.input,
-        variants: const [TextFieldSize.header, TextFieldFrame.none],
-      ),
-    );
-  }
+    ),
+    child: MarkdownText(
+      allowAttachments: true,
+      data: controller.titleController.text,
+      controller: controller.titleController,
+      placeholder: 'Deck Title...',
+      mode: MarkdownTextMode.input,
+      variants: const [TextFieldSize.header, TextFieldFrame.none],
+    ),
+  );
 }

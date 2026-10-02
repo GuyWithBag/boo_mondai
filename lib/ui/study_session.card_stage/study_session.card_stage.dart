@@ -1,7 +1,6 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         StudySessionController,
-        CardTemplateController,
         FlashcardTemplate,
         IdentificationTemplate,
         StudySessionCardStageController,
@@ -27,8 +26,7 @@ class StudySessionCardStage extends HookWidget {
   });
 
   final StudySessionController studySessionController;
-  final StudySessionCardStageController<CardTemplateController>
-  cardStageController;
+  final StudySessionCardStageController cardStageController;
 
   // Temporary helper
   static bool isImplemented(CardTemplate template) {

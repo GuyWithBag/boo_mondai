@@ -4,6 +4,8 @@
 export 'widgets/widgets.barrel.dart';
 export 'models/models.barrel.dart';
 export 'helpers/helpers.barrel.dart';
+export 'layout_views/layout_views.barrel.dart';
+
 // Other files
 export 'view_cards.controller.dart';
 export 'view_cards.query.dart';

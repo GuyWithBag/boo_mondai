@@ -2,3 +2,6 @@
 
 // Other files
 export 'study_deck_entry.dart';
+export 'deck_due_stats.dart';
+export 'deck_rating_stats.dart';
+export 'deck_review_stats.dart';

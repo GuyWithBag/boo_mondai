@@ -2,4 +2,5 @@
 
 // Other files
 export 'study_all.card.dart';
+export 'session_rating_stats.block.dart';
 export 'study_deck.tile.dart';

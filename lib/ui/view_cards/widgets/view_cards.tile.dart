@@ -63,13 +63,8 @@ class ViewCardsTile extends HookWidget {
             contentScale,
           );
 
-    void onEditCardPressed(BuildContext context, CardTemplate template) {
-      context.push(
-        Uri(
-          path: '/decks-local/${template.deckId}/edit',
-          queryParameters: {'initialTemplateId': template.id},
-        ).toString(),
-      );
+    void onPressed(BuildContext context, CardTemplate template) {
+      context.push('/view-cards/${template.deckId}');
     }
 
     final tile = SizedBox(
@@ -137,7 +132,7 @@ class ViewCardsTile extends HookWidget {
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: () => onEditCardPressed(context, template),
+      onTap: () => onPressed(context, template),
       child: tile,
     );
   }

@@ -2,7 +2,6 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         FillInTheBlanksTemplate,
         FillInTheBlanksController,
-        CardTemplateController,
         StudySessionCardStageController,
         AppTokens,
         textStyle,
@@ -33,8 +32,7 @@ class FillInTheBlanksCard extends SignalHookWidget {
   });
 
   final FillInTheBlanksTemplate template;
-  final StudySessionCardStageController<CardTemplateController>?
-  cardStageController;
+  final StudySessionCardStageController? cardStageController;
   final bool isRevealed;
   final double? maxWidth;
   final double contentScale;

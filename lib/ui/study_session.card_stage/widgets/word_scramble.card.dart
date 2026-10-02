@@ -2,7 +2,6 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         AlignedScrollView,
         AppTokens,
-        CardTemplateController,
         PhysicalCard,
         PhysicalCardController,
         ScaleHelper,
@@ -32,8 +31,7 @@ class WordScrambleCard extends SignalHookWidget {
   });
 
   final WordScrambleTemplate template;
-  final StudySessionCardStageController<CardTemplateController>
-  cardStageController;
+  final StudySessionCardStageController cardStageController;
   final bool isRevealed;
   final double? maxWidth;
   final double contentScale;

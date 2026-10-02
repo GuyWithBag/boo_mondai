@@ -6,7 +6,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         Button,
         CardTemplate,
-        CardTemplateController,
         FillInTheBlanksCard,
         FillInTheBlanksTemplate,
         FlashcardCard,
@@ -131,8 +130,7 @@ class _PreviewCard extends StatelessWidget {
 
   final CardTemplate template;
   final StudyCard previewStudyCard;
-  final StudySessionCardStageController<CardTemplateController>
-  cardStageController;
+  final StudySessionCardStageController cardStageController;
   final double width;
   final double contentScale;
 

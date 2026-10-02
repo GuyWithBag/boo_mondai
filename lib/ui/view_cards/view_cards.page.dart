@@ -8,8 +8,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         SegmentOption,
         SegmentedControl,
         ViewCardsController,
-        ViewCardsLayoutMode,
-        ViewCardsTemplateScopeView;
+        ViewCardsLayoutModeView,
+        ViewCardsWrapView,
+        ViewCardsListView;
 import 'package:flutter/material.dart' hide AppBar, Scaffold;
 import 'package:provider/provider.dart';
 import 'package:signals_hooks/signals_hooks.dart';
@@ -44,17 +45,25 @@ class _ViewCardsView extends SignalHookWidget {
     final tokens = context.themeTokens<AppTokens>();
     final controller = context.read<ViewCardsController>();
     final layoutMode = controller.layoutMode.value;
-    final hasSearchQuery = controller.hasSearchQuery.value;
 
-    final searchBar = FilteredSearchBar<CardTemplate>(
-      controller: controller.templateSearchController,
-      placeholder: 'Search templates',
-    );
+    Widget getBody() {
+      switch (controller.layoutMode.value) {
+        case ViewCardsLayoutModeView.wrap:
+          return ViewCardsWrapView(controller: controller);
+        case ViewCardsLayoutModeView.list:
+          return ViewCardsListView(controller: controller);
+        case _:
+          return SizedBox.shrink();
+      }
+    }
 
     return Scaffold(
       appBar: AppBar(
         title: 'View Cards',
-        header: searchBar,
+        header: FilteredSearchBar<CardTemplate>(
+          controller: controller.templateSearchController,
+          placeholder: 'Search templates',
+        ),
         preferredBottomHeight: 104,
         bottom: Padding(
           padding: EdgeInsets.only(
@@ -65,17 +74,18 @@ class _ViewCardsView extends SignalHookWidget {
           child: Column(
             spacing: tokens.spaceLayoutGapSm,
             children: [
-              SegmentedControl<ViewCardsLayoutMode>(
+              SegmentedControl<ViewCardsLayoutModeView>(
                 value: layoutMode,
                 onChanged: controller.setLayoutMode,
                 options: const [
+                  // ToDo: Add paired option
                   SegmentOption(
-                    value: ViewCardsLayoutMode.compact,
-                    label: 'Cards',
+                    value: ViewCardsLayoutModeView.wrap,
+                    label: 'Wrap',
                   ),
                   SegmentOption(
-                    value: ViewCardsLayoutMode.paired,
-                    label: 'Pairs',
+                    value: ViewCardsLayoutModeView.list,
+                    label: 'List',
                   ),
                 ],
               ),
@@ -83,12 +93,8 @@ class _ViewCardsView extends SignalHookWidget {
           ),
         ),
       ),
-      body: ViewCardsTemplateScopeView(
-        controller: controller,
-        entries: controller.templateSearchController.results.value,
-        layoutMode: layoutMode,
-        hasSearchQuery: hasSearchQuery,
-      ),
+
+      body: getBody(),
     );
   }
 }

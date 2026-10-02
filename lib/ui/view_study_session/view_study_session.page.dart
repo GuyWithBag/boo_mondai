@@ -6,6 +6,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         ProgressBar,
         Scaffold,
         SessionException,
+        SessionRatingStatsBlock,
+        SessionRatingStatsBlockController,
+        SessionRatingStatsMode,
         SessionMode,
         StatusLayoutState,
         StudySessionCardStage,
@@ -44,13 +47,22 @@ class ViewStudySessionPage extends SignalHookWidget {
     );
 
     useEffect(() => controller.dispose, [controller]);
+    final ratingStatsController = useMemoized(
+      () => SessionRatingStatsBlockController(
+        initialMode: SessionRatingStatsMode.ratingStats,
+        showText: true,
+      ),
+      [controller],
+    );
+    useEffect(() => ratingStatsController.dispose, [ratingStatsController]);
 
     final tokens = context.themeTokens<AppTokens>();
     final studySessionController = controller.sessionController;
     final step = studySessionController.currentStep.value;
     final template = studySessionController.currentTemplate.value;
     final studyCard = studySessionController.currentStudyCard.value;
-    final cardStageController = controller.cardStageController.value;
+    final cardStageController = controller.cardStageController;
+    final reviewStats = controller.reviewStats.value;
 
     // if (studySessionController.error.value != null) {
     //   return StatusLayoutState.exception(
@@ -97,37 +109,45 @@ class ViewStudySessionPage extends SignalHookWidget {
       appBar: AppBar(
         onPop: () => controller.onPop(context),
         title: controller.title.value,
-        header: Row(
-          spacing: tokens.spaceLayoutGapMd,
-          children: [
-            Expanded(
-              child: ProgressBar(
-                value: studySessionController.stepProgressPercentage.value,
+        preferredHeaderHeight: 30,
+        header: Padding(
+          padding: EdgeInsets.only(top: tokens.spaceLayoutGapSm),
+          child: Row(
+            spacing: tokens.spaceLayoutGapMd,
+            children: [
+              Expanded(
+                child: ProgressBar(
+                  value: studySessionController.stepProgressPercentage.value,
+                ),
               ),
-            ),
-            Text(
-              '${studySessionController.currentStepIndex.value + 1} / ${studySessionController.totalStepCount.value}',
-              style: textStyle.resolve(tokens, [
-                TextSize.labelSmall,
-                TextWeight.heavy,
-                TextColor.muted,
-              ]),
-            ),
-          ],
+              Text(
+                '${studySessionController.currentStepIndex.value + 1} / ${studySessionController.totalStepCount.value}',
+                style: textStyle.resolve(tokens, [
+                  TextSize.labelSmall,
+                  TextWeight.heavy,
+                  TextColor.muted,
+                ]),
+              ),
+            ],
+          ),
         ),
+        child: (mode == SessionMode.review && reviewStats != null)
+            ? SizedBox(
+                width: 120,
+                child: SessionRatingStatsBlock(
+                  stats: reviewStats,
+                  controller: ratingStatsController,
+                ),
+              )
+            : null,
       ),
-      bottomNavBar: !cardStageController.isBottomNavBarHidden.value
+      bottomNavBar: !controller.isBottomNavBarHidden.value
           ? BottomNavBar(
               preferredHeight: ViewStudySessionBottomNavBarBody.preferredHeight(
                 template: template,
-                cardStageController: cardStageController,
+                controller: controller,
               ),
-              child: ViewStudySessionBottomNavBarBody(
-                template: template,
-                studySessionController: studySessionController,
-                cardStageController: cardStageController,
-                isCompleting: controller.isCompleting.value,
-              ),
+              child: ViewStudySessionBottomNavBarBody(controller: controller),
             )
           : null,
       inheritMainBottomNavBarHeight: false,

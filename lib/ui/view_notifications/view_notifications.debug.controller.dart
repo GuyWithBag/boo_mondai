@@ -6,7 +6,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         NotificationIntent,
         NotificationIntentType,
         NotificationsController,
-        Pages,
         showSnackbar;
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
@@ -136,9 +135,7 @@ class ViewNotificationsDebugController {
     final id =
         NotificationIds.dynamicIdOffset +
         DateTime.now().microsecondsSinceEpoch % NotificationIds.dynamicIdRange;
-    final route = assignIntentRoute.value
-        ? Pages.notificationIntentUrl(id)
-        : customRoute.value.trim().isEmpty
+    final route = customRoute.value.trim().isEmpty
         ? null
         : customRoute.value.trim();
 
@@ -150,6 +147,7 @@ class ViewNotificationsDebugController {
         title: resolvedTitle,
         body: resolvedBody,
         route: route,
+        ifRouteNullPushToView: assignIntentRoute.value,
         persistInInbox: persistInInbox.value,
         showSystemNotification: showSystemNotification.value,
         purgeAfterDays: resolvedPurgeAfterDays,

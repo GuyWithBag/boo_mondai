@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         MultipleChoiceTemplate,
-        CardTemplateController,
         StudySessionCardStageController,
         StudySessionAnswer,
         AppTokens,
@@ -40,8 +39,7 @@ class MultipleChoiceCard extends SignalHookWidget {
   });
 
   final MultipleChoiceTemplate template;
-  final StudySessionCardStageController<CardTemplateController>?
-  cardStageController;
+  final StudySessionCardStageController? cardStageController;
   final bool isRevealed;
   final double? maxWidth;
   final double contentScale;

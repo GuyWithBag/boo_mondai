@@ -3,8 +3,8 @@ import 'package:boo_mondai/lib.barrel.dart'
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-class ViewCardsByPairTile extends StatelessWidget {
-  const ViewCardsByPairTile.template({
+class ViewCardsPairedTile extends StatelessWidget {
+  const ViewCardsPairedTile.template({
     required this.template,
     this.tileWidth = 260,
     super.key,

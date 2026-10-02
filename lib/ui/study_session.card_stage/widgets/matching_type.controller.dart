@@ -14,9 +14,6 @@ import 'package:signals/signals_flutter.dart';
 
 class MatchingTypeController implements CardTemplateController {
   MatchingTypeController({required this.template, this.cardStageController}) {
-    if (cardStageController != null) {
-      cardStageController!.isBottomNavBarHidden.value = true;
-    }
     final random = Random();
     final pairs = _matchingRows(template);
 
@@ -38,8 +35,7 @@ class MatchingTypeController implements CardTemplateController {
   }
 
   final MatchingTypeTemplate template;
-  final StudySessionCardStageController<CardTemplateController>?
-  cardStageController;
+  final StudySessionCardStageController? cardStageController;
 
   final leftItems = listSignal<MatchingTypeItem>(const []);
   final rightItems = listSignal<MatchingTypeItem>(const []);

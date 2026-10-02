@@ -15,7 +15,7 @@ import 'package:signals/signals_flutter.dart';
 class ViewStudyDecksController {
   final deckEntries = signal<List<StudyDeckEntry>>(const []);
   final dueFilter = signal(DueFilterThreshold.lookAheadOneDay);
-  final cachedHistoricalStats = signal<Map<String, DeckRatingStats>?>(null);
+  final cachedRatingStats = signal<Map<String, DeckRatingStats>?>(null);
   final isLoading = signal(false);
   final error = signal<Exception?>(null);
 
@@ -40,8 +40,8 @@ class ViewStudyDecksController {
       final profileId = LocalDB.currentProfile.getOrCreate().id;
       final allDecks = LocalDB.deck.selectMany();
 
-      if (getRatingStats || cachedHistoricalStats.value == null) {
-        cachedHistoricalStats.value = FsrsService.calculateHistoricalStats(
+      if (getRatingStats || cachedRatingStats.value == null) {
+        cachedRatingStats.value = FsrsService.calculateHistoricalStats(
           profileId: profileId,
         );
       }
@@ -60,8 +60,8 @@ class ViewStudyDecksController {
         final stats = DeckReviewStats(
           deck: deck,
           due: dueStats,
-          historical:
-              cachedHistoricalStats.value![deck.id] ?? const DeckRatingStats(),
+          ratingStats:
+              cachedRatingStats.value![deck.id] ?? const DeckRatingStats(),
         );
 
         combinedEntries.add(StudyDeckEntry(deck: deck, stats: stats));
@@ -81,7 +81,7 @@ class ViewStudyDecksController {
     deckStats.dispose();
     error.dispose();
     isLoading.dispose();
-    cachedHistoricalStats.dispose();
+    cachedRatingStats.dispose();
     dueFilter.dispose();
     deckEntries.dispose();
   }

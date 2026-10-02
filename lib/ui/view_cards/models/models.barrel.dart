@@ -2,3 +2,4 @@
 
 // Other files
 export 'view_cards_tile_side.dart';
+export 'view_cards.layout_view.mode.dart';
