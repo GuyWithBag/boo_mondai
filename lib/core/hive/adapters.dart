@@ -27,7 +27,9 @@ import 'package:boo_mondai/features/decks/models/visibility_state.dto.dart';
 import 'package:boo_mondai/features/fsrs/models/fsrs_card.dto.dart';
 import 'package:boo_mondai/features/fsrs/models/fsrs_review_log.dto.dart';
 import 'package:boo_mondai/features/notifications/models/notification.intent.dart';
+import 'package:boo_mondai/features/notifications/models/notification.intent.type.dart';
 import 'package:boo_mondai/features/profile/models/profile.dto.dart';
+import 'package:boo_mondai/features/profile/models/profile.role.dto.dart';
 import 'package:boo_mondai/features/progress_checkpoints/models/progress_checkpoint.dto.dart';
 import 'package:boo_mondai/features/review.study_session/models/review_session.dto.dart';
 // import 'package:boo_mondai/features/settings/models/setting.dart';
@@ -35,7 +37,9 @@ import 'package:boo_mondai/features/settings/models/user_settings.dart';
 import 'package:boo_mondai/features/streak/streak.dto.dart';
 import 'package:boo_mondai/features/study_cards/study_card.dto.dart';
 import 'package:boo_mondai/features/study_session/models/study_session.answer.dart';
+import 'package:boo_mondai/features/study_session/models/study_session.completed_results.dart';
 import 'package:boo_mondai/features/study_session/models/study_session.snapshot.dart';
+import 'package:boo_mondai/features/study_session/session_mode.dart';
 import 'package:boo_mondai/features/study_session/session_steps/card.session_step.dart';
 import 'package:boo_mondai/features/study_session/session_steps/message.session_step.dart';
 import 'package:boo_mondai/features/study_session/session_steps/session_step.dto.dart';
@@ -54,6 +58,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 @GenerateAdapters([
   AdapterSpec<Profile>(),
+  AdapterSpec<ProfileRole>(),
   AdapterSpec<Deck>(),
 
   AdapterSpec<FillInTheBlanksTemplate>(),
@@ -80,6 +85,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
   AdapterSpec<StudySessionMessageStep>(),
   AdapterSpec<StudySessionAnswer>(),
   AdapterSpec<StudySessionSnapshot>(),
+  AdapterSpec<StudySessionCompletedResults>(),
+  AdapterSpec<SessionMode>(),
 
   AdapterSpec<FsrsReviewLog>(),
   AdapterSpec<State>(),

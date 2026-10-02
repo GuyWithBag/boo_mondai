@@ -20,7 +20,11 @@ class ProfileAdapter extends TypeAdapter<Profile> {
       id: fields[0] as String,
       username: fields[2] as String,
       displayName: fields[3] as String,
-      role: fields[4] as String?,
+      role: fields[4] == null
+          ? ProfileRole.user
+          : fields[4] is ProfileRole
+          ? fields[4] as ProfileRole
+          : ProfileRole.fromString(fields[4] as String?),
       avatarUrl: fields[5] as String?,
       createdAt: fields[6] as DateTime,
       userId: fields[1] as String,
@@ -2511,6 +2515,7 @@ class NotificationIntentAdapter extends TypeAdapter<NotificationIntent> {
       updatedAt: fields[8] as DateTime,
       purgeAt: fields[10] as DateTime,
       route: fields[4] as String?,
+      ifRouteNullPushToView: fields[14] == null ? false : fields[14] as bool,
       persistInInbox: fields[5] == null ? false : fields[5] as bool,
       showSystemNotification: fields[6] == null ? true : fields[6] as bool,
       readAt: fields[13] as DateTime?,
@@ -2522,7 +2527,7 @@ class NotificationIntentAdapter extends TypeAdapter<NotificationIntent> {
   @override
   void write(BinaryWriter writer, NotificationIntent obj) {
     writer
-      ..writeByte(14)
+      ..writeByte(15)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -2550,7 +2555,9 @@ class NotificationIntentAdapter extends TypeAdapter<NotificationIntent> {
       ..writeByte(12)
       ..write(obj.profileId)
       ..writeByte(13)
-      ..write(obj.readAt);
+      ..write(obj.readAt)
+      ..writeByte(14)
+      ..write(obj.ifRouteNullPushToView);
   }
 
   @override
@@ -2614,6 +2621,154 @@ class NotificationIntentTypeAdapter
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is NotificationIntentTypeAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class StudySessionCompletedResultsAdapter
+    extends TypeAdapter<StudySessionCompletedResults> {
+  @override
+  final typeId = 49;
+
+  @override
+  StudySessionCompletedResults read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return StudySessionCompletedResults(
+      profileId: fields[0] as String,
+      sessionId: fields[1] as String,
+      deckId: fields[2] as String?,
+      mode: fields[3] as SessionMode,
+      startedAt: fields[4] as DateTime,
+      snapshots: (fields[5] as List).cast<StudySessionSnapshot>(),
+      fsrsCards: (fields[6] as List).cast<FsrsCard>(),
+      fsrsLogs: (fields[7] as List).cast<FsrsReviewLog>(),
+      correctCount: (fields[8] as num).toInt(),
+      cardCount: (fields[9] as num).toInt(),
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, StudySessionCompletedResults obj) {
+    writer
+      ..writeByte(10)
+      ..writeByte(0)
+      ..write(obj.profileId)
+      ..writeByte(1)
+      ..write(obj.sessionId)
+      ..writeByte(2)
+      ..write(obj.deckId)
+      ..writeByte(3)
+      ..write(obj.mode)
+      ..writeByte(4)
+      ..write(obj.startedAt)
+      ..writeByte(5)
+      ..write(obj.snapshots)
+      ..writeByte(6)
+      ..write(obj.fsrsCards)
+      ..writeByte(7)
+      ..write(obj.fsrsLogs)
+      ..writeByte(8)
+      ..write(obj.correctCount)
+      ..writeByte(9)
+      ..write(obj.cardCount);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is StudySessionCompletedResultsAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class SessionModeAdapter extends TypeAdapter<SessionMode> {
+  @override
+  final typeId = 50;
+
+  @override
+  SessionMode read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return SessionMode.drill;
+      case 1:
+        return SessionMode.review;
+      default:
+        return SessionMode.drill;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, SessionMode obj) {
+    switch (obj) {
+      case SessionMode.drill:
+        writer.writeByte(0);
+      case SessionMode.review:
+        writer.writeByte(1);
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SessionModeAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class ProfileRoleAdapter extends TypeAdapter<ProfileRole> {
+  @override
+  final typeId = 51;
+
+  @override
+  ProfileRole read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return ProfileRole.user;
+      case 1:
+        return ProfileRole.researcher;
+      case 2:
+        return ProfileRole.admin;
+      case 3:
+        return ProfileRole.participantA;
+      case 4:
+        return ProfileRole.participantB;
+      default:
+        return ProfileRole.user;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, ProfileRole obj) {
+    switch (obj) {
+      case ProfileRole.user:
+        writer.writeByte(0);
+      case ProfileRole.researcher:
+        writer.writeByte(1);
+      case ProfileRole.admin:
+        writer.writeByte(2);
+      case ProfileRole.participantA:
+        writer.writeByte(3);
+      case ProfileRole.participantB:
+        writer.writeByte(4);
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ProfileRoleAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

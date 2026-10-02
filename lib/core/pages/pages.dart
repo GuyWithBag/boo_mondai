@@ -16,7 +16,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         PlaceholderAppPage,
         ChangeTrackerPage,
         ChangeTrackerRouteArgs,
-        SettingsPage,
+        ViewSettingsPage,
         ResearcherDashboardPage,
         ResearcherSurveyDetailPage,
         ResearcherSurveyResponsePage,
@@ -27,6 +27,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         ViewNotificationIntentPage,
         CardTemplate,
         ChangeTrackerController;
+import 'package:boo_mondai/ui/view_study_session.drill_onboarding/view_study_session.drill_onboarding.page.dart';
 import 'package:boo_mondai/ui/view_onboarding/view_onboarding.page.dart';
 
 import 'package:flutter/material.dart';
@@ -177,7 +178,7 @@ class Pages {
   );
 
   static final viewCardSingle = AppPage(
-    url: '/cards/:templateId/preview',
+    url: '/view-cards/:templateId',
     name: 'Card Preview',
     builder:
         (
@@ -203,6 +204,20 @@ class Pages {
         }) => ViewStudySessionPage(
           deckId: pathParameters['deckId'],
           mode: SessionMode.drill,
+        ),
+  );
+
+  static final drillOnboarding = AppPage(
+    url: '/drill/:deckId/onboarding',
+    name: 'Drill Onboarding',
+    builder:
+        (
+          context, {
+          pathParameters = const {},
+          queryParameters = const {},
+          extra,
+        }) => ViewStudySessionDrillOnboardingPage(
+          deckId: pathParameters['deckId']!,
         ),
   );
 
@@ -373,7 +388,7 @@ class Pages {
           pathParameters = const {},
           queryParameters = const {},
           extra,
-        }) => const SettingsPage(),
+        }) => ViewSettingsPage(pagePath: queryParameters['page']),
   );
 
   static final notifications = AppPage(
@@ -450,6 +465,7 @@ class Pages {
     editDeck,
     viewCards,
     viewCardSingle,
+    drillOnboarding,
     drillSession,
     drillResult,
     reviewSession,

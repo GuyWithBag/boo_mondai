@@ -17,6 +17,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         DeckTagsLocalDB,
         CardTemplateTagsLocalDB,
         UserStudyCardTagsLocalDB,
+        StudySessionCompletedResultsLocalDB,
         StudySessionSnapshotsLocalDB,
         SurveyResponsesLocalDB,
         CachedMediaLocalDB,
@@ -44,6 +45,8 @@ class LocalDB {
   static late final DeckTagsLocalDB deckTag;
   static late final CardTemplateTagsLocalDB cardTemplateTag;
   static late final UserStudyCardTagsLocalDB userStudyCardTag;
+  static late final StudySessionCompletedResultsLocalDB
+  studySessionCompletedResults;
   static late final StudySessionSnapshotsLocalDB studySessionSnapshot;
   static late final SurveyResponsesLocalDB surveyResponse;
   static late final CachedMediaLocalDB cachedMedias;
@@ -75,6 +78,9 @@ class LocalDB {
         await CardTemplateTagsLocalDB().init() as CardTemplateTagsLocalDB;
     userStudyCardTag =
         await UserStudyCardTagsLocalDB().init() as UserStudyCardTagsLocalDB;
+    studySessionCompletedResults =
+        await StudySessionCompletedResultsLocalDB().init()
+            as StudySessionCompletedResultsLocalDB;
     studySessionSnapshot =
         await StudySessionSnapshotsLocalDB().init()
             as StudySessionSnapshotsLocalDB;
@@ -100,6 +106,7 @@ class LocalDB {
     await deckTag.clear();
     await cardTemplateTag.clear();
     await userStudyCardTag.clear();
+    await studySessionCompletedResults.clear();
     await studySessionSnapshot.clear();
     await surveyResponse.clear();
     await profiles.clear();
