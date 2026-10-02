@@ -60,7 +60,6 @@ Future<void> main() async {
   await NotificationsController.instance.init();
   // ── Restore session ─────────────────────────────────
   final authController = AuthController();
-  await authController.restoreSession();
   // ── App-level sync ──────────────────────────────────
   final viewDecksLocalController = ViewDecksLocalController();
   final syncChangeTrackerController = ChangeTrackerController(
@@ -91,4 +90,7 @@ Future<void> main() async {
       child: BooMondaiApp(authController: authController),
     ),
   );
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    authController.startRemoteSessionRestoreListener();
+  });
 }

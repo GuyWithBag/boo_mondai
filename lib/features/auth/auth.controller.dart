@@ -3,6 +3,8 @@
 // PURPOSE: Manages UI state, loading indicators, and migration flows.
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'dart:async';
+
 import 'package:boo_mondai/features/app_theme/app_theme.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
@@ -15,14 +17,21 @@ import 'package:boo_mondai/lib.barrel.dart'
         ModalAction,
         ButtonColor,
         SyncDeckService;
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
 
 class AuthController {
+  static const _backgroundRestoreTimeout = Duration(seconds: 5);
+
+  StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
+  Future<void>? _backgroundRestore;
+
   final currentProfile = ProfileService.currentProfile;
   final currentEmail = signal<String?>(AuthService.currentUser?.email);
   final isAuthenticatedRemote = signal(AuthService.isAuthenticatedRemote);
   final isLoading = signal(false);
+  final isRestoringRemoteSession = signal(false);
   final error = signal<Exception?>(null);
 
   late final isAuthenticatedEither = computed(
@@ -61,6 +70,50 @@ class AuthController {
       refresh();
       isLoading.value = false;
     }
+  }
+
+  void startRemoteSessionRestoreListener() {
+    if (_connectivitySubscription != null) return;
+
+    _connectivitySubscription = Connectivity().onConnectivityChanged.listen((
+      results,
+    ) {
+      if (_hasNetwork(results)) {
+        restoreSessionInBackground();
+      }
+    });
+
+    restoreSessionInBackground();
+  }
+
+  Future<void> restoreSessionInBackground() {
+    final running = _backgroundRestore;
+    if (running != null) return running;
+
+    final restore = _restoreSessionInBackground();
+    _backgroundRestore = restore.whenComplete(() {
+      if (identical(_backgroundRestore, restore)) {
+        _backgroundRestore = null;
+      }
+    });
+    return _backgroundRestore!;
+  }
+
+  Future<void> _restoreSessionInBackground() async {
+    isRestoringRemoteSession.value = true;
+    error.value = null;
+    try {
+      await AuthService.restoreSession().timeout(_backgroundRestoreTimeout);
+    } on Exception catch (e) {
+      error.value = e;
+    } finally {
+      refresh();
+      isRestoringRemoteSession.value = false;
+    }
+  }
+
+  bool _hasNetwork(List<ConnectivityResult> results) {
+    return results.any((result) => result != ConnectivityResult.none);
   }
 
   Future<AuthServiceResponse> signIn(
@@ -300,10 +353,12 @@ class AuthController {
   }
 
   void dispose() {
+    _connectivitySubscription?.cancel();
     routerRefresh.dispose();
     isAuthenticatedEither.dispose();
     error.dispose();
     isLoading.dispose();
+    isRestoringRemoteSession.dispose();
     isAuthenticatedRemote.dispose();
     currentEmail.dispose();
   }
