@@ -24,3 +24,4 @@ export 'study_session.card_stage/study_session.card_stage.barrel.dart';
 export 'text.context_menu/text.context_menu.barrel.dart';
 export 'view_card_single/view_card_single.barrel.dart';
 export 'view_notification_intent/view_notification_intent.barrel.dart';
+export 'view_onboarding/view_onboarding.barrel.dart';

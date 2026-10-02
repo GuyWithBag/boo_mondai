@@ -30,16 +30,19 @@ class NotificationsService {
   static final _plugin = FlutterLocalNotificationsPlugin();
   static ValueChanged<String>? _routeHandler;
   static String? _pendingRoute;
+  static bool _initialized = false;
 
   // -------------------------------------------------------------------------
   // Init
   // -------------------------------------------------------------------------
 
-  /// Initialise the plugin, request Android permissions, register channels,
-  /// and set the local timezone via [flutter_timezone].
+  /// Initialise the plugin, register channels, and set the local timezone via
+  /// [flutter_timezone].
   ///
   /// Safe to call multiple times (idempotent after first call).
   static Future<void> init() async {
+    if (_initialized) return;
+
     // Initialise the tz database and resolve the device's local location.
     // flutter_timezone isn't supported on Linux, and we don't schedule there
     // anyway, so skip it on that platform.
@@ -69,12 +72,6 @@ class NotificationsService {
     }
 
     if (Platform.isAndroid) {
-      await _plugin
-          .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin
-          >()
-          ?.requestNotificationsPermission();
-
       await _createAndroidChannel(
         id: _remindersChannelId,
         name: 'Reminders',
@@ -88,6 +85,20 @@ class NotificationsService {
         importance: Importance.low,
       );
     }
+
+    _initialized = true;
+  }
+
+  static Future<bool?> requestPermission() async {
+    await init();
+
+    if (!Platform.isAndroid) return null;
+
+    return _plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >()
+        ?.requestNotificationsPermission();
   }
 
   static void setRouteHandler(ValueChanged<String> handler) {

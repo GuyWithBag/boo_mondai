@@ -12,7 +12,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         RouteException,
         Pages,
         MainScaffold,
-        AuthService;
+        AuthService,
+        SettingPath,
+        SettingsStore;
 import 'package:go_router/go_router.dart';
 
 GoRouter createRouter(AuthController authController) {
@@ -40,6 +42,17 @@ GoRouter createRouter(AuthController authController) {
       final auth = authController;
       // final isAnonymous = !auth.currentProfile.isAnonymous;
       final loc = state.matchedLocation;
+      final hasCompletedOnboarding = SettingsStore.instance.get<bool>(
+        SettingPath.onboardingCompleted,
+      );
+
+      if (!hasCompletedOnboarding && loc != Pages.onboarding.url) {
+        return Pages.onboarding.url;
+      }
+
+      if (hasCompletedOnboarding && loc == Pages.onboarding.url) {
+        return Pages.home.url;
+      }
 
       if (AuthService.isAuthenticatedRemote &&
           (loc == Pages.login.url || loc == Pages.register.url)) {

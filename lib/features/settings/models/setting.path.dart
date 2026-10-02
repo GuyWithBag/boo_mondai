@@ -21,6 +21,7 @@ enum SettingPath {
   buttonDownSoundEnabled('media/ui_sounds/button_down_enabled'),
   buttonUpSoundEnabled('media/ui_sounds/button_up_enabled'),
   studySessionSoundsEnabled('media/study_session/sounds_enabled'),
+  onboardingCompleted('app/onboarding/completed'),
   disableOnlineFeatures('developer/disabled_online_features');
 
   const SettingPath(this.value);

@@ -27,6 +27,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         ViewNotificationIntentPage,
         CardTemplate,
         ChangeTrackerController;
+import 'package:boo_mondai/ui/view_onboarding/view_onboarding.page.dart';
 
 import 'package:flutter/material.dart';
 import 'package:signals_hooks/signals_hooks.dart';
@@ -134,6 +135,18 @@ class Pages {
           queryParameters = const {},
           extra,
         }) => const RegisterPage(),
+  );
+
+  static final onboarding = AppPage(
+    url: '/onboarding',
+    name: 'Onboarding',
+    builder:
+        (
+          context, {
+          pathParameters = const {},
+          queryParameters = const {},
+          extra,
+        }) => const ViewOnboardingPage(),
   );
 
   static final editDeck = AppPage(
@@ -433,6 +446,7 @@ class Pages {
     termsOfService,
   ];
   static final nonShell = <AppPage>[
+    onboarding,
     editDeck,
     viewCards,
     viewCardSingle,

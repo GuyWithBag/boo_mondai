@@ -64,6 +64,7 @@ class SettingsRegistry {
       defaultValue: true,
       description: 'Play sounds during study and drill sessions.',
     ),
+    SettingPath.onboardingCompleted: Setting<bool>(defaultValue: false),
     SettingPath.disableOnlineFeatures: Setting<bool>(
       defaultValue: true,
       description: 'Disable features like deck listing, sync.',
