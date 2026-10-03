@@ -25,7 +25,7 @@ class ViewNotificationsDebug extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (!kDebugMode) return const SizedBox.shrink();
+    // if (!kDebugMode) return const SizedBox.shrink();
 
     return Button(
       onPressed: () => showViewNotificationsDebugModal(context),

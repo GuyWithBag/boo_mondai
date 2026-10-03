@@ -8,15 +8,10 @@ import 'package:path_provider/path_provider.dart';
 
 abstract class FileSystemHandler {
   static Future<PlatformFile?> pickSupportedFile() async {
-    final result = await FilePicker.pickFiles(
+    return FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: MediaHelper.supportedExtensions,
-      allowMultiple: false,
-      withData: true,
     );
-    final files = result?.files;
-    if (files == null || files.isEmpty) return null;
-    return files.first;
   }
 
   static Future<File?> getCachedRemoteFile({
@@ -40,8 +35,8 @@ abstract class FileSystemHandler {
     required String path,
     required PlatformFile file,
   }) async {
-    final bytes = file.bytes;
-    if (bytes == null || bytes.isEmpty) return null;
+    final bytes = await file.readAsBytes();
+    if (bytes.isEmpty) return null;
 
     return storeBytes(path: path, bytes: bytes);
   }

@@ -2,3 +2,5 @@
 
 // Other files
 export 'ui_sounds.service.dart';
+export 'ui_sound_source_cache.dart';
+export 'ui_sounds_preloader.dart';

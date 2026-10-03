@@ -1,4 +1,5 @@
-import 'package:boo_mondai/core/theme/app_media_pack.model.dart';
+import 'package:boo_mondai/features/media_variants/app_media_pack.model.dart';
+import 'package:boo_mondai/features/media_variants/media_pack.store.dart';
 import 'package:boo_mondai/features/ui_sounds/ui_sounds.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
@@ -11,13 +12,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         ButtonColor,
         Elevated,
         MediaSelector,
-        ScaleHelper,
-        SettingPath,
-        SettingsStore;
+        ScaleHelper;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:media_variants/media_variants.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 class Button extends HookWidget {
@@ -33,8 +31,6 @@ class Button extends HookWidget {
     this.contentScale = 1,
     this.buttonDownSound,
     this.buttonUpSound,
-    this.buttonDownSoundEnabledSetting,
-    this.buttonUpSoundEnabledSetting,
     bool dashed = false,
     super.key,
     this.elevated = true,
@@ -52,8 +48,6 @@ class Button extends HookWidget {
   final bool elevated;
   final MediaSelector<AppMediaPack>? buttonDownSound;
   final MediaSelector<AppMediaPack>? buttonUpSound;
-  final SettingPath? buttonDownSoundEnabledSetting;
-  final SettingPath? buttonUpSoundEnabledSetting;
   final bool _isDashed;
 
   static Button icon({
@@ -219,8 +213,6 @@ class Button extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final mediaPackController = context.mediaPackController<AppMediaPack>();
-    final settingsStore = SettingsStore.instance;
     final state = useState(getState());
     useEffect(() {
       state.value = getState();
@@ -322,13 +314,9 @@ class Button extends HookWidget {
                     : ButtonState.pressed;
 
                 await UiSoundsService.playIfEnabled(
-                  mediaPackController.resolve(
+                  appMediaPackStore.resolve(
                     buttonDownSound ?? (media) => media.buttonDownSound,
                   ),
-                  settingsStore: settingsStore,
-                  enabledSetting:
-                      buttonDownSoundEnabledSetting ??
-                      SettingPath.buttonDownSoundEnabled,
                   volume: 2,
                 );
               },
@@ -341,13 +329,9 @@ class Button extends HookWidget {
                 onPressed?.call();
                 state.value = getHoverState();
                 await UiSoundsService.playIfEnabled(
-                  mediaPackController.resolve(
+                  appMediaPackStore.resolve(
                     buttonUpSound ?? (media) => media.buttonUpSound,
                   ),
-                  settingsStore: settingsStore,
-                  enabledSetting:
-                      buttonUpSoundEnabledSetting ??
-                      SettingPath.buttonUpSoundEnabled,
                   volume: 2,
                 );
               },

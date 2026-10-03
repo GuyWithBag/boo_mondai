@@ -502,48 +502,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.1.5+1"
-  flutter_keyboard_visibility_linux:
-    dependency: transitive
-    description:
-      name: flutter_keyboard_visibility_linux
-      sha256: "6fba7cd9bb033b6ddd8c2beb4c99ad02d728f1e6e6d9b9446667398b2ac39f08"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.0"
-  flutter_keyboard_visibility_macos:
-    dependency: transitive
-    description:
-      name: flutter_keyboard_visibility_macos
-      sha256: c5c49b16fff453dfdafdc16f26bdd8fb8d55812a1d50b0ce25fc8d9f2e53d086
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.0"
-  flutter_keyboard_visibility_platform_interface:
-    dependency: transitive
-    description:
-      name: flutter_keyboard_visibility_platform_interface
-      sha256: e43a89845873f7be10cb3884345ceb9aebf00a659f479d1c8f4293fcb37022a4
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.0"
-  flutter_keyboard_visibility_temp_fork:
-    dependency: transitive
-    description:
-      name: flutter_keyboard_visibility_temp_fork
-      sha256: e3d02900640fbc1129245540db16944a0898b8be81694f4bf04b6c985bed9048
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.1.5"
-  flutter_keyboard_visibility_windows:
-    dependency: transitive
-    description:
-      name: flutter_keyboard_visibility_windows
-      sha256: fc4b0f0b6be9b93ae527f3d527fb56ee2d918cd88bbca438c478af7bcfd0ef73
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.0"
   flutter_launcher_icons:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: flutter_launcher_icons
       sha256: "10f13781741a2e3972126fae08393d3c4e01fa4cd7473326b94b72cf594195e7"
@@ -952,14 +912,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.1.0"
-  logger:
-    dependency: transitive
-    description:
-      name: logger
-      sha256: "25aee487596a6257655a1e091ec2ae66bc30e7af663592cc3a27e6591e05035c"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.7.0"
   logging:
     dependency: transitive
     description:
@@ -992,13 +944,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.13.0"
-  media_variants:
-    dependency: "direct main"
-    description:
-      path: "../media_variants"
-      relative: true
-    source: path
-    version: "0.1.0"
   meta:
     dependency: transitive
     description:
@@ -1493,14 +1438,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.0"
-  unite_keyboard_visibility:
-    dependency: "direct main"
-    description:
-      name: unite_keyboard_visibility
-      sha256: d9289071b08ca2acd1db24acd613790e05a6cce4e425ad4b941f59a9882a7442
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.4.1"
   url_launcher:
     dependency: "direct main"
     description:

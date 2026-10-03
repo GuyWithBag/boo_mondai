@@ -9,7 +9,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         Button,
         ButtonColor,
         ButtonPadding,
-        SettingPath,
+        MediaAsset,
         StudyRating,
         StudyRatingHelper,
         StudySessionController,
@@ -18,7 +18,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         buttonStyle,
         textStyle;
 import 'package:flutter/material.dart';
-import 'package:media_variants/media_variants.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 class RatingButton extends StatelessWidget {
@@ -73,8 +72,6 @@ class RatingButton extends StatelessWidget {
           variants: variants,
           buttonDownSound: (_) => const MediaAsset.none(),
           buttonUpSound: StudyRatingHelper.getSound(type),
-          buttonDownSoundEnabledSetting: SettingPath.uiSoundsEnabled,
-          buttonUpSoundEnabledSetting: SettingPath.uiSoundsEnabled,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             spacing: tokens.spaceLayoutGapXsm,

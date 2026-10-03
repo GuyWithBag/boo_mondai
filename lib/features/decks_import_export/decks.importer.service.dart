@@ -58,18 +58,17 @@ final class DecksImporterService {
   }
 
   Future<DeckImportPreview> previewDecksFromFiles() async {
-    final result = await FilePicker.pickFiles(
+    final files = await FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['json', 'txt'],
-      allowMultiple: true,
     );
 
-    if (result == null || result.files.isEmpty) {
+    if (files.isEmpty) {
       return DeckImportPreview.empty(DeckImportMode.decks);
     }
 
     final maps = <Map<String, dynamic>>[];
-    for (final file in result.files) {
+    for (final file in files) {
       maps.addAll(await fileToMaps(file.xFile, file));
     }
 
@@ -79,18 +78,17 @@ final class DecksImporterService {
   Future<DeckImportPreview> previewCardTemplatesFromFiles(
     String deckTitle,
   ) async {
-    final result = await FilePicker.pickFiles(
+    final files = await FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['json', 'txt', 'csv'],
-      allowMultiple: true,
     );
 
-    if (result == null || result.files.isEmpty) {
+    if (files.isEmpty) {
       return DeckImportPreview.empty(DeckImportMode.cardTemplates);
     }
 
     final maps = <Map<String, dynamic>>[];
-    for (final file in result.files) {
+    for (final file in files) {
       maps.addAll(await fileToMaps(file.xFile, file));
     }
 

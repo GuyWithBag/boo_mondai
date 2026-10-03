@@ -41,8 +41,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await UiSoundsService.init();
-
   // ── Hive ────────────────────────────────────────────
   await Hive.initFlutter('boo_mondai');
   Hive.registerAdapters();
@@ -57,8 +55,17 @@ Future<void> main() async {
   // ── Settings (must come before notifications) ───────
   final settingsStore = SettingsStore.instance;
   await settingsStore.init();
+  await UiSoundsService.init();
 
-  await NotificationsController.instance.init();
+  try {
+    await NotificationsController.instance.init();
+  } catch (error, stackTrace) {
+    developer.log(
+      'Notifications failed to initialize.',
+      error: error,
+      stackTrace: stackTrace,
+    );
+  }
   ResearchPariticipantPortalStore.instance.init();
   // ── Restore session ─────────────────────────────────
   final authController = AuthController();

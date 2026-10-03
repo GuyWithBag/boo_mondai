@@ -21,8 +21,8 @@ class ViewProfileController {
   }
 
   Future<void> upsertAvatar(PlatformFile file) async {
-    final bytes = file.bytes;
-    if (bytes == null) return;
+    final bytes = await file.readAsBytes();
+    if (bytes.isEmpty) return;
     pickedAvatarImage.value = MemoryImage(bytes);
     ProfileService.upsertAvatar(bytes);
   }

@@ -1,4 +1,4 @@
-import 'package:media_variants/media_variants.dart';
+import 'package:boo_mondai/features/media_variants/media_asset.model.dart';
 
 typedef AppMediaPack = ({
   MediaAsset buttonDownSound,

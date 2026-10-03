@@ -33,9 +33,9 @@ abstract final class ImageHelper {
     return FileImage(file);
   }
 
-  static String? getImageSourceFromPickedFile(PlatformFile file) {
-    final bytes = file.bytes;
-    if (bytes != null && bytes.isNotEmpty) {
+  static Future<String?> getImageSourceFromPickedFile(PlatformFile file) async {
+    final bytes = await file.readAsBytes();
+    if (bytes.isNotEmpty) {
       return 'data:${getMimeTypeFromExtension(file.extension)};base64,${base64Encode(bytes)}';
     }
 

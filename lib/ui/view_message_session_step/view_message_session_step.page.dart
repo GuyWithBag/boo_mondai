@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:boo_mondai/lib.barrel.dart'
     show
-        AppMediaPack,
+        appMediaPackStore,
         Scaffold,
         AppBar,
         ProgressBar,
@@ -10,15 +10,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         BottomNavBar,
         StudySessionMessageStep,
         AppTokens,
-        SettingPath,
-        SettingsStore,
         StudySessionStepHelper,
         StudySessionController,
         ViewStudySessionController,
         UiSoundsService;
 import 'package:flutter/material.dart' hide Scaffold, AppBar;
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:media_variants/media_variants.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 class ViewMessageSessionStepPage extends HookWidget {
@@ -36,8 +33,6 @@ class ViewMessageSessionStepPage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final mediaPackController = context.mediaPackController<AppMediaPack>();
-    final settingsStore = SettingsStore.instance;
     final messageStepSound = StudySessionStepHelper.getMessageStepSound(step);
 
     useEffect(() {
@@ -45,13 +40,11 @@ class ViewMessageSessionStepPage extends HookWidget {
 
       unawaited(
         UiSoundsService.playIfEnabled(
-          mediaPackController.resolve(messageStepSound),
-          settingsStore: settingsStore,
-          enabledSetting: SettingPath.uiSoundsEnabled,
+          appMediaPackStore.resolve(messageStepSound),
         ),
       );
       return null;
-    }, [step.id, messageStepSound, mediaPackController, settingsStore]);
+    }, [step.id, messageStepSound]);
 
     return Scaffold(
       scrollable: false,

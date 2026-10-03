@@ -233,9 +233,10 @@ class ViewDeckSingleSheetController {
     // );
 
     // ToDo: Add error handling
-    if (file.bytes == null) return;
+    final bytes = await file.readAsBytes();
+    if (bytes.isEmpty) return;
     pickedCoverImageFile.value = file;
-    coverImage.value = MemoryImage(file.bytes!);
+    coverImage.value = MemoryImage(bytes);
   }
 
   Future<void> save() async {

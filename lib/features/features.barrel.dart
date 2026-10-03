@@ -48,3 +48,4 @@ export 'comments/comments.barrel.dart';
 export 'reviews/reviews.barrel.dart';
 export 'cached_media/cached_media.barrel.dart';
 export 'study_session_notifications/study_session_notifications.barrel.dart';
+export 'media_variants/media_variants.barrel.dart';

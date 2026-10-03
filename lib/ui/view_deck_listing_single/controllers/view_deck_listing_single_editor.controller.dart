@@ -108,9 +108,12 @@ class ViewDeckListingSingleEditorController
   }
 
   Future<void> upsertFeaturedImage(int index, PlatformFile? file) async {
-    if (file == null || file.bytes == null) return;
+    if (file == null) return;
 
-    final image = MemoryImage(file.bytes!);
+    final bytes = await file.readAsBytes();
+    if (bytes.isEmpty) return;
+
+    final image = MemoryImage(bytes);
     final newImages = featuredImages.value.toList();
 
     if (index < newImages.length) {

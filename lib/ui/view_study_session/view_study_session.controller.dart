@@ -9,12 +9,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         DeckReviewStats,
         DueFilterThreshold,
         FlashcardTemplate,
+        appMediaPackStore,
         MatchingTypeTemplate,
+        MediaAsset,
         MediaSelector,
         SessionException,
         SessionMode,
-        SettingPath,
-        SettingsStore,
         StreakController,
         StudySessionAnswer,
         StudySessionCardStageController,
@@ -32,7 +32,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         CasingHelper;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart' show GoRouterHelper;
-import 'package:media_variants/media_variants.dart';
 import 'package:provider/provider.dart' show ReadContext;
 import 'package:signals/signals_flutter.dart';
 
@@ -60,9 +59,9 @@ final class ViewStudySessionController {
       );
     }
 
-    studySessionCompleteSound = context
-        .mediaPackController<AppMediaPack>()
-        .resolve((media) => media.studySessionCompleteSound);
+    studySessionCompleteSound = appMediaPackStore.resolve(
+      (media) => media.studySessionCompleteSound,
+    );
     cardStageController = StudySessionCardStageController(
       template: null,
       canReveal: false,
@@ -82,7 +81,6 @@ final class ViewStudySessionController {
   final StudySessionController sessionController;
   final currentStepId = signal<String?>(null);
 
-  final SettingsStore settingsStore = SettingsStore.instance;
   late final MediaAsset studySessionCompleteSound;
   late final StudySessionCardStageController cardStageController;
   late final EffectCleanup controllerEffect;
@@ -190,13 +188,7 @@ final class ViewStudySessionController {
   }
 
   void playStudySessionSound(MediaSelector<AppMediaPack> sound) {
-    unawaited(
-      UiSoundsService.playIfEnabled(
-        context.mediaPackController<AppMediaPack>().resolve(sound),
-        settingsStore: settingsStore,
-        enabledSetting: SettingPath.uiSoundsEnabled,
-      ),
-    );
+    unawaited(UiSoundsService.playIfEnabled(appMediaPackStore.resolve(sound)));
   }
 
   void submitCurrentAnswer() {
@@ -272,13 +264,7 @@ final class ViewStudySessionController {
     }
     isCompleting.value = true;
 
-    unawaited(
-      UiSoundsService.playIfEnabled(
-        studySessionCompleteSound,
-        settingsStore: settingsStore,
-        enabledSetting: SettingPath.uiSoundsEnabled,
-      ),
-    );
+    unawaited(UiSoundsService.playIfEnabled(studySessionCompleteSound));
 
     unawaited(() async {
       try {

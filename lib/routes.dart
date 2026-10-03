@@ -19,7 +19,7 @@ import 'package:go_router/go_router.dart';
 
 GoRouter createRouter(AuthController authController) {
   return GoRouter(
-    initialLocation: Pages.home.url,
+    initialLocation: Pages.decksLocal.url,
     refreshListenable: authController.routerRefresh,
     errorBuilder: (context, state) {
       final exception = RouteException(

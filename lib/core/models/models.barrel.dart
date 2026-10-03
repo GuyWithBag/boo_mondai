@@ -9,6 +9,5 @@ export 'mutable_entity.dart';
 export 'immutable_entity.dart';
 export 'side.dart';
 export 'study_rating_color_set.dart';
-export 'media_selector.dart';
 export 'modal_draft_action_type.dart';
 export 'vector2.hive.dart';

@@ -33,15 +33,7 @@ typedef BackgroundImagePicked = FutureOr<void> Function(PlatformFile file);
 enum BackgroundImageEditButtonPosition { topRight, bottomRight }
 
 Future<PlatformFile?> pickBackgroundImageFile() async {
-  final result = await FilePicker.pickFiles(
-    type: FileType.image,
-    allowMultiple: false,
-    withData: true,
-  );
-  final files = result?.files;
-  if (files == null || files.isEmpty) return null;
-
-  return files.first;
+  return FilePicker.pickFile(type: FileType.image);
 }
 
 class BackgroundImageSurface extends StatelessWidget {
