@@ -53,7 +53,7 @@ class NotificationsService {
       tz.setLocalLocation(tz.getLocation(tzInfo.identifier));
     }
 
-    const androidInit = AndroidInitializationSettings('ic_stat_logo');
+    const androidInit = AndroidInitializationSettings('@drawable/ic_stat_logo');
     const linuxInit = LinuxInitializationSettings(defaultActionName: 'Open');
     const initSettings = InitializationSettings(
       android: androidInit,
