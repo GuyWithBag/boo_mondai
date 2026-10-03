@@ -5,8 +5,6 @@ import 'package:boo_mondai/lib.barrel.dart'
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show ScrollDirection;
 import 'package:signals/signals_flutter.dart';
-import 'package:unite_keyboard_visibility/unite_keyboard_visibility.dart'
-    show KeyboardVisibilityStatus, UniteKeyboardVisibility;
 
 class ScaffoldController {
   ScaffoldController({
@@ -338,9 +336,6 @@ class ScaffoldController {
     }
     return false;
   }
-
-  bool get isKeyboardVisible =>
-      UniteKeyboardVisibility.instance.value == KeyboardVisibilityStatus.open;
 
   void dispose() {
     if (isDisposed) return;
