@@ -20,6 +20,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         ViewStudyDecksController;
 import 'package:flutter/material.dart' hide Scaffold, AppBar;
 import 'package:flutter_hooks/flutter_hooks.dart' show useEffect, useMemoized;
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart' show GoRouterHelper;
 import 'package:provider/provider.dart' show ReadContext;
 import 'package:signals_hooks/signals_hooks.dart';
@@ -45,7 +46,15 @@ class HomePage extends SignalHookWidget {
     }, []);
 
     return Scaffold(
-      appBar: AppBar(title: 'Home', actions: const [NotificationsButton()]),
+      appBar: AppBar(
+        leading: SizedBox(
+          height: 40,
+          width: 40,
+          child: SvgPicture.asset('assets/icon/logo.svg', fit: BoxFit.contain),
+        ),
+        title: 'Home',
+        actions: const [NotificationsButton()],
+      ),
       scrollable: true,
       body: RefreshIndicator(
         onRefresh: () async {
