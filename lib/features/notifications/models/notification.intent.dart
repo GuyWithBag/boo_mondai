@@ -18,6 +18,8 @@ class NotificationIntent with NotificationIntentMappable {
     this.ifRouteNullPushToView = false,
     this.persistInInbox = false,
     this.showSystemNotification = true,
+    this.showAsBubble = false,
+    this.shown = false,
     this.readAt,
     this.deletedAt,
     this.purgeAfterDays = 30,
@@ -33,6 +35,8 @@ class NotificationIntent with NotificationIntentMappable {
     bool ifRouteNullPushToView = false,
     bool persistInInbox = false,
     bool showSystemNotification = true,
+    bool showAsBubble = false,
+    bool shown = false,
     DateTime? createdAt,
     DateTime? updatedAt,
     DateTime? readAt,
@@ -52,6 +56,8 @@ class NotificationIntent with NotificationIntentMappable {
       ifRouteNullPushToView: ifRouteNullPushToView,
       persistInInbox: persistInInbox,
       showSystemNotification: showSystemNotification,
+      showAsBubble: showAsBubble,
+      shown: shown,
       createdAt: resolvedCreatedAt,
       updatedAt: updatedAt ?? now,
       readAt: readAt,
@@ -70,6 +76,8 @@ class NotificationIntent with NotificationIntentMappable {
   final bool ifRouteNullPushToView;
   final bool persistInInbox;
   final bool showSystemNotification;
+  final bool showAsBubble;
+  final bool shown;
   final DateTime createdAt;
   final DateTime updatedAt;
   final DateTime? readAt;

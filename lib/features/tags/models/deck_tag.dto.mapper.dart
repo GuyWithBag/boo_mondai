@@ -1,6 +1,8 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format off
 // ignore_for_file: type=lint
+// ignore_for_file: invalid_use_of_protected_member
 // ignore_for_file: unused_element, unnecessary_cast, override_on_non_overriding_member
 // ignore_for_file: strict_raw_type, inference_failure_on_untyped_parameter
 
@@ -21,11 +23,17 @@ class DeckTagMapper extends ClassMapperBase<DeckTag> {
   final String id = 'DeckTag';
 
   static String _$deckId(DeckTag v) => v.deckId;
-  static const Field<DeckTag, String> _f$deckId =
-      Field('deckId', _$deckId, key: r'deck_id');
+  static const Field<DeckTag, String> _f$deckId = Field(
+    'deckId',
+    _$deckId,
+    key: r'deck_id',
+  );
   static String _$tagId(DeckTag v) => v.tagId;
-  static const Field<DeckTag, String> _f$tagId =
-      Field('tagId', _$tagId, key: r'tag_id');
+  static const Field<DeckTag, String> _f$tagId = Field(
+    'tagId',
+    _$tagId,
+    key: r'tag_id',
+  );
 
   @override
   final MappableFields<DeckTag> fields = const {
@@ -51,18 +59,23 @@ class DeckTagMapper extends ClassMapperBase<DeckTag> {
 
 mixin DeckTagMappable {
   String toJson() {
-    return DeckTagMapper.ensureInitialized()
-        .encodeJson<DeckTag>(this as DeckTag);
+    return DeckTagMapper.ensureInitialized().encodeJson<DeckTag>(
+      this as DeckTag,
+    );
   }
 
   Map<String, dynamic> toMap() {
-    return DeckTagMapper.ensureInitialized()
-        .encodeMap<DeckTag>(this as DeckTag);
+    return DeckTagMapper.ensureInitialized().encodeMap<DeckTag>(
+      this as DeckTag,
+    );
   }
 
   DeckTagCopyWith<DeckTag, DeckTag, DeckTag> get copyWith =>
       _DeckTagCopyWithImpl<DeckTag, DeckTag>(
-          this as DeckTag, $identity, $identity);
+        this as DeckTag,
+        $identity,
+        $identity,
+      );
   @override
   String toString() {
     return DeckTagMapper.ensureInitialized().stringifyValue(this as DeckTag);
@@ -70,8 +83,10 @@ mixin DeckTagMappable {
 
   @override
   bool operator ==(Object other) {
-    return DeckTagMapper.ensureInitialized()
-        .equalsValue(this as DeckTag, other);
+    return DeckTagMapper.ensureInitialized().equalsValue(
+      this as DeckTag,
+      other,
+    );
   }
 
   @override
@@ -100,14 +115,20 @@ class _DeckTagCopyWithImpl<$R, $Out>
   late final ClassMapperBase<DeckTag> $mapper =
       DeckTagMapper.ensureInitialized();
   @override
-  $R call({String? deckId, String? tagId}) => $apply(FieldCopyWithData(
-      {if (deckId != null) #deckId: deckId, if (tagId != null) #tagId: tagId}));
+  $R call({String? deckId, String? tagId}) => $apply(
+    FieldCopyWithData({
+      if (deckId != null) #deckId: deckId,
+      if (tagId != null) #tagId: tagId,
+    }),
+  );
   @override
   DeckTag $make(CopyWithData data) => DeckTag(
-      deckId: data.get(#deckId, or: $value.deckId),
-      tagId: data.get(#tagId, or: $value.tagId));
+    deckId: data.get(#deckId, or: $value.deckId),
+    tagId: data.get(#tagId, or: $value.tagId),
+  );
 
   @override
   DeckTagCopyWith<$R2, DeckTag, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
       _DeckTagCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
+

@@ -1,6 +1,8 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format off
 // ignore_for_file: type=lint
+// ignore_for_file: invalid_use_of_protected_member
 // ignore_for_file: unused_element, unnecessary_cast, override_on_non_overriding_member
 // ignore_for_file: strict_raw_type, inference_failure_on_untyped_parameter
 
@@ -27,53 +29,97 @@ class MultipleChoiceTemplateMapper
   static String _$id(MultipleChoiceTemplate v) => v.id;
   static const Field<MultipleChoiceTemplate, String> _f$id = Field('id', _$id);
   static String _$deckId(MultipleChoiceTemplate v) => v.deckId;
-  static const Field<MultipleChoiceTemplate, String> _f$deckId =
-      Field('deckId', _$deckId, key: r'deck_id');
+  static const Field<MultipleChoiceTemplate, String> _f$deckId = Field(
+    'deckId',
+    _$deckId,
+    key: r'deck_id',
+  );
   static int _$sortOrder(MultipleChoiceTemplate v) => v.sortOrder;
-  static const Field<MultipleChoiceTemplate, int> _f$sortOrder =
-      Field('sortOrder', _$sortOrder, key: r'sort_order');
+  static const Field<MultipleChoiceTemplate, int> _f$sortOrder = Field(
+    'sortOrder',
+    _$sortOrder,
+    key: r'sort_order',
+  );
   static DateTime _$createdAt(MultipleChoiceTemplate v) => v.createdAt;
-  static const Field<MultipleChoiceTemplate, DateTime> _f$createdAt =
-      Field('createdAt', _$createdAt, key: r'created_at');
+  static const Field<MultipleChoiceTemplate, DateTime> _f$createdAt = Field(
+    'createdAt',
+    _$createdAt,
+    key: r'created_at',
+  );
   static DateTime _$updatedAt(MultipleChoiceTemplate v) => v.updatedAt;
-  static const Field<MultipleChoiceTemplate, DateTime> _f$updatedAt =
-      Field('updatedAt', _$updatedAt, key: r'updated_at');
+  static const Field<MultipleChoiceTemplate, DateTime> _f$updatedAt = Field(
+    'updatedAt',
+    _$updatedAt,
+    key: r'updated_at',
+  );
   static DateTime? _$deletedAt(MultipleChoiceTemplate v) => v.deletedAt;
-  static const Field<MultipleChoiceTemplate, DateTime> _f$deletedAt =
-      Field('deletedAt', _$deletedAt, key: r'deleted_at', opt: true);
+  static const Field<MultipleChoiceTemplate, DateTime> _f$deletedAt = Field(
+    'deletedAt',
+    _$deletedAt,
+    key: r'deleted_at',
+    opt: true,
+  );
   static DateTime? _$purgeAfter(MultipleChoiceTemplate v) => v.purgeAfter;
-  static const Field<MultipleChoiceTemplate, DateTime> _f$purgeAfter =
-      Field('purgeAfter', _$purgeAfter, key: r'purge_after', opt: true);
+  static const Field<MultipleChoiceTemplate, DateTime> _f$purgeAfter = Field(
+    'purgeAfter',
+    _$purgeAfter,
+    key: r'purge_after',
+    opt: true,
+  );
   static String? _$sourceTemplateId(MultipleChoiceTemplate v) =>
       v.sourceTemplateId;
   static const Field<MultipleChoiceTemplate, String> _f$sourceTemplateId =
-      Field('sourceTemplateId', _$sourceTemplateId,
-          key: r'source_template_id', opt: true);
+      Field(
+        'sourceTemplateId',
+        _$sourceTemplateId,
+        key: r'source_template_id',
+        opt: true,
+      );
   static List<Tag> _$tags(MultipleChoiceTemplate v) => v.tags;
-  static const Field<MultipleChoiceTemplate, List<Tag>> _f$tags =
-      Field('tags', _$tags, opt: true, def: const []);
+  static const Field<MultipleChoiceTemplate, List<Tag>> _f$tags = Field(
+    'tags',
+    _$tags,
+    opt: true,
+    def: const [],
+  );
   static bool _$verticallyCentered(MultipleChoiceTemplate v) =>
       v.verticallyCentered;
   static const Field<MultipleChoiceTemplate, bool> _f$verticallyCentered =
-      Field('verticallyCentered', _$verticallyCentered,
-          key: r'vertically_centered', opt: true, def: true);
+      Field(
+        'verticallyCentered',
+        _$verticallyCentered,
+        key: r'vertically_centered',
+        opt: true,
+        def: true,
+      );
   static String _$questionPrompt(MultipleChoiceTemplate v) => v.questionPrompt;
-  static const Field<MultipleChoiceTemplate, String> _f$questionPrompt =
-      Field('questionPrompt', _$questionPrompt, key: r'question_prompt');
+  static const Field<MultipleChoiceTemplate, String> _f$questionPrompt = Field(
+    'questionPrompt',
+    _$questionPrompt,
+    key: r'question_prompt',
+  );
   static List<MultipleChoiceOption> _$options(MultipleChoiceTemplate v) =>
       v.options;
   static const Field<MultipleChoiceTemplate, List<MultipleChoiceOption>>
-      _f$options = Field('options', _$options);
+  _f$options = Field('options', _$options);
   static bool _$multipleAnswers(MultipleChoiceTemplate v) => v.multipleAnswers;
   static const Field<MultipleChoiceTemplate, bool> _f$multipleAnswers = Field(
-      'multipleAnswers', _$multipleAnswers,
-      key: r'multiple_answers', opt: true, def: false);
+    'multipleAnswers',
+    _$multipleAnswers,
+    key: r'multiple_answers',
+    opt: true,
+    def: false,
+  );
   static bool _$randomizedOptionsOrdering(MultipleChoiceTemplate v) =>
       v.randomizedOptionsOrdering;
   static const Field<MultipleChoiceTemplate, bool>
-      _f$randomizedOptionsOrdering = Field(
-          'randomizedOptionsOrdering', _$randomizedOptionsOrdering,
-          key: r'randomized_options_ordering', opt: true, def: false);
+  _f$randomizedOptionsOrdering = Field(
+    'randomizedOptionsOrdering',
+    _$randomizedOptionsOrdering,
+    key: r'randomized_options_ordering',
+    opt: true,
+    def: false,
+  );
 
   @override
   final MappableFields<MultipleChoiceTemplate> fields = const {
@@ -103,20 +149,21 @@ class MultipleChoiceTemplateMapper
 
   static MultipleChoiceTemplate _instantiate(DecodingData data) {
     return MultipleChoiceTemplate(
-        id: data.dec(_f$id),
-        deckId: data.dec(_f$deckId),
-        sortOrder: data.dec(_f$sortOrder),
-        createdAt: data.dec(_f$createdAt),
-        updatedAt: data.dec(_f$updatedAt),
-        deletedAt: data.dec(_f$deletedAt),
-        purgeAfter: data.dec(_f$purgeAfter),
-        sourceTemplateId: data.dec(_f$sourceTemplateId),
-        tags: data.dec(_f$tags),
-        verticallyCentered: data.dec(_f$verticallyCentered),
-        questionPrompt: data.dec(_f$questionPrompt),
-        options: data.dec(_f$options),
-        multipleAnswers: data.dec(_f$multipleAnswers),
-        randomizedOptionsOrdering: data.dec(_f$randomizedOptionsOrdering));
+      id: data.dec(_f$id),
+      deckId: data.dec(_f$deckId),
+      sortOrder: data.dec(_f$sortOrder),
+      createdAt: data.dec(_f$createdAt),
+      updatedAt: data.dec(_f$updatedAt),
+      deletedAt: data.dec(_f$deletedAt),
+      purgeAfter: data.dec(_f$purgeAfter),
+      sourceTemplateId: data.dec(_f$sourceTemplateId),
+      tags: data.dec(_f$tags),
+      verticallyCentered: data.dec(_f$verticallyCentered),
+      questionPrompt: data.dec(_f$questionPrompt),
+      options: data.dec(_f$options),
+      multipleAnswers: data.dec(_f$multipleAnswers),
+      randomizedOptionsOrdering: data.dec(_f$randomizedOptionsOrdering),
+    );
   }
 
   @override
@@ -142,66 +189,81 @@ mixin MultipleChoiceTemplateMappable {
         .encodeMap<MultipleChoiceTemplate>(this as MultipleChoiceTemplate);
   }
 
-  MultipleChoiceTemplateCopyWith<MultipleChoiceTemplate, MultipleChoiceTemplate,
-          MultipleChoiceTemplate>
-      get copyWith => _MultipleChoiceTemplateCopyWithImpl<
-              MultipleChoiceTemplate, MultipleChoiceTemplate>(
-          this as MultipleChoiceTemplate, $identity, $identity);
+  MultipleChoiceTemplateCopyWith<
+    MultipleChoiceTemplate,
+    MultipleChoiceTemplate,
+    MultipleChoiceTemplate
+  >
+  get copyWith =>
+      _MultipleChoiceTemplateCopyWithImpl<
+        MultipleChoiceTemplate,
+        MultipleChoiceTemplate
+      >(this as MultipleChoiceTemplate, $identity, $identity);
   @override
   String toString() {
-    return MultipleChoiceTemplateMapper.ensureInitialized()
-        .stringifyValue(this as MultipleChoiceTemplate);
+    return MultipleChoiceTemplateMapper.ensureInitialized().stringifyValue(
+      this as MultipleChoiceTemplate,
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return MultipleChoiceTemplateMapper.ensureInitialized()
-        .equalsValue(this as MultipleChoiceTemplate, other);
+    return MultipleChoiceTemplateMapper.ensureInitialized().equalsValue(
+      this as MultipleChoiceTemplate,
+      other,
+    );
   }
 
   @override
   int get hashCode {
-    return MultipleChoiceTemplateMapper.ensureInitialized()
-        .hashValue(this as MultipleChoiceTemplate);
+    return MultipleChoiceTemplateMapper.ensureInitialized().hashValue(
+      this as MultipleChoiceTemplate,
+    );
   }
 }
 
 extension MultipleChoiceTemplateValueCopy<$R, $Out>
     on ObjectCopyWith<$R, MultipleChoiceTemplate, $Out> {
   MultipleChoiceTemplateCopyWith<$R, MultipleChoiceTemplate, $Out>
-      get $asMultipleChoiceTemplate => $base.as((v, t, t2) =>
-          _MultipleChoiceTemplateCopyWithImpl<$R, $Out>(v, t, t2));
+  get $asMultipleChoiceTemplate => $base.as(
+    (v, t, t2) => _MultipleChoiceTemplateCopyWithImpl<$R, $Out>(v, t, t2),
+  );
 }
 
 abstract class MultipleChoiceTemplateCopyWith<
-    $R,
-    $In extends MultipleChoiceTemplate,
-    $Out> implements CardTemplateCopyWith<$R, $In, $Out> {
+  $R,
+  $In extends MultipleChoiceTemplate,
+  $Out
+>
+    implements CardTemplateCopyWith<$R, $In, $Out> {
   @override
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags;
   ListCopyWith<
-      $R,
-      MultipleChoiceOption,
-      MultipleChoiceOptionCopyWith<$R, MultipleChoiceOption,
-          MultipleChoiceOption>> get options;
+    $R,
+    MultipleChoiceOption,
+    MultipleChoiceOptionCopyWith<$R, MultipleChoiceOption, MultipleChoiceOption>
+  >
+  get options;
   @override
-  $R call(
-      {String? id,
-      String? deckId,
-      int? sortOrder,
-      DateTime? createdAt,
-      DateTime? updatedAt,
-      DateTime? deletedAt,
-      DateTime? purgeAfter,
-      String? sourceTemplateId,
-      List<Tag>? tags,
-      bool? verticallyCentered,
-      String? questionPrompt,
-      List<MultipleChoiceOption>? options,
-      bool? multipleAnswers,
-      bool? randomizedOptionsOrdering});
+  $R call({
+    String? id,
+    String? deckId,
+    int? sortOrder,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    DateTime? deletedAt,
+    DateTime? purgeAfter,
+    String? sourceTemplateId,
+    List<Tag>? tags,
+    bool? verticallyCentered,
+    String? questionPrompt,
+    List<MultipleChoiceOption>? options,
+    bool? multipleAnswers,
+    bool? randomizedOptionsOrdering,
+  });
   MultipleChoiceTemplateCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-      Then<$Out2, $R2> t);
+    Then<$Out2, $R2> t,
+  );
 }
 
 class _MultipleChoiceTemplateCopyWithImpl<$R, $Out>
@@ -215,69 +277,83 @@ class _MultipleChoiceTemplateCopyWithImpl<$R, $Out>
       MultipleChoiceTemplateMapper.ensureInitialized();
   @override
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags => ListCopyWith(
-      $value.tags, (v, t) => v.copyWith.$chain(t), (v) => call(tags: v));
+    $value.tags,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(tags: v),
+  );
   @override
   ListCopyWith<
-      $R,
-      MultipleChoiceOption,
-      MultipleChoiceOptionCopyWith<$R, MultipleChoiceOption,
-          MultipleChoiceOption>> get options => ListCopyWith(
-      $value.options, (v, t) => v.copyWith.$chain(t), (v) => call(options: v));
+    $R,
+    MultipleChoiceOption,
+    MultipleChoiceOptionCopyWith<$R, MultipleChoiceOption, MultipleChoiceOption>
+  >
+  get options => ListCopyWith(
+    $value.options,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(options: v),
+  );
   @override
-  $R call(
-          {String? id,
-          String? deckId,
-          int? sortOrder,
-          DateTime? createdAt,
-          DateTime? updatedAt,
-          Object? deletedAt = $none,
-          Object? purgeAfter = $none,
-          Object? sourceTemplateId = $none,
-          List<Tag>? tags,
-          bool? verticallyCentered,
-          String? questionPrompt,
-          List<MultipleChoiceOption>? options,
-          bool? multipleAnswers,
-          bool? randomizedOptionsOrdering}) =>
-      $apply(FieldCopyWithData({
-        if (id != null) #id: id,
-        if (deckId != null) #deckId: deckId,
-        if (sortOrder != null) #sortOrder: sortOrder,
-        if (createdAt != null) #createdAt: createdAt,
-        if (updatedAt != null) #updatedAt: updatedAt,
-        if (deletedAt != $none) #deletedAt: deletedAt,
-        if (purgeAfter != $none) #purgeAfter: purgeAfter,
-        if (sourceTemplateId != $none) #sourceTemplateId: sourceTemplateId,
-        if (tags != null) #tags: tags,
-        if (verticallyCentered != null) #verticallyCentered: verticallyCentered,
-        if (questionPrompt != null) #questionPrompt: questionPrompt,
-        if (options != null) #options: options,
-        if (multipleAnswers != null) #multipleAnswers: multipleAnswers,
-        if (randomizedOptionsOrdering != null)
-          #randomizedOptionsOrdering: randomizedOptionsOrdering
-      }));
+  $R call({
+    String? id,
+    String? deckId,
+    int? sortOrder,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Object? deletedAt = $none,
+    Object? purgeAfter = $none,
+    Object? sourceTemplateId = $none,
+    List<Tag>? tags,
+    bool? verticallyCentered,
+    String? questionPrompt,
+    List<MultipleChoiceOption>? options,
+    bool? multipleAnswers,
+    bool? randomizedOptionsOrdering,
+  }) => $apply(
+    FieldCopyWithData({
+      if (id != null) #id: id,
+      if (deckId != null) #deckId: deckId,
+      if (sortOrder != null) #sortOrder: sortOrder,
+      if (createdAt != null) #createdAt: createdAt,
+      if (updatedAt != null) #updatedAt: updatedAt,
+      if (deletedAt != $none) #deletedAt: deletedAt,
+      if (purgeAfter != $none) #purgeAfter: purgeAfter,
+      if (sourceTemplateId != $none) #sourceTemplateId: sourceTemplateId,
+      if (tags != null) #tags: tags,
+      if (verticallyCentered != null) #verticallyCentered: verticallyCentered,
+      if (questionPrompt != null) #questionPrompt: questionPrompt,
+      if (options != null) #options: options,
+      if (multipleAnswers != null) #multipleAnswers: multipleAnswers,
+      if (randomizedOptionsOrdering != null)
+        #randomizedOptionsOrdering: randomizedOptionsOrdering,
+    }),
+  );
   @override
   MultipleChoiceTemplate $make(CopyWithData data) => MultipleChoiceTemplate(
-      id: data.get(#id, or: $value.id),
-      deckId: data.get(#deckId, or: $value.deckId),
-      sortOrder: data.get(#sortOrder, or: $value.sortOrder),
-      createdAt: data.get(#createdAt, or: $value.createdAt),
-      updatedAt: data.get(#updatedAt, or: $value.updatedAt),
-      deletedAt: data.get(#deletedAt, or: $value.deletedAt),
-      purgeAfter: data.get(#purgeAfter, or: $value.purgeAfter),
-      sourceTemplateId:
-          data.get(#sourceTemplateId, or: $value.sourceTemplateId),
-      tags: data.get(#tags, or: $value.tags),
-      verticallyCentered:
-          data.get(#verticallyCentered, or: $value.verticallyCentered),
-      questionPrompt: data.get(#questionPrompt, or: $value.questionPrompt),
-      options: data.get(#options, or: $value.options),
-      multipleAnswers: data.get(#multipleAnswers, or: $value.multipleAnswers),
-      randomizedOptionsOrdering: data.get(#randomizedOptionsOrdering,
-          or: $value.randomizedOptionsOrdering));
+    id: data.get(#id, or: $value.id),
+    deckId: data.get(#deckId, or: $value.deckId),
+    sortOrder: data.get(#sortOrder, or: $value.sortOrder),
+    createdAt: data.get(#createdAt, or: $value.createdAt),
+    updatedAt: data.get(#updatedAt, or: $value.updatedAt),
+    deletedAt: data.get(#deletedAt, or: $value.deletedAt),
+    purgeAfter: data.get(#purgeAfter, or: $value.purgeAfter),
+    sourceTemplateId: data.get(#sourceTemplateId, or: $value.sourceTemplateId),
+    tags: data.get(#tags, or: $value.tags),
+    verticallyCentered: data.get(
+      #verticallyCentered,
+      or: $value.verticallyCentered,
+    ),
+    questionPrompt: data.get(#questionPrompt, or: $value.questionPrompt),
+    options: data.get(#options, or: $value.options),
+    multipleAnswers: data.get(#multipleAnswers, or: $value.multipleAnswers),
+    randomizedOptionsOrdering: data.get(
+      #randomizedOptionsOrdering,
+      or: $value.randomizedOptionsOrdering,
+    ),
+  );
 
   @override
   MultipleChoiceTemplateCopyWith<$R2, MultipleChoiceTemplate, $Out2>
-      $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-          _MultipleChoiceTemplateCopyWithImpl<$R2, $Out2>($value, $cast, t);
+  $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _MultipleChoiceTemplateCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
+

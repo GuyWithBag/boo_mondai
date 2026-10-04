@@ -66,10 +66,10 @@ class FsrsCardsLocalDB extends HiveLocalDB<FsrsCard> {
 
   /// Highly optimized: Returns just a Set of IDs.
   /// Perfect for checking if a card is already enrolled!
-  Set<String> getEnrolledStudyCardIds(String profileId) => guardSync(
+  List<FsrsCard> getEnrolledStudyCardIds(String profileId) => guardSync(
     () => selectMany(
       where: (s) => s.profileId == profileId,
-    ).map((s) => s.studyCardId).toSet(),
+    ).map((s) => s).toList(),
     action: 'getEnrolledStudyCardIds($profileId)',
   );
 

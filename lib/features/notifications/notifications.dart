@@ -79,4 +79,16 @@ abstract final class Notifications {
       route: '/reviews',
     );
   }
+
+  static NotificationIntent researcherStudySessionComplete() {
+    return NotificationIntent.create(
+      id: NotificationIds.researcherStudySessionComplete,
+      profileId: currentProfileId,
+      type: NotificationIntentType.researcherStudySessionComplete,
+      title: 'Research session complete',
+      body: 'A research deck study session was completed.',
+      showAsBubble: true,
+      persistInInbox: true,
+    );
+  }
 }

@@ -1,6 +1,8 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format off
 // ignore_for_file: type=lint
+// ignore_for_file: invalid_use_of_protected_member
 // ignore_for_file: unused_element, unnecessary_cast, override_on_non_overriding_member
 // ignore_for_file: strict_raw_type, inference_failure_on_untyped_parameter
 
@@ -25,11 +27,17 @@ class CommentMapper extends ClassMapperBase<Comment> {
   static String _$body(Comment v) => v.body;
   static const Field<Comment, String> _f$body = Field('body', _$body);
   static String _$contentId(Comment v) => v.contentId;
-  static const Field<Comment, String> _f$contentId =
-      Field('contentId', _$contentId, key: r'content_id');
+  static const Field<Comment, String> _f$contentId = Field(
+    'contentId',
+    _$contentId,
+    key: r'content_id',
+  );
   static DateTime _$deletedAt(Comment v) => v.deletedAt;
-  static const Field<Comment, DateTime> _f$deletedAt =
-      Field('deletedAt', _$deletedAt, key: r'deleted_at');
+  static const Field<Comment, DateTime> _f$deletedAt = Field(
+    'deletedAt',
+    _$deletedAt,
+    key: r'deleted_at',
+  );
 
   @override
   final MappableFields<Comment> fields = const {
@@ -41,10 +49,11 @@ class CommentMapper extends ClassMapperBase<Comment> {
 
   static Comment _instantiate(DecodingData data) {
     return Comment(
-        id: data.dec(_f$id),
-        body: data.dec(_f$body),
-        contentId: data.dec(_f$contentId),
-        deletedAt: data.dec(_f$deletedAt));
+      id: data.dec(_f$id),
+      body: data.dec(_f$body),
+      contentId: data.dec(_f$contentId),
+      deletedAt: data.dec(_f$deletedAt),
+    );
   }
 
   @override
@@ -61,18 +70,23 @@ class CommentMapper extends ClassMapperBase<Comment> {
 
 mixin CommentMappable {
   String toJson() {
-    return CommentMapper.ensureInitialized()
-        .encodeJson<Comment>(this as Comment);
+    return CommentMapper.ensureInitialized().encodeJson<Comment>(
+      this as Comment,
+    );
   }
 
   Map<String, dynamic> toMap() {
-    return CommentMapper.ensureInitialized()
-        .encodeMap<Comment>(this as Comment);
+    return CommentMapper.ensureInitialized().encodeMap<Comment>(
+      this as Comment,
+    );
   }
 
   CommentCopyWith<Comment, Comment, Comment> get copyWith =>
       _CommentCopyWithImpl<Comment, Comment>(
-          this as Comment, $identity, $identity);
+        this as Comment,
+        $identity,
+        $identity,
+      );
   @override
   String toString() {
     return CommentMapper.ensureInitialized().stringifyValue(this as Comment);
@@ -80,8 +94,10 @@ mixin CommentMappable {
 
   @override
   bool operator ==(Object other) {
-    return CommentMapper.ensureInitialized()
-        .equalsValue(this as Comment, other);
+    return CommentMapper.ensureInitialized().equalsValue(
+      this as Comment,
+      other,
+    );
   }
 
   @override
@@ -111,20 +127,24 @@ class _CommentCopyWithImpl<$R, $Out>
       CommentMapper.ensureInitialized();
   @override
   $R call({String? id, String? body, String? contentId, DateTime? deletedAt}) =>
-      $apply(FieldCopyWithData({
-        if (id != null) #id: id,
-        if (body != null) #body: body,
-        if (contentId != null) #contentId: contentId,
-        if (deletedAt != null) #deletedAt: deletedAt
-      }));
+      $apply(
+        FieldCopyWithData({
+          if (id != null) #id: id,
+          if (body != null) #body: body,
+          if (contentId != null) #contentId: contentId,
+          if (deletedAt != null) #deletedAt: deletedAt,
+        }),
+      );
   @override
   Comment $make(CopyWithData data) => Comment(
-      id: data.get(#id, or: $value.id),
-      body: data.get(#body, or: $value.body),
-      contentId: data.get(#contentId, or: $value.contentId),
-      deletedAt: data.get(#deletedAt, or: $value.deletedAt));
+    id: data.get(#id, or: $value.id),
+    body: data.get(#body, or: $value.body),
+    contentId: data.get(#contentId, or: $value.contentId),
+    deletedAt: data.get(#deletedAt, or: $value.deletedAt),
+  );
 
   @override
   CommentCopyWith<$R2, Comment, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
       _CommentCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
+

@@ -1,6 +1,8 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format off
 // ignore_for_file: type=lint
+// ignore_for_file: invalid_use_of_protected_member
 // ignore_for_file: unused_element, unnecessary_cast, override_on_non_overriding_member
 // ignore_for_file: strict_raw_type, inference_failure_on_untyped_parameter
 
@@ -21,14 +23,23 @@ class LeaderboardEntryMapper extends ClassMapperBase<LeaderboardEntry> {
   final String id = 'LeaderboardEntry';
 
   static String _$profileId(LeaderboardEntry v) => v.profileId;
-  static const Field<LeaderboardEntry, String> _f$profileId =
-      Field('profileId', _$profileId, key: r'profile_id');
+  static const Field<LeaderboardEntry, String> _f$profileId = Field(
+    'profileId',
+    _$profileId,
+    key: r'profile_id',
+  );
   static int _$drillScore(LeaderboardEntry v) => v.drillScore;
-  static const Field<LeaderboardEntry, int> _f$drillScore =
-      Field('drillScore', _$drillScore, key: r'drill_score');
+  static const Field<LeaderboardEntry, int> _f$drillScore = Field(
+    'drillScore',
+    _$drillScore,
+    key: r'drill_score',
+  );
   static int _$reviewCount(LeaderboardEntry v) => v.reviewCount;
-  static const Field<LeaderboardEntry, int> _f$reviewCount =
-      Field('reviewCount', _$reviewCount, key: r'review_count');
+  static const Field<LeaderboardEntry, int> _f$reviewCount = Field(
+    'reviewCount',
+    _$reviewCount,
+    key: r'review_count',
+  );
 
   @override
   final MappableFields<LeaderboardEntry> fields = const {
@@ -39,9 +50,10 @@ class LeaderboardEntryMapper extends ClassMapperBase<LeaderboardEntry> {
 
   static LeaderboardEntry _instantiate(DecodingData data) {
     return LeaderboardEntry(
-        profileId: data.dec(_f$profileId),
-        drillScore: data.dec(_f$drillScore),
-        reviewCount: data.dec(_f$reviewCount));
+      profileId: data.dec(_f$profileId),
+      drillScore: data.dec(_f$drillScore),
+      reviewCount: data.dec(_f$reviewCount),
+    );
   }
 
   @override
@@ -68,40 +80,48 @@ mixin LeaderboardEntryMappable {
   }
 
   LeaderboardEntryCopyWith<LeaderboardEntry, LeaderboardEntry, LeaderboardEntry>
-      get copyWith =>
-          _LeaderboardEntryCopyWithImpl<LeaderboardEntry, LeaderboardEntry>(
-              this as LeaderboardEntry, $identity, $identity);
+  get copyWith =>
+      _LeaderboardEntryCopyWithImpl<LeaderboardEntry, LeaderboardEntry>(
+        this as LeaderboardEntry,
+        $identity,
+        $identity,
+      );
   @override
   String toString() {
-    return LeaderboardEntryMapper.ensureInitialized()
-        .stringifyValue(this as LeaderboardEntry);
+    return LeaderboardEntryMapper.ensureInitialized().stringifyValue(
+      this as LeaderboardEntry,
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return LeaderboardEntryMapper.ensureInitialized()
-        .equalsValue(this as LeaderboardEntry, other);
+    return LeaderboardEntryMapper.ensureInitialized().equalsValue(
+      this as LeaderboardEntry,
+      other,
+    );
   }
 
   @override
   int get hashCode {
-    return LeaderboardEntryMapper.ensureInitialized()
-        .hashValue(this as LeaderboardEntry);
+    return LeaderboardEntryMapper.ensureInitialized().hashValue(
+      this as LeaderboardEntry,
+    );
   }
 }
 
 extension LeaderboardEntryValueCopy<$R, $Out>
     on ObjectCopyWith<$R, LeaderboardEntry, $Out> {
   LeaderboardEntryCopyWith<$R, LeaderboardEntry, $Out>
-      get $asLeaderboardEntry => $base
-          .as((v, t, t2) => _LeaderboardEntryCopyWithImpl<$R, $Out>(v, t, t2));
+  get $asLeaderboardEntry =>
+      $base.as((v, t, t2) => _LeaderboardEntryCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
 abstract class LeaderboardEntryCopyWith<$R, $In extends LeaderboardEntry, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   $R call({String? profileId, int? drillScore, int? reviewCount});
   LeaderboardEntryCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-      Then<$Out2, $R2> t);
+    Then<$Out2, $R2> t,
+  );
 }
 
 class _LeaderboardEntryCopyWithImpl<$R, $Out>
@@ -113,20 +133,23 @@ class _LeaderboardEntryCopyWithImpl<$R, $Out>
   late final ClassMapperBase<LeaderboardEntry> $mapper =
       LeaderboardEntryMapper.ensureInitialized();
   @override
-  $R call({String? profileId, int? drillScore, int? reviewCount}) =>
-      $apply(FieldCopyWithData({
-        if (profileId != null) #profileId: profileId,
-        if (drillScore != null) #drillScore: drillScore,
-        if (reviewCount != null) #reviewCount: reviewCount
-      }));
+  $R call({String? profileId, int? drillScore, int? reviewCount}) => $apply(
+    FieldCopyWithData({
+      if (profileId != null) #profileId: profileId,
+      if (drillScore != null) #drillScore: drillScore,
+      if (reviewCount != null) #reviewCount: reviewCount,
+    }),
+  );
   @override
   LeaderboardEntry $make(CopyWithData data) => LeaderboardEntry(
-      profileId: data.get(#profileId, or: $value.profileId),
-      drillScore: data.get(#drillScore, or: $value.drillScore),
-      reviewCount: data.get(#reviewCount, or: $value.reviewCount));
+    profileId: data.get(#profileId, or: $value.profileId),
+    drillScore: data.get(#drillScore, or: $value.drillScore),
+    reviewCount: data.get(#reviewCount, or: $value.reviewCount),
+  );
 
   @override
   LeaderboardEntryCopyWith<$R2, LeaderboardEntry, $Out2> $chain<$R2, $Out2>(
-          Then<$Out2, $R2> t) =>
-      _LeaderboardEntryCopyWithImpl<$R2, $Out2>($value, $cast, t);
+    Then<$Out2, $R2> t,
+  ) => _LeaderboardEntryCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
+

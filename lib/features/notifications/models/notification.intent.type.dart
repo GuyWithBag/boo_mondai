@@ -10,4 +10,5 @@ enum NotificationIntentType {
   syncComplete,
   firstDrillSurvey,
   studyDeckReview,
+  researcherStudySessionComplete,
 }

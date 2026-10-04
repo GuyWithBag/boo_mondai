@@ -31,6 +31,7 @@ class SegmentedControl<T> extends HookWidget {
     this.onDisabledOptionPressed,
     super.key,
     this.isScrollable = false,
+    this.enableGradient = false,
   });
 
   final List<SegmentOption<T>> options;
@@ -40,6 +41,7 @@ class SegmentedControl<T> extends HookWidget {
   final bool Function(T value)? isOptionEnabled;
   final ValueChanged<T>? onDisabledOptionPressed;
   final bool isScrollable;
+  final bool enableGradient;
 
   @override
   Widget build(BuildContext context) {
@@ -106,6 +108,30 @@ class SegmentedControl<T> extends HookWidget {
       body = SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: body,
+      );
+    }
+
+    if (enableGradient) {
+      body = Stack(
+        alignment: Alignment.centerRight,
+        children: [
+          body,
+          IgnorePointer(
+            child: Container(
+              width: 44,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.centerRight,
+                  end: Alignment.centerLeft,
+                  colors: [
+                    tokens.colorScaffoldBackground,
+                    tokens.colorScaffoldBackground.withValues(alpha: 0),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       );
     }
 

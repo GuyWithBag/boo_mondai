@@ -1,6 +1,8 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format off
 // ignore_for_file: type=lint
+// ignore_for_file: invalid_use_of_protected_member
 // ignore_for_file: unused_element, unnecessary_cast, override_on_non_overriding_member
 // ignore_for_file: strict_raw_type, inference_failure_on_untyped_parameter
 
@@ -21,13 +23,19 @@ class GayMapper extends ClassMapperBase<Gay> {
   final String id = 'Gay';
 
   static String _$profileId(Gay v) => v.profileId;
-  static const Field<Gay, String> _f$profileId =
-      Field('profileId', _$profileId, key: r'profile_id');
+  static const Field<Gay, String> _f$profileId = Field(
+    'profileId',
+    _$profileId,
+    key: r'profile_id',
+  );
   static Uint8List _$bytes(Gay v) => v.bytes;
   static const Field<Gay, Uint8List> _f$bytes = Field('bytes', _$bytes);
   static String _$filePath(Gay v) => v.filePath;
-  static const Field<Gay, String> _f$filePath =
-      Field('filePath', _$filePath, key: r'file_path');
+  static const Field<Gay, String> _f$filePath = Field(
+    'filePath',
+    _$filePath,
+    key: r'file_path',
+  );
 
   @override
   final MappableFields<Gay> fields = const {
@@ -38,9 +46,10 @@ class GayMapper extends ClassMapperBase<Gay> {
 
   static Gay _instantiate(DecodingData data) {
     return Gay(
-        profileId: data.dec(_f$profileId),
-        bytes: data.dec(_f$bytes),
-        filePath: data.dec(_f$filePath));
+      profileId: data.dec(_f$profileId),
+      bytes: data.dec(_f$bytes),
+      filePath: data.dec(_f$filePath),
+    );
   }
 
   @override
@@ -100,19 +109,22 @@ class _GayCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Gay, $Out>
   @override
   late final ClassMapperBase<Gay> $mapper = GayMapper.ensureInitialized();
   @override
-  $R call({String? profileId, Uint8List? bytes, String? filePath}) =>
-      $apply(FieldCopyWithData({
-        if (profileId != null) #profileId: profileId,
-        if (bytes != null) #bytes: bytes,
-        if (filePath != null) #filePath: filePath
-      }));
+  $R call({String? profileId, Uint8List? bytes, String? filePath}) => $apply(
+    FieldCopyWithData({
+      if (profileId != null) #profileId: profileId,
+      if (bytes != null) #bytes: bytes,
+      if (filePath != null) #filePath: filePath,
+    }),
+  );
   @override
   Gay $make(CopyWithData data) => Gay(
-      profileId: data.get(#profileId, or: $value.profileId),
-      bytes: data.get(#bytes, or: $value.bytes),
-      filePath: data.get(#filePath, or: $value.filePath));
+    profileId: data.get(#profileId, or: $value.profileId),
+    bytes: data.get(#bytes, or: $value.bytes),
+    filePath: data.get(#filePath, or: $value.filePath),
+  );
 
   @override
   GayCopyWith<$R2, Gay, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
       _GayCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
+

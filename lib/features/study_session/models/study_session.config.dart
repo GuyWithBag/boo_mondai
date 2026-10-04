@@ -6,22 +6,30 @@ final class StudySessionConfig {
     required this.autoRateIncorrectAnswers,
     required this.requeueIncorrectAnswers,
     required this.requeueAgainWhenIntervalLessThan,
+    required this.saveAfterEachAnswer,
+    this.showCardsByBatch,
   });
 
   const StudySessionConfig.drill()
     : mode = SessionMode.drill,
       autoRateIncorrectAnswers = true,
       requeueIncorrectAnswers = true,
+      saveAfterEachAnswer = false,
+      showCardsByBatch = 10,
       requeueAgainWhenIntervalLessThan = null;
 
   const StudySessionConfig.spacedRepitition({
     this.requeueAgainWhenIntervalLessThan,
+    this.showCardsByBatch,
   }) : mode = SessionMode.review,
        autoRateIncorrectAnswers = false,
-       requeueIncorrectAnswers = false;
+       requeueIncorrectAnswers = false,
+       saveAfterEachAnswer = true;
 
   final SessionMode mode;
   final bool autoRateIncorrectAnswers;
   final bool requeueIncorrectAnswers;
+  final bool saveAfterEachAnswer;
+  final int? showCardsByBatch;
   final Duration? requeueAgainWhenIntervalLessThan;
 }

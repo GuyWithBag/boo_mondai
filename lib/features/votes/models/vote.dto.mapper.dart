@@ -1,6 +1,8 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format off
 // ignore_for_file: type=lint
+// ignore_for_file: invalid_use_of_protected_member
 // ignore_for_file: unused_element, unnecessary_cast, override_on_non_overriding_member
 // ignore_for_file: strict_raw_type, inference_failure_on_untyped_parameter
 
@@ -21,14 +23,23 @@ class VoteMapper extends ClassMapperBase<Vote> {
   final String id = 'Vote';
 
   static String _$contentId(Vote v) => v.contentId;
-  static const Field<Vote, String> _f$contentId =
-      Field('contentId', _$contentId, key: r'content_id');
+  static const Field<Vote, String> _f$contentId = Field(
+    'contentId',
+    _$contentId,
+    key: r'content_id',
+  );
   static DateTime _$createdAt(Vote v) => v.createdAt;
-  static const Field<Vote, DateTime> _f$createdAt =
-      Field('createdAt', _$createdAt, key: r'created_at');
+  static const Field<Vote, DateTime> _f$createdAt = Field(
+    'createdAt',
+    _$createdAt,
+    key: r'created_at',
+  );
   static bool _$isPositive(Vote v) => v.isPositive;
-  static const Field<Vote, bool> _f$isPositive =
-      Field('isPositive', _$isPositive, key: r'is_positive');
+  static const Field<Vote, bool> _f$isPositive = Field(
+    'isPositive',
+    _$isPositive,
+    key: r'is_positive',
+  );
 
   @override
   final MappableFields<Vote> fields = const {
@@ -39,9 +50,10 @@ class VoteMapper extends ClassMapperBase<Vote> {
 
   static Vote _instantiate(DecodingData data) {
     return Vote(
-        contentId: data.dec(_f$contentId),
-        createdAt: data.dec(_f$createdAt),
-        isPositive: data.dec(_f$isPositive));
+      contentId: data.dec(_f$contentId),
+      createdAt: data.dec(_f$createdAt),
+      isPositive: data.dec(_f$isPositive),
+    );
   }
 
   @override
@@ -101,19 +113,22 @@ class _VoteCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Vote, $Out>
   @override
   late final ClassMapperBase<Vote> $mapper = VoteMapper.ensureInitialized();
   @override
-  $R call({String? contentId, DateTime? createdAt, bool? isPositive}) =>
-      $apply(FieldCopyWithData({
-        if (contentId != null) #contentId: contentId,
-        if (createdAt != null) #createdAt: createdAt,
-        if (isPositive != null) #isPositive: isPositive
-      }));
+  $R call({String? contentId, DateTime? createdAt, bool? isPositive}) => $apply(
+    FieldCopyWithData({
+      if (contentId != null) #contentId: contentId,
+      if (createdAt != null) #createdAt: createdAt,
+      if (isPositive != null) #isPositive: isPositive,
+    }),
+  );
   @override
   Vote $make(CopyWithData data) => Vote(
-      contentId: data.get(#contentId, or: $value.contentId),
-      createdAt: data.get(#createdAt, or: $value.createdAt),
-      isPositive: data.get(#isPositive, or: $value.isPositive));
+    contentId: data.get(#contentId, or: $value.contentId),
+    createdAt: data.get(#createdAt, or: $value.createdAt),
+    isPositive: data.get(#isPositive, or: $value.isPositive),
+  );
 
   @override
   VoteCopyWith<$R2, Vote, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
       _VoteCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
+

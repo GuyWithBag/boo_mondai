@@ -1,6 +1,8 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format off
 // ignore_for_file: type=lint
+// ignore_for_file: invalid_use_of_protected_member
 // ignore_for_file: unused_element, unnecessary_cast, override_on_non_overriding_member
 // ignore_for_file: strict_raw_type, inference_failure_on_untyped_parameter
 
@@ -23,14 +25,23 @@ class CommentEditLogMapper extends ClassMapperBase<CommentEditLog> {
   static String _$id(CommentEditLog v) => v.id;
   static const Field<CommentEditLog, String> _f$id = Field('id', _$id);
   static String _$oldBody(CommentEditLog v) => v.oldBody;
-  static const Field<CommentEditLog, String> _f$oldBody =
-      Field('oldBody', _$oldBody, key: r'old_body');
+  static const Field<CommentEditLog, String> _f$oldBody = Field(
+    'oldBody',
+    _$oldBody,
+    key: r'old_body',
+  );
   static String _$newBody(CommentEditLog v) => v.newBody;
-  static const Field<CommentEditLog, String> _f$newBody =
-      Field('newBody', _$newBody, key: r'new_body');
+  static const Field<CommentEditLog, String> _f$newBody = Field(
+    'newBody',
+    _$newBody,
+    key: r'new_body',
+  );
   static String _$contentId(CommentEditLog v) => v.contentId;
-  static const Field<CommentEditLog, String> _f$contentId =
-      Field('contentId', _$contentId, key: r'content_id');
+  static const Field<CommentEditLog, String> _f$contentId = Field(
+    'contentId',
+    _$contentId,
+    key: r'content_id',
+  );
 
   @override
   final MappableFields<CommentEditLog> fields = const {
@@ -42,10 +53,11 @@ class CommentEditLogMapper extends ClassMapperBase<CommentEditLog> {
 
   static CommentEditLog _instantiate(DecodingData data) {
     return CommentEditLog(
-        id: data.dec(_f$id),
-        oldBody: data.dec(_f$oldBody),
-        newBody: data.dec(_f$newBody),
-        contentId: data.dec(_f$contentId));
+      id: data.dec(_f$id),
+      oldBody: data.dec(_f$oldBody),
+      newBody: data.dec(_f$newBody),
+      contentId: data.dec(_f$contentId),
+    );
   }
 
   @override
@@ -62,35 +74,43 @@ class CommentEditLogMapper extends ClassMapperBase<CommentEditLog> {
 
 mixin CommentEditLogMappable {
   String toJson() {
-    return CommentEditLogMapper.ensureInitialized()
-        .encodeJson<CommentEditLog>(this as CommentEditLog);
+    return CommentEditLogMapper.ensureInitialized().encodeJson<CommentEditLog>(
+      this as CommentEditLog,
+    );
   }
 
   Map<String, dynamic> toMap() {
-    return CommentEditLogMapper.ensureInitialized()
-        .encodeMap<CommentEditLog>(this as CommentEditLog);
+    return CommentEditLogMapper.ensureInitialized().encodeMap<CommentEditLog>(
+      this as CommentEditLog,
+    );
   }
 
   CommentEditLogCopyWith<CommentEditLog, CommentEditLog, CommentEditLog>
-      get copyWith =>
-          _CommentEditLogCopyWithImpl<CommentEditLog, CommentEditLog>(
-              this as CommentEditLog, $identity, $identity);
+  get copyWith => _CommentEditLogCopyWithImpl<CommentEditLog, CommentEditLog>(
+    this as CommentEditLog,
+    $identity,
+    $identity,
+  );
   @override
   String toString() {
-    return CommentEditLogMapper.ensureInitialized()
-        .stringifyValue(this as CommentEditLog);
+    return CommentEditLogMapper.ensureInitialized().stringifyValue(
+      this as CommentEditLog,
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return CommentEditLogMapper.ensureInitialized()
-        .equalsValue(this as CommentEditLog, other);
+    return CommentEditLogMapper.ensureInitialized().equalsValue(
+      this as CommentEditLog,
+      other,
+    );
   }
 
   @override
   int get hashCode {
-    return CommentEditLogMapper.ensureInitialized()
-        .hashValue(this as CommentEditLog);
+    return CommentEditLogMapper.ensureInitialized().hashValue(
+      this as CommentEditLog,
+    );
   }
 }
 
@@ -104,7 +124,8 @@ abstract class CommentEditLogCopyWith<$R, $In extends CommentEditLog, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   $R call({String? id, String? oldBody, String? newBody, String? contentId});
   CommentEditLogCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-      Then<$Out2, $R2> t);
+    Then<$Out2, $R2> t,
+  );
 }
 
 class _CommentEditLogCopyWithImpl<$R, $Out>
@@ -117,21 +138,25 @@ class _CommentEditLogCopyWithImpl<$R, $Out>
       CommentEditLogMapper.ensureInitialized();
   @override
   $R call({String? id, String? oldBody, String? newBody, String? contentId}) =>
-      $apply(FieldCopyWithData({
-        if (id != null) #id: id,
-        if (oldBody != null) #oldBody: oldBody,
-        if (newBody != null) #newBody: newBody,
-        if (contentId != null) #contentId: contentId
-      }));
+      $apply(
+        FieldCopyWithData({
+          if (id != null) #id: id,
+          if (oldBody != null) #oldBody: oldBody,
+          if (newBody != null) #newBody: newBody,
+          if (contentId != null) #contentId: contentId,
+        }),
+      );
   @override
   CommentEditLog $make(CopyWithData data) => CommentEditLog(
-      id: data.get(#id, or: $value.id),
-      oldBody: data.get(#oldBody, or: $value.oldBody),
-      newBody: data.get(#newBody, or: $value.newBody),
-      contentId: data.get(#contentId, or: $value.contentId));
+    id: data.get(#id, or: $value.id),
+    oldBody: data.get(#oldBody, or: $value.oldBody),
+    newBody: data.get(#newBody, or: $value.newBody),
+    contentId: data.get(#contentId, or: $value.contentId),
+  );
 
   @override
   CommentEditLogCopyWith<$R2, CommentEditLog, $Out2> $chain<$R2, $Out2>(
-          Then<$Out2, $R2> t) =>
-      _CommentEditLogCopyWithImpl<$R2, $Out2>($value, $cast, t);
+    Then<$Out2, $R2> t,
+  ) => _CommentEditLogCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
+

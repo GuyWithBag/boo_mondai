@@ -1,6 +1,8 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format off
 // ignore_for_file: type=lint
+// ignore_for_file: invalid_use_of_protected_member
 // ignore_for_file: unused_element, unnecessary_cast, override_on_non_overriding_member
 // ignore_for_file: strict_raw_type, inference_failure_on_untyped_parameter
 
@@ -23,26 +25,49 @@ class SyncDeletionMapper extends ClassMapperBase<SyncDeletion> {
   static String _$id(SyncDeletion v) => v.id;
   static const Field<SyncDeletion, String> _f$id = Field('id', _$id);
   static String _$entityType(SyncDeletion v) => v.entityType;
-  static const Field<SyncDeletion, String> _f$entityType =
-      Field('entityType', _$entityType, key: r'entity_type');
+  static const Field<SyncDeletion, String> _f$entityType = Field(
+    'entityType',
+    _$entityType,
+    key: r'entity_type',
+  );
   static String _$entityId(SyncDeletion v) => v.entityId;
-  static const Field<SyncDeletion, String> _f$entityId =
-      Field('entityId', _$entityId, key: r'entity_id');
+  static const Field<SyncDeletion, String> _f$entityId = Field(
+    'entityId',
+    _$entityId,
+    key: r'entity_id',
+  );
   static String _$profileId(SyncDeletion v) => v.profileId;
-  static const Field<SyncDeletion, String> _f$profileId =
-      Field('profileId', _$profileId, key: r'profile_id');
+  static const Field<SyncDeletion, String> _f$profileId = Field(
+    'profileId',
+    _$profileId,
+    key: r'profile_id',
+  );
   static DateTime _$deletedAt(SyncDeletion v) => v.deletedAt;
-  static const Field<SyncDeletion, DateTime> _f$deletedAt =
-      Field('deletedAt', _$deletedAt, key: r'deleted_at');
+  static const Field<SyncDeletion, DateTime> _f$deletedAt = Field(
+    'deletedAt',
+    _$deletedAt,
+    key: r'deleted_at',
+  );
   static DateTime _$createdAt(SyncDeletion v) => v.createdAt;
-  static const Field<SyncDeletion, DateTime> _f$createdAt =
-      Field('createdAt', _$createdAt, key: r'created_at');
+  static const Field<SyncDeletion, DateTime> _f$createdAt = Field(
+    'createdAt',
+    _$createdAt,
+    key: r'created_at',
+  );
   static String? _$scopeType(SyncDeletion v) => v.scopeType;
-  static const Field<SyncDeletion, String> _f$scopeType =
-      Field('scopeType', _$scopeType, key: r'scope_type', opt: true);
+  static const Field<SyncDeletion, String> _f$scopeType = Field(
+    'scopeType',
+    _$scopeType,
+    key: r'scope_type',
+    opt: true,
+  );
   static String? _$scopeId(SyncDeletion v) => v.scopeId;
-  static const Field<SyncDeletion, String> _f$scopeId =
-      Field('scopeId', _$scopeId, key: r'scope_id', opt: true);
+  static const Field<SyncDeletion, String> _f$scopeId = Field(
+    'scopeId',
+    _$scopeId,
+    key: r'scope_id',
+    opt: true,
+  );
 
   @override
   final MappableFields<SyncDeletion> fields = const {
@@ -58,14 +83,15 @@ class SyncDeletionMapper extends ClassMapperBase<SyncDeletion> {
 
   static SyncDeletion _instantiate(DecodingData data) {
     return SyncDeletion(
-        id: data.dec(_f$id),
-        entityType: data.dec(_f$entityType),
-        entityId: data.dec(_f$entityId),
-        profileId: data.dec(_f$profileId),
-        deletedAt: data.dec(_f$deletedAt),
-        createdAt: data.dec(_f$createdAt),
-        scopeType: data.dec(_f$scopeType),
-        scopeId: data.dec(_f$scopeId));
+      id: data.dec(_f$id),
+      entityType: data.dec(_f$entityType),
+      entityId: data.dec(_f$entityId),
+      profileId: data.dec(_f$profileId),
+      deletedAt: data.dec(_f$deletedAt),
+      createdAt: data.dec(_f$createdAt),
+      scopeType: data.dec(_f$scopeType),
+      scopeId: data.dec(_f$scopeId),
+    );
   }
 
   @override
@@ -82,34 +108,43 @@ class SyncDeletionMapper extends ClassMapperBase<SyncDeletion> {
 
 mixin SyncDeletionMappable {
   String toJson() {
-    return SyncDeletionMapper.ensureInitialized()
-        .encodeJson<SyncDeletion>(this as SyncDeletion);
+    return SyncDeletionMapper.ensureInitialized().encodeJson<SyncDeletion>(
+      this as SyncDeletion,
+    );
   }
 
   Map<String, dynamic> toMap() {
-    return SyncDeletionMapper.ensureInitialized()
-        .encodeMap<SyncDeletion>(this as SyncDeletion);
+    return SyncDeletionMapper.ensureInitialized().encodeMap<SyncDeletion>(
+      this as SyncDeletion,
+    );
   }
 
   SyncDeletionCopyWith<SyncDeletion, SyncDeletion, SyncDeletion> get copyWith =>
       _SyncDeletionCopyWithImpl<SyncDeletion, SyncDeletion>(
-          this as SyncDeletion, $identity, $identity);
+        this as SyncDeletion,
+        $identity,
+        $identity,
+      );
   @override
   String toString() {
-    return SyncDeletionMapper.ensureInitialized()
-        .stringifyValue(this as SyncDeletion);
+    return SyncDeletionMapper.ensureInitialized().stringifyValue(
+      this as SyncDeletion,
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return SyncDeletionMapper.ensureInitialized()
-        .equalsValue(this as SyncDeletion, other);
+    return SyncDeletionMapper.ensureInitialized().equalsValue(
+      this as SyncDeletion,
+      other,
+    );
   }
 
   @override
   int get hashCode {
-    return SyncDeletionMapper.ensureInitialized()
-        .hashValue(this as SyncDeletion);
+    return SyncDeletionMapper.ensureInitialized().hashValue(
+      this as SyncDeletion,
+    );
   }
 }
 
@@ -121,15 +156,16 @@ extension SyncDeletionValueCopy<$R, $Out>
 
 abstract class SyncDeletionCopyWith<$R, $In extends SyncDeletion, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  $R call(
-      {String? id,
-      String? entityType,
-      String? entityId,
-      String? profileId,
-      DateTime? deletedAt,
-      DateTime? createdAt,
-      String? scopeType,
-      String? scopeId});
+  $R call({
+    String? id,
+    String? entityType,
+    String? entityId,
+    String? profileId,
+    DateTime? deletedAt,
+    DateTime? createdAt,
+    String? scopeType,
+    String? scopeId,
+  });
   SyncDeletionCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -142,38 +178,42 @@ class _SyncDeletionCopyWithImpl<$R, $Out>
   late final ClassMapperBase<SyncDeletion> $mapper =
       SyncDeletionMapper.ensureInitialized();
   @override
-  $R call(
-          {String? id,
-          String? entityType,
-          String? entityId,
-          String? profileId,
-          DateTime? deletedAt,
-          DateTime? createdAt,
-          Object? scopeType = $none,
-          Object? scopeId = $none}) =>
-      $apply(FieldCopyWithData({
-        if (id != null) #id: id,
-        if (entityType != null) #entityType: entityType,
-        if (entityId != null) #entityId: entityId,
-        if (profileId != null) #profileId: profileId,
-        if (deletedAt != null) #deletedAt: deletedAt,
-        if (createdAt != null) #createdAt: createdAt,
-        if (scopeType != $none) #scopeType: scopeType,
-        if (scopeId != $none) #scopeId: scopeId
-      }));
+  $R call({
+    String? id,
+    String? entityType,
+    String? entityId,
+    String? profileId,
+    DateTime? deletedAt,
+    DateTime? createdAt,
+    Object? scopeType = $none,
+    Object? scopeId = $none,
+  }) => $apply(
+    FieldCopyWithData({
+      if (id != null) #id: id,
+      if (entityType != null) #entityType: entityType,
+      if (entityId != null) #entityId: entityId,
+      if (profileId != null) #profileId: profileId,
+      if (deletedAt != null) #deletedAt: deletedAt,
+      if (createdAt != null) #createdAt: createdAt,
+      if (scopeType != $none) #scopeType: scopeType,
+      if (scopeId != $none) #scopeId: scopeId,
+    }),
+  );
   @override
   SyncDeletion $make(CopyWithData data) => SyncDeletion(
-      id: data.get(#id, or: $value.id),
-      entityType: data.get(#entityType, or: $value.entityType),
-      entityId: data.get(#entityId, or: $value.entityId),
-      profileId: data.get(#profileId, or: $value.profileId),
-      deletedAt: data.get(#deletedAt, or: $value.deletedAt),
-      createdAt: data.get(#createdAt, or: $value.createdAt),
-      scopeType: data.get(#scopeType, or: $value.scopeType),
-      scopeId: data.get(#scopeId, or: $value.scopeId));
+    id: data.get(#id, or: $value.id),
+    entityType: data.get(#entityType, or: $value.entityType),
+    entityId: data.get(#entityId, or: $value.entityId),
+    profileId: data.get(#profileId, or: $value.profileId),
+    deletedAt: data.get(#deletedAt, or: $value.deletedAt),
+    createdAt: data.get(#createdAt, or: $value.createdAt),
+    scopeType: data.get(#scopeType, or: $value.scopeType),
+    scopeId: data.get(#scopeId, or: $value.scopeId),
+  );
 
   @override
   SyncDeletionCopyWith<$R2, SyncDeletion, $Out2> $chain<$R2, $Out2>(
-          Then<$Out2, $R2> t) =>
-      _SyncDeletionCopyWithImpl<$R2, $Out2>($value, $cast, t);
+    Then<$Out2, $R2> t,
+  ) => _SyncDeletionCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
+

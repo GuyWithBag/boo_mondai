@@ -1,6 +1,8 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format off
 // ignore_for_file: type=lint
+// ignore_for_file: invalid_use_of_protected_member
 // ignore_for_file: unused_element, unnecessary_cast, override_on_non_overriding_member
 // ignore_for_file: strict_raw_type, inference_failure_on_untyped_parameter
 
@@ -29,14 +31,22 @@ class SurveyBlockMapper extends ClassMapperBase<SurveyBlock> {
   static String _$id(SurveyBlock v) => v.id;
   static const Field<SurveyBlock, String> _f$id = Field('id', _$id);
   static String _$surveyId(SurveyBlock v) => v.surveyId;
-  static const Field<SurveyBlock, String> _f$surveyId =
-      Field('surveyId', _$surveyId, key: r'survey_id');
+  static const Field<SurveyBlock, String> _f$surveyId = Field(
+    'surveyId',
+    _$surveyId,
+    key: r'survey_id',
+  );
   static String _$pageId(SurveyBlock v) => v.pageId;
-  static const Field<SurveyBlock, String> _f$pageId =
-      Field('pageId', _$pageId, key: r'page_id');
+  static const Field<SurveyBlock, String> _f$pageId = Field(
+    'pageId',
+    _$pageId,
+    key: r'page_id',
+  );
   static int _$position(SurveyBlock v) => v.position;
-  static const Field<SurveyBlock, int> _f$position =
-      Field('position', _$position);
+  static const Field<SurveyBlock, int> _f$position = Field(
+    'position',
+    _$position,
+  );
 
   @override
   final MappableFields<SurveyBlock> fields = const {
@@ -48,7 +58,10 @@ class SurveyBlockMapper extends ClassMapperBase<SurveyBlock> {
 
   static SurveyBlock _instantiate(DecodingData data) {
     throw MapperException.missingSubclass(
-        'SurveyBlock', 'block_type', '${data.value['block_type']}');
+      'SurveyBlock',
+      'block_type',
+      '${data.value['block_type']}',
+    );
   }
 
   @override
@@ -74,3 +87,4 @@ abstract class SurveyBlockCopyWith<$R, $In extends SurveyBlock, $Out>
   $R call({String? id, String? surveyId, String? pageId, int? position});
   SurveyBlockCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
+

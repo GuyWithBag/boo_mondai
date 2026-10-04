@@ -1,6 +1,8 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format off
 // ignore_for_file: type=lint
+// ignore_for_file: invalid_use_of_protected_member
 // ignore_for_file: unused_element, unnecessary_cast, override_on_non_overriding_member
 // ignore_for_file: strict_raw_type, inference_failure_on_untyped_parameter
 
@@ -26,44 +28,85 @@ class FlashcardTemplateMapper extends SubClassMapperBase<FlashcardTemplate> {
   static String _$id(FlashcardTemplate v) => v.id;
   static const Field<FlashcardTemplate, String> _f$id = Field('id', _$id);
   static String _$deckId(FlashcardTemplate v) => v.deckId;
-  static const Field<FlashcardTemplate, String> _f$deckId =
-      Field('deckId', _$deckId, key: r'deck_id');
+  static const Field<FlashcardTemplate, String> _f$deckId = Field(
+    'deckId',
+    _$deckId,
+    key: r'deck_id',
+  );
   static int _$sortOrder(FlashcardTemplate v) => v.sortOrder;
-  static const Field<FlashcardTemplate, int> _f$sortOrder =
-      Field('sortOrder', _$sortOrder, key: r'sort_order');
+  static const Field<FlashcardTemplate, int> _f$sortOrder = Field(
+    'sortOrder',
+    _$sortOrder,
+    key: r'sort_order',
+  );
   static DateTime _$createdAt(FlashcardTemplate v) => v.createdAt;
-  static const Field<FlashcardTemplate, DateTime> _f$createdAt =
-      Field('createdAt', _$createdAt, key: r'created_at');
+  static const Field<FlashcardTemplate, DateTime> _f$createdAt = Field(
+    'createdAt',
+    _$createdAt,
+    key: r'created_at',
+  );
   static DateTime _$updatedAt(FlashcardTemplate v) => v.updatedAt;
-  static const Field<FlashcardTemplate, DateTime> _f$updatedAt =
-      Field('updatedAt', _$updatedAt, key: r'updated_at');
+  static const Field<FlashcardTemplate, DateTime> _f$updatedAt = Field(
+    'updatedAt',
+    _$updatedAt,
+    key: r'updated_at',
+  );
   static DateTime? _$deletedAt(FlashcardTemplate v) => v.deletedAt;
-  static const Field<FlashcardTemplate, DateTime> _f$deletedAt =
-      Field('deletedAt', _$deletedAt, key: r'deleted_at', opt: true);
+  static const Field<FlashcardTemplate, DateTime> _f$deletedAt = Field(
+    'deletedAt',
+    _$deletedAt,
+    key: r'deleted_at',
+    opt: true,
+  );
   static DateTime? _$purgeAfter(FlashcardTemplate v) => v.purgeAfter;
-  static const Field<FlashcardTemplate, DateTime> _f$purgeAfter =
-      Field('purgeAfter', _$purgeAfter, key: r'purge_after', opt: true);
+  static const Field<FlashcardTemplate, DateTime> _f$purgeAfter = Field(
+    'purgeAfter',
+    _$purgeAfter,
+    key: r'purge_after',
+    opt: true,
+  );
   static String? _$sourceTemplateId(FlashcardTemplate v) => v.sourceTemplateId;
   static const Field<FlashcardTemplate, String> _f$sourceTemplateId = Field(
-      'sourceTemplateId', _$sourceTemplateId,
-      key: r'source_template_id', opt: true);
+    'sourceTemplateId',
+    _$sourceTemplateId,
+    key: r'source_template_id',
+    opt: true,
+  );
   static List<Tag> _$tags(FlashcardTemplate v) => v.tags;
-  static const Field<FlashcardTemplate, List<Tag>> _f$tags =
-      Field('tags', _$tags, opt: true, def: const []);
+  static const Field<FlashcardTemplate, List<Tag>> _f$tags = Field(
+    'tags',
+    _$tags,
+    opt: true,
+    def: const [],
+  );
   static bool _$verticallyCentered(FlashcardTemplate v) => v.verticallyCentered;
   static const Field<FlashcardTemplate, bool> _f$verticallyCentered = Field(
-      'verticallyCentered', _$verticallyCentered,
-      key: r'vertically_centered', opt: true, def: true);
+    'verticallyCentered',
+    _$verticallyCentered,
+    key: r'vertically_centered',
+    opt: true,
+    def: true,
+  );
   static String _$frontText(FlashcardTemplate v) => v.frontText;
-  static const Field<FlashcardTemplate, String> _f$frontText =
-      Field('frontText', _$frontText, key: r'front_text');
+  static const Field<FlashcardTemplate, String> _f$frontText = Field(
+    'frontText',
+    _$frontText,
+    key: r'front_text',
+  );
   static String _$backText(FlashcardTemplate v) => v.backText;
-  static const Field<FlashcardTemplate, String> _f$backText =
-      Field('backText', _$backText, key: r'back_text');
+  static const Field<FlashcardTemplate, String> _f$backText = Field(
+    'backText',
+    _$backText,
+    key: r'back_text',
+  );
   static CardTemplateDirection _$direction(FlashcardTemplate v) => v.direction;
   static const Field<FlashcardTemplate, CardTemplateDirection> _f$direction =
-      Field('direction', _$direction,
-          opt: true, def: CardTemplateDirection.normal);
+      Field(
+        'direction',
+        _$direction,
+        opt: true,
+        def: CardTemplateDirection.normal,
+      );
 
   @override
   final MappableFields<FlashcardTemplate> fields = const {
@@ -92,19 +135,20 @@ class FlashcardTemplateMapper extends SubClassMapperBase<FlashcardTemplate> {
 
   static FlashcardTemplate _instantiate(DecodingData data) {
     return FlashcardTemplate(
-        id: data.dec(_f$id),
-        deckId: data.dec(_f$deckId),
-        sortOrder: data.dec(_f$sortOrder),
-        createdAt: data.dec(_f$createdAt),
-        updatedAt: data.dec(_f$updatedAt),
-        deletedAt: data.dec(_f$deletedAt),
-        purgeAfter: data.dec(_f$purgeAfter),
-        sourceTemplateId: data.dec(_f$sourceTemplateId),
-        tags: data.dec(_f$tags),
-        verticallyCentered: data.dec(_f$verticallyCentered),
-        frontText: data.dec(_f$frontText),
-        backText: data.dec(_f$backText),
-        direction: data.dec(_f$direction));
+      id: data.dec(_f$id),
+      deckId: data.dec(_f$deckId),
+      sortOrder: data.dec(_f$sortOrder),
+      createdAt: data.dec(_f$createdAt),
+      updatedAt: data.dec(_f$updatedAt),
+      deletedAt: data.dec(_f$deletedAt),
+      purgeAfter: data.dec(_f$purgeAfter),
+      sourceTemplateId: data.dec(_f$sourceTemplateId),
+      tags: data.dec(_f$tags),
+      verticallyCentered: data.dec(_f$verticallyCentered),
+      frontText: data.dec(_f$frontText),
+      backText: data.dec(_f$backText),
+      direction: data.dec(_f$direction),
+    );
   }
 
   @override
@@ -130,58 +174,75 @@ mixin FlashcardTemplateMappable {
         .encodeMap<FlashcardTemplate>(this as FlashcardTemplate);
   }
 
-  FlashcardTemplateCopyWith<FlashcardTemplate, FlashcardTemplate,
-          FlashcardTemplate>
-      get copyWith =>
-          _FlashcardTemplateCopyWithImpl<FlashcardTemplate, FlashcardTemplate>(
-              this as FlashcardTemplate, $identity, $identity);
+  FlashcardTemplateCopyWith<
+    FlashcardTemplate,
+    FlashcardTemplate,
+    FlashcardTemplate
+  >
+  get copyWith =>
+      _FlashcardTemplateCopyWithImpl<FlashcardTemplate, FlashcardTemplate>(
+        this as FlashcardTemplate,
+        $identity,
+        $identity,
+      );
   @override
   String toString() {
-    return FlashcardTemplateMapper.ensureInitialized()
-        .stringifyValue(this as FlashcardTemplate);
+    return FlashcardTemplateMapper.ensureInitialized().stringifyValue(
+      this as FlashcardTemplate,
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return FlashcardTemplateMapper.ensureInitialized()
-        .equalsValue(this as FlashcardTemplate, other);
+    return FlashcardTemplateMapper.ensureInitialized().equalsValue(
+      this as FlashcardTemplate,
+      other,
+    );
   }
 
   @override
   int get hashCode {
-    return FlashcardTemplateMapper.ensureInitialized()
-        .hashValue(this as FlashcardTemplate);
+    return FlashcardTemplateMapper.ensureInitialized().hashValue(
+      this as FlashcardTemplate,
+    );
   }
 }
 
 extension FlashcardTemplateValueCopy<$R, $Out>
     on ObjectCopyWith<$R, FlashcardTemplate, $Out> {
   FlashcardTemplateCopyWith<$R, FlashcardTemplate, $Out>
-      get $asFlashcardTemplate => $base
-          .as((v, t, t2) => _FlashcardTemplateCopyWithImpl<$R, $Out>(v, t, t2));
+  get $asFlashcardTemplate => $base.as(
+    (v, t, t2) => _FlashcardTemplateCopyWithImpl<$R, $Out>(v, t, t2),
+  );
 }
 
-abstract class FlashcardTemplateCopyWith<$R, $In extends FlashcardTemplate,
-    $Out> implements CardTemplateCopyWith<$R, $In, $Out> {
+abstract class FlashcardTemplateCopyWith<
+  $R,
+  $In extends FlashcardTemplate,
+  $Out
+>
+    implements CardTemplateCopyWith<$R, $In, $Out> {
   @override
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags;
   @override
-  $R call(
-      {String? id,
-      String? deckId,
-      int? sortOrder,
-      DateTime? createdAt,
-      DateTime? updatedAt,
-      DateTime? deletedAt,
-      DateTime? purgeAfter,
-      String? sourceTemplateId,
-      List<Tag>? tags,
-      bool? verticallyCentered,
-      String? frontText,
-      String? backText,
-      CardTemplateDirection? direction});
+  $R call({
+    String? id,
+    String? deckId,
+    int? sortOrder,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    DateTime? deletedAt,
+    DateTime? purgeAfter,
+    String? sourceTemplateId,
+    List<Tag>? tags,
+    bool? verticallyCentered,
+    String? frontText,
+    String? backText,
+    CardTemplateDirection? direction,
+  });
   FlashcardTemplateCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-      Then<$Out2, $R2> t);
+    Then<$Out2, $R2> t,
+  );
 }
 
 class _FlashcardTemplateCopyWithImpl<$R, $Out>
@@ -194,57 +255,65 @@ class _FlashcardTemplateCopyWithImpl<$R, $Out>
       FlashcardTemplateMapper.ensureInitialized();
   @override
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags => ListCopyWith(
-      $value.tags, (v, t) => v.copyWith.$chain(t), (v) => call(tags: v));
+    $value.tags,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(tags: v),
+  );
   @override
-  $R call(
-          {String? id,
-          String? deckId,
-          int? sortOrder,
-          DateTime? createdAt,
-          DateTime? updatedAt,
-          Object? deletedAt = $none,
-          Object? purgeAfter = $none,
-          Object? sourceTemplateId = $none,
-          List<Tag>? tags,
-          bool? verticallyCentered,
-          String? frontText,
-          String? backText,
-          CardTemplateDirection? direction}) =>
-      $apply(FieldCopyWithData({
-        if (id != null) #id: id,
-        if (deckId != null) #deckId: deckId,
-        if (sortOrder != null) #sortOrder: sortOrder,
-        if (createdAt != null) #createdAt: createdAt,
-        if (updatedAt != null) #updatedAt: updatedAt,
-        if (deletedAt != $none) #deletedAt: deletedAt,
-        if (purgeAfter != $none) #purgeAfter: purgeAfter,
-        if (sourceTemplateId != $none) #sourceTemplateId: sourceTemplateId,
-        if (tags != null) #tags: tags,
-        if (verticallyCentered != null) #verticallyCentered: verticallyCentered,
-        if (frontText != null) #frontText: frontText,
-        if (backText != null) #backText: backText,
-        if (direction != null) #direction: direction
-      }));
+  $R call({
+    String? id,
+    String? deckId,
+    int? sortOrder,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Object? deletedAt = $none,
+    Object? purgeAfter = $none,
+    Object? sourceTemplateId = $none,
+    List<Tag>? tags,
+    bool? verticallyCentered,
+    String? frontText,
+    String? backText,
+    CardTemplateDirection? direction,
+  }) => $apply(
+    FieldCopyWithData({
+      if (id != null) #id: id,
+      if (deckId != null) #deckId: deckId,
+      if (sortOrder != null) #sortOrder: sortOrder,
+      if (createdAt != null) #createdAt: createdAt,
+      if (updatedAt != null) #updatedAt: updatedAt,
+      if (deletedAt != $none) #deletedAt: deletedAt,
+      if (purgeAfter != $none) #purgeAfter: purgeAfter,
+      if (sourceTemplateId != $none) #sourceTemplateId: sourceTemplateId,
+      if (tags != null) #tags: tags,
+      if (verticallyCentered != null) #verticallyCentered: verticallyCentered,
+      if (frontText != null) #frontText: frontText,
+      if (backText != null) #backText: backText,
+      if (direction != null) #direction: direction,
+    }),
+  );
   @override
   FlashcardTemplate $make(CopyWithData data) => FlashcardTemplate(
-      id: data.get(#id, or: $value.id),
-      deckId: data.get(#deckId, or: $value.deckId),
-      sortOrder: data.get(#sortOrder, or: $value.sortOrder),
-      createdAt: data.get(#createdAt, or: $value.createdAt),
-      updatedAt: data.get(#updatedAt, or: $value.updatedAt),
-      deletedAt: data.get(#deletedAt, or: $value.deletedAt),
-      purgeAfter: data.get(#purgeAfter, or: $value.purgeAfter),
-      sourceTemplateId:
-          data.get(#sourceTemplateId, or: $value.sourceTemplateId),
-      tags: data.get(#tags, or: $value.tags),
-      verticallyCentered:
-          data.get(#verticallyCentered, or: $value.verticallyCentered),
-      frontText: data.get(#frontText, or: $value.frontText),
-      backText: data.get(#backText, or: $value.backText),
-      direction: data.get(#direction, or: $value.direction));
+    id: data.get(#id, or: $value.id),
+    deckId: data.get(#deckId, or: $value.deckId),
+    sortOrder: data.get(#sortOrder, or: $value.sortOrder),
+    createdAt: data.get(#createdAt, or: $value.createdAt),
+    updatedAt: data.get(#updatedAt, or: $value.updatedAt),
+    deletedAt: data.get(#deletedAt, or: $value.deletedAt),
+    purgeAfter: data.get(#purgeAfter, or: $value.purgeAfter),
+    sourceTemplateId: data.get(#sourceTemplateId, or: $value.sourceTemplateId),
+    tags: data.get(#tags, or: $value.tags),
+    verticallyCentered: data.get(
+      #verticallyCentered,
+      or: $value.verticallyCentered,
+    ),
+    frontText: data.get(#frontText, or: $value.frontText),
+    backText: data.get(#backText, or: $value.backText),
+    direction: data.get(#direction, or: $value.direction),
+  );
 
   @override
   FlashcardTemplateCopyWith<$R2, FlashcardTemplate, $Out2> $chain<$R2, $Out2>(
-          Then<$Out2, $R2> t) =>
-      _FlashcardTemplateCopyWithImpl<$R2, $Out2>($value, $cast, t);
+    Then<$Out2, $R2> t,
+  ) => _FlashcardTemplateCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
+

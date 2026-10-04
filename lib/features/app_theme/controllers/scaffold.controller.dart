@@ -289,9 +289,7 @@ class ScaffoldController {
     if (isDisposed) return;
 
     final focusedContext = FocusManager.instance.primaryFocus?.context;
-    isUserInputFocusing.value =
-        focusedContext?.widget is EditableText ||
-        focusedContext?.findAncestorWidgetOfExactType<EditableText>() != null;
+    isUserInputFocusing.value = focusedContext?.widget is EditableText;
   }
 
   void addFocusListener() {

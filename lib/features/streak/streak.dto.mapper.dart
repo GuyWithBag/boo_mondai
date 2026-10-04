@@ -1,6 +1,8 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format off
 // ignore_for_file: type=lint
+// ignore_for_file: invalid_use_of_protected_member
 // ignore_for_file: unused_element, unnecessary_cast, override_on_non_overriding_member
 // ignore_for_file: strict_raw_type, inference_failure_on_untyped_parameter
 
@@ -24,30 +26,56 @@ class StreakMapper extends ClassMapperBase<Streak> {
   static String _$id(Streak v) => v.id;
   static const Field<Streak, String> _f$id = Field('id', _$id);
   static DateTime _$createdAt(Streak v) => v.createdAt;
-  static const Field<Streak, DateTime> _f$createdAt =
-      Field('createdAt', _$createdAt, key: r'created_at');
+  static const Field<Streak, DateTime> _f$createdAt = Field(
+    'createdAt',
+    _$createdAt,
+    key: r'created_at',
+  );
   static DateTime _$updatedAt(Streak v) => v.updatedAt;
-  static const Field<Streak, DateTime> _f$updatedAt =
-      Field('updatedAt', _$updatedAt, key: r'updated_at');
+  static const Field<Streak, DateTime> _f$updatedAt = Field(
+    'updatedAt',
+    _$updatedAt,
+    key: r'updated_at',
+  );
   static DateTime? _$deletedAt(Streak v) => v.deletedAt;
-  static const Field<Streak, DateTime> _f$deletedAt =
-      Field('deletedAt', _$deletedAt, key: r'deleted_at', opt: true);
+  static const Field<Streak, DateTime> _f$deletedAt = Field(
+    'deletedAt',
+    _$deletedAt,
+    key: r'deleted_at',
+    opt: true,
+  );
   static DateTime? _$purgeAfter(Streak v) => v.purgeAfter;
-  static const Field<Streak, DateTime> _f$purgeAfter =
-      Field('purgeAfter', _$purgeAfter, key: r'purge_after', opt: true);
+  static const Field<Streak, DateTime> _f$purgeAfter = Field(
+    'purgeAfter',
+    _$purgeAfter,
+    key: r'purge_after',
+    opt: true,
+  );
   static String _$profileId(Streak v) => v.profileId;
-  static const Field<Streak, String> _f$profileId =
-      Field('profileId', _$profileId, key: r'profile_id');
+  static const Field<Streak, String> _f$profileId = Field(
+    'profileId',
+    _$profileId,
+    key: r'profile_id',
+  );
   static int _$currentStreak(Streak v) => v.currentStreak;
-  static const Field<Streak, int> _f$currentStreak =
-      Field('currentStreak', _$currentStreak, key: r'current_streak');
+  static const Field<Streak, int> _f$currentStreak = Field(
+    'currentStreak',
+    _$currentStreak,
+    key: r'current_streak',
+  );
   static int _$longestStreak(Streak v) => v.longestStreak;
-  static const Field<Streak, int> _f$longestStreak =
-      Field('longestStreak', _$longestStreak, key: r'longest_streak');
+  static const Field<Streak, int> _f$longestStreak = Field(
+    'longestStreak',
+    _$longestStreak,
+    key: r'longest_streak',
+  );
   static DateTime? _$lastActivityDate(Streak v) => v.lastActivityDate;
   static const Field<Streak, DateTime> _f$lastActivityDate = Field(
-      'lastActivityDate', _$lastActivityDate,
-      key: r'last_activity_date', opt: true);
+    'lastActivityDate',
+    _$lastActivityDate,
+    key: r'last_activity_date',
+    opt: true,
+  );
 
   @override
   final MappableFields<Streak> fields = const {
@@ -64,15 +92,16 @@ class StreakMapper extends ClassMapperBase<Streak> {
 
   static Streak _instantiate(DecodingData data) {
     return Streak(
-        id: data.dec(_f$id),
-        createdAt: data.dec(_f$createdAt),
-        updatedAt: data.dec(_f$updatedAt),
-        deletedAt: data.dec(_f$deletedAt),
-        purgeAfter: data.dec(_f$purgeAfter),
-        profileId: data.dec(_f$profileId),
-        currentStreak: data.dec(_f$currentStreak),
-        longestStreak: data.dec(_f$longestStreak),
-        lastActivityDate: data.dec(_f$lastActivityDate));
+      id: data.dec(_f$id),
+      createdAt: data.dec(_f$createdAt),
+      updatedAt: data.dec(_f$updatedAt),
+      deletedAt: data.dec(_f$deletedAt),
+      purgeAfter: data.dec(_f$purgeAfter),
+      profileId: data.dec(_f$profileId),
+      currentStreak: data.dec(_f$currentStreak),
+      longestStreak: data.dec(_f$longestStreak),
+      lastActivityDate: data.dec(_f$lastActivityDate),
+    );
   }
 
   @override
@@ -122,16 +151,17 @@ extension StreakValueCopy<$R, $Out> on ObjectCopyWith<$R, Streak, $Out> {
 abstract class StreakCopyWith<$R, $In extends Streak, $Out>
     implements MutableEntityCopyWith<$R, $In, $Out> {
   @override
-  $R call(
-      {String? id,
-      DateTime? createdAt,
-      DateTime? updatedAt,
-      DateTime? deletedAt,
-      DateTime? purgeAfter,
-      String? profileId,
-      int? currentStreak,
-      int? longestStreak,
-      DateTime? lastActivityDate});
+  $R call({
+    String? id,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    DateTime? deletedAt,
+    DateTime? purgeAfter,
+    String? profileId,
+    int? currentStreak,
+    int? longestStreak,
+    DateTime? lastActivityDate,
+  });
   StreakCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -142,41 +172,44 @@ class _StreakCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Streak, $Out>
   @override
   late final ClassMapperBase<Streak> $mapper = StreakMapper.ensureInitialized();
   @override
-  $R call(
-          {String? id,
-          DateTime? createdAt,
-          DateTime? updatedAt,
-          Object? deletedAt = $none,
-          Object? purgeAfter = $none,
-          String? profileId,
-          int? currentStreak,
-          int? longestStreak,
-          Object? lastActivityDate = $none}) =>
-      $apply(FieldCopyWithData({
-        if (id != null) #id: id,
-        if (createdAt != null) #createdAt: createdAt,
-        if (updatedAt != null) #updatedAt: updatedAt,
-        if (deletedAt != $none) #deletedAt: deletedAt,
-        if (purgeAfter != $none) #purgeAfter: purgeAfter,
-        if (profileId != null) #profileId: profileId,
-        if (currentStreak != null) #currentStreak: currentStreak,
-        if (longestStreak != null) #longestStreak: longestStreak,
-        if (lastActivityDate != $none) #lastActivityDate: lastActivityDate
-      }));
+  $R call({
+    String? id,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Object? deletedAt = $none,
+    Object? purgeAfter = $none,
+    String? profileId,
+    int? currentStreak,
+    int? longestStreak,
+    Object? lastActivityDate = $none,
+  }) => $apply(
+    FieldCopyWithData({
+      if (id != null) #id: id,
+      if (createdAt != null) #createdAt: createdAt,
+      if (updatedAt != null) #updatedAt: updatedAt,
+      if (deletedAt != $none) #deletedAt: deletedAt,
+      if (purgeAfter != $none) #purgeAfter: purgeAfter,
+      if (profileId != null) #profileId: profileId,
+      if (currentStreak != null) #currentStreak: currentStreak,
+      if (longestStreak != null) #longestStreak: longestStreak,
+      if (lastActivityDate != $none) #lastActivityDate: lastActivityDate,
+    }),
+  );
   @override
   Streak $make(CopyWithData data) => Streak(
-      id: data.get(#id, or: $value.id),
-      createdAt: data.get(#createdAt, or: $value.createdAt),
-      updatedAt: data.get(#updatedAt, or: $value.updatedAt),
-      deletedAt: data.get(#deletedAt, or: $value.deletedAt),
-      purgeAfter: data.get(#purgeAfter, or: $value.purgeAfter),
-      profileId: data.get(#profileId, or: $value.profileId),
-      currentStreak: data.get(#currentStreak, or: $value.currentStreak),
-      longestStreak: data.get(#longestStreak, or: $value.longestStreak),
-      lastActivityDate:
-          data.get(#lastActivityDate, or: $value.lastActivityDate));
+    id: data.get(#id, or: $value.id),
+    createdAt: data.get(#createdAt, or: $value.createdAt),
+    updatedAt: data.get(#updatedAt, or: $value.updatedAt),
+    deletedAt: data.get(#deletedAt, or: $value.deletedAt),
+    purgeAfter: data.get(#purgeAfter, or: $value.purgeAfter),
+    profileId: data.get(#profileId, or: $value.profileId),
+    currentStreak: data.get(#currentStreak, or: $value.currentStreak),
+    longestStreak: data.get(#longestStreak, or: $value.longestStreak),
+    lastActivityDate: data.get(#lastActivityDate, or: $value.lastActivityDate),
+  );
 
   @override
   StreakCopyWith<$R2, Streak, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
       _StreakCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
+

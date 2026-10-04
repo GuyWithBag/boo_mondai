@@ -440,7 +440,11 @@ class Scaffold extends SignalHookWidget {
                       alignment: Alignment.centerLeft,
                       child: SafeArea(
                         right: false,
-                        child: SizedBox(width: sidebarWidth, child: sidebar!),
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () {},
+                          child: SizedBox(width: sidebarWidth, child: sidebar!),
+                        ),
                       ),
                     ),
                   ),

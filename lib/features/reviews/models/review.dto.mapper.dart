@@ -1,6 +1,8 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format off
 // ignore_for_file: type=lint
+// ignore_for_file: invalid_use_of_protected_member
 // ignore_for_file: unused_element, unnecessary_cast, override_on_non_overriding_member
 // ignore_for_file: strict_raw_type, inference_failure_on_untyped_parameter
 
@@ -24,19 +26,29 @@ class ReviewMapper extends ClassMapperBase<Review> {
   static String _$id(Review v) => v.id;
   static const Field<Review, String> _f$id = Field('id', _$id);
   static String _$contentId(Review v) => v.contentId;
-  static const Field<Review, String> _f$contentId =
-      Field('contentId', _$contentId, key: r'content_id');
+  static const Field<Review, String> _f$contentId = Field(
+    'contentId',
+    _$contentId,
+    key: r'content_id',
+  );
   static String _$title(Review v) => v.title;
   static const Field<Review, String> _f$title = Field('title', _$title);
   static String _$body(Review v) => v.body;
   static const Field<Review, String> _f$body = Field('body', _$body);
   static DateTime _$deletedAt(Review v) => v.deletedAt;
-  static const Field<Review, DateTime> _f$deletedAt =
-      Field('deletedAt', _$deletedAt, key: r'deleted_at');
+  static const Field<Review, DateTime> _f$deletedAt = Field(
+    'deletedAt',
+    _$deletedAt,
+    key: r'deleted_at',
+  );
   static bool _$isNegative(Review v) => v.isNegative;
   static const Field<Review, bool> _f$isNegative = Field(
-      'isNegative', _$isNegative,
-      key: r'is_negative', opt: true, def: false);
+    'isNegative',
+    _$isNegative,
+    key: r'is_negative',
+    opt: true,
+    def: false,
+  );
 
   @override
   final MappableFields<Review> fields = const {
@@ -50,12 +62,13 @@ class ReviewMapper extends ClassMapperBase<Review> {
 
   static Review _instantiate(DecodingData data) {
     return Review(
-        id: data.dec(_f$id),
-        contentId: data.dec(_f$contentId),
-        title: data.dec(_f$title),
-        body: data.dec(_f$body),
-        deletedAt: data.dec(_f$deletedAt),
-        isNegative: data.dec(_f$isNegative));
+      id: data.dec(_f$id),
+      contentId: data.dec(_f$contentId),
+      title: data.dec(_f$title),
+      body: data.dec(_f$body),
+      deletedAt: data.dec(_f$deletedAt),
+      isNegative: data.dec(_f$isNegative),
+    );
   }
 
   @override
@@ -105,13 +118,14 @@ extension ReviewValueCopy<$R, $Out> on ObjectCopyWith<$R, Review, $Out> {
 abstract class ReviewCopyWith<$R, $In extends Review, $Out>
     implements CommentCopyWith<$R, $In, $Out> {
   @override
-  $R call(
-      {String? id,
-      String? contentId,
-      String? title,
-      String? body,
-      DateTime? deletedAt,
-      bool? isNegative});
+  $R call({
+    String? id,
+    String? contentId,
+    String? title,
+    String? body,
+    DateTime? deletedAt,
+    bool? isNegative,
+  });
   ReviewCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -122,31 +136,35 @@ class _ReviewCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Review, $Out>
   @override
   late final ClassMapperBase<Review> $mapper = ReviewMapper.ensureInitialized();
   @override
-  $R call(
-          {String? id,
-          String? contentId,
-          String? title,
-          String? body,
-          DateTime? deletedAt,
-          bool? isNegative}) =>
-      $apply(FieldCopyWithData({
-        if (id != null) #id: id,
-        if (contentId != null) #contentId: contentId,
-        if (title != null) #title: title,
-        if (body != null) #body: body,
-        if (deletedAt != null) #deletedAt: deletedAt,
-        if (isNegative != null) #isNegative: isNegative
-      }));
+  $R call({
+    String? id,
+    String? contentId,
+    String? title,
+    String? body,
+    DateTime? deletedAt,
+    bool? isNegative,
+  }) => $apply(
+    FieldCopyWithData({
+      if (id != null) #id: id,
+      if (contentId != null) #contentId: contentId,
+      if (title != null) #title: title,
+      if (body != null) #body: body,
+      if (deletedAt != null) #deletedAt: deletedAt,
+      if (isNegative != null) #isNegative: isNegative,
+    }),
+  );
   @override
   Review $make(CopyWithData data) => Review(
-      id: data.get(#id, or: $value.id),
-      contentId: data.get(#contentId, or: $value.contentId),
-      title: data.get(#title, or: $value.title),
-      body: data.get(#body, or: $value.body),
-      deletedAt: data.get(#deletedAt, or: $value.deletedAt),
-      isNegative: data.get(#isNegative, or: $value.isNegative));
+    id: data.get(#id, or: $value.id),
+    contentId: data.get(#contentId, or: $value.contentId),
+    title: data.get(#title, or: $value.title),
+    body: data.get(#body, or: $value.body),
+    deletedAt: data.get(#deletedAt, or: $value.deletedAt),
+    isNegative: data.get(#isNegative, or: $value.isNegative),
+  );
 
   @override
   ReviewCopyWith<$R2, Review, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
       _ReviewCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
+

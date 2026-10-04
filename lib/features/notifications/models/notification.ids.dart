@@ -4,6 +4,7 @@ abstract final class NotificationIds {
   static const int downloadComplete = 3;
   static const int syncComplete = 4;
   static const int firstDrillSurvey = 5;
+  static const int researcherStudySessionComplete = 6;
 
   static const int dynamicIdOffset = 100000;
   static const int dynamicIdRange = 1800000;

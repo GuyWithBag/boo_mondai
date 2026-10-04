@@ -6,7 +6,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart'
-    show StudyCard, HiveLocalDB, SyncIndexEntry;
+    show StudyCard, HiveLocalDB, SyncIndexEntry, LocalDB;
 
 class StudyCardsLocalDB extends HiveLocalDB<StudyCard> {
   @override
@@ -50,4 +50,18 @@ class StudyCardsLocalDB extends HiveLocalDB<StudyCard> {
         .toList();
     await box.deleteAll(keys.map(encodePrimaryKey));
   }, action: 'deleteByDeckId($deckId)');
+
+  List<StudyCard> getEligibleDrillCards(String deckId, String profileId) {
+    // 1. Get all base cards for this deck
+    final allDeckCards = getByDeckId(deckId);
+
+    // 2. Get the Set of all StudyCard IDs that the user already has in FSRS
+    // (Using the highly optimized Set query you built earlier!)
+    final enrolledCards = LocalDB.fsrsCard.getEnrolledStudyCardIds(profileId);
+
+    // 3. Filter out the enrolled ones
+    return allDeckCards
+        .where((card) => !enrolledCards.any((c) => c.id == card.id))
+        .toList();
+  }
 }

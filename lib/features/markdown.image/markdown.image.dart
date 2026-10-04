@@ -42,8 +42,9 @@ class MarkdownImage extends SignalHookWidget {
       borderRadius: BorderRadius.circular(tokens.radiusSurfaceXsm),
       child: Image(
         image: image,
-        width: imageOptions.pixelWidth,
-        height: imageOptions.pixelHeight,
+        // ToDo: Changed to hard coded values for now.
+        width: 80,
+        height: 80,
         fit: imageOptions.fit,
         semanticLabel: alt,
         errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),

@@ -1,6 +1,8 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format off
 // ignore_for_file: type=lint
+// ignore_for_file: invalid_use_of_protected_member
 // ignore_for_file: unused_element, unnecessary_cast, override_on_non_overriding_member
 // ignore_for_file: strict_raw_type, inference_failure_on_untyped_parameter
 
@@ -23,13 +25,20 @@ class TagMapper extends ClassMapperBase<Tag> {
   static String _$id(Tag v) => v.id;
   static const Field<Tag, String> _f$id = Field('id', _$id);
   static String? _$profileId(Tag v) => v.profileId;
-  static const Field<Tag, String> _f$profileId =
-      Field('profileId', _$profileId, key: r'profile_id', opt: true);
+  static const Field<Tag, String> _f$profileId = Field(
+    'profileId',
+    _$profileId,
+    key: r'profile_id',
+    opt: true,
+  );
   static String _$name(Tag v) => v.name;
   static const Field<Tag, String> _f$name = Field('name', _$name);
   static DateTime _$createdAt(Tag v) => v.createdAt;
-  static const Field<Tag, DateTime> _f$createdAt =
-      Field('createdAt', _$createdAt, key: r'created_at');
+  static const Field<Tag, DateTime> _f$createdAt = Field(
+    'createdAt',
+    _$createdAt,
+    key: r'created_at',
+  );
 
   @override
   final MappableFields<Tag> fields = const {
@@ -41,10 +50,11 @@ class TagMapper extends ClassMapperBase<Tag> {
 
   static Tag _instantiate(DecodingData data) {
     return Tag(
-        id: data.dec(_f$id),
-        profileId: data.dec(_f$profileId),
-        name: data.dec(_f$name),
-        createdAt: data.dec(_f$createdAt));
+      id: data.dec(_f$id),
+      profileId: data.dec(_f$profileId),
+      name: data.dec(_f$name),
+      createdAt: data.dec(_f$createdAt),
+    );
   }
 
   @override
@@ -104,25 +114,29 @@ class _TagCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Tag, $Out>
   @override
   late final ClassMapperBase<Tag> $mapper = TagMapper.ensureInitialized();
   @override
-  $R call(
-          {String? id,
-          Object? profileId = $none,
-          String? name,
-          DateTime? createdAt}) =>
-      $apply(FieldCopyWithData({
-        if (id != null) #id: id,
-        if (profileId != $none) #profileId: profileId,
-        if (name != null) #name: name,
-        if (createdAt != null) #createdAt: createdAt
-      }));
+  $R call({
+    String? id,
+    Object? profileId = $none,
+    String? name,
+    DateTime? createdAt,
+  }) => $apply(
+    FieldCopyWithData({
+      if (id != null) #id: id,
+      if (profileId != $none) #profileId: profileId,
+      if (name != null) #name: name,
+      if (createdAt != null) #createdAt: createdAt,
+    }),
+  );
   @override
   Tag $make(CopyWithData data) => Tag(
-      id: data.get(#id, or: $value.id),
-      profileId: data.get(#profileId, or: $value.profileId),
-      name: data.get(#name, or: $value.name),
-      createdAt: data.get(#createdAt, or: $value.createdAt));
+    id: data.get(#id, or: $value.id),
+    profileId: data.get(#profileId, or: $value.profileId),
+    name: data.get(#name, or: $value.name),
+    createdAt: data.get(#createdAt, or: $value.createdAt),
+  );
 
   @override
   TagCopyWith<$R2, Tag, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
       _TagCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
+

@@ -12,7 +12,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         NotificationsService,
         SettingPath,
         SettingsStore,
-        Time;
+        Time,
+        SessionMode;
 
 /// High-level notification manager.
 ///
@@ -174,10 +175,11 @@ class NotificationsController {
   // -------------------------------------------------------------------------
 
   Future<bool> hasReviewedToday() async {
-    final sessions = LocalDB.reviewSession.selectMany(
-      where: (s) =>
-          s.completedAt != null &&
-          DateHelper.isSameLocalDate(s.completedAt!, DateTime.now()),
+    final sessions = LocalDB.studySessionCompletedResults.selectMany(
+      where: (session) =>
+          session.profileId == profileId &&
+          session.mode == SessionMode.review &&
+          DateHelper.isSameLocalDate(session.startedAt, DateTime.now()),
     );
     return sessions.isNotEmpty;
   }

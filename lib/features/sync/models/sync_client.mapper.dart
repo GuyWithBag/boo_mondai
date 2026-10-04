@@ -1,6 +1,8 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format off
 // ignore_for_file: type=lint
+// ignore_for_file: invalid_use_of_protected_member
 // ignore_for_file: unused_element, unnecessary_cast, override_on_non_overriding_member
 // ignore_for_file: strict_raw_type, inference_failure_on_untyped_parameter
 
@@ -23,20 +25,37 @@ class SyncClientMapper extends ClassMapperBase<SyncClient> {
   static String _$id(SyncClient v) => v.id;
   static const Field<SyncClient, String> _f$id = Field('id', _$id);
   static String _$profileId(SyncClient v) => v.profileId;
-  static const Field<SyncClient, String> _f$profileId =
-      Field('profileId', _$profileId, key: r'profile_id');
+  static const Field<SyncClient, String> _f$profileId = Field(
+    'profileId',
+    _$profileId,
+    key: r'profile_id',
+  );
   static DateTime _$createdAt(SyncClient v) => v.createdAt;
-  static const Field<SyncClient, DateTime> _f$createdAt =
-      Field('createdAt', _$createdAt, key: r'created_at');
+  static const Field<SyncClient, DateTime> _f$createdAt = Field(
+    'createdAt',
+    _$createdAt,
+    key: r'created_at',
+  );
   static DateTime _$lastSeenAt(SyncClient v) => v.lastSeenAt;
-  static const Field<SyncClient, DateTime> _f$lastSeenAt =
-      Field('lastSeenAt', _$lastSeenAt, key: r'last_seen_at');
+  static const Field<SyncClient, DateTime> _f$lastSeenAt = Field(
+    'lastSeenAt',
+    _$lastSeenAt,
+    key: r'last_seen_at',
+  );
   static DateTime? _$lastSyncedAt(SyncClient v) => v.lastSyncedAt;
-  static const Field<SyncClient, DateTime> _f$lastSyncedAt =
-      Field('lastSyncedAt', _$lastSyncedAt, key: r'last_synced_at', opt: true);
+  static const Field<SyncClient, DateTime> _f$lastSyncedAt = Field(
+    'lastSyncedAt',
+    _$lastSyncedAt,
+    key: r'last_synced_at',
+    opt: true,
+  );
   static String? _$deviceName(SyncClient v) => v.deviceName;
-  static const Field<SyncClient, String> _f$deviceName =
-      Field('deviceName', _$deviceName, key: r'device_name', opt: true);
+  static const Field<SyncClient, String> _f$deviceName = Field(
+    'deviceName',
+    _$deviceName,
+    key: r'device_name',
+    opt: true,
+  );
 
   @override
   final MappableFields<SyncClient> fields = const {
@@ -50,12 +69,13 @@ class SyncClientMapper extends ClassMapperBase<SyncClient> {
 
   static SyncClient _instantiate(DecodingData data) {
     return SyncClient(
-        id: data.dec(_f$id),
-        profileId: data.dec(_f$profileId),
-        createdAt: data.dec(_f$createdAt),
-        lastSeenAt: data.dec(_f$lastSeenAt),
-        lastSyncedAt: data.dec(_f$lastSyncedAt),
-        deviceName: data.dec(_f$deviceName));
+      id: data.dec(_f$id),
+      profileId: data.dec(_f$profileId),
+      createdAt: data.dec(_f$createdAt),
+      lastSeenAt: data.dec(_f$lastSeenAt),
+      lastSyncedAt: data.dec(_f$lastSyncedAt),
+      deviceName: data.dec(_f$deviceName),
+    );
   }
 
   @override
@@ -72,28 +92,36 @@ class SyncClientMapper extends ClassMapperBase<SyncClient> {
 
 mixin SyncClientMappable {
   String toJson() {
-    return SyncClientMapper.ensureInitialized()
-        .encodeJson<SyncClient>(this as SyncClient);
+    return SyncClientMapper.ensureInitialized().encodeJson<SyncClient>(
+      this as SyncClient,
+    );
   }
 
   Map<String, dynamic> toMap() {
-    return SyncClientMapper.ensureInitialized()
-        .encodeMap<SyncClient>(this as SyncClient);
+    return SyncClientMapper.ensureInitialized().encodeMap<SyncClient>(
+      this as SyncClient,
+    );
   }
 
   SyncClientCopyWith<SyncClient, SyncClient, SyncClient> get copyWith =>
       _SyncClientCopyWithImpl<SyncClient, SyncClient>(
-          this as SyncClient, $identity, $identity);
+        this as SyncClient,
+        $identity,
+        $identity,
+      );
   @override
   String toString() {
-    return SyncClientMapper.ensureInitialized()
-        .stringifyValue(this as SyncClient);
+    return SyncClientMapper.ensureInitialized().stringifyValue(
+      this as SyncClient,
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return SyncClientMapper.ensureInitialized()
-        .equalsValue(this as SyncClient, other);
+    return SyncClientMapper.ensureInitialized().equalsValue(
+      this as SyncClient,
+      other,
+    );
   }
 
   @override
@@ -110,13 +138,14 @@ extension SyncClientValueCopy<$R, $Out>
 
 abstract class SyncClientCopyWith<$R, $In extends SyncClient, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  $R call(
-      {String? id,
-      String? profileId,
-      DateTime? createdAt,
-      DateTime? lastSeenAt,
-      DateTime? lastSyncedAt,
-      String? deviceName});
+  $R call({
+    String? id,
+    String? profileId,
+    DateTime? createdAt,
+    DateTime? lastSeenAt,
+    DateTime? lastSyncedAt,
+    String? deviceName,
+  });
   SyncClientCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -129,32 +158,36 @@ class _SyncClientCopyWithImpl<$R, $Out>
   late final ClassMapperBase<SyncClient> $mapper =
       SyncClientMapper.ensureInitialized();
   @override
-  $R call(
-          {String? id,
-          String? profileId,
-          DateTime? createdAt,
-          DateTime? lastSeenAt,
-          Object? lastSyncedAt = $none,
-          Object? deviceName = $none}) =>
-      $apply(FieldCopyWithData({
-        if (id != null) #id: id,
-        if (profileId != null) #profileId: profileId,
-        if (createdAt != null) #createdAt: createdAt,
-        if (lastSeenAt != null) #lastSeenAt: lastSeenAt,
-        if (lastSyncedAt != $none) #lastSyncedAt: lastSyncedAt,
-        if (deviceName != $none) #deviceName: deviceName
-      }));
+  $R call({
+    String? id,
+    String? profileId,
+    DateTime? createdAt,
+    DateTime? lastSeenAt,
+    Object? lastSyncedAt = $none,
+    Object? deviceName = $none,
+  }) => $apply(
+    FieldCopyWithData({
+      if (id != null) #id: id,
+      if (profileId != null) #profileId: profileId,
+      if (createdAt != null) #createdAt: createdAt,
+      if (lastSeenAt != null) #lastSeenAt: lastSeenAt,
+      if (lastSyncedAt != $none) #lastSyncedAt: lastSyncedAt,
+      if (deviceName != $none) #deviceName: deviceName,
+    }),
+  );
   @override
   SyncClient $make(CopyWithData data) => SyncClient(
-      id: data.get(#id, or: $value.id),
-      profileId: data.get(#profileId, or: $value.profileId),
-      createdAt: data.get(#createdAt, or: $value.createdAt),
-      lastSeenAt: data.get(#lastSeenAt, or: $value.lastSeenAt),
-      lastSyncedAt: data.get(#lastSyncedAt, or: $value.lastSyncedAt),
-      deviceName: data.get(#deviceName, or: $value.deviceName));
+    id: data.get(#id, or: $value.id),
+    profileId: data.get(#profileId, or: $value.profileId),
+    createdAt: data.get(#createdAt, or: $value.createdAt),
+    lastSeenAt: data.get(#lastSeenAt, or: $value.lastSeenAt),
+    lastSyncedAt: data.get(#lastSyncedAt, or: $value.lastSyncedAt),
+    deviceName: data.get(#deviceName, or: $value.deviceName),
+  );
 
   @override
   SyncClientCopyWith<$R2, SyncClient, $Out2> $chain<$R2, $Out2>(
-          Then<$Out2, $R2> t) =>
-      _SyncClientCopyWithImpl<$R2, $Out2>($value, $cast, t);
+    Then<$Out2, $R2> t,
+  ) => _SyncClientCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
+

@@ -8,7 +8,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         FsrsHelper,
         FsrsReviewLog,
         LocalDB,
+        ImmediateSchedule,
+        Notifications,
         NotificationsController,
+        ResearchParticipantSetAData,
+        ResearchParticipantSetBData,
         Services,
         SessionException,
         SessionMode,
@@ -88,7 +92,6 @@ final class StudySessionController {
   Future<void> startSession({
     String? deckId,
     DueFilterThreshold? filter,
-    int batchSize = 20,
   }) async {
     reset();
     isLoading.value = true;
@@ -104,10 +107,8 @@ final class StudySessionController {
           );
         }
         selected.addAll(
-          (DrillStudySessionHelper.getEligibleDrillCards(
-            deckId,
-            profileId,
-          )..shuffle()).take(batchSize),
+          (LocalDB.studyCard.getEligibleDrillCards(deckId, profileId)
+            ..shuffle()),
         );
         if (selected.isEmpty) {
           throw SessionException(
@@ -141,14 +142,23 @@ final class StudySessionController {
           );
         }
       }
-      cards.value = {for (final card in selected) card.id: card};
+      final sessionCards = config.showCardsByBatch == null
+          ? selected
+          : selected.take(config.showCardsByBatch!).toList();
+      if (sessionCards.isEmpty) {
+        throw SessionException(
+          'No cards are available for this session.',
+          code: 'SESSION_NO_CARDS',
+        );
+      }
+      cards.value = {for (final card in sessionCards) card.id: card};
       final allTemplates = deckId == null
           ? LocalDB.cardTemplate.selectMany()
           : LocalDB.cardTemplate.getByDeckId(deckId);
       templates.value = {
         for (final template in allTemplates) template.id: template,
       };
-      for (final card in selected) {
+      for (final card in sessionCards) {
         if (!templates.value.containsKey(card.templateId)) {
           throw SessionException(
             'A card template is missing.',
@@ -163,7 +173,7 @@ final class StudySessionController {
         mode: mode,
         startedAt: now,
         steps: [
-          for (final card in selected)
+          for (final card in sessionCards)
             StudySessionCardStep(id: uuid.v7(), studyCardId: card.id),
         ],
       );
@@ -271,7 +281,11 @@ final class StudySessionController {
         ],
       );
       if (after != null) fsrsCards.value = {...fsrsCards.value, card.id: after};
-      if (session.value!.isFinished) await completeSession();
+      if (session.value!.isFinished) {
+        await completeSession();
+      } else if (config.saveAfterEachAnswer) {
+        await saveSessionProgress();
+      }
     } catch (cause, trace) {
       error.value = cause is SessionException
           ? cause
@@ -424,17 +438,7 @@ final class StudySessionController {
     }
     if (active.isSaved) return;
     try {
-      final results = active.completedResults;
-      await LocalDB.studySessionCompletedResults.upsert(results);
-      for (final log in results.fsrsLogs) {
-        await LocalDB.reviewLogs.upsert(log);
-      }
-      for (final card in results.fsrsCards) {
-        await LocalDB.fsrsCard.upsert(card);
-      }
-      for (final snapshot in active.history) {
-        await LocalDB.studySessionSnapshot.upsert(snapshot);
-      }
+      await saveSessionProgress();
       session.value = active.copyWith(isSaved: true);
       error.value = null;
     } catch (cause, trace) {
@@ -455,6 +459,42 @@ final class StudySessionController {
         profileId: active.profileId,
         deckId: deck.id,
       );
+    }
+    await showResearcherStudySessionCompleteNotification(active);
+  }
+
+  Future<void> showResearcherStudySessionCompleteNotification(
+    StudySession active,
+  ) async {
+    final profile = LocalDB.currentProfile.getOrCreate();
+    if (!profile.isResearcher) return;
+    if (active.deckId != ResearchParticipantSetAData.dataDeckId &&
+        active.deckId != ResearchParticipantSetBData.dataDeckId) {
+      return;
+    }
+
+    await notificationsController.notify(
+      Notifications.researcherStudySessionComplete(),
+      const ImmediateSchedule.now(),
+    );
+  }
+
+  Future<void> saveSessionProgress() async {
+    final active = session.value;
+    if (active == null) {
+      throw SessionException('No session is active.', code: 'SESSION_MISSING');
+    }
+
+    final results = active.completedResults;
+    await LocalDB.studySessionCompletedResults.upsert(results);
+    for (final log in results.fsrsLogs) {
+      await LocalDB.reviewLogs.upsert(log);
+    }
+    for (final card in results.fsrsCards) {
+      await LocalDB.fsrsCard.upsert(card);
+    }
+    for (final snapshot in active.history) {
+      await LocalDB.studySessionSnapshot.upsert(snapshot);
     }
   }
 

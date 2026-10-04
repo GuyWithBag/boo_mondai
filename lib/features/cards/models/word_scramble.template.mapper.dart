@@ -1,6 +1,8 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format off
 // ignore_for_file: type=lint
+// ignore_for_file: invalid_use_of_protected_member
 // ignore_for_file: unused_element, unnecessary_cast, override_on_non_overriding_member
 // ignore_for_file: strict_raw_type, inference_failure_on_untyped_parameter
 
@@ -26,41 +28,75 @@ class WordScrambleTemplateMapper
   static String _$id(WordScrambleTemplate v) => v.id;
   static const Field<WordScrambleTemplate, String> _f$id = Field('id', _$id);
   static String _$deckId(WordScrambleTemplate v) => v.deckId;
-  static const Field<WordScrambleTemplate, String> _f$deckId =
-      Field('deckId', _$deckId, key: r'deck_id');
+  static const Field<WordScrambleTemplate, String> _f$deckId = Field(
+    'deckId',
+    _$deckId,
+    key: r'deck_id',
+  );
   static int _$sortOrder(WordScrambleTemplate v) => v.sortOrder;
-  static const Field<WordScrambleTemplate, int> _f$sortOrder =
-      Field('sortOrder', _$sortOrder, key: r'sort_order');
+  static const Field<WordScrambleTemplate, int> _f$sortOrder = Field(
+    'sortOrder',
+    _$sortOrder,
+    key: r'sort_order',
+  );
   static DateTime _$createdAt(WordScrambleTemplate v) => v.createdAt;
-  static const Field<WordScrambleTemplate, DateTime> _f$createdAt =
-      Field('createdAt', _$createdAt, key: r'created_at');
+  static const Field<WordScrambleTemplate, DateTime> _f$createdAt = Field(
+    'createdAt',
+    _$createdAt,
+    key: r'created_at',
+  );
   static DateTime _$updatedAt(WordScrambleTemplate v) => v.updatedAt;
-  static const Field<WordScrambleTemplate, DateTime> _f$updatedAt =
-      Field('updatedAt', _$updatedAt, key: r'updated_at');
+  static const Field<WordScrambleTemplate, DateTime> _f$updatedAt = Field(
+    'updatedAt',
+    _$updatedAt,
+    key: r'updated_at',
+  );
   static DateTime? _$deletedAt(WordScrambleTemplate v) => v.deletedAt;
-  static const Field<WordScrambleTemplate, DateTime> _f$deletedAt =
-      Field('deletedAt', _$deletedAt, key: r'deleted_at', opt: true);
+  static const Field<WordScrambleTemplate, DateTime> _f$deletedAt = Field(
+    'deletedAt',
+    _$deletedAt,
+    key: r'deleted_at',
+    opt: true,
+  );
   static DateTime? _$purgeAfter(WordScrambleTemplate v) => v.purgeAfter;
-  static const Field<WordScrambleTemplate, DateTime> _f$purgeAfter =
-      Field('purgeAfter', _$purgeAfter, key: r'purge_after', opt: true);
+  static const Field<WordScrambleTemplate, DateTime> _f$purgeAfter = Field(
+    'purgeAfter',
+    _$purgeAfter,
+    key: r'purge_after',
+    opt: true,
+  );
   static String? _$sourceTemplateId(WordScrambleTemplate v) =>
       v.sourceTemplateId;
   static const Field<WordScrambleTemplate, String> _f$sourceTemplateId = Field(
-      'sourceTemplateId', _$sourceTemplateId,
-      key: r'source_template_id', opt: true);
+    'sourceTemplateId',
+    _$sourceTemplateId,
+    key: r'source_template_id',
+    opt: true,
+  );
   static List<Tag> _$tags(WordScrambleTemplate v) => v.tags;
-  static const Field<WordScrambleTemplate, List<Tag>> _f$tags =
-      Field('tags', _$tags, opt: true, def: const []);
+  static const Field<WordScrambleTemplate, List<Tag>> _f$tags = Field(
+    'tags',
+    _$tags,
+    opt: true,
+    def: const [],
+  );
   static bool _$verticallyCentered(WordScrambleTemplate v) =>
       v.verticallyCentered;
   static const Field<WordScrambleTemplate, bool> _f$verticallyCentered = Field(
-      'verticallyCentered', _$verticallyCentered,
-      key: r'vertically_centered', opt: true, def: true);
+    'verticallyCentered',
+    _$verticallyCentered,
+    key: r'vertically_centered',
+    opt: true,
+    def: true,
+  );
   static String _$sentenceToScramble(WordScrambleTemplate v) =>
       v.sentenceToScramble;
   static const Field<WordScrambleTemplate, String> _f$sentenceToScramble =
-      Field('sentenceToScramble', _$sentenceToScramble,
-          key: r'sentence_to_scramble');
+      Field(
+        'sentenceToScramble',
+        _$sentenceToScramble,
+        key: r'sentence_to_scramble',
+      );
 
   @override
   final MappableFields<WordScrambleTemplate> fields = const {
@@ -87,17 +123,18 @@ class WordScrambleTemplateMapper
 
   static WordScrambleTemplate _instantiate(DecodingData data) {
     return WordScrambleTemplate(
-        id: data.dec(_f$id),
-        deckId: data.dec(_f$deckId),
-        sortOrder: data.dec(_f$sortOrder),
-        createdAt: data.dec(_f$createdAt),
-        updatedAt: data.dec(_f$updatedAt),
-        deletedAt: data.dec(_f$deletedAt),
-        purgeAfter: data.dec(_f$purgeAfter),
-        sourceTemplateId: data.dec(_f$sourceTemplateId),
-        tags: data.dec(_f$tags),
-        verticallyCentered: data.dec(_f$verticallyCentered),
-        sentenceToScramble: data.dec(_f$sentenceToScramble));
+      id: data.dec(_f$id),
+      deckId: data.dec(_f$deckId),
+      sortOrder: data.dec(_f$sortOrder),
+      createdAt: data.dec(_f$createdAt),
+      updatedAt: data.dec(_f$updatedAt),
+      deletedAt: data.dec(_f$deletedAt),
+      purgeAfter: data.dec(_f$purgeAfter),
+      sourceTemplateId: data.dec(_f$sourceTemplateId),
+      tags: data.dec(_f$tags),
+      verticallyCentered: data.dec(_f$verticallyCentered),
+      sentenceToScramble: data.dec(_f$sentenceToScramble),
+    );
   }
 
   @override
@@ -123,57 +160,72 @@ mixin WordScrambleTemplateMappable {
         .encodeMap<WordScrambleTemplate>(this as WordScrambleTemplate);
   }
 
-  WordScrambleTemplateCopyWith<WordScrambleTemplate, WordScrambleTemplate,
-      WordScrambleTemplate> get copyWith => _WordScrambleTemplateCopyWithImpl<
-          WordScrambleTemplate, WordScrambleTemplate>(
-      this as WordScrambleTemplate, $identity, $identity);
+  WordScrambleTemplateCopyWith<
+    WordScrambleTemplate,
+    WordScrambleTemplate,
+    WordScrambleTemplate
+  >
+  get copyWith =>
+      _WordScrambleTemplateCopyWithImpl<
+        WordScrambleTemplate,
+        WordScrambleTemplate
+      >(this as WordScrambleTemplate, $identity, $identity);
   @override
   String toString() {
-    return WordScrambleTemplateMapper.ensureInitialized()
-        .stringifyValue(this as WordScrambleTemplate);
+    return WordScrambleTemplateMapper.ensureInitialized().stringifyValue(
+      this as WordScrambleTemplate,
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return WordScrambleTemplateMapper.ensureInitialized()
-        .equalsValue(this as WordScrambleTemplate, other);
+    return WordScrambleTemplateMapper.ensureInitialized().equalsValue(
+      this as WordScrambleTemplate,
+      other,
+    );
   }
 
   @override
   int get hashCode {
-    return WordScrambleTemplateMapper.ensureInitialized()
-        .hashValue(this as WordScrambleTemplate);
+    return WordScrambleTemplateMapper.ensureInitialized().hashValue(
+      this as WordScrambleTemplate,
+    );
   }
 }
 
 extension WordScrambleTemplateValueCopy<$R, $Out>
     on ObjectCopyWith<$R, WordScrambleTemplate, $Out> {
   WordScrambleTemplateCopyWith<$R, WordScrambleTemplate, $Out>
-      get $asWordScrambleTemplate => $base.as(
-          (v, t, t2) => _WordScrambleTemplateCopyWithImpl<$R, $Out>(v, t, t2));
+  get $asWordScrambleTemplate => $base.as(
+    (v, t, t2) => _WordScrambleTemplateCopyWithImpl<$R, $Out>(v, t, t2),
+  );
 }
 
 abstract class WordScrambleTemplateCopyWith<
-    $R,
-    $In extends WordScrambleTemplate,
-    $Out> implements CardTemplateCopyWith<$R, $In, $Out> {
+  $R,
+  $In extends WordScrambleTemplate,
+  $Out
+>
+    implements CardTemplateCopyWith<$R, $In, $Out> {
   @override
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags;
   @override
-  $R call(
-      {String? id,
-      String? deckId,
-      int? sortOrder,
-      DateTime? createdAt,
-      DateTime? updatedAt,
-      DateTime? deletedAt,
-      DateTime? purgeAfter,
-      String? sourceTemplateId,
-      List<Tag>? tags,
-      bool? verticallyCentered,
-      String? sentenceToScramble});
+  $R call({
+    String? id,
+    String? deckId,
+    int? sortOrder,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    DateTime? deletedAt,
+    DateTime? purgeAfter,
+    String? sourceTemplateId,
+    List<Tag>? tags,
+    bool? verticallyCentered,
+    String? sentenceToScramble,
+  });
   WordScrambleTemplateCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-      Then<$Out2, $R2> t);
+    Then<$Out2, $R2> t,
+  );
 }
 
 class _WordScrambleTemplateCopyWithImpl<$R, $Out>
@@ -186,52 +238,62 @@ class _WordScrambleTemplateCopyWithImpl<$R, $Out>
       WordScrambleTemplateMapper.ensureInitialized();
   @override
   ListCopyWith<$R, Tag, TagCopyWith<$R, Tag, Tag>> get tags => ListCopyWith(
-      $value.tags, (v, t) => v.copyWith.$chain(t), (v) => call(tags: v));
+    $value.tags,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(tags: v),
+  );
   @override
-  $R call(
-          {String? id,
-          String? deckId,
-          int? sortOrder,
-          DateTime? createdAt,
-          DateTime? updatedAt,
-          Object? deletedAt = $none,
-          Object? purgeAfter = $none,
-          Object? sourceTemplateId = $none,
-          List<Tag>? tags,
-          bool? verticallyCentered,
-          String? sentenceToScramble}) =>
-      $apply(FieldCopyWithData({
-        if (id != null) #id: id,
-        if (deckId != null) #deckId: deckId,
-        if (sortOrder != null) #sortOrder: sortOrder,
-        if (createdAt != null) #createdAt: createdAt,
-        if (updatedAt != null) #updatedAt: updatedAt,
-        if (deletedAt != $none) #deletedAt: deletedAt,
-        if (purgeAfter != $none) #purgeAfter: purgeAfter,
-        if (sourceTemplateId != $none) #sourceTemplateId: sourceTemplateId,
-        if (tags != null) #tags: tags,
-        if (verticallyCentered != null) #verticallyCentered: verticallyCentered,
-        if (sentenceToScramble != null) #sentenceToScramble: sentenceToScramble
-      }));
+  $R call({
+    String? id,
+    String? deckId,
+    int? sortOrder,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Object? deletedAt = $none,
+    Object? purgeAfter = $none,
+    Object? sourceTemplateId = $none,
+    List<Tag>? tags,
+    bool? verticallyCentered,
+    String? sentenceToScramble,
+  }) => $apply(
+    FieldCopyWithData({
+      if (id != null) #id: id,
+      if (deckId != null) #deckId: deckId,
+      if (sortOrder != null) #sortOrder: sortOrder,
+      if (createdAt != null) #createdAt: createdAt,
+      if (updatedAt != null) #updatedAt: updatedAt,
+      if (deletedAt != $none) #deletedAt: deletedAt,
+      if (purgeAfter != $none) #purgeAfter: purgeAfter,
+      if (sourceTemplateId != $none) #sourceTemplateId: sourceTemplateId,
+      if (tags != null) #tags: tags,
+      if (verticallyCentered != null) #verticallyCentered: verticallyCentered,
+      if (sentenceToScramble != null) #sentenceToScramble: sentenceToScramble,
+    }),
+  );
   @override
   WordScrambleTemplate $make(CopyWithData data) => WordScrambleTemplate(
-      id: data.get(#id, or: $value.id),
-      deckId: data.get(#deckId, or: $value.deckId),
-      sortOrder: data.get(#sortOrder, or: $value.sortOrder),
-      createdAt: data.get(#createdAt, or: $value.createdAt),
-      updatedAt: data.get(#updatedAt, or: $value.updatedAt),
-      deletedAt: data.get(#deletedAt, or: $value.deletedAt),
-      purgeAfter: data.get(#purgeAfter, or: $value.purgeAfter),
-      sourceTemplateId:
-          data.get(#sourceTemplateId, or: $value.sourceTemplateId),
-      tags: data.get(#tags, or: $value.tags),
-      verticallyCentered:
-          data.get(#verticallyCentered, or: $value.verticallyCentered),
-      sentenceToScramble:
-          data.get(#sentenceToScramble, or: $value.sentenceToScramble));
+    id: data.get(#id, or: $value.id),
+    deckId: data.get(#deckId, or: $value.deckId),
+    sortOrder: data.get(#sortOrder, or: $value.sortOrder),
+    createdAt: data.get(#createdAt, or: $value.createdAt),
+    updatedAt: data.get(#updatedAt, or: $value.updatedAt),
+    deletedAt: data.get(#deletedAt, or: $value.deletedAt),
+    purgeAfter: data.get(#purgeAfter, or: $value.purgeAfter),
+    sourceTemplateId: data.get(#sourceTemplateId, or: $value.sourceTemplateId),
+    tags: data.get(#tags, or: $value.tags),
+    verticallyCentered: data.get(
+      #verticallyCentered,
+      or: $value.verticallyCentered,
+    ),
+    sentenceToScramble: data.get(
+      #sentenceToScramble,
+      or: $value.sentenceToScramble,
+    ),
+  );
 
   @override
   WordScrambleTemplateCopyWith<$R2, WordScrambleTemplate, $Out2>
-      $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-          _WordScrambleTemplateCopyWithImpl<$R2, $Out2>($value, $cast, t);
+  $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _WordScrambleTemplateCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
+
