@@ -3,6 +3,8 @@ import 'package:flutter/material.dart'
     show
         InputDecorationTheme,
         InputBorder,
+        BoxDecoration,
+        BoxConstraints,
         TextStyle,
         Color,
         FontWeight,
@@ -20,7 +22,8 @@ import 'package:flutter/material.dart'
         IconThemeData,
         ChipThemeData,
         DividerThemeData,
-        TextSelectionThemeData;
+        TextSelectionThemeData,
+        TooltipThemeData;
 
 TextStyle _textStyle(
   AppTokens tokens, {
@@ -191,6 +194,21 @@ ThemeData buildAppThemeData(AppTokens tokens, Brightness brightness) {
     textSelectionTheme: TextSelectionThemeData(
       selectionColor: tokens.colorPrimary.withValues(alpha: 0.22),
       cursorColor: tokens.colorPrimary,
+    ),
+    tooltipTheme: TooltipThemeData(
+      decoration: BoxDecoration(
+        color: tokens.colorPrimarySoft,
+        borderRadius: BorderRadius.zero,
+        boxShadow: const [],
+      ),
+      textStyle: TextStyle(
+        color: tokens.colorTextBaseline,
+        fontFamily: tokens.fontFamily,
+        fontSize: tokens.textSizeLabel,
+        fontWeight: tokens.fontWeightTextStrong,
+        height: tokens.lineHeightTextBody,
+      ),
+      constraints: const BoxConstraints(minHeight: 40),
     ),
     inputDecorationTheme: InputDecorationTheme(
       border: InputBorder.none,

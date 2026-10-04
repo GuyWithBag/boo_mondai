@@ -1,6 +1,8 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format off
 // ignore_for_file: type=lint
+// ignore_for_file: invalid_use_of_protected_member
 // ignore_for_file: unused_element, unnecessary_cast, override_on_non_overriding_member
 // ignore_for_file: strict_raw_type, inference_failure_on_untyped_parameter
 
@@ -21,17 +23,31 @@ class MutableEntityMapper extends ClassMapperBase<MutableEntity> {
   final String id = 'MutableEntity';
 
   static DateTime _$createdAt(MutableEntity v) => v.createdAt;
-  static const Field<MutableEntity, DateTime> _f$createdAt =
-      Field('createdAt', _$createdAt, key: r'created_at');
+  static const Field<MutableEntity, DateTime> _f$createdAt = Field(
+    'createdAt',
+    _$createdAt,
+    key: r'created_at',
+  );
   static DateTime _$updatedAt(MutableEntity v) => v.updatedAt;
-  static const Field<MutableEntity, DateTime> _f$updatedAt =
-      Field('updatedAt', _$updatedAt, key: r'updated_at');
+  static const Field<MutableEntity, DateTime> _f$updatedAt = Field(
+    'updatedAt',
+    _$updatedAt,
+    key: r'updated_at',
+  );
   static DateTime? _$deletedAt(MutableEntity v) => v.deletedAt;
-  static const Field<MutableEntity, DateTime> _f$deletedAt =
-      Field('deletedAt', _$deletedAt, key: r'deleted_at', opt: true);
+  static const Field<MutableEntity, DateTime> _f$deletedAt = Field(
+    'deletedAt',
+    _$deletedAt,
+    key: r'deleted_at',
+    opt: true,
+  );
   static DateTime? _$purgeAfter(MutableEntity v) => v.purgeAfter;
-  static const Field<MutableEntity, DateTime> _f$purgeAfter =
-      Field('purgeAfter', _$purgeAfter, key: r'purge_after', opt: true);
+  static const Field<MutableEntity, DateTime> _f$purgeAfter = Field(
+    'purgeAfter',
+    _$purgeAfter,
+    key: r'purge_after',
+    opt: true,
+  );
 
   @override
   final MappableFields<MutableEntity> fields = const {
@@ -61,15 +77,17 @@ mixin MutableEntityMappable {
   String toJson();
   Map<String, dynamic> toMap();
   MutableEntityCopyWith<MutableEntity, MutableEntity, MutableEntity>
-      get copyWith;
+  get copyWith;
 }
 
 abstract class MutableEntityCopyWith<$R, $In extends MutableEntity, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  $R call(
-      {DateTime? createdAt,
-      DateTime? updatedAt,
-      DateTime? deletedAt,
-      DateTime? purgeAfter});
+  $R call({
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    DateTime? deletedAt,
+    DateTime? purgeAfter,
+  });
   MutableEntityCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
+

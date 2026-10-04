@@ -375,26 +375,6 @@ types:
         index: 2
       reviewDuration:
         index: 3
-  ReviewSession:
-    typeId: 17
-    nextIndex: 8
-    fields:
-      id:
-        index: 0
-      profileId:
-        index: 1
-      deckId:
-        index: 2
-      startedAt:
-        index: 3
-      completedAt:
-        index: 4
-      deck:
-        index: 5
-      totalCards:
-        index: 6
-      cardsReviewed:
-        index: 7
   StudySessionCardStep:
     typeId: 18
     nextIndex: 5
@@ -853,7 +833,7 @@ types:
         index: 1
   NotificationIntent:
     typeId: 47
-    nextIndex: 15
+    nextIndex: 17
     fields:
       id:
         index: 0
@@ -885,9 +865,13 @@ types:
         index: 13
       ifRouteNullPushToView:
         index: 14
+      showAsBubble:
+        index: 15
+      shown:
+        index: 16
   NotificationIntentType:
     typeId: 48
-    nextIndex: 6
+    nextIndex: 7
     fields:
       reviewReminder:
         index: 0
@@ -901,6 +885,8 @@ types:
         index: 4
       studyDeckReview:
         index: 5
+      researcherStudySessionComplete:
+        index: 6
   StudySessionCompletedResults:
     typeId: 49
     nextIndex: 10

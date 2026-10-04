@@ -1,6 +1,8 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format off
 // ignore_for_file: type=lint
+// ignore_for_file: invalid_use_of_protected_member
 // ignore_for_file: unused_element, unnecessary_cast, override_on_non_overriding_member
 // ignore_for_file: strict_raw_type, inference_failure_on_untyped_parameter
 
@@ -23,8 +25,11 @@ class ImmutableEntityMapper extends ClassMapperBase<ImmutableEntity> {
   static String _$id(ImmutableEntity v) => v.id;
   static const Field<ImmutableEntity, String> _f$id = Field('id', _$id);
   static DateTime _$createdAt(ImmutableEntity v) => v.createdAt;
-  static const Field<ImmutableEntity, DateTime> _f$createdAt =
-      Field('createdAt', _$createdAt, key: r'created_at');
+  static const Field<ImmutableEntity, DateTime> _f$createdAt = Field(
+    'createdAt',
+    _$createdAt,
+    key: r'created_at',
+  );
 
   @override
   final MappableFields<ImmutableEntity> fields = const {
@@ -52,12 +57,14 @@ mixin ImmutableEntityMappable {
   String toJson();
   Map<String, dynamic> toMap();
   ImmutableEntityCopyWith<ImmutableEntity, ImmutableEntity, ImmutableEntity>
-      get copyWith;
+  get copyWith;
 }
 
 abstract class ImmutableEntityCopyWith<$R, $In extends ImmutableEntity, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   $R call({String? id, DateTime? createdAt});
   ImmutableEntityCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-      Then<$Out2, $R2> t);
+    Then<$Out2, $R2> t,
+  );
 }
+

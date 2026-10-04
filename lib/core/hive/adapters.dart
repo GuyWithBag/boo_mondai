@@ -31,8 +31,7 @@ import 'package:boo_mondai/features/notifications/models/notification.intent.typ
 import 'package:boo_mondai/features/profile/models/profile.dto.dart';
 import 'package:boo_mondai/features/profile/models/profile.role.dto.dart';
 import 'package:boo_mondai/features/progress_checkpoints/models/progress_checkpoint.dto.dart';
-import 'package:boo_mondai/features/review.study_session/models/review_session.dto.dart';
-// import 'package:boo_mondai/features/settings/models/setting.dart';
+import 'package:boo_mondai/features/settings/models/setting.dart';
 import 'package:boo_mondai/features/settings/models/user_settings.dart';
 import 'package:boo_mondai/features/streak/streak.dto.dart';
 import 'package:boo_mondai/features/study_cards/study_card.dto.dart';
@@ -80,7 +79,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
   AdapterSpec<FsrsCard>(),
 
   AdapterSpec<ReviewLog>(),
-  AdapterSpec<ReviewSession>(),
   AdapterSpec<StudySessionCardStep>(),
   AdapterSpec<StudySessionMessageStep>(),
   AdapterSpec<StudySessionAnswer>(),

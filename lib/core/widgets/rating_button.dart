@@ -3,6 +3,7 @@
 // PURPOSE: Individual button for submitting an FSRS rating
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/features/features.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
@@ -66,7 +67,8 @@ class RatingButton extends StatelessWidget {
 
     return Expanded(
       child: Tooltip(
-        message: 'Press $shortcut',
+        message: 'This Card will show up $reviewTime later.',
+        preferBelow: false,
         child: Button(
           onPressed: onTap,
           variants: variants,

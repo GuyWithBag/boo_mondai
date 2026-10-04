@@ -20,11 +20,7 @@ class ProfileAdapter extends TypeAdapter<Profile> {
       id: fields[0] as String,
       username: fields[2] as String,
       displayName: fields[3] as String,
-      role: fields[4] == null
-          ? ProfileRole.user
-          : fields[4] is ProfileRole
-          ? fields[4] as ProfileRole
-          : ProfileRole.fromString(fields[4] as String?),
+      role: fields[4] == null ? ProfileRole.user : fields[4] as ProfileRole,
       avatarUrl: fields[5] as String?,
       createdAt: fields[6] as DateTime,
       userId: fields[1] as String,
@@ -1003,61 +999,6 @@ class ReviewLogAdapter extends TypeAdapter<ReviewLog> {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is ReviewLogAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
-}
-
-class ReviewSessionAdapter extends TypeAdapter<ReviewSession> {
-  @override
-  final typeId = 17;
-
-  @override
-  ReviewSession read(BinaryReader reader) {
-    final numOfFields = reader.readByte();
-    final fields = <int, dynamic>{
-      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
-    };
-    return ReviewSession(
-      id: fields[0] as String,
-      profileId: fields[1] as String,
-      deckId: fields[2] as String?,
-      startedAt: fields[3] as DateTime,
-      completedAt: fields[4] as DateTime?,
-      deck: fields[5] as Deck?,
-      totalCards: (fields[6] as num).toInt(),
-      cardsReviewed: fields[7] == null ? 0 : (fields[7] as num).toInt(),
-    );
-  }
-
-  @override
-  void write(BinaryWriter writer, ReviewSession obj) {
-    writer
-      ..writeByte(8)
-      ..writeByte(0)
-      ..write(obj.id)
-      ..writeByte(1)
-      ..write(obj.profileId)
-      ..writeByte(2)
-      ..write(obj.deckId)
-      ..writeByte(3)
-      ..write(obj.startedAt)
-      ..writeByte(4)
-      ..write(obj.completedAt)
-      ..writeByte(5)
-      ..write(obj.deck)
-      ..writeByte(6)
-      ..write(obj.totalCards)
-      ..writeByte(7)
-      ..write(obj.cardsReviewed);
-  }
-
-  @override
-  int get hashCode => typeId.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ReviewSessionAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
@@ -2518,6 +2459,8 @@ class NotificationIntentAdapter extends TypeAdapter<NotificationIntent> {
       ifRouteNullPushToView: fields[14] == null ? false : fields[14] as bool,
       persistInInbox: fields[5] == null ? false : fields[5] as bool,
       showSystemNotification: fields[6] == null ? true : fields[6] as bool,
+      showAsBubble: fields[15] == null ? false : fields[15] as bool,
+      shown: fields[16] == null ? false : fields[16] as bool,
       readAt: fields[13] as DateTime?,
       deletedAt: fields[9] as DateTime?,
       purgeAfterDays: fields[11] == null ? 30 : (fields[11] as num).toInt(),
@@ -2527,7 +2470,7 @@ class NotificationIntentAdapter extends TypeAdapter<NotificationIntent> {
   @override
   void write(BinaryWriter writer, NotificationIntent obj) {
     writer
-      ..writeByte(15)
+      ..writeByte(17)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -2557,7 +2500,11 @@ class NotificationIntentAdapter extends TypeAdapter<NotificationIntent> {
       ..writeByte(13)
       ..write(obj.readAt)
       ..writeByte(14)
-      ..write(obj.ifRouteNullPushToView);
+      ..write(obj.ifRouteNullPushToView)
+      ..writeByte(15)
+      ..write(obj.showAsBubble)
+      ..writeByte(16)
+      ..write(obj.shown);
   }
 
   @override
@@ -2591,6 +2538,8 @@ class NotificationIntentTypeAdapter
         return NotificationIntentType.firstDrillSurvey;
       case 5:
         return NotificationIntentType.studyDeckReview;
+      case 6:
+        return NotificationIntentType.researcherStudySessionComplete;
       default:
         return NotificationIntentType.reviewReminder;
     }
@@ -2611,6 +2560,8 @@ class NotificationIntentTypeAdapter
         writer.writeByte(4);
       case NotificationIntentType.studyDeckReview:
         writer.writeByte(5);
+      case NotificationIntentType.researcherStudySessionComplete:
+        writer.writeByte(6);
     }
   }
 

@@ -1,7 +1,6 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         CardTemplatesRemoteDB,
-        DrillSessionsRemoteDB,
         ProfilesRemoteDB,
         DecksRemoteDB,
         DeckListingsRemoteDB,
@@ -11,8 +10,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         ReviewLogsRemoteDB,
         ReviewEditLogsRemoteDB,
         UserSettingsRemoteDB,
-        ReviewSessionsRemoteDB,
-        DrillAnswersRemoteDB,
         FsrsCardsRemoteDB,
         LeaderboardEntriesRemoteDB,
         PublicBucketRemoteDB,
@@ -49,7 +46,6 @@ class RemoteDB {
   static late final UserSettingsRemoteDB userSettings;
   static late final CardTemplatesRemoteDB card;
   static late final StudyCardsRemoteDB studyCard;
-  static late final ReviewSessionsRemoteDB reviewSession;
   static late final ReviewLogsRemoteDB reviewLogs;
   static late final FsrsCardsRemoteDB fsrsSync;
   static late final LeaderboardEntriesRemoteDB leaderboard;
@@ -85,7 +81,6 @@ class RemoteDB {
     userSettings = UserSettingsRemoteDB();
     card = CardTemplatesRemoteDB();
     studyCard = StudyCardsRemoteDB();
-    reviewSession = ReviewSessionsRemoteDB();
     reviewLogs = ReviewLogsRemoteDB();
     fsrsSync = FsrsCardsRemoteDB();
     leaderboard = LeaderboardEntriesRemoteDB();

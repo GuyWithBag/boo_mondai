@@ -2,7 +2,7 @@
 // Do not modify
 // Check in to version control
 
-import 'package:hive_ce/hive.dart';
+import 'package:hive_ce/hive_ce.dart';
 import 'package:boo_mondai/core/hive/adapters.dart';
 
 extension HiveRegistrar on HiveInterface {
@@ -38,7 +38,6 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(ProgressCheckpointTypeAdapter());
     registerAdapter(RatingAdapter());
     registerAdapter(ReviewLogAdapter());
-    registerAdapter(ReviewSessionAdapter());
     registerAdapter(SessionModeAdapter());
     registerAdapter(StateAdapter());
     registerAdapter(StreakAdapter());
@@ -95,7 +94,6 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(ProgressCheckpointTypeAdapter());
     registerAdapter(RatingAdapter());
     registerAdapter(ReviewLogAdapter());
-    registerAdapter(ReviewSessionAdapter());
     registerAdapter(SessionModeAdapter());
     registerAdapter(StateAdapter());
     registerAdapter(StreakAdapter());

@@ -92,15 +92,21 @@ class StatusLayoutState extends HookWidget {
       }
 
       var active = true;
+      var locked = false;
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!active) return;
         setScrollLocked(scrollLockKey, true);
+        locked = true;
       });
 
       return () {
         active = false;
-        setScrollLocked(scrollLockKey, false);
+        if (!locked) return;
+
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          setScrollLocked(scrollLockKey, false);
+        });
       };
     }, [disableScaffoldScrollingWhenShown, setScrollLocked, scrollLockKey]);
 
