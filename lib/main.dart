@@ -1,6 +1,5 @@
 import 'dart:developer' as developer;
 import 'package:app_links/app_links.dart';
-import 'package:barrel_annotation/barrel_annotation.dart';
 import 'package:boo_mondai/core/hive/hive_registrar.g.dart' show HiveRegistrar;
 import 'package:boo_mondai/env.dart' show Env;
 import 'package:boo_mondai/features/ui_sounds/ui_sounds.barrel.dart';
@@ -28,16 +27,6 @@ import 'package:provider/provider.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-@BarrelConfig(
-  exclude: [
-    'lib/core/hive/hive.barrel.dart',
-    'lib/core/helpers/image_file_provider_io.dart',
-    'lib/core/helpers/image_file_provider_stub.dart',
-    'lib/**/**/*.mapper.dart',
-    'lib/**/*.mapper.dart',
-    'lib/*.mapper.dart',
-  ],
-)
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 

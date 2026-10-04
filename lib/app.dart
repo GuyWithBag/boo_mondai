@@ -25,6 +25,12 @@ class BooMondaiApp extends HookWidget {
       NotificationsService.setRouteHandler(router.push);
       return NotificationsService.clearRouteHandler;
     }, [router]);
+    useEffect(() {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        NotificationBubbleController.instance.refresh();
+      });
+      return null;
+    }, const []);
     final settings = SettingsStore.instance;
     final controller = useMemoized(
       () => UserSettingsThemeBridge.createController(settings),

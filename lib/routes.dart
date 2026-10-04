@@ -15,10 +15,14 @@ import 'package:boo_mondai/lib.barrel.dart'
         AuthService,
         SettingPath,
         SettingsStore;
+import 'package:flutter/widgets.dart' show GlobalKey, NavigatorState;
 import 'package:go_router/go_router.dart';
+
+final rootNavigatorKey = GlobalKey<NavigatorState>();
 
 GoRouter createRouter(AuthController authController) {
   return GoRouter(
+    navigatorKey: rootNavigatorKey,
     initialLocation: Pages.decksLocal.url,
     refreshListenable: authController.routerRefresh,
     errorBuilder: (context, state) {
