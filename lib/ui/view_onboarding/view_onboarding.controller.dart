@@ -23,7 +23,7 @@ class ViewOnboardingController {
         SettingPath.onboardingCompleted,
         true,
       );
-      if (context.mounted) context.go(Pages.home.url);
+      if (context.mounted) context.go(Pages.decksLocal.url);
       return;
     }
 
