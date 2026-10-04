@@ -4,36 +4,32 @@ publish_to: "none"
 version: 1.0.0+6
 
 environment:
-  sdk: ">=3.10.8"
+  sdk: ">=3.11.8"
 
 dependencies:
   flutter:
     sdk: flutter
 
   theme_variants:
-    git:
-      url: https://github.com/GuyWithBag/theme_variants.git
+    path: /run/media/loejee/1-tb-drive/github-repositories/theme_variants/
 
   # ── State & UI ──────────────────────────────────────────
   provider: ^6.1.2
   flutter_hooks: ^0.20.5
 
-  # ── Code generation ─────────────────────────────────────
-  barrel_annotation: 1.0.0
-
   # ── Local persistence ────────────────────────────────────
-  hive_ce: 2.19.3
-  hive_ce_flutter: 2.3.4
+  hive_ce: ^2.20.1
+  hive_ce_flutter: ^2.4.0
 
   # ── Input & pickers ─────────────────────────────────────
-  flutter_picker_plus: 1.5.6
-  flutter_colorpicker: 1.1.0
+  flutter_picker_plus: ^1.5.6
+  flutter_colorpicker: ^1.1.0
 
   # ── Notifications ────────────────────────────────────────
   flutter_local_notifications: ^22.3.1
 
   # ── Loading states ───────────────────────────────────────
-  skeletonizer: 2.1.3
+  skeletonizer: ^2.1.3
 
   # ── Utilities ────────────────────────────────────────────
   url_launcher: ^6.3.2
@@ -43,7 +39,7 @@ dependencies:
   supabase_flutter: ^2.12.2
 
   # ── Navigation ───────────────────────────────────────────
-  go_router: 17.0.1
+  go_router: ^17.0.1
 
   # ── Project-specific ─────────────────────────────────────
   fsrs: ^2.0.1 # FSRS spaced repetition algorithm
@@ -65,7 +61,7 @@ dependencies:
   http: ^1.6.0
   just_audio: ^0.10.6
   signals: ^7.1.0
-  flutter_soloud: ^4.0.12
+  flutter_soloud: ^3.5.4
   fl_chart: ^1.2.0
   signals_hooks: ^7.1.0
   cross_file: ^0.3.5+5
@@ -78,11 +74,10 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
-  mockito: ^5.4.4
-  build_runner: ^2.5.4
-  barrel_generator: ^1.0.4
-  hive_ce_generator: ^1.0.0
-  dart_mappable_builder: ^4.5.0
+  mockito: ^5.8.1
+  build_runner: ^2.13.1
+  hive_ce_generator: ^1.11.3
+  dart_mappable_builder: ^4.10.0
 
 dependency_overrides:
   dbus: ^0.8.0
@@ -96,10 +91,6 @@ flutter:
     - assets/ui/modal_showed/
     - assets/ui/popped_modal/
     - assets/ui/segment_selector_pressed/
-
-analyzer:
-  enable-experiment:
-    - dot-shorthands
 
 fonts:
   - family: Noto Sans

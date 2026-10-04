@@ -46,3 +46,6 @@ app.*.map.json
 /lib/shared/env.dart
 
 node_modules
+
+# FVM Version Cache
+.fvm/
