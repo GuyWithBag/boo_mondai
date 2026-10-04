@@ -88,7 +88,7 @@ class EditDeckSideBar extends SignalWidget {
                         : () => controller.selectTemplate(entry.value.id),
                     leading: Icon(_iconFor(entry.value)),
                     mainAxisAlignment: MainAxisAlignment.start,
-                    variants: const [ButtonVariant.text, ButtonColor.baseline],
+                    // variants: const [ButtonVariant.text, ButtonColor.baseline],
                     child: Text(
                       _labelFor(entry.value),
                       maxLines: 2,

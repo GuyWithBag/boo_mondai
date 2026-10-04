@@ -1,22 +1,16 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
+        AnswerKeyTile,
         Button,
         CardVerticalAlignmentControl,
-        CasingType,
         ChipTone,
         EditDeckController,
         EditDeckFormValidator,
-        FillInTheBlankAnswerKey,
         FillInTheBlanksEditorController,
         FormField,
         SectionEyebrow,
-        SegmentOption,
-        SegmentedControl,
-        SurfaceBorder,
         SurfaceColor,
-        SurfacePadding,
-        SurfaceShadow,
         TextColor,
         TextFieldCard,
         TextSize,
@@ -94,9 +88,10 @@ class FillInTheBlanksEditor extends SignalHookWidget {
                   spacing: tokens.spaceLayoutGapMd,
                   children: [
                     for (final entry in answerKeys.asMap().entries)
-                      _FillInTheBlankAnswerKeyRow(
+                      AnswerKeyTile(
                         index: entry.key,
-                        value: entry.value,
+                        value: entry.value.value,
+                        casingType: entry.value.casingType,
                         canMoveUp: entry.key > 0,
                         canMoveDown: entry.key < answerKeys.length - 1,
                         canRemove: true,
@@ -105,6 +100,13 @@ class FillInTheBlanksEditor extends SignalHookWidget {
                         onMoveUp: () => editor.moveAnswerKeyUp(entry.key),
                         onMoveDown: () => editor.moveAnswerKeyDown(entry.key),
                         onRemove: () => editor.removeAnswerKey(entry.key),
+                        valueChild: Align(
+                          alignment: Alignment.centerLeft,
+                          child: _BlankChip(
+                            value: entry.value.value,
+                            onDeleted: () => editor.removeAnswerKey(entry.key),
+                          ),
+                        ),
                       ),
                   ],
                 ),
@@ -157,95 +159,6 @@ class FillInTheBlanksEditor extends SignalHookWidget {
           onChanged: editor.onVerticalAlignmentControlChanged,
         ),
       ],
-    );
-  }
-}
-
-class _FillInTheBlankAnswerKeyRow extends StatelessWidget {
-  const _FillInTheBlankAnswerKeyRow({
-    required this.index,
-    required this.value,
-    required this.canMoveUp,
-    required this.canMoveDown,
-    required this.canRemove,
-    required this.onCasingTypeChanged,
-    required this.onMoveUp,
-    required this.onMoveDown,
-    required this.onRemove,
-  });
-
-  final int index;
-  final FillInTheBlankAnswerKey value;
-  final bool canMoveUp;
-  final bool canMoveDown;
-  final bool canRemove;
-  final ValueChanged<CasingType> onCasingTypeChanged;
-  final VoidCallback onMoveUp;
-  final VoidCallback onMoveDown;
-  final VoidCallback onRemove;
-
-  @override
-  Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
-
-    return Surface(
-      style: surfaceStyle
-          .resolve(tokens, const [
-            SurfaceColor.muted,
-            SurfaceBorder.baseline,
-            SurfacePadding.sm,
-            SurfaceShadow.none,
-          ])
-          .copyWith(padding: EdgeInsets.all(tokens.spaceLayoutGapSm)),
-      child: Column(
-        spacing: tokens.spaceLayoutGapSm,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            spacing: tokens.spaceLayoutGapSm,
-            children: [
-              Text(
-                '${index + 1}.',
-                style: textStyle.resolve(tokens, const [
-                  TextSize.label,
-                  TextWeight.heavy,
-                  TextColor.muted,
-                ]),
-              ),
-              Expanded(
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: _BlankChip(value: value.value, onDeleted: onRemove),
-                ),
-              ),
-              Button.icon(
-                tokens: tokens,
-                icon: Icons.keyboard_arrow_up_rounded,
-                onPressed: canMoveUp ? onMoveUp : null,
-              ),
-              Button.icon(
-                tokens: tokens,
-                icon: Icons.keyboard_arrow_down_rounded,
-                onPressed: canMoveDown ? onMoveDown : null,
-              ),
-              Button.icon(
-                tokens: tokens,
-                icon: Icons.delete_rounded,
-                onPressed: canRemove ? onRemove : null,
-              ),
-            ],
-          ),
-          SegmentedControl<CasingType>(
-            isScrollable: true,
-            value: value.casingType,
-            options: [
-              for (final type in CasingType.values)
-                SegmentOption(value: type, label: type.label),
-            ],
-            onChanged: onCasingTypeChanged,
-          ),
-        ],
-      ),
     );
   }
 }

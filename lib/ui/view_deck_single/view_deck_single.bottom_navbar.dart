@@ -19,7 +19,7 @@ class ViewDeckSingleBottomNavBar extends StatelessWidget
     final tokens = context.themeTokens<AppTokens>();
 
     final profileId = LocalDB.currentProfile.getOrCreate().id;
-    final eligibleCards = DrillStudySessionHelper.getEligibleDrillCards(
+    final eligibleCards = LocalDB.studyCard.getEligibleDrillCards(
       deck.id,
       profileId,
     );

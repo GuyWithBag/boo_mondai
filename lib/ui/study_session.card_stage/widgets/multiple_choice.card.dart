@@ -160,7 +160,7 @@ class MultipleChoiceCard extends SignalHookWidget {
                       contentScale: contentScale,
                       variants: [
                         ..._optionVariants(option, effectiveIsRevealed),
-                        ButtonVariant.flat,
+                        ButtonVariant.elevated,
                       ],
                       selected:
                           !effectiveIsRevealed &&

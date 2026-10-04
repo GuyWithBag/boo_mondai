@@ -13,7 +13,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextFieldSize,
         ViewNotificationsDebugController,
         showModal;
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide TextField;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter/services.dart';
@@ -58,6 +57,7 @@ class ViewNotificationsDebugModal extends SignalHookWidget {
     final type = controller.type.value;
     final persistInInbox = controller.persistInInbox.value;
     final showSystemNotification = controller.showSystemNotification.value;
+    final showAsBubble = controller.showAsBubble.value;
     final assignIntentRoute = controller.assignIntentRoute.value;
     final routeFieldEnabled = controller.routeFieldEnabled.value;
     final canSubmit = controller.canSubmit.value;
@@ -152,6 +152,12 @@ class ViewNotificationsDebugModal extends SignalHookWidget {
               title: const Text('Show system notification'),
               value: showSystemNotification,
               onChanged: controller.setShowSystemNotification,
+            ),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: const Text('Show as bubble'),
+              value: showAsBubble,
+              onChanged: controller.setShowAsBubble,
             ),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,

@@ -1,31 +1,22 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
+        AnswerKeyTile,
         Button,
         CardVerticalAlignmentControl,
-        CasingType,
         EditDeckController,
         EditDeckFormValidator,
         FormField,
+        IdentificationAnswerKey,
         IdentificationEditorController,
-        MarkdownText,
-        MarkdownTextMode,
         SectionEyebrow,
-        SegmentOption,
-        SegmentedControl,
-        SurfaceBorder,
         SurfaceColor,
-        SurfacePadding,
-        SurfaceShadow,
         TextColor,
         TextFieldCard,
-        TextFieldFrame,
-        TextFieldSize,
         TextSize,
         TextWeight,
         surfaceStyle,
-        textStyle,
-        IdentificationAnswerKey;
+        textStyle;
 import 'package:flutter/material.dart' hide FormField;
 import 'package:flutter_hooks/flutter_hooks.dart' show useEffect, useMemoized;
 import 'package:signals_hooks/signals_hooks.dart';
@@ -92,9 +83,10 @@ class IdentificationEditor extends SignalHookWidget {
                   spacing: tokens.spaceLayoutGapMd,
                   children: [
                     for (final entry in answers.asMap().entries)
-                      _IdentificationAnswerKeyRow(
+                      AnswerKeyTile(
                         index: entry.key,
-                        answerKey: entry.value,
+                        value: entry.value.value,
+                        casingType: entry.value.casingType,
                         canMoveUp: entry.key > 0,
                         canMoveDown: entry.key < answers.length - 1,
                         canRemove: answers.length > 1,
@@ -123,103 +115,6 @@ class IdentificationEditor extends SignalHookWidget {
           onChanged: controller.onVerticalAlignmentControlChanged,
         ),
       ],
-    );
-  }
-}
-
-class _IdentificationAnswerKeyRow extends StatelessWidget {
-  const _IdentificationAnswerKeyRow({
-    required this.index,
-    required this.answerKey,
-    required this.canMoveUp,
-    required this.canMoveDown,
-    required this.canRemove,
-    required this.onAnswerChanged,
-    required this.onCasingTypeChanged,
-    required this.onMoveUp,
-    required this.onMoveDown,
-    required this.onRemove,
-  });
-
-  final int index;
-  final IdentificationAnswerKey answerKey;
-  final bool canMoveUp;
-  final bool canMoveDown;
-  final bool canRemove;
-  final ValueChanged<String> onAnswerChanged;
-  final ValueChanged<CasingType> onCasingTypeChanged;
-  final VoidCallback onMoveUp;
-  final VoidCallback onMoveDown;
-  final VoidCallback onRemove;
-
-  @override
-  Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
-
-    return Surface(
-      style: surfaceStyle
-          .resolve(tokens, const [
-            SurfaceColor.muted,
-            SurfaceBorder.baseline,
-            SurfacePadding.sm,
-            SurfaceShadow.none,
-          ])
-          .copyWith(padding: EdgeInsets.all(tokens.spaceLayoutGapSm)),
-      child: Column(
-        spacing: tokens.spaceLayoutGapSm,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            spacing: tokens.spaceLayoutGapSm,
-            children: [
-              Text(
-                '${index + 1}.',
-                style: textStyle.resolve(tokens, const [
-                  TextSize.label,
-                  TextWeight.heavy,
-                  TextColor.muted,
-                ]),
-              ),
-              Expanded(
-                child: MarkdownText(
-                  data: answerKey.value,
-                  onChanged: onAnswerChanged,
-                  mode: MarkdownTextMode.input,
-                  placeholder: 'Accepted answer...',
-                  variants: const [
-                    TextFieldSize.labelLarge,
-                    TextFieldFrame.outline,
-                  ],
-                ),
-              ),
-              Button.icon(
-                tokens: tokens,
-                icon: Icons.keyboard_arrow_up_rounded,
-                onPressed: canMoveUp ? onMoveUp : null,
-              ),
-              Button.icon(
-                tokens: tokens,
-                icon: Icons.keyboard_arrow_down_rounded,
-                onPressed: canMoveDown ? onMoveDown : null,
-              ),
-              Button.icon(
-                tokens: tokens,
-                icon: Icons.delete_rounded,
-                onPressed: canRemove ? onRemove : null,
-              ),
-            ],
-          ),
-          SegmentedControl<CasingType>(
-            isScrollable: true,
-            value: answerKey.casingType,
-            options: [
-              for (final type in CasingType.values)
-                SegmentOption(value: type, label: type.label),
-            ],
-            onChanged: onCasingTypeChanged,
-          ),
-        ],
-      ),
     );
   }
 }

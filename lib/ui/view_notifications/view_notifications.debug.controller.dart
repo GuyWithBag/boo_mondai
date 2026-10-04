@@ -46,6 +46,7 @@ class ViewNotificationsDebugController {
   final type = signal(NotificationIntentType.firstDrillSurvey);
   final persistInInbox = signal(true);
   final showSystemNotification = signal(false);
+  final showAsBubble = signal(false);
   final assignIntentRoute = signal(true);
   final isSubmitting = signal(false);
 
@@ -101,6 +102,10 @@ class ViewNotificationsDebugController {
     showSystemNotification.value = value;
   }
 
+  void setShowAsBubble(bool value) {
+    showAsBubble.value = value;
+  }
+
   void setAssignIntentRoute(bool value) {
     assignIntentRoute.value = value;
   }
@@ -131,30 +136,42 @@ class ViewNotificationsDebugController {
     }
 
     isSubmitting.value = true;
+    try {
+      final id =
+          NotificationIds.dynamicIdOffset +
+          DateTime.now().microsecondsSinceEpoch %
+              NotificationIds.dynamicIdRange;
+      final route = customRoute.value.trim().isEmpty
+          ? null
+          : customRoute.value.trim();
 
-    final id =
-        NotificationIds.dynamicIdOffset +
-        DateTime.now().microsecondsSinceEpoch % NotificationIds.dynamicIdRange;
-    final route = customRoute.value.trim().isEmpty
-        ? null
-        : customRoute.value.trim();
-
-    await NotificationsController.instance.notify(
-      NotificationIntent.create(
-        id: id,
-        profileId: LocalDB.currentProfile.getOrCreate().id,
-        type: type.value,
-        title: resolvedTitle,
-        body: resolvedBody,
-        route: route,
-        ifRouteNullPushToView: assignIntentRoute.value,
-        persistInInbox: persistInInbox.value,
-        showSystemNotification: showSystemNotification.value,
-        purgeAfterDays: resolvedPurgeAfterDays,
-      ),
-      const ImmediateSchedule.now(),
-    );
-    isSubmitting.value = false;
+      await NotificationsController.instance.notify(
+        NotificationIntent.create(
+          id: id,
+          profileId: LocalDB.currentProfile.getOrCreate().id,
+          type: type.value,
+          title: resolvedTitle,
+          body: resolvedBody,
+          route: route,
+          ifRouteNullPushToView: assignIntentRoute.value,
+          persistInInbox: persistInInbox.value,
+          showSystemNotification: showSystemNotification.value,
+          showAsBubble: showAsBubble.value,
+          purgeAfterDays: resolvedPurgeAfterDays,
+        ),
+        const ImmediateSchedule.now(),
+      );
+    } catch (error) {
+      if (!context.mounted) return;
+      showSnackbar(
+        context,
+        message: 'Could not insert notification: $error',
+        leading: const Icon(Icons.error_outline),
+      );
+      return;
+    } finally {
+      isSubmitting.value = false;
+    }
 
     if (!context.mounted) return;
     showSnackbar(
@@ -162,7 +179,6 @@ class ViewNotificationsDebugController {
       message: 'Debug notification inserted.',
       leading: const Icon(Icons.notifications_active_outlined),
     );
-    Navigator.of(context).pop();
   }
 
   void dispose() {
@@ -174,6 +190,7 @@ class ViewNotificationsDebugController {
     type.dispose();
     persistInInbox.dispose();
     showSystemNotification.dispose();
+    showAsBubble.dispose();
     assignIntentRoute.dispose();
     isSubmitting.dispose();
     purgeAfterDays.dispose();

@@ -167,7 +167,7 @@ class _MatchingColumn extends SignalWidget {
               elevated: false,
               contentScale: contentScale,
               selected: controller.isSelected(item),
-              variants: [..._itemVariants(item), ButtonVariant.flat],
+              variants: [..._itemVariants(item)],
               mainAxisAlignment: MainAxisAlignment.center,
               onPressed: locked || controller.isMatched(item)
                   ? null
