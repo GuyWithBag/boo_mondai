@@ -1,5 +1,7 @@
+create extension if not exists pgcrypto with schema extensions;
+
 create table public.profiles (
-  id uuid primary key,
+  id uuid primary key default extensions.gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
   username text not null,
   display_name text not null,
@@ -11,7 +13,15 @@ create table public.profiles (
   purge_after timestamptz,
   is_anonymous boolean not null default true,
   constraint profiles_role_valid check (
-    role in ('user', 'researcher', 'appAdmin', 'participant_a', 'participant_b')
+    role in (
+      'user',
+      'researcher',
+      'appAdmin',
+      'participant_chinese_a',
+      'participant_chinese_b',
+      'participant_japanese_a',
+      'participant_japanese_b'
+    )
   ),
   constraint profiles_username_not_blank check (length(btrim(username)) > 0),
   constraint profiles_display_name_not_blank check (length(btrim(display_name)) > 0),
@@ -88,6 +98,74 @@ create trigger profiles_prevent_privilege_escalation
 before update on public.profiles
 for each row
 execute function public.prevent_profile_privilege_escalation();
+
+create or replace function public.handle_new_auth_user()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  base_username text;
+  candidate_username text;
+  display_name text;
+  retry_count integer = 0;
+begin
+  base_username = nullif(btrim(new.raw_user_meta_data->>'username'), '');
+  base_username = coalesce(
+    base_username,
+    nullif(split_part(coalesce(new.email, ''), '@', 1), ''),
+    'User'
+  );
+  display_name = coalesce(
+    nullif(btrim(new.raw_user_meta_data->>'display_name'), ''),
+    base_username
+  );
+  candidate_username = base_username;
+
+  loop
+    begin
+      insert into public.profiles (
+        user_id,
+        username,
+        display_name,
+        role,
+        is_anonymous
+      ) values (
+        new.id,
+        candidate_username,
+        display_name,
+        'user',
+        false
+      );
+
+      return new;
+    exception
+      when unique_violation then
+        if exists (
+          select 1
+          from public.profiles
+          where user_id = new.id
+        ) then
+          return new;
+        end if;
+
+        retry_count = retry_count + 1;
+        candidate_username =
+          base_username || '_' || replace(left(new.id::text, 8), '-', '');
+
+        if retry_count > 1 then
+          candidate_username = candidate_username || '_' || retry_count;
+        end if;
+    end;
+  end loop;
+end;
+$$;
+
+create trigger on_auth_user_created
+after insert on auth.users
+for each row
+execute function public.handle_new_auth_user();
 
 alter table public.profiles enable row level security;
 
