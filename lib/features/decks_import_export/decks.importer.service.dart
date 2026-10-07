@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:boo_mondai/lib.barrel.dart'
     show
@@ -23,6 +24,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         DeckMapper,
         CardTemplateMapper,
         CasingHelper,
+        CasingType,
         FlashcardTemplate,
         IdentificationTemplate,
         MultipleChoiceTemplate,
@@ -31,9 +33,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         WordScrambleTemplate,
         MultipleChoiceOption,
         IdentificationAnswerKey,
+        FillInTheBlankAnswerKey,
         MatchingTypeValue;
 import 'package:cross_file/cross_file.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:path/path.dart' as p;
 
 final class DecksImporterService {
   const DecksImporterService();
@@ -75,6 +79,22 @@ final class DecksImporterService {
     return previewDeckMaps(maps);
   }
 
+  Future<DeckImportPreview> previewDecksFromDirectory() async {
+    final directoryPath = await FilePicker.getDirectoryPath();
+    if (directoryPath == null || directoryPath.trim().isEmpty) {
+      return DeckImportPreview.empty(DeckImportMode.decks);
+    }
+
+    final directory = Directory(directoryPath);
+    final importFile = await deckImportFileFromDirectory(directory);
+    if (importFile == null) {
+      return DeckImportPreview.empty(DeckImportMode.decks);
+    }
+
+    final preview = await previewDeckMaps(await pathToMaps(importFile.path));
+    return preview.copyWith(sourceDirectoryPath: directory.path);
+  }
+
   Future<DeckImportPreview> previewCardTemplatesFromFiles(
     String deckTitle,
   ) async {
@@ -96,7 +116,7 @@ final class DecksImporterService {
   }
 
   Future<void> importFromDirectories() async {
-    await FilePicker.getDirectoryPath();
+    await previewDecksFromDirectory();
   }
 
   List<Map<String, dynamic>> textToMaps(String text) {
@@ -117,6 +137,19 @@ final class DecksImporterService {
     final text = await xFile.readAsString();
     final extension = file.extension?.trim().toLowerCase();
 
+    return textToMapsByExtension(text: text, extension: extension);
+  }
+
+  Future<List<Map<String, dynamic>>> pathToMaps(String path) async {
+    final text = await File(path).readAsString();
+    final extension = p.extension(path).replaceFirst('.', '').toLowerCase();
+    return textToMapsByExtension(text: text, extension: extension);
+  }
+
+  List<Map<String, dynamic>> textToMapsByExtension({
+    required String text,
+    required String? extension,
+  }) {
     if (extension == 'csv') {
       return normalizeMany(CsvHelper.toManyMaps(text));
     }
@@ -236,6 +269,69 @@ final class DecksImporterService {
             .toList(growable: false),
       );
     }
+
+    await copyDirectoryAttachments(preview);
+  }
+
+  Future<File?> deckImportFileFromDirectory(Directory directory) async {
+    if (!await directory.exists()) return null;
+
+    final children = await directory.list(followLinks: false).toList();
+    final files = children.whereType<File>().toList(growable: false);
+    if (files.isEmpty) return null;
+
+    const preferredNames = {'deck.json', 'decks.json', 'import.json'};
+    for (final file in files) {
+      final fileName = p.basename(file.path).toLowerCase();
+      if (preferredNames.contains(fileName)) return file;
+    }
+
+    for (final extension in const ['.json', '.txt']) {
+      for (final file in files) {
+        if (p.extension(file.path).toLowerCase() == extension) return file;
+      }
+    }
+
+    return null;
+  }
+
+  Future<void> copyDirectoryAttachments(DeckImportPreview preview) async {
+    final sourceDirectoryPath = preview.sourceDirectoryPath;
+    if (sourceDirectoryPath == null || sourceDirectoryPath.trim().isEmpty) {
+      return;
+    }
+
+    final sourceAttachments = Directory(
+      p.join(sourceDirectoryPath, 'attachments'),
+    );
+    if (!await sourceAttachments.exists()) return;
+
+    final files = await sourceAttachments
+        .list(recursive: true, followLinks: false)
+        .where((entity) => entity is File)
+        .cast<File>()
+        .toList();
+
+    for (final deckMap in preview.result.decks) {
+      final title = deckMap['title']?.toString().trim();
+      if (title == null || title.isEmpty) continue;
+
+      final destinationRoot =
+          await FileSystemHandler.getAbsolutePathOfRelativePath(
+            p.posix.join('decks', title, 'attachments'),
+          );
+
+      for (final file in files) {
+        final relativePath = p.relative(
+          file.path,
+          from: sourceAttachments.path,
+        );
+        final destinationPath = p.join(destinationRoot, relativePath);
+        final destinationFile = File(destinationPath);
+        await destinationFile.parent.create(recursive: true);
+        await file.copy(destinationFile.path);
+      }
+    }
   }
 
   List<CardTemplate> templatesFromResult(DeckImportResult result) {
@@ -281,12 +377,12 @@ final class DecksImporterService {
       },
       'identification' => {
         ...template,
-        'accepted_answers': answersByTemplateId[templateId] ?? const [],
+        'answers': answersByTemplateId[templateId] ?? const [],
       },
       'fill_in_the_blanks' => {...template},
-      'match_madness' => {
+      'matching_type' => {
         ...template,
-        'pairs': pairsByTemplateId[templateId] ?? const [],
+        'values': pairsByTemplateId[templateId] ?? const [],
       },
       _ => template,
     };
@@ -469,7 +565,7 @@ final class DecksImporterService {
       'fill_in_the_blanks' => keysWithType(
         FillInTheBlanksTemplate.createDummy().toMap(),
       ),
-      'match_madness' => keysWithType(
+      'matching_type' => keysWithType(
         MatchingTypeTemplate.createDummy().toMap(),
       ),
       'word_scramble' => keysWithType(
@@ -490,21 +586,45 @@ final class DecksImporterService {
   List<Map<String, dynamic>> normalizeMany(List<Map<String, dynamic>> maps) {
     return [
       for (final map in maps)
-        Map<String, dynamic>.from(normalizeKeysToSnakeCase(map) as Map),
+        Map<String, dynamic>.from(normalizeImportKeys(map) as Map),
     ];
   }
 
-  Object? normalizeKeysToSnakeCase(Object? value) {
+  Object? normalizeImportKeys(Object? value) {
     return switch (value) {
       final Map<dynamic, dynamic> map => {
         for (final entry in map.entries)
-          CasingHelper.toSnakeCase(entry.key.toString()):
-              normalizeKeysToSnakeCase(entry.value),
+          storageImportKey(entry.key.toString()): normalizeImportKeys(
+            entry.value,
+          ),
       },
       final List<dynamic> list => [
-        for (final item in list) normalizeKeysToSnakeCase(item),
+        for (final item in list) normalizeImportKeys(item),
       ],
       _ => value,
+    };
+  }
+
+  String storageImportKey(String key) {
+    return switch (key) {
+      'answerKeys' => 'answer_keys',
+      'backText' => 'back_text',
+      'casingType' => 'casing_type',
+      'coverImageUrl' => 'cover_image_url',
+      'frontText' => 'front_text',
+      'isCorrect' => 'is_correct',
+      'matchPosition' => 'match_position',
+      'maxIncorrectAnswers' => 'max_incorrect_answers',
+      'multipleAnswers' => 'multiple_answers',
+      'optionText' => 'option_text',
+      'promptText' => 'prompt_text',
+      'questionPrompt' => 'question_prompt',
+      'randomizedOptionsOrdering' => 'randomized_options_ordering',
+      'sentenceToScramble' => 'sentence_to_scramble',
+      'sourceDeckId' => 'source_deck_id',
+      'sourceTemplateId' => 'source_template_id',
+      'verticallyCentered' => 'vertically_centered',
+      _ => key,
     };
   }
 
@@ -525,11 +645,13 @@ final class DecksImporterService {
 
   Map<String, Set<String>> get templateChildKeys => {
     'options': MultipleChoiceOption.createDummy().toMap().keys.toSet(),
-    'accepted_answers': IdentificationAnswerKey.createDummy()
-        .toMap()
-        .keys
-        .toSet(),
-    'pairs': MatchingTypeValue.createDummy().toMap().keys.toSet(),
+    'answers': IdentificationAnswerKey.createDummy().toMap().keys.toSet(),
+    'answer_keys': FillInTheBlankAnswerKey(
+      casingType: CasingType.any,
+      value: '',
+      order: 0,
+    ).toMap().keys.toSet(),
+    'values': MatchingTypeValue.createDummy().toMap().keys.toSet(),
   };
 
   Set<String> get generatedKeys => const {

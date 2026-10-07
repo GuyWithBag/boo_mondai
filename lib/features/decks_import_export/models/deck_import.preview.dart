@@ -9,6 +9,7 @@ final class DeckImportPreview {
     required this.result,
     this.titleConflicts = const [],
     this.unsupportedKeys = const [],
+    this.sourceDirectoryPath,
   });
 
   factory DeckImportPreview.empty(DeckImportMode mode) {
@@ -19,6 +20,7 @@ final class DeckImportPreview {
   final DeckImportResult result;
   final List<DeckImportTitleConflict> titleConflicts;
   final List<DeckImportUnsupportedKey> unsupportedKeys;
+  final String? sourceDirectoryPath;
 
   bool get hasChanges =>
       result.decks.isNotEmpty ||
@@ -29,6 +31,22 @@ final class DeckImportPreview {
 
   bool get hasTitleConflicts => titleConflicts.isNotEmpty;
   bool get hasUnsupportedKeys => unsupportedKeys.isNotEmpty;
+
+  DeckImportPreview copyWith({
+    DeckImportMode? mode,
+    DeckImportResult? result,
+    List<DeckImportTitleConflict>? titleConflicts,
+    List<DeckImportUnsupportedKey>? unsupportedKeys,
+    String? sourceDirectoryPath,
+  }) {
+    return DeckImportPreview(
+      mode: mode ?? this.mode,
+      result: result ?? this.result,
+      titleConflicts: titleConflicts ?? this.titleConflicts,
+      unsupportedKeys: unsupportedKeys ?? this.unsupportedKeys,
+      sourceDirectoryPath: sourceDirectoryPath ?? this.sourceDirectoryPath,
+    );
+  }
 
   DeckImportPreview resolveTitleConflicts(Map<int, String> titlesByDeckIndex) {
     final decks = [
@@ -53,6 +71,7 @@ final class DeckImportPreview {
           if (!titlesByDeckIndex.containsKey(conflict.deckIndex)) conflict,
       ],
       unsupportedKeys: unsupportedKeys,
+      sourceDirectoryPath: sourceDirectoryPath,
     );
   }
 }

@@ -99,7 +99,7 @@ abstract class DeckMapNormalizer {
         templateId: templateId,
         injectValues: injectValues,
       ),
-      'match_madness' => _flattenMatchingTypeTemplate(
+      'matching_type' => _flattenMatchingTypeTemplate(
         imported,
         templateId: templateId,
         injectValues: injectValues,
@@ -125,8 +125,8 @@ abstract class DeckMapNormalizer {
   }) {
     final answers = MapHelper.requireNestedMaps(
       imported,
-      'accepted_answers',
-      'Identification template accepted_answers',
+      'answers',
+      'Identification template answers',
     );
     return DeckImportResult(
       cardTemplates: [
@@ -134,8 +134,8 @@ abstract class DeckMapNormalizer {
           base: IdentificationTemplate.createDummy(id: templateId).toMap(),
           imported: imported,
           injectValues: injectValues,
-          removeKeys: const {'accepted_answers'},
-          requiredKeys: const {'type', 'prompt_text', 'accepted_answers'},
+          removeKeys: const {'answers'},
+          requiredKeys: const {'type', 'prompt_text', 'answers'},
         ),
       ],
       identificationAnswers: [
@@ -150,7 +150,7 @@ abstract class DeckMapNormalizer {
               'template_id': templateId,
               'display_order': entry.key,
             },
-            requiredKeys: const {'answer'},
+            requiredKeys: const {'value'},
           ),
       ],
     );
@@ -199,13 +199,26 @@ abstract class DeckMapNormalizer {
     required String templateId,
     required Map<String, dynamic> injectValues,
   }) {
+    final answerKeys = MapHelper.requireNestedMaps(
+      imported,
+      'answer_keys',
+      'Fill in the blanks template answer_keys',
+    );
+    for (final answerKey in answerKeys) {
+      MapHelper.requireKeysOrThrowException(answerKey, const {
+        'value',
+        'casing_type',
+        'order',
+      });
+    }
+
     return DeckImportResult(
       cardTemplates: [
         MapHelper.normalizeWithBaseMap(
           base: FillInTheBlanksTemplate.createDummy(id: templateId).toMap(),
           imported: imported,
           injectValues: injectValues,
-          requiredKeys: const {'type', 'prompt_text', 'answer_keys', 'order'},
+          requiredKeys: const {'type', 'prompt_text', 'answer_keys'},
         ),
       ],
     );
@@ -216,10 +229,10 @@ abstract class DeckMapNormalizer {
     required String templateId,
     required Map<String, dynamic> injectValues,
   }) {
-    final pairs = MapHelper.requireNestedMaps(
+    final values = MapHelper.requireNestedMaps(
       imported,
-      'pairs',
-      'Match madness template pairs',
+      'values',
+      'Matching type template values',
     );
     return DeckImportResult(
       cardTemplates: [
@@ -227,20 +240,19 @@ abstract class DeckMapNormalizer {
           base: MatchingTypeTemplate.createDummy(id: templateId).toMap(),
           imported: imported,
           injectValues: injectValues,
-          removeKeys: const {'pairs'},
-          requiredKeys: const {'type', 'pairs'},
+          removeKeys: const {'values'},
+          requiredKeys: const {'type', 'values'},
         ),
       ],
-      // ToDo:
-      // matchMadnessPairs: [
-      //   for (final entry in pairs.asMap().entries)
-      //     MapHelper.normalizeWithBaseMap(
-      //       base: MatchingTypeValue.createDummy().toMap(),
-      //       imported: entry.value,
-      //       injectValues: {'id': uuid.v7(), 'display_order': entry.key},
-      //       requiredKeys: const {'term', 'match'},
-      //     ),
-      // ],
+      matchMadnessPairs: [
+        for (final value in values)
+          MapHelper.normalizeWithBaseMap(
+            base: MatchingTypeValue.createDummy().toMap(),
+            imported: value,
+            injectValues: {'template_id': templateId},
+            requiredKeys: const {'text', 'match_position', 'position'},
+          ),
+      ],
     );
   }
 }
