@@ -1,6 +1,6 @@
 {
-  "type": "Deck",
-  "title": "All 6",
+  "type": "deck",
+  "title": "Test Deck",
   "templates": [
     {
       "type": "match_madness",
