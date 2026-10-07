@@ -55,13 +55,10 @@ class StudyCardsLocalDB extends HiveLocalDB<StudyCard> {
     // 1. Get all base cards for this deck
     final allDeckCards = getByDeckId(deckId);
 
-    // 2. Get the Set of all StudyCard IDs that the user already has in FSRS
-    // (Using the highly optimized Set query you built earlier!)
     final enrolledCards = LocalDB.fsrsCard.getEnrolledStudyCardIds(profileId);
 
-    // 3. Filter out the enrolled ones
     return allDeckCards
-        .where((card) => !enrolledCards.any((c) => c.id == card.id))
+        .where((card) => !enrolledCards.contains(card.id))
         .toList();
   }
 }
