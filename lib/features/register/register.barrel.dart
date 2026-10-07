@@ -4,3 +4,4 @@
 // Other files
 export 'register.page.dart';
 export 'register.controller.dart';
+export 'register.result.page.dart';

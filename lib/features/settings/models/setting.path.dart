@@ -22,6 +22,8 @@ enum SettingPath {
   buttonUpSoundEnabled('media/ui_sounds/button_up_enabled'),
   studySessionSoundsEnabled('media/study_session/sounds_enabled'),
   onboardingCompleted('app/onboarding/completed'),
+  isAppDemo('app/demo/is_app_demo'),
+  allowSettingDeckImage('deck/allow_setting_deck_image'),
   disableOnlineFeatures('developer/disabled_online_features');
 
   const SettingPath(this.value);

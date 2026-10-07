@@ -27,16 +27,20 @@ class ProfileRoleMapper extends EnumMapper<ProfileRole> {
   @override
   ProfileRole decode(dynamic value) {
     switch (value) {
-      case r'user':
+      case 'user':
         return ProfileRole.user;
-      case r'researcher':
+      case 'researcher':
         return ProfileRole.researcher;
-      case r'admin':
-        return ProfileRole.admin;
-      case r'participant_a':
-        return ProfileRole.participantA;
-      case r'participant_b':
-        return ProfileRole.participantB;
+      case 'appAdmin':
+        return ProfileRole.appAdmin;
+      case 'participant_chinese_a':
+        return ProfileRole.participantChineseA;
+      case 'participant_chinese_b':
+        return ProfileRole.participantChineseB;
+      case 'participant_japanese_a':
+        return ProfileRole.participantJapaneseA;
+      case 'participant_japanese_b':
+        return ProfileRole.participantJapaneseB;
       default:
         throw MapperException.unknownEnumValue(value);
     }
@@ -46,23 +50,27 @@ class ProfileRoleMapper extends EnumMapper<ProfileRole> {
   dynamic encode(ProfileRole self) {
     switch (self) {
       case ProfileRole.user:
-        return r'user';
+        return 'user';
       case ProfileRole.researcher:
-        return r'researcher';
-      case ProfileRole.admin:
-        return r'admin';
-      case ProfileRole.participantA:
-        return r'participant_a';
-      case ProfileRole.participantB:
-        return r'participant_b';
+        return 'researcher';
+      case ProfileRole.appAdmin:
+        return 'appAdmin';
+      case ProfileRole.participantChineseA:
+        return 'participant_chinese_a';
+      case ProfileRole.participantChineseB:
+        return 'participant_chinese_b';
+      case ProfileRole.participantJapaneseA:
+        return 'participant_japanese_a';
+      case ProfileRole.participantJapaneseB:
+        return 'participant_japanese_b';
     }
   }
 }
 
 extension ProfileRoleMapperExtension on ProfileRole {
-  String toValue() {
+  dynamic toValue() {
     ProfileRoleMapper.ensureInitialized();
-    return MapperContainer.globals.toValue<ProfileRole>(this) as String;
+    return MapperContainer.globals.toValue<ProfileRole>(this);
   }
 }
 

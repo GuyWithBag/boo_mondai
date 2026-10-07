@@ -65,6 +65,14 @@ class SettingsRegistry {
       description: 'Play sounds during study and drill sessions.',
     ),
     SettingPath.onboardingCompleted: Setting<bool>(defaultValue: false),
+    SettingPath.isAppDemo: Setting<bool>(
+      defaultValue: false,
+      description: 'Disable unavailable demo actions.',
+    ),
+    SettingPath.allowSettingDeckImage: Setting<bool>(
+      defaultValue: false,
+      description: 'Allow custom deck cover images.',
+    ),
     SettingPath.disableOnlineFeatures: Setting<bool>(
       defaultValue: true,
       description: 'Disable features like deck listing, sync.',

@@ -1,4 +1,4 @@
-import 'package:boo_mondai/features/features.barrel.dart';
+import 'package:boo_mondai/features/app_theme/app_theme.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart' show AuthController, Pages;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -47,25 +47,28 @@ class RegisterController {
 
     if (!context.mounted) return;
 
-    if (response.profile == null) return;
+    if (authController.error.value != null) return;
 
-    if (response.needsMerge) {
+    if (response.profile != null && response.needsMerge) {
       final isMergeResolved = await authController.showPendingGuestMerge(
         context,
         authServiceResponse: response,
       );
       if (!context.mounted || !isMergeResolved) return;
 
-      showSnackbar(
-        context,
-        message: 'Succesfully registered and merge resolved!',
-      );
-      context.go(Pages.account.url);
+      showRegistrationSuccess(context);
       return;
     }
 
-    showSnackbar(context, message: 'Succesfully registered!');
+    showRegistrationSuccess(context);
+  }
+
+  void showRegistrationSuccess(BuildContext context) {
     context.go(Pages.account.url);
+    showSnackbar(
+      context,
+      message: 'Registration successful. Please log in to continue.',
+    );
   }
 
   void dispose() {
