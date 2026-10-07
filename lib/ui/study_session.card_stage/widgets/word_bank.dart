@@ -19,33 +19,36 @@ class WordBank extends SignalWidget {
     final words = controller.wordBank.value;
     final isLocked = controller.isLocked;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(
-          'Word Bank'.toUpperCase(),
-          style: textStyle.resolve(tokens, const [
-            TextSize.labelSmall,
-            TextWeight.heavy,
-            TextColor.muted,
-          ]),
-        ),
-        SizedBox(height: tokens.spaceLayoutGapSm),
-        SingleChildScrollView(
-          child: Wrap(
-            spacing: tokens.spaceLayoutGapSm,
-            runSpacing: tokens.spaceLayoutGapSm,
-            children: [
-              for (final word in words)
-                _DraggableBankChip(
-                  word: word,
-                  enabled: !isLocked,
-                  onPressed: () => controller.selectWord(word),
-                ),
-            ],
+    return SizedBox(
+      height: WordBank.preferredHeight,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            'Word Bank'.toUpperCase(),
+            style: textStyle.resolve(tokens, const [
+              TextSize.labelSmall,
+              TextWeight.heavy,
+              TextColor.muted,
+            ]),
           ),
-        ),
-      ],
+          SizedBox(height: tokens.spaceLayoutGapSm),
+          SingleChildScrollView(
+            child: Wrap(
+              spacing: tokens.spaceLayoutGapSm,
+              runSpacing: tokens.spaceLayoutGapSm,
+              children: [
+                for (final word in words)
+                  _DraggableBankChip(
+                    word: word,
+                    enabled: !isLocked,
+                    onPressed: () => controller.selectWord(word),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

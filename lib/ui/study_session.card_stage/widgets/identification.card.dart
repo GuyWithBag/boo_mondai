@@ -6,6 +6,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         AlignedScrollView,
         AppTokens,
         IdentificationTemplate,
+        MarkdownAttachmentUrlResolver,
+        MarkdownHelper,
         MarkdownText,
         MarkdownTextMode,
         PhysicalCard,
@@ -61,6 +63,9 @@ class IdentificationCard extends SignalHookWidget {
       width: maxWidth,
     );
     final physicalCardController = controller ?? fallbackPhysicalCardController;
+    final resolveAttachmentUrl = MarkdownHelper.resolveTemplateAttachmentUrl(
+      template,
+    );
     final eyebrowStyle = ScaleHelper.getTextStyleWithScaledFontSize(
       textStyle.resolve(tokens, const [
         TextSize.labelSmall,
@@ -137,6 +142,7 @@ class IdentificationCard extends SignalHookWidget {
               mode: MarkdownTextMode.preview,
               baseTextStyle: promptStyle,
               contentScale: contentScale,
+              resolveAttachmentUrl: resolveAttachmentUrl,
             ),
             SizedBox(height: gap),
             if (effectiveIsRevealed)
@@ -146,6 +152,7 @@ class IdentificationCard extends SignalHookWidget {
                 contentScale: contentScale,
                 wasIncorrect: wasIncorrect,
                 submittedAnswer: submittedAnswer,
+                resolveAttachmentUrl: resolveAttachmentUrl,
               )
             else ...[
               TextField(
@@ -177,6 +184,7 @@ class _AcceptedAnswersPreview extends StatelessWidget {
     required this.textStyle,
     required this.contentScale,
     required this.wasIncorrect,
+    required this.resolveAttachmentUrl,
     this.submittedAnswer,
   });
 
@@ -184,6 +192,7 @@ class _AcceptedAnswersPreview extends StatelessWidget {
   final TextStyle textStyle;
   final double contentScale;
   final bool wasIncorrect;
+  final MarkdownAttachmentUrlResolver resolveAttachmentUrl;
   final String? submittedAnswer;
 
   @override
@@ -234,6 +243,7 @@ class _AcceptedAnswersPreview extends StatelessWidget {
                   mode: MarkdownTextMode.preview,
                   baseTextStyle: textStyle,
                   contentScale: contentScale,
+                  resolveAttachmentUrl: resolveAttachmentUrl,
                 ),
               ),
           ],

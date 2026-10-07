@@ -50,6 +50,9 @@ class FlashcardBackSide extends StatelessWidget {
     );
     final dividerHeight = ScaleHelper.getScaledValue(16, contentScale);
     final dividerThickness = ScaleHelper.getScaledValue(1, contentScale);
+    final resolveAttachmentUrl = MarkdownHelper.resolveTemplateAttachmentUrl(
+      template,
+    );
 
     return AlignedScrollView(
       verticallyCentered: template.verticallyCentered,
@@ -65,7 +68,7 @@ class FlashcardBackSide extends StatelessWidget {
             data: template.getQuestion(isReversed: studyCard.isReversed),
             baseTextStyle: markdownTextStyle,
             contentScale: contentScale,
-            resolveAttachmentUrl: MarkdownHelper.resolveAttachmentUrl,
+            resolveAttachmentUrl: resolveAttachmentUrl,
             defaultMarkdownAlignment: WrapAlignment.center,
           ),
           Divider(height: dividerHeight, thickness: dividerThickness),
@@ -75,7 +78,7 @@ class FlashcardBackSide extends StatelessWidget {
             baseTextStyle: markdownTextStyle,
             contentScale: contentScale,
             defaultMarkdownAlignment: WrapAlignment.center,
-            resolveAttachmentUrl: MarkdownHelper.resolveAttachmentUrl,
+            resolveAttachmentUrl: resolveAttachmentUrl,
           ),
         ],
       ),

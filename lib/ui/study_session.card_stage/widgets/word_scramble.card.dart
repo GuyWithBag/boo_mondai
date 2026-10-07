@@ -15,6 +15,7 @@ import 'package:boo_mondai/lib.barrel.dart'
 import 'package:boo_mondai/ui/study_session.card_stage/widgets/word_scramble.chip.dart';
 import 'package:boo_mondai/ui/study_session.card_stage/widgets/word_scramble.controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -23,7 +24,7 @@ class WordScrambleCard extends SignalHookWidget {
   const WordScrambleCard({
     super.key,
     required this.template,
-    required this.cardStageController,
+    this.cardStageController,
     this.isRevealed = false,
     this.maxWidth,
     this.contentScale = 1,
@@ -31,7 +32,7 @@ class WordScrambleCard extends SignalHookWidget {
   });
 
   final WordScrambleTemplate template;
-  final StudySessionCardStageController cardStageController;
+  final StudySessionCardStageController? cardStageController;
   final bool isRevealed;
   final double? maxWidth;
   final double contentScale;
@@ -40,10 +41,25 @@ class WordScrambleCard extends SignalHookWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
+    final fallbackCardStageController = useMemoized(
+      () => StudySessionCardStageController(
+        template: template,
+        canReveal: true,
+        createCardController: (stage) => WordScrambleController(
+          template: template,
+          answer: stage.answer,
+          canReveal: stage.canReveal,
+          isRevealed: stage.isRevealed,
+        ),
+      ),
+      [template.id],
+    );
+    final effectiveCardStageController =
+        cardStageController ?? fallbackCardStageController;
     final wordScrambleController =
-        cardStageController.cardController! as WordScrambleController;
+        effectiveCardStageController.cardController! as WordScrambleController;
     final effectiveIsRevealed =
-        isRevealed || cardStageController.isRevealed.value == true;
+        isRevealed || effectiveCardStageController.isRevealed.value == true;
     final fallbackPhysicalCardController = usePhysicalCardController(
       context,
       width: maxWidth,
@@ -73,7 +89,24 @@ class WordScrambleCard extends SignalHookWidget {
       tokens.spaceLayoutGapMd,
       contentScale,
     );
+    final sectionGap = ScaleHelper.getScaledValue(
+      tokens.spaceLayoutGapXsm,
+      contentScale,
+    );
     final selectedWords = wordScrambleController.selectedWords.value;
+    final correctWords = template.sentenceToScramble
+        .trim()
+        .split(RegExp(r'\s+'))
+        .where((word) => word.isNotEmpty);
+
+    useEffect(() {
+      fallbackCardStageController.isRevealed.value = isRevealed;
+      return null;
+    }, [fallbackCardStageController, isRevealed]);
+
+    useEffect(() => fallbackCardStageController.dispose, [
+      fallbackCardStageController,
+    ]);
 
     return PhysicalCard(
       controller: physicalCardController,
@@ -98,7 +131,7 @@ class WordScrambleCard extends SignalHookWidget {
                 selectedWords.length,
               ),
               builder: (context, candidateData, rejectedData) {
-                final isHovering = candidateData.isNotEmpty;
+                // final isHovering = candidateData.isNotEmpty;
                 return AnimatedContainer(
                   duration: const Duration(milliseconds: 160),
                   width: double.infinity,
@@ -109,18 +142,69 @@ class WordScrambleCard extends SignalHookWidget {
                     EdgeInsets.all(tokens.spaceLayoutPaddingSm),
                     contentScale,
                   ),
-                  decoration: BoxDecoration(
-                    color: tokens.colorPrimary.withValues(
-                      alpha: isHovering ? 0.10 : 0.04,
-                    ),
-                    border: Border.all(
-                      color: isHovering
-                          ? tokens.colorPrimary
-                          : tokens.colorBorderNeutralSubtle,
-                    ),
-                    borderRadius: BorderRadius.circular(14.r * contentScale),
-                  ),
-                  child: selectedWords.isEmpty
+
+                  child: effectiveIsRevealed
+                      ? Column(
+                          spacing: gap,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Column(
+                              spacing: sectionGap,
+                              children: [
+                                if (selectedWords.isNotEmpty)
+                                  Text(
+                                    'Your answer',
+                                    style: eyebrowStyle,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                if (selectedWords.isNotEmpty)
+                                  Wrap(
+                                    alignment: WrapAlignment.center,
+                                    crossAxisAlignment:
+                                        WrapCrossAlignment.center,
+                                    spacing: sectionGap,
+                                    runSpacing: sectionGap,
+                                    children: [
+                                      for (final entry in selectedWords.indexed)
+                                        WordScrambleChip(
+                                          value: entry.$2.text,
+                                          selected: true,
+                                          correct: wordScrambleController
+                                              .isCorrectWordAt(entry.$1),
+                                          contentScale: contentScale,
+                                        ),
+                                    ],
+                                  ),
+                              ],
+                            ),
+                            Column(
+                              spacing: sectionGap,
+                              children: [
+                                Text(
+                                  'Correct answer',
+                                  style: eyebrowStyle,
+                                  textAlign: TextAlign.center,
+                                ),
+                                Wrap(
+                                  alignment: WrapAlignment.center,
+                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                  spacing: sectionGap,
+                                  runSpacing: sectionGap,
+                                  children: [
+                                    for (final word in correctWords)
+                                      WordScrambleChip(
+                                        value: word,
+                                        selected: true,
+                                        correct: true,
+                                        contentScale: contentScale,
+                                      ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        )
+                      : selectedWords.isEmpty
                       ? Center(
                           child: Text(
                             'Tap or drag words here',
@@ -132,11 +216,11 @@ class WordScrambleCard extends SignalHookWidget {
                           alignment: WrapAlignment.center,
                           crossAxisAlignment: WrapCrossAlignment.center,
                           spacing: ScaleHelper.getScaledValue(
-                            8.w,
+                            tokens.spaceLayoutGapSm,
                             contentScale,
                           ),
                           runSpacing: ScaleHelper.getScaledValue(
-                            12.h,
+                            tokens.spaceLayoutGapSm,
                             contentScale,
                           ),
                           children: [

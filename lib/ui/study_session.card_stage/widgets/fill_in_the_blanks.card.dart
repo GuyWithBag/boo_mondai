@@ -102,8 +102,14 @@ class FillInTheBlanksCard extends SignalHookWidget {
             Wrap(
               alignment: WrapAlignment.start,
               crossAxisAlignment: WrapCrossAlignment.center,
-              spacing: ScaleHelper.getScaledValue(8.w, contentScale),
-              runSpacing: ScaleHelper.getScaledValue(16.h, contentScale),
+              spacing: ScaleHelper.getScaledValue(
+                tokens.spaceLayoutGapSm,
+                contentScale,
+              ),
+              runSpacing: ScaleHelper.getScaledValue(
+                tokens.spaceLayoutGapSm,
+                contentScale,
+              ),
               children: [
                 for (final entry
                     in fillInTheBlanksController.segments.value.indexed)

@@ -85,6 +85,9 @@ class MultipleChoiceCard extends SignalHookWidget {
       width: maxWidth,
     );
     final physicalCardController = controller ?? fallbackPhysicalCardController;
+    final resolveAttachmentUrl = MarkdownHelper.resolveTemplateAttachmentUrl(
+      template,
+    );
 
     useEffect(() {
       selectedOptionIds.value = {};
@@ -146,7 +149,7 @@ class MultipleChoiceCard extends SignalHookWidget {
                   mode: MarkdownTextMode.previewSelectable,
                   baseTextStyle: markdownTextStyle,
                   contentScale: contentScale,
-                  resolveAttachmentUrl: MarkdownHelper.resolveAttachmentUrl,
+                  resolveAttachmentUrl: resolveAttachmentUrl,
                 ),
               ],
             ),
@@ -174,8 +177,7 @@ class MultipleChoiceCard extends SignalHookWidget {
                         mode: MarkdownTextMode.previewSelectable,
                         baseTextStyle: markdownTextStyle,
                         contentScale: contentScale,
-                        resolveAttachmentUrl:
-                            MarkdownHelper.resolveAttachmentUrl,
+                        resolveAttachmentUrl: resolveAttachmentUrl,
                       ),
                     ),
                   ),

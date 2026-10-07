@@ -4,12 +4,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         StudySessionCardStageController,
         AppTokens,
         ButtonColor,
-        ButtonVariant,
         textStyle,
         TextSize,
         TextWeight,
         TextColor,
         MarkdownText,
+        MarkdownAttachmentUrlResolver,
         MarkdownTextMode,
         MarkdownHelper,
         PhysicalCard,
@@ -91,6 +91,9 @@ class MatchingTypeCard extends SignalHookWidget {
       width: maxWidth,
     );
     final physicalCardController = controller ?? fallbackPhysicalCardController;
+    final resolveAttachmentUrl = MarkdownHelper.resolveTemplateAttachmentUrl(
+      template,
+    );
 
     return PhysicalCard(
       controller: physicalCardController,
@@ -118,6 +121,7 @@ class MatchingTypeCard extends SignalHookWidget {
                     locked: effectiveIsRevealed,
                     itemTextStyle: itemTextStyle,
                     contentScale: contentScale,
+                    resolveAttachmentUrl: resolveAttachmentUrl,
                   ),
                 ),
                 Expanded(
@@ -127,6 +131,7 @@ class MatchingTypeCard extends SignalHookWidget {
                     locked: effectiveIsRevealed,
                     itemTextStyle: itemTextStyle,
                     contentScale: contentScale,
+                    resolveAttachmentUrl: resolveAttachmentUrl,
                   ),
                 ),
               ],
@@ -145,6 +150,7 @@ class _MatchingColumn extends SignalWidget {
     required this.locked,
     required this.itemTextStyle,
     required this.contentScale,
+    required this.resolveAttachmentUrl,
   });
 
   final List<MatchingTypeItem> items;
@@ -152,6 +158,7 @@ class _MatchingColumn extends SignalWidget {
   final bool locked;
   final TextStyle itemTextStyle;
   final double contentScale;
+  final MarkdownAttachmentUrlResolver resolveAttachmentUrl;
 
   @override
   Widget build(BuildContext context) {
@@ -177,7 +184,7 @@ class _MatchingColumn extends SignalWidget {
                 mode: MarkdownTextMode.previewSelectable,
                 baseTextStyle: itemTextStyle,
                 contentScale: contentScale,
-                resolveAttachmentUrl: MarkdownHelper.resolveAttachmentUrl,
+                resolveAttachmentUrl: resolveAttachmentUrl,
               ),
             ),
           ),
