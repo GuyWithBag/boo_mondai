@@ -17,7 +17,7 @@ Future<bool?> showViewImportModal(BuildContext context) {
     context: context,
     leading: const Icon(Icons.upload_file_outlined),
     title: 'Import',
-    subtitle: 'Paste import data or choose a local file.',
+    subtitle: 'Paste import data, choose card files, or import a deck folder.',
     showCancelButton: true,
     child: const ViewImportModal(),
   );
@@ -31,6 +31,7 @@ class ViewImportModal extends SignalHookWidget {
     final tokens = context.themeTokens<AppTokens>();
     final controller = useMemoized(ViewImportController.new);
     final importMode = controller.importMode.value;
+    final isDeckImport = importMode == DeckImportMode.decks;
     final shouldShowDeckTitle = controller.shouldShowDeckTitle.value;
     final canImportText = controller.canImportText.value;
     final canImportFile =
@@ -109,6 +110,8 @@ class ViewImportModal extends SignalHookWidget {
                 child: Text(
                   controller.isPickingFile.value
                       ? 'Opening...'
+                      : isDeckImport
+                      ? 'Import from folder'
                       : 'Import from file',
                 ),
               ),

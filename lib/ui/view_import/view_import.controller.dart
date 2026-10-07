@@ -99,14 +99,15 @@ class ViewImportController {
 
     try {
       final nextPreview = switch (importMode.value) {
-        DeckImportMode.decks => await importerService.previewDecksFromFiles(),
+        DeckImportMode.decks =>
+          await importerService.previewDecksFromDirectory(),
         DeckImportMode.cardTemplates =>
           await importerService.previewCardTemplatesFromFiles(
             formDeckTitle.value,
           ),
       };
 
-      if (!nextPreview.hasChanges || !context.mounted) return;
+      if (!context.mounted) return;
       await commitPreview(context, nextPreview);
     } on Exception catch (e) {
       error.value = e;
@@ -207,7 +208,7 @@ class ViewImportController {
   Future<String?> promptForDeckTitle(BuildContext context) async {
     final controller = TextEditingController();
     try {
-      return showModal<String?>(
+      return await showModal<String?>(
         context: context,
         title: 'Rename title to...',
         child: TextField(controller: controller),
