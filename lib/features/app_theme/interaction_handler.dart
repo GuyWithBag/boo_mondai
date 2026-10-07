@@ -1,9 +1,9 @@
 import 'package:boo_mondai/lib.barrel.dart' show SelectionController;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show PointerHoverEvent;
-import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class InteractionHandler<T> extends HookWidget {
+class InteractionHandler<T> extends SignalHookWidget {
   const InteractionHandler({
     super.key,
     required this.child,
