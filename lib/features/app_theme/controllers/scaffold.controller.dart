@@ -1,7 +1,12 @@
 import 'dart:math' as math;
 
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, Breakpoints, MainController, PlatformService;
+    show
+        AppTokens,
+        Breakpoints,
+        MainController,
+        PlatformService,
+        ToolBarController;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show ScrollDirection;
 import 'package:signals/signals_flutter.dart';
@@ -16,6 +21,7 @@ class ScaffoldController {
     required this.sidebarWidth,
     required this.bottomNavBar,
     required this.toolBar,
+    required this.toolBarController,
     required this.padding,
     required bool hideNavigation,
     required this.floatingActionButton,
@@ -62,6 +68,7 @@ class ScaffoldController {
   final double sidebarWidth;
   final PreferredSizeWidget? bottomNavBar;
   final PreferredSizeWidget? toolBar;
+  final ToolBarController? toolBarController;
   final EdgeInsetsGeometry? padding;
   final Widget? floatingActionButton;
   final double preferredFloatingActionButtonHeight;
@@ -99,7 +106,6 @@ class ScaffoldController {
   final isEitherAppBarVisible = signal(true);
   final isSideBarVisible = signal(false);
   final isEitherFabVisible = signal(true);
-  final isUserInputFocusing = signal(false);
   final scrollLockKeys = signal<Set<Object>>({});
   late final ScaffoldScrollLockSetter setScrollLockedCallback = setScrollLocked;
 
@@ -148,7 +154,7 @@ class ScaffoldController {
       () => shouldHaveAppBar.value || shouldHaveFloatingAppBar.value,
     );
     shouldHaveToolBar = computed(
-      () => toolBar != null && isUserInputFocusing.value,
+      () => toolBar != null && (toolBarController?.isVisible.value ?? false),
     );
     shouldHaveBottomNavBar = computed(() {
       final isMobile = Breakpoints.isMobile(mediaQuery.size);
@@ -273,7 +279,10 @@ class ScaffoldController {
       () => scrollable && scrollLockKeys.value.isEmpty,
     );
     shouldShowUnfocusButton = computed(
-      () => showUnfocusButton && mediaQuery.viewInsets.bottom <= 0,
+      () =>
+          showUnfocusButton &&
+          (toolBarController?.isVisible.value ?? false) &&
+          mediaQuery.viewInsets.bottom <= 0,
     );
   }
 
@@ -283,22 +292,6 @@ class ScaffoldController {
     final next = {...scrollLockKeys.value};
     final didChange = value ? next.add(key) : next.remove(key);
     if (didChange) scrollLockKeys.value = next;
-  }
-
-  void syncUserInputFocus() {
-    if (isDisposed) return;
-
-    final focusedContext = FocusManager.instance.primaryFocus?.context;
-    isUserInputFocusing.value = focusedContext?.widget is EditableText;
-  }
-
-  void addFocusListener() {
-    FocusManager.instance.addListener(syncUserInputFocus);
-    syncUserInputFocus();
-  }
-
-  void removeFocusListener() {
-    FocusManager.instance.removeListener(syncUserInputFocus);
   }
 
   void toggleSideBarVisibility() {
@@ -338,7 +331,6 @@ class ScaffoldController {
   void dispose() {
     if (isDisposed) return;
     isDisposed = true;
-    removeFocusListener();
 
     hideNavigationSignal.dispose();
     showBottomNavBar.dispose();
@@ -348,7 +340,6 @@ class ScaffoldController {
     isEitherAppBarVisible.dispose();
     isSideBarVisible.dispose();
     isEitherFabVisible.dispose();
-    isUserInputFocusing.dispose();
     scrollLockKeys.dispose();
     shouldHaveAppBar.dispose();
     shouldHaveFloatingAppBar.dispose();

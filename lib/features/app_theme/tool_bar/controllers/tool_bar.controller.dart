@@ -4,7 +4,9 @@ import 'package:signals/signals_flutter.dart';
 
 class ToolBarController {
   final activeTextController = signal<TextEditingController?>(null);
+  final activeFocusNode = signal<FocusNode?>(null);
   final activeTextAllowsAttachments = signal(false);
+  final isVisible = signal(false);
   final isDisposed = signal(false);
 
   late final hasActiveTextController = computed(
@@ -14,25 +16,50 @@ class ToolBarController {
     () => hasActiveTextController.value && activeTextAllowsAttachments.value,
   );
 
+  void show({
+    required TextEditingController textController,
+    required FocusNode focusNode,
+    bool allowAttachments = false,
+  }) {
+    if (isDisposed.value) return;
+    if (activeTextController.value == textController &&
+        activeFocusNode.value == focusNode &&
+        activeTextAllowsAttachments.value == allowAttachments) {
+      isVisible.value = true;
+      return;
+    }
+    activeTextController.value = textController;
+    activeFocusNode.value = focusNode;
+    activeTextAllowsAttachments.value = allowAttachments;
+    isVisible.value = true;
+  }
+
+  void hide({TextEditingController? textController}) {
+    if (isDisposed.value) return;
+    if (textController != null &&
+        activeTextController.value != textController) {
+      return;
+    }
+
+    activeTextController.value = null;
+    activeFocusNode.value = null;
+    activeTextAllowsAttachments.value = false;
+    isVisible.value = false;
+  }
+
   void setActiveTextController(
     TextEditingController controller, {
     bool allowAttachments = false,
   }) {
     if (isDisposed.value) return;
-    if (activeTextController.value == controller &&
-        activeTextAllowsAttachments.value == allowAttachments) {
-      return;
-    }
     activeTextController.value = controller;
+    activeFocusNode.value = null;
     activeTextAllowsAttachments.value = allowAttachments;
+    isVisible.value = true;
   }
 
   void clearActiveTextController(TextEditingController controller) {
-    if (isDisposed.value) return;
-    if (activeTextController.value != controller) return;
-
-    activeTextController.value = null;
-    activeTextAllowsAttachments.value = false;
+    hide(textController: controller);
   }
 
   bool canPerform(ToolBarAction action) {
@@ -52,6 +79,8 @@ class ToolBarController {
     isDisposed.value = true;
 
     activeTextController.value = null;
+    activeFocusNode.value = null;
     activeTextAllowsAttachments.value = false;
+    isVisible.value = false;
   }
 }

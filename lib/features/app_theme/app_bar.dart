@@ -16,9 +16,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         textStyle;
 import 'package:flutter/material.dart' hide AppBar;
 import 'package:go_router/go_router.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-class AppBar<TSelectedType> extends StatelessWidget
+class AppBar<TSelectedType> extends SignalHookWidget
     implements PreferredSizeWidget {
   const AppBar({
     super.key,

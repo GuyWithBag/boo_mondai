@@ -111,22 +111,26 @@ class SegmentedControl<T> extends HookWidget {
       );
     }
 
-    if (enableGradient) {
+    if (enableGradient && isScrollable) {
       body = Stack(
-        alignment: Alignment.centerRight,
         children: [
           body,
-          IgnorePointer(
-            child: Container(
-              width: 44,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.centerRight,
-                  end: Alignment.centerLeft,
-                  colors: [
-                    tokens.colorScaffoldBackground,
-                    tokens.colorScaffoldBackground.withValues(alpha: 0),
-                  ],
+          Positioned(
+            top: 0,
+            right: 0,
+            bottom: 0,
+            child: IgnorePointer(
+              child: Container(
+                width: 44,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.centerRight,
+                    end: Alignment.centerLeft,
+                    colors: [
+                      tokens.colorScaffoldBackground,
+                      tokens.colorScaffoldBackground.withValues(alpha: 0),
+                    ],
+                  ),
                 ),
               ),
             ),

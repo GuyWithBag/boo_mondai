@@ -16,7 +16,6 @@ import 'package:flutter/material.dart' hide Scaffold;
 import 'package:flutter/material.dart' as material show Scaffold;
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:provider/provider.dart' show ReadContext;
 import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -108,6 +107,9 @@ class Scaffold extends SignalHookWidget {
     final tokens = context.themeTokens<AppTokens>();
     final mediaQuery = MediaQuery.of(context);
     final mainController = MainController.instance;
+    final toolBarController = toolBar is ToolBar
+        ? (toolBar! as ToolBar).controller
+        : null;
     final controller = useMemoized(
       () => ScaffoldController(
         tokens: tokens,
@@ -118,6 +120,7 @@ class Scaffold extends SignalHookWidget {
         sidebarWidth: sidebarWidth,
         bottomNavBar: bottomNavBar,
         toolBar: toolBar,
+        toolBarController: toolBarController,
         padding: padding,
         hideNavigation: hideNavigation,
         floatingActionButton: floatingActionButton,
@@ -158,6 +161,7 @@ class Scaffold extends SignalHookWidget {
         sidebarWidth,
         bottomNavBar,
         toolBar,
+        toolBarController,
         padding,
         hideNavigation,
         showBottomNavBar,
@@ -192,16 +196,6 @@ class Scaffold extends SignalHookWidget {
 
     useEffect(() => controller.dispose, [controller]);
 
-    useEffect(() {
-      if (toolBar == null && !resizeBodyForKeyboard) {
-        controller.isUserInputFocusing.value = false;
-        return null;
-      }
-
-      controller.addFocusListener();
-      return controller.removeFocusListener;
-    }, [controller, resizeBodyForKeyboard, toolBar]);
-
     final shouldHaveAppBar = controller.shouldHaveAppBar.value;
     final shouldHaveFloatingAppBar = controller.shouldHaveFloatingAppBar.value;
     final shouldHaveBottomNavBar = controller.shouldHaveBottomNavBar.value;
@@ -226,9 +220,7 @@ class Scaffold extends SignalHookWidget {
         controller.scaffoldOverlayBottomInset.value;
     final scaffoldOverlayTopInset = effectiveAppBarHeight;
 
-    final toolBarController = toolBar is ToolBar
-        ? (toolBar! as ToolBar).controller
-        : null;
+    final isToolBarVisible = toolBarController?.isVisible.value ?? false;
     final bodyWithScrollLockScope = ScaffoldScrollLockScope(
       setScrollLocked: controller.setScrollLockedCallback,
       child: body,
@@ -396,7 +388,7 @@ class Scaffold extends SignalHookWidget {
                 Padding(
                   padding: EdgeInsets.only(right: tokens.spaceLayoutPaddingSm),
                   child: AnimatedOverlay(
-                    visible: controller.isUserInputFocusing.value,
+                    visible: isToolBarVisible,
                     hiddenOffset: const Offset(0, 1),
                     child: Button(
                       onPressed: FocusManager.instance.primaryFocus?.unfocus,
@@ -405,11 +397,13 @@ class Scaffold extends SignalHookWidget {
                   ),
                 ),
               AnimatedOverlay(
-                visible: controller.isUserInputFocusing.value,
+                visible: isToolBarVisible,
                 hiddenOffset: const Offset(0, 1),
-                child: SizedBox(
-                  height: effectiveToolBarHeight,
-                  child: toolBar!,
+                child: TextFieldTapRegion(
+                  child: SizedBox(
+                    height: effectiveToolBarHeight,
+                    child: toolBar!,
+                  ),
                 ),
               ),
             ],

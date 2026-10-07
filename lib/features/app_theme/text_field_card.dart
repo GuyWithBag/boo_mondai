@@ -10,9 +10,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         surfaceStyle;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-class TextFieldCard extends HookWidget {
+class TextFieldCard extends SignalHookWidget {
   const TextFieldCard({
     required this.title,
     required this.placeholder,
@@ -34,9 +35,14 @@ class TextFieldCard extends HookWidget {
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
     final focusNode = useFocusNode();
-    final resolvedSurfaceStyle = surfaceStyle.resolve(tokens, const [
-      SurfaceShape.roundedSm,
-    ]);
+    final resolvedSurfaceStyle = surfaceStyle
+        .resolve(tokens, const [SurfaceShape.roundedSm])
+        .copyWith(
+          padding: EdgeInsets.symmetric(
+            vertical: tokens.spaceLayoutPaddingLg,
+            horizontal: tokens.spaceLayoutPaddingSm,
+          ),
+        );
 
     return ConstrainedBox(
       constraints: BoxConstraints(minHeight: minHeight ?? 260),
