@@ -2,6 +2,12 @@ abstract final class FileHelper {
   static String toSanitizedFileName(String value) =>
       value.replaceAll(RegExp(r'[^A-Za-z0-9_.-]'), '_');
 
+  static String fileName(String filePath) {
+    final normalized = filePath.trim().split(RegExp(r'[/\\]+')).last;
+    final sanitized = toSanitizedFileName(normalized);
+    return sanitized.isEmpty ? 'media' : sanitized;
+  }
+
   static String fileNameWithoutExtension(String fileName) {
     final normalized = fileName.trim().split(RegExp(r'[/\\]+')).last;
     final dotIndex = normalized.lastIndexOf('.');

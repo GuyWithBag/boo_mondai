@@ -3,11 +3,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppPage,
         HomePage,
         ViewDeckListingsPage,
-        ViewDecksLocalPage,
+        ViewDecksPage,
         ViewStudyDecksPage,
         ViewProfilePage,
         LoginPage,
         RegisterPage,
+        RegisterResultPage,
         ViewStudySessionPage,
         ViewLeaderboardPage,
         EditDeckPage,
@@ -85,7 +86,7 @@ class Pages {
           pathParameters = const {},
           queryParameters = const {},
           extra,
-        }) => const ViewDecksLocalPage(),
+        }) => const ViewDecksPage(),
   );
 
   static final reviews = AppPage(
@@ -136,6 +137,18 @@ class Pages {
           queryParameters = const {},
           extra,
         }) => const RegisterPage(),
+  );
+
+  static final registerResult = AppPage(
+    url: '/register/result',
+    name: 'Check Your Email',
+    builder:
+        (
+          context, {
+          pathParameters = const {},
+          queryParameters = const {},
+          extra,
+        }) => const RegisterResultPage(),
   );
 
   static final onboarding = AppPage(
@@ -204,6 +217,10 @@ class Pages {
         }) => ViewStudySessionPage(
           deckId: pathParameters['deckId'],
           mode: SessionMode.drill,
+          initialStudyCardIds: queryParameters['studyCardIds']
+              ?.split(',')
+              .where((id) => id.isNotEmpty)
+              .toList(),
         ),
   );
 
@@ -453,7 +470,7 @@ class Pages {
     reviews,
     account,
   ];
-  static final auth = <AppPage>[login, register];
+  static final auth = <AppPage>[login, register, registerResult];
   static final appDetails = <AppPage>[
     settings,
     notifications,

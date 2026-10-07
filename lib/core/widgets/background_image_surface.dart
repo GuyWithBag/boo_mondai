@@ -52,6 +52,7 @@ class BackgroundImageSurface extends StatelessWidget {
     this.showCenteredEditButtonWhenChildPresent = false,
     this.useAddIconWhenNoImage = false,
     this.editButtonPosition = BackgroundImageEditButtonPosition.bottomRight,
+    this.canPickImage,
     this.onImagePicked,
     this.border = SurfaceBorder.none,
     this.editIcon = Icons.edit,
@@ -70,6 +71,7 @@ class BackgroundImageSurface extends StatelessWidget {
   final bool showCenteredEditButtonWhenChildPresent;
   final bool useAddIconWhenNoImage;
   final BackgroundImageEditButtonPosition editButtonPosition;
+  final FutureOr<bool> Function(BuildContext context)? canPickImage;
   final BackgroundImagePicked? onImagePicked;
   final SurfaceBorder border;
   final IconData editIcon;
@@ -93,7 +95,7 @@ class BackgroundImageSurface extends StatelessWidget {
           (child == null || showCenteredEditButtonWhenChildPresent)) {
         return Button.iconOnly(
           icon: image == null && useAddIconWhenNoImage ? Icons.add : editIcon,
-          onPressed: _pickImage,
+          onPressed: () => _pickImage(context),
         );
       }
       return missingImageIcon == null
@@ -154,13 +156,20 @@ class BackgroundImageSurface extends StatelessWidget {
                   BackgroundImageEditButtonPosition.bottomRight
               ? editButtonPadding
               : null,
-          child: Button.iconOnlySmall(icon: editIcon, onPressed: _pickImage),
+          child: Button.iconOnlySmall(
+            icon: editIcon,
+            onPressed: () => _pickImage(context),
+          ),
         ),
       ],
     );
   }
 
-  Future<void> _pickImage() async {
+  Future<void> _pickImage(BuildContext context) async {
+    //ToDo: Fix later
+    final canPick = await canPickImage?.call(context) ?? true;
+    if (!canPick) return;
+
     final file = await pickBackgroundImageFile();
     if (file == null) return;
 

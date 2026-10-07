@@ -921,15 +921,19 @@ types:
         index: 1
   ProfileRole:
     typeId: 51
-    nextIndex: 5
+    nextIndex: 10
     fields:
       user:
         index: 0
       researcher:
         index: 1
-      admin:
-        index: 2
-      participantA:
-        index: 3
-      participantB:
-        index: 4
+      appAdmin:
+        index: 5
+      participantChineseA:
+        index: 6
+      participantChineseB:
+        index: 7
+      participantJapaneseA:
+        index: 8
+      participantJapaneseB:
+        index: 9

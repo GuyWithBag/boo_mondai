@@ -2686,12 +2686,16 @@ class ProfileRoleAdapter extends TypeAdapter<ProfileRole> {
         return ProfileRole.user;
       case 1:
         return ProfileRole.researcher;
-      case 2:
-        return ProfileRole.admin;
-      case 3:
-        return ProfileRole.participantA;
-      case 4:
-        return ProfileRole.participantB;
+      case 5:
+        return ProfileRole.appAdmin;
+      case 6:
+        return ProfileRole.participantChineseA;
+      case 7:
+        return ProfileRole.participantChineseB;
+      case 8:
+        return ProfileRole.participantJapaneseA;
+      case 9:
+        return ProfileRole.participantJapaneseB;
       default:
         return ProfileRole.user;
     }
@@ -2704,12 +2708,16 @@ class ProfileRoleAdapter extends TypeAdapter<ProfileRole> {
         writer.writeByte(0);
       case ProfileRole.researcher:
         writer.writeByte(1);
-      case ProfileRole.admin:
-        writer.writeByte(2);
-      case ProfileRole.participantA:
-        writer.writeByte(3);
-      case ProfileRole.participantB:
-        writer.writeByte(4);
+      case ProfileRole.appAdmin:
+        writer.writeByte(5);
+      case ProfileRole.participantChineseA:
+        writer.writeByte(6);
+      case ProfileRole.participantChineseB:
+        writer.writeByte(7);
+      case ProfileRole.participantJapaneseA:
+        writer.writeByte(8);
+      case ProfileRole.participantJapaneseB:
+        writer.writeByte(9);
     }
   }
 

@@ -1,3 +1,5 @@
+import 'dart:async' show FutureOr;
+
 import 'package:boo_mondai/core/widgets/background_image_surface.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
@@ -6,7 +8,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         Cube,
         CubeController,
         Deck,
-        ImageHelper,
+        DecksHelper,
         ScaleHelper,
         SurfaceBorder,
         SurfaceBorderColor,
@@ -16,8 +18,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextSize,
         TextWeight,
         surfaceStyle,
-        textStyle,
-        DecksDirectoryPaths;
+        textStyle;
 import 'package:flutter/material.dart';
 import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -31,6 +32,7 @@ class PhysicalDeck extends SignalHookWidget {
     this.showInfoCover = true,
     this.isCoverImageEditable = false,
     this.textScaleBaseWidth,
+    this.canPickCoverImage,
     this.onCoverImagePicked,
     this.isSelected = false,
   });
@@ -41,6 +43,7 @@ class PhysicalDeck extends SignalHookWidget {
   final bool showInfoCover;
   final bool isCoverImageEditable;
   final double? textScaleBaseWidth;
+  final FutureOr<bool> Function(BuildContext context)? canPickCoverImage;
   final BackgroundImagePicked? onCoverImagePicked;
   final bool isSelected;
 
@@ -68,12 +71,9 @@ class PhysicalDeck extends SignalHookWidget {
       textScale,
     );
 
-    final coverImagePath = deck == null
-        ? null
-        : DecksDirectoryPaths.coverImage(deckTitle: deck!.title);
     final coverImage = useFutureSignal(
-      () => ImageHelper.getImageProviderFromSource(coverImagePath),
-      keys: [coverImagePath],
+      () => DecksHelper.getCoverImageProvider(deck),
+      keys: [deck?.id, deck?.title, deck?.isPremade],
     );
     final coverImageProvider = coverImage.value.map(
       data: (value) => value,
@@ -109,6 +109,7 @@ class PhysicalDeck extends SignalHookWidget {
           return BackgroundImageSurface(
             image: coverImageProvider,
             isEditable: isCoverImageEditable,
+            canPickImage: canPickCoverImage,
             onImagePicked: onCoverImagePicked,
             clipBehavior: Clip.none,
             style: surfaceStyle.resolve(tokens, [

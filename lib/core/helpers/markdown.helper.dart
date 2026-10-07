@@ -1,5 +1,14 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, MediaHelper, StringHelper;
+    show
+        AppTokens,
+        CardTemplate,
+        DecksDirectoryPaths,
+        FileHelper,
+        FileSystemHandler,
+        LocalDB,
+        MarkdownAttachmentUrlResolver,
+        MediaHelper,
+        StringHelper;
 import 'package:file_picker/file_picker.dart' show PlatformFile;
 import 'package:flutter/material.dart'
     show
@@ -18,17 +27,38 @@ import 'package:flutter_markdown_plus/flutter_markdown_plus.dart'
 import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
 
 abstract class MarkdownHelper {
-  static String? resolveAttachmentUrl(Uri uri) {
+  static Future<String?> resolveAttachmentUrl(Uri uri) async {
     final source = uri.toString().trim();
     if (source.isEmpty) return null;
 
     if (uri.path.isEmpty) return null;
 
-    if (uri.scheme == 'local') {
-      return uri.path;
-    }
-
     return source;
+  }
+
+  static MarkdownAttachmentUrlResolver resolveTemplateAttachmentUrl(
+    CardTemplate template,
+  ) {
+    return (uri) => resolveDeckAttachmentUrl(uri: uri, deckId: template.deckId);
+  }
+
+  static Future<String?> resolveDeckAttachmentUrl({
+    required Uri uri,
+    required String deckId,
+  }) async {
+    final source = uri.toString().trim();
+    if (source.isEmpty || uri.path.isEmpty) return null;
+    if (uri.scheme.isNotEmpty) return source;
+
+    final deck = LocalDB.deck.selectByPk({'id': deckId});
+    if (deck == null) return source;
+
+    return FileSystemHandler.getAbsolutePathOfRelativePath(
+      DecksDirectoryPaths.attachment(
+        deckTitle: deck.title,
+        fileName: FileHelper.fileName(uri.path),
+      ),
+    );
   }
 
   static String normalizeMediaSource(String source) {
@@ -52,12 +82,10 @@ abstract class MarkdownHelper {
   }) async {
     // final localPath = await FileSystemHandler.storeFile(path: path, file: file);
 
-    final newLocalPath = toLocalUri(path).toString();
-    return toViewLinkSyntax(label: file.name, source: newLocalPath);
-  }
-
-  static Uri toLocalUri(String path) {
-    return Uri.parse('local:$path');
+    return toViewLinkSyntax(
+      label: FileHelper.fileName(path),
+      source: FileHelper.fileName(path),
+    );
   }
 
   static String toViewLinkSyntax({

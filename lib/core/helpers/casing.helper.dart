@@ -2,6 +2,10 @@ import 'package:boo_mondai/core/helpers/casing.type.dart';
 
 abstract final class CasingHelper {
   static bool matches(String input, String expected, CasingType casingType) {
+    if (casingType == CasingType.any) {
+      return input.trim().toLowerCase() == expected.trim().toLowerCase();
+    }
+
     final normalizedInput = normalizedWords(input);
     final normalizedExpected = normalizedWords(expected);
     if (normalizedInput.isEmpty || normalizedExpected.isEmpty) return false;
