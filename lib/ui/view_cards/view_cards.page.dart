@@ -61,7 +61,7 @@ class _ViewCardsView extends SignalHookWidget {
       appBar: AppBar(
         title: 'View Cards',
         header: FilteredSearchBar<CardTemplate>(
-          controller: controller.templateSearchController,
+          controller: controller.searchController,
           placeholder: 'Search templates',
         ),
         preferredBottomHeight: 104,

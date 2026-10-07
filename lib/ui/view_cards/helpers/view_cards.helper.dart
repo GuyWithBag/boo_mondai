@@ -6,24 +6,18 @@ import 'package:boo_mondai/lib.barrel.dart'
         FillInTheBlanksTemplate,
         FlashcardCard,
         FlashcardTemplate,
+        IdentificationCard,
         IdentificationTemplate,
         MatchingTypeTemplate,
-        MarkdownText,
-        MarkdownTextMode,
         MatchingTypeCard,
         MultipleChoiceCard,
         MultipleChoiceTemplate,
         PhysicalCardController,
-        ScaleHelper,
         StudyCard,
-        textStyle,
-        TextColor,
-        TextSize,
-        TextWeight,
         ViewCardsTileSide,
+        WordScrambleCard,
         WordScrambleTemplate,
-        surfaceStyle,
-        MarkdownHelper;
+        surfaceStyle;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -36,15 +30,6 @@ abstract class ViewCardsHelper {
     required PhysicalCardController? controller,
     double contentScale = 1,
   }) {
-    final promptTextStyle = ScaleHelper.getTextStyleWithScaledFontSize(
-      textStyle.resolve(tokens, const [
-        TextSize.label,
-        TextWeight.body,
-        TextColor.baseline,
-      ]),
-      contentScale,
-    );
-
     return switch (template) {
       FlashcardTemplate t => FlashcardCard(
         controller: controller,
@@ -79,25 +64,19 @@ abstract class ViewCardsHelper {
         contentScale: contentScale,
         isRevealed: true,
       ),
-      IdentificationTemplate t => Surface(
-        style: surfaceStyle.resolve(tokens),
-        child: MarkdownText(
-          data: t.promptText,
-          mode: MarkdownTextMode.previewSelectable,
-          baseTextStyle: promptTextStyle,
-          contentScale: contentScale,
-          resolveAttachmentUrl: MarkdownHelper.resolveAttachmentUrl,
-        ),
+      IdentificationTemplate t => IdentificationCard(
+        controller: controller,
+        template: t,
+        maxWidth: width,
+        contentScale: contentScale,
+        isRevealed: true,
       ),
-      WordScrambleTemplate t => Surface(
-        style: surfaceStyle.resolve(tokens),
-        child: MarkdownText(
-          data: t.sentenceToScramble,
-          mode: MarkdownTextMode.previewSelectable,
-          baseTextStyle: promptTextStyle,
-          contentScale: contentScale,
-          resolveAttachmentUrl: MarkdownHelper.resolveAttachmentUrl,
-        ),
+      WordScrambleTemplate t => WordScrambleCard(
+        controller: controller,
+        template: t,
+        maxWidth: width,
+        contentScale: contentScale,
+        isRevealed: true,
       ),
       _ => Surface(
         style: surfaceStyle.resolve(tokens),

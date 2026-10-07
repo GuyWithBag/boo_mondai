@@ -64,7 +64,7 @@ class ViewCardsTile extends HookWidget {
           );
 
     void onPressed(BuildContext context, CardTemplate template) {
-      context.push('/view-cards/${template.deckId}');
+      context.push('/view-cards/${template.id}', extra: template);
     }
 
     final tile = SizedBox(

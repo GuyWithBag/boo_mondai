@@ -20,10 +20,12 @@ class ViewCardsListView extends SignalWidget {
     final tokens = context.themeTokens<AppTokens>();
 
     return ListingStatesWrapper.list(
+      useParentScroll: true,
       isLoading: controller.isLoading.value,
       exception: controller.error.value,
-      items: controller.templates,
+      items: controller.searchController.results.value,
       emptyState: controller.emptyState.value,
+      padding: EdgeInsets.zero,
       onRetry: controller.load,
       skeletonTile: ViewCardsTile.template(
         template: FlashcardTemplate.createDummy(),

@@ -21,7 +21,7 @@ class ViewCardsWrapView extends SignalWidget {
     return ListingStatesWrapper.wrap(
       isLoading: controller.isLoading.value,
       exception: controller.error.value,
-      items: controller.templates,
+      items: controller.searchController.results.value,
       emptyState: controller.emptyState.value,
       onRetry: controller.load,
       skeletonTile: ViewCardsTile.template(
@@ -29,15 +29,8 @@ class ViewCardsWrapView extends SignalWidget {
       ),
       spacing: tokens.spaceLayoutGapMd,
       runSpacing: tokens.spaceLayoutGapMd,
-      itemBuilder: (context, _, item) => LayoutBuilder(
-        builder: (context, constraints) {
-          return ViewCardsTile.template(
-            template: item,
-            width: constraints.maxWidth,
-            editable: true,
-          );
-        },
-      ),
+      itemBuilder: (context, _, item) =>
+          ViewCardsTile.template(template: item, width: 150, editable: true),
     );
   }
 }

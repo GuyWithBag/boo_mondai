@@ -21,7 +21,7 @@ class ViewCardsPairedView extends SignalWidget {
     return ListingStatesWrapper.wrap(
       isLoading: controller.isLoading.value,
       exception: controller.error.value,
-      items: controller.templates,
+      items: controller.searchController.results.value,
       emptyState: controller.emptyState.value,
       onRetry: controller.load,
       skeletonTile: ViewCardsTile.template(
@@ -31,9 +31,12 @@ class ViewCardsPairedView extends SignalWidget {
       runSpacing: tokens.spaceLayoutGapMd,
       itemBuilder: (context, _, item) => LayoutBuilder(
         builder: (context, constraints) {
+          final width = constraints.maxWidth < 280
+              ? constraints.maxWidth
+              : 280.0;
           return ViewCardsTile.template(
             template: item,
-            width: constraints.maxWidth,
+            width: width,
             editable: true,
           );
         },

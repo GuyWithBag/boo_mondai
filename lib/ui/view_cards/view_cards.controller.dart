@@ -13,34 +13,43 @@ import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:signals/signals_flutter.dart';
 
 class ViewCardsController {
-  ViewCardsController({Map<String, String> queryParameters = const {}}) {
+  ViewCardsController({
+    Map<String, String> queryParameters = const {},
+    this.loadTemplates,
+    this.additionalListenables = const [],
+  }) {
     final initialSearchText = cleanViewCardsSearchText(
       buildViewCardsInitialSearchText(queryParameters),
     );
 
-    templateSearchController = FilteredSearchBarController<CardTemplate>(
+    searchController = FilteredSearchBarController<CardTemplate>(
       tokenShapes: ViewCardsSearch.tokenShapes,
       searchTextLabel: ViewCardsSearch.templateSearchTextLabel,
       itemFilter: ViewCardsSearch.templateItemFilter,
       items: templates.value,
       initialInput: initialSearchText,
     );
-    hasSearchQuery = computed(() => templateSearchController.hasText.value);
+    hasSearchQuery = computed(() => searchController.hasText.value);
 
     deckListenable = LocalDB.deck.box.listenable();
     templateListenable = LocalDB.cardTemplate.box.listenable();
 
     deckListenable.addListener(load);
     templateListenable.addListener(load);
+    for (final listenable in additionalListenables) {
+      listenable.addListener(load);
+    }
   }
 
+  final List<CardTemplate> Function()? loadTemplates;
+  final List<Listenable> additionalListenables;
   late final Listenable deckListenable;
   late final Listenable templateListenable;
   final layoutMode = signal(ViewCardsLayoutModeView.wrap);
   final isLoading = signal(false);
   final error = signal<Exception?>(null);
   final templates = listSignal<CardTemplate>(const []);
-  late final FilteredSearchBarController<CardTemplate> templateSearchController;
+  late final FilteredSearchBarController<CardTemplate> searchController;
   late final Computed<bool> hasSearchQuery;
 
   late final emptyState = computed(() {
@@ -64,8 +73,11 @@ class ViewCardsController {
   void dispose() {
     deckListenable.removeListener(load);
     templateListenable.removeListener(load);
+    for (final listenable in additionalListenables) {
+      listenable.removeListener(load);
+    }
     hasSearchQuery.dispose();
-    templateSearchController.dispose();
+    searchController.dispose();
     templates.dispose();
     error.dispose();
     isLoading.dispose();
@@ -79,14 +91,15 @@ class ViewCardsController {
     Exception? failure;
     try {
       final templatesById = {
-        for (final template in LocalDB.cardTemplate.box.values)
+        for (final template
+            in loadTemplates?.call() ?? LocalDB.cardTemplate.box.values)
           template.id: template,
       };
 
       final loadedTemplates = templatesById.values.toList()
         ..sort(_compareTemplates);
       templates.value = List.unmodifiable(loadedTemplates);
-      templateSearchController.setItems(loadedTemplates);
+      searchController.setItems(loadedTemplates);
     } on Exception catch (e) {
       failure = e;
     } finally {
