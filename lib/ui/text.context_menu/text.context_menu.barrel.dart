@@ -4,3 +4,4 @@
 // Other files
 export 'text.context_menu.controller.dart';
 export 'text.context_menu.dart';
+export 'text.context_menu.navigator_observer.dart';

@@ -77,12 +77,14 @@ class _TextContextMenuBody extends SignalHookWidget {
                         : () => controller.press(item),
                     color: ButtonColor.baseline,
                     variant: ButtonVariant.flat,
+                    elevated: false,
                   ),
                 Button.iconSmall(
                   icon: Icons.more_horiz,
                   onPressed: controller.toggleDropdown,
                   selected: isDropdownOpen,
                   color: ButtonColor.baseline,
+                  elevated: false,
                   variant: ButtonVariant.flat,
                 ),
               ],
@@ -108,6 +110,8 @@ class _TextContextMenuBody extends SignalHookWidget {
                                 ? null
                                 : () => controller.press(item),
                             mainAxisAlignment: MainAxisAlignment.start,
+                            elevated: false,
+
                             variants: const [
                               ButtonColor.baseline,
                               ButtonSize.sm,
