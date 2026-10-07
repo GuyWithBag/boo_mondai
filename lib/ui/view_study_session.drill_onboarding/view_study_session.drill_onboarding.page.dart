@@ -3,9 +3,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         BottomNavBar,
         Button,
         Scaffold,
-        ViewCardsController,
         ViewCardsListView,
         AppTokens,
+        ViewStudySessionDrillOnboardingController,
         ButtonColor;
 import 'package:flutter/material.dart' hide Scaffold;
 import 'package:flutter_hooks/flutter_hooks.dart' show useEffect, useMemoized;
@@ -21,19 +21,19 @@ class ViewStudySessionDrillOnboardingPage extends SignalHookWidget {
   @override
   Widget build(BuildContext context) {
     final controller = useMemoized(
-      () => ViewCardsController(queryParameters: {'deckId': deckId})..load(),
+      () => ViewStudySessionDrillOnboardingController(deckId: deckId),
       [deckId],
     );
     useEffect(() => controller.dispose, [controller]);
 
     final tokens = context.themeTokens<AppTokens>();
+    final canContinue = controller.cardsController.templates.value.isNotEmpty;
 
     return Scaffold(
-      scrollable: false,
       body: Column(
         children: [
           const Text('Review cards before starting the session.'),
-          Expanded(child: ViewCardsListView(controller: controller)),
+          ViewCardsListView(controller: controller.cardsController),
         ],
       ),
       bottomNavBar: BottomNavBar(
@@ -49,7 +49,9 @@ class ViewStudySessionDrillOnboardingPage extends SignalHookWidget {
             Expanded(
               child: Button(
                 variants: [ButtonColor.primary],
-                onPressed: () => context.push('/drill/$deckId/session'),
+                onPressed: canContinue
+                    ? () => context.push(controller.sessionPath)
+                    : null,
                 child: const Text('Continue'),
               ),
             ),

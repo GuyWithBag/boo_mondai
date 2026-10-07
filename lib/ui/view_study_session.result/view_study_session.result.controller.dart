@@ -38,8 +38,9 @@ final class ViewStudySessionResultController {
         .toSet();
     if (sessionStudyCardIds.isEmpty) return const [];
 
-    return LocalDB.fsrsCard.getEnrolledStudyCardIds(
-      ProfileService.currentProfile.value.id,
+    return LocalDB.fsrsCard.selectManyByProfileIdAndStudyCardIds(
+      profileId: ProfileService.currentProfile.value.id,
+      studyCardIds: sessionStudyCardIds,
     );
   });
 
@@ -114,11 +115,11 @@ final class ViewStudySessionResultController {
     if (!canReviewNow.value) return;
     final deckId = completedResults.value?.deckId;
     if (deckId == null) {
-      context.go('/review/session');
+      context.push('/review/session');
       return;
     }
 
-    context.go('/review/$deckId/session');
+    context.push('/review/$deckId/session');
   }
 
   void dispose() {

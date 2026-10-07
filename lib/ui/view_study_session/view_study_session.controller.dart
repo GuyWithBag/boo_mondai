@@ -42,6 +42,7 @@ final class ViewStudySessionController {
     required this.context,
     required String? deckId,
     required SessionMode mode,
+    this.initialStudyCardIds,
   }) : deckId = signal(deckId),
        mode = signal(mode),
        sessionController = StudySessionController(
@@ -78,6 +79,7 @@ final class ViewStudySessionController {
   final BuildContext context;
   final Signal<String?> deckId;
   final Signal<SessionMode> mode;
+  final List<String>? initialStudyCardIds;
   final StudySessionController sessionController;
   final currentStepId = signal<String?>(null);
 
@@ -145,6 +147,7 @@ final class ViewStudySessionController {
             deckId: deckId.value,
             // ToDo: look into
             filter: DueFilterThreshold.lookAheadOneDay,
+            studyCardIds: initialStudyCardIds,
           )
           .catchError((Object _, StackTrace _) {}),
     );

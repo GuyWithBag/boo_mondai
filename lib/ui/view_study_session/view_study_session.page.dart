@@ -30,10 +30,12 @@ class ViewStudySessionPage extends SignalHookWidget {
     super.key,
     required this.deckId,
     required this.mode,
+    this.initialStudyCardIds,
   });
 
   final String? deckId;
   final SessionMode mode;
+  final List<String>? initialStudyCardIds;
 
   @override
   Widget build(BuildContext context) {
@@ -42,8 +44,9 @@ class ViewStudySessionPage extends SignalHookWidget {
         context: context,
         deckId: deckId,
         mode: mode,
+        initialStudyCardIds: initialStudyCardIds,
       ),
-      [deckId, mode],
+      [deckId, mode, initialStudyCardIds],
     );
 
     useEffect(() => controller.dispose, [controller]);
