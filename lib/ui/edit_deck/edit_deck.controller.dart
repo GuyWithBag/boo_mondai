@@ -122,7 +122,7 @@ class EditDeckController {
   String? createAttachmentPath(PlatformFile file) {
     return DecksDirectoryPaths.attachment(
       deckTitle: deck.value.title,
-      fileNameWithoutExtension: file.name,
+      fileName: file.name,
     );
   }
 
@@ -152,10 +152,30 @@ class EditDeckController {
     showSnackbar(context, message: 'New Card Template Created');
   }
 
-  void selectTemplate(String id) {
-    if (templates.value.any((template) => template.id == id)) {
-      selectedTemplateId.value = id;
+  Future<void> selectTemplate(BuildContext context, String id) async {
+    if (selectedTemplateId.value == id ||
+        !templates.value.any((template) => template.id == id)) {
+      return;
     }
+
+    if (isDirty.value) {
+      final confirmed = await showModal<bool>(
+        context: context,
+        title: 'Switching to another template will remove current values.',
+        actions: [
+          const ModalAction<bool>(value: false, label: 'Cancel'),
+          const ModalAction<bool>(
+            value: true,
+            label: 'Continue',
+            color: ButtonColor.primary,
+          ),
+        ],
+      );
+      if (confirmed != true) return;
+      templates.value = [...initialTemplates.value];
+    }
+
+    selectedTemplateId.value = id;
   }
 
   CardTemplate? templateById(String id) {

@@ -1,3 +1,4 @@
+import 'package:boo_mondai/features/app_theme/app_theme.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
@@ -12,9 +13,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         MatchingTypeValue,
         SectionEyebrow,
         SurfaceColor,
-        SurfacePadding,
-        SurfaceShadow,
-        SurfaceShape,
         TextFieldFrame,
         TextFieldSize,
         TextColor,
@@ -81,7 +79,14 @@ class _MatchingTypeValuesPanel extends StatelessWidget {
     void syncField() => onChanged(controller.values.value);
 
     return Surface(
-      style: surfaceStyle.resolve(tokens, const [SurfaceColor.baseline]),
+      style: surfaceStyle
+          .resolve(tokens, const [SurfaceShape.roundedSm])
+          .copyWith(
+            padding: EdgeInsets.symmetric(
+              horizontal: tokens.spaceLayoutPaddingSm,
+              vertical: tokens.spaceLayoutPaddingLg,
+            ),
+          ),
       child: Column(
         spacing: tokens.spaceLayoutGapMd,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -239,14 +244,8 @@ class _MatchingTypeCell extends StatelessWidget {
         onChanged();
       },
       builder: (context, candidates, _) {
-        final isTargeted = candidates.isNotEmpty;
-        return Surface(
-          style: surfaceStyle.resolve(tokens, [
-            isTargeted ? SurfaceColor.primarySoft : SurfaceColor.muted,
-            SurfaceShape.roundedXsm,
-            SurfacePadding.sm,
-            SurfaceShadow.none,
-          ]),
+        // final isTargeted = candidates.isNotEmpty;
+        return SizedBox(
           child: Row(
             spacing: tokens.spaceLayoutGapXsm,
             children: [

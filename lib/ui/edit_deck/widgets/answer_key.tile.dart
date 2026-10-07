@@ -20,9 +20,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         SegmentOption,
         SegmentedControl;
 import 'package:flutter/material.dart';
+import 'package:signals/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-class AnswerKeyTile extends StatelessWidget {
+class AnswerKeyTile extends SignalHookWidget {
   const AnswerKeyTile({
     super.key,
     required this.index,

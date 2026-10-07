@@ -19,7 +19,7 @@ abstract final class EditDeckQuestionTypeHelper {
       CardTemplateType.multipleChoice => 'Multiple Choice',
       CardTemplateType.fillInTheBlanks => 'Fill in Blanks',
       CardTemplateType.wordScramble => 'Word Scramble',
-      CardTemplateType.matchMadness => 'Match Madness',
+      CardTemplateType.matchMadness => 'Matching Type',
     };
   }
 

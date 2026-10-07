@@ -10,8 +10,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         Button,
         PanelHeader,
-        ButtonColor,
-        ButtonVariant,
         EditDeckController;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -85,7 +83,10 @@ class EditDeckSideBar extends SignalWidget {
                     selected: entry.value.id == selectedTemplateId,
                     onPressed: entry.value.id == selectedTemplateId
                         ? null
-                        : () => controller.selectTemplate(entry.value.id),
+                        : () => controller.selectTemplate(
+                            context,
+                            entry.value.id,
+                          ),
                     leading: Icon(_iconFor(entry.value)),
                     mainAxisAlignment: MainAxisAlignment.start,
                     // variants: const [ButtonVariant.text, ButtonColor.baseline],

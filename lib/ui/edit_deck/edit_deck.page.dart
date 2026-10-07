@@ -6,13 +6,13 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
         Button,
-        EditDeckBottomNavBar,
         EditDeckEditorBody,
         EditDeckSideBar,
         Scaffold,
         ToolBar,
         ToolBarController,
         EditDeckController,
+        editDeckBottomNavBar,
         buildEditDeckAppBar;
 import 'package:flutter/material.dart' hide Scaffold;
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -54,9 +54,9 @@ class EditDeckPage extends SignalHookWidget {
       ),
       sidebar: EditDeckSideBar(controller: controller),
       bottomNavBar: controller.hasSelectedTemplate.value
-          ? EditDeckBottomNavBar(editor: controller)
+          ? editDeckBottomNavBar(context: context, editor: controller)
           : null,
-      // bottomNavBar: EditDeckBottomNavBar(editor: controller),
+      // bottomNavBar: editDeckBottomNavBar(context: context, editor: controller),
       haveSideBarOpenButton: true,
       // hideAppBarOnScroll: true,
       // hideFloatingActionButtonOnScroll: true,

@@ -16,7 +16,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextSize,
         TextWeight,
         surfaceStyle,
-        textStyle;
+        textStyle,
+        SurfaceShape;
 import 'package:flutter/material.dart' hide FormField;
 import 'package:flutter_hooks/flutter_hooks.dart' show useEffect, useMemoized;
 import 'package:signals_hooks/signals_hooks.dart';
@@ -60,7 +61,14 @@ class IdentificationEditor extends SignalHookWidget {
           value: answers,
           validator: EditDeckFormValidator.identificationAnswers,
           builder: (_, _) => Surface(
-            style: surfaceStyle.resolve(tokens, const [SurfaceColor.baseline]),
+            style: surfaceStyle
+                .resolve(tokens, const [SurfaceShape.roundedSm])
+                .copyWith(
+                  padding: EdgeInsets.symmetric(
+                    vertical: tokens.spaceLayoutPaddingLg,
+                    horizontal: tokens.spaceLayoutPaddingSm,
+                  ),
+                ),
             child: Column(
               spacing: tokens.spaceLayoutGapMd,
               crossAxisAlignment: CrossAxisAlignment.stretch,

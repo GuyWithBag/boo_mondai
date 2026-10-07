@@ -8,7 +8,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextSize,
         TextWeight,
         surfaceStyle,
-        textStyle;
+        textStyle,
+        SurfaceShape;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -27,7 +28,14 @@ class CardVerticalAlignmentControl extends StatelessWidget {
     final tokens = context.themeTokens<AppTokens>();
 
     return Surface(
-      style: surfaceStyle.resolve(tokens, const [SurfaceColor.baseline]),
+      style: surfaceStyle
+          .resolve(tokens, const [SurfaceShape.roundedSm])
+          .copyWith(
+            padding: EdgeInsets.symmetric(
+              vertical: tokens.spaceLayoutPaddingLg,
+              horizontal: tokens.spaceLayoutPaddingSm,
+            ),
+          ),
       child: Column(
         spacing: tokens.spaceLayoutGapMd,
         crossAxisAlignment: CrossAxisAlignment.stretch,
