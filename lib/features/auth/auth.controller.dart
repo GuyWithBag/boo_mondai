@@ -153,12 +153,12 @@ class AuthController {
       actions: const [
         ModalAction<bool>(
           value: false,
-          label: 'Discard local data',
+          label: 'Discard',
           color: ButtonColor.error,
         ),
         ModalAction<bool>(
           value: true,
-          label: 'Merge into account',
+          label: 'Merge',
           color: ButtonColor.error,
         ),
       ],

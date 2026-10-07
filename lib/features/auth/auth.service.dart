@@ -245,24 +245,31 @@ class AuthService {
     String password,
     String username,
   ) async {
-    final guestProfileId = LocalDB.currentProfile.getOrCreate().id;
+    final trimmedUsername = username.trim();
 
     final response = await _guard(
-      () => _client.auth.signUp(email: email, password: password),
+      () => _client.auth.signUp(
+        email: email,
+        password: password,
+        data: {'username': trimmedUsername, 'display_name': trimmedUsername},
+      ),
       action: 'signUp',
     );
 
     final user = response.user!;
 
-    final profile = await _upsertNewRemoteProfile(user.id, username);
+    Profile? profile;
+    if (response.session != null) {
+      profile = await RemoteDB.profile.selectByUserId(user.id);
+      profile ??= await _upsertNewRemoteProfile(
+        user.id,
+        trimmedUsername,
+        persistLocal: false,
+      );
+      await _client.auth.signOut();
+    }
 
-    final needsMerge = GuestMigrationService.hasLocalData(guestProfileId);
-
-    return (
-      profile: profile,
-      needsMerge: needsMerge,
-      guestUserId: needsMerge ? guestProfileId : null,
-    );
+    return (profile: profile, needsMerge: false, guestUserId: null);
   }
 
   /// Clears out the session and local profile.
@@ -378,8 +385,9 @@ class AuthService {
   /// Will create a new profile with the same local ID but new information based on the sign-up form.
   static Future<Profile> _upsertNewRemoteProfile(
     String newUserId,
-    String newUsername,
-  ) async {
+    String newUsername, {
+    bool persistLocal = true,
+  }) async {
     final localProfile = LocalDB.currentProfile.getOrCreate();
 
     final profile = Profile(
@@ -394,7 +402,9 @@ class AuthService {
     );
 
     await RemoteDB.profile.upsert(profile);
-    await LocalDB.currentProfile.upsert(profile);
+    if (persistLocal) {
+      await LocalDB.currentProfile.upsert(profile);
+    }
     return profile;
   }
 }
