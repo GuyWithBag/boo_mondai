@@ -7,15 +7,10 @@
 
 abstract final class Env {
   // Replace with your Supabase project credentials
-  static const supabaseUrl = String.fromEnvironment(
-    'SUPABASE_URL',
-    defaultValue: 'http://127.0.0.1:54321',
-  );
+  static const supabaseUrl = 'https://rjaxxdzawkbovzovskhw.supabase.co';
 
-  static const supabaseAnonKey = String.fromEnvironment(
-    'SUPABASE_ANON_KEY',
-    defaultValue: 'sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH',
-  );
+  static const supabaseAnonKey =
+      'sb_publishable_brxiBtAxKLStsdvRy0cWww_LgOA7nWt';
 
   static const publicMediaBucket = 'public-media';
   static const privateMediaBucket = 'private-media';

@@ -14,16 +14,19 @@ import 'package:boo_mondai/lib.barrel.dart'
         MainScaffold,
         AuthService,
         SettingPath,
-        SettingsStore;
+        SettingsStore,
+        TextContextMenuNavigatorObserver;
 import 'package:flutter/widgets.dart' show GlobalKey, NavigatorState;
 import 'package:go_router/go_router.dart';
 
 final rootNavigatorKey = GlobalKey<NavigatorState>();
+final intialLocation = Pages.decksLocal.url;
 
 GoRouter createRouter(AuthController authController) {
   return GoRouter(
     navigatorKey: rootNavigatorKey,
-    initialLocation: Pages.decksLocal.url,
+    observers: [TextContextMenuNavigatorObserver()],
+    initialLocation: intialLocation,
     refreshListenable: authController.routerRefresh,
     errorBuilder: (context, state) {
       final exception = RouteException(
@@ -68,7 +71,7 @@ GoRouter createRouter(AuthController authController) {
         return Pages.home.url;
       }
 
-      // if (!isAnonymous && auth.currentProfile.role == 'group_b_participant') {
+      // if (!isAnonymous && auth.currentProfile.role == ProfileRole.participantJapaneseB) {
       //   final allowed = [
       //     Pages.home.url,
       //     Pages.researchCode.url,

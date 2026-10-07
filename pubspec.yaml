@@ -1,7 +1,7 @@
 name: boo_mondai
 description: "BooMondai — Gamified language learning with FSRS spaced repetition."
 publish_to: "none"
-version: 1.0.0+6
+version: 1.0.0+10
 
 environment:
   sdk: ">=3.11.8"
@@ -57,6 +57,7 @@ dependencies:
   timezone: ^0.11.0
   flutter_animate: ^4.5.2
   archive: ^4.0.9
+  path: ^1.9.1
   path_provider: ^2.1.6
   http: ^1.6.0
   just_audio: ^0.10.6
@@ -69,6 +70,7 @@ dependencies:
   flutter_image_compress: ^2.5.1
   flutter_launcher_icons: ^0.14.4
   flutter_svg: ^2.3.0
+  package_info_plus: ^10.2.2
 
 dev_dependencies:
   flutter_test:
@@ -91,6 +93,10 @@ flutter:
     - assets/ui/modal_showed/
     - assets/ui/popped_modal/
     - assets/ui/segment_selector_pressed/
+    - assets/temporary/chinese_set_a_attachments/
+    - assets/temporary/chinese_set_b_attachments/
+    - assets/temporary/japanese_set_a_attachments/
+    - assets/temporary/japanese_set_b_attachments/
 
 fonts:
   - family: Noto Sans
