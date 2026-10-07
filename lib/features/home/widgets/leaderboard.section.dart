@@ -12,6 +12,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         ButtonPadding,
         ButtonSize,
         LeaderboardTileWidget,
+        FeatureDisabledState,
+        SettingPath,
+        SettingsStore,
         SurfaceBorder,
         SurfaceShape,
         TextColor,
@@ -21,9 +24,10 @@ import 'package:boo_mondai/lib.barrel.dart'
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-class LeaderboardSection extends StatelessWidget {
+class LeaderboardSection extends SignalHookWidget {
   const LeaderboardSection({
     super.key,
     required this.entries,
@@ -38,6 +42,7 @@ class LeaderboardSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
+    final isAppDemo = SettingsStore.instance.get<bool>(SettingPath.isAppDemo);
 
     return Surface(
       style: surfaceStyle.resolve(tokens, const [
@@ -82,7 +87,9 @@ class LeaderboardSection extends StatelessWidget {
             ],
           ),
           SizedBox(height: 20.h),
-          if (isLoading)
+          if (isAppDemo)
+            const FeatureDisabledState()
+          else if (isLoading)
             const Center(child: CircularProgressIndicator())
           else if (entries.isEmpty)
             Text(
@@ -101,16 +108,17 @@ class LeaderboardSection extends StatelessWidget {
                 ),
               ),
             ),
-          SizedBox(height: 12.h),
-          SizedBox(
-            width: double.infinity,
-            child: Button(
-              onPressed: () => context.push('/leaderboard'),
-
-              variants: const [ButtonSize.lg, ButtonPadding.lg],
-              child: const Text('SEE ALL RANKINGS'),
+          if (!isAppDemo) ...[
+            SizedBox(height: 12.h),
+            SizedBox(
+              width: double.infinity,
+              child: Button(
+                onPressed: () => context.push('/leaderboard'),
+                variants: const [ButtonSize.lg, ButtonPadding.lg],
+                child: const Text('SEE ALL RANKINGS'),
+              ),
             ),
-          ),
+          ],
         ],
       ),
     );

@@ -21,8 +21,10 @@ class MainScaffold extends SignalHookWidget {
   @override
   Widget build(BuildContext context) {
     final auth = context.read<AuthController>();
+    final role = auth.currentProfile.value.role;
     final hideNavigation =
-        auth.currentProfile.value.role == 'group_b_participant';
+        role == ProfileRole.participantChineseB ||
+        role == ProfileRole.participantJapaneseB;
     final controller = MainController.instance;
     return Scaffold(
       hideNavigation: hideNavigation,
