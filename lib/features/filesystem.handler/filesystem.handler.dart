@@ -62,8 +62,12 @@ abstract class FileSystemHandler {
     required String path,
     required Uint8List bytes,
   }) async {
-    final file = File(path);
-    await file.create();
+    final inputFile = File(path);
+    final resolvedPath = inputFile.isAbsolute
+        ? path
+        : await getAbsolutePathOfRelativePath(path);
+    final file = File(resolvedPath);
+    await file.parent.create(recursive: true);
     await file.writeAsBytes(bytes, flush: true);
 
     return file;

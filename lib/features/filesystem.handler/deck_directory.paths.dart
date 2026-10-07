@@ -33,11 +33,13 @@ abstract final class DecksDirectoryPaths {
   /// Returns the local stored-media path for a markdown attachment.
   static String attachment({
     required String deckTitle,
-    required String fileNameWithoutExtension,
+    required String fileName,
   }) {
-    final sanitizedFileName = FileHelper.fileNameWithoutExtension(
-      fileNameWithoutExtension,
-    );
-    return 'decks/$deckTitle/attachments/$sanitizedFileName$imageExtension';
+    final sanitizedFileName = FileHelper.fileNameWithoutExtension(fileName);
+    final extension = FileHelper.getExtension(fileName);
+    final attachmentExtension = extension == null
+        ? imageExtension
+        : '.$extension';
+    return 'decks/$deckTitle/attachments/$sanitizedFileName$attachmentExtension';
   }
 }
