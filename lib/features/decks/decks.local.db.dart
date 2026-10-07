@@ -14,6 +14,9 @@ class DecksLocalDB extends HiveLocalDB<Deck> {
   @override
   Map<String, Object?> primaryKeyFromItem(Deck item) => {'id': item.id};
 
+  @override
+  DateTime? getDeletedAt(Deck item) => item.deletedAt;
+
   List<Deck> getByCurrentProfile() => guardSync(
     () => selectMany()
         .where((d) => d.profileId == LocalDB.currentProfile.getOrCreate().id)

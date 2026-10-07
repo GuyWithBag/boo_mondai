@@ -237,7 +237,6 @@ abstract final class DecksService {
 
     final now = DateTime.now();
     final purgeAfter = SyncDeletionPolicy.current().purgeAfter(now);
-    final profileId = deck.profileId;
     final studyCards = LocalDB.studyCard.getByDeckId(deck.id);
     final studyCardIds = studyCards.map((card) => card.id).toSet();
     final cardTemplates = LocalDB.cardTemplate.getByDeckId(deck.id);
@@ -245,20 +244,7 @@ abstract final class DecksService {
     final fsrsCards = LocalDB.fsrsCard.selectMany(
       where: (card) => studyCardIds.contains(card.studyCardId),
     );
-    final deckTags = LocalDB.deckTag.getTagsForDeck(deck.id);
-    final templateTags = LocalDB.cardTemplateTag.getTagsForTemplates(
-      templateIds,
-    );
-    final studyCardTags = LocalDB.userStudyCardTag.getTagsForCards(
-      studyCardIds,
-    );
     final shouldSyncDeletion = AuthService.isAuthenticatedRemote;
-
-    final tagIdsToCheck = {
-      for (final tag in deckTags) tag.tagId,
-      for (final tag in templateTags) tag.tagId,
-      for (final tag in studyCardTags) tag.tagId,
-    };
 
     if (!keepReviewLogs) {
       final fsrsCardIds = fsrsCards.map((card) => card.id).toSet();

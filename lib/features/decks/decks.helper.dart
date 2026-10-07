@@ -1,6 +1,22 @@
 import 'package:boo_mondai/core/services/uuid.dart';
+import 'package:boo_mondai/lib.barrel.dart'
+    show Deck, DecksDirectoryPaths, ImageHelper;
+import 'package:flutter/material.dart' show AssetImage, ImageProvider;
 
 abstract final class DecksHelper {
+  static const premadeCoverImage = AssetImage('assets/icon/icon.png');
+
+  static Future<ImageProvider?> getCoverImageProvider(Deck? deck) async {
+    if (deck == null) return null;
+
+    //ToDo: Fix later
+    if (deck.isPremade) return premadeCoverImage;
+
+    return ImageHelper.getImageProviderFromSource(
+      DecksDirectoryPaths.coverImage(deckTitle: deck.title),
+    );
+  }
+
   static Map<String, dynamic> readRequiredMap(
     Map<String, dynamic> parent,
     String key,
