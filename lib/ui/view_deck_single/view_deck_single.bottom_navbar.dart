@@ -1,61 +1,68 @@
 import 'package:boo_mondai/features/app_theme/app_theme.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, Button, ButtonColor, Deck, DrillStudySessionHelper, LocalDB;
+    show
+        AppTokens,
+        Button,
+        ButtonColor,
+        Deck,
+        LocalDB,
+        ViewDeckSingleSheetController;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart' show GoRouterHelper;
 import 'package:theme_variants/theme_variants.dart' show ThemeVariantsContext;
 
-class ViewDeckSingleBottomNavBar extends StatelessWidget
-    implements PreferredSizeWidget {
-  const ViewDeckSingleBottomNavBar({super.key, required this.deck});
+BottomNavBar viewDeckSingleBottomNavBar({
+  required BuildContext context,
+  required Deck deck,
+  required ViewDeckSingleSheetController controller,
+}) {
+  final tokens = context.themeTokens<AppTokens>();
 
-  final Deck deck;
+  final profileId = LocalDB.currentProfile.getOrCreate().id;
+  final eligibleCards = LocalDB.studyCard.getEligibleDrillCards(
+    deck.id,
+    profileId,
+  );
+  final canDrill = eligibleCards.isNotEmpty;
 
-  @override
-  Size get preferredSize => Size(0, BottomNavBar.preferredHeightDefault);
-
-  @override
-  Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
-
-    final profileId = LocalDB.currentProfile.getOrCreate().id;
-    final eligibleCards = LocalDB.studyCard.getEligibleDrillCards(
-      deck.id,
-      profileId,
-    );
-    final canDrill = eligibleCards.isNotEmpty;
-
-    return BottomNavBar(
-      variants: const [SurfaceShape.roundedSm],
-      child: Row(
-        spacing: tokens.spaceLayoutGapMd,
-        children: [
-          Expanded(
+  return BottomNavBar(
+    variants: const [SurfaceShape.roundedSm],
+    child: Row(
+      spacing: tokens.spaceLayoutGapSm,
+      children: [
+        // Expanded(
+        //   child: Button(
+        //     onPressed: () => context.push(
+        //       '/view-cards?deckId=${Uri.encodeQueryComponent(deck.id)}',
+        //     ),
+        //     child: const Text('Cards'),
+        //   ),
+        // ),
+        Expanded(
+          child: Button(
+            onPressed: controller.canEdit.value
+                ? () => controller.onEditPressed(context)
+                : null,
+            child: const Text('Edit Cards'),
+          ),
+        ),
+        Expanded(
+          child: Tooltip(
+            message: deck.cardTemplatesCount == 0
+                ? 'No cards yet'
+                : canDrill
+                ? '${eligibleCards.length} cards ready'
+                : 'Completed',
             child: Button(
-              onPressed: () => context.push(
-                '/view-cards?deckId=${Uri.encodeQueryComponent(deck.id)}',
-              ),
-              child: const Text('Cards'),
+              variants: const [ButtonColor.primary],
+              onPressed: canDrill
+                  ? () => context.push('/drill/${deck.id}/onboarding')
+                  : null,
+              child: const Text('Study'),
             ),
           ),
-          Expanded(
-            child: Tooltip(
-              message: deck.cardTemplatesCount == 0
-                  ? 'No cards yet'
-                  : canDrill
-                  ? '${eligibleCards.length} cards ready'
-                  : 'Completed',
-              child: Button(
-                variants: const [ButtonColor.primary],
-                onPressed: canDrill
-                    ? () => context.push('/drill/${deck.id}/onboarding')
-                    : null,
-                child: const Text('Study'),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
 }

@@ -4,8 +4,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         Button,
         Deck,
         DeckReviewStats,
-        DecksDirectoryPaths,
-        ImageHelper,
+        DecksHelper,
         ProgressBar,
         SessionRatingStatsBlock,
         SessionRatingStatsBlockController,
@@ -37,7 +36,6 @@ class StudyDeckTile extends SignalHookWidget {
     final completion = _completionValue(stats);
     final ratingStatsController = useMemoized(
       () => SessionRatingStatsBlockController(
-        showText: false,
         initialMode: SessionRatingStatsMode.ratingStats,
       ),
     );
@@ -52,12 +50,9 @@ class StudyDeckTile extends SignalHookWidget {
       TextWeight.strong,
     ]);
 
-    final deckCoverImagePath = deck == null
-        ? null
-        : DecksDirectoryPaths.coverImage(deckTitle: deck!.title);
     final deckCoverImageSignal = useFutureSignal(
-      () => ImageHelper.getImageProviderFromSource(deckCoverImagePath),
-      keys: [deckCoverImagePath],
+      () => DecksHelper.getCoverImageProvider(deck),
+      keys: [deck?.id, deck?.title, deck?.isPremade],
     );
     final deckCoverImage = deckCoverImageSignal.value.map(
       data: (value) => value,

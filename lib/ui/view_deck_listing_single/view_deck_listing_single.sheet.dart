@@ -209,7 +209,7 @@ class ViewDeckListingSingleSheet<T extends ViewDeckListingSingleController>
                   createAttachmentPath: (file) =>
                       DecksDirectoryPaths.attachment(
                         deckTitle: controller.deck.value.title,
-                        fileNameWithoutExtension: file.name,
+                        fileName: file.name,
                       ),
                 ),
                 body: isEditing

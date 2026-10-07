@@ -7,6 +7,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         DeckListing,
         DeckListingsService,
         DecksDirectoryPaths,
+        DecksHelper,
         DecksService,
         LocalDB,
         ModalAction,
@@ -19,8 +20,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         showViewDeckListingSingleSheet,
         showModal,
         ViewDeckSingleHelper,
-        FileSystemHandler,
-        ImageHelper;
+        FileSystemHandler;
 import 'package:file_picker/file_picker.dart' show PlatformFile;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart' show GoRouterHelper;
@@ -42,9 +42,7 @@ class ViewDeckSingleSheetController {
 
   late final FutureSignal<ImageProvider?> coverImageFuture = futureSignal(
     () async {
-      return await ImageHelper.getImageProviderFromSource(
-        DecksDirectoryPaths.coverImage(deckTitle: deck.value.title),
-      );
+      return await DecksHelper.getCoverImageProvider(deck.value);
     },
   );
 
@@ -237,6 +235,17 @@ class ViewDeckSingleSheetController {
     if (bytes.isEmpty) return;
     pickedCoverImageFile.value = file;
     coverImage.value = MemoryImage(bytes);
+  }
+
+  Future<bool> canPickCoverImage(BuildContext context) async {
+    final allowSettingDeckImage = SettingsStore.instance.get<bool>(
+      SettingPath.allowSettingDeckImage,
+    );
+    if (allowSettingDeckImage) return true;
+
+    //ToDo: Fix later
+    await showFeatureDisabledModal(context);
+    return false;
   }
 
   Future<void> save() async {

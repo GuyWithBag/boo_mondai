@@ -5,6 +5,8 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'dart:async' show FutureOr;
+
 import 'package:boo_mondai/lib.barrel.dart'
     show
         BackgroundImagePicked,
@@ -20,11 +22,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         ViewCardsTile;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 enum DeckTileState { defaultView, bare, spread }
 
-class DeckTile extends HookWidget {
+class DeckTile extends SignalHookWidget {
   final Deck? deck;
 
   /// When non-null, a delete option appears in the card's popup menu.
@@ -49,6 +52,7 @@ class DeckTile extends HookWidget {
   final bool hasTags;
 
   final bool isImageEditable;
+  final FutureOr<bool> Function(BuildContext context)? canPickImage;
   final BackgroundImagePicked? onImagePicked;
 
   final double? width;
@@ -64,6 +68,7 @@ class DeckTile extends HookWidget {
     this.state = DeckTileState.defaultView,
     this.hasTags = false,
     this.isImageEditable = false,
+    this.canPickImage,
     this.onImagePicked,
     this.width,
   });
@@ -168,6 +173,7 @@ class DeckTile extends HookWidget {
                   controller: physicalDeckController,
                   showInfoCover: false,
                   isCoverImageEditable: effectiveOnImagePicked != null,
+                  canPickCoverImage: canPickImage,
                   onCoverImagePicked: effectiveOnImagePicked,
                   textScaleBaseWidth: cardWidth,
                   isSelected: isSelected,

@@ -41,6 +41,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         showSnackbar,
         showModal;
 import 'package:boo_mondai/ui/ui.barrel.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide AppBar, Scaffold;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
@@ -48,8 +49,8 @@ import 'package:provider/provider.dart';
 import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-class ViewDecksLocalPage extends SignalHookWidget {
-  const ViewDecksLocalPage({super.key});
+class ViewDecksPage extends SignalHookWidget {
+  const ViewDecksPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +60,7 @@ class ViewDecksLocalPage extends SignalHookWidget {
     final areOnlineFeaturesDisabled = settingsStore.get<bool>(
       SettingPath.disableOnlineFeatures,
     );
+    final isAppDemo = settingsStore.get<bool>(SettingPath.isAppDemo);
     final changeTrackerPageArgs = useMemoized(
       () => signal(const ChangeTrackerRouteArgs.missing(entryId: '')),
     );
@@ -337,15 +339,18 @@ class ViewDecksLocalPage extends SignalHookWidget {
           Button.icon(tokens: tokens, icon: Icons.import_export),
         ],
         actions: [
-          Button.icon(
-            tokens: tokens,
-            icon: Icons.folder_outlined,
-            onPressed: showSandboxFiles,
-          ),
+          if (kDebugMode)
+            Button.icon(
+              tokens: tokens,
+              icon: Icons.folder_outlined,
+              onPressed: showSandboxFiles,
+            ),
           Button.icon(
             tokens: tokens,
             icon: Icons.file_open_outlined,
-            onPressed: showImportDeckModal,
+            onPressed: isAppDemo
+                ? () => showFeatureDisabledModal(context)
+                : showImportDeckModal,
           ),
           Button.icon(
             tokens: tokens,

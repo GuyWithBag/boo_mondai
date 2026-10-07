@@ -20,7 +20,6 @@ import 'package:boo_mondai/lib.barrel.dart'
         ViewDeckSingleSheetController,
         surfaceStyle,
         Scaffold,
-        ViewDeckSingleBottomNavBar,
         BackgroundImageSurface,
         SurfaceBorder,
         SurfaceShadow,
@@ -30,11 +29,13 @@ import 'package:boo_mondai/lib.barrel.dart'
         DecksDirectoryPaths,
         ToolBar,
         ToolBarController,
-        showBottomSheet;
+        showBottomSheet,
+        viewDeckSingleBottomNavBar;
 import 'package:flutter/material.dart'
     hide AppBar, FormField, Scaffold, showBottomSheet;
 import 'package:flutter_hooks/flutter_hooks.dart' show useEffect, useMemoized;
 import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
+import 'package:go_router/go_router.dart';
 import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart'
     show Surface, ThemeVariantsContext;
@@ -98,7 +99,11 @@ class ViewDeckSingleSheet extends SignalHookWidget {
                   .copyWith(clipBehavior: Clip.antiAlias),
               child: Scaffold(
                 backgroundColor: Colors.transparent,
-                bottomNavBar: ViewDeckSingleBottomNavBar(deck: activeDeck),
+                bottomNavBar: viewDeckSingleBottomNavBar(
+                  context: context,
+                  deck: activeDeck,
+                  controller: controller,
+                ),
                 scrollable: true,
                 shouldConstrainWidth: false,
                 inheritMainBottomNavBarHeight: false,
@@ -111,7 +116,7 @@ class ViewDeckSingleSheet extends SignalHookWidget {
                         createAttachmentPath: (file) =>
                             DecksDirectoryPaths.attachment(
                               deckTitle: activeDeck.title,
-                              fileNameWithoutExtension: file.name,
+                              fileName: file.name,
                             ),
                       )
                     : null,
@@ -121,17 +126,18 @@ class ViewDeckSingleSheet extends SignalHookWidget {
                   actions: [
                     Button.icon(
                       tokens: tokens,
-                      icon: Icons.edit,
-                      onPressed: controller.canEdit.value
-                          ? () => controller.onEditPressed(context)
-                          : null,
+                      icon: Icons.layers_outlined,
+                      onPressed: () => context.push(
+                        '/view-cards?deckId=${Uri.encodeQueryComponent(deck.id)}',
+                      ),
                     ),
-                    Button.icon(
-                      tokens: tokens,
-                      icon: Icons.delete_outline,
-                      color: ButtonColor.error,
-                      onPressed: () => controller.deleteDeck(context),
-                    ),
+                    if (!controller.deck.value.isPremade)
+                      Button.icon(
+                        tokens: tokens,
+                        icon: Icons.delete_outline,
+                        color: ButtonColor.error,
+                        onPressed: () => controller.deleteDeck(context),
+                      ),
                     if (controller.shouldShowSaveButton.value)
                       Button(
                         variants: const [
@@ -346,6 +352,7 @@ class _BodySubSection extends SignalHookWidget {
                       width: deckWidth,
                       state: DeckTileState.bare,
                       isImageEditable: true,
+                      canPickImage: controller.canPickCoverImage,
                       onImagePicked: controller.onCoverImagePicked,
                     ),
                   )
