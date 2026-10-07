@@ -8,8 +8,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         Notifications,
         NotificationsController,
         ProfileRole,
-        ResearchParticipantSetAData,
-        ResearchParticipantSetBData,
+        ResearchParticipantChineseSetAData,
+        ResearchParticipantChineseSetBData,
+        ResearchParticipantJapaneseSetAData,
+        ResearchParticipantJapaneseSetBData,
         StudySessionCompletedResults;
 
 class ResearchPariticipantPortalStore {
@@ -60,8 +62,10 @@ class ResearchPariticipantPortalStore {
   }
 
   bool _isResearchParticipantDeck(String? deckId) {
-    return deckId == ResearchParticipantSetAData.dataDeckId ||
-        deckId == ResearchParticipantSetBData.dataDeckId;
+    return deckId == ResearchParticipantChineseSetAData.dataDeckId ||
+        deckId == ResearchParticipantChineseSetBData.dataDeckId ||
+        deckId == ResearchParticipantJapaneseSetAData.dataDeckId ||
+        deckId == ResearchParticipantJapaneseSetBData.dataDeckId;
   }
 
   bool _isParticipantDeckForRole({
@@ -69,10 +73,14 @@ class ResearchPariticipantPortalStore {
     required ProfileRole role,
   }) {
     return switch (role) {
-      ProfileRole.participantA =>
-        deckId == ResearchParticipantSetAData.dataDeckId,
-      ProfileRole.participantB =>
-        deckId == ResearchParticipantSetBData.dataDeckId,
+      ProfileRole.participantChineseA =>
+        deckId == ResearchParticipantChineseSetAData.dataDeckId,
+      ProfileRole.participantChineseB =>
+        deckId == ResearchParticipantChineseSetBData.dataDeckId,
+      ProfileRole.participantJapaneseA =>
+        deckId == ResearchParticipantJapaneseSetAData.dataDeckId,
+      ProfileRole.participantJapaneseB =>
+        deckId == ResearchParticipantJapaneseSetBData.dataDeckId,
       _ => false,
     };
   }

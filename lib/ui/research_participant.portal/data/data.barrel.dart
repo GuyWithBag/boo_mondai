@@ -2,5 +2,7 @@
 
 // Barrel files
 // Other files
-export 'research_participant.set_a_data.dart';
-export 'research_participant.set_b_data.dart';
+export 'research_participant.chinese_set_a_data.dart';
+export 'research_participant.chinese_set_b_data.dart';
+export 'research_participant.japanese_set_a_data.dart';
+export 'research_participant.japanese_set_b_data.dart';
