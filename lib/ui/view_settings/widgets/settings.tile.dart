@@ -1,8 +1,9 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show PathHelper, StringHelper, SettingPath, SettingsStore;
 import 'package:flutter/material.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class SettingsTile extends StatelessWidget {
+class SettingsTile extends SignalHookWidget {
   const SettingsTile({
     super.key,
     required this.path,
