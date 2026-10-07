@@ -90,12 +90,14 @@ class DeckListView extends SignalHookWidget {
             },
             selectionController: selectionController,
             selectionValue: deck.id,
-            child: DeckTile(
-              deck: deck,
-              width: width,
-              hasTags: true,
-              state: DeckTileState.defaultView,
-              isSelected: selectionController.isSelected(deck.id),
+            child: SignalHookBuilder(
+              builder: (_) => DeckTile(
+                deck: deck,
+                width: width,
+                hasTags: true,
+                state: DeckTileState.defaultView,
+                isSelected: selectionController.isSelected(deck.id),
+              ),
             ),
           ),
         );

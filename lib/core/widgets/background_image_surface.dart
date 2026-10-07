@@ -26,6 +26,7 @@ import 'package:flutter/material.dart'
         StackFit,
         StatelessWidget,
         Widget;
+import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 typedef BackgroundImagePicked = FutureOr<void> Function(PlatformFile file);
@@ -36,7 +37,7 @@ Future<PlatformFile?> pickBackgroundImageFile() async {
   return FilePicker.pickFile(type: FileType.image);
 }
 
-class BackgroundImageSurface extends StatelessWidget {
+class BackgroundImageSurface extends SignalWidget {
   const BackgroundImageSurface({
     super.key,
     this.image,
