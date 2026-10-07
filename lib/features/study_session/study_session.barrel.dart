@@ -9,3 +9,4 @@ export 'session_mode.dart';
 export 'study_session.helper.dart';
 export 'study_session.rules.dart';
 export 'study_session.controller.dart';
+export 'drill_study_session.selector.dart';

@@ -1,7 +1,7 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         CardTemplate,
-        DrillStudySessionHelper,
+        DrillStudySessionSelector,
         DueFilterThreshold,
         DueFilterExtension,
         FsrsCard,
@@ -11,8 +11,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         ImmediateSchedule,
         Notifications,
         NotificationsController,
-        ResearchParticipantSetAData,
-        ResearchParticipantSetBData,
+        ResearchParticipantChineseSetAData,
+        ResearchParticipantChineseSetBData,
+        ResearchParticipantJapaneseSetAData,
+        ResearchParticipantJapaneseSetBData,
         Services,
         SessionException,
         SessionMode,
@@ -92,6 +94,7 @@ final class StudySessionController {
   Future<void> startSession({
     String? deckId,
     DueFilterThreshold? filter,
+    List<String>? studyCardIds,
   }) async {
     reset();
     isLoading.value = true;
@@ -107,8 +110,12 @@ final class StudySessionController {
           );
         }
         selected.addAll(
-          (LocalDB.studyCard.getEligibleDrillCards(deckId, profileId)
-            ..shuffle()),
+          DrillStudySessionSelector.select(
+            deckId: deckId,
+            profileId: profileId,
+            config: config,
+            studyCardIds: studyCardIds,
+          ),
         );
         if (selected.isEmpty) {
           throw SessionException(
@@ -468,8 +475,10 @@ final class StudySessionController {
   ) async {
     final profile = LocalDB.currentProfile.getOrCreate();
     if (!profile.isResearcher) return;
-    if (active.deckId != ResearchParticipantSetAData.dataDeckId &&
-        active.deckId != ResearchParticipantSetBData.dataDeckId) {
+    if (active.deckId != ResearchParticipantChineseSetAData.dataDeckId &&
+        active.deckId != ResearchParticipantChineseSetBData.dataDeckId &&
+        active.deckId != ResearchParticipantJapaneseSetAData.dataDeckId &&
+        active.deckId != ResearchParticipantJapaneseSetBData.dataDeckId) {
       return;
     }
 
