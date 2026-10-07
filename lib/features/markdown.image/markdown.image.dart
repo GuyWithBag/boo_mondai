@@ -1,5 +1,10 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show ImageHelper, MarkdownImageOptions, AppTokens, MarkdownHelper;
+    show
+        AppTokens,
+        ImageHelper,
+        MarkdownAttachmentUrlResolver,
+        MarkdownHelper,
+        MarkdownImageOptions;
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:markdown/markdown.dart' as md;
@@ -14,21 +19,24 @@ class MarkdownImage extends SignalHookWidget {
     this.title,
     this.alt,
     this.options,
+    this.resolveAttachmentUrl,
   });
 
   final Uri uri;
   final String? title;
   final String? alt;
   final String? options;
+  final MarkdownAttachmentUrlResolver? resolveAttachmentUrl;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final imageUrl = MarkdownHelper.resolveAttachmentUrl(uri);
-    final imageSignal = useFutureSignal(
-      () => ImageHelper.getImageProviderFromSource(imageUrl),
-      keys: [imageUrl],
-    );
+    final imageSignal = useFutureSignal(() async {
+      final imageUrl =
+          await resolveAttachmentUrl?.call(uri) ??
+          await MarkdownHelper.resolveAttachmentUrl(uri);
+      return ImageHelper.getImageProviderFromSource(imageUrl);
+    }, keys: [uri, resolveAttachmentUrl]);
     final image = imageSignal.value.map(
       data: (value) => value,
       error: () => null,
@@ -43,8 +51,8 @@ class MarkdownImage extends SignalHookWidget {
       child: Image(
         image: image,
         // ToDo: Changed to hard coded values for now.
-        width: 80,
-        height: 80,
+        width: 250,
+        height: 250,
         fit: imageOptions.fit,
         semanticLabel: alt,
         errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
@@ -63,6 +71,10 @@ class MarkdownImage extends SignalHookWidget {
 }
 
 class MarkdownImageElementBuilder extends MarkdownElementBuilder {
+  MarkdownImageElementBuilder({this.resolveAttachmentUrl});
+
+  final MarkdownAttachmentUrlResolver? resolveAttachmentUrl;
+
   @override
   Widget visitElementAfterWithContext(
     BuildContext context,
@@ -78,6 +90,7 @@ class MarkdownImageElementBuilder extends MarkdownElementBuilder {
       title: element.attributes['title'],
       alt: element.attributes['alt'],
       options: element.attributes['options'],
+      resolveAttachmentUrl: resolveAttachmentUrl,
     );
   }
 }

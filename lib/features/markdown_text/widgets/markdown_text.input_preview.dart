@@ -77,6 +77,16 @@ class MarkdownTextInputPreview extends HookWidget {
     }, [data, effectiveController]);
 
     useEffect(() {
+      final handleChanged = onChanged;
+      if (handleChanged == null) return null;
+
+      void listener() => handleChanged(effectiveController.text);
+
+      effectiveController.addListener(listener);
+      return () => effectiveController.removeListener(listener);
+    }, [effectiveController, onChanged]);
+
+    useEffect(() {
       void listener() => isEditing.value = effectiveFocusNode.hasFocus;
       effectiveFocusNode.addListener(listener);
       return () => effectiveFocusNode.removeListener(listener);
@@ -88,12 +98,13 @@ class MarkdownTextInputPreview extends HookWidget {
 
         void listener() {
           if (effectiveFocusNode.hasFocus) {
-            toolBarController.setActiveTextController(
-              effectiveController,
+            toolBarController.show(
+              textController: effectiveController,
+              focusNode: effectiveFocusNode,
               allowAttachments: allowAttachments,
             );
           } else {
-            toolBarController.clearActiveTextController(effectiveController);
+            toolBarController.hide(textController: effectiveController);
           }
         }
 
@@ -101,7 +112,7 @@ class MarkdownTextInputPreview extends HookWidget {
         listener();
         return () {
           effectiveFocusNode.removeListener(listener);
-          toolBarController.clearActiveTextController(effectiveController);
+          toolBarController.hide(textController: effectiveController);
         };
       },
       [
@@ -118,7 +129,6 @@ class MarkdownTextInputPreview extends HookWidget {
         controller: effectiveController,
         focusNode: effectiveFocusNode,
         enabled: enabled,
-        onChanged: onChanged,
         onSubmitted: onSubmitted,
         placeholder: placeholder,
         style: resolvedTextStyle,
@@ -148,6 +158,7 @@ class MarkdownTextInputPreview extends HookWidget {
         // the GestureDetector above won't interfere because MarkdownBody
         // calls onTapLink and stops the gesture from bubbling.
         contentScale: contentScale,
+        resolveAttachmentUrl: resolveAttachmentUrl,
       ),
     );
   }

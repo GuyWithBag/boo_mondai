@@ -4,6 +4,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         Button,
         ButtonColor,
         ButtonVariant,
+        MarkdownAttachmentUrlResolver,
         MarkdownAudioPlayerProgress,
         MarkdownHelper,
         ScaleHelper,
@@ -19,9 +20,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
-class MarkdownAudioPlayer extends HookWidget {
+class MarkdownAudioPlayer extends SignalHookWidget {
   const MarkdownAudioPlayer({
     required this.alt,
     this.contentScale = 1,
@@ -29,6 +31,7 @@ class MarkdownAudioPlayer extends HookWidget {
     required this.uri,
     this.title,
     this.options,
+    this.resolveAttachmentUrl,
   });
 
   final Uri uri;
@@ -36,6 +39,7 @@ class MarkdownAudioPlayer extends HookWidget {
   final String? title;
   final String? options;
   final double contentScale;
+  final MarkdownAttachmentUrlResolver? resolveAttachmentUrl;
 
   Future<void> _togglePlayback({
     required AudioPlayer player,
@@ -68,8 +72,6 @@ class MarkdownAudioPlayer extends HookWidget {
       initialData: player.playerState,
     );
 
-    final String source = MarkdownHelper.resolveAttachmentUrl(uri) ?? '';
-
     useEffect(() {
       var isDisposed = false;
 
@@ -78,6 +80,10 @@ class MarkdownAudioPlayer extends HookWidget {
         error.value = null;
 
         try {
+          final source =
+              await resolveAttachmentUrl?.call(uri) ??
+              await MarkdownHelper.resolveAttachmentUrl(uri) ??
+              '';
           if (_isRemoteSource(source)) {
             await player.setUrl(source);
           } else {
@@ -97,7 +103,7 @@ class MarkdownAudioPlayer extends HookWidget {
       return () {
         isDisposed = true;
       };
-    }, [player, source]);
+    }, [player, uri, resolveAttachmentUrl]);
 
     useEffect(() => player.dispose, [player]);
 

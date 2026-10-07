@@ -61,18 +61,29 @@ class MarkdownTextInput extends HookWidget {
       return null;
     }, [data, effectiveController]);
 
+    useEffect(() {
+      final handleChanged = onChanged;
+      if (handleChanged == null) return null;
+
+      void listener() => handleChanged(effectiveController.text);
+
+      effectiveController.addListener(listener);
+      return () => effectiveController.removeListener(listener);
+    }, [effectiveController, onChanged]);
+
     useEffect(
       () {
         if (toolBarController == null) return null;
 
         void listener() {
           if (effectiveFocusNode.hasFocus) {
-            toolBarController.setActiveTextController(
-              effectiveController,
+            toolBarController.show(
+              textController: effectiveController,
+              focusNode: effectiveFocusNode,
               allowAttachments: allowAttachments,
             );
           } else {
-            toolBarController.clearActiveTextController(effectiveController);
+            toolBarController.hide(textController: effectiveController);
           }
         }
 
@@ -80,7 +91,7 @@ class MarkdownTextInput extends HookWidget {
         listener();
         return () {
           effectiveFocusNode.removeListener(listener);
-          toolBarController.clearActiveTextController(effectiveController);
+          toolBarController.hide(textController: effectiveController);
         };
       },
       [
@@ -96,7 +107,6 @@ class MarkdownTextInput extends HookWidget {
       controller: effectiveController,
       focusNode: effectiveFocusNode,
       enabled: enabled,
-      onChanged: onChanged,
       onSubmitted: onSubmitted,
       placeholder: placeholder,
       placeholderTextStyle: placeholderTextStyle,

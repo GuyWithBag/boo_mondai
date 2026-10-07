@@ -1,1 +1,3 @@
-typedef MarkdownAttachmentUrlResolver = String? Function(Uri uri);
+import 'dart:async';
+
+typedef MarkdownAttachmentUrlResolver = FutureOr<String?> Function(Uri uri);

@@ -1,4 +1,5 @@
-import 'package:boo_mondai/lib.barrel.dart' show MarkdownTextBody;
+import 'package:boo_mondai/lib.barrel.dart'
+    show MarkdownAttachmentUrlResolver, MarkdownTextBody;
 import 'package:flutter/material.dart';
 
 class MarkdownTextPreview extends StatelessWidget {
@@ -9,6 +10,7 @@ class MarkdownTextPreview extends StatelessWidget {
     required this.selectable,
     required this.defaultAlignment,
     this.contentScale = 1,
+    this.resolveAttachmentUrl,
   });
 
   final TextStyle resolvedTextStyle;
@@ -16,6 +18,8 @@ class MarkdownTextPreview extends StatelessWidget {
   final bool selectable;
   final WrapAlignment defaultAlignment;
   final double contentScale;
+  final MarkdownAttachmentUrlResolver? resolveAttachmentUrl;
+
   @override
   Widget build(BuildContext context) {
     return MarkdownTextBody(
@@ -24,6 +28,7 @@ class MarkdownTextPreview extends StatelessWidget {
       selectable: false,
       defaultAlignment: defaultAlignment,
       contentScale: contentScale,
+      resolveAttachmentUrl: resolveAttachmentUrl,
     );
   }
 }

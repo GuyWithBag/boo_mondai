@@ -4,6 +4,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         MarkdownHelper,
         MarkdownAlignedTextSyntax,
         MarkdownImageSyntax,
+        MarkdownAttachmentUrlResolver,
         AppTokens,
         MarkdownAlignedText,
         MarkdownImageElementBuilder,
@@ -21,6 +22,7 @@ class MarkdownTextBody extends StatelessWidget {
     required this.selectable,
     required this.defaultAlignment,
     this.contentScale = 1,
+    this.resolveAttachmentUrl,
   });
 
   final TextStyle resolvedTextStyle;
@@ -28,6 +30,7 @@ class MarkdownTextBody extends StatelessWidget {
   final bool selectable;
   final WrapAlignment defaultAlignment;
   final double contentScale;
+  final MarkdownAttachmentUrlResolver? resolveAttachmentUrl;
 
   @override
   Widget build(BuildContext context) {
@@ -38,19 +41,22 @@ class MarkdownTextBody extends StatelessWidget {
       defaultAlignment,
     );
 
-    Uri? resolveExternalUri(String? href) {
+    Future<Uri?> resolveExternalUri(String? href) async {
       final value = href?.trim() ?? '';
       if (value.isEmpty) return null;
 
       final uri = Uri.tryParse(value);
       if (uri == null) return null;
+      final resolved = await resolveAttachmentUrl?.call(uri);
+      if (resolved != null) return Uri.tryParse(resolved);
+
       if (uri.hasScheme) return uri;
 
       return Uri.tryParse('https://$value');
     }
 
     Future<void> launchLink(String? href) async {
-      final uri = resolveExternalUri(href);
+      final uri = await resolveExternalUri(href);
       if (uri == null) return;
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
@@ -70,19 +76,31 @@ class MarkdownTextBody extends StatelessWidget {
         blockSyntaxes: [MarkdownAlignedTextSyntax()],
         inlineSyntaxes: [MarkdownImageSyntax()],
         builders: {
-          MarkdownImageSyntax.tag: MarkdownImageElementBuilder(),
+          MarkdownImageSyntax.tag: MarkdownImageElementBuilder(
+            resolveAttachmentUrl: resolveAttachmentUrl,
+          ),
           MarkdownAlignedTextSyntax.tag: MarkdownAlignedText(
             selectable: selectable,
             onTapLink: onTapLink,
-            imageBuilder: (uri, title, alt) =>
-                MarkdownMedia(uri: uri, title: title, alt: alt),
+            imageBuilder: (uri, title, alt) => MarkdownMedia(
+              uri: uri,
+              title: title,
+              alt: alt,
+              resolveAttachmentUrl: resolveAttachmentUrl,
+              contentScale: contentScale,
+            ),
             styleSheet: styleSheet,
           ),
         },
 
         onTapLink: onTapLink,
-        imageBuilder: (uri, title, alt) =>
-            MarkdownMedia(uri: uri, title: title, alt: alt),
+        imageBuilder: (uri, title, alt) => MarkdownMedia(
+          uri: uri,
+          title: title,
+          alt: alt,
+          resolveAttachmentUrl: resolveAttachmentUrl,
+          contentScale: contentScale,
+        ),
         styleSheet: styleSheet,
       ),
     );

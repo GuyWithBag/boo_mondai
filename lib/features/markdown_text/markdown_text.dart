@@ -75,8 +75,8 @@ class MarkdownText extends HookWidget {
   /// opened via [url_launcher] automatically.
   final MarkdownTapLinkCallback? onTapLink;
 
-  /// Resolves markdown media URIs like `local:<id>` to displayable URLs. Used
-  /// for images and by the default link launcher.
+  /// Resolves markdown media URIs to displayable URLs. Used for images and by
+  /// the default link launcher.
   final MarkdownAttachmentUrlResolver? resolveAttachmentUrl;
 
   @override
@@ -103,6 +103,7 @@ class MarkdownText extends HookWidget {
         selectable: true,
         defaultAlignment: defaultMarkdownAlignment,
         contentScale: contentScale,
+        resolveAttachmentUrl: resolveAttachmentUrl,
       ),
       MarkdownTextMode.preview => MarkdownTextPreview(
         resolvedTextStyle: resolvedTextStyle,
@@ -110,6 +111,7 @@ class MarkdownText extends HookWidget {
         selectable: false,
         defaultAlignment: defaultMarkdownAlignment,
         contentScale: contentScale,
+        resolveAttachmentUrl: resolveAttachmentUrl,
       ),
       MarkdownTextMode.raw => Text(
         data,

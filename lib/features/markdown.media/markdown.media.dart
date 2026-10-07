@@ -1,32 +1,60 @@
 // It is kept separate from MarkdownImageElementBuilder because it needs to support regular flutter_markdown_plus image and the configurable image
 import 'package:boo_mondai/features/markdown.audio_player/markdown.audio_player.barrel.dart';
 import 'package:boo_mondai/features/markdown.image/markdown.image.dart';
-import 'package:boo_mondai/lib.barrel.dart' show MediaHelper;
+import 'package:boo_mondai/lib.barrel.dart'
+    show MarkdownAttachmentUrlResolver, MediaHelper;
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class MarkdownMedia extends HookWidget {
+class MarkdownMedia extends SignalHookWidget {
   const MarkdownMedia({
     super.key,
     required this.uri,
     this.title,
     this.alt,
     this.options,
+    this.resolveAttachmentUrl,
+    this.contentScale = 1,
   });
 
   final Uri uri;
   final String? title;
   final String? alt;
   final String? options;
+  final MarkdownAttachmentUrlResolver? resolveAttachmentUrl;
+  final double contentScale;
 
   @override
   Widget build(BuildContext context) {
-    final source = uri.toString();
+    final sourceSignal = useFutureSignal(
+      () async => await resolveAttachmentUrl?.call(uri) ?? uri.toString(),
+      keys: [uri, resolveAttachmentUrl],
+    );
+    final source = sourceSignal.value.map(
+      data: (value) => value,
+      error: () => uri.toString(),
+      loading: () => null,
+    );
+    if (source == null) return const SizedBox.shrink();
+
     if (MediaHelper.isAudio(source)) {
-      MarkdownAudioPlayer(uri: uri, alt: alt, title: title, options: options);
+      return MarkdownAudioPlayer(
+        uri: uri,
+        alt: alt,
+        title: title,
+        options: options,
+        resolveAttachmentUrl: resolveAttachmentUrl,
+        contentScale: contentScale,
+      );
     } else if (MediaHelper.isImage(source)) {
-      MarkdownImage(uri: uri, alt: alt, title: title, options: options);
+      return MarkdownImage(
+        uri: uri,
+        alt: alt,
+        title: title,
+        options: options,
+        resolveAttachmentUrl: resolveAttachmentUrl,
+      );
     }
-    return SizedBox.shrink();
+    return const SizedBox.shrink();
   }
 }
