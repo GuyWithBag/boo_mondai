@@ -7,7 +7,7 @@ import 'package:signals/signals_flutter.dart';
 class ViewOnboardingController {
   ViewOnboardingController();
 
-  static const int lastPageIndex = 2;
+  static const int lastPageIndex = 3;
 
   final pageController = PageController();
   final currentPage = signal(0);

@@ -4,8 +4,17 @@ import 'package:boo_mondai/lib.barrel.dart'
         BottomNavBar,
         Button,
         ButtonColor,
+        MarkdownText,
+        MarkdownTextMode,
+        RatingButton,
         Scaffold,
-        StatusLayoutState;
+        StatusLayoutState,
+        StudyRating,
+        StudySessionConfig,
+        StudySessionController,
+        TextSize,
+        TextWeight,
+        textStyle;
 import 'package:boo_mondai/ui/view_onboarding/view_onboarding.controller.dart';
 import 'package:boo_mondai/ui/view_onboarding/widgets/page_dots.dart';
 import 'package:flutter/material.dart' hide Scaffold;
@@ -22,6 +31,12 @@ class ViewOnboardingPage extends SignalHookWidget {
     useEffect(() => controller.dispose, [controller]);
 
     final tokens = context.themeTokens<AppTokens>();
+    final ratingDemoController = useMemoized(
+      () => StudySessionController(
+        config: const StudySessionConfig.spacedRepitition(),
+      ),
+    );
+    useEffect(() => ratingDemoController.dispose, [ratingDemoController]);
     final currentPage = controller.currentPage.value;
     final isRequestingNotifications =
         controller.isRequestingNotifications.value;
@@ -56,22 +71,28 @@ class ViewOnboardingPage extends SignalHookWidget {
                     ),
                   ],
                 ),
-                const StatusLayoutState(
+                _buildMarkdownStatusPage(
+                  context: context,
                   icon: Icons.school_outlined,
-                  title: 'Drills and FSRS',
-                  message:
-                      'Drills help you practice a deck before review. FSRS is the scheduler that learns from your answers and brings cards back when they are worth seeing again.',
+                  title: 'Drills and FSRS Review',
+                  markdown:
+                      '## Drills are for first practice\n they help you memorize cards in the short term.\n\n## FSRS is the spaced repitition review scheduler for long term memorization\n After you rate a card, it estimates how stable that memory is and chooses when the card should return. Easy cards wait longer; shaky cards come back sooner.',
                 ),
-                const StatusLayoutState(
+                _buildRatingTooltipPage(
+                  context: context,
+                  ratingDemoController: ratingDemoController,
+                ),
+                _buildMarkdownStatusPage(
+                  context: context,
                   icon: Icons.auto_awesome_outlined,
-                  title: 'Welcome to BooMondai',
-                  message:
-                      'Build decks, study in small sessions, and let your review queue grow at a pace you can keep.',
+                  title: 'Are you ready?',
+                  markdown:
+                      '**Welome to BooMondai!**\n\nStart creating decks and your first cards to start your memorizing journey!',
                 ),
               ],
             ),
           ),
-          PageDots(index: currentPage, count: 3),
+          PageDots(index: currentPage, count: 4),
         ],
       ),
       bottomNavBar: BottomNavBar(
@@ -101,4 +122,111 @@ class ViewOnboardingPage extends SignalHookWidget {
       ),
     );
   }
+}
+
+Widget _buildMarkdownStatusPage({
+  required BuildContext context,
+  required IconData icon,
+  required String title,
+  required String markdown,
+}) {
+  final tokens = context.themeTokens<AppTokens>();
+
+  return Center(
+    child: SingleChildScrollView(
+      child: Column(
+        spacing: tokens.spaceLayoutGapSm,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 56, color: tokens.colorTextMuted),
+          SelectableText(
+            title,
+            textAlign: TextAlign.center,
+            style: textStyle.resolve(tokens, const [
+              TextSize.header2,
+              TextWeight.strong,
+            ]),
+          ),
+          MarkdownText(
+            data: markdown,
+            fitContent: false,
+            mode: MarkdownTextMode.previewSelectable,
+            defaultMarkdownAlignment: WrapAlignment.center,
+            baseTextStyle: textStyle.resolve(tokens, const [
+              TextSize.label,
+              TextWeight.body,
+            ]),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget _buildRatingTooltipPage({
+  required BuildContext context,
+  required StudySessionController ratingDemoController,
+}) {
+  final tokens = context.themeTokens<AppTokens>();
+
+  return Center(
+    child: SingleChildScrollView(
+      child: Column(
+        spacing: tokens.spaceLayoutGapMd,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.touch_app_outlined,
+            size: 56,
+            color: tokens.colorTextMuted,
+          ),
+          SelectableText(
+            'Hold for help',
+            textAlign: TextAlign.center,
+            style: textStyle.resolve(tokens, const [
+              TextSize.header2,
+              TextWeight.strong,
+            ]),
+          ),
+          MarkdownText(
+            data:
+                '**Press and hold** a button to view what it does.\n\nMost buttons work this way, so when you are having problems understanding what it does, *just press and hold!*',
+            mode: MarkdownTextMode.previewSelectable,
+            defaultMarkdownAlignment: WrapAlignment.center,
+            baseTextStyle: textStyle.resolve(tokens, const [
+              TextSize.label,
+              TextWeight.body,
+            ]),
+          ),
+          Row(
+            spacing: tokens.spaceLayoutGapSm,
+            children: [
+              RatingButton(
+                StudyRating.again,
+                ctrl: ratingDemoController,
+                onTap: () {},
+              ),
+              RatingButton(
+                StudyRating.hard,
+                ctrl: ratingDemoController,
+                onTap: () {},
+              ),
+              RatingButton(
+                StudyRating.good,
+                ctrl: ratingDemoController,
+                onTap: () {},
+              ),
+              RatingButton(
+                StudyRating.easy,
+                ctrl: ratingDemoController,
+                onTap: () {},
+              ),
+            ],
+          ),
+        ],
+      ),
+    ),
+  );
 }
