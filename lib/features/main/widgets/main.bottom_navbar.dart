@@ -7,9 +7,13 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
         ButtonColor,
+        ButtonPadding,
+        ButtonSize,
         Button,
         ButtonVariant,
         BottomNavBar,
+        LocalDB,
+        NotificationsController,
         Pages,
         SurfaceShape,
         SurfacePadding;
@@ -39,17 +43,27 @@ class MainBottomNavBar extends StatelessWidget implements PreferredSizeWidget {
           ...List.generate(pages.length, (index) {
             final page = pages[index];
             final isSelected = index == currentPageIndex;
+            final icon = isSelected && page.selectedIcon != null
+                ? page.selectedIcon!
+                : page.icon!;
 
             return Expanded(
-              child: Button.iconWithLabel(
-                color: ButtonColor.baseline,
-                variant: ButtonVariant.selectedElevatedText,
+              child: Button(
+                variants: const [
+                  ButtonColor.baseline,
+                  ButtonSize.iconWithLabel,
+                  ButtonPadding.iconWithLabel,
+                  ButtonVariant.selectedElevatedText,
+                ],
                 selected: isSelected,
-                icon: isSelected && page.selectedIcon != null
-                    ? page.selectedIcon!
-                    : page.icon!,
-
-                label: page.name,
+                axis: Axis.vertical,
+                leading: _bottomNavIcon(pageUrl: page.url, icon: icon),
+                child: Text(
+                  page.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                ),
                 onPressed: () => context.go(pages[index].url),
               ),
             );
@@ -58,4 +72,21 @@ class MainBottomNavBar extends StatelessWidget implements PreferredSizeWidget {
       ),
     );
   }
+}
+
+Widget _bottomNavIcon({required String pageUrl, required IconData icon}) {
+  if (pageUrl != Pages.home.url) return Icon(icon);
+
+  return StreamBuilder(
+    stream: LocalDB.notifications.watch(),
+    builder: (context, snapshot) {
+      final count = NotificationsController.instance.unreadCount;
+
+      return Badge(
+        isLabelVisible: count > 0,
+        label: Text(count > 99 ? '99+' : '$count'),
+        child: Icon(icon),
+      );
+    },
+  );
 }
