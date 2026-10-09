@@ -2,6 +2,7 @@ import 'package:boo_mondai/lib.barrel.dart'
     show
         AppTokens,
         Button,
+        NotificationIntent,
         NotificationBubbleColor,
         NotificationBubbleController,
         NotificationBubbleVariant,
@@ -36,14 +37,58 @@ class NotificationBubble extends SignalHookWidget {
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
     final controller = NotificationBubbleController.instance;
-    final notification = controller.activeNotification.value;
+    final notifications = controller.activeNotifications.value;
     final resolvedStyle = notificationBubbleStyle.resolve(tokens, [
       color,
       variant,
       ...variants,
     ]);
 
-    if (notification == null) return const SizedBox.shrink();
+    if (notifications.isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: resolvedStyle.transform != null
+          ? EdgeInsets.only(top: tokens.modalShadowOffset)
+          : EdgeInsets.zero,
+      child: Align(
+        alignment: Alignment.topRight,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            for (final notification in notifications)
+              _NotificationBubbleItem(
+                key: ValueKey(notification.id),
+                notification: notification,
+                minWidth: minWidth,
+                maxWidth: maxWidth,
+                resolvedStyle: resolvedStyle,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _NotificationBubbleItem extends StatelessWidget {
+  const _NotificationBubbleItem({
+    super.key,
+    required this.notification,
+    required this.minWidth,
+    required this.maxWidth,
+    required this.resolvedStyle,
+  });
+
+  final NotificationIntent notification;
+  final double minWidth;
+  final double maxWidth;
+  final dynamic resolvedStyle;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = context.themeTokens<AppTokens>();
+    final controller = NotificationBubbleController.instance;
 
     final route = controller.routeFor(notification);
     final canOpen = route != null && route.isNotEmpty;
@@ -58,7 +103,7 @@ class NotificationBubble extends SignalHookWidget {
             child: InkWell(
               onTap: canOpen
                   ? () async {
-                      await controller.dismiss();
+                      await controller.dismiss(notification);
                       if (!context.mounted) return;
                       context.push(route);
                     }
@@ -97,7 +142,7 @@ class NotificationBubble extends SignalHookWidget {
                     SizedBox(width: tokens.spaceLayoutGapSm),
                     Button.iconOnlySmall(
                       icon: Icons.close,
-                      onPressed: controller.dismiss,
+                      onPressed: () => controller.dismiss(notification),
                     ),
                   ],
                 ),
@@ -108,25 +153,14 @@ class NotificationBubble extends SignalHookWidget {
       ),
     );
 
-    return Padding(
-      padding: resolvedStyle.transform != null
-          ? EdgeInsets.only(top: tokens.modalShadowOffset)
-          : EdgeInsets.zero,
-      child:
-          Dismissible(
-                key: ValueKey(notification.id),
-                direction: DismissDirection.horizontal,
-                onDismissed: (_) => controller.dismiss(),
-                child: bubble,
-              )
-              .animate(key: ValueKey('notification-bubble-${notification.id}'))
-              .fadeIn(duration: 220.ms, curve: Curves.easeOutCubic)
-              .slideX(
-                begin: 1,
-                end: 0,
-                duration: 260.ms,
-                curve: Curves.easeOutCubic,
-              ),
-    );
+    return Dismissible(
+          key: ValueKey(notification.id),
+          direction: DismissDirection.horizontal,
+          onDismissed: (_) => controller.dismiss(notification),
+          child: bubble,
+        )
+        .animate(key: ValueKey('notification-bubble-${notification.id}'))
+        .fadeIn(duration: 220.ms, curve: Curves.easeOutCubic)
+        .slideX(begin: 1, end: 0, duration: 260.ms, curve: Curves.easeOutCubic);
   }
 }

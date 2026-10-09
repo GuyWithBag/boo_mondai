@@ -22,66 +22,52 @@ class NotificationBubbleController {
   static final instance = NotificationBubbleController();
 
   final NotificationsController notificationsController;
-  final activeNotification = signal<NotificationIntent?>(null);
+  final activeNotifications = listSignal<NotificationIntent>(const []);
 
   NotificationBubbleHandle? notificationBubbleHandle;
-  int? visibleNotificationId;
   bool isWaitingForOverlay = false;
   StreamSubscription<BoxEvent>? notificationsSubscription;
 
   void refresh() {
-    final unreadNotifications = notificationsController.unreadNotifications;
-    final currentVisibleNotification =
-        notificationBubbleHandle == null || visibleNotificationId == null
-        ? null
-        : unreadNotifications
-              .where((notification) => notification.id == visibleNotificationId)
-              .firstOrNull;
-    final nextNotification =
-        currentVisibleNotification ??
-        unreadNotifications
-            .where(
-              (notification) =>
-                  notification.showAsBubble && !notification.shown,
-            )
-            .firstOrNull;
+    final nextNotifications = notificationsController.unreadNotifications
+        .where(
+          (notification) => notification.showAsBubble && !notification.shown,
+        )
+        .toList();
 
-    activeNotification.value = nextNotification;
+    activeNotifications.value = nextNotifications;
 
-    if (nextNotification == null) {
+    if (nextNotifications.isEmpty) {
       removeNotificationBubble();
       return;
     }
 
-    showActiveNotificationBubble();
+    showActiveNotificationBubbles();
   }
 
-  void showActiveNotificationBubble() {
-    final notification = activeNotification.value;
-    if (notification == null || notification.shown) return;
-    if (visibleNotificationId == notification.id &&
-        notificationBubbleHandle != null) {
-      return;
-    }
+  void showActiveNotificationBubbles() {
+    final notifications = activeNotifications.value;
+    if (notifications.isEmpty) return;
+    if (notificationBubbleHandle != null) return;
 
     final overlay = rootNavigatorKey.currentState?.overlay;
     if (overlay == null || !overlay.mounted) {
-      deferShowActiveNotificationBubble();
+      deferShowActiveNotificationBubbles();
       return;
     }
 
-    removeNotificationBubble();
     notificationBubbleHandle = showNotificationBubble(overlay);
-    visibleNotificationId = notification.id;
-    unawaited(markShown(notification));
+    for (final notification in notifications) {
+      unawaited(markShown(notification));
+    }
   }
 
-  void deferShowActiveNotificationBubble() {
+  void deferShowActiveNotificationBubbles() {
     if (isWaitingForOverlay) return;
     isWaitingForOverlay = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       isWaitingForOverlay = false;
-      showActiveNotificationBubble();
+      showActiveNotificationBubbles();
     });
   }
 
@@ -96,7 +82,6 @@ class NotificationBubbleController {
   void removeNotificationBubble() {
     notificationBubbleHandle?.remove();
     notificationBubbleHandle = null;
-    visibleNotificationId = null;
     isWaitingForOverlay = false;
   }
 
@@ -107,10 +92,7 @@ class NotificationBubbleController {
             : null);
   }
 
-  Future<void> dismiss() async {
-    final notification = activeNotification.value;
-    if (notification == null) return;
-
+  Future<void> dismiss(NotificationIntent notification) async {
     await notificationsController.markRead(notification.id);
     refresh();
   }
@@ -118,6 +100,6 @@ class NotificationBubbleController {
   Future<void> dispose() async {
     removeNotificationBubble();
     await notificationsSubscription?.cancel();
-    activeNotification.dispose();
+    activeNotifications.dispose();
   }
 }
