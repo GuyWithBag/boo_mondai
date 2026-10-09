@@ -1,10 +1,21 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show CardTemplate, StudyRating, StudySessionAnswer;
+    show
+        CardTemplate,
+        FillInTheBlanksTemplate,
+        FlashcardTemplate,
+        IdentificationTemplate,
+        MatchingTypeTemplate,
+        MultipleChoiceTemplate,
+        StudyRating,
+        StudySessionAnswer,
+        WordScrambleTemplate;
 import 'package:boo_mondai/ui/study_session.card_stage/widgets/card_template.controller.dart';
 import 'package:signals_hooks/signals_hooks.dart';
 
 typedef CardTemplateControllerFactory =
     CardTemplateController Function(StudySessionCardStageController stage);
+
+typedef StudySessionSubmitHint = ({Duration delay, String message});
 
 class StudySessionCardStageController {
   StudySessionCardStageController({
@@ -27,6 +38,33 @@ class StudySessionCardStageController {
   final Signal<bool> canReveal;
 
   final Signal<bool> isRevealed = signal(false);
+
+  late final submitHint = computed<StudySessionSubmitHint?>(() {
+    final currentTemplate = template.value;
+    if (currentTemplate == null) return null;
+
+    return switch (currentTemplate) {
+      FlashcardTemplate() => (
+        delay: const Duration(seconds: 15),
+        message: 'Don\'t know this one? Show the answer and rate "Again".',
+      ),
+      FillInTheBlanksTemplate() || IdentificationTemplate() => (
+        delay: const Duration(seconds: 8),
+        message:
+            'Don\'t know this one? Submit an incorrect answer, then rate "Again".',
+      ),
+      MultipleChoiceTemplate() ||
+      WordScrambleTemplate() ||
+      MatchingTypeTemplate() => (
+        delay: const Duration(seconds: 10),
+        message: 'Don\'t know this one? Get it incorrect, then rate "Again".',
+      ),
+      _ => (
+        delay: const Duration(seconds: 10),
+        message: 'Don\'t know this one? Get it incorrect, then rate "Again".',
+      ),
+    };
+  });
 
   void reset({
     CardTemplate? template,
@@ -60,6 +98,7 @@ class StudySessionCardStageController {
   void dispose() {
     cardController?.dispose();
     template.dispose();
+    submitHint.dispose();
     canReveal.dispose();
     pendingRating.dispose();
     isRevealed.dispose();

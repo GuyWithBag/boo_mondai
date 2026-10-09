@@ -57,7 +57,7 @@ class StudySessionCardStage extends SignalHookWidget {
     final stepId = studySessionController.currentStep.value?.id;
     final isRevealed = cardStageController.isRevealed.value;
     final showSubmitHint = useState(false);
-    final submitHint = template == null ? null : submitHintFor(template);
+    final submitHint = cardStageController.submitHint.value;
 
     useEffect(() {
       showSubmitHint.value = false;
@@ -168,29 +168,5 @@ class StudySessionCardStage extends SignalHookWidget {
         );
       },
     );
-  }
-
-  ({Duration delay, String message}) submitHintFor(CardTemplate template) {
-    return switch (template) {
-      FlashcardTemplate() => (
-        delay: const Duration(seconds: 15),
-        message: 'Don\'t know this one? Show the answer and rate "Again".',
-      ),
-      FillInTheBlanksTemplate() || IdentificationTemplate() => (
-        delay: const Duration(seconds: 8),
-        message:
-            'Don\'t know this one? Submit an incorrect answer, then rate "Again".',
-      ),
-      MultipleChoiceTemplate() ||
-      WordScrambleTemplate() ||
-      MatchingTypeTemplate() => (
-        delay: const Duration(seconds: 10),
-        message: 'Don\'t know this one? Get it incorrect, then rate "Again".',
-      ),
-      _ => (
-        delay: const Duration(seconds: 10),
-        message: 'Don\'t know this one? Get it incorrect, then rate "Again".',
-      ),
-    };
   }
 }
