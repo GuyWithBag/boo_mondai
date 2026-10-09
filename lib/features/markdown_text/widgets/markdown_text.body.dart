@@ -21,16 +21,22 @@ class MarkdownTextBody extends StatelessWidget {
     required this.data,
     required this.selectable,
     required this.defaultAlignment,
+    this.fitContent = false,
     this.contentScale = 1,
     this.resolveAttachmentUrl,
+    this.imageConstraints,
+    this.audioConstraints,
   });
 
   final TextStyle resolvedTextStyle;
   final String data;
   final bool selectable;
   final WrapAlignment defaultAlignment;
+  final bool fitContent;
   final double contentScale;
   final MarkdownAttachmentUrlResolver? resolveAttachmentUrl;
+  final BoxConstraints? imageConstraints;
+  final BoxConstraints? audioConstraints;
 
   @override
   Widget build(BuildContext context) {
@@ -65,44 +71,49 @@ class MarkdownTextBody extends StatelessWidget {
       launchLink(href);
     }
 
-    return Align(
-      alignment: MarkdownAlignmentHelper.alignmentForWrapAlignment(
-        defaultAlignment,
-      ),
-      child: MarkdownBody(
-        data: data,
-        selectable: selectable,
-        fitContent: false,
-        blockSyntaxes: [MarkdownAlignedTextSyntax()],
-        inlineSyntaxes: [MarkdownImageSyntax()],
-        builders: {
-          MarkdownImageSyntax.tag: MarkdownImageElementBuilder(
-            resolveAttachmentUrl: resolveAttachmentUrl,
-          ),
-          MarkdownAlignedTextSyntax.tag: MarkdownAlignedText(
-            selectable: selectable,
-            onTapLink: onTapLink,
-            imageBuilder: (uri, title, alt) => MarkdownMedia(
-              uri: uri,
-              title: title,
-              alt: alt,
-              resolveAttachmentUrl: resolveAttachmentUrl,
-              contentScale: contentScale,
-            ),
-            styleSheet: styleSheet,
-          ),
-        },
-
-        onTapLink: onTapLink,
-        imageBuilder: (uri, title, alt) => MarkdownMedia(
-          uri: uri,
-          title: title,
-          alt: alt,
+    final body = MarkdownBody(
+      data: data,
+      selectable: selectable,
+      fitContent: fitContent,
+      blockSyntaxes: [MarkdownAlignedTextSyntax()],
+      inlineSyntaxes: [MarkdownImageSyntax()],
+      builders: {
+        MarkdownImageSyntax.tag: MarkdownImageElementBuilder(
           resolveAttachmentUrl: resolveAttachmentUrl,
+          imageConstraints: imageConstraints,
           contentScale: contentScale,
         ),
-        styleSheet: styleSheet,
+        MarkdownAlignedTextSyntax.tag: MarkdownAlignedText(
+          selectable: selectable,
+          onTapLink: onTapLink,
+          imageBuilder: (uri, title, alt) => MarkdownMedia(
+            uri: uri,
+            title: title,
+            alt: alt,
+            resolveAttachmentUrl: resolveAttachmentUrl,
+            contentScale: contentScale,
+            imageConstraints: imageConstraints,
+            audioConstraints: audioConstraints,
+          ),
+          styleSheet: styleSheet,
+        ),
+      },
+
+      onTapLink: onTapLink,
+      imageBuilder: (uri, title, alt) => MarkdownMedia(
+        uri: uri,
+        title: title,
+        alt: alt,
+        resolveAttachmentUrl: resolveAttachmentUrl,
+        contentScale: contentScale,
+        imageConstraints: imageConstraints,
+        audioConstraints: audioConstraints,
       ),
+      styleSheet: styleSheet,
     );
+
+    if (fitContent) return body;
+
+    return SizedBox(width: double.infinity, child: body);
   }
 }

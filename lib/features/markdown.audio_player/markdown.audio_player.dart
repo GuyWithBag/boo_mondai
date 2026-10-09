@@ -32,6 +32,7 @@ class MarkdownAudioPlayer extends SignalHookWidget {
     this.title,
     this.options,
     this.resolveAttachmentUrl,
+    this.constraints,
   });
 
   final Uri uri;
@@ -40,6 +41,7 @@ class MarkdownAudioPlayer extends SignalHookWidget {
   final String? options;
   final double contentScale;
   final MarkdownAttachmentUrlResolver? resolveAttachmentUrl;
+  final BoxConstraints? constraints;
 
   Future<void> _togglePlayback({
     required AudioPlayer player,
@@ -153,7 +155,7 @@ class MarkdownAudioPlayer extends SignalHookWidget {
       contentScale,
     );
 
-    return Surface(
+    final playerSurface = Surface(
       style: scaledContainerStyle,
       child: Column(
         children: [
@@ -204,6 +206,23 @@ class MarkdownAudioPlayer extends SignalHookWidget {
           ),
         ],
       ),
+    );
+    final resolvedConstraints = constraints;
+    if (resolvedConstraints == null) return playerSurface;
+
+    double scaleValue(double value) {
+      if (value.isInfinite) return value;
+      return ScaleHelper.getScaledValue(value, contentScale);
+    }
+
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        minWidth: scaleValue(resolvedConstraints.minWidth),
+        maxWidth: scaleValue(resolvedConstraints.maxWidth),
+        minHeight: scaleValue(resolvedConstraints.minHeight),
+        maxHeight: scaleValue(resolvedConstraints.maxHeight),
+      ),
+      child: playerSurface,
     );
   }
 

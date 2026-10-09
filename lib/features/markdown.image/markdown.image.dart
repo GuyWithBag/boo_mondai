@@ -4,7 +4,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         ImageHelper,
         MarkdownAttachmentUrlResolver,
         MarkdownHelper,
-        MarkdownImageOptions;
+        MarkdownImageOptions,
+        ScaleHelper;
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:markdown/markdown.dart' as md;
@@ -20,6 +21,8 @@ class MarkdownImage extends SignalHookWidget {
     this.alt,
     this.options,
     this.resolveAttachmentUrl,
+    this.constraints,
+    this.contentScale = 1,
   });
 
   final Uri uri;
@@ -27,6 +30,8 @@ class MarkdownImage extends SignalHookWidget {
   final String? alt;
   final String? options;
   final MarkdownAttachmentUrlResolver? resolveAttachmentUrl;
+  final BoxConstraints? constraints;
+  final double contentScale;
 
   @override
   Widget build(BuildContext context) {
@@ -46,16 +51,20 @@ class MarkdownImage extends SignalHookWidget {
 
     // ToDo: Needs rewrite. This basically takes the config from the text and translates it into image config.
     final imageOptions = MarkdownImageOptions.parse(title, rawOptions: options);
-    final child = ClipRRect(
-      borderRadius: BorderRadius.circular(tokens.radiusSurfaceXsm),
-      child: Image(
-        image: image,
-        // ToDo: Changed to hard coded values for now.
-        width: 250,
-        height: 250,
-        fit: imageOptions.fit,
-        semanticLabel: alt,
-        errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+    final resolvedConstraints = _scaledConstraints(
+      constraints ?? const BoxConstraints.tightFor(width: 250, height: 250),
+      contentScale,
+    );
+    final child = ConstrainedBox(
+      constraints: resolvedConstraints,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(tokens.radiusSurfaceXsm),
+        child: Image(
+          image: image,
+          fit: imageOptions.fit,
+          semanticLabel: alt,
+          errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+        ),
       ),
     );
 
@@ -71,9 +80,15 @@ class MarkdownImage extends SignalHookWidget {
 }
 
 class MarkdownImageElementBuilder extends MarkdownElementBuilder {
-  MarkdownImageElementBuilder({this.resolveAttachmentUrl});
+  MarkdownImageElementBuilder({
+    this.resolveAttachmentUrl,
+    this.imageConstraints,
+    this.contentScale = 1,
+  });
 
   final MarkdownAttachmentUrlResolver? resolveAttachmentUrl;
+  final BoxConstraints? imageConstraints;
+  final double contentScale;
 
   @override
   Widget visitElementAfterWithContext(
@@ -91,6 +106,22 @@ class MarkdownImageElementBuilder extends MarkdownElementBuilder {
       alt: element.attributes['alt'],
       options: element.attributes['options'],
       resolveAttachmentUrl: resolveAttachmentUrl,
+      constraints: imageConstraints,
+      contentScale: contentScale,
     );
   }
+}
+
+BoxConstraints _scaledConstraints(BoxConstraints constraints, double scale) {
+  double scaleValue(double value) {
+    if (value.isInfinite) return value;
+    return ScaleHelper.getScaledValue(value, scale);
+  }
+
+  return BoxConstraints(
+    minWidth: scaleValue(constraints.minWidth),
+    maxWidth: scaleValue(constraints.maxWidth),
+    minHeight: scaleValue(constraints.minHeight),
+    maxHeight: scaleValue(constraints.maxHeight),
+  );
 }

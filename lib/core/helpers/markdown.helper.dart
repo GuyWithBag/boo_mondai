@@ -27,6 +27,93 @@ import 'package:flutter_markdown_plus/flutter_markdown_plus.dart'
 import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
 
 abstract class MarkdownHelper {
+  static List<({bool isLineBreak, String text})> splitInlineMarkdownWords(
+    String data,
+  ) {
+    final chunks = <({bool isLineBreak, String text})>[];
+    final activeDelimiters = <String>[];
+    final word = StringBuffer();
+
+    void emitWord() {
+      if (word.isEmpty) return;
+
+      chunks.add((
+        isLineBreak: false,
+        text:
+            '${activeDelimiters.join()}$word'
+            '${activeDelimiters.reversed.join()}',
+      ));
+      word.clear();
+    }
+
+    void emitLineBreak() {
+      emitWord();
+      chunks.add((isLineBreak: true, text: ''));
+    }
+
+    String? delimiterAt(int index) {
+      if (data.startsWith('**', index)) return '**';
+      if (data.startsWith('__', index)) return '__';
+      if (data.startsWith('~~', index)) return '~~';
+      final character = data[index];
+      if (character == '*' || character == '_' || character == '`') {
+        return character;
+      }
+      return null;
+    }
+
+    for (var index = 0; index < data.length; index += 1) {
+      final character = data[index];
+
+      if (character == r'\' && index + 1 < data.length) {
+        word.write(character);
+        index += 1;
+        word.write(data[index]);
+        continue;
+      }
+
+      if (character == '\r' || character == '\n') {
+        if (character == '\r' &&
+            index + 1 < data.length &&
+            data[index + 1] == '\n') {
+          index += 1;
+        }
+        emitLineBreak();
+        continue;
+      }
+
+      if (character.trim().isEmpty) {
+        emitWord();
+        continue;
+      }
+
+      final delimiter = delimiterAt(index);
+      if (delimiter != null) {
+        final activeIndex = activeDelimiters.lastIndexOf(delimiter);
+        if (activeIndex == -1) {
+          if (data.indexOf(delimiter, index + delimiter.length) == -1) {
+            word.write(delimiter);
+            index += delimiter.length - 1;
+            continue;
+          }
+          emitWord();
+          activeDelimiters.add(delimiter);
+        } else {
+          emitWord();
+          activeDelimiters.removeAt(activeIndex);
+        }
+        index += delimiter.length - 1;
+        continue;
+      }
+
+      word.write(character);
+    }
+
+    emitWord();
+
+    return chunks;
+  }
+
   static Future<String?> resolveAttachmentUrl(Uri uri) async {
     final source = uri.toString().trim();
     if (source.isEmpty) return null;

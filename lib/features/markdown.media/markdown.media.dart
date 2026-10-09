@@ -15,6 +15,8 @@ class MarkdownMedia extends SignalHookWidget {
     this.options,
     this.resolveAttachmentUrl,
     this.contentScale = 1,
+    this.imageConstraints,
+    this.audioConstraints,
   });
 
   final Uri uri;
@@ -23,6 +25,8 @@ class MarkdownMedia extends SignalHookWidget {
   final String? options;
   final MarkdownAttachmentUrlResolver? resolveAttachmentUrl;
   final double contentScale;
+  final BoxConstraints? imageConstraints;
+  final BoxConstraints? audioConstraints;
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +49,7 @@ class MarkdownMedia extends SignalHookWidget {
         options: options,
         resolveAttachmentUrl: resolveAttachmentUrl,
         contentScale: contentScale,
+        constraints: audioConstraints,
       );
     } else if (MediaHelper.isImage(source)) {
       return MarkdownImage(
@@ -53,6 +58,8 @@ class MarkdownMedia extends SignalHookWidget {
         title: title,
         options: options,
         resolveAttachmentUrl: resolveAttachmentUrl,
+        constraints: imageConstraints,
+        contentScale: contentScale,
       );
     }
     return const SizedBox.shrink();

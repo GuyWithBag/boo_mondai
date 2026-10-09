@@ -39,8 +39,11 @@ class MarkdownText extends HookWidget {
     this.mode = MarkdownTextMode.raw,
     this.onTapLink,
     this.resolveAttachmentUrl,
+    this.imageConstraints,
+    this.audioConstraints,
     this.baseTextStyle,
     this.defaultMarkdownAlignment = WrapAlignment.center,
+    this.fitContent = false,
     this.contentScale = 1,
     this.useToolBar = true,
     this.allowAttachments = false,
@@ -67,6 +70,7 @@ class MarkdownText extends HookWidget {
   final Iterable<Object> variants;
   final MarkdownTextMode mode;
   final WrapAlignment defaultMarkdownAlignment;
+  final bool fitContent;
   final double contentScale;
   final bool useToolBar;
   final bool allowAttachments;
@@ -78,6 +82,8 @@ class MarkdownText extends HookWidget {
   /// Resolves markdown media URIs to displayable URLs. Used for images and by
   /// the default link launcher.
   final MarkdownAttachmentUrlResolver? resolveAttachmentUrl;
+  final BoxConstraints? imageConstraints;
+  final BoxConstraints? audioConstraints;
 
   @override
   Widget build(BuildContext context) {
@@ -102,16 +108,22 @@ class MarkdownText extends HookWidget {
         data: data,
         selectable: true,
         defaultAlignment: defaultMarkdownAlignment,
+        fitContent: fitContent,
         contentScale: contentScale,
         resolveAttachmentUrl: resolveAttachmentUrl,
+        imageConstraints: imageConstraints,
+        audioConstraints: audioConstraints,
       ),
       MarkdownTextMode.preview => MarkdownTextPreview(
         resolvedTextStyle: resolvedTextStyle,
         data: data,
         selectable: false,
         defaultAlignment: defaultMarkdownAlignment,
+        fitContent: fitContent,
         contentScale: contentScale,
         resolveAttachmentUrl: resolveAttachmentUrl,
+        imageConstraints: imageConstraints,
+        audioConstraints: audioConstraints,
       ),
       MarkdownTextMode.raw => Text(
         data,
@@ -158,7 +170,10 @@ class MarkdownText extends HookWidget {
         variants: variants,
         onTapLink: onTapLink,
         resolveAttachmentUrl: resolveAttachmentUrl,
+        imageConstraints: imageConstraints,
+        audioConstraints: audioConstraints,
         defaultMarkdownAlignment: defaultMarkdownAlignment,
+        fitContent: fitContent,
         contentScale: contentScale,
         useToolBar: useToolBar,
         allowAttachments: allowAttachments,

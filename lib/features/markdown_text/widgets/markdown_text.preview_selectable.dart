@@ -9,16 +9,22 @@ class MarkdownTextPreviewSelectable extends StatelessWidget {
     required this.data,
     required this.selectable,
     required this.defaultAlignment,
+    this.fitContent = false,
     this.contentScale = 1,
     this.resolveAttachmentUrl,
+    this.imageConstraints,
+    this.audioConstraints,
   });
 
   final TextStyle resolvedTextStyle;
   final String data;
   final bool selectable;
   final WrapAlignment defaultAlignment;
+  final bool fitContent;
   final double contentScale;
   final MarkdownAttachmentUrlResolver? resolveAttachmentUrl;
+  final BoxConstraints? imageConstraints;
+  final BoxConstraints? audioConstraints;
 
   @override
   Widget build(BuildContext context) {
@@ -27,8 +33,11 @@ class MarkdownTextPreviewSelectable extends StatelessWidget {
       data: data,
       selectable: false,
       defaultAlignment: defaultAlignment,
+      fitContent: fitContent,
       contentScale: contentScale,
       resolveAttachmentUrl: resolveAttachmentUrl,
+      imageConstraints: imageConstraints,
+      audioConstraints: audioConstraints,
     );
   }
 }

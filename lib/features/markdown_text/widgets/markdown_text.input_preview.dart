@@ -30,7 +30,10 @@ class MarkdownTextInputPreview extends HookWidget {
     required this.scrollPadding,
     this.onTapLink,
     this.resolveAttachmentUrl,
+    this.imageConstraints,
+    this.audioConstraints,
     required this.defaultMarkdownAlignment,
+    this.fitContent = false,
     required this.useToolBar,
     required this.allowAttachments,
   });
@@ -53,7 +56,10 @@ class MarkdownTextInputPreview extends HookWidget {
   final Iterable<Object> variants;
   final MarkdownTapLinkCallback? onTapLink;
   final MarkdownAttachmentUrlResolver? resolveAttachmentUrl;
+  final BoxConstraints? imageConstraints;
+  final BoxConstraints? audioConstraints;
   final WrapAlignment defaultMarkdownAlignment;
+  final bool fitContent;
   final double contentScale;
   final bool useToolBar;
   final bool allowAttachments;
@@ -153,12 +159,15 @@ class MarkdownTextInputPreview extends HookWidget {
         data: effectiveController.text,
         selectable: false,
         defaultAlignment: defaultMarkdownAlignment,
+        fitContent: fitContent,
         // Links in inputPreview use the caller's handler or the default
         // launcher. Tapping a link should NOT switch to edit mode, so
         // the GestureDetector above won't interfere because MarkdownBody
         // calls onTapLink and stops the gesture from bubbling.
         contentScale: contentScale,
         resolveAttachmentUrl: resolveAttachmentUrl,
+        imageConstraints: imageConstraints,
+        audioConstraints: audioConstraints,
       ),
     );
   }
