@@ -1,0 +1,626 @@
+{
+  "type": "Deck",
+  "title": "Set B Deck",
+  "templates": [
+    {
+      "type": "multiple_choice",
+      "question_prompt": "What does 谢谢 [xièxiè] mean?",
+      "options": [
+        {
+          "option_text": "Please",
+          "is_correct": false
+        },
+        {
+          "option_text": "Thank you",
+          "is_correct": true
+        },
+        {
+          "option_text": "Sorry",
+          "is_correct": false
+        },
+        {
+          "option_text": "Goodbye",
+          "is_correct": false
+        }
+      ]
+    },
+    {
+      "type": "multiple_choice",
+      "question_prompt": "What does 再见 [zàijiàn] mean?",
+      "options": [
+        {
+          "option_text": "Hello",
+          "is_correct": false
+        },
+        {
+          "option_text": "Thank you",
+          "is_correct": false
+        },
+        {
+          "option_text": "Sorry",
+          "is_correct": false
+        },
+        {
+          "option_text": "Goodbye",
+          "is_correct": true
+        }
+      ]
+    },
+    {
+      "type": "multiple_choice",
+      "question_prompt": "What does 请 [qǐng] mean?",
+      "options": [
+        {
+          "option_text": "Please",
+          "is_correct": true
+        },
+        {
+          "option_text": "Thank you",
+          "is_correct": false
+        },
+        {
+          "option_text": "Sorry",
+          "is_correct": false
+        },
+        {
+          "option_text": "Goodbye",
+          "is_correct": false
+        }
+      ]
+    },
+    {
+      "type": "multiple_choice",
+      "question_prompt": "What does 有 [yǒu] mean?",
+      "options": [
+        {
+          "option_text": "To have",
+          "is_correct": true
+        },
+        {
+          "option_text": "To be",
+          "is_correct": false
+        },
+        {
+          "option_text": "To want",
+          "is_correct": false
+        },
+        {
+          "option_text": "To like",
+          "is_correct": false
+        }
+      ]
+    },
+    {
+      "type": "multiple_choice",
+      "question_prompt": "What does 没有 [méiyǒu] mean?",
+      "options": [
+        {
+          "option_text": "To have",
+          "is_correct": false
+        },
+        {
+          "option_text": "Don't have, there isn't",
+          "is_correct": true
+        },
+        {
+          "option_text": "To want",
+          "is_correct": false
+        },
+        {
+          "option_text": "To like",
+          "is_correct": false
+        }
+      ]
+    },
+    {
+      "type": "identification",
+      "prompt_text": "What does 多少 [duōshao] mean?",
+      "answers": [
+        {
+          "value": "How many, how much",
+          "casing_type": "any"
+        }
+      ]
+    },
+    {
+      "type": "identification",
+      "prompt_text": "What does 怎么 [zěnme] mean?",
+      "answers": [
+        {
+          "value": "How",
+          "casing_type": "any"
+        }
+      ]
+    },
+    {
+      "type": "identification",
+      "prompt_text": "What does 现在 [xiànzài] mean?",
+      "answers": [
+        {
+          "value": "Now",
+          "casing_type": "any"
+        }
+      ]
+    },
+    {
+      "type": "identification",
+      "prompt_text": "What does 喜欢 [xǐhuan] mean?",
+      "answers": [
+        {
+          "value": "To like",
+          "casing_type": "any"
+        }
+      ]
+    },
+    {
+      "type": "identification",
+      "prompt_text": "What does 想 [xiǎng] mean?",
+      "answers": [
+        {
+          "value": "To want, would like",
+          "casing_type": "any"
+        }
+      ]
+    },
+    {
+      "type": "flashcard",
+      "front_text": "![Audio](classmate.mp3)",
+      "back_text": "同学\ntóngxué\nClassmate",
+      "direction": "both"
+    },
+    {
+      "type": "flashcard",
+      "front_text": "![Audio](doctor.mp3)",
+      "back_text": "医生\nyīshēng\nDoctor",
+      "direction": "both"
+    },
+    {
+      "type": "flashcard",
+      "front_text": "![Audio](sir.mp3)",
+      "back_text": "先生\nxiānsheng\nMr., sir",
+      "direction": "both"
+    },
+    {
+      "type": "flashcard",
+      "front_text": "![Audio](miss.mp3)",
+      "back_text": "小姐\nxiǎojiě\nMiss, young lady",
+      "direction": "both"
+    },
+    {
+      "type": "flashcard",
+      "front_text": "![Audio](son.mp3)",
+      "back_text": "儿子\nérzi\nSon",
+      "direction": "both"
+    },
+    {
+      "type": "matching_type",
+      "values": [
+        {
+          "text": "![Audio](daughter.mp3)",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "match_position": {
+            "x": 1,
+            "y": 0
+          }
+        },
+        {
+          "text": "女儿\nnǚ'ér\nDaughter",
+          "position": {
+            "x": 1,
+            "y": 0
+          },
+          "match_position": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        {
+          "text": "![Audio](name.mp3)",
+          "position": {
+            "x": 0,
+            "y": 1
+          },
+          "match_position": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        {
+          "text": "名字\nmíngzi\nName",
+          "position": {
+            "x": 1,
+            "y": 1
+          },
+          "match_position": {
+            "x": 0,
+            "y": 1
+          }
+        },
+        {
+          "text": "![Audio](chinese.mp3)",
+          "position": {
+            "x": 0,
+            "y": 2
+          },
+          "match_position": {
+            "x": 1,
+            "y": 2
+          }
+        },
+        {
+          "text": "汉语\nHànyǔ\nChinese (language)",
+          "position": {
+            "x": 1,
+            "y": 2
+          },
+          "match_position": {
+            "x": 0,
+            "y": 2
+          }
+        }
+      ]
+    },
+    {
+      "type": "matching_type",
+      "values": [
+        {
+          "text": "![Audio](name.mp3)",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "match_position": {
+            "x": 1,
+            "y": 0
+          }
+        },
+        {
+          "text": "名字\nmíngzi\nName",
+          "position": {
+            "x": 1,
+            "y": 0
+          },
+          "match_position": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        {
+          "text": "![Audio](chinese.mp3)",
+          "position": {
+            "x": 0,
+            "y": 1
+          },
+          "match_position": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        {
+          "text": "汉语\nHànyǔ\nChinese (language)",
+          "position": {
+            "x": 1,
+            "y": 1
+          },
+          "match_position": {
+            "x": 0,
+            "y": 1
+          }
+        },
+        {
+          "text": "![Audio](china.mp3)",
+          "position": {
+            "x": 0,
+            "y": 2
+          },
+          "match_position": {
+            "x": 1,
+            "y": 2
+          }
+        },
+        {
+          "text": "中国\nZhōngguó\nChina",
+          "position": {
+            "x": 1,
+            "y": 2
+          },
+          "match_position": {
+            "x": 0,
+            "y": 2
+          }
+        }
+      ]
+    },
+    {
+      "type": "matching_type",
+      "values": [
+        {
+          "text": "![Audio](chinese.mp3)",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "match_position": {
+            "x": 1,
+            "y": 0
+          }
+        },
+        {
+          "text": "汉语\nHànyǔ\nChinese (language)",
+          "position": {
+            "x": 1,
+            "y": 0
+          },
+          "match_position": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        {
+          "text": "![Audio](china.mp3)",
+          "position": {
+            "x": 0,
+            "y": 1
+          },
+          "match_position": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        {
+          "text": "中国\nZhōngguó\nChina",
+          "position": {
+            "x": 1,
+            "y": 1
+          },
+          "match_position": {
+            "x": 0,
+            "y": 1
+          }
+        },
+        {
+          "text": "![Audio](beijing.mp3)",
+          "position": {
+            "x": 0,
+            "y": 2
+          },
+          "match_position": {
+            "x": 1,
+            "y": 2
+          }
+        },
+        {
+          "text": "北京\nBěijīng\nBeijing",
+          "position": {
+            "x": 1,
+            "y": 2
+          },
+          "match_position": {
+            "x": 0,
+            "y": 2
+          }
+        }
+      ]
+    },
+    {
+      "type": "matching_type",
+      "values": [
+        {
+          "text": "![Audio](china.mp3)",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "match_position": {
+            "x": 1,
+            "y": 0
+          }
+        },
+        {
+          "text": "中国\nZhōngguó\nChina",
+          "position": {
+            "x": 1,
+            "y": 0
+          },
+          "match_position": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        {
+          "text": "![Audio](beijing.mp3)",
+          "position": {
+            "x": 0,
+            "y": 1
+          },
+          "match_position": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        {
+          "text": "北京\nBěijīng\nBeijing",
+          "position": {
+            "x": 1,
+            "y": 1
+          },
+          "match_position": {
+            "x": 0,
+            "y": 1
+          }
+        },
+        {
+          "text": "谢谢 [xièxiè]",
+          "position": {
+            "x": 0,
+            "y": 2
+          },
+          "match_position": {
+            "x": 1,
+            "y": 2
+          }
+        },
+        {
+          "text": "Thank you",
+          "position": {
+            "x": 1,
+            "y": 2
+          },
+          "match_position": {
+            "x": 0,
+            "y": 2
+          }
+        }
+      ]
+    },
+    {
+      "type": "matching_type",
+      "values": [
+        {
+          "text": "![Audio](beijing.mp3)",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "match_position": {
+            "x": 1,
+            "y": 0
+          }
+        },
+        {
+          "text": "北京\nBěijīng\nBeijing",
+          "position": {
+            "x": 1,
+            "y": 0
+          },
+          "match_position": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        {
+          "text": "谢谢 [xièxiè]",
+          "position": {
+            "x": 0,
+            "y": 1
+          },
+          "match_position": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        {
+          "text": "Thank you",
+          "position": {
+            "x": 1,
+            "y": 1
+          },
+          "match_position": {
+            "x": 0,
+            "y": 1
+          }
+        },
+        {
+          "text": "再见 [zàijiàn]",
+          "position": {
+            "x": 0,
+            "y": 2
+          },
+          "match_position": {
+            "x": 1,
+            "y": 2
+          }
+        },
+        {
+          "text": "Goodbye",
+          "position": {
+            "x": 1,
+            "y": 2
+          },
+          "match_position": {
+            "x": 0,
+            "y": 2
+          }
+        }
+      ]
+    },
+    {
+      "type": "fill_in_the_blanks",
+      "prompt_text": "![Image](cup.webp)\nZhè shì wǒ de bēizi.\nMeaning: This is my cup.",
+      "answer_keys": [
+        {
+          "value": "bēizi",
+          "casing_type": "any",
+          "order": 0
+        }
+      ]
+    },
+    {
+      "type": "fill_in_the_blanks",
+      "prompt_text": "![Image](desk.webp)\nShū zài zhuōzi shàng.\nMeaning: The book is on the table.",
+      "answer_keys": [
+        {
+          "value": "zhuōzi",
+          "casing_type": "any",
+          "order": 0
+        }
+      ]
+    },
+    {
+      "type": "fill_in_the_blanks",
+      "prompt_text": "![Image](chair.webp)\nWǒ zuò zài yǐzi shàng.\nMeaning: I sit on the chair.",
+      "answer_keys": [
+        {
+          "value": "yǐzi",
+          "casing_type": "any",
+          "order": 0
+        }
+      ]
+    },
+    {
+      "type": "fill_in_the_blanks",
+      "prompt_text": "![Image](computer.webp)\nWǒ yǒu yì tái diànnǎo.\nMeaning: I have a computer.",
+      "answer_keys": [
+        {
+          "value": "diànnǎo",
+          "casing_type": "any",
+          "order": 0
+        }
+      ]
+    },
+    {
+      "type": "fill_in_the_blanks",
+      "prompt_text": "![Image](tv.webp)\nWǒ kàn diànshì.\nMeaning: I watch television.",
+      "answer_keys": [
+        {
+          "value": "diànshì",
+          "casing_type": "any",
+          "order": 0
+        }
+      ]
+    },
+    {
+      "type": "word_scramble",
+      "sentence_to_scramble": "Wǒ kàn diànyǐng"
+    },
+    {
+      "type": "word_scramble",
+      "sentence_to_scramble": "Wǒ zuò fēijī qù Běijīng"
+    },
+    {
+      "type": "word_scramble",
+      "sentence_to_scramble": "Wǒ zuò chūzūchē"
+    },
+    {
+      "type": "word_scramble",
+      "sentence_to_scramble": "Zhè shì wǒ de yīfu"
+    },
+    {
+      "type": "word_scramble",
+      "sentence_to_scramble": "Wǒ xǐhuan chī shuǐguǒ"
+    }
+  ]
+}

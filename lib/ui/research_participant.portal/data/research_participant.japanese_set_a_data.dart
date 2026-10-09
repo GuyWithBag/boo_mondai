@@ -26,370 +26,663 @@ class ResearchParticipantJapaneseSetAData extends ResearchParticipantData {
   static const attachmentAssetDirectory =
       'assets/temporary/japanese_set_a_attachments/';
 
-  static const multipleChoiceQuestions = [
-    (
-      questionPrompt: 'What does みんなさん [Minnasan] mean?',
-      options: [
-        (optionText: 'you', isCorrect: false),
-        (optionText: 'that person', isCorrect: false),
-        (optionText: 'everyone', isCorrect: true),
-        (optionText: 'us', isCorrect: false),
-      ],
-    ),
-    (
-      questionPrompt: 'What does ほん [hon] mean?',
-      options: [
-        (optionText: 'book', isCorrect: true),
-        (optionText: 'magazine', isCorrect: false),
-        (optionText: 'notebook', isCorrect: false),
-        (optionText: 'newspaper', isCorrect: false),
-      ],
-    ),
-    (
-      questionPrompt: 'What does ここ [koko] mean?',
-      options: [
-        (optionText: 'there', isCorrect: false),
-        (optionText: 'here', isCorrect: true),
-        (optionText: 'where', isCorrect: false),
-        (optionText: 'over there', isCorrect: false),
-      ],
-    ),
-    (
-      questionPrompt: 'What does いま [ima] mean?',
-      options: [
-        (optionText: 'today', isCorrect: false),
-        (optionText: 'now', isCorrect: true),
-        (optionText: 'tomorrow', isCorrect: false),
-        (optionText: 'yesterday', isCorrect: false),
-      ],
-    ),
-    (
-      questionPrompt: 'What does いきます [ikimasu] mean?',
-      options: [
-        (optionText: 'return', isCorrect: false),
-        (optionText: 'come', isCorrect: false),
-        (optionText: 'go', isCorrect: true),
-        (optionText: 'eat', isCorrect: false),
-      ],
-    ),
-  ];
-
-  static const identificationQuestions = [
-    (promptText: 'What does みず [mizu] mean?', answer: 'water'),
-    (promptText: 'What does あげます [agemasu] mean?', answer: 'give'),
-    (promptText: 'What does おおきい [ookii] mean?', answer: 'big'),
-    (promptText: 'What does わかります [wakarimasu] mean?', answer: 'understand'),
-    (promptText: 'What does いぬ [inu] mean?', answer: 'dog'),
-  ];
-
-  static const flashcards = [
-    (frontText: 'かさ', backText: 'umbrella'),
-    (frontText: 'すし ![food](food.mp3)', backText: 'sushi'),
-    (frontText: 'さとう', backText: 'sugar'),
-    (frontText: 'りんご', backText: 'apple'),
-    (frontText: 'ねこ', backText: 'cat'),
-  ];
-
-  static const matchingValueGroups = [
-    [
-      MatchingTypeValue(
-        text: 'じてんしゃ',
-        position: Vector2Hive(0, 0),
-        matchPosition: Vector2Hive(1, 0),
-      ),
-      MatchingTypeValue(
-        text: 'bicycle',
-        position: Vector2Hive(1, 0),
-        matchPosition: Vector2Hive(0, 0),
-      ),
-      MatchingTypeValue(
-        text: 'いす',
-        position: Vector2Hive(0, 1),
-        matchPosition: Vector2Hive(1, 1),
-      ),
-      MatchingTypeValue(
-        text: 'chair',
-        position: Vector2Hive(1, 1),
-        matchPosition: Vector2Hive(0, 1),
-      ),
-      MatchingTypeValue(
-        text: 'とけい',
-        position: Vector2Hive(0, 2),
-        matchPosition: Vector2Hive(1, 2),
-      ),
-      MatchingTypeValue(
-        text: 'clock',
-        position: Vector2Hive(1, 2),
-        matchPosition: Vector2Hive(0, 2),
-      ),
-    ],
-    [
-      MatchingTypeValue(
-        text: 'いす',
-        position: Vector2Hive(0, 0),
-        matchPosition: Vector2Hive(1, 0),
-      ),
-      MatchingTypeValue(
-        text: 'chair',
-        position: Vector2Hive(1, 0),
-        matchPosition: Vector2Hive(0, 0),
-      ),
-      MatchingTypeValue(
-        text: 'とけい',
-        position: Vector2Hive(0, 1),
-        matchPosition: Vector2Hive(1, 1),
-      ),
-      MatchingTypeValue(
-        text: 'clock',
-        position: Vector2Hive(1, 1),
-        matchPosition: Vector2Hive(0, 1),
-      ),
-      MatchingTypeValue(
-        text: 'かばん',
-        position: Vector2Hive(0, 2),
-        matchPosition: Vector2Hive(1, 2),
-      ),
-      MatchingTypeValue(
-        text: 'bag',
-        position: Vector2Hive(1, 2),
-        matchPosition: Vector2Hive(0, 2),
-      ),
-    ],
-    [
-      MatchingTypeValue(
-        text: 'とけい',
-        position: Vector2Hive(0, 0),
-        matchPosition: Vector2Hive(1, 0),
-      ),
-      MatchingTypeValue(
-        text: 'clock',
-        position: Vector2Hive(1, 0),
-        matchPosition: Vector2Hive(0, 0),
-      ),
-      MatchingTypeValue(
-        text: 'かばん',
-        position: Vector2Hive(0, 1),
-        matchPosition: Vector2Hive(1, 1),
-      ),
-      MatchingTypeValue(
-        text: 'bag',
-        position: Vector2Hive(1, 1),
-        matchPosition: Vector2Hive(0, 1),
-      ),
-      MatchingTypeValue(
-        text: 'えんぴつ',
-        position: Vector2Hive(0, 2),
-        matchPosition: Vector2Hive(1, 2),
-      ),
-      MatchingTypeValue(
-        text: 'pencil',
-        position: Vector2Hive(1, 2),
-        matchPosition: Vector2Hive(0, 2),
-      ),
-    ],
-    [
-      MatchingTypeValue(
-        text: 'かばん',
-        position: Vector2Hive(0, 0),
-        matchPosition: Vector2Hive(1, 0),
-      ),
-      MatchingTypeValue(
-        text: 'bag',
-        position: Vector2Hive(1, 0),
-        matchPosition: Vector2Hive(0, 0),
-      ),
-      MatchingTypeValue(
-        text: 'えんぴつ',
-        position: Vector2Hive(0, 1),
-        matchPosition: Vector2Hive(1, 1),
-      ),
-      MatchingTypeValue(
-        text: 'pencil',
-        position: Vector2Hive(1, 1),
-        matchPosition: Vector2Hive(0, 1),
-      ),
-      MatchingTypeValue(
-        text: 'みんなさん [Minnasan]',
-        position: Vector2Hive(0, 2),
-        matchPosition: Vector2Hive(1, 2),
-      ),
-      MatchingTypeValue(
-        text: 'everyone',
-        position: Vector2Hive(1, 2),
-        matchPosition: Vector2Hive(0, 2),
-      ),
-    ],
-    [
-      MatchingTypeValue(
-        text: 'えんぴつ',
-        position: Vector2Hive(0, 0),
-        matchPosition: Vector2Hive(1, 0),
-      ),
-      MatchingTypeValue(
-        text: 'pencil',
-        position: Vector2Hive(1, 0),
-        matchPosition: Vector2Hive(0, 0),
-      ),
-      MatchingTypeValue(
-        text: 'みんなさん [Minnasan]',
-        position: Vector2Hive(0, 1),
-        matchPosition: Vector2Hive(1, 1),
-      ),
-      MatchingTypeValue(
-        text: 'everyone',
-        position: Vector2Hive(1, 1),
-        matchPosition: Vector2Hive(0, 1),
-      ),
-      MatchingTypeValue(
-        text: 'ほん [hon]',
-        position: Vector2Hive(0, 2),
-        matchPosition: Vector2Hive(1, 2),
-      ),
-      MatchingTypeValue(
-        text: 'book',
-        position: Vector2Hive(1, 2),
-        matchPosition: Vector2Hive(0, 2),
-      ),
-    ],
-  ];
-
-  static const fillInTheBlanksQuestions = [
-    (
-      promptText: 'Watashi wa ____ ni norimasu.\nMeaning: I ride in a car.',
-      answer: 'kuruma',
-    ),
-    (
-      promptText: 'Kore wa ____ desu.\nMeaning: This is a telephone.',
-      answer: 'denwa',
-    ),
-    (
-      promptText: 'Watashi wa ____ o yomimasu.\nMeaning: I read a newspaper.',
-      answer: 'shinbun',
-    ),
-    (
-      promptText: 'Watashi wa ____ e ikimasu.\nMeaning: I go to school.',
-      answer: 'gakkou',
-    ),
-    (
-      promptText: 'Kore wa ____ desu.\nMeaning: This is food.',
-      answer: 'tabemono',
-    ),
-  ];
-
-  static const wordScrambleSentences = [
-    'Kore wa nomimono desu',
-    'Watashi wa kutsu o hakimasu',
-    'Tori wa sora o tobimasu',
-    'Watashi wa sakana o tabemasu',
-    'Watashi wa densha ni norimasu',
-  ];
-
   @override
   String get participantDeckId => dataDeckId;
 
   @override
   Future<void> initialize(Profile profile) async {
-    const multipleChoiceOffset = 0;
-    const identificationOffset = 5;
-    const flashcardOffset = 10;
-    const matchingTypeOffset = 15;
-    const fillInTheBlanksOffset = 20;
-    const wordScrambleOffset = 25;
-
     final now = DateTime.now();
     final deck = Deck(
       id: dataDeckId,
       createdAt: now,
       updatedAt: now,
       profileId: profile.id,
-      title: 'Japanese Set A',
+      title: "Japanese Set A",
       isPremade: true,
       isEditable: false,
     );
 
     final templates = <CardTemplate>[
-      for (final entry in multipleChoiceQuestions.indexed)
-        MultipleChoiceTemplate(
-          id: multipleChoiceTemplateId(entry.$1),
-          deckId: dataDeckId,
-          sortOrder: multipleChoiceOffset + entry.$1,
-          createdAt: now,
-          updatedAt: now,
-          questionPrompt: entry.$2.questionPrompt,
-          options: [
-            for (final optionEntry in entry.$2.options.indexed)
-              MultipleChoiceOption(
-                id: multipleChoiceOptionId(entry.$1, optionEntry.$1),
-                templateId: multipleChoiceTemplateId(entry.$1),
-                optionText: optionEntry.$2.optionText,
-                isCorrect: optionEntry.$2.isCorrect,
-                displayOrder: optionEntry.$1,
-              ),
-          ],
-        ),
-      for (final entry in identificationQuestions.indexed)
-        IdentificationTemplate(
-          id: identificationTemplateId(entry.$1),
-          deckId: dataDeckId,
-          sortOrder: identificationOffset + entry.$1,
-          createdAt: now,
-          updatedAt: now,
-          promptText: entry.$2.promptText,
-          answers: [
-            IdentificationAnswerKey(
-              id: identificationAnswerId(entry.$1),
-              templateId: identificationTemplateId(entry.$1),
-              displayOrder: 0,
-              value: entry.$2.answer,
-              casingType: CasingType.any,
-            ),
-          ],
-        ),
-      for (final entry in flashcards.indexed)
-        FlashcardTemplate(
-          id: flashcardTemplateId(entry.$1),
-          deckId: dataDeckId,
-          sortOrder: flashcardOffset + entry.$1,
-          createdAt: now,
-          updatedAt: now,
-          frontText: entry.$2.frontText,
-          backText: entry.$2.backText,
-          direction: CardTemplateDirection.both,
-        ),
-      for (final entry in matchingValueGroups.indexed)
-        MatchingTypeTemplate(
-          id: matchingTypeTemplateId(entry.$1),
-          deckId: dataDeckId,
-          sortOrder: matchingTypeOffset + entry.$1,
-          createdAt: now,
-          updatedAt: now,
-          values: entry.$2,
-        ),
-      for (final entry in fillInTheBlanksQuestions.indexed)
-        FillInTheBlanksTemplate(
-          id: fillInTheBlanksTemplateId(entry.$1),
-          deckId: dataDeckId,
-          sortOrder: fillInTheBlanksOffset + entry.$1,
-          createdAt: now,
-          updatedAt: now,
-          promptText: entry.$2.promptText,
-          answerKeys: [
-            FillInTheBlankAnswerKey(
-              value: entry.$2.answer,
-              casingType: CasingType.any,
-              order: 0,
-            ),
-          ],
-        ),
-      for (final entry in wordScrambleSentences.indexed)
-        WordScrambleTemplate(
-          id: wordScrambleTemplateId(entry.$1),
-          deckId: dataDeckId,
-          sortOrder: wordScrambleOffset + entry.$1,
-          createdAt: now,
-          updatedAt: now,
-          sentenceToScramble: entry.$2,
-        ),
+      MultipleChoiceTemplate(
+        id: '${idPrefix}template_0',
+        deckId: dataDeckId,
+        sortOrder: 0,
+        createdAt: now,
+        updatedAt: now,
+        questionPrompt: "What does みんなさん [Minnasan] mean?",
+        options: const [
+          MultipleChoiceOption(
+            id: '${idPrefix}multiple_choice_option_0_0',
+            templateId: '${idPrefix}template_0',
+            optionText: "you",
+            isCorrect: false,
+            displayOrder: 0,
+          ),
+          MultipleChoiceOption(
+            id: '${idPrefix}multiple_choice_option_0_1',
+            templateId: '${idPrefix}template_0',
+            optionText: "that person",
+            isCorrect: false,
+            displayOrder: 1,
+          ),
+          MultipleChoiceOption(
+            id: '${idPrefix}multiple_choice_option_0_2',
+            templateId: '${idPrefix}template_0',
+            optionText: "everyone",
+            isCorrect: true,
+            displayOrder: 2,
+          ),
+          MultipleChoiceOption(
+            id: '${idPrefix}multiple_choice_option_0_3',
+            templateId: '${idPrefix}template_0',
+            optionText: "us",
+            isCorrect: false,
+            displayOrder: 3,
+          ),
+        ],
+      ),
+      MultipleChoiceTemplate(
+        id: '${idPrefix}template_1',
+        deckId: dataDeckId,
+        sortOrder: 1,
+        createdAt: now,
+        updatedAt: now,
+        questionPrompt: "What does ほん [hon] mean?",
+        options: const [
+          MultipleChoiceOption(
+            id: '${idPrefix}multiple_choice_option_1_0',
+            templateId: '${idPrefix}template_1',
+            optionText: "book",
+            isCorrect: true,
+            displayOrder: 0,
+          ),
+          MultipleChoiceOption(
+            id: '${idPrefix}multiple_choice_option_1_1',
+            templateId: '${idPrefix}template_1',
+            optionText: "magazine",
+            isCorrect: false,
+            displayOrder: 1,
+          ),
+          MultipleChoiceOption(
+            id: '${idPrefix}multiple_choice_option_1_2',
+            templateId: '${idPrefix}template_1',
+            optionText: "notebook",
+            isCorrect: false,
+            displayOrder: 2,
+          ),
+          MultipleChoiceOption(
+            id: '${idPrefix}multiple_choice_option_1_3',
+            templateId: '${idPrefix}template_1',
+            optionText: "newspaper",
+            isCorrect: false,
+            displayOrder: 3,
+          ),
+        ],
+      ),
+      MultipleChoiceTemplate(
+        id: '${idPrefix}template_2',
+        deckId: dataDeckId,
+        sortOrder: 2,
+        createdAt: now,
+        updatedAt: now,
+        questionPrompt: "What does ここ [koko] mean?",
+        options: const [
+          MultipleChoiceOption(
+            id: '${idPrefix}multiple_choice_option_2_0',
+            templateId: '${idPrefix}template_2',
+            optionText: "there",
+            isCorrect: false,
+            displayOrder: 0,
+          ),
+          MultipleChoiceOption(
+            id: '${idPrefix}multiple_choice_option_2_1',
+            templateId: '${idPrefix}template_2',
+            optionText: "here",
+            isCorrect: true,
+            displayOrder: 1,
+          ),
+          MultipleChoiceOption(
+            id: '${idPrefix}multiple_choice_option_2_2',
+            templateId: '${idPrefix}template_2',
+            optionText: "where",
+            isCorrect: false,
+            displayOrder: 2,
+          ),
+          MultipleChoiceOption(
+            id: '${idPrefix}multiple_choice_option_2_3',
+            templateId: '${idPrefix}template_2',
+            optionText: "over there",
+            isCorrect: false,
+            displayOrder: 3,
+          ),
+        ],
+      ),
+      MultipleChoiceTemplate(
+        id: '${idPrefix}template_3',
+        deckId: dataDeckId,
+        sortOrder: 3,
+        createdAt: now,
+        updatedAt: now,
+        questionPrompt: "What does いま [ima] mean?",
+        options: const [
+          MultipleChoiceOption(
+            id: '${idPrefix}multiple_choice_option_3_0',
+            templateId: '${idPrefix}template_3',
+            optionText: "today",
+            isCorrect: false,
+            displayOrder: 0,
+          ),
+          MultipleChoiceOption(
+            id: '${idPrefix}multiple_choice_option_3_1',
+            templateId: '${idPrefix}template_3',
+            optionText: "now",
+            isCorrect: true,
+            displayOrder: 1,
+          ),
+          MultipleChoiceOption(
+            id: '${idPrefix}multiple_choice_option_3_2',
+            templateId: '${idPrefix}template_3',
+            optionText: "tomorrow",
+            isCorrect: false,
+            displayOrder: 2,
+          ),
+          MultipleChoiceOption(
+            id: '${idPrefix}multiple_choice_option_3_3',
+            templateId: '${idPrefix}template_3',
+            optionText: "yesterday",
+            isCorrect: false,
+            displayOrder: 3,
+          ),
+        ],
+      ),
+      MultipleChoiceTemplate(
+        id: '${idPrefix}template_4',
+        deckId: dataDeckId,
+        sortOrder: 4,
+        createdAt: now,
+        updatedAt: now,
+        questionPrompt: "What does いきます [ikimasu] mean?",
+        options: const [
+          MultipleChoiceOption(
+            id: '${idPrefix}multiple_choice_option_4_0',
+            templateId: '${idPrefix}template_4',
+            optionText: "return",
+            isCorrect: false,
+            displayOrder: 0,
+          ),
+          MultipleChoiceOption(
+            id: '${idPrefix}multiple_choice_option_4_1',
+            templateId: '${idPrefix}template_4',
+            optionText: "come",
+            isCorrect: false,
+            displayOrder: 1,
+          ),
+          MultipleChoiceOption(
+            id: '${idPrefix}multiple_choice_option_4_2',
+            templateId: '${idPrefix}template_4',
+            optionText: "go",
+            isCorrect: true,
+            displayOrder: 2,
+          ),
+          MultipleChoiceOption(
+            id: '${idPrefix}multiple_choice_option_4_3',
+            templateId: '${idPrefix}template_4',
+            optionText: "eat",
+            isCorrect: false,
+            displayOrder: 3,
+          ),
+        ],
+      ),
+      IdentificationTemplate(
+        id: '${idPrefix}template_5',
+        deckId: dataDeckId,
+        sortOrder: 5,
+        createdAt: now,
+        updatedAt: now,
+        promptText: "What does みず [mizu] mean?",
+        answers: const [
+          IdentificationAnswerKey(
+            id: '${idPrefix}identification_answer_5_0',
+            templateId: '${idPrefix}template_5',
+            displayOrder: 0,
+            value: "water",
+            casingType: CasingType.any,
+          ),
+        ],
+      ),
+      IdentificationTemplate(
+        id: '${idPrefix}template_6',
+        deckId: dataDeckId,
+        sortOrder: 6,
+        createdAt: now,
+        updatedAt: now,
+        promptText: "What does あげます [agemasu] mean?",
+        answers: const [
+          IdentificationAnswerKey(
+            id: '${idPrefix}identification_answer_6_0',
+            templateId: '${idPrefix}template_6',
+            displayOrder: 0,
+            value: "give",
+            casingType: CasingType.any,
+          ),
+        ],
+      ),
+      IdentificationTemplate(
+        id: '${idPrefix}template_7',
+        deckId: dataDeckId,
+        sortOrder: 7,
+        createdAt: now,
+        updatedAt: now,
+        promptText: "What does おおきい [ookii] mean?",
+        answers: const [
+          IdentificationAnswerKey(
+            id: '${idPrefix}identification_answer_7_0',
+            templateId: '${idPrefix}template_7',
+            displayOrder: 0,
+            value: "big",
+            casingType: CasingType.any,
+          ),
+        ],
+      ),
+      IdentificationTemplate(
+        id: '${idPrefix}template_8',
+        deckId: dataDeckId,
+        sortOrder: 8,
+        createdAt: now,
+        updatedAt: now,
+        promptText: "What does わかります [wakarimasu] mean?",
+        answers: const [
+          IdentificationAnswerKey(
+            id: '${idPrefix}identification_answer_8_0',
+            templateId: '${idPrefix}template_8',
+            displayOrder: 0,
+            value: "understand",
+            casingType: CasingType.any,
+          ),
+        ],
+      ),
+      IdentificationTemplate(
+        id: '${idPrefix}template_9',
+        deckId: dataDeckId,
+        sortOrder: 9,
+        createdAt: now,
+        updatedAt: now,
+        promptText: "What does いぬ [inu] mean?",
+        answers: const [
+          IdentificationAnswerKey(
+            id: '${idPrefix}identification_answer_9_0',
+            templateId: '${idPrefix}template_9',
+            displayOrder: 0,
+            value: "dog",
+            casingType: CasingType.any,
+          ),
+        ],
+      ),
+      FlashcardTemplate(
+        id: '${idPrefix}template_10',
+        deckId: dataDeckId,
+        sortOrder: 10,
+        createdAt: now,
+        updatedAt: now,
+        frontText: "![Image](umbrella.webp)",
+        backText: "かさ\nkasa\numbrella",
+        direction: CardTemplateDirection.both,
+      ),
+      FlashcardTemplate(
+        id: '${idPrefix}template_11',
+        deckId: dataDeckId,
+        sortOrder: 11,
+        createdAt: now,
+        updatedAt: now,
+        frontText: "![Image](sushi.webp)",
+        backText: "すし\nsushi\nsushi",
+        direction: CardTemplateDirection.both,
+      ),
+      FlashcardTemplate(
+        id: '${idPrefix}template_12',
+        deckId: dataDeckId,
+        sortOrder: 12,
+        createdAt: now,
+        updatedAt: now,
+        frontText: "![Image](sugar.webp)",
+        backText: "さとう\nsatou\nsugar",
+        direction: CardTemplateDirection.both,
+      ),
+      FlashcardTemplate(
+        id: '${idPrefix}template_13',
+        deckId: dataDeckId,
+        sortOrder: 13,
+        createdAt: now,
+        updatedAt: now,
+        frontText: "![Image](apple.webp)",
+        backText: "りんご\nringo\napple",
+        direction: CardTemplateDirection.both,
+      ),
+      FlashcardTemplate(
+        id: '${idPrefix}template_14',
+        deckId: dataDeckId,
+        sortOrder: 14,
+        createdAt: now,
+        updatedAt: now,
+        frontText: "![Image](cat.webp)",
+        backText: "ねこ\nneko\ncat",
+        direction: CardTemplateDirection.both,
+      ),
+      MatchingTypeTemplate(
+        id: '${idPrefix}template_15',
+        deckId: dataDeckId,
+        sortOrder: 15,
+        createdAt: now,
+        updatedAt: now,
+        values: const [
+          MatchingTypeValue(
+            text: "![Image](bicycle.webp)",
+            position: Vector2Hive(0, 0),
+            matchPosition: Vector2Hive(1, 0),
+          ),
+          MatchingTypeValue(
+            text: "じてんしゃ\njitensha\nbicycle",
+            position: Vector2Hive(1, 0),
+            matchPosition: Vector2Hive(0, 0),
+          ),
+          MatchingTypeValue(
+            text: "![Image](chair.webp)",
+            position: Vector2Hive(0, 1),
+            matchPosition: Vector2Hive(1, 1),
+          ),
+          MatchingTypeValue(
+            text: "いす\nisu\nchair",
+            position: Vector2Hive(1, 1),
+            matchPosition: Vector2Hive(0, 1),
+          ),
+          MatchingTypeValue(
+            text: "![Image](clock.webp)",
+            position: Vector2Hive(0, 2),
+            matchPosition: Vector2Hive(1, 2),
+          ),
+          MatchingTypeValue(
+            text: "とけい\ntokei\nclock",
+            position: Vector2Hive(1, 2),
+            matchPosition: Vector2Hive(0, 2),
+          ),
+        ],
+      ),
+      MatchingTypeTemplate(
+        id: '${idPrefix}template_16',
+        deckId: dataDeckId,
+        sortOrder: 16,
+        createdAt: now,
+        updatedAt: now,
+        values: const [
+          MatchingTypeValue(
+            text: "![Image](chair.webp)",
+            position: Vector2Hive(0, 0),
+            matchPosition: Vector2Hive(1, 0),
+          ),
+          MatchingTypeValue(
+            text: "いす\nisu\nchair",
+            position: Vector2Hive(1, 0),
+            matchPosition: Vector2Hive(0, 0),
+          ),
+          MatchingTypeValue(
+            text: "![Image](clock.webp)",
+            position: Vector2Hive(0, 1),
+            matchPosition: Vector2Hive(1, 1),
+          ),
+          MatchingTypeValue(
+            text: "とけい\ntokei\nclock",
+            position: Vector2Hive(1, 1),
+            matchPosition: Vector2Hive(0, 1),
+          ),
+          MatchingTypeValue(
+            text: "![Image](bag.webp)",
+            position: Vector2Hive(0, 2),
+            matchPosition: Vector2Hive(1, 2),
+          ),
+          MatchingTypeValue(
+            text: "かばん\nkaban\nbag",
+            position: Vector2Hive(1, 2),
+            matchPosition: Vector2Hive(0, 2),
+          ),
+        ],
+      ),
+      MatchingTypeTemplate(
+        id: '${idPrefix}template_17',
+        deckId: dataDeckId,
+        sortOrder: 17,
+        createdAt: now,
+        updatedAt: now,
+        values: const [
+          MatchingTypeValue(
+            text: "![Image](clock.webp)",
+            position: Vector2Hive(0, 0),
+            matchPosition: Vector2Hive(1, 0),
+          ),
+          MatchingTypeValue(
+            text: "とけい\ntokei\nclock",
+            position: Vector2Hive(1, 0),
+            matchPosition: Vector2Hive(0, 0),
+          ),
+          MatchingTypeValue(
+            text: "![Image](bag.webp)",
+            position: Vector2Hive(0, 1),
+            matchPosition: Vector2Hive(1, 1),
+          ),
+          MatchingTypeValue(
+            text: "かばん\nkaban\nbag",
+            position: Vector2Hive(1, 1),
+            matchPosition: Vector2Hive(0, 1),
+          ),
+          MatchingTypeValue(
+            text: "![Image](pencil.webp)",
+            position: Vector2Hive(0, 2),
+            matchPosition: Vector2Hive(1, 2),
+          ),
+          MatchingTypeValue(
+            text: "えんぴつ\nenpitsu\npencil",
+            position: Vector2Hive(1, 2),
+            matchPosition: Vector2Hive(0, 2),
+          ),
+        ],
+      ),
+      MatchingTypeTemplate(
+        id: '${idPrefix}template_18',
+        deckId: dataDeckId,
+        sortOrder: 18,
+        createdAt: now,
+        updatedAt: now,
+        values: const [
+          MatchingTypeValue(
+            text: "![Image](bag.webp)",
+            position: Vector2Hive(0, 0),
+            matchPosition: Vector2Hive(1, 0),
+          ),
+          MatchingTypeValue(
+            text: "かばん\nkaban\nbag",
+            position: Vector2Hive(1, 0),
+            matchPosition: Vector2Hive(0, 0),
+          ),
+          MatchingTypeValue(
+            text: "![Image](pencil.webp)",
+            position: Vector2Hive(0, 1),
+            matchPosition: Vector2Hive(1, 1),
+          ),
+          MatchingTypeValue(
+            text: "えんぴつ\nenpitsu\npencil",
+            position: Vector2Hive(1, 1),
+            matchPosition: Vector2Hive(0, 1),
+          ),
+          MatchingTypeValue(
+            text: "みんなさん [Minnasan]",
+            position: Vector2Hive(0, 2),
+            matchPosition: Vector2Hive(1, 2),
+          ),
+          MatchingTypeValue(
+            text: "everyone",
+            position: Vector2Hive(1, 2),
+            matchPosition: Vector2Hive(0, 2),
+          ),
+        ],
+      ),
+      MatchingTypeTemplate(
+        id: '${idPrefix}template_19',
+        deckId: dataDeckId,
+        sortOrder: 19,
+        createdAt: now,
+        updatedAt: now,
+        values: const [
+          MatchingTypeValue(
+            text: "![Image](pencil.webp)",
+            position: Vector2Hive(0, 0),
+            matchPosition: Vector2Hive(1, 0),
+          ),
+          MatchingTypeValue(
+            text: "えんぴつ\nenpitsu\npencil",
+            position: Vector2Hive(1, 0),
+            matchPosition: Vector2Hive(0, 0),
+          ),
+          MatchingTypeValue(
+            text: "みんなさん [Minnasan]",
+            position: Vector2Hive(0, 1),
+            matchPosition: Vector2Hive(1, 1),
+          ),
+          MatchingTypeValue(
+            text: "everyone",
+            position: Vector2Hive(1, 1),
+            matchPosition: Vector2Hive(0, 1),
+          ),
+          MatchingTypeValue(
+            text: "ほん [hon]",
+            position: Vector2Hive(0, 2),
+            matchPosition: Vector2Hive(1, 2),
+          ),
+          MatchingTypeValue(
+            text: "book",
+            position: Vector2Hive(1, 2),
+            matchPosition: Vector2Hive(0, 2),
+          ),
+        ],
+      ),
+      FillInTheBlanksTemplate(
+        id: '${idPrefix}template_20',
+        deckId: dataDeckId,
+        sortOrder: 20,
+        createdAt: now,
+        updatedAt: now,
+        promptText:
+            "![Audio](car.mp3)\nWatashi wa kuruma ni norimasu.\nMeaning: I ride in a car.",
+        answerKeys: const [
+          FillInTheBlankAnswerKey(
+            value: "kuruma",
+            casingType: CasingType.any,
+            order: 0,
+          ),
+        ],
+      ),
+      FillInTheBlanksTemplate(
+        id: '${idPrefix}template_21',
+        deckId: dataDeckId,
+        sortOrder: 21,
+        createdAt: now,
+        updatedAt: now,
+        promptText:
+            "![Audio](telephone.mp3)\nKore wa denwa desu.\nMeaning: This is a telephone.",
+        answerKeys: const [
+          FillInTheBlankAnswerKey(
+            value: "denwa",
+            casingType: CasingType.any,
+            order: 0,
+          ),
+        ],
+      ),
+      FillInTheBlanksTemplate(
+        id: '${idPrefix}template_22',
+        deckId: dataDeckId,
+        sortOrder: 22,
+        createdAt: now,
+        updatedAt: now,
+        promptText:
+            "![Audio](newspaper.mp3)\nWatashi wa shinbun o yomimasu.\nMeaning: I read a newspaper.",
+        answerKeys: const [
+          FillInTheBlankAnswerKey(
+            value: "shinbun",
+            casingType: CasingType.any,
+            order: 0,
+          ),
+        ],
+      ),
+      FillInTheBlanksTemplate(
+        id: '${idPrefix}template_23',
+        deckId: dataDeckId,
+        sortOrder: 23,
+        createdAt: now,
+        updatedAt: now,
+        promptText:
+            "![Audio](school.mp3)\nWatashi wa gakkou e ikimasu.\nMeaning: I go to school.",
+        answerKeys: const [
+          FillInTheBlankAnswerKey(
+            value: "gakkou",
+            casingType: CasingType.any,
+            order: 0,
+          ),
+        ],
+      ),
+      FillInTheBlanksTemplate(
+        id: '${idPrefix}template_24',
+        deckId: dataDeckId,
+        sortOrder: 24,
+        createdAt: now,
+        updatedAt: now,
+        promptText:
+            "![Audio](food.mp3)\nKore wa tabemono desu.\nMeaning: This is food.",
+        answerKeys: const [
+          FillInTheBlankAnswerKey(
+            value: "tabemono",
+            casingType: CasingType.any,
+            order: 0,
+          ),
+        ],
+      ),
+      WordScrambleTemplate(
+        id: '${idPrefix}template_25',
+        deckId: dataDeckId,
+        sortOrder: 25,
+        createdAt: now,
+        updatedAt: now,
+        sentenceToScramble: "Kore wa nomimono desu",
+      ),
+      WordScrambleTemplate(
+        id: '${idPrefix}template_26',
+        deckId: dataDeckId,
+        sortOrder: 26,
+        createdAt: now,
+        updatedAt: now,
+        sentenceToScramble: "Watashi wa kutsu o hakimasu",
+      ),
+      WordScrambleTemplate(
+        id: '${idPrefix}template_27',
+        deckId: dataDeckId,
+        sortOrder: 27,
+        createdAt: now,
+        updatedAt: now,
+        sentenceToScramble: "Tori wa sora o tobimasu",
+      ),
+      WordScrambleTemplate(
+        id: '${idPrefix}template_28',
+        deckId: dataDeckId,
+        sortOrder: 28,
+        createdAt: now,
+        updatedAt: now,
+        sentenceToScramble: "Watashi wa sakana o tabemasu",
+      ),
+      WordScrambleTemplate(
+        id: '${idPrefix}template_29',
+        deckId: dataDeckId,
+        sortOrder: 29,
+        createdAt: now,
+        updatedAt: now,
+        sentenceToScramble: "Watashi wa densha ni norimasu",
+      ),
     ];
 
     await LocalDB.deck.upsert(deck);
@@ -402,37 +695,5 @@ class ResearchParticipantJapaneseSetAData extends ResearchParticipantData {
       assetDirectory: attachmentAssetDirectory,
       deckTitle: deck.title,
     );
-  }
-
-  static String multipleChoiceTemplateId(int index) {
-    return '${idPrefix}multiple_choice_template_$index';
-  }
-
-  static String multipleChoiceOptionId(int templateIndex, int optionIndex) {
-    return '${idPrefix}multiple_choice_${templateIndex}_option_$optionIndex';
-  }
-
-  static String identificationTemplateId(int index) {
-    return '${idPrefix}identification_template_$index';
-  }
-
-  static String identificationAnswerId(int index) {
-    return '${idPrefix}identification_answer_$index';
-  }
-
-  static String flashcardTemplateId(int index) {
-    return '${idPrefix}flashcard_template_$index';
-  }
-
-  static String matchingTypeTemplateId(int index) {
-    return '${idPrefix}matching_type_template_$index';
-  }
-
-  static String fillInTheBlanksTemplateId(int index) {
-    return '${idPrefix}fill_in_the_blanks_template_$index';
-  }
-
-  static String wordScrambleTemplateId(int index) {
-    return '${idPrefix}word_scramble_template_$index';
   }
 }

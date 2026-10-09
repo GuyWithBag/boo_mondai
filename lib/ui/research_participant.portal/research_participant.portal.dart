@@ -30,11 +30,11 @@ class ResearchParticipantPortal extends SignalHookWidget {
     final data = dataForRole(profile.role);
 
     useEffect(() {
-      isInitialized.value = data == null || isDataInitialized(data);
+      isInitialized.value = data.isEmpty || data.every(isDataInitialized);
       return null;
-    }, [profile.role, data]);
+    }, [profile.role]);
 
-    if (!profile.isParticipant) {
+    if (!profile.isParticipant && profile.role != ProfileRole.appAdmin) {
       return const SizedBox.shrink();
     }
 
@@ -66,14 +66,16 @@ class ResearchParticipantPortal extends SignalHookWidget {
     BuildContext context, {
     required ValueNotifier<bool> isInitializing,
     required ValueNotifier<bool> isInitialized,
-    required ResearchParticipantData? data,
+    required List<ResearchParticipantData> data,
   }) async {
-    if (data == null) return;
+    if (data.isEmpty) return;
 
     isInitializing.value = true;
     try {
       final profile = ProfileService.currentProfile.value;
-      await data.initialize(profile);
+      for (final participantData in data) {
+        await participantData.initialize(profile);
+      }
       isInitialized.value = true;
       if (!context.mounted) return;
 
@@ -92,13 +94,23 @@ class ResearchParticipantPortal extends SignalHookWidget {
     }
   }
 
-  ResearchParticipantData? dataForRole(ProfileRole role) {
+  List<ResearchParticipantData> dataForRole(ProfileRole role) {
     return switch (role) {
-      ProfileRole.participantChineseA => ResearchParticipantChineseSetAData(),
-      ProfileRole.participantChineseB => ResearchParticipantChineseSetBData(),
-      ProfileRole.participantJapaneseA => ResearchParticipantJapaneseSetAData(),
-      ProfileRole.participantJapaneseB => ResearchParticipantJapaneseSetBData(),
-      _ => null,
+      ProfileRole.appAdmin => [
+        ResearchParticipantChineseSetAData(),
+        ResearchParticipantChineseSetBData(),
+        ResearchParticipantJapaneseSetAData(),
+        ResearchParticipantJapaneseSetBData(),
+      ],
+      ProfileRole.participantChineseA => [ResearchParticipantChineseSetAData()],
+      ProfileRole.participantChineseB => [ResearchParticipantChineseSetBData()],
+      ProfileRole.participantJapaneseA => [
+        ResearchParticipantJapaneseSetAData(),
+      ],
+      ProfileRole.participantJapaneseB => [
+        ResearchParticipantJapaneseSetBData(),
+      ],
+      _ => const [],
     };
   }
 

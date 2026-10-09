@@ -1,0 +1,626 @@
+{
+  "type": "Deck",
+  "title": "Set A Deck",
+  "templates": [
+    {
+      "type": "multiple_choice",
+      "question_prompt": "What does 你 [nǐ] mean?",
+      "options": [
+        {
+          "option_text": "I",
+          "is_correct": false
+        },
+        {
+          "option_text": "You",
+          "is_correct": true
+        },
+        {
+          "option_text": "He",
+          "is_correct": false
+        },
+        {
+          "option_text": "She",
+          "is_correct": false
+        }
+      ]
+    },
+    {
+      "type": "multiple_choice",
+      "question_prompt": "What does 我 [wǒ] mean?",
+      "options": [
+        {
+          "option_text": "I",
+          "is_correct": true
+        },
+        {
+          "option_text": "You",
+          "is_correct": false
+        },
+        {
+          "option_text": "He",
+          "is_correct": false
+        },
+        {
+          "option_text": "She",
+          "is_correct": false
+        }
+      ]
+    },
+    {
+      "type": "multiple_choice",
+      "question_prompt": "What does 他 [tā] mean?",
+      "options": [
+        {
+          "option_text": "I",
+          "is_correct": false
+        },
+        {
+          "option_text": "You",
+          "is_correct": false
+        },
+        {
+          "option_text": "He",
+          "is_correct": true
+        },
+        {
+          "option_text": "She",
+          "is_correct": false
+        }
+      ]
+    },
+    {
+      "type": "multiple_choice",
+      "question_prompt": "What does 她 [tā] mean?",
+      "options": [
+        {
+          "option_text": "I",
+          "is_correct": false
+        },
+        {
+          "option_text": "You",
+          "is_correct": false
+        },
+        {
+          "option_text": "He",
+          "is_correct": false
+        },
+        {
+          "option_text": "She",
+          "is_correct": true
+        }
+      ]
+    },
+    {
+      "type": "multiple_choice",
+      "question_prompt": "What does 好 [hǎo] mean?",
+      "options": [
+        {
+          "option_text": "Good",
+          "is_correct": true
+        },
+        {
+          "option_text": "Bad",
+          "is_correct": false
+        },
+        {
+          "option_text": "Big",
+          "is_correct": false
+        },
+        {
+          "option_text": "Small",
+          "is_correct": false
+        }
+      ]
+    },
+    {
+      "type": "identification",
+      "prompt_text": "What does 是 [shì] mean?",
+      "answers": [
+        {
+          "value": "To be",
+          "casing_type": "any"
+        }
+      ]
+    },
+    {
+      "type": "identification",
+      "prompt_text": "What does 不 [bù] mean?",
+      "answers": [
+        {
+          "value": "No, not",
+          "casing_type": "any"
+        }
+      ]
+    },
+    {
+      "type": "identification",
+      "prompt_text": "What does 的 [de] mean?",
+      "answers": [
+        {
+          "value": "Possessive particle ('s)",
+          "casing_type": "any"
+        }
+      ]
+    },
+    {
+      "type": "identification",
+      "prompt_text": "What does 什么 [shénme] mean?",
+      "answers": [
+        {
+          "value": "What",
+          "casing_type": "any"
+        }
+      ]
+    },
+    {
+      "type": "identification",
+      "prompt_text": "What does 谁 [shéi] mean?",
+      "answers": [
+        {
+          "value": "Who",
+          "casing_type": "any"
+        }
+      ]
+    },
+    {
+      "type": "flashcard",
+      "front_text": "![Audio](father.mp3)",
+      "back_text": "爸爸\nbàba\nFather",
+      "direction": "both"
+    },
+    {
+      "type": "flashcard",
+      "front_text": "![Audio](mother.mp3)",
+      "back_text": "妈妈\nmāma\nMother",
+      "direction": "both"
+    },
+    {
+      "type": "flashcard",
+      "front_text": "![Audio](teacher.mp3)",
+      "back_text": "老师\nlǎoshī\nTeacher",
+      "direction": "both"
+    },
+    {
+      "type": "flashcard",
+      "front_text": "![Audio](student.mp3)",
+      "back_text": "学生\nxuésheng\nStudent",
+      "direction": "both"
+    },
+    {
+      "type": "flashcard",
+      "front_text": "![Audio](friend.mp3)",
+      "back_text": "朋友\npéngyou\nFriend",
+      "direction": "both"
+    },
+    {
+      "type": "matching_type",
+      "values": [
+        {
+          "text": "![Audio](cat.mp3)",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "match_position": {
+            "x": 1,
+            "y": 0
+          }
+        },
+        {
+          "text": "猫\nmāo\nCat",
+          "position": {
+            "x": 1,
+            "y": 0
+          },
+          "match_position": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        {
+          "text": "![Audio](dog.mp3)",
+          "position": {
+            "x": 0,
+            "y": 1
+          },
+          "match_position": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        {
+          "text": "狗\ngǒu\nDog",
+          "position": {
+            "x": 1,
+            "y": 1
+          },
+          "match_position": {
+            "x": 0,
+            "y": 1
+          }
+        },
+        {
+          "text": "![Audio](book.mp3)",
+          "position": {
+            "x": 0,
+            "y": 2
+          },
+          "match_position": {
+            "x": 1,
+            "y": 2
+          }
+        },
+        {
+          "text": "书\nshū\nBook",
+          "position": {
+            "x": 1,
+            "y": 2
+          },
+          "match_position": {
+            "x": 0,
+            "y": 2
+          }
+        }
+      ]
+    },
+    {
+      "type": "matching_type",
+      "values": [
+        {
+          "text": "![Audio](dog.mp3)",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "match_position": {
+            "x": 1,
+            "y": 0
+          }
+        },
+        {
+          "text": "狗\ngǒu\nDog",
+          "position": {
+            "x": 1,
+            "y": 0
+          },
+          "match_position": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        {
+          "text": "![Audio](book.mp3)",
+          "position": {
+            "x": 0,
+            "y": 1
+          },
+          "match_position": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        {
+          "text": "书\nshū\nBook",
+          "position": {
+            "x": 1,
+            "y": 1
+          },
+          "match_position": {
+            "x": 0,
+            "y": 1
+          }
+        },
+        {
+          "text": "![Image](water.webp)",
+          "position": {
+            "x": 0,
+            "y": 2
+          },
+          "match_position": {
+            "x": 1,
+            "y": 2
+          }
+        },
+        {
+          "text": "水\nshuǐ\nWater",
+          "position": {
+            "x": 1,
+            "y": 2
+          },
+          "match_position": {
+            "x": 0,
+            "y": 2
+          }
+        }
+      ]
+    },
+    {
+      "type": "matching_type",
+      "values": [
+        {
+          "text": "![Audio](book.mp3)",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "match_position": {
+            "x": 1,
+            "y": 0
+          }
+        },
+        {
+          "text": "书\nshū\nBook",
+          "position": {
+            "x": 1,
+            "y": 0
+          },
+          "match_position": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        {
+          "text": "![Image](water.webp)",
+          "position": {
+            "x": 0,
+            "y": 1
+          },
+          "match_position": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        {
+          "text": "水\nshuǐ\nWater",
+          "position": {
+            "x": 1,
+            "y": 1
+          },
+          "match_position": {
+            "x": 0,
+            "y": 1
+          }
+        },
+        {
+          "text": "![Image](tea.webp)",
+          "position": {
+            "x": 0,
+            "y": 2
+          },
+          "match_position": {
+            "x": 1,
+            "y": 2
+          }
+        },
+        {
+          "text": "茶\nchá\nTea",
+          "position": {
+            "x": 1,
+            "y": 2
+          },
+          "match_position": {
+            "x": 0,
+            "y": 2
+          }
+        }
+      ]
+    },
+    {
+      "type": "matching_type",
+      "values": [
+        {
+          "text": "![Image](water.webp)",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "match_position": {
+            "x": 1,
+            "y": 0
+          }
+        },
+        {
+          "text": "水\nshuǐ\nWater",
+          "position": {
+            "x": 1,
+            "y": 0
+          },
+          "match_position": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        {
+          "text": "![Image](tea.webp)",
+          "position": {
+            "x": 0,
+            "y": 1
+          },
+          "match_position": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        {
+          "text": "茶\nchá\nTea",
+          "position": {
+            "x": 1,
+            "y": 1
+          },
+          "match_position": {
+            "x": 0,
+            "y": 1
+          }
+        },
+        {
+          "text": "你 [nǐ]",
+          "position": {
+            "x": 0,
+            "y": 2
+          },
+          "match_position": {
+            "x": 1,
+            "y": 2
+          }
+        },
+        {
+          "text": "You",
+          "position": {
+            "x": 1,
+            "y": 2
+          },
+          "match_position": {
+            "x": 0,
+            "y": 2
+          }
+        }
+      ]
+    },
+    {
+      "type": "matching_type",
+      "values": [
+        {
+          "text": "![Image](tea.webp)",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "match_position": {
+            "x": 1,
+            "y": 0
+          }
+        },
+        {
+          "text": "茶\nchá\nTea",
+          "position": {
+            "x": 1,
+            "y": 0
+          },
+          "match_position": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        {
+          "text": "你 [nǐ]",
+          "position": {
+            "x": 0,
+            "y": 1
+          },
+          "match_position": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        {
+          "text": "You",
+          "position": {
+            "x": 1,
+            "y": 1
+          },
+          "match_position": {
+            "x": 0,
+            "y": 1
+          }
+        },
+        {
+          "text": "我 [wǒ]",
+          "position": {
+            "x": 0,
+            "y": 2
+          },
+          "match_position": {
+            "x": 1,
+            "y": 2
+          }
+        },
+        {
+          "text": "I",
+          "position": {
+            "x": 1,
+            "y": 2
+          },
+          "match_position": {
+            "x": 0,
+            "y": 2
+          }
+        }
+      ]
+    },
+    {
+      "type": "fill_in_the_blanks",
+      "prompt_text": "![Image](eat.webp)\nWǒ chī mǐfàn.\nMeaning: I eat rice.",
+      "answer_keys": [
+        {
+          "value": "chī",
+          "casing_type": "any",
+          "order": 0
+        }
+      ]
+    },
+    {
+      "type": "fill_in_the_blanks",
+      "prompt_text": "![Image](drink.webp)\nWǒ hē shuǐ.\nMeaning: I drink water.",
+      "answer_keys": [
+        {
+          "value": "hē",
+          "casing_type": "any",
+          "order": 0
+        }
+      ]
+    },
+    {
+      "type": "fill_in_the_blanks",
+      "prompt_text": "![Image](look.webp)\nWǒ kàn diànyǐng.\nMeaning: I watch a movie.",
+      "answer_keys": [
+        {
+          "value": "kàn",
+          "casing_type": "any",
+          "order": 0
+        }
+      ]
+    },
+    {
+      "type": "fill_in_the_blanks",
+      "prompt_text": "![Image](go.webp)\nWǒ qù Běijīng.\nMeaning: I go to Beijing.",
+      "answer_keys": [
+        {
+          "value": "qù",
+          "casing_type": "any",
+          "order": 0
+        }
+      ]
+    },
+    {
+      "type": "fill_in_the_blanks",
+      "prompt_text": "![Image](come.webp)\nTā lái wǒ jiā.\nMeaning: He comes to my home.",
+      "answer_keys": [
+        {
+          "value": "lái",
+          "casing_type": "any",
+          "order": 0
+        }
+      ]
+    },
+    {
+      "type": "word_scramble",
+      "sentence_to_scramble": "Wǒ zuò zài yǐzi shàng"
+    },
+    {
+      "type": "word_scramble",
+      "sentence_to_scramble": "Jīntiān tiānqì hěn hǎo"
+    },
+    {
+      "type": "word_scramble",
+      "sentence_to_scramble": "Wǒ míngtiān qù Běijīng"
+    },
+    {
+      "type": "word_scramble",
+      "sentence_to_scramble": "Wǒ chī píngguǒ"
+    },
+    {
+      "type": "word_scramble",
+      "sentence_to_scramble": "Wǒ xǐhuan chī mǐfàn"
+    }
+  ]
+}
