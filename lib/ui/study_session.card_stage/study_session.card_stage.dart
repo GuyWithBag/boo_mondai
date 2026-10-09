@@ -57,17 +57,18 @@ class StudySessionCardStage extends SignalHookWidget {
     final stepId = studySessionController.currentStep.value?.id;
     final isRevealed = cardStageController.isRevealed.value;
     final showSubmitHint = useState(false);
+    final submitHint = template == null ? null : submitHintFor(template);
 
     useEffect(() {
       showSubmitHint.value = false;
-      if (stepId == null || isRevealed) return null;
+      if (stepId == null || isRevealed || submitHint == null) return null;
 
-      final timer = Timer(const Duration(seconds: 3), () {
+      final timer = Timer(submitHint.delay, () {
         showSubmitHint.value = true;
       });
 
       return timer.cancel;
-    }, [stepId, isRevealed]);
+    }, [stepId, isRevealed, submitHint]);
 
     if (template == null || studyCard == null) {
       return const Center(child: Text('No card available'));
@@ -118,7 +119,8 @@ class StudySessionCardStage extends SignalHookWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final hasSubmitHint = showSubmitHint.value && !isRevealed;
+        final hasSubmitHint =
+            showSubmitHint.value && !isRevealed && submitHint != null;
 
         return Column(
           children: [
@@ -151,7 +153,7 @@ class StudySessionCardStage extends SignalHookWidget {
                       key: const ValueKey('submit-hint'),
                       padding: EdgeInsets.only(top: tokens.spaceLayoutGapSm),
                       child: Text(
-                        "Don't know this one? Submit an incorrect answer and try again.",
+                        submitHint.message,
                         textAlign: TextAlign.center,
                         style: textStyle.resolve(tokens, const [
                           TextSize.labelSmall,
@@ -166,5 +168,29 @@ class StudySessionCardStage extends SignalHookWidget {
         );
       },
     );
+  }
+
+  ({Duration delay, String message}) submitHintFor(CardTemplate template) {
+    return switch (template) {
+      FlashcardTemplate() => (
+        delay: const Duration(seconds: 15),
+        message: 'Don\'t know this one? Show the answer and rate "Again".',
+      ),
+      FillInTheBlanksTemplate() || IdentificationTemplate() => (
+        delay: const Duration(seconds: 8),
+        message:
+            'Don\'t know this one? Submit an incorrect answer, then rate "Again".',
+      ),
+      MultipleChoiceTemplate() ||
+      WordScrambleTemplate() ||
+      MatchingTypeTemplate() => (
+        delay: const Duration(seconds: 10),
+        message: 'Don\'t know this one? Get it incorrect, then rate "Again".',
+      ),
+      _ => (
+        delay: const Duration(seconds: 10),
+        message: 'Don\'t know this one? Get it incorrect, then rate "Again".',
+      ),
+    };
   }
 }
