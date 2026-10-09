@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:boo_mondai/lib.barrel.dart'
     show
@@ -7,6 +8,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         FlashcardTemplate,
         IdentificationTemplate,
         StudySessionCardStageController,
+        PhysicalCardController,
         CardTemplate,
         MultipleChoiceTemplate,
         FillInTheBlanksTemplate,
@@ -71,64 +73,95 @@ class StudySessionCardStage extends SignalHookWidget {
       return const Center(child: Text('No card available'));
     }
 
-    final child = switch (template) {
-      FlashcardTemplate f => FlashcardCard(
-        template: f,
-        studyCard: studyCard,
-        cardStageController: cardStageController,
-      ),
-      MultipleChoiceTemplate m => MultipleChoiceCard(
-        template: m,
-        cardStageController: cardStageController,
-      ),
-      IdentificationTemplate i => IdentificationCard(
-        template: i,
-        cardStageController: cardStageController,
-      ),
-      FillInTheBlanksTemplate fb => FillInTheBlanksCard(
-        template: fb,
-        cardStageController: cardStageController,
-      ),
-      MatchingTypeTemplate mm => MatchingTypeCard(
-        template: mm,
-        cardStageController: cardStageController,
-      ),
-      WordScrambleTemplate ws => WordScrambleCard(
-        template: ws,
-        cardStageController: cardStageController,
-      ),
-      _ => Center(
-        // Replace with error text
-        child: Text(
-          'Unsupported card type: ${template.runtimeType}',
-          style: TextStyle(color: Theme.of(context).colorScheme.error),
+    Widget buildCard(double maxWidth) {
+      return switch (template) {
+        FlashcardTemplate f => FlashcardCard(
+          template: f,
+          studyCard: studyCard,
+          cardStageController: cardStageController,
+          maxWidth: maxWidth,
         ),
-      ),
-    };
-
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        spacing: tokens.spaceLayoutGapSm,
-        children: [
-          child,
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 180),
-            child: showSubmitHint.value && !isRevealed
-                ? Text(
-                    "Don't know this one? Submit an incorrect answer and try again.",
-                    key: const ValueKey('submit-hint'),
-                    textAlign: TextAlign.center,
-                    style: textStyle.resolve(tokens, const [
-                      TextSize.labelSmall,
-                      TextWeight.strong,
-                      TextColor.error,
-                    ]),
-                  )
-                : const SizedBox.shrink(key: ValueKey('submit-hint-empty')),
+        MultipleChoiceTemplate m => MultipleChoiceCard(
+          template: m,
+          cardStageController: cardStageController,
+          maxWidth: maxWidth,
+        ),
+        IdentificationTemplate i => IdentificationCard(
+          template: i,
+          cardStageController: cardStageController,
+          maxWidth: maxWidth,
+        ),
+        FillInTheBlanksTemplate fb => FillInTheBlanksCard(
+          template: fb,
+          cardStageController: cardStageController,
+          maxWidth: maxWidth,
+        ),
+        MatchingTypeTemplate mm => MatchingTypeCard(
+          template: mm,
+          cardStageController: cardStageController,
+          maxWidth: maxWidth,
+        ),
+        WordScrambleTemplate ws => WordScrambleCard(
+          template: ws,
+          cardStageController: cardStageController,
+          maxWidth: maxWidth,
+        ),
+        _ => Center(
+          // Replace with error text
+          child: Text(
+            'Unsupported card type: ${template.runtimeType}',
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
           ),
-        ],
-      ),
+        ),
+      };
+    }
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final hasSubmitHint = showSubmitHint.value && !isRevealed;
+        final availableWidth = constraints.maxWidth.isFinite
+            ? constraints.maxWidth
+            : tokens.studyCardWidth;
+        final hintReserve = hasSubmitHint ? 56.0 : 0.0;
+        final availableCardHeight = constraints.maxHeight.isFinite
+            ? math.max(
+                1.0,
+                constraints.maxHeight - tokens.spaceLayoutGapSm - hintReserve,
+              )
+            : double.infinity;
+        final maxWidthFromHeight = availableCardHeight.isFinite
+            ? availableCardHeight * PhysicalCardController.defaultAspectRatio
+            : tokens.studyCardWidth;
+        final cardMaxWidth = math.min(
+          math.min(tokens.studyCardWidth, availableWidth),
+          maxWidthFromHeight,
+        );
+
+        return Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            spacing: tokens.spaceLayoutGapSm,
+            children: [
+              buildCard(cardMaxWidth),
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 180),
+                child: hasSubmitHint
+                    ? Text(
+                        "Don't know this one? Submit an incorrect answer and try again.",
+                        key: const ValueKey('submit-hint'),
+                        textAlign: TextAlign.center,
+                        style: textStyle.resolve(tokens, const [
+                          TextSize.labelSmall,
+                          TextWeight.strong,
+                          TextColor.error,
+                        ]),
+                      )
+                    : const SizedBox.shrink(key: ValueKey('submit-hint-empty')),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
