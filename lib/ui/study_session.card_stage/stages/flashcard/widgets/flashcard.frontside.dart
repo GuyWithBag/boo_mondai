@@ -73,13 +73,40 @@ class FlashcardFrontSide extends StatelessWidget {
           if (showRevealButton)
             Align(
               alignment: Alignment.bottomCenter,
-              child: Button(
-                variants: const [ButtonVariant.text],
-                elevated: false,
-                leading: const Icon(Icons.touch_app),
-                contentScale: contentScale,
-                onPressed: onReveal,
-                child: const Text('Tap to reveal'),
+              child: Padding(
+                padding: ScaleHelper.getScaledEdgeInsets(
+                  EdgeInsets.all(tokens.spaceLayoutPaddingSm),
+                  contentScale,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  spacing: ScaleHelper.getScaledValue(
+                    tokens.spaceLayoutGapXsm,
+                    contentScale,
+                  ),
+                  children: [
+                    Text(
+                      'Guess the answer in your mind, then reveal and rate yourself.',
+                      textAlign: TextAlign.center,
+                      style: ScaleHelper.getTextStyleWithScaledFontSize(
+                        textStyle.resolve(tokens, const [
+                          TextSize.labelSmall,
+                          TextWeight.body,
+                          TextColor.muted,
+                        ]),
+                        contentScale,
+                      ),
+                    ),
+                    Button(
+                      variants: const [ButtonVariant.text],
+                      elevated: false,
+                      leading: const Icon(Icons.touch_app),
+                      contentScale: contentScale,
+                      onPressed: onReveal,
+                      child: const Text('Tap to reveal'),
+                    ),
+                  ],
+                ),
               ),
             ),
         ],
