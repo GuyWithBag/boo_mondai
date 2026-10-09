@@ -244,23 +244,21 @@ class _CubeBody extends StatelessWidget {
       child: SizedBox(
         width: bounds,
         height: bounds,
-        child: Center(
-          child: Transform(
-            alignment: Alignment.center,
-            transform: Matrix4.identity()
-              ..setEntry(3, 2, perspective)
-              ..rotateX(pitch)
-              ..rotateY(yaw)
-              ..rotateZ(roll)
-              ..scaleByDouble(scale, scale, scale, 1.0),
-            child: SizedBox(
-              width: width,
-              height: height,
-              child: Stack(
-                clipBehavior: Clip.none,
-                alignment: Alignment.center,
-                children: faces.map(_CubeFace.fromData).toList(),
-              ),
+        child: Transform(
+          alignment: Alignment.center,
+          transform: Matrix4.identity()
+            ..setEntry(3, 2, perspective)
+            ..rotateX(pitch)
+            ..rotateY(yaw)
+            ..rotateZ(roll)
+            ..scaleByDouble(scale, scale, scale, 1.0),
+          child: SizedBox(
+            width: width,
+            height: height,
+            child: Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.center,
+              children: faces.map(_CubeFace.fromData).toList(),
             ),
           ),
         ),

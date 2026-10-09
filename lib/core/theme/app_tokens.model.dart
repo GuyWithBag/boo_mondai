@@ -1,7 +1,4 @@
-import 'package:dart_mappable/dart_mappable.dart';
 import 'package:flutter/material.dart';
-
-part 'app_tokens.model.mapper.dart';
 
 /*
 Token naming guide
@@ -78,199 +75,156 @@ studyCardWidth
 studyCardAspectRatio
 */
 
-@MappableClass()
-class AppTokens with AppTokensMappable {
-  const AppTokens({
-    required this.name,
-    required this.colorPrimary,
-    required this.colorPrimaryDim,
-    required this.colorPrimaryBright,
-    required this.colorPrimarySoft,
-    required this.colorStreak,
-    required this.colorStreakDim,
-    required this.colorScaffoldBackground,
-    required this.colorSurfaceBackground,
-    required this.colorBorderNeutralSubtle,
-    required this.colorActionSuccess,
-    required this.colorActionSuccessBackground,
-    required this.colorActionSuccessBorder,
-    required this.colorActionError,
-    required this.colorActionErrorBackground,
-    required this.colorActionErrorBorder,
-    required this.colorTextBaseline,
-    required this.colorTextMuted,
-    required this.colorMuted,
-    required this.colorRatingAgainBackground,
-    required this.colorRatingAgainText,
-    required this.colorRatingAgainBorder,
-    required this.colorRatingAgainHoverBackground,
-    required this.colorRatingHardBackground,
-    required this.colorRatingHardText,
-    required this.colorRatingHardBorder,
-    required this.colorRatingHardHoverBackground,
-    required this.colorRatingGoodBackground,
-    required this.colorRatingGoodText,
-    required this.colorRatingGoodBorder,
-    required this.colorRatingGoodHoverBackground,
-    required this.colorRatingEasyBackground,
-    required this.colorRatingEasyText,
-    required this.colorRatingEasyBorder,
-    required this.colorRatingEasyHoverBackground,
-    required this.colorGoogle,
-    required this.colorGoogleDim,
-    required this.colorTextOnGoogle,
-    required this.colorMono,
-    required this.colorMonoDim,
-    required this.colorTextOnMono,
-    required this.colorLayoutShadow,
-  });
+class AppTokens {
+  const AppTokens();
 
-  final String name;
-  final String fontFamily = 'Noto Sans';
+  String get name => 'BooMondai';
+  String get fontFamily => 'Noto Sans';
 
-  final Color colorLayoutShadow;
+  Color get colorLayoutShadow => const Color(0x14080808);
 
   // Primary
-  final Color colorPrimary;
-  final Color colorPrimaryDim;
-  final Color colorPrimaryBright;
-  final Color colorPrimarySoft;
+  Color get colorPrimary => const Color(0xff6366f1);
+  Color get colorPrimaryDim => const Color(0xff3f498a);
+  Color get colorPrimaryBright => const Color(0xffc7d2fe);
+  Color get colorPrimarySoft => const Color(0xffeef2ff);
 
   // Streak
-  final Color colorStreak;
-  final Color colorStreakDim;
+  Color get colorStreak => const Color(0xfff97316);
+  Color get colorStreakDim => const Color(0xffc2410c);
 
   // Background
-  final Color colorScaffoldBackground;
-  final Color colorSurfaceBackground;
+  Color get colorScaffoldBackground => const Color(0xffF0F3F5);
+  Color get colorSurfaceBackground => const Color(0xffffffff);
 
   // Border
-  final Color colorBorderNeutralSubtle;
+  Color get colorBorderNeutralSubtle => const Color(0xffe5e7eb);
 
   // Action
-  final Color colorActionSuccess;
-  final Color colorActionSuccessBackground;
-  final Color colorActionSuccessBorder;
-  final Color colorActionError;
-  final Color colorActionErrorBackground;
-  final Color colorActionErrorBorder;
+  Color get colorActionSuccess => const Color(0xff22c55e);
+  Color get colorActionSuccessBackground => const Color(0xfff0fdf4);
+  Color get colorActionSuccessBorder => const Color(0xffbbf7d0);
+  Color get colorActionError => const Color(0xffef4444);
+  Color get colorActionErrorBackground => const Color(0xfffef2f2);
+  Color get colorActionErrorBorder => const Color(0xfffecaca);
 
   // Text
-  final Color colorTextBaseline;
-  final Color colorTextMuted;
+  Color get colorTextBaseline => const Color(0xff111827);
+  Color get colorTextMuted => const Color(0xff9ca3af);
 
   // Neutral
-  final Color colorMuted;
+  Color get colorMuted => const Color(0xfff3f4f6);
 
   // Rating
-  final Color colorRatingAgainBackground;
-  final Color colorRatingAgainText;
-  final Color colorRatingAgainBorder;
-  final Color colorRatingAgainHoverBackground;
-  final Color colorRatingHardBackground;
-  final Color colorRatingHardText;
-  final Color colorRatingHardBorder;
-  final Color colorRatingHardHoverBackground;
-  final Color colorRatingGoodBackground;
-  final Color colorRatingGoodText;
-  final Color colorRatingGoodBorder;
-  final Color colorRatingGoodHoverBackground;
-  final Color colorRatingEasyBackground;
-  final Color colorRatingEasyText;
-  final Color colorRatingEasyBorder;
-  final Color colorRatingEasyHoverBackground;
+  Color get colorRatingAgainBackground => const Color(0xfffef2f2);
+  Color get colorRatingAgainText => const Color(0xfff44336);
+  Color get colorRatingAgainBorder => const Color(0xfffecaca);
+  Color get colorRatingAgainHoverBackground => const Color(0xfffee2e2);
+  Color get colorRatingHardBackground => const Color(0xfffff7ed);
+  Color get colorRatingHardText => const Color(0xffff9800);
+  Color get colorRatingHardBorder => const Color(0xfffed7aa);
+  Color get colorRatingHardHoverBackground => const Color(0xffffedd5);
+  Color get colorRatingGoodBackground => const Color(0xfff0fdf4);
+  Color get colorRatingGoodText => const Color(0xff4caf50);
+  Color get colorRatingGoodBorder => const Color(0xffbbf7d0);
+  Color get colorRatingGoodHoverBackground => const Color(0xffdcfce7);
+  Color get colorRatingEasyBackground => const Color(0xffeff6ff);
+  Color get colorRatingEasyText => const Color(0xff2196f3);
+  Color get colorRatingEasyBorder => const Color(0xffbfdbfe);
+  Color get colorRatingEasyHoverBackground => const Color(0xffdbeafe);
 
   // Utility
-  final Color colorTransparent = Colors.transparent;
-  final Color colorTextOnBrand = Colors.white;
+  Color get colorTransparent => Colors.transparent;
+  Color get colorTextOnBrand => Colors.white;
 
   // Auth providers
-  final Color colorGoogle;
-  final Color colorGoogleDim;
-  final Color colorTextOnGoogle;
-  final Color colorMono;
-  final Color colorMonoDim;
-  final Color colorTextOnMono;
+  Color get colorGoogle => const Color(0xFFFFFFFF);
+  Color get colorGoogleDim => const Color(0xFFDADADA);
+  Color get colorTextOnGoogle => const Color(0xFF1F1F1F);
+  Color get colorMono => const Color(0xFF000000);
+  Color get colorMonoDim => const Color(0xFF3A3A3A);
+  Color get colorTextOnMono => const Color(0xFFFFFFFF);
 
   // Button padding
-  final double buttonPaddingHorizontalSm = 8;
-  final double buttonPaddingVerticalSm = 12;
-  final double buttonPaddingHorizontalMd = 24;
-  final double buttonPaddingVerticalMd = 16;
-  final double buttonPaddingHorizontalLg = 32;
-  final double buttonPaddingVerticalLg = 18;
-  final double buttonPaddingHorizontalIconWithLabel = 4;
-  final double buttonPaddingVerticalIconWithLabel = 6;
-  final double buttonPaddingHorizontalExtendedFab = 24;
-  final double buttonPaddingVerticalExtendedFab = 0;
+  double get buttonPaddingHorizontalSm => 8;
+  double get buttonPaddingVerticalSm => 12;
+  double get buttonPaddingHorizontalMd => 24;
+  double get buttonPaddingVerticalMd => 16;
+  double get buttonPaddingHorizontalLg => 32;
+  double get buttonPaddingVerticalLg => 18;
+  double get buttonPaddingHorizontalIconWithLabel => 4;
+  double get buttonPaddingVerticalIconWithLabel => 6;
+  double get buttonPaddingHorizontalExtendedFab => 24;
+  double get buttonPaddingVerticalExtendedFab => 0;
 
-  final double buttonIconSmallTactileShadowOffset = 5;
-  final double buttonTactileShadowOffset = 8;
-  final double buttonShadowOffset = 8;
-  final double modalShadowOffset = 10;
+  double get buttonIconSmallTactileShadowOffset => 5;
+  double get buttonTactileShadowOffset => 8;
+  double get buttonShadowOffset => 8;
+  double get modalShadowOffset => 10;
 
-  final FontWeight fontWeightTextBody = FontWeight.w600;
-  final FontWeight fontWeightTextStrong = FontWeight.w800;
-  final FontWeight fontWeightTextHeavy = FontWeight.w900;
+  FontWeight get fontWeightTextBody => FontWeight.w600;
+  FontWeight get fontWeightTextStrong => FontWeight.w800;
+  FontWeight get fontWeightTextHeavy => FontWeight.w900;
 
-  final double lineHeightTextBody = 1.45;
-  final double lineHeightTextTitle = 1.1;
-  final double lineHeightTextDisplay = 1.05;
-  final double lineHeightFieldDisplay = 1.15;
-  final double lineHeightButton = 1.1;
-  final double letterSpacingTextEyebrow = 2;
+  double get lineHeightTextBody => 1.45;
+  double get lineHeightTextTitle => 1.1;
+  double get lineHeightTextDisplay => 1.05;
+  double get lineHeightFieldDisplay => 1.15;
+  double get lineHeightButton => 1.1;
+  double get letterSpacingTextEyebrow => 2;
 
-  final double borderWidthDefault = 2;
+  double get borderWidthDefault => 2;
 
-  final double spaceScaffoldPadding = 20;
-  final double spaceScaffoldPaddingXsm = 2;
-  final double spaceScaffoldPaddingMobileY = 28;
+  double get spaceScaffoldPadding => 20;
+  double get spaceScaffoldPaddingXsm => 2;
+  double get spaceScaffoldPaddingMobileY => 28;
 
-  final double spaceLayoutPaddingLg = 20;
-  final double spaceLayoutPadding = 15;
-  final double spaceLayoutPaddingSm = 10;
-  final double spaceLayoutGapLg = 24;
-  final double spaceLayoutGapMd = 18;
-  final double spaceLayoutGapSm = 8;
-  final double spaceLayoutGapXsm = 4;
-  final double spaceScaffoldMaxWidth = 800;
+  double get spaceLayoutPaddingLg => 20;
+  double get spaceLayoutPadding => 15;
+  double get spaceLayoutPaddingSm => 10;
+  double get spaceLayoutGapLg => 24;
+  double get spaceLayoutGapMd => 18;
+  double get spaceLayoutGapSm => 8;
+  double get spaceLayoutGapXsm => 4;
+  double get spaceScaffoldMaxWidth => 800;
 
-  final double radiusSurfaceLg = 60;
-  final double radiusSurface = 40;
-  final double radiusSurfaceSm = 26;
-  final double radiusSurfaceXsm = 16;
+  double get radiusSurfaceLg => 60;
+  double get radiusSurface => 40;
+  double get radiusSurfaceSm => 26;
+  double get radiusSurfaceXsm => 16;
+  double get radiusSurfaceXxsm => 8;
 
-  final double radiusButton = 16;
-  final double radiusButtonIcon = 16;
-  final double radiusButtonIconSm = 12;
+  double get radiusButton => 16;
+  double get radiusButtonIcon => 16;
+  double get radiusButtonIconSm => 12;
 
-  final double textSizeHeaderLarge = 36;
-  final double textSizeHeader = 24;
-  final double textSizeHeader2 = 30;
-  final double textSizeBody = 20;
-  final double textSizeBodyLarge = 30;
-  final double textSizeLabelLarge = 16;
-  final double textSizeLabel = 14;
-  final double textSizeLabelSmall = 10;
+  double get textSizeHeaderLarge => 36;
+  double get textSizeHeader => 24;
+  double get textSizeHeader2 => 30;
+  double get textSizeBody => 20;
+  double get textSizeBodyLarge => 30;
+  double get textSizeLabelLarge => 16;
+  double get textSizeLabel => 14;
+  double get textSizeLabelSmall => 10;
 
-  final double sizeIconSm = 18;
-  final double sizeIcon = 24;
-  final double sizeIconLg = 30;
-  final double sizeModalIcon = 50;
+  double get sizeIconSm => 18;
+  double get sizeIcon => 24;
+  double get sizeIconLg => 30;
+  double get sizeModalIcon => 50;
 
-  final double sizeButtonIcon = 48;
-  final double sizeButtonIconSm = 38;
+  double get sizeButtonIcon => 48;
+  double get sizeButtonIconSm => 38;
   // final double bottomNavBarPreferredHeight = 90;
   // final double appBarPreferredHeight = 90;
   // final double preferredHeightDefault = 82;
   // final double unfocusButtonHeight = 48;
 
-  final double studyCardAspectRatio = 5 / 7;
-  final double studyCardWidth = 300;
-  final double studyCardRadius = 16;
-  final double studyCardTextSizeFront = 68;
-  final double studyCardTextSizeBack = 42;
-  final double studyCardTextSizeBackContent = 34;
+  double get studyCardAspectRatio => 5 / 7;
+  double get studyCardWidth => 300;
+  double get studyCardRadius => 16;
+  double get studyCardTextSizeFront => 68;
+  double get studyCardTextSizeBack => 42;
+  double get studyCardTextSizeBackContent => 34;
 
-  final double deckListingFeaturedImagesAspectRatio = 83 / 65;
+  double get deckListingFeaturedImagesAspectRatio => 83 / 65;
 }
