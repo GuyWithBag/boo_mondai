@@ -22,6 +22,7 @@ import 'package:boo_mondai/lib.barrel.dart'
 import 'package:boo_mondai/ui/view_study_session/view_study_session.bottom_nav_bar_body.dart';
 import 'package:flutter/material.dart' hide AppBar, Scaffold;
 import 'package:flutter_hooks/flutter_hooks.dart' show useEffect, useMemoized;
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -87,8 +88,12 @@ class ViewStudySessionPage extends SignalHookWidget {
       }
       if (controller.isCompleting.value ||
           studySessionController.isFinished.value == true) {
-        return const StatusLayoutState(
-          leading: CircularProgressIndicator(),
+        return StatusLayoutState(
+          leading: SizedBox(
+            height: 20.h,
+            width: 20.w,
+            child: CircularProgressIndicator(),
+          ),
           title: 'Saving results...',
           message: '',
         );
@@ -109,6 +114,8 @@ class ViewStudySessionPage extends SignalHookWidget {
 
     return Scaffold(
       scrollable: false,
+      resizeBodyForKeyboard: false,
+
       appBar: AppBar(
         onPop: () => controller.onPop(context),
         title: controller.title.value,
