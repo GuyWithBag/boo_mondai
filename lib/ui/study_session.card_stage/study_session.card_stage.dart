@@ -119,47 +119,50 @@ class StudySessionCardStage extends SignalHookWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final hasSubmitHint = showSubmitHint.value && !isRevealed;
-        final availableWidth = constraints.maxWidth.isFinite
-            ? constraints.maxWidth
-            : tokens.studyCardWidth;
-        final hintReserve = hasSubmitHint ? 56.0 : 0.0;
-        final availableCardHeight = constraints.maxHeight.isFinite
-            ? math.max(
-                1.0,
-                constraints.maxHeight - tokens.spaceLayoutGapSm - hintReserve,
-              )
-            : double.infinity;
-        final maxWidthFromHeight = availableCardHeight.isFinite
-            ? availableCardHeight * PhysicalCardController.defaultAspectRatio
-            : tokens.studyCardWidth;
-        final cardMaxWidth = math.min(
-          math.min(tokens.studyCardWidth, availableWidth),
-          maxWidthFromHeight,
-        );
 
-        return Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            spacing: tokens.spaceLayoutGapSm,
-            children: [
-              buildCard(cardMaxWidth),
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 180),
-                child: hasSubmitHint
-                    ? Text(
+        return Column(
+          children: [
+            Expanded(
+              child: LayoutBuilder(
+                builder: (context, cardConstraints) {
+                  final availableWidth = cardConstraints.maxWidth.isFinite
+                      ? cardConstraints.maxWidth
+                      : tokens.studyCardWidth;
+                  final availableHeight = cardConstraints.maxHeight.isFinite
+                      ? cardConstraints.maxHeight
+                      : double.infinity;
+                  final maxWidthFromHeight = availableHeight.isFinite
+                      ? availableHeight *
+                            PhysicalCardController.defaultAspectRatio
+                      : tokens.studyCardWidth;
+                  final cardMaxWidth = math.min(
+                    math.min(tokens.studyCardWidth, availableWidth),
+                    maxWidthFromHeight,
+                  );
+
+                  return Center(child: buildCard(cardMaxWidth));
+                },
+              ),
+            ),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 180),
+              child: hasSubmitHint
+                  ? Padding(
+                      key: const ValueKey('submit-hint'),
+                      padding: EdgeInsets.only(top: tokens.spaceLayoutGapSm),
+                      child: Text(
                         "Don't know this one? Submit an incorrect answer and try again.",
-                        key: const ValueKey('submit-hint'),
                         textAlign: TextAlign.center,
                         style: textStyle.resolve(tokens, const [
                           TextSize.labelSmall,
                           TextWeight.strong,
                           TextColor.error,
                         ]),
-                      )
-                    : const SizedBox.shrink(key: ValueKey('submit-hint-empty')),
-              ),
-            ],
-          ),
+                      ),
+                    )
+                  : const SizedBox.shrink(key: ValueKey('submit-hint-empty')),
+            ),
+          ],
         );
       },
     );
