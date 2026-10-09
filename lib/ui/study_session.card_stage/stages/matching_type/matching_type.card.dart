@@ -18,7 +18,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         AlignedScrollView,
         usePhysicalCardController,
         PhysicalCardController;
-import 'package:boo_mondai/ui/study_session.card_stage/widgets/matching_type.controller.dart';
+import 'package:boo_mondai/ui/study_session.card_stage/stages/matching_type/controllers/matching_type.controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -185,6 +185,11 @@ class _MatchingColumn extends SignalWidget {
                 baseTextStyle: itemTextStyle,
                 contentScale: contentScale,
                 resolveAttachmentUrl: resolveAttachmentUrl,
+                imageConstraints: const BoxConstraints(
+                  maxWidth: 96,
+                  maxHeight: 96,
+                ),
+                audioConstraints: const BoxConstraints(maxWidth: 160),
               ),
             ),
           ),

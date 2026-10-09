@@ -12,8 +12,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         WordScrambleTemplate,
         textStyle,
         usePhysicalCardController;
-import 'package:boo_mondai/ui/study_session.card_stage/widgets/word_scramble.chip.dart';
-import 'package:boo_mondai/ui/study_session.card_stage/widgets/word_scramble.controller.dart';
+import 'package:boo_mondai/ui/study_session.card_stage/stages/word_scramble/word_scramble.barrel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -89,11 +88,12 @@ class WordScrambleCard extends SignalHookWidget {
       tokens.spaceLayoutGapMd,
       contentScale,
     );
-    final sectionGap = ScaleHelper.getScaledValue(
+    final chipGap = ScaleHelper.getScaledValue(
       tokens.spaceLayoutGapXsm,
       contentScale,
     );
     final selectedWords = wordScrambleController.selectedWords.value;
+    final answered = selectedWords.isNotEmpty;
     final correctWords = template.sentenceToScramble
         .trim()
         .split(RegExp(r'\s+'))
@@ -149,7 +149,7 @@ class WordScrambleCard extends SignalHookWidget {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             Column(
-                              spacing: sectionGap,
+                              spacing: chipGap,
                               children: [
                                 if (selectedWords.isNotEmpty)
                                   Text(
@@ -162,13 +162,12 @@ class WordScrambleCard extends SignalHookWidget {
                                     alignment: WrapAlignment.center,
                                     crossAxisAlignment:
                                         WrapCrossAlignment.center,
-                                    spacing: sectionGap,
-                                    runSpacing: sectionGap,
+                                    spacing: chipGap,
+                                    runSpacing: chipGap,
                                     children: [
                                       for (final entry in selectedWords.indexed)
                                         WordScrambleChip(
                                           value: entry.$2.text,
-                                          selected: true,
                                           correct: wordScrambleController
                                               .isCorrectWordAt(entry.$1),
                                           contentScale: contentScale,
@@ -178,7 +177,7 @@ class WordScrambleCard extends SignalHookWidget {
                               ],
                             ),
                             Column(
-                              spacing: sectionGap,
+                              spacing: chipGap,
                               children: [
                                 Text(
                                   'Correct answer',
@@ -188,14 +187,13 @@ class WordScrambleCard extends SignalHookWidget {
                                 Wrap(
                                   alignment: WrapAlignment.center,
                                   crossAxisAlignment: WrapCrossAlignment.center,
-                                  spacing: sectionGap,
-                                  runSpacing: sectionGap,
+                                  spacing: chipGap,
+                                  runSpacing: chipGap,
                                   children: [
                                     for (final word in correctWords)
                                       WordScrambleChip(
                                         value: word,
-                                        selected: true,
-                                        correct: true,
+                                        correct: answered ? true : null,
                                         contentScale: contentScale,
                                       ),
                                   ],
@@ -215,16 +213,10 @@ class WordScrambleCard extends SignalHookWidget {
                       : Wrap(
                           alignment: WrapAlignment.center,
                           crossAxisAlignment: WrapCrossAlignment.center,
-                          spacing: ScaleHelper.getScaledValue(
-                            tokens.spaceLayoutGapSm,
-                            contentScale,
-                          ),
-                          runSpacing: ScaleHelper.getScaledValue(
-                            tokens.spaceLayoutGapSm,
-                            contentScale,
-                          ),
+                          spacing: chipGap,
+                          runSpacing: chipGap,
                           children: [
-                            _WordInsertionTarget(
+                            WordInsertTarget(
                               index: 0,
                               locked: wordScrambleController.isLocked,
                               contentScale: contentScale,
@@ -235,20 +227,25 @@ class WordScrambleCard extends SignalHookWidget {
                               ),
                             ),
                             for (final entry in selectedWords.indexed) ...[
-                              _SelectedWordChip(
-                                index: entry.$1,
+                              WordScrambleChip(
                                 value: entry.$2.text,
                                 correct: effectiveIsRevealed
                                     ? wordScrambleController.isCorrectWordAt(
                                         entry.$1,
                                       )
                                     : null,
-                                locked: wordScrambleController.isLocked,
+                                dragPayload: wordScrambleController.isLocked
+                                    ? null
+                                    : WordScrambleSelectedWordDragPayload(
+                                        entry.$1,
+                                      ),
                                 contentScale: contentScale,
-                                onDeleted: () => wordScrambleController
-                                    .removeSelectedWordAt(entry.$1),
+                                onPressed: wordScrambleController.isLocked
+                                    ? null
+                                    : () => wordScrambleController
+                                          .removeSelectedWordAt(entry.$1),
                               ),
-                              _WordInsertionTarget(
+                              WordInsertTarget(
                                 index: entry.$1 + 1,
                                 locked: wordScrambleController.isLocked,
                                 contentScale: contentScale,
@@ -281,82 +278,5 @@ class WordScrambleCard extends SignalHookWidget {
       case WordScrambleSelectedWordDragPayload(index: final from):
         controller.moveSelectedWord(from, index);
     }
-  }
-}
-
-class _SelectedWordChip extends StatelessWidget {
-  const _SelectedWordChip({
-    required this.index,
-    required this.value,
-    required this.locked,
-    required this.contentScale,
-    required this.onDeleted,
-    this.correct,
-  });
-
-  final int index;
-  final String value;
-  final bool locked;
-  final double contentScale;
-  final bool? correct;
-  final VoidCallback onDeleted;
-
-  @override
-  Widget build(BuildContext context) {
-    final chip = WordScrambleChip(
-      value: value,
-      selected: true,
-      correct: correct,
-      contentScale: contentScale,
-      onDeleted: locked ? null : onDeleted,
-    );
-
-    if (locked) return chip;
-
-    return LongPressDraggable<WordScrambleDragPayload>(
-      data: WordScrambleSelectedWordDragPayload(index),
-      feedback: Material(color: Colors.transparent, child: chip),
-      childWhenDragging: Opacity(opacity: 0.35, child: chip),
-      child: chip,
-    );
-  }
-}
-
-class _WordInsertionTarget extends StatelessWidget {
-  const _WordInsertionTarget({
-    required this.index,
-    required this.locked,
-    required this.contentScale,
-    required this.onAccept,
-  });
-
-  final int index;
-  final bool locked;
-  final double contentScale;
-  final ValueChanged<WordScrambleDragPayload> onAccept;
-
-  @override
-  Widget build(BuildContext context) {
-    return DragTarget<WordScrambleDragPayload>(
-      onWillAcceptWithDetails: (_) => !locked,
-      onAcceptWithDetails: (details) => onAccept(details.data),
-      builder: (context, candidateData, rejectedData) {
-        final active = candidateData.isNotEmpty;
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 120),
-          width: ScaleHelper.getScaledValue(active ? 28.w : 10.w, contentScale),
-          height: ScaleHelper.getScaledValue(42.h, contentScale),
-          decoration: BoxDecoration(
-            color: active
-                ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.18)
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(999),
-            border: active
-                ? Border.all(color: Theme.of(context).colorScheme.primary)
-                : null,
-          ),
-        );
-      },
-    );
   }
 }

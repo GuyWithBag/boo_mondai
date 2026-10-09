@@ -17,8 +17,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         WordScrambleCard;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class StudySessionCardStage extends HookWidget {
+class StudySessionCardStage extends SignalHookWidget {
   const StudySessionCardStage({
     required this.studySessionController,
     required this.cardStageController,

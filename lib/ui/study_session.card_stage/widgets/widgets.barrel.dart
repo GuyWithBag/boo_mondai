@@ -3,18 +3,5 @@
 // Barrel files
 // Other files
 export 'card_template.controller.dart';
-export 'fill_in_the_blank.text_field.dart';
-export 'fill_in_the_blanks.controller.dart';
-export 'flashcard.backside.dart';
-export 'flashcard.frontside.dart';
-export 'matching_type.controller.dart';
 export 'rating_area.dart';
-export 'word_bank.dart';
-export 'word_scramble.chip.dart';
-export 'word_scramble.controller.dart';
-export 'fill_in_the_blanks.card.dart';
-export 'flashcard.card.dart';
-export 'identification.card.dart';
-export 'matching_type.card.dart';
-export 'multiple_choice.card.dart';
-export 'word_scramble.card.dart';
+export 'scaled_surface_style.dart';

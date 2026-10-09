@@ -1,5 +1,5 @@
-
-import 'package:boo_mondai/lib.barrel.dart' show uuid, StudySessionRule, StudyRating, StudySessionMessageStep;
+import 'package:boo_mondai/lib.barrel.dart'
+    show uuid, StudySessionRule, StudyRating, StudySessionMessageStep;
 
 abstract final class StudySessionRules {
   static final rules = <StudySessionRule>[
@@ -32,9 +32,11 @@ abstract final class StudySessionRules {
     ),
     StudySessionRule(
       id: 'progress-encouragement-v1',
-      when: (session) => const {5, 10, 20}.contains(
-        session.history.where((entry) => entry.rating != null).length,
-      ),
+      when: (session) => const {
+        5,
+        10,
+        20,
+      }.contains(session.history.where((entry) => entry.rating != null).length),
       build: (session) {
         final count = session.history
             .where((entry) => entry.rating != null)
@@ -42,8 +44,8 @@ abstract final class StudySessionRules {
         return StudySessionMessageStep(
           id: uuid.v7(),
           messageDefinitionId: 'progress-milestone',
-          title: 'Good progress',
-          message: '$count cards completed.',
+          title: 'Good Job!',
+          message: 'You have $count cards completed! Keep it up!',
           insertedByRuleId: 'progress-encouragement-v1',
           insertionReason: 'Completed $count card steps',
         );

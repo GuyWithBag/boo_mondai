@@ -3,5 +3,4 @@
 // Barrel files
 // Other files
 export 'due_filter_threshold.dart';
-export 'scrambled_word.dart';
 export 'study_rating.dto.dart';

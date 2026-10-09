@@ -50,9 +50,6 @@ class FlashcardFrontSide extends StatelessWidget {
       EdgeInsets.all(tokens.spaceLayoutPaddingSm),
       contentScale,
     );
-    final resolveAttachmentUrl = MarkdownHelper.resolveTemplateAttachmentUrl(
-      template,
-    );
 
     return SizedBox.expand(
       child: Stack(
@@ -68,7 +65,8 @@ class FlashcardFrontSide extends StatelessWidget {
                 baseTextStyle: markdownTextStyle,
                 contentScale: contentScale,
                 defaultMarkdownAlignment: WrapAlignment.center,
-                resolveAttachmentUrl: resolveAttachmentUrl,
+                resolveAttachmentUrl:
+                    MarkdownHelper.resolveTemplateAttachmentUrl(template),
               ),
             ),
           ),

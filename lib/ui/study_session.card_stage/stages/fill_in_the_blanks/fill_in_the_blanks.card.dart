@@ -13,7 +13,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         PhysicalCard,
         AlignedScrollView,
         usePhysicalCardController,
-        PhysicalCardController;
+        PhysicalCardController,
+        MarkdownText,
+        MarkdownTextMode,
+        MarkdownHelper;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -99,47 +102,71 @@ class FillInTheBlanksCard extends SignalHookWidget {
           children: [
             Text('Fill in the blank'.toUpperCase(), style: eyebrowStyle),
             SizedBox(height: ScaleHelper.getScaledValue(48.h, contentScale)),
-            Wrap(
-              alignment: WrapAlignment.start,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              spacing: ScaleHelper.getScaledValue(
-                tokens.spaceLayoutGapSm,
-                contentScale,
-              ),
-              runSpacing: ScaleHelper.getScaledValue(
-                tokens.spaceLayoutGapSm,
-                contentScale,
-              ),
-              children: [
-                for (final entry
-                    in fillInTheBlanksController.segments.value.indexed)
-                  if (entry.$2.key case final key?)
-                    FillInTheBlankTextField(
-                      revealed: effectiveIsRevealed,
-                      correct: fillInTheBlanksController.isCorrect(
-                        fillInTheBlanksController.blankIndexForSegment(
-                          entry.$1,
-                        ),
-                      ),
-                      value:
-                          fillInTheBlanksController
+            LayoutBuilder(
+              builder: (context, constraints) => Wrap(
+                alignment: WrapAlignment.center,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: ScaleHelper.getScaledValue(
+                  tokens.spaceLayoutGapXsm,
+                  contentScale,
+                ),
+                runSpacing: ScaleHelper.getScaledValue(
+                  tokens.spaceLayoutGapSm,
+                  contentScale,
+                ),
+                children: [
+                  for (final entry
+                      in fillInTheBlanksController.segments.value.indexed)
+                    if (entry.$2.key case final key?)
+                      Builder(
+                        builder: (context) {
+                          final blankIndex = fillInTheBlanksController
+                              .blankIndexForSegment(entry.$1);
+                          final answer = fillInTheBlanksController
                               .answers
-                              .value[fillInTheBlanksController
-                              .blankIndexForSegment(entry.$1)],
-                      correctAnswer: key.value,
-                      onChanged: (value) =>
-                          fillInTheBlanksController.updateAnswer(
-                            fillInTheBlanksController.blankIndexForSegment(
-                              entry.$1,
+                              .value[blankIndex];
+
+                          return FillInTheBlankTextField(
+                            revealed: effectiveIsRevealed,
+                            answered: answer.trim().isNotEmpty,
+                            correct: fillInTheBlanksController.isCorrect(
+                              blankIndex,
                             ),
-                            value,
+                            value: answer,
+                            correctAnswer: key.value,
+                            onChanged: (value) => fillInTheBlanksController
+                                .updateAnswer(blankIndex, value),
+                            contentScale: contentScale,
+                            textStyle: answerTextStyle,
+                          );
+                        },
+                      )
+                    else
+                      for (final chunk
+                          in MarkdownHelper.splitInlineMarkdownWords(
+                            entry.$2.text!,
+                          ))
+                        if (chunk.isLineBreak)
+                          SizedBox(
+                            width: constraints.hasBoundedWidth
+                                ? constraints.maxWidth
+                                : maxWidth,
+                          )
+                        else
+                          MarkdownText(
+                            mode: MarkdownTextMode.previewSelectable,
+                            data: chunk.text,
+                            baseTextStyle: promptTextStyle,
+                            contentScale: contentScale,
+                            defaultMarkdownAlignment: WrapAlignment.center,
+                            fitContent: true,
+                            resolveAttachmentUrl:
+                                MarkdownHelper.resolveTemplateAttachmentUrl(
+                                  template,
+                                ),
                           ),
-                      contentScale: contentScale,
-                      textStyle: answerTextStyle,
-                    )
-                  else
-                    Text(entry.$2.text!, style: promptTextStyle),
-              ],
+                ],
+              ),
             ),
           ],
         ),

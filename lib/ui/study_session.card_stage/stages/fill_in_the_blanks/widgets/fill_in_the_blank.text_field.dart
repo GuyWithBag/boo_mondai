@@ -7,7 +7,13 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextFieldSize,
         TextFieldColor,
         ScaleHelper,
-        TextField;
+        TextField,
+        surfaceStyle,
+        SurfaceColor,
+        SurfacePadding,
+        SurfaceShadow,
+        SurfaceShape;
+import 'package:boo_mondai/ui/study_session.card_stage/widgets/scaled_surface_style.dart';
 import 'package:flutter/material.dart' hide TextField;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -15,6 +21,7 @@ import 'package:theme_variants/theme_variants.dart';
 class FillInTheBlankTextField extends StatelessWidget {
   const FillInTheBlankTextField({
     required this.revealed,
+    required this.answered,
     required this.correct,
     required this.value,
     required this.correctAnswer,
@@ -25,6 +32,7 @@ class FillInTheBlankTextField extends StatelessWidget {
   });
 
   final bool revealed;
+  final bool answered;
   final bool correct;
   final String value;
   final String correctAnswer;
@@ -51,20 +59,23 @@ class FillInTheBlankTextField extends StatelessWidget {
       );
     }
 
-    final color = correct ? tokens.colorActionSuccess : tokens.colorActionError;
+    final color = !answered
+        ? SurfaceColor.baseline
+        : correct
+        ? SurfaceColor.success
+        : SurfaceColor.error;
+    final resolvedStyle = surfaceStyle.resolve(tokens, [
+      color,
+      SurfacePadding.xsm,
+      SurfaceShape.roundedXxsm,
+      SurfaceShadow.none,
+    ]);
+
     return IntrinsicWidth(
-      child: Container(
-        padding: ScaleHelper.getScaledEdgeInsets(
-          EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-          contentScale,
-        ),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.12),
-          border: Border.all(color: color),
-          borderRadius: BorderRadius.circular(10.r * contentScale),
-        ),
+      child: Surface(
+        style: scaledSurfaceStyle(resolvedStyle, contentScale),
         child: MarkdownText(
-          data: correct ? value : correctAnswer,
+          data: correct && answered ? value : correctAnswer,
           mode: MarkdownTextMode.preview,
           baseTextStyle: textStyle,
           contentScale: contentScale,
