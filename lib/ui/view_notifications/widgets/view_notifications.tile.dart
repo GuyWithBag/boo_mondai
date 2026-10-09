@@ -96,7 +96,7 @@ class ViewNotificationsTile extends StatelessWidget {
                 ],
               ),
               MarkdownText(
-                data: notification.body,
+                data: notification.shortDescription,
                 mode: MarkdownTextMode.preview,
                 defaultMarkdownAlignment: WrapAlignment.start,
                 baseTextStyle: textStyle.resolve(tokens, const [

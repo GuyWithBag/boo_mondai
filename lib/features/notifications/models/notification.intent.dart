@@ -10,6 +10,7 @@ class NotificationIntent with NotificationIntentMappable {
     required this.profileId,
     required this.type,
     required this.title,
+    required this.shortDescription,
     required this.body,
     required this.createdAt,
     required this.updatedAt,
@@ -30,6 +31,7 @@ class NotificationIntent with NotificationIntentMappable {
     required String profileId,
     required NotificationIntentType type,
     required String title,
+    required String shortDescription,
     required String body,
     String? route,
     bool ifRouteNullPushToView = false,
@@ -51,6 +53,7 @@ class NotificationIntent with NotificationIntentMappable {
       profileId: profileId,
       type: type,
       title: title,
+      shortDescription: shortDescription,
       body: body,
       route: route,
       ifRouteNullPushToView: ifRouteNullPushToView,
@@ -71,6 +74,7 @@ class NotificationIntent with NotificationIntentMappable {
   final String profileId;
   final NotificationIntentType type;
   final String title;
+  final String shortDescription;
   final String body;
   final String? route;
   final bool ifRouteNullPushToView;

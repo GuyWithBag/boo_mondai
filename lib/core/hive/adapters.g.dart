@@ -2456,6 +2456,7 @@ class NotificationIntentAdapter extends TypeAdapter<NotificationIntent> {
       profileId: fields[12] as String,
       type: fields[1] as NotificationIntentType,
       title: fields[2] as String,
+      shortDescription: fields[17] as String,
       body: fields[3] as String,
       createdAt: fields[7] as DateTime,
       updatedAt: fields[8] as DateTime,
@@ -2475,7 +2476,7 @@ class NotificationIntentAdapter extends TypeAdapter<NotificationIntent> {
   @override
   void write(BinaryWriter writer, NotificationIntent obj) {
     writer
-      ..writeByte(17)
+      ..writeByte(18)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -2509,7 +2510,9 @@ class NotificationIntentAdapter extends TypeAdapter<NotificationIntent> {
       ..writeByte(15)
       ..write(obj.showAsBubble)
       ..writeByte(16)
-      ..write(obj.shown);
+      ..write(obj.shown)
+      ..writeByte(17)
+      ..write(obj.shortDescription);
   }
 
   @override

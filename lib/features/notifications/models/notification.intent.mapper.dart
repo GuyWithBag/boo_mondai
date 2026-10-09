@@ -39,6 +39,12 @@ class NotificationIntentMapper extends ClassMapperBase<NotificationIntent> {
     'title',
     _$title,
   );
+  static String _$shortDescription(NotificationIntent v) => v.shortDescription;
+  static const Field<NotificationIntent, String> _f$shortDescription = Field(
+    'shortDescription',
+    _$shortDescription,
+    key: r'short_description',
+  );
   static String _$body(NotificationIntent v) => v.body;
   static const Field<NotificationIntent, String> _f$body = Field(
     'body',
@@ -139,6 +145,7 @@ class NotificationIntentMapper extends ClassMapperBase<NotificationIntent> {
     #profileId: _f$profileId,
     #type: _f$type,
     #title: _f$title,
+    #shortDescription: _f$shortDescription,
     #body: _f$body,
     #createdAt: _f$createdAt,
     #updatedAt: _f$updatedAt,
@@ -160,6 +167,7 @@ class NotificationIntentMapper extends ClassMapperBase<NotificationIntent> {
       profileId: data.dec(_f$profileId),
       type: data.dec(_f$type),
       title: data.dec(_f$title),
+      shortDescription: data.dec(_f$shortDescription),
       body: data.dec(_f$body),
       createdAt: data.dec(_f$createdAt),
       updatedAt: data.dec(_f$updatedAt),
@@ -252,6 +260,7 @@ abstract class NotificationIntentCopyWith<
     String? profileId,
     NotificationIntentType? type,
     String? title,
+    String? shortDescription,
     String? body,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -285,6 +294,7 @@ class _NotificationIntentCopyWithImpl<$R, $Out>
     String? profileId,
     NotificationIntentType? type,
     String? title,
+    String? shortDescription,
     String? body,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -304,6 +314,7 @@ class _NotificationIntentCopyWithImpl<$R, $Out>
       if (profileId != null) #profileId: profileId,
       if (type != null) #type: type,
       if (title != null) #title: title,
+      if (shortDescription != null) #shortDescription: shortDescription,
       if (body != null) #body: body,
       if (createdAt != null) #createdAt: createdAt,
       if (updatedAt != null) #updatedAt: updatedAt,
@@ -327,6 +338,7 @@ class _NotificationIntentCopyWithImpl<$R, $Out>
     profileId: data.get(#profileId, or: $value.profileId),
     type: data.get(#type, or: $value.type),
     title: data.get(#title, or: $value.title),
+    shortDescription: data.get(#shortDescription, or: $value.shortDescription),
     body: data.get(#body, or: $value.body),
     createdAt: data.get(#createdAt, or: $value.createdAt),
     updatedAt: data.get(#updatedAt, or: $value.updatedAt),

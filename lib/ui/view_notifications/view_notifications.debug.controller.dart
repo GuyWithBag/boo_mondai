@@ -151,6 +151,7 @@ class ViewNotificationsDebugController {
           profileId: LocalDB.currentProfile.getOrCreate().id,
           type: type.value,
           title: resolvedTitle,
+          shortDescription: resolvedBody,
           body: resolvedBody,
           route: route,
           ifRouteNullPushToView: assignIntentRoute.value,

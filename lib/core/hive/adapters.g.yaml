@@ -835,7 +835,7 @@ types:
         index: 1
   NotificationIntent:
     typeId: 47
-    nextIndex: 17
+    nextIndex: 18
     fields:
       id:
         index: 0
@@ -871,6 +871,8 @@ types:
         index: 15
       shown:
         index: 16
+      shortDescription:
+        index: 17
   NotificationIntentType:
     typeId: 48
     nextIndex: 12

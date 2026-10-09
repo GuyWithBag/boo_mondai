@@ -12,6 +12,7 @@ abstract final class Notifications {
       profileId: currentProfileId,
       type: NotificationIntentType.reviewReminder,
       title: 'Time to review 🗂️',
+      shortDescription: 'Your cards are waiting.',
       body: 'Your cards are waiting. Keep your streak going!',
       route: '/reviews',
     );
@@ -23,6 +24,7 @@ abstract final class Notifications {
       profileId: currentProfileId,
       type: NotificationIntentType.streakReminder,
       title: "Don't break your streak 🔥",
+      shortDescription: 'A quick review keeps your streak alive.',
       body: 'A quick review is all it takes to keep it alive.',
       route: '/reviews',
     );
@@ -37,6 +39,7 @@ abstract final class Notifications {
       profileId: currentProfileId,
       type: NotificationIntentType.downloadComplete,
       title: 'Download complete',
+      shortDescription: deckTitle,
       body: deckTitle,
       route: route,
     );
@@ -48,6 +51,7 @@ abstract final class Notifications {
       profileId: currentProfileId,
       type: NotificationIntentType.syncComplete,
       title: 'Sync complete',
+      shortDescription: 'Your decks are up to date.',
       body: 'Your decks are up to date.',
     );
   }
@@ -58,6 +62,7 @@ abstract final class Notifications {
       profileId: currentProfileId,
       type: NotificationIntentType.finalDrillBatchSurvey,
       title: 'Quick question',
+      shortDescription: 'Tell us how your drill batches felt.',
       body: 'Tell us how your drill batches felt.',
       ifRouteNullPushToView: true,
       persistInInbox: true,
@@ -71,6 +76,7 @@ abstract final class Notifications {
       profileId: currentProfileId,
       type: NotificationIntentType.finalDrillBatchReviewNow,
       title: 'Review this deck now',
+      shortDescription: 'All drill batches are done. Start review next.',
       body:
           'Now that every drill batch is done, press Review Now to start spaced repetition for the cards you just practiced.',
       ifRouteNullPushToView: true,
@@ -86,6 +92,7 @@ abstract final class Notifications {
       profileId: currentProfileId,
       type: NotificationIntentType.firstReviewFsrsScheduling,
       title: 'Your review schedule is working',
+      shortDescription: 'FSRS is scheduling cards based on your ratings.',
       body:
           'BooMondai uses FSRS to choose when each card should return. Your ratings help it schedule reviews when they are most useful for memory.',
       ifRouteNullPushToView: true,
@@ -104,6 +111,7 @@ abstract final class Notifications {
       profileId: currentProfileId,
       type: NotificationIntentType.drillDeckComplete,
       title: 'Deck drill complete',
+      shortDescription: 'Every new card in $deckTitle has been drilled.',
       body:
           'You have drilled every new card in $deckTitle. Future cards will appear under Review.',
       ifRouteNullPushToView: true,
@@ -123,6 +131,7 @@ abstract final class Notifications {
       profileId: currentProfileId,
       type: NotificationIntentType.studyDeckReview,
       title: deckTitle,
+      shortDescription: body,
       body: body,
       route: '/reviews',
     );
@@ -134,6 +143,7 @@ abstract final class Notifications {
       profileId: currentProfileId,
       type: NotificationIntentType.researcherStudySessionComplete,
       title: 'Research session complete',
+      shortDescription: 'A research deck study session was completed.',
       body: 'A research deck study session was completed.',
       showAsBubble: true,
       persistInInbox: true,
