@@ -43,7 +43,7 @@ class MarkdownText extends HookWidget {
     this.audioConstraints,
     this.baseTextStyle,
     this.defaultMarkdownAlignment = WrapAlignment.center,
-    this.fitContent = false,
+    this.fitContent = true,
     this.contentScale = 1,
     this.useToolBar = true,
     this.allowAttachments = false,

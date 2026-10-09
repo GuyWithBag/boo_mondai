@@ -9,7 +9,7 @@ class MarkdownTextPreview extends StatelessWidget {
     required this.data,
     required this.selectable,
     required this.defaultAlignment,
-    this.fitContent = false,
+    this.fitContent = true,
     this.contentScale = 1,
     this.resolveAttachmentUrl,
     this.imageConstraints,

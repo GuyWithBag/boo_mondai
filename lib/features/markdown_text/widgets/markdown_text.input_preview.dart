@@ -33,7 +33,7 @@ class MarkdownTextInputPreview extends HookWidget {
     this.imageConstraints,
     this.audioConstraints,
     required this.defaultMarkdownAlignment,
-    this.fitContent = false,
+    this.fitContent = true,
     required this.useToolBar,
     required this.allowAttachments,
   });
