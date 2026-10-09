@@ -27,6 +27,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         DateHelper,
         FormField,
         DecksDirectoryPaths,
+        ProfileRole,
+        ProfileService,
         ToolBar,
         ToolBarController,
         showBottomSheet,
@@ -68,6 +70,9 @@ class ViewDeckSingleSheet extends SignalHookWidget {
     final toolBarController = useMemoized(() => ToolBarController());
     useEffect(() => toolBarController.dispose, [toolBarController]);
     final activeDeck = controller.deck.value;
+    final canDeleteDeck =
+        !activeDeck.isPremade ||
+        ProfileService.currentProfile.value.role == ProfileRole.appAdmin;
     return PopScope<void>(
       canPop: controller.canClose.value,
       onPopInvokedWithResult: (didPop, _) {
@@ -131,7 +136,7 @@ class ViewDeckSingleSheet extends SignalHookWidget {
                         '/view-cards?deckId=${Uri.encodeQueryComponent(deck.id)}',
                       ),
                     ),
-                    if (!controller.deck.value.isPremade)
+                    if (canDeleteDeck)
                       Button.icon(
                         tokens: tokens,
                         icon: Icons.delete_outline,

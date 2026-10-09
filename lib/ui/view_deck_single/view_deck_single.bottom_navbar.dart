@@ -6,6 +6,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         ButtonColor,
         Deck,
         LocalDB,
+        StudySessionConfig,
         ViewDeckSingleSheetController;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart' show GoRouterHelper;
@@ -24,6 +25,10 @@ BottomNavBar viewDeckSingleBottomNavBar({
     profileId,
   );
   final canDrill = eligibleCards.isNotEmpty;
+  final batchSize = const StudySessionConfig.drill().showCardsByBatch ?? 0;
+  final effectiveBatchSize = eligibleCards.length < batchSize
+      ? eligibleCards.length
+      : batchSize;
 
   return BottomNavBar(
     variants: const [SurfaceShape.roundedSm],
@@ -51,14 +56,14 @@ BottomNavBar viewDeckSingleBottomNavBar({
             message: deck.cardTemplatesCount == 0
                 ? 'No cards yet'
                 : canDrill
-                ? '${eligibleCards.length} cards ready'
+                ? 'Start a study session with $effectiveBatchSize of ${eligibleCards.length} ready cards.'
                 : 'Completed',
             child: Button(
               variants: const [ButtonColor.primary],
               onPressed: canDrill
                   ? () => context.push('/drill/${deck.id}/onboarding')
                   : null,
-              child: const Text('Study'),
+              child: Text('Study ($effectiveBatchSize)'),
             ),
           ),
         ),

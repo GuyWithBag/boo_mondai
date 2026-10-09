@@ -61,7 +61,6 @@ class ViewStudyDecksPage extends SignalHookWidget {
 
     return Scaffold(
       appBar: AppBar(title: 'FSRS Reviews', header: searchBar),
-      scrollable: false,
       body: ListingStatesWrapper.list(
         emptyState: StatusLayoutState(
           icon: Icons.abc,
