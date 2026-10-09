@@ -76,7 +76,7 @@ class ViewOnboardingPage extends SignalHookWidget {
                   icon: Icons.school_outlined,
                   title: 'Drills and FSRS Review',
                   markdown:
-                      '## Drills are for first practice\nDrills introduce new cards in **batches of 10**, so a big deck stays manageable. After one batch, you might see **Continue Next Batch (20)** when 20 new cards are still waiting.\n\n## FSRS is for long-term review\nAfter you rate a reviewed card, FSRS estimates how stable that memory is and chooses when the card should return. Easy cards wait longer; shaky cards come back sooner.',
+                      '## Drills are for first practice\n they help you memorize cards in the short term.\n\n## FSRS is the spaced repitition review scheduler for long term memorization\n After you rate a card, it estimates how stable that memory is and chooses when the card should return. Easy cards wait longer; shaky cards come back sooner.',
                 ),
                 _buildRatingTooltipPage(
                   context: context,

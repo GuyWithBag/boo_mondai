@@ -3,10 +3,14 @@ import 'package:boo_mondai/lib.barrel.dart'
         BottomNavBar,
         Button,
         Scaffold,
+        TextColor,
+        TextSize,
+        TextWeight,
         ViewCardsListView,
         AppTokens,
         ViewStudySessionDrillOnboardingController,
-        ButtonColor;
+        ButtonColor,
+        textStyle;
 import 'package:flutter/material.dart' hide Scaffold;
 import 'package:flutter_hooks/flutter_hooks.dart' show useEffect, useMemoized;
 import 'package:go_router/go_router.dart';
@@ -32,7 +36,18 @@ class ViewStudySessionDrillOnboardingPage extends SignalHookWidget {
     return Scaffold(
       body: Column(
         children: [
-          const Text('Review cards before starting the session.'),
+          Padding(
+            padding: EdgeInsets.all(tokens.spaceLayoutGapSm),
+            child: Text(
+              controller.batchMessage,
+              textAlign: TextAlign.center,
+              style: textStyle.resolve(tokens, const [
+                TextSize.labelSmall,
+                TextWeight.strong,
+                TextColor.muted,
+              ]),
+            ),
+          ),
           ViewCardsListView(controller: controller.cardsController),
         ],
       ),

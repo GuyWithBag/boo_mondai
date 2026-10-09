@@ -4,6 +4,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         DrillStudySessionSelector,
         LocalDB,
         StudyCard,
+        StudySessionConfig,
         ViewCardsController;
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 
@@ -22,6 +23,20 @@ final class ViewStudySessionDrillOnboardingController {
 
   late final ViewCardsController cardsController;
   List<StudyCard> selectedStudyCards = const [];
+  int remainingCardsAfterBatch = 0;
+
+  String get batchMessage {
+    final batchSize = const StudySessionConfig.drill().showCardsByBatch ?? 0;
+    final selectedCount = selectedStudyCards.length;
+    final cardLabel = selectedCount == 1 ? 'card' : 'cards';
+    final remainingLabel = remainingCardsAfterBatch == 1 ? 'card' : 'cards';
+
+    if (remainingCardsAfterBatch <= 0) {
+      return 'You are studying by batches of $batchSize cards. This drill has $selectedCount $cardLabel and is the final batch for this deck.';
+    }
+
+    return 'You are studying by batches of $batchSize cards. This drill has $selectedCount $cardLabel; after it, $remainingCardsAfterBatch $remainingLabel will still be waiting for the next batch.';
+  }
 
   String get sessionPath {
     return Uri(
@@ -38,10 +53,15 @@ final class ViewStudySessionDrillOnboardingController {
 
   List<CardTemplate> _loadTemplates() {
     final profileId = LocalDB.currentProfile.getOrCreate().id;
+    final eligibleCards = LocalDB.studyCard.getEligibleDrillCards(
+      deckId,
+      profileId,
+    );
     selectedStudyCards = DrillStudySessionSelector.select(
       deckId: deckId,
       profileId: profileId,
     );
+    remainingCardsAfterBatch = eligibleCards.length - selectedStudyCards.length;
     final templateIds = selectedStudyCards
         .map((card) => card.templateId)
         .toSet();
