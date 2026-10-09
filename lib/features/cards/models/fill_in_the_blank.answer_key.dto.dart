@@ -10,11 +10,16 @@ class FillInTheBlankAnswerKey with FillInTheBlankAnswerKeyMappable {
     required this.casingType,
     required this.value,
     required this.order,
+    this.aliases = const [],
   });
 
   final CasingType casingType;
   final String value;
   final int order;
+  final List<String> aliases;
 
-  bool accepts(String input) => CasingHelper.matches(input, value, casingType);
+  bool accepts(String input) {
+    return CasingHelper.matches(input, value, casingType) ||
+        aliases.any((alias) => CasingHelper.matches(input, alias, casingType));
+  }
 }

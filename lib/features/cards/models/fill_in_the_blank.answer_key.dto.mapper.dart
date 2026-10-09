@@ -42,12 +42,20 @@ class FillInTheBlankAnswerKeyMapper
     'order',
     _$order,
   );
+  static List<String> _$aliases(FillInTheBlankAnswerKey v) => v.aliases;
+  static const Field<FillInTheBlankAnswerKey, List<String>> _f$aliases = Field(
+    'aliases',
+    _$aliases,
+    opt: true,
+    def: const [],
+  );
 
   @override
   final MappableFields<FillInTheBlankAnswerKey> fields = const {
     #casingType: _f$casingType,
     #value: _f$value,
     #order: _f$order,
+    #aliases: _f$aliases,
   };
 
   static FillInTheBlankAnswerKey _instantiate(DecodingData data) {
@@ -55,6 +63,7 @@ class FillInTheBlankAnswerKeyMapper
       casingType: data.dec(_f$casingType),
       value: data.dec(_f$value),
       order: data.dec(_f$order),
+      aliases: data.dec(_f$aliases),
     );
   }
 
@@ -128,7 +137,13 @@ abstract class FillInTheBlankAnswerKeyCopyWith<
   $Out
 >
     implements ClassCopyWith<$R, $In, $Out> {
-  $R call({CasingType? casingType, String? value, int? order});
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get aliases;
+  $R call({
+    CasingType? casingType,
+    String? value,
+    int? order,
+    List<String>? aliases,
+  });
   FillInTheBlankAnswerKeyCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
   );
@@ -144,11 +159,24 @@ class _FillInTheBlankAnswerKeyCopyWithImpl<$R, $Out>
   late final ClassMapperBase<FillInTheBlankAnswerKey> $mapper =
       FillInTheBlankAnswerKeyMapper.ensureInitialized();
   @override
-  $R call({CasingType? casingType, String? value, int? order}) => $apply(
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get aliases =>
+      ListCopyWith(
+        $value.aliases,
+        (v, t) => ObjectCopyWith(v, $identity, t),
+        (v) => call(aliases: v),
+      );
+  @override
+  $R call({
+    CasingType? casingType,
+    String? value,
+    int? order,
+    List<String>? aliases,
+  }) => $apply(
     FieldCopyWithData({
       if (casingType != null) #casingType: casingType,
       if (value != null) #value: value,
       if (order != null) #order: order,
+      if (aliases != null) #aliases: aliases,
     }),
   );
   @override
@@ -156,6 +184,7 @@ class _FillInTheBlankAnswerKeyCopyWithImpl<$R, $Out>
     casingType: data.get(#casingType, or: $value.casingType),
     value: data.get(#value, or: $value.value),
     order: data.get(#order, or: $value.order),
+    aliases: data.get(#aliases, or: $value.aliases),
   );
 
   @override
