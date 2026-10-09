@@ -11,6 +11,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         MarkdownMedia;
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
+import 'package:markdown/markdown.dart' as md;
 import 'package:theme_variants/theme_variants.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -75,6 +76,7 @@ class MarkdownTextBody extends StatelessWidget {
       data: data,
       selectable: selectable,
       fitContent: fitContent,
+      extensionSet: md.ExtensionSet.gitHubWeb,
       blockSyntaxes: [MarkdownAlignedTextSyntax()],
       inlineSyntaxes: [MarkdownImageSyntax()],
       builders: {

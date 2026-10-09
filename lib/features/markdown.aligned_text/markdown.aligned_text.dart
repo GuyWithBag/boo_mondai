@@ -40,6 +40,7 @@ class MarkdownAlignedText extends MarkdownElementBuilder {
         data: element.attributes['content'] ?? '',
         selectable: selectable,
         fitContent: false,
+        extensionSet: md.ExtensionSet.gitHubWeb,
         inlineSyntaxes: [MarkdownImageSyntax()],
         onTapLink: onTapLink,
         builders: {MarkdownImageSyntax.tag: MarkdownImageElementBuilder()},
