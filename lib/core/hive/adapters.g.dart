@@ -674,19 +674,24 @@ class FillInTheBlankAnswerKeyAdapter
       casingType: fields[0] as CasingType,
       value: fields[1] as String,
       order: (fields[2] as num).toInt(),
+      aliases: fields[3] == null
+          ? const []
+          : (fields[3] as List).cast<String>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, FillInTheBlankAnswerKey obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.casingType)
       ..writeByte(1)
       ..write(obj.value)
       ..writeByte(2)
-      ..write(obj.order);
+      ..write(obj.order)
+      ..writeByte(3)
+      ..write(obj.aliases);
   }
 
   @override
@@ -2540,6 +2545,12 @@ class NotificationIntentTypeAdapter
         return NotificationIntentType.studyDeckReview;
       case 6:
         return NotificationIntentType.researcherStudySessionComplete;
+      case 7:
+        return NotificationIntentType.firstDrillReviewNow;
+      case 8:
+        return NotificationIntentType.drillDeckComplete;
+      case 9:
+        return NotificationIntentType.firstReviewFsrsScheduling;
       default:
         return NotificationIntentType.reviewReminder;
     }
@@ -2562,6 +2573,12 @@ class NotificationIntentTypeAdapter
         writer.writeByte(5);
       case NotificationIntentType.researcherStudySessionComplete:
         writer.writeByte(6);
+      case NotificationIntentType.firstDrillReviewNow:
+        writer.writeByte(7);
+      case NotificationIntentType.drillDeckComplete:
+        writer.writeByte(8);
+      case NotificationIntentType.firstReviewFsrsScheduling:
+        writer.writeByte(9);
     }
   }
 

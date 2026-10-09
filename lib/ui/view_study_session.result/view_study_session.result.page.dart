@@ -62,10 +62,14 @@ class ViewStudySessionResultPage extends SignalHookWidget {
             ),
             if (canReviewNow)
               Expanded(
-                child: Button(
-                  onPressed: () => controller.reviewNow(context),
-                  variants: [ButtonColor.primary],
-                  child: const Text('Review Now'),
+                child: Tooltip(
+                  message:
+                      'Start spaced repetition for the cards you just drilled.',
+                  child: Button(
+                    onPressed: () => controller.reviewNow(context),
+                    variants: [ButtonColor.primary],
+                    child: const Text('Review Now'),
+                  ),
                 ),
               ),
           ],

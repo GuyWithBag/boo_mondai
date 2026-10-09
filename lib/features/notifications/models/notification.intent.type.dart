@@ -9,6 +9,9 @@ enum NotificationIntentType {
   downloadComplete,
   syncComplete,
   firstDrillSurvey,
+  firstDrillReviewNow,
+  firstReviewFsrsScheduling,
+  drillDeckComplete,
   studyDeckReview,
   researcherStudySessionComplete,
 }

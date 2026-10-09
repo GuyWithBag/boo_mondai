@@ -5,12 +5,16 @@ import 'package:boo_mondai/lib.barrel.dart'
         LocalDB,
         NotificationIds,
         Notifications,
+        NotificationsController,
         NotificationsService,
         SettingPath,
-        SettingsStore;
+        SettingsStore,
+        SessionMode,
+        StudySession;
 
 abstract final class StudySessionNotificationsService {
   static const scheduleWindow = Duration(days: 7);
+  static final notificationsController = NotificationsController.instance;
 
   static Future<void> rescheduleAfterSession({
     required String profileId,
@@ -25,6 +29,65 @@ abstract final class StudySessionNotificationsService {
     }
 
     await rescheduleDeck(profileId: profileId, deckId: deckId);
+  }
+
+  static Future<void> showDrillCompletionNotifications(
+    StudySession session,
+  ) async {
+    if (session.mode != SessionMode.drill) return;
+
+    await showFirstDrillReviewNowNotification();
+
+    final deckId = session.deckId;
+    if (deckId == null) return;
+
+    final remainingEligibleCards = LocalDB.studyCard.getEligibleDrillCards(
+      deckId,
+      session.profileId,
+    );
+    if (remainingEligibleCards.isNotEmpty) return;
+
+    final deckCompleteNotificationId = NotificationIds.drillDeckComplete(
+      deckId: deckId,
+    );
+    if (notificationExists(deckCompleteNotificationId)) return;
+
+    final deck = LocalDB.deck.selectByPk({'id': deckId});
+    if (deck == null) return;
+
+    await notificationsController.notify(
+      Notifications.drillDeckComplete(
+        id: deckCompleteNotificationId,
+        deckTitle: deck.title,
+      ),
+      const ImmediateSchedule.now(),
+    );
+  }
+
+  static Future<void> showFirstDrillReviewNowNotification() async {
+    if (notificationExists(NotificationIds.firstDrillReviewNow)) return;
+
+    await notificationsController.notify(
+      Notifications.firstDrillReviewNow(),
+      const ImmediateSchedule.now(),
+    );
+  }
+
+  static Future<void> showReviewCompletionNotifications(
+    StudySession session,
+  ) async {
+    if (session.mode != SessionMode.review) return;
+    if (notificationExists(NotificationIds.firstReviewFsrsScheduling)) return;
+
+    await notificationsController.notify(
+      Notifications.firstReviewFsrsScheduling(),
+      const ImmediateSchedule.now(),
+    );
+  }
+
+  static bool notificationExists(int id) {
+    return LocalDB.notifications.selectByPk({'id': id}, includeDeleted: true) !=
+        null;
   }
 
   static Future<void> rescheduleDeck({

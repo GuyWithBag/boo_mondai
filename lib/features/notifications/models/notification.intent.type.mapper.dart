@@ -37,6 +37,12 @@ class NotificationIntentTypeMapper extends EnumMapper<NotificationIntentType> {
         return NotificationIntentType.syncComplete;
       case r'first_drill_survey':
         return NotificationIntentType.firstDrillSurvey;
+      case r'first_drill_review_now':
+        return NotificationIntentType.firstDrillReviewNow;
+      case r'first_review_fsrs_scheduling':
+        return NotificationIntentType.firstReviewFsrsScheduling;
+      case r'drill_deck_complete':
+        return NotificationIntentType.drillDeckComplete;
       case r'study_deck_review':
         return NotificationIntentType.studyDeckReview;
       case r'researcher_study_session_complete':
@@ -59,6 +65,12 @@ class NotificationIntentTypeMapper extends EnumMapper<NotificationIntentType> {
         return r'sync_complete';
       case NotificationIntentType.firstDrillSurvey:
         return r'first_drill_survey';
+      case NotificationIntentType.firstDrillReviewNow:
+        return r'first_drill_review_now';
+      case NotificationIntentType.firstReviewFsrsScheduling:
+        return r'first_review_fsrs_scheduling';
+      case NotificationIntentType.drillDeckComplete:
+        return r'drill_deck_complete';
       case NotificationIntentType.studyDeckReview:
         return r'study_deck_review';
       case NotificationIntentType.researcherStudySessionComplete:

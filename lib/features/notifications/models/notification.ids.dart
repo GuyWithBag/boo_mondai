@@ -5,14 +5,22 @@ abstract final class NotificationIds {
   static const int syncComplete = 4;
   static const int firstDrillSurvey = 5;
   static const int researcherStudySessionComplete = 6;
+  static const int firstDrillReviewNow = 7;
+  static const int firstReviewFsrsScheduling = 8;
 
   static const int dynamicIdOffset = 100000;
   static const int dynamicIdRange = 1800000;
+  static const int drillDeckCompleteDynamicIdOffset =
+      dynamicIdOffset + dynamicIdRange;
 
   static int studyDeckReview({required String deckId, required DateTime day}) {
     final localDay = DateTime(day.year, day.month, day.day);
     return dynamicIdOffset +
         _stableHash('$deckId:${localDay.toIso8601String()}');
+  }
+
+  static int drillDeckComplete({required String deckId}) {
+    return drillDeckCompleteDynamicIdOffset + _stableHash(deckId);
   }
 
   static int _stableHash(String value) {

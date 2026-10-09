@@ -459,6 +459,12 @@ final class StudySessionController {
             );
       throw error.value!;
     }
+    await StudySessionNotificationsService.showDrillCompletionNotifications(
+      active,
+    );
+    await StudySessionNotificationsService.showReviewCompletionNotifications(
+      active,
+    );
     await Services.streak.refreshFromReviewLogs();
     final decks = LocalDB.deck.getByProfileId(active.profileId);
     for (final deck in decks) {
