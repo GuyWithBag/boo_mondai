@@ -2,5 +2,5 @@
 
 // Barrel files
 // Other files
-export 'first_drill.survey.dart';
+export 'final_drill_batch.survey.dart';
 export 'survey.registry.dart';

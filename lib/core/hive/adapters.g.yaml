@@ -873,7 +873,7 @@ types:
         index: 16
   NotificationIntentType:
     typeId: 48
-    nextIndex: 10
+    nextIndex: 12
     fields:
       reviewReminder:
         index: 0
@@ -883,18 +883,18 @@ types:
         index: 2
       syncComplete:
         index: 3
-      firstDrillSurvey:
-        index: 4
       studyDeckReview:
         index: 5
       researcherStudySessionComplete:
         index: 6
-      firstDrillReviewNow:
-        index: 7
       drillDeckComplete:
         index: 8
       firstReviewFsrsScheduling:
         index: 9
+      finalDrillBatchSurvey:
+        index: 10
+      finalDrillBatchReviewNow:
+        index: 11
   StudySessionCompletedResults:
     typeId: 49
     nextIndex: 10

@@ -3,9 +3,9 @@ abstract final class NotificationIds {
   static const int streakReminder = 2;
   static const int downloadComplete = 3;
   static const int syncComplete = 4;
-  static const int firstDrillSurvey = 5;
+  static const int finalDrillBatchSurvey = 5;
   static const int researcherStudySessionComplete = 6;
-  static const int firstDrillReviewNow = 7;
+  static const int finalDrillBatchReviewNow = 7;
   static const int firstReviewFsrsScheduling = 8;
 
   static const int dynamicIdOffset = 100000;

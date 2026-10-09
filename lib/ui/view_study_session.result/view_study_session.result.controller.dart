@@ -50,12 +50,48 @@ final class ViewStudySessionResultController {
         availableSessionReviewCards.value.isNotEmpty,
   );
 
+  late final remainingDrillCardCount = computed(() {
+    final results = completedResults.value;
+    final deckId = results?.deckId;
+    if (results == null ||
+        results.mode != SessionMode.drill ||
+        deckId == null) {
+      return 0;
+    }
+
+    return LocalDB.studyCard
+        .getEligibleDrillCards(deckId, results.profileId)
+        .length;
+  });
+
+  late final canContinueNextBatch = computed(
+    () => remainingDrillCardCount.value > 0,
+  );
+
+  late final hasPrimaryAction = computed(
+    () => canContinueNextBatch.value || canReviewNow.value,
+  );
+
+  late final primaryActionLabel = computed(() {
+    final remaining = remainingDrillCardCount.value;
+    if (remaining > 0) return 'Continue Next Batch ($remaining)';
+    return 'Review Now';
+  });
+
+  late final primaryActionTooltip = computed(() {
+    if (canContinueNextBatch.value) {
+      return 'Study the next batch of new cards in this deck.';
+    }
+
+    return 'Start spaced repetition for the cards you just drilled.';
+  });
+
   late final backButtonLabel = computed(() {
     return 'Done';
   });
 
   late final backButtonVariants = computed(
-    () => canReviewNow.value
+    () => hasPrimaryAction.value
         ? const <ButtonColor>[]
         : const [ButtonColor.primary],
   );
@@ -111,9 +147,15 @@ final class ViewStudySessionResultController {
     context.go('/reviews');
   }
 
-  void reviewNow(BuildContext context) {
-    if (!canReviewNow.value) return;
+  void primaryAction(BuildContext context) {
     final deckId = completedResults.value?.deckId;
+
+    if (canContinueNextBatch.value && deckId != null) {
+      context.push('/drill/$deckId/session');
+      return;
+    }
+
+    if (!canReviewNow.value) return;
     if (deckId == null) {
       context.push('/review/session');
       return;
@@ -128,6 +170,11 @@ final class ViewStudySessionResultController {
     snapshots.dispose();
     availableSessionReviewCards.dispose();
     canReviewNow.dispose();
+    remainingDrillCardCount.dispose();
+    canContinueNextBatch.dispose();
+    hasPrimaryAction.dispose();
+    primaryActionLabel.dispose();
+    primaryActionTooltip.dispose();
     backButtonLabel.dispose();
     backButtonVariants.dispose();
     totalCards.dispose();

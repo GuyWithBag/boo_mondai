@@ -35,10 +35,10 @@ class NotificationIntentTypeMapper extends EnumMapper<NotificationIntentType> {
         return NotificationIntentType.downloadComplete;
       case r'sync_complete':
         return NotificationIntentType.syncComplete;
-      case r'first_drill_survey':
-        return NotificationIntentType.firstDrillSurvey;
-      case r'first_drill_review_now':
-        return NotificationIntentType.firstDrillReviewNow;
+      case r'final_drill_batch_survey':
+        return NotificationIntentType.finalDrillBatchSurvey;
+      case r'final_drill_batch_review_now':
+        return NotificationIntentType.finalDrillBatchReviewNow;
       case r'first_review_fsrs_scheduling':
         return NotificationIntentType.firstReviewFsrsScheduling;
       case r'drill_deck_complete':
@@ -63,10 +63,10 @@ class NotificationIntentTypeMapper extends EnumMapper<NotificationIntentType> {
         return r'download_complete';
       case NotificationIntentType.syncComplete:
         return r'sync_complete';
-      case NotificationIntentType.firstDrillSurvey:
-        return r'first_drill_survey';
-      case NotificationIntentType.firstDrillReviewNow:
-        return r'first_drill_review_now';
+      case NotificationIntentType.finalDrillBatchSurvey:
+        return r'final_drill_batch_survey';
+      case NotificationIntentType.finalDrillBatchReviewNow:
+        return r'final_drill_batch_review_now';
       case NotificationIntentType.firstReviewFsrsScheduling:
         return r'first_review_fsrs_scheduling';
       case NotificationIntentType.drillDeckComplete:

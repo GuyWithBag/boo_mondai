@@ -83,7 +83,7 @@ class ViewNotificationsDebugModal extends SignalHookWidget {
               isScrollable: true,
               options: const [
                 SegmentOption(
-                  value: NotificationIntentType.firstDrillSurvey,
+                  value: NotificationIntentType.finalDrillBatchSurvey,
                   label: 'Survey',
                 ),
                 SegmentOption(

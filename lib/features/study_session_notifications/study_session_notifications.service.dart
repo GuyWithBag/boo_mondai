@@ -36,8 +36,6 @@ abstract final class StudySessionNotificationsService {
   ) async {
     if (session.mode != SessionMode.drill) return;
 
-    await showFirstDrillReviewNowNotification();
-
     final deckId = session.deckId;
     if (deckId == null) return;
 
@@ -46,6 +44,9 @@ abstract final class StudySessionNotificationsService {
       session.profileId,
     );
     if (remainingEligibleCards.isNotEmpty) return;
+
+    await showFinalDrillBatchSurveyNotification();
+    await showFinalDrillBatchReviewNowNotification();
 
     final deckCompleteNotificationId = NotificationIds.drillDeckComplete(
       deckId: deckId,
@@ -64,11 +65,20 @@ abstract final class StudySessionNotificationsService {
     );
   }
 
-  static Future<void> showFirstDrillReviewNowNotification() async {
-    if (notificationExists(NotificationIds.firstDrillReviewNow)) return;
+  static Future<void> showFinalDrillBatchSurveyNotification() async {
+    if (notificationExists(NotificationIds.finalDrillBatchSurvey)) return;
 
     await notificationsController.notify(
-      Notifications.firstDrillReviewNow(),
+      Notifications.finalDrillBatchSurvey(),
+      const ImmediateSchedule.now(),
+    );
+  }
+
+  static Future<void> showFinalDrillBatchReviewNowNotification() async {
+    if (notificationExists(NotificationIds.finalDrillBatchReviewNow)) return;
+
+    await notificationsController.notify(
+      Notifications.finalDrillBatchReviewNow(),
       const ImmediateSchedule.now(),
     );
   }

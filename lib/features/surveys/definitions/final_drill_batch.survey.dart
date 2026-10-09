@@ -10,14 +10,14 @@ import 'package:boo_mondai/lib.barrel.dart'
         SurveyStatus,
         SurveyTextInputBlock;
 
-abstract final class FirstDrillSurvey {
-  static const String id = 'first-drill-survey-v1';
-  static const String introPageId = 'first-drill-survey-v1-intro';
-  static const String questionsPageId = 'first-drill-survey-v1-questions';
-  static const String contentBlockId = 'first-drill-survey-v1-content';
-  static const String ratingBlockId = 'first-drill-survey-v1-rating';
-  static const String feelingBlockId = 'first-drill-survey-v1-feeling';
-  static const String noteBlockId = 'first-drill-survey-v1-note';
+abstract final class FinalDrillBatchSurvey {
+  static const String id = 'final-drill-batch-survey-v1';
+  static const String introPageId = 'final-drill-batch-survey-v1-intro';
+  static const String questionsPageId = 'final-drill-batch-survey-v1-questions';
+  static const String contentBlockId = 'final-drill-batch-survey-v1-content';
+  static const String ratingBlockId = 'final-drill-batch-survey-v1-rating';
+  static const String feelingBlockId = 'final-drill-batch-survey-v1-feeling';
+  static const String noteBlockId = 'final-drill-batch-survey-v1-note';
 
   static SurveyDefinition build({required String profileId}) {
     final now = DateTime.now();
@@ -26,8 +26,8 @@ abstract final class FirstDrillSurvey {
       survey: Survey(
         id: id,
         profileId: profileId,
-        title: 'First drill feedback',
-        description: 'A short feedback survey after the first drill.',
+        title: 'Drill batch feedback',
+        description: 'A short feedback survey after finishing drill batches.',
         status: SurveyStatus.published,
         createdAt: now,
         updatedAt: now,
@@ -43,15 +43,15 @@ abstract final class FirstDrillSurvey {
           pageId: introPageId,
           position: 0,
           markdown:
-              'Thanks for finishing your first drill. This quick check helps tune the early study experience.',
+              'Thanks for finishing every drill batch. This quick check helps tune the early study experience.',
         ),
         SurveyLikertInputBlock(
           id: ratingBlockId,
           surveyId: id,
           pageId: questionsPageId,
           position: 0,
-          key: 'first_drill_rating',
-          prompt: 'How useful did that drill feel?',
+          key: 'final_drill_batch_rating',
+          prompt: 'How useful did the drill batches feel?',
           minValue: 1,
           maxValue: 5,
           minLabel: 'Not useful',
@@ -62,26 +62,26 @@ abstract final class FirstDrillSurvey {
           surveyId: id,
           pageId: questionsPageId,
           position: 1,
-          key: 'first_drill_feeling',
-          prompt: 'What best describes the drill?',
+          key: 'final_drill_batch_feeling',
+          prompt: 'What best describes the drill batches?',
           maxAnswers: 2,
           options: [
             SurveyChoiceOption(
-              id: 'first-drill-survey-v1-feeling-clear',
+              id: 'final-drill-batch-survey-v1-feeling-clear',
               blockId: feelingBlockId,
               position: 0,
               value: 'clear',
               label: 'Clear',
             ),
             SurveyChoiceOption(
-              id: 'first-drill-survey-v1-feeling-too_easy',
+              id: 'final-drill-batch-survey-v1-feeling-too_easy',
               blockId: feelingBlockId,
               position: 1,
               value: 'too_easy',
               label: 'Too easy',
             ),
             SurveyChoiceOption(
-              id: 'first-drill-survey-v1-feeling-too_hard',
+              id: 'final-drill-batch-survey-v1-feeling-too_hard',
               blockId: feelingBlockId,
               position: 2,
               value: 'too_hard',
@@ -94,7 +94,7 @@ abstract final class FirstDrillSurvey {
           surveyId: id,
           pageId: questionsPageId,
           position: 2,
-          key: 'first_drill_note',
+          key: 'final_drill_batch_note',
           prompt: 'Anything confusing?',
           isRequired: false,
           isLongText: true,

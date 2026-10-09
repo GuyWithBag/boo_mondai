@@ -35,7 +35,7 @@ class ViewStudySessionResultPage extends SignalHookWidget {
     );
     useEffect(() => controller.dispose, [controller]);
     final tokens = context.themeTokens<AppTokens>();
-    final canReviewNow = controller.canReviewNow.value;
+    final hasPrimaryAction = controller.hasPrimaryAction.value;
     final cardAnswers = controller.cardAnswers.value;
 
     final scoreAnim = useAnimationController(
@@ -60,15 +60,14 @@ class ViewStudySessionResultPage extends SignalHookWidget {
                 child: Text(controller.backButtonLabel.value),
               ),
             ),
-            if (canReviewNow)
+            if (hasPrimaryAction)
               Expanded(
                 child: Tooltip(
-                  message:
-                      'Start spaced repetition for the cards you just drilled.',
+                  message: controller.primaryActionTooltip.value,
                   child: Button(
-                    onPressed: () => controller.reviewNow(context),
+                    onPressed: () => controller.primaryAction(context),
                     variants: [ButtonColor.primary],
-                    child: const Text('Review Now'),
+                    child: Text(controller.primaryActionLabel.value),
                   ),
                 ),
               ),

@@ -41,7 +41,7 @@ void main() {
 
   group('StudySessionNotificationsService.showDrillCompletionNotifications', () {
     test(
-      'creates first drill and deck complete inbox bubble notifications',
+      'creates final drill batch survey, review, and deck complete notifications',
       () async {
         final profile = LocalDB.currentProfile.getOrCreate();
         final now = DateTime.utc(2026);
@@ -85,21 +85,30 @@ void main() {
           ),
         );
 
-        final firstDrillNotification = LocalDB.notifications.selectByPk({
-          'id': NotificationIds.firstDrillReviewNow,
+        final surveyNotification = LocalDB.notifications.selectByPk({
+          'id': NotificationIds.finalDrillBatchSurvey,
+        });
+        final reviewNotification = LocalDB.notifications.selectByPk({
+          'id': NotificationIds.finalDrillBatchReviewNow,
         });
         final deckCompleteNotification = LocalDB.notifications.selectByPk({
           'id': NotificationIds.drillDeckComplete(deckId: 'deck-1'),
         });
 
         expect(
-          firstDrillNotification?.type,
-          NotificationIntentType.firstDrillReviewNow,
+          surveyNotification?.type,
+          NotificationIntentType.finalDrillBatchSurvey,
         );
-        expect(firstDrillNotification?.persistInInbox, isTrue);
-        expect(firstDrillNotification?.showAsBubble, isTrue);
-        expect(firstDrillNotification?.showSystemNotification, isFalse);
-        expect(firstDrillNotification?.ifRouteNullPushToView, isTrue);
+        expect(surveyNotification?.persistInInbox, isTrue);
+        expect(surveyNotification?.ifRouteNullPushToView, isTrue);
+        expect(
+          reviewNotification?.type,
+          NotificationIntentType.finalDrillBatchReviewNow,
+        );
+        expect(reviewNotification?.persistInInbox, isTrue);
+        expect(reviewNotification?.showAsBubble, isTrue);
+        expect(reviewNotification?.showSystemNotification, isFalse);
+        expect(reviewNotification?.ifRouteNullPushToView, isTrue);
         expect(
           deckCompleteNotification?.type,
           NotificationIntentType.drillDeckComplete,
@@ -112,7 +121,7 @@ void main() {
     );
 
     test(
-      'does not create deck complete notification while cards remain',
+      'does not create final batch notifications while cards remain',
       () async {
         final profile = LocalDB.currentProfile.getOrCreate();
         final now = DateTime.utc(2026);
@@ -165,9 +174,15 @@ void main() {
 
         expect(
           LocalDB.notifications.selectByPk({
-            'id': NotificationIds.firstDrillReviewNow,
+            'id': NotificationIds.finalDrillBatchSurvey,
           }),
-          isNotNull,
+          isNull,
+        );
+        expect(
+          LocalDB.notifications.selectByPk({
+            'id': NotificationIds.finalDrillBatchReviewNow,
+          }),
+          isNull,
         );
         expect(
           LocalDB.notifications.selectByPk({
@@ -222,14 +237,20 @@ void main() {
       await StudySessionNotificationsService.showDrillCompletionNotifications(
         session,
       );
-      final firstDrillNotification = LocalDB.notifications.selectByPk({
-        'id': NotificationIds.firstDrillReviewNow,
+      final surveyNotification = LocalDB.notifications.selectByPk({
+        'id': NotificationIds.finalDrillBatchSurvey,
+      })!;
+      final reviewNotification = LocalDB.notifications.selectByPk({
+        'id': NotificationIds.finalDrillBatchReviewNow,
       })!;
       final deckCompleteNotification = LocalDB.notifications.selectByPk({
         'id': NotificationIds.drillDeckComplete(deckId: 'deck-1'),
       })!;
       await LocalDB.notifications.upsert(
-        firstDrillNotification.copyWith(deletedAt: deletedAt),
+        surveyNotification.copyWith(deletedAt: deletedAt),
+      );
+      await LocalDB.notifications.upsert(
+        reviewNotification.copyWith(deletedAt: deletedAt),
       );
       await LocalDB.notifications.upsert(
         deckCompleteNotification.copyWith(deletedAt: deletedAt),
@@ -241,7 +262,13 @@ void main() {
 
       expect(
         LocalDB.notifications.selectByPk({
-          'id': NotificationIds.firstDrillReviewNow,
+          'id': NotificationIds.finalDrillBatchSurvey,
+        }, includeDeleted: true)?.deletedAt,
+        deletedAt,
+      );
+      expect(
+        LocalDB.notifications.selectByPk({
+          'id': NotificationIds.finalDrillBatchReviewNow,
         }, includeDeleted: true)?.deletedAt,
         deletedAt,
       );

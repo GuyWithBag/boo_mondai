@@ -2539,18 +2539,18 @@ class NotificationIntentTypeAdapter
         return NotificationIntentType.downloadComplete;
       case 3:
         return NotificationIntentType.syncComplete;
-      case 4:
-        return NotificationIntentType.firstDrillSurvey;
       case 5:
         return NotificationIntentType.studyDeckReview;
       case 6:
         return NotificationIntentType.researcherStudySessionComplete;
-      case 7:
-        return NotificationIntentType.firstDrillReviewNow;
       case 8:
         return NotificationIntentType.drillDeckComplete;
       case 9:
         return NotificationIntentType.firstReviewFsrsScheduling;
+      case 10:
+        return NotificationIntentType.finalDrillBatchSurvey;
+      case 11:
+        return NotificationIntentType.finalDrillBatchReviewNow;
       default:
         return NotificationIntentType.reviewReminder;
     }
@@ -2567,18 +2567,18 @@ class NotificationIntentTypeAdapter
         writer.writeByte(2);
       case NotificationIntentType.syncComplete:
         writer.writeByte(3);
-      case NotificationIntentType.firstDrillSurvey:
-        writer.writeByte(4);
       case NotificationIntentType.studyDeckReview:
         writer.writeByte(5);
       case NotificationIntentType.researcherStudySessionComplete:
         writer.writeByte(6);
-      case NotificationIntentType.firstDrillReviewNow:
-        writer.writeByte(7);
       case NotificationIntentType.drillDeckComplete:
         writer.writeByte(8);
       case NotificationIntentType.firstReviewFsrsScheduling:
         writer.writeByte(9);
+      case NotificationIntentType.finalDrillBatchSurvey:
+        writer.writeByte(10);
+      case NotificationIntentType.finalDrillBatchReviewNow:
+        writer.writeByte(11);
     }
   }
 

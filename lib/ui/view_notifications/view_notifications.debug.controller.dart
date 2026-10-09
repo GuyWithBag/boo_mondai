@@ -43,7 +43,7 @@ class ViewNotificationsDebugController {
   final body = signal('');
   final customRoute = signal('');
   final purgeAfterDaysText = signal('30');
-  final type = signal(NotificationIntentType.firstDrillSurvey);
+  final type = signal(NotificationIntentType.finalDrillBatchSurvey);
   final persistInInbox = signal(true);
   final showSystemNotification = signal(false);
   final showAsBubble = signal(false);

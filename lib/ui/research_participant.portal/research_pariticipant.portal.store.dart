@@ -46,9 +46,16 @@ class ResearchPariticipantPortalStore {
     if (!_isParticipantDeckForRole(deckId: result.deckId, role: profile.role)) {
       return;
     }
+    if (result.deckId case final deckId?) {
+      final remainingEligibleCards = LocalDB.studyCard.getEligibleDrillCards(
+        deckId,
+        profile.id,
+      );
+      if (remainingEligibleCards.isNotEmpty) return;
+    }
 
     final existingNotification = LocalDB.notifications.selectByPk({
-      'id': NotificationIds.firstDrillSurvey,
+      'id': NotificationIds.finalDrillBatchSurvey,
     }, includeDeleted: true);
     if (existingNotification != null &&
         existingNotification.profileId == profile.id) {
@@ -56,7 +63,7 @@ class ResearchPariticipantPortalStore {
     }
 
     await NotificationsController.instance.notify(
-      Notifications.firstDrillSurvey(),
+      Notifications.finalDrillBatchSurvey(),
       const ImmediateSchedule.now(),
     );
   }

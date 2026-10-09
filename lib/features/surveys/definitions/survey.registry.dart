@@ -1,10 +1,10 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show FirstDrillSurvey, LocalDB, SurveyDefinition;
+    show FinalDrillBatchSurvey, LocalDB, SurveyDefinition;
 
 abstract final class SurveyRegistry {
   static List<SurveyDefinition> getAll() {
     final profileId = LocalDB.currentProfile.getOrCreate().id;
-    return [FirstDrillSurvey.build(profileId: profileId)];
+    return [FinalDrillBatchSurvey.build(profileId: profileId)];
   }
 
   static SurveyDefinition? getById(String surveyId) {

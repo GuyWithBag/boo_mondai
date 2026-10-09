@@ -52,27 +52,27 @@ abstract final class Notifications {
     );
   }
 
-  static NotificationIntent firstDrillSurvey() {
+  static NotificationIntent finalDrillBatchSurvey() {
     return NotificationIntent.create(
-      id: NotificationIds.firstDrillSurvey,
+      id: NotificationIds.finalDrillBatchSurvey,
       profileId: currentProfileId,
-      type: NotificationIntentType.firstDrillSurvey,
+      type: NotificationIntentType.finalDrillBatchSurvey,
       title: 'Quick question',
-      body: 'Tell us how your first drill felt.',
+      body: 'Tell us how your drill batches felt.',
       ifRouteNullPushToView: true,
       persistInInbox: true,
       showSystemNotification: true,
     );
   }
 
-  static NotificationIntent firstDrillReviewNow() {
+  static NotificationIntent finalDrillBatchReviewNow() {
     return NotificationIntent.create(
-      id: NotificationIds.firstDrillReviewNow,
+      id: NotificationIds.finalDrillBatchReviewNow,
       profileId: currentProfileId,
-      type: NotificationIntentType.firstDrillReviewNow,
+      type: NotificationIntentType.finalDrillBatchReviewNow,
       title: 'Review this deck now',
       body:
-          'After a drill, press Review Now to start spaced repetition for the cards you just practiced.',
+          'Now that every drill batch is done, press Review Now to start spaced repetition for the cards you just practiced.',
       ifRouteNullPushToView: true,
       persistInInbox: true,
       showAsBubble: true,
