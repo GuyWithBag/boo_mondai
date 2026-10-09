@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:boo_mondai/lib.barrel.dart'
     show
+        AppTokens,
         StudySessionController,
         FlashcardTemplate,
         IdentificationTemplate,
@@ -14,10 +17,15 @@ import 'package:boo_mondai/lib.barrel.dart'
         FillInTheBlanksCard,
         MatchingTypeCard,
         IdentificationCard,
-        WordScrambleCard;
+        WordScrambleCard,
+        TextColor,
+        TextSize,
+        TextWeight,
+        textStyle;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:signals_hooks/signals_hooks.dart';
+import 'package:theme_variants/theme_variants.dart';
 
 class StudySessionCardStage extends SignalHookWidget {
   const StudySessionCardStage({
@@ -41,8 +49,23 @@ class StudySessionCardStage extends SignalHookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = context.themeTokens<AppTokens>();
     final template = studySessionController.currentTemplate.value;
     final studyCard = studySessionController.currentStudyCard.value;
+    final stepId = studySessionController.currentStep.value?.id;
+    final isRevealed = cardStageController.isRevealed.value;
+    final showSubmitHint = useState(false);
+
+    useEffect(() {
+      showSubmitHint.value = false;
+      if (stepId == null || isRevealed) return null;
+
+      final timer = Timer(const Duration(seconds: 3), () {
+        showSubmitHint.value = true;
+      });
+
+      return timer.cancel;
+    }, [stepId, isRevealed]);
 
     if (template == null || studyCard == null) {
       return const Center(child: Text('No card available'));
@@ -83,6 +106,29 @@ class StudySessionCardStage extends SignalHookWidget {
       ),
     };
 
-    return Center(child: child);
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        spacing: tokens.spaceLayoutGapSm,
+        children: [
+          child,
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 180),
+            child: showSubmitHint.value && !isRevealed
+                ? Text(
+                    "Don't know this one? Submit an incorrect answer and try again.",
+                    key: const ValueKey('submit-hint'),
+                    textAlign: TextAlign.center,
+                    style: textStyle.resolve(tokens, const [
+                      TextSize.labelSmall,
+                      TextWeight.strong,
+                      TextColor.error,
+                    ]),
+                  )
+                : const SizedBox.shrink(key: ValueKey('submit-hint-empty')),
+          ),
+        ],
+      ),
+    );
   }
 }
