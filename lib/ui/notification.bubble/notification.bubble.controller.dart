@@ -29,9 +29,15 @@ class NotificationBubbleController {
   StreamSubscription<BoxEvent>? notificationsSubscription;
 
   void refresh() {
+    final activeNotificationIds = activeNotifications.value
+        .map((notification) => notification.id)
+        .toSet();
     final nextNotifications = notificationsController.unreadNotifications
         .where(
-          (notification) => notification.showAsBubble && !notification.shown,
+          (notification) =>
+              notification.showAsBubble &&
+              (!notification.shown ||
+                  activeNotificationIds.contains(notification.id)),
         )
         .toList();
 
