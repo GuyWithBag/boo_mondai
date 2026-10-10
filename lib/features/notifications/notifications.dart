@@ -61,11 +61,25 @@ abstract final class Notifications {
       id: NotificationIds.finalDrillBatchSurvey,
       profileId: currentProfileId,
       type: NotificationIntentType.finalDrillBatchSurvey,
-      title: 'Quick question',
-      shortDescription: 'Tell us how your drill batches felt.',
-      body: 'Tell us how your drill batches felt.',
+      title: '[Answer this Immediately] Post Session Survey',
+      shortDescription: 'Post Session Survey.',
+      body: '''
+## Tell us how your drill batches felt.
+
+**Answer this** [Google Form](https://forms.gle/NC9wyM5rSeAkDGxC7). 
+This serves as your *first survey (post session)*.
+
+### After completing the form above,
+**Answer** your corresponding *pre-test* based on your *language and set*.
+
+- [Japanese Set A](https://forms.gle/5UNnqtHMwUEUMuUB6)
+- [Japanese Set B](https://forms.gle/59DnQ1U6NNnjdSph8)
+- [Chinese Set A](https://forms.gle/itvFM5tpqxLEP1di7)
+- [Chinese Set B](https://forms.gle/14M8aYJS378voR6o9)
+''',
       ifRouteNullPushToView: true,
       persistInInbox: true,
+      showAsBubble: true,
       showSystemNotification: true,
     );
   }
