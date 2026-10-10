@@ -336,7 +336,7 @@ class _BodySubSection extends SignalHookWidget {
                         ),
                         MetaLabel(
                           icon: Icons.style_outlined,
-                          label: '${activeDeck.cardTemplatesCount} cards',
+                          label: '${controller.studyCardCount.value} cards',
                         ),
                       ],
                     ),

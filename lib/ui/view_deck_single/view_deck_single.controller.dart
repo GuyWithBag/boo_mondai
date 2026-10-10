@@ -24,13 +24,17 @@ import 'package:boo_mondai/lib.barrel.dart'
 import 'package:file_picker/file_picker.dart' show PlatformFile;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart' show GoRouterHelper;
+import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:signals_hooks/signals_hooks.dart';
 
 class ViewDeckSingleSheetController {
   ViewDeckSingleSheetController({
     required this.coverImage,
     required this.initialDeck,
-  }) : deck = signal(initialDeck);
+  }) : deck = signal(initialDeck) {
+    studyCardListenable = LocalDB.studyCard.box.listenable();
+    studyCardListenable.addListener(refreshStudyCardCount);
+  }
 
   Deck initialDeck;
   final Signal<Deck> deck;
@@ -38,6 +42,8 @@ class ViewDeckSingleSheetController {
   final pickedCoverImageFile = signal<PlatformFile?>(null);
   final isLoading = signal(false);
   final canClose = signal(false);
+  final studyCardRevision = signal(0);
+  late final Listenable studyCardListenable;
   bool _isRequestingClose = false;
 
   late final FutureSignal<ImageProvider?> coverImageFuture = futureSignal(
@@ -88,6 +94,10 @@ class ViewDeckSingleSheetController {
   late final coverImagePath = computed(
     () => DecksDirectoryPaths.coverImage(deckTitle: deck.value.title),
   );
+  late final studyCardCount = computed(() {
+    studyCardRevision.value;
+    return LocalDB.studyCard.getByDeckId(deck.value.id).length;
+  });
 
   static Content resolveDeckContent(Deck deck) {
     final existing = LocalDB.contents.selectByPk({'id': deck.id});
@@ -324,6 +334,10 @@ class ViewDeckSingleSheetController {
     coverImageFuture.refresh();
   }
 
+  void refreshStudyCardCount() {
+    studyCardRevision.value++;
+  }
+
   Future<void> deleteDeck(BuildContext context) async {
     final confirmed = await showModal<bool>(
       context: context,
@@ -350,6 +364,9 @@ class ViewDeckSingleSheetController {
   }
 
   void dispose() {
+    studyCardListenable.removeListener(refreshStudyCardCount);
+    studyCardCount.dispose();
+    studyCardRevision.dispose();
     canClose.dispose();
     isLoading.dispose();
     pickedCoverImageFile.dispose();
