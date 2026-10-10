@@ -326,7 +326,7 @@ class ResearchParticipantJapaneseSetAData extends ResearchParticipantData {
         updatedAt: now,
         frontText: "![Image](umbrella.webp)",
         backText: "かさ\nkasa\numbrella",
-        direction: CardTemplateDirection.both,
+        direction: CardTemplateDirection.normal,
       ),
       FlashcardTemplate(
         id: '${idPrefix}template_11',
@@ -336,7 +336,7 @@ class ResearchParticipantJapaneseSetAData extends ResearchParticipantData {
         updatedAt: now,
         frontText: "![Image](sushi.webp)",
         backText: "すし\nsushi\nsushi",
-        direction: CardTemplateDirection.both,
+        direction: CardTemplateDirection.normal,
       ),
       FlashcardTemplate(
         id: '${idPrefix}template_12',
@@ -346,7 +346,7 @@ class ResearchParticipantJapaneseSetAData extends ResearchParticipantData {
         updatedAt: now,
         frontText: "![Image](sugar.webp)",
         backText: "さとう\nsatou\nsugar",
-        direction: CardTemplateDirection.both,
+        direction: CardTemplateDirection.normal,
       ),
       FlashcardTemplate(
         id: '${idPrefix}template_13',
@@ -356,7 +356,7 @@ class ResearchParticipantJapaneseSetAData extends ResearchParticipantData {
         updatedAt: now,
         frontText: "![Image](apple.webp)",
         backText: "りんご\nringo\napple",
-        direction: CardTemplateDirection.both,
+        direction: CardTemplateDirection.normal,
       ),
       FlashcardTemplate(
         id: '${idPrefix}template_14',
@@ -366,7 +366,7 @@ class ResearchParticipantJapaneseSetAData extends ResearchParticipantData {
         updatedAt: now,
         frontText: "![Image](cat.webp)",
         backText: "ねこ\nneko\ncat",
-        direction: CardTemplateDirection.both,
+        direction: CardTemplateDirection.normal,
       ),
       MatchingTypeTemplate(
         id: '${idPrefix}template_15',

@@ -340,7 +340,7 @@ class ResearchParticipantChineseSetBData extends ResearchParticipantData {
         updatedAt: now,
         frontText: "![Audio](classmate.mp3)",
         backText: "同学\ntóngxué\nClassmate",
-        direction: CardTemplateDirection.both,
+        direction: CardTemplateDirection.normal,
       ),
       FlashcardTemplate(
         id: '${idPrefix}template_11',
@@ -350,7 +350,7 @@ class ResearchParticipantChineseSetBData extends ResearchParticipantData {
         updatedAt: now,
         frontText: "![Audio](doctor.mp3)",
         backText: "医生\nyīshēng\nDoctor",
-        direction: CardTemplateDirection.both,
+        direction: CardTemplateDirection.normal,
       ),
       FlashcardTemplate(
         id: '${idPrefix}template_12',
@@ -360,7 +360,7 @@ class ResearchParticipantChineseSetBData extends ResearchParticipantData {
         updatedAt: now,
         frontText: "![Audio](sir.mp3)",
         backText: "先生\nxiānsheng\nMr., sir",
-        direction: CardTemplateDirection.both,
+        direction: CardTemplateDirection.normal,
       ),
       FlashcardTemplate(
         id: '${idPrefix}template_13',
@@ -370,7 +370,7 @@ class ResearchParticipantChineseSetBData extends ResearchParticipantData {
         updatedAt: now,
         frontText: "![Audio](miss.mp3)",
         backText: "小姐\nxiǎojiě\nMiss, young lady",
-        direction: CardTemplateDirection.both,
+        direction: CardTemplateDirection.normal,
       ),
       FlashcardTemplate(
         id: '${idPrefix}template_14',
@@ -380,7 +380,7 @@ class ResearchParticipantChineseSetBData extends ResearchParticipantData {
         updatedAt: now,
         frontText: "![Audio](son.mp3)",
         backText: "儿子\nérzi\nSon",
-        direction: CardTemplateDirection.both,
+        direction: CardTemplateDirection.normal,
       ),
       MatchingTypeTemplate(
         id: '${idPrefix}template_15',
