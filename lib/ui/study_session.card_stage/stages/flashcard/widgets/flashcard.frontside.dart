@@ -64,6 +64,7 @@ class FlashcardFrontSide extends StatelessWidget {
                 data: template.getQuestion(isReversed: studyCard.isReversed),
                 baseTextStyle: markdownTextStyle,
                 contentScale: contentScale,
+                fitContent: false,
                 defaultMarkdownAlignment: WrapAlignment.center,
                 resolveAttachmentUrl:
                     MarkdownHelper.resolveTemplateAttachmentUrl(template),

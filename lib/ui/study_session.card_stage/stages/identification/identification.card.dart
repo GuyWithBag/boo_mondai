@@ -1,6 +1,3 @@
-import 'package:boo_mondai/core/helpers/casing.helper.dart';
-import 'package:boo_mondai/core/helpers/casing.type.dart';
-import 'package:boo_mondai/features/cards/models/identification.answer_key.dto.dart';
 import 'package:boo_mondai/ui/study_session.card_stage/widgets/scaled_surface_style.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
@@ -14,10 +11,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         PhysicalCard,
         PhysicalCardController,
         ScaleHelper,
-        StudyRating,
         StudySessionCardStageController,
-        StudySessionAnswer,
-        SurfaceColor,
         SurfacePadding,
         SurfaceShadow,
         SurfaceShape,
@@ -30,10 +24,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         surfaceStyle,
         textStyle,
         usePhysicalCardController;
+import 'package:boo_mondai/ui/study_session.card_stage/stages/identification/controllers/identification.controller.dart';
 import 'package:flutter/material.dart' hide TextField;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:fuzzywuzzy/fuzzywuzzy.dart';
 import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -58,12 +52,15 @@ class IdentificationCard extends SignalHookWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final answerController = useTextEditingController();
-    final effectiveIsRevealed =
-        isRevealed || cardStageController?.isRevealed.value == true;
-    final wasIncorrect =
-        cardStageController?.pendingRating.value == StudyRating.incorrect;
-    final submittedAnswer = cardStageController?.answer.value?.value.trim();
+    final identificationController = useMemoized(
+      () => IdentificationController(
+        template: template,
+        cardStageController: cardStageController,
+        isRevealed: isRevealed,
+      ),
+      [template.id, cardStageController],
+    );
+    identificationController.updateIsRevealed(isRevealed);
     final fallbackPhysicalCardController = usePhysicalCardController(
       context,
       width: maxWidth,
@@ -114,18 +111,12 @@ class IdentificationCard extends SignalHookWidget {
     );
 
     useEffect(() {
-      answerController.clear();
-      cardStageController?.answer.value = null;
-      cardStageController?.canReveal.value = false;
+      identificationController.resetAnswer();
       return null;
-    }, [template.id, cardStageController]);
-
-    void updateAnswer(String value) {
-      cardStageController?.answer.value = value.trim().isEmpty
-          ? null
-          : StudySessionAnswer(value: value);
-      cardStageController?.canReveal.value = value.trim().isNotEmpty;
-    }
+    }, [identificationController, template.id, cardStageController]);
+    useEffect(() => identificationController.dispose, [
+      identificationController,
+    ]);
 
     return PhysicalCard(
       controller: physicalCardController,
@@ -151,19 +142,17 @@ class IdentificationCard extends SignalHookWidget {
               resolveAttachmentUrl: resolveAttachmentUrl,
             ),
             SizedBox(height: gap),
-            if (effectiveIsRevealed)
+            if (identificationController.effectiveIsRevealed)
               _AcceptedAnswersPreview(
-                template: template,
+                controller: identificationController,
                 textStyle: answerStyle,
                 contentScale: contentScale,
-                wasIncorrect: wasIncorrect,
-                submittedAnswer: submittedAnswer,
                 resolveAttachmentUrl: resolveAttachmentUrl,
               )
             else ...[
               TextField(
-                controller: answerController,
-                onChanged: updateAnswer,
+                controller: identificationController.answerTextController,
+                onChanged: identificationController.updateAnswer,
                 placeholder: 'Type your answer...',
                 variants: const [
                   TextFieldSize.labelLarge,
@@ -172,10 +161,13 @@ class IdentificationCard extends SignalHookWidget {
               ),
               SizedBox(height: ScaleHelper.getScaledValue(8.h, contentScale)),
               Text(
-                _answerGuidance(template),
+                identificationController.answerCasingGuidance,
                 textAlign: TextAlign.center,
                 style: helperStyle,
               ),
+              if (identificationController.answerCountGuidance
+                  case final guidance?)
+                Text(guidance, textAlign: TextAlign.center, style: helperStyle),
             ],
           ],
         ),
@@ -186,37 +178,22 @@ class IdentificationCard extends SignalHookWidget {
 
 class _AcceptedAnswersPreview extends StatelessWidget {
   const _AcceptedAnswersPreview({
-    required this.template,
+    required this.controller,
     required this.textStyle,
     required this.contentScale,
-    required this.wasIncorrect,
     required this.resolveAttachmentUrl,
-    this.submittedAnswer,
   });
 
-  final IdentificationTemplate template;
+  final IdentificationController controller;
   final TextStyle textStyle;
   final double contentScale;
-  final bool wasIncorrect;
   final MarkdownAttachmentUrlResolver resolveAttachmentUrl;
-  final String? submittedAnswer;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final answers = template.answers.toList()
-      ..sort((a, b) => a.displayOrder.compareTo(b.displayOrder));
-
-    final visibleSubmittedAnswer = submittedAnswer?.trim();
-    final answered =
-        visibleSubmittedAnswer != null && visibleSubmittedAnswer.isNotEmpty;
-    final color = !answered
-        ? SurfaceColor.baseline
-        : wasIncorrect
-        ? SurfaceColor.error
-        : SurfaceColor.success;
     final resolvedAnswerStyle = surfaceStyle.resolve(tokens, [
-      color,
+      controller.answerSurfaceColor,
       SurfacePadding.xsm,
       SurfaceShape.roundedXxsm,
       SurfaceShadow.none,
@@ -229,11 +206,9 @@ class _AcceptedAnswersPreview extends StatelessWidget {
     return Column(
       spacing: ScaleHelper.getScaledValue(12.h, contentScale),
       children: [
-        if (wasIncorrect &&
-            visibleSubmittedAnswer != null &&
-            visibleSubmittedAnswer.isNotEmpty)
+        if (controller.shouldShowSubmittedAnswer)
           Text(
-            visibleSubmittedAnswer,
+            controller.visibleSubmittedAnswer!,
             textAlign: TextAlign.center,
             style: textStyle.copyWith(color: tokens.colorActionError),
           ),
@@ -242,7 +217,7 @@ class _AcceptedAnswersPreview extends StatelessWidget {
           spacing: ScaleHelper.getScaledValue(8.w, contentScale),
           runSpacing: ScaleHelper.getScaledValue(8.h, contentScale),
           children: [
-            for (final answer in answers)
+            for (final answer in controller.sortedAnswers)
               Surface(
                 style: scaledAnswerStyle,
                 child: MarkdownText(
@@ -255,12 +230,9 @@ class _AcceptedAnswersPreview extends StatelessWidget {
               ),
           ],
         ),
-        if (wasIncorrect &&
-            visibleSubmittedAnswer != null &&
-            visibleSubmittedAnswer.isNotEmpty)
+        if (controller.wrongAnswerInsight case final insight?)
           _WrongAnswerInsight(
-            answers: answers,
-            submittedAnswer: visibleSubmittedAnswer,
+            insight: insight,
             textStyle: textStyle,
             contentScale: contentScale,
           ),
@@ -271,22 +243,18 @@ class _AcceptedAnswersPreview extends StatelessWidget {
 
 class _WrongAnswerInsight extends StatelessWidget {
   const _WrongAnswerInsight({
-    required this.answers,
-    required this.submittedAnswer,
+    required this.insight,
     required this.textStyle,
     required this.contentScale,
   });
 
-  final List<IdentificationAnswerKey> answers;
-  final String submittedAnswer;
+  final String insight;
   final TextStyle textStyle;
   final double contentScale;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
-    final insight = _wrongAnswerInsight(answers, submittedAnswer);
-    if (insight == null) return const SizedBox.shrink();
 
     return Container(
       width: double.infinity,
@@ -306,87 +274,4 @@ class _WrongAnswerInsight extends StatelessWidget {
       ),
     );
   }
-}
-
-String _answerGuidance(IdentificationTemplate template) {
-  final answers = template.answers;
-  final casingLabels = answers
-      .map((answer) => _casingInstruction(answer.casingType))
-      .toSet()
-      .toList();
-  final casingText = casingLabels.length == 1
-      ? casingLabels.single
-      : casingLabels.join(' or ');
-  final answerText = answers.length == 1
-      ? 'There is 1 accepted answer.'
-      : 'There are ${answers.length} accepted answers.';
-
-  return 'Expected casing: $casingText $answerText';
-}
-
-String? _wrongAnswerInsight(
-  List<IdentificationAnswerKey> answers,
-  String submittedAnswer,
-) {
-  final normalizedSubmitted = CasingHelper.normalizedWords(submittedAnswer);
-  if (normalizedSubmitted.isEmpty) return null;
-
-  for (final answer in answers) {
-    if (CasingHelper.normalizedWords(answer.value) != normalizedSubmitted) {
-      continue;
-    }
-
-    return 'The wording matches "${answer.value}", but the casing should be ${_casingRequirement(answer.casingType)}.';
-  }
-
-  final closest = _closestAnswer(answers, submittedAnswer);
-  if (closest == null) return null;
-
-  return 'Closest accepted answer: "${closest.value}".';
-}
-
-String _casingRequirement(CasingType casingType) {
-  return switch (casingType) {
-    CasingType.any => 'any casing',
-    CasingType.exact => 'exact',
-    CasingType.camel => 'camelCase',
-    CasingType.pascal => 'PascalCase',
-    CasingType.snake => 'snake_case',
-    CasingType.kebab => 'kebab-case',
-    CasingType.title => 'Title Case',
-  };
-}
-
-IdentificationAnswerKey? _closestAnswer(
-  List<IdentificationAnswerKey> answers,
-  String submittedAnswer,
-) {
-  const cutoff = 70;
-  IdentificationAnswerKey? closest;
-  var bestScore = 0;
-
-  for (final answer in answers) {
-    final score = ratio(
-      CasingHelper.normalizedWords(submittedAnswer),
-      CasingHelper.normalizedWords(answer.value),
-    );
-    if (score > bestScore) {
-      closest = answer;
-      bestScore = score;
-    }
-  }
-
-  return bestScore >= cutoff ? closest : null;
-}
-
-String _casingInstruction(CasingType casingType) {
-  return switch (casingType) {
-    CasingType.any => 'Any casing is accepted.',
-    CasingType.exact => 'Use exact casing.',
-    CasingType.camel => 'Use camelCase.',
-    CasingType.pascal => 'Use PascalCase.',
-    CasingType.snake => 'Use snake_case.',
-    CasingType.kebab => 'Use kebab-case.',
-    CasingType.title => 'Use Title Case.',
-  };
 }
