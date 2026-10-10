@@ -151,7 +151,7 @@ final class ViewStudySessionResultController {
     final deckId = completedResults.value?.deckId;
 
     if (canContinueNextBatch.value && deckId != null) {
-      context.push('/drill/$deckId/session');
+      context.push('/drill/$deckId/onboarding');
       return;
     }
 

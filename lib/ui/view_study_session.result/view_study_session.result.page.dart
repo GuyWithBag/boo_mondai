@@ -53,12 +53,10 @@ class ViewStudySessionResultPage extends SignalHookWidget {
         child: Row(
           spacing: tokens.spaceLayoutGapSm,
           children: [
-            Expanded(
-              child: Button(
-                variants: controller.backButtonVariants.value,
-                onPressed: () => controller.onBackPressed(context),
-                child: Text(controller.backButtonLabel.value),
-              ),
+            Button(
+              variants: controller.backButtonVariants.value,
+              onPressed: () => controller.onBackPressed(context),
+              child: Text(controller.backButtonLabel.value),
             ),
             if (hasPrimaryAction)
               Expanded(
