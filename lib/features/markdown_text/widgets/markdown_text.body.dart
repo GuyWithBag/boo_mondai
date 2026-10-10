@@ -76,7 +76,8 @@ class MarkdownTextBody extends StatelessWidget {
       data: data,
       selectable: selectable,
       fitContent: fitContent,
-      extensionSet: md.ExtensionSet.gitHubWeb,
+      extensionSet: md.ExtensionSet.gitHubFlavored,
+      softLineBreak: true,
       blockSyntaxes: [MarkdownAlignedTextSyntax()],
       inlineSyntaxes: [MarkdownImageSyntax()],
       builders: {
