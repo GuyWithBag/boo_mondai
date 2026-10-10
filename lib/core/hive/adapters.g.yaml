@@ -31,7 +31,7 @@ types:
         index: 10
   Deck:
     typeId: 1
-    nextIndex: 19
+    nextIndex: 20
     fields:
       id:
         index: 0
@@ -63,14 +63,14 @@ types:
         index: 13
       isEditable:
         index: 14
-      cardTemplatesCount:
-        index: 15
       version:
         index: 16
       buildNumber:
         index: 17
       tags:
         index: 18
+      cardTemplatesCount:
+        index: 19
   MultipleChoiceOption:
     typeId: 2
     nextIndex: 5

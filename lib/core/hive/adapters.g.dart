@@ -94,7 +94,7 @@ class DeckAdapter extends TypeAdapter<Deck> {
           : fields[12] as VisibilityState,
       isPublished: fields[13] == null ? false : fields[13] as bool,
       isEditable: fields[14] == null ? true : fields[14] as bool,
-      cardTemplatesCount: fields[15] == null ? 0 : (fields[15] as num).toInt(),
+      cardTemplatesCount: fields[19] == null ? 0 : (fields[19] as num).toInt(),
       version: fields[16] == null ? '0.1.0+1' : fields[16] as String,
       buildNumber: fields[17] == null ? 1 : (fields[17] as num).toInt(),
       tags: fields[18] == null ? const [] : (fields[18] as List).cast<Tag>(),
@@ -139,14 +139,14 @@ class DeckAdapter extends TypeAdapter<Deck> {
       ..write(obj.isPublished)
       ..writeByte(14)
       ..write(obj.isEditable)
-      ..writeByte(15)
-      ..write(obj.cardTemplatesCount)
       ..writeByte(16)
       ..write(obj.version)
       ..writeByte(17)
       ..write(obj.buildNumber)
       ..writeByte(18)
-      ..write(obj.tags);
+      ..write(obj.tags)
+      ..writeByte(19)
+      ..write(obj.cardTemplatesCount);
   }
 
   @override
