@@ -4,6 +4,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         LocalDB,
         NotificationIds,
         NotificationIntent,
+        NotificationIntentTone,
         NotificationIntentType,
         NotificationsController,
         showSnackbar;
@@ -44,6 +45,7 @@ class ViewNotificationsDebugController {
   final customRoute = signal('');
   final purgeAfterDaysText = signal('30');
   final type = signal(NotificationIntentType.finalDrillBatchSurvey);
+  final tone = signal(NotificationIntentTone.inherit);
   final persistInInbox = signal(true);
   final showSystemNotification = signal(false);
   final showAsBubble = signal(false);
@@ -92,6 +94,10 @@ class ViewNotificationsDebugController {
 
   void setType(NotificationIntentType value) {
     type.value = value;
+  }
+
+  void setTone(NotificationIntentTone value) {
+    tone.value = value;
   }
 
   void setPersistInInbox(bool value) {
@@ -153,6 +159,7 @@ class ViewNotificationsDebugController {
           title: resolvedTitle,
           shortDescription: resolvedBody,
           body: resolvedBody,
+          tone: tone.value,
           route: route,
           ifRouteNullPushToView: assignIntentRoute.value,
           persistInInbox: persistInInbox.value,
@@ -189,6 +196,7 @@ class ViewNotificationsDebugController {
     customRoute.dispose();
     purgeAfterDaysText.dispose();
     type.dispose();
+    tone.dispose();
     persistInInbox.dispose();
     showSystemNotification.dispose();
     showAsBubble.dispose();

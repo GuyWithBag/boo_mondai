@@ -1,7 +1,8 @@
 import 'models/notification.ids.dart';
 import 'models/notification.intent.dart';
+import 'models/notification.intent.tone.dart';
 import 'package:boo_mondai/lib.barrel.dart'
-    show LocalDB, NotificationIntentType;
+    show LocalDB, NotificationIntentType, Pages;
 
 abstract final class Notifications {
   static String get currentProfileId => LocalDB.currentProfile.getOrCreate().id;
@@ -14,6 +15,7 @@ abstract final class Notifications {
       title: 'Time to review 🗂️',
       shortDescription: 'Your cards are waiting.',
       body: 'Your cards are waiting. Keep your streak going!',
+      tone: NotificationIntentTone.announcement,
       route: '/reviews',
     );
   }
@@ -26,6 +28,7 @@ abstract final class Notifications {
       title: "Don't break your streak 🔥",
       shortDescription: 'A quick review keeps your streak alive.',
       body: 'A quick review is all it takes to keep it alive.',
+      tone: NotificationIntentTone.inherit,
       route: '/reviews',
     );
   }
@@ -41,6 +44,7 @@ abstract final class Notifications {
       title: 'Download complete',
       shortDescription: deckTitle,
       body: deckTitle,
+      tone: NotificationIntentTone.success,
       route: route,
     );
   }
@@ -53,6 +57,7 @@ abstract final class Notifications {
       title: 'Sync complete',
       shortDescription: 'Your decks are up to date.',
       body: 'Your decks are up to date.',
+      tone: NotificationIntentTone.success,
     );
   }
 
@@ -77,6 +82,7 @@ This serves as your *first survey (post session)*.
 - [Chinese Set A](https://forms.gle/itvFM5tpqxLEP1di7)
 - [Chinese Set B](https://forms.gle/14M8aYJS378voR6o9)
 ''',
+      tone: NotificationIntentTone.announcement,
       ifRouteNullPushToView: true,
       persistInInbox: true,
       showAsBubble: true,
@@ -92,7 +98,8 @@ This serves as your *first survey (post session)*.
       title: 'Review this deck now',
       shortDescription: 'All drill batches are done. Start review next.',
       body:
-          'Now that every drill batch is done, press Review Now to start spaced repetition for the cards you just practiced.',
+          'Now that every drill batch is done,\npress Review Now to start spaced repetition for the cards you just practiced.',
+      tone: NotificationIntentTone.announcement,
       ifRouteNullPushToView: true,
       persistInInbox: true,
       showAsBubble: true,
@@ -109,6 +116,26 @@ This serves as your *first survey (post session)*.
       shortDescription: 'FSRS is scheduling cards based on your ratings.',
       body:
           'BooMondai uses FSRS to choose when each card should return. Your ratings help it schedule reviews when they are most useful for memory.',
+      tone: NotificationIntentTone.announcement,
+      ifRouteNullPushToView: true,
+      persistInInbox: true,
+      showAsBubble: true,
+      showSystemNotification: false,
+    );
+  }
+
+  static NotificationIntent reviewFsrsWarning() {
+    return NotificationIntent.create(
+      id: NotificationIds.reviewFsrsWarning,
+      profileId: currentProfileId,
+      type: NotificationIntentType.reviewFsrsWarning,
+      title: 'FSRS Review saves your progress',
+      shortDescription:
+          'Unlike Drill, With FSRS Review, you can quit anytime and it will save your progress.',
+      body:
+          'Unlike Drill, With FSRS Review, you can quit anytime and it will save your progress.',
+      tone: NotificationIntentTone.warning,
+      route: Pages.notificationIntentUrl(NotificationIds.reviewFsrsWarning),
       ifRouteNullPushToView: true,
       persistInInbox: true,
       showAsBubble: true,
@@ -127,7 +154,8 @@ This serves as your *first survey (post session)*.
       title: 'Deck drill complete',
       shortDescription: 'Every new card in $deckTitle has been drilled.',
       body:
-          'You have drilled every new card in $deckTitle. Future cards will appear under Review.',
+          'You have drilled every new card in $deckTitle.\nFuture cards will appear under Review.',
+      tone: NotificationIntentTone.success,
       ifRouteNullPushToView: true,
       persistInInbox: true,
       showAsBubble: true,
@@ -147,6 +175,7 @@ This serves as your *first survey (post session)*.
       title: deckTitle,
       shortDescription: body,
       body: body,
+      tone: NotificationIntentTone.announcement,
       route: '/reviews',
     );
   }
@@ -159,6 +188,7 @@ This serves as your *first survey (post session)*.
       title: 'Research session complete',
       shortDescription: 'A research deck study session was completed.',
       body: 'A research deck study session was completed.',
+      tone: NotificationIntentTone.success,
       showAsBubble: true,
       persistInInbox: true,
     );

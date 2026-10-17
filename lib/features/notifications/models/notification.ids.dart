@@ -7,6 +7,7 @@ abstract final class NotificationIds {
   static const int researcherStudySessionComplete = 6;
   static const int finalDrillBatchReviewNow = 7;
   static const int firstReviewFsrsScheduling = 8;
+  static const int reviewFsrsWarning = 9;
 
   static const int dynamicIdOffset = 100000;
   static const int dynamicIdRange = 1800000;

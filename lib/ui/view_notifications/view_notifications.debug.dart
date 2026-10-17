@@ -5,6 +5,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         ButtonColor,
         MarkdownText,
         MarkdownTextMode,
+        NotificationIntentTone,
         NotificationIntentType,
         SegmentOption,
         SegmentedControl,
@@ -56,6 +57,7 @@ class ViewNotificationsDebugModal extends SignalHookWidget {
     useEffect(() => controller.dispose, [controller]);
 
     final type = controller.type.value;
+    final tone = controller.tone.value;
     final persistInInbox = controller.persistInInbox.value;
     final showSystemNotification = controller.showSystemNotification.value;
     final showAsBubble = controller.showAsBubble.value;
@@ -98,6 +100,34 @@ class ViewNotificationsDebugModal extends SignalHookWidget {
                 SegmentOption(
                   value: NotificationIntentType.studyDeckReview,
                   label: 'Review',
+                ),
+              ],
+            ),
+            SizedBox(height: tokens.spaceLayoutGapSm),
+            SegmentedControl<NotificationIntentTone>(
+              value: tone,
+              onChanged: controller.setTone,
+              isScrollable: true,
+              options: const [
+                SegmentOption(
+                  value: NotificationIntentTone.inherit,
+                  label: 'Inherit',
+                ),
+                SegmentOption(
+                  value: NotificationIntentTone.success,
+                  label: 'Success',
+                ),
+                SegmentOption(
+                  value: NotificationIntentTone.danger,
+                  label: 'Danger',
+                ),
+                SegmentOption(
+                  value: NotificationIntentTone.warning,
+                  label: 'Warning',
+                ),
+                SegmentOption(
+                  value: NotificationIntentTone.announcement,
+                  label: 'Announcement',
                 ),
               ],
             ),

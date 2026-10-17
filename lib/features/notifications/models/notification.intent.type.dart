@@ -11,6 +11,7 @@ enum NotificationIntentType {
   finalDrillBatchSurvey,
   finalDrillBatchReviewNow,
   firstReviewFsrsScheduling,
+  reviewFsrsWarning,
   drillDeckComplete,
   studyDeckReview,
   researcherStudySessionComplete,

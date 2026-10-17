@@ -1,4 +1,5 @@
 import 'package:boo_mondai/features/notifications/models/notification.intent.type.dart';
+import 'package:boo_mondai/features/notifications/models/notification.intent.tone.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 
 part 'notification.intent.mapper.dart';
@@ -15,6 +16,7 @@ class NotificationIntent with NotificationIntentMappable {
     required this.createdAt,
     required this.updatedAt,
     required this.purgeAt,
+    this.tone = NotificationIntentTone.inherit,
     this.route,
     this.ifRouteNullPushToView = false,
     this.persistInInbox = false,
@@ -33,6 +35,7 @@ class NotificationIntent with NotificationIntentMappable {
     required String title,
     required String shortDescription,
     required String body,
+    NotificationIntentTone tone = NotificationIntentTone.inherit,
     String? route,
     bool ifRouteNullPushToView = false,
     bool persistInInbox = false,
@@ -55,6 +58,7 @@ class NotificationIntent with NotificationIntentMappable {
       title: title,
       shortDescription: shortDescription,
       body: body,
+      tone: tone,
       route: route,
       ifRouteNullPushToView: ifRouteNullPushToView,
       persistInInbox: persistInInbox,
@@ -76,6 +80,7 @@ class NotificationIntent with NotificationIntentMappable {
   final String title;
   final String shortDescription;
   final String body;
+  final NotificationIntentTone tone;
   final String? route;
   final bool ifRouteNullPushToView;
   final bool persistInInbox;

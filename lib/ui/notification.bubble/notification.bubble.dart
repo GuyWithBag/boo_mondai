@@ -3,13 +3,16 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         Button,
         NotificationIntent,
-        NotificationBubbleColor,
+        NotificationIntentPresentation,
         NotificationBubbleController,
-        NotificationBubbleVariant,
+        SurfaceBorder,
+        SurfacePadding,
+        SurfaceShape,
+        SurfaceShadow,
         TextColor,
         TextSize,
         TextWeight,
-        notificationBubbleStyle,
+        surfaceStyle,
         textStyle;
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -20,16 +23,10 @@ import 'package:theme_variants/theme_variants.dart';
 class NotificationBubble extends SignalHookWidget {
   const NotificationBubble({
     super.key,
-    this.color = NotificationBubbleColor.surface,
-    this.variant = NotificationBubbleVariant.elevated,
-    this.variants = const [],
     this.minWidth = 320,
     this.maxWidth = 420,
   });
 
-  final NotificationBubbleColor color;
-  final NotificationBubbleVariant variant;
-  final List<Object> variants;
   final double minWidth;
   final double maxWidth;
 
@@ -38,18 +35,11 @@ class NotificationBubble extends SignalHookWidget {
     final tokens = context.themeTokens<AppTokens>();
     final controller = NotificationBubbleController.instance;
     final notifications = controller.activeNotifications.value;
-    final resolvedStyle = notificationBubbleStyle.resolve(tokens, [
-      color,
-      variant,
-      ...variants,
-    ]);
 
     if (notifications.isEmpty) return const SizedBox.shrink();
 
     return Padding(
-      padding: resolvedStyle.transform != null
-          ? EdgeInsets.only(top: tokens.modalShadowOffset)
-          : EdgeInsets.zero,
+      padding: EdgeInsets.only(top: tokens.modalShadowOffset),
       child: Align(
         alignment: Alignment.topRight,
         child: Column(
@@ -62,7 +52,6 @@ class NotificationBubble extends SignalHookWidget {
                 notification: notification,
                 minWidth: minWidth,
                 maxWidth: maxWidth,
-                resolvedStyle: resolvedStyle,
               ),
           ],
         ),
@@ -77,18 +66,23 @@ class _NotificationBubbleItem extends StatelessWidget {
     required this.notification,
     required this.minWidth,
     required this.maxWidth,
-    required this.resolvedStyle,
   });
 
   final NotificationIntent notification;
   final double minWidth;
   final double maxWidth;
-  final dynamic resolvedStyle;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
     final controller = NotificationBubbleController.instance;
+    final resolvedStyle = surfaceStyle.resolve(tokens, [
+      notification.surfaceColor,
+      SurfaceBorder.baseline,
+      SurfacePadding.baseline,
+      SurfaceShape.roundedXsm,
+      SurfaceShadow.tactile,
+    ]);
 
     final route = controller.routeFor(notification);
     final canOpen = route != null && route.isNotEmpty;
@@ -103,9 +97,9 @@ class _NotificationBubbleItem extends StatelessWidget {
             child: InkWell(
               onTap: canOpen
                   ? () async {
+                      final router = GoRouter.of(context);
                       await controller.dismiss(notification);
-                      if (!context.mounted) return;
-                      context.push(route);
+                      router.push(route);
                     }
                   : null,
               child: Surface(
@@ -113,6 +107,8 @@ class _NotificationBubbleItem extends StatelessWidget {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Icon(notification.icon),
+                    SizedBox(width: tokens.spaceLayoutGapSm),
                     Expanded(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
@@ -127,7 +123,7 @@ class _NotificationBubbleItem extends StatelessWidget {
                           ),
                           SizedBox(height: tokens.spaceLayoutGapXsm),
                           Text(
-                            notification.body,
+                            notification.shortDescription,
                             maxLines: 3,
                             overflow: TextOverflow.ellipsis,
                             style: textStyle.resolve(tokens, const [

@@ -41,6 +41,8 @@ class NotificationIntentTypeMapper extends EnumMapper<NotificationIntentType> {
         return NotificationIntentType.finalDrillBatchReviewNow;
       case r'first_review_fsrs_scheduling':
         return NotificationIntentType.firstReviewFsrsScheduling;
+      case r'review_fsrs_warning':
+        return NotificationIntentType.reviewFsrsWarning;
       case r'drill_deck_complete':
         return NotificationIntentType.drillDeckComplete;
       case r'study_deck_review':
@@ -69,6 +71,8 @@ class NotificationIntentTypeMapper extends EnumMapper<NotificationIntentType> {
         return r'final_drill_batch_review_now';
       case NotificationIntentType.firstReviewFsrsScheduling:
         return r'first_review_fsrs_scheduling';
+      case NotificationIntentType.reviewFsrsWarning:
+        return r'review_fsrs_warning';
       case NotificationIntentType.drillDeckComplete:
         return r'drill_deck_complete';
       case NotificationIntentType.studyDeckReview:

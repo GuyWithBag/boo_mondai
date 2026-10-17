@@ -5,6 +5,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         MarkdownText,
         MarkdownTextMode,
         NotificationIntent,
+        NotificationIntentPresentation,
         NotificationsController,
         Pages,
         SurfaceBorder,
@@ -37,7 +38,7 @@ class ViewNotificationsTile extends StatelessWidget {
     final canOpen = route != null && route.isNotEmpty;
     final isRead = notification.readAt != null;
     final style = surfaceStyle.resolve(tokens, [
-      isRead ? SurfaceColor.baseline : SurfaceColor.muted,
+      isRead ? SurfaceColor.baseline : notification.surfaceColor,
       SurfaceBorder.baseline,
       SurfaceShape.roundedXsm,
       SurfaceShadow.none,
@@ -70,7 +71,10 @@ class ViewNotificationsTile extends StatelessWidget {
             spacing: tokens.spaceLayoutGapXsm,
             children: [
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Icon(notification.icon),
+                  SizedBox(width: tokens.spaceLayoutGapSm),
                   Expanded(
                     child: MarkdownText(
                       data: notification.title,

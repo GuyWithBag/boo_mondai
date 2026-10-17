@@ -4,5 +4,7 @@
 // Other files
 export 'notification.ids.dart';
 export 'notification.intent.dart';
+export 'notification.intent.presentation.dart';
+export 'notification.intent.tone.dart';
 export 'notification.schedule.dart';
 export 'notification.intent.type.dart';

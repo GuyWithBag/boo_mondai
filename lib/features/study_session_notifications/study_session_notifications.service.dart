@@ -4,6 +4,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         ImmediateSchedule,
         LocalDB,
         NotificationIds,
+        NotificationIntent,
         Notifications,
         NotificationsController,
         NotificationsService,
@@ -48,38 +49,44 @@ abstract final class StudySessionNotificationsService {
     await showFinalDrillBatchSurveyNotification();
     await showFinalDrillBatchReviewNowNotification();
 
-    final deckCompleteNotificationId = NotificationIds.drillDeckComplete(
-      deckId: deckId,
-    );
-    if (notificationExists(deckCompleteNotificationId)) return;
+    if (SettingsStore.instance.get<bool>(SettingPath.drillDeckCompleteShown)) {
+      return;
+    }
 
     final deck = LocalDB.deck.selectByPk({'id': deckId});
     if (deck == null) return;
 
-    await notificationsController.notify(
-      Notifications.drillDeckComplete(
-        id: deckCompleteNotificationId,
+    await showFirstTimeEventNotification(
+      path: SettingPath.drillDeckCompleteShown,
+      createNotification: () => Notifications.drillDeckComplete(
+        id: NotificationIds.drillDeckComplete(deckId: deckId),
         deckTitle: deck.title,
       ),
-      const ImmediateSchedule.now(),
     );
   }
 
   static Future<void> showFinalDrillBatchSurveyNotification() async {
-    if (notificationExists(NotificationIds.finalDrillBatchSurvey)) return;
-
-    await notificationsController.notify(
-      Notifications.finalDrillBatchSurvey(),
-      const ImmediateSchedule.now(),
+    await showFirstTimeEventNotification(
+      path: SettingPath.finalDrillBatchSurveyShown,
+      createNotification: Notifications.finalDrillBatchSurvey,
     );
   }
 
   static Future<void> showFinalDrillBatchReviewNowNotification() async {
-    if (notificationExists(NotificationIds.finalDrillBatchReviewNow)) return;
+    await showFirstTimeEventNotification(
+      path: SettingPath.finalDrillBatchReviewNowShown,
+      createNotification: Notifications.finalDrillBatchReviewNow,
+    );
+  }
 
-    await notificationsController.notify(
-      Notifications.finalDrillBatchReviewNow(),
-      const ImmediateSchedule.now(),
+  static Future<void> showReviewStartNotifications({
+    required SessionMode mode,
+  }) async {
+    if (mode != SessionMode.review) return;
+
+    await showFirstTimeEventNotification(
+      path: SettingPath.reviewFsrsWarningShown,
+      createNotification: Notifications.reviewFsrsWarning,
     );
   }
 
@@ -87,17 +94,24 @@ abstract final class StudySessionNotificationsService {
     StudySession session,
   ) async {
     if (session.mode != SessionMode.review) return;
-    if (notificationExists(NotificationIds.firstReviewFsrsScheduling)) return;
 
-    await notificationsController.notify(
-      Notifications.firstReviewFsrsScheduling(),
-      const ImmediateSchedule.now(),
+    await showFirstTimeEventNotification(
+      path: SettingPath.firstReviewFsrsSchedulingShown,
+      createNotification: Notifications.firstReviewFsrsScheduling,
     );
   }
 
-  static bool notificationExists(int id) {
-    return LocalDB.notifications.selectByPk({'id': id}, includeDeleted: true) !=
-        null;
+  static Future<void> showFirstTimeEventNotification({
+    required SettingPath path,
+    required NotificationIntent Function() createNotification,
+  }) async {
+    if (SettingsStore.instance.get<bool>(path)) return;
+
+    await notificationsController.notify(
+      createNotification(),
+      const ImmediateSchedule.now(),
+    );
+    await SettingsStore.instance.set<bool>(path, true);
   }
 
   static Future<void> rescheduleDeck({

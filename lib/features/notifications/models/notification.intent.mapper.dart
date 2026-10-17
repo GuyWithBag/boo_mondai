@@ -16,6 +16,7 @@ class NotificationIntentMapper extends ClassMapperBase<NotificationIntent> {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = NotificationIntentMapper._());
       NotificationIntentTypeMapper.ensureInitialized();
+      NotificationIntentToneMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -68,6 +69,9 @@ class NotificationIntentMapper extends ClassMapperBase<NotificationIntent> {
     _$purgeAt,
     key: r'purge_at',
   );
+  static NotificationIntentTone _$tone(NotificationIntent v) => v.tone;
+  static const Field<NotificationIntent, NotificationIntentTone> _f$tone =
+      Field('tone', _$tone, opt: true, def: NotificationIntentTone.inherit);
   static String? _$route(NotificationIntent v) => v.route;
   static const Field<NotificationIntent, String> _f$route = Field(
     'route',
@@ -150,6 +154,7 @@ class NotificationIntentMapper extends ClassMapperBase<NotificationIntent> {
     #createdAt: _f$createdAt,
     #updatedAt: _f$updatedAt,
     #purgeAt: _f$purgeAt,
+    #tone: _f$tone,
     #route: _f$route,
     #ifRouteNullPushToView: _f$ifRouteNullPushToView,
     #persistInInbox: _f$persistInInbox,
@@ -172,6 +177,7 @@ class NotificationIntentMapper extends ClassMapperBase<NotificationIntent> {
       createdAt: data.dec(_f$createdAt),
       updatedAt: data.dec(_f$updatedAt),
       purgeAt: data.dec(_f$purgeAt),
+      tone: data.dec(_f$tone),
       route: data.dec(_f$route),
       ifRouteNullPushToView: data.dec(_f$ifRouteNullPushToView),
       persistInInbox: data.dec(_f$persistInInbox),
@@ -265,6 +271,7 @@ abstract class NotificationIntentCopyWith<
     DateTime? createdAt,
     DateTime? updatedAt,
     DateTime? purgeAt,
+    NotificationIntentTone? tone,
     String? route,
     bool? ifRouteNullPushToView,
     bool? persistInInbox,
@@ -299,6 +306,7 @@ class _NotificationIntentCopyWithImpl<$R, $Out>
     DateTime? createdAt,
     DateTime? updatedAt,
     DateTime? purgeAt,
+    NotificationIntentTone? tone,
     Object? route = $none,
     bool? ifRouteNullPushToView,
     bool? persistInInbox,
@@ -319,6 +327,7 @@ class _NotificationIntentCopyWithImpl<$R, $Out>
       if (createdAt != null) #createdAt: createdAt,
       if (updatedAt != null) #updatedAt: updatedAt,
       if (purgeAt != null) #purgeAt: purgeAt,
+      if (tone != null) #tone: tone,
       if (route != $none) #route: route,
       if (ifRouteNullPushToView != null)
         #ifRouteNullPushToView: ifRouteNullPushToView,
@@ -343,6 +352,7 @@ class _NotificationIntentCopyWithImpl<$R, $Out>
     createdAt: data.get(#createdAt, or: $value.createdAt),
     updatedAt: data.get(#updatedAt, or: $value.updatedAt),
     purgeAt: data.get(#purgeAt, or: $value.purgeAt),
+    tone: data.get(#tone, or: $value.tone),
     route: data.get(#route, or: $value.route),
     ifRouteNullPushToView: data.get(
       #ifRouteNullPushToView,

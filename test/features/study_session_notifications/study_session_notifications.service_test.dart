@@ -8,6 +8,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         LocalDB,
         NotificationIds,
         NotificationIntentType,
+        SettingPath,
+        SettingsStore,
         SessionMode,
         StudyCard,
         StudySession,
@@ -32,6 +34,7 @@ void main() {
   setUp(() async {
     await LocalDB.clearAll();
     await LocalDB.studyCard.clear();
+    await SettingsStore.instance.init();
   });
 
   tearDownAll(() async {
@@ -117,6 +120,22 @@ void main() {
         expect(deckCompleteNotification?.showAsBubble, isTrue);
         expect(deckCompleteNotification?.showSystemNotification, isFalse);
         expect(deckCompleteNotification?.ifRouteNullPushToView, isTrue);
+        expect(
+          SettingsStore.instance.get<bool>(
+            SettingPath.finalDrillBatchSurveyShown,
+          ),
+          isTrue,
+        );
+        expect(
+          SettingsStore.instance.get<bool>(
+            SettingPath.finalDrillBatchReviewNowShown,
+          ),
+          isTrue,
+        );
+        expect(
+          SettingsStore.instance.get<bool>(SettingPath.drillDeckCompleteShown),
+          isTrue,
+        );
       },
     );
 
@@ -193,90 +212,137 @@ void main() {
       },
     );
 
-    test('does not recreate deleted one-shot notifications', () async {
-      final profile = LocalDB.currentProfile.getOrCreate();
-      final now = DateTime.utc(2026);
-      final deletedAt = DateTime.utc(2026, 2);
-      await LocalDB.deck.upsert(
-        Deck.createDummy(
-          id: 'deck-1',
+    test(
+      'does not recreate one-shot notifications when settings are enabled',
+      () async {
+        final profile = LocalDB.currentProfile.getOrCreate();
+        final now = DateTime.utc(2026);
+        await LocalDB.deck.upsert(
+          Deck.createDummy(
+            id: 'deck-1',
+            profileId: profile.id,
+            title: 'Kana Basics',
+          ),
+        );
+        await LocalDB.studyCard.upsert(
+          StudyCard(
+            id: 'study-1',
+            createdAt: now,
+            updatedAt: now,
+            templateId: 'template-1',
+            deckId: 'deck-1',
+          ),
+        );
+        await LocalDB.fsrsCard.upsert(
+          FsrsCard(
+            id: 'fsrs-1',
+            createdAt: now,
+            updatedAt: now,
+            profileId: profile.id,
+            studyCardId: 'study-1',
+            state: fsrs.Card(cardId: 1),
+          ),
+        );
+        final session = StudySession(
+          id: 'session-1',
           profileId: profile.id,
-          title: 'Kana Basics',
-        ),
-      );
-      await LocalDB.studyCard.upsert(
-        StudyCard(
-          id: 'study-1',
-          createdAt: now,
-          updatedAt: now,
-          templateId: 'template-1',
           deckId: 'deck-1',
-        ),
-      );
-      await LocalDB.fsrsCard.upsert(
-        FsrsCard(
-          id: 'fsrs-1',
-          createdAt: now,
-          updatedAt: now,
-          profileId: profile.id,
-          studyCardId: 'study-1',
-          state: fsrs.Card(cardId: 1),
-        ),
-      );
-      final session = StudySession(
-        id: 'session-1',
-        profileId: profile.id,
-        deckId: 'deck-1',
-        mode: SessionMode.drill,
-        startedAt: now,
-        steps: const [
-          StudySessionCardStep(id: 'step-1', studyCardId: 'study-1'),
-        ],
+          mode: SessionMode.drill,
+          startedAt: now,
+          steps: const [
+            StudySessionCardStep(id: 'step-1', studyCardId: 'study-1'),
+          ],
+        );
+
+        await StudySessionNotificationsService.showDrillCompletionNotifications(
+          session,
+        );
+        await LocalDB.notifications.clear();
+
+        await StudySessionNotificationsService.showDrillCompletionNotifications(
+          session,
+        );
+
+        expect(
+          LocalDB.notifications.selectByPk({
+            'id': NotificationIds.finalDrillBatchSurvey,
+          }),
+          isNull,
+        );
+        expect(
+          LocalDB.notifications.selectByPk({
+            'id': NotificationIds.finalDrillBatchReviewNow,
+          }),
+          isNull,
+        );
+        expect(
+          LocalDB.notifications.selectByPk({
+            'id': NotificationIds.drillDeckComplete(deckId: 'deck-1'),
+          }),
+          isNull,
+        );
+      },
+    );
+  });
+
+  group('StudySessionNotificationsService.showReviewStartNotifications', () {
+    test('creates first review warning notification', () async {
+      await StudySessionNotificationsService.showReviewStartNotifications(
+        mode: SessionMode.review,
       );
 
-      await StudySessionNotificationsService.showDrillCompletionNotifications(
-        session,
-      );
-      final surveyNotification = LocalDB.notifications.selectByPk({
-        'id': NotificationIds.finalDrillBatchSurvey,
-      })!;
-      final reviewNotification = LocalDB.notifications.selectByPk({
-        'id': NotificationIds.finalDrillBatchReviewNow,
-      })!;
-      final deckCompleteNotification = LocalDB.notifications.selectByPk({
-        'id': NotificationIds.drillDeckComplete(deckId: 'deck-1'),
-      })!;
-      await LocalDB.notifications.upsert(
-        surveyNotification.copyWith(deletedAt: deletedAt),
-      );
-      await LocalDB.notifications.upsert(
-        reviewNotification.copyWith(deletedAt: deletedAt),
-      );
-      await LocalDB.notifications.upsert(
-        deckCompleteNotification.copyWith(deletedAt: deletedAt),
-      );
+      final notification = LocalDB.notifications.selectByPk({
+        'id': NotificationIds.reviewFsrsWarning,
+      });
 
-      await StudySessionNotificationsService.showDrillCompletionNotifications(
-        session,
+      expect(notification?.type, NotificationIntentType.reviewFsrsWarning);
+      expect(notification?.persistInInbox, isTrue);
+      expect(notification?.showAsBubble, isTrue);
+      expect(notification?.showSystemNotification, isFalse);
+      expect(notification?.ifRouteNullPushToView, isTrue);
+      expect(
+        SettingsStore.instance.get<bool>(SettingPath.reviewFsrsWarningShown),
+        isTrue,
+      );
+    });
+
+    test('does not recreate review warning when setting is enabled', () async {
+      await StudySessionNotificationsService.showReviewStartNotifications(
+        mode: SessionMode.review,
+      );
+      await LocalDB.notifications.clear();
+
+      await StudySessionNotificationsService.showReviewStartNotifications(
+        mode: SessionMode.review,
       );
 
       expect(
         LocalDB.notifications.selectByPk({
-          'id': NotificationIds.finalDrillBatchSurvey,
-        }, includeDeleted: true)?.deletedAt,
-        deletedAt,
+          'id': NotificationIds.reviewFsrsWarning,
+        }),
+        isNull,
       );
+    });
+
+    test('recreates review warning after setting is turned off', () async {
+      await StudySessionNotificationsService.showReviewStartNotifications(
+        mode: SessionMode.review,
+      );
+      await LocalDB.notifications.clear();
+      await SettingsStore.instance.set<bool>(
+        SettingPath.reviewFsrsWarningShown,
+        false,
+      );
+
+      await StudySessionNotificationsService.showReviewStartNotifications(
+        mode: SessionMode.review,
+      );
+
       expect(
         LocalDB.notifications.selectByPk({
-          'id': NotificationIds.finalDrillBatchReviewNow,
-        }, includeDeleted: true)?.deletedAt,
-        deletedAt,
-      );
-      expect(
-        LocalDB.notifications.selectByPk({
-          'id': NotificationIds.drillDeckComplete(deckId: 'deck-1'),
-        }, includeDeleted: true)?.deletedAt,
-        deletedAt,
+          'id': NotificationIds.reviewFsrsWarning,
+        })?.type,
+        NotificationIntentType.reviewFsrsWarning,
       );
     });
   });
@@ -313,44 +379,47 @@ void main() {
         expect(notification?.showAsBubble, isTrue);
         expect(notification?.showSystemNotification, isFalse);
         expect(notification?.ifRouteNullPushToView, isTrue);
+        expect(
+          SettingsStore.instance.get<bool>(
+            SettingPath.firstReviewFsrsSchedulingShown,
+          ),
+          isTrue,
+        );
       },
     );
 
-    test('does not recreate deleted review FSRS notification', () async {
-      final profile = LocalDB.currentProfile.getOrCreate();
-      final now = DateTime.utc(2026);
-      final deletedAt = DateTime.utc(2026, 2);
-      final session = StudySession(
-        id: 'session-1',
-        profileId: profile.id,
-        deckId: 'deck-1',
-        mode: SessionMode.review,
-        startedAt: now,
-        steps: const [
-          StudySessionCardStep(id: 'step-1', studyCardId: 'study-1'),
-        ],
-      );
+    test(
+      'does not recreate review FSRS notification when setting is enabled',
+      () async {
+        final profile = LocalDB.currentProfile.getOrCreate();
+        final now = DateTime.utc(2026);
+        final session = StudySession(
+          id: 'session-1',
+          profileId: profile.id,
+          deckId: 'deck-1',
+          mode: SessionMode.review,
+          startedAt: now,
+          steps: const [
+            StudySessionCardStep(id: 'step-1', studyCardId: 'study-1'),
+          ],
+        );
 
-      await StudySessionNotificationsService.showReviewCompletionNotifications(
-        session,
-      );
-      final notification = LocalDB.notifications.selectByPk({
-        'id': NotificationIds.firstReviewFsrsScheduling,
-      })!;
-      await LocalDB.notifications.upsert(
-        notification.copyWith(deletedAt: deletedAt),
-      );
+        await StudySessionNotificationsService.showReviewCompletionNotifications(
+          session,
+        );
+        await LocalDB.notifications.clear();
 
-      await StudySessionNotificationsService.showReviewCompletionNotifications(
-        session,
-      );
+        await StudySessionNotificationsService.showReviewCompletionNotifications(
+          session,
+        );
 
-      expect(
-        LocalDB.notifications.selectByPk({
-          'id': NotificationIds.firstReviewFsrsScheduling,
-        }, includeDeleted: true)?.deletedAt,
-        deletedAt,
-      );
-    });
+        expect(
+          LocalDB.notifications.selectByPk({
+            'id': NotificationIds.firstReviewFsrsScheduling,
+          }),
+          isNull,
+        );
+      },
+    );
   });
 }
