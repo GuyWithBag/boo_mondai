@@ -82,6 +82,15 @@ class SettingsRegistry {
       description: 'Play sounds during study and drill sessions.',
     ),
     SettingPath.onboardingCompleted: Setting<bool>(defaultValue: false),
+    SettingPath.reviewFsrsWarningShown: Setting<bool>(defaultValue: false),
+    SettingPath.finalDrillBatchReviewNowShown: Setting<bool>(
+      defaultValue: false,
+    ),
+    SettingPath.finalDrillBatchSurveyShown: Setting<bool>(defaultValue: false),
+    SettingPath.firstReviewFsrsSchedulingShown: Setting<bool>(
+      defaultValue: false,
+    ),
+    SettingPath.drillDeckCompleteShown: Setting<bool>(defaultValue: false),
     SettingPath.isAppDemo: Setting<bool>(
       disabled: true,
       defaultValue: false,

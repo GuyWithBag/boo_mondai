@@ -21,7 +21,18 @@ enum SettingPath {
   buttonDownSoundEnabled('media/ui_sounds/button_down_enabled'),
   buttonUpSoundEnabled('media/ui_sounds/button_up_enabled'),
   studySessionSoundsEnabled('media/study_session/sounds_enabled'),
-  onboardingCompleted('app/onboarding/completed'),
+  onboardingCompleted('first-time-events/onboarding/completed'),
+  reviewFsrsWarningShown('first-time-events/review/fsrs_warning_shown'),
+  finalDrillBatchReviewNowShown(
+    'first-time-events/final_drill_batch/review_now_shown',
+  ),
+  finalDrillBatchSurveyShown(
+    'first-time-events/final_drill_batch/survey_shown',
+  ),
+  firstReviewFsrsSchedulingShown(
+    'first-time-events/review/fsrs_scheduling_shown',
+  ),
+  drillDeckCompleteShown('first-time-events/drill/deck_complete_shown'),
   isAppDemo('app/demo/is_app_demo'),
   allowSettingDeckImage('deck/allow_setting_deck_image'),
   disableOnlineFeatures('developer/disabled_online_features');
