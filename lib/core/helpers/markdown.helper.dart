@@ -1,0 +1,292 @@
+import 'package:boo_mondai/lib.barrel.dart'
+    show
+        AppTokens,
+        CardTemplate,
+        DecksDirectoryPaths,
+        FileHelper,
+        FileSystemHandler,
+        LocalDB,
+        MarkdownAttachmentUrlResolver,
+        MediaHelper,
+        StringHelper;
+import 'package:file_picker/file_picker.dart' show PlatformFile;
+import 'package:flutter/material.dart'
+    show
+        TextStyle,
+        TextDecoration,
+        EdgeInsets,
+        FontStyle,
+        TextAlign,
+        TableBorder,
+        BorderSide,
+        Border,
+        BorderRadius,
+        BoxDecoration;
+import 'package:flutter_markdown_plus/flutter_markdown_plus.dart'
+    show MarkdownStyleSheet;
+import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
+
+abstract class MarkdownHelper {
+  static List<({bool isLineBreak, String text})> splitInlineMarkdownWords(
+    String data,
+  ) {
+    final chunks = <({bool isLineBreak, String text})>[];
+    final activeDelimiters = <String>[];
+    final word = StringBuffer();
+
+    void emitWord() {
+      if (word.isEmpty) return;
+
+      chunks.add((
+        isLineBreak: false,
+        text:
+            '${activeDelimiters.join()}$word'
+            '${activeDelimiters.reversed.join()}',
+      ));
+      word.clear();
+    }
+
+    void emitLineBreak() {
+      emitWord();
+      chunks.add((isLineBreak: true, text: ''));
+    }
+
+    String? delimiterAt(int index) {
+      if (data.startsWith('**', index)) return '**';
+      if (data.startsWith('__', index)) return '__';
+      if (data.startsWith('~~', index)) return '~~';
+      final character = data[index];
+      if (character == '*' || character == '_' || character == '`') {
+        return character;
+      }
+      return null;
+    }
+
+    for (var index = 0; index < data.length; index += 1) {
+      final character = data[index];
+
+      if (character == r'\' && index + 1 < data.length) {
+        word.write(character);
+        index += 1;
+        word.write(data[index]);
+        continue;
+      }
+
+      if (character == '\r' || character == '\n') {
+        if (character == '\r' &&
+            index + 1 < data.length &&
+            data[index + 1] == '\n') {
+          index += 1;
+        }
+        emitLineBreak();
+        continue;
+      }
+
+      if (character.trim().isEmpty) {
+        emitWord();
+        continue;
+      }
+
+      final delimiter = delimiterAt(index);
+      if (delimiter != null) {
+        final activeIndex = activeDelimiters.lastIndexOf(delimiter);
+        if (activeIndex == -1) {
+          if (data.indexOf(delimiter, index + delimiter.length) == -1) {
+            word.write(delimiter);
+            index += delimiter.length - 1;
+            continue;
+          }
+          emitWord();
+          activeDelimiters.add(delimiter);
+        } else {
+          emitWord();
+          activeDelimiters.removeAt(activeIndex);
+        }
+        index += delimiter.length - 1;
+        continue;
+      }
+
+      word.write(character);
+    }
+
+    emitWord();
+
+    return chunks;
+  }
+
+  static Future<String?> resolveAttachmentUrl(Uri uri) async {
+    final source = uri.toString().trim();
+    if (source.isEmpty) return null;
+
+    if (uri.path.isEmpty) return null;
+
+    return source;
+  }
+
+  static MarkdownAttachmentUrlResolver resolveTemplateAttachmentUrl(
+    CardTemplate template,
+  ) {
+    return (uri) => resolveDeckAttachmentUrl(uri: uri, deckId: template.deckId);
+  }
+
+  static Future<String?> resolveDeckAttachmentUrl({
+    required Uri uri,
+    required String deckId,
+  }) async {
+    final source = uri.toString().trim();
+    if (source.isEmpty || uri.path.isEmpty) return null;
+    if (uri.scheme.isNotEmpty) return source;
+
+    final deck = LocalDB.deck.selectByPk({'id': deckId});
+    if (deck == null) return source;
+
+    return FileSystemHandler.getAbsolutePathOfRelativePath(
+      DecksDirectoryPaths.attachment(
+        deckTitle: deck.title,
+        fileName: FileHelper.fileName(uri.path),
+      ),
+    );
+  }
+
+  static String normalizeMediaSource(String source) {
+    if (MediaHelper.isRemoteUrl(source)) return source;
+
+    final trimmed = source.trim();
+    final uri = Uri.tryParse(trimmed);
+    if (uri == null || uri.scheme.isNotEmpty) return trimmed;
+
+    final maybeDomain = StringHelper.toTrimmedOrNull(trimmed);
+    if (maybeDomain != null && maybeDomain.contains('.')) {
+      return 'https://$maybeDomain';
+    }
+
+    return trimmed;
+  }
+
+  static Future<String?> fromFileToViewFileSyntax({
+    required String path,
+    required PlatformFile file,
+  }) async {
+    // final localPath = await FileSystemHandler.storeFile(path: path, file: file);
+
+    return toViewLinkSyntax(
+      label: FileHelper.fileName(path),
+      source: FileHelper.fileName(path),
+    );
+  }
+
+  static String toViewLinkSyntax({
+    required String label,
+    required String source,
+  }) {
+    final safeLabel = label.replaceAll(RegExp(r'[\]\r\n]'), ' ');
+    return '![$safeLabel]($source)';
+  }
+
+  static String toLinkSyntax({required String label, required String source}) {
+    final safeLabel = label.replaceAll(RegExp(r'[\]\r\n]'), ' ');
+    return '[$safeLabel]($source)';
+  }
+
+  static MarkdownStyleSheet getMarkdownStyleSheet(
+    AppTokens tokens,
+    TextStyle body,
+  ) {
+    final bodyFontSize = body.fontSize;
+    final strong = body.copyWith(fontWeight: tokens.fontWeightTextStrong);
+    final heading = body.copyWith(fontWeight: tokens.fontWeightTextHeavy);
+    final code = body.copyWith(
+      backgroundColor: tokens.colorMuted,
+      color: tokens.colorTextBaseline,
+      fontFamily: 'monospace',
+      fontSize: tokens.textSizeLabelSmall.sp,
+      height: tokens.lineHeightTextBody,
+    );
+
+    return MarkdownStyleSheet(
+      a: body.copyWith(
+        color: tokens.colorPrimary,
+        decoration: TextDecoration.underline,
+        decorationColor: tokens.colorPrimary,
+      ),
+      p: body,
+      pPadding: EdgeInsets.zero,
+      code: code,
+      h1: heading.copyWith(
+        fontSize: bodyFontSize == null ? null : bodyFontSize * 1.35,
+      ),
+      h1Padding: EdgeInsets.only(bottom: tokens.spaceLayoutGapSm),
+      h2: heading.copyWith(
+        fontSize: bodyFontSize == null ? null : bodyFontSize * 1.2,
+      ),
+      h2Padding: EdgeInsets.only(bottom: tokens.spaceLayoutGapSm),
+      h3: heading.copyWith(
+        fontSize: bodyFontSize == null ? null : bodyFontSize * 1.1,
+      ),
+      h3Padding: EdgeInsets.only(bottom: tokens.spaceLayoutGapSm),
+      h4: strong,
+      h4Padding: EdgeInsets.zero,
+      h5: strong,
+      h5Padding: EdgeInsets.zero,
+      h6: body.copyWith(
+        color: tokens.colorTextMuted,
+        fontSize: bodyFontSize == null ? null : bodyFontSize * 0.9,
+        fontWeight: tokens.fontWeightTextStrong,
+      ),
+      h6Padding: EdgeInsets.zero,
+      em: body.copyWith(fontStyle: FontStyle.italic),
+      strong: strong,
+      del: body.copyWith(decoration: TextDecoration.lineThrough),
+      blockquote: body.copyWith(color: tokens.colorTextMuted),
+      img: body,
+      checkbox: body.copyWith(color: tokens.colorPrimary),
+      blockSpacing: tokens.spaceLayoutGapMd,
+      listIndent: tokens.spaceLayoutGapMd,
+      listBullet: body,
+      listBulletPadding: EdgeInsets.only(right: tokens.spaceLayoutGapSm),
+      tableHead: strong,
+      tableBody: body,
+      tableHeadAlign: TextAlign.left,
+      tablePadding: EdgeInsets.only(bottom: tokens.spaceLayoutGapSm),
+      tableBorder: TableBorder.all(
+        color: tokens.colorBorderNeutralSubtle,
+        width: tokens.borderWidthDefault,
+      ),
+      tableCellsPadding: EdgeInsets.symmetric(
+        horizontal: tokens.spaceLayoutGapMd,
+        vertical: tokens.spaceLayoutGapSm,
+      ),
+      blockquotePadding: EdgeInsets.symmetric(
+        horizontal: tokens.spaceLayoutGapMd,
+        vertical: tokens.spaceLayoutGapSm,
+      ),
+      blockquoteDecoration: BoxDecoration(
+        color: tokens.colorPrimarySoft,
+        border: Border(
+          left: BorderSide(
+            color: tokens.colorPrimary,
+            width: tokens.borderWidthDefault * 3,
+          ),
+        ),
+        borderRadius: BorderRadius.circular(tokens.radiusSurfaceXsm),
+      ),
+      codeblockPadding: EdgeInsets.all(tokens.spaceLayoutGapMd),
+      codeblockDecoration: BoxDecoration(
+        color: tokens.colorMuted,
+        borderRadius: BorderRadius.circular(tokens.radiusSurfaceXsm),
+        border: Border.all(
+          color: tokens.colorBorderNeutralSubtle,
+          width: tokens.borderWidthDefault,
+        ),
+      ),
+      horizontalRuleDecoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(
+            color: tokens.colorBorderNeutralSubtle,
+            width: tokens.borderWidthDefault,
+          ),
+        ),
+      ),
+    );
+  }
+}

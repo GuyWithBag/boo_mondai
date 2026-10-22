@@ -1,0 +1,61 @@
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// PATH: lib/models/fsrs_card.dart
+// PURPOSE: Tracks a specific user's spaced-repetition progress for a StudyCard
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import 'package:boo_mondai/lib.barrel.dart'
+    show
+        MutableEntity,
+        uuid,
+        MutableEntityMapper,
+        MutableEntityCopyWith,
+        StudyCard;
+import 'package:dart_mappable/dart_mappable.dart';
+import 'package:fsrs/fsrs.dart';
+
+part 'fsrs_card.dto.mapper.dart';
+
+@MappableClass()
+class FsrsCard with FsrsCardMappable implements MutableEntity {
+  final String id;
+  @override
+  final DateTime createdAt;
+  @override
+  final DateTime updatedAt;
+  @override
+  final DateTime? deletedAt;
+  @override
+  final DateTime? purgeAfter;
+  final String profileId;
+
+  /// <-- CHANGED: Now points to the StudyCard (the testable instance)
+  /// instead of the Template (the raw data blueprint).
+  final String studyCardId;
+
+  final Card state;
+
+  FsrsCard({
+    required this.id,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+    this.purgeAfter,
+    required this.profileId,
+    required this.studyCardId,
+    required this.state,
+  });
+
+  static Future<FsrsCard> create({
+    required String studyCardId,
+    required String profileId,
+  }) async {
+    final now = DateTime.now();
+    return FsrsCard(
+      id: uuid.v7(),
+      createdAt: now,
+      updatedAt: now,
+      profileId: profileId,
+      studyCardId: studyCardId,
+      state: await Card.create(),
+    );
+  }
+}

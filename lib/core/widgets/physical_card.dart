@@ -1,0 +1,94 @@
+import 'package:boo_mondai/lib.barrel.dart'
+    show
+        Cube,
+        PhysicalCardController,
+        AppTokens,
+        ScaleHelper,
+        surfaceStyle,
+        usePhysicalCardController;
+import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
+import 'package:theme_variants/theme_variants.dart'
+    show ThemeVariantsContext, Surface;
+
+class PhysicalCard extends SignalHookWidget {
+  const PhysicalCard({
+    super.key,
+    this.controller,
+    this.front,
+    this.back,
+    this.tapToFlip = false,
+    this.onTap,
+    this.animateChanges = true,
+    this.frontVariants = const [],
+    this.backVariants = const [],
+    this.padding,
+  });
+
+  final PhysicalCardController? controller;
+  final Widget? front;
+  final Widget? back;
+  final List<Object> frontVariants;
+  final List<Object> backVariants;
+  final bool tapToFlip;
+  final VoidCallback? onTap;
+  final bool animateChanges;
+  final EdgeInsets? padding;
+
+  @override
+  Widget build(BuildContext context) {
+    final fallbackController = usePhysicalCardController(context);
+    final effectiveController = useMemoized(
+      () => controller ?? fallbackController,
+      [controller, fallbackController],
+    );
+    final tokens = context.themeTokens<AppTokens>();
+    final radius = ScaleHelper.getScaledRadiusFromBase(
+      radius: tokens.studyCardRadius,
+      current: effectiveController.width.value,
+      base: tokens.studyCardWidth,
+    );
+    final resolvedFrontStyle = surfaceStyle.resolve(tokens, frontVariants);
+    final resolvedBackStyle = surfaceStyle.resolve(tokens, backVariants);
+    final scaledFrontStyle = resolvedFrontStyle.copyWith(
+      decoration: resolvedFrontStyle.decoration.copyWith(
+        borderRadius: BorderRadius.circular(radius),
+      ),
+      clipBehavior: Clip.antiAlias,
+    );
+    final scaledBackStyle = resolvedFrontStyle.copyWith(
+      decoration: resolvedBackStyle.decoration.copyWith(
+        borderRadius: BorderRadius.circular(radius),
+      ),
+      clipBehavior: Clip.antiAlias,
+    );
+
+    final cube = Cube(
+      controller: effectiveController.controller,
+      front: Surface(
+        style: scaledFrontStyle.copyWith(padding: padding),
+        child: front,
+      ),
+      back: Surface(
+        style: scaledBackStyle.copyWith(padding: padding),
+        child: back,
+      ),
+      depth: effectiveController.depth.value,
+    );
+
+    if (!tapToFlip && onTap == null) {
+      return cube;
+    }
+
+    return GestureDetector(
+      onTap: () {
+        onTap?.call();
+        if (tapToFlip) {
+          effectiveController.flip();
+        }
+      },
+      child: cube,
+    );
+  }
+}

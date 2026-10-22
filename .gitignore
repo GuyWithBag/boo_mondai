@@ -44,3 +44,8 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 /lib/shared/env.dart
+
+node_modules
+
+# FVM Version Cache
+.fvm/

@@ -1,0 +1,63 @@
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// PATH: lib/pages/drill_result/answer_result_tile.dart
+// PURPOSE: List tile showing a single drill answer result with rating chip
+// PROVIDERS: none
+// HOOKS: none
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+import 'package:boo_mondai/features/app_theme/app_theme.barrel.dart';
+import 'package:boo_mondai/lib.barrel.dart'
+    show StudyRating, AppTokens, ThemeHelper;
+import 'package:flutter/material.dart';
+import 'package:theme_variants/theme_variants.dart';
+
+class AnswerResultTile extends StatelessWidget {
+  const AnswerResultTile({
+    super.key,
+    required this.answerValue,
+    required this.type, // <-- Replaced `isCorrect` and `selfRating`
+    this.isEjected = false,
+  });
+
+  final String answerValue;
+  final StudyRating type; // <-- The clean enum
+  final bool isEjected;
+
+  // Helper to determine pass/fail for the leading icon
+  bool get _isCorrect => type != StudyRating.incorrect;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = context.themeTokens<AppTokens>();
+    final ratingColorSet = ThemeHelper.getStudyRatingColorSet(tokens, type);
+
+    return Surface(
+      style: surfaceStyle.resolve(tokens, const [
+        SurfaceShape.roundedSm,
+        SurfacePadding.sm,
+        // SurfaceBorder.none,
+      ]),
+      child: ListTile(
+        leading: Icon(
+          _isCorrect ? Icons.check_circle : Icons.cancel,
+          color: _isCorrect
+              ? tokens.colorActionSuccess
+              : tokens.colorActionError,
+        ),
+        title: Text(answerValue.isEmpty ? '(no answer)' : answerValue),
+        trailing: isEjected
+            ? Tooltip(
+                message: 'This card was moved to FSRS review',
+                child: ChipTheme(
+                  data: chipStyle.resolve(tokens, const [ChipTone.hard]),
+                  child: Chip(label: const Text('Review Later')),
+                ),
+              )
+            // If it's correct (not a typo), show the FSRS rating they gave it
+            : type != StudyRating.incorrect
+            ? Chip(label: Text(ratingColorSet.name))
+            : null,
+      ),
+    );
+  }
+}

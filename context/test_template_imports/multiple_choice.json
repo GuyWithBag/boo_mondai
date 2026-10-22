@@ -1,0 +1,92 @@
+[
+  {
+    "type": "multiple_choice",
+    "questionPrompt": "Which word means hello?",
+    "options": [
+      {
+        "optionText": "bonjour",
+        "isCorrect": true
+      },
+      {
+        "optionText": "fromage",
+        "isCorrect": false
+      },
+      {
+        "optionText": "rouge",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "type": "multiple_choice",
+    "questionPrompt": "Which phrase means good evening?",
+    "options": [
+      {
+        "optionText": "bonsoir",
+        "isCorrect": true
+      },
+      {
+        "optionText": "bonjour",
+        "isCorrect": false
+      },
+      {
+        "optionText": "bonne chance",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "type": "multiple_choice",
+    "questionPrompt": "What is the French word for bread?",
+    "options": [
+      {
+        "optionText": "pain",
+        "isCorrect": true
+      },
+      {
+        "optionText": "lait",
+        "isCorrect": false
+      },
+      {
+        "optionText": "eau",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "type": "multiple_choice",
+    "questionPrompt": "Which option means I am learning?",
+    "options": [
+      {
+        "optionText": "j'apprends",
+        "isCorrect": true
+      },
+      {
+        "optionText": "je dors",
+        "isCorrect": false
+      },
+      {
+        "optionText": "je mange",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "type": "multiple_choice",
+    "questionPrompt": "Which word means book?",
+    "options": [
+      {
+        "optionText": "livre",
+        "isCorrect": true
+      },
+      {
+        "optionText": "table",
+        "isCorrect": false
+      },
+      {
+        "optionText": "chaise",
+        "isCorrect": false
+      }
+    ]
+  }
+]

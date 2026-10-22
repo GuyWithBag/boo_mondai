@@ -1,0 +1,405 @@
+import 'package:boo_mondai/lib.barrel.dart'
+    show
+        AppTokens,
+        Button,
+        ButtonColor,
+        ButtonPadding,
+        ButtonSize,
+        ChipTone,
+        DeckDetails,
+        DeckFormValidator,
+        Deck,
+        DeckProfilesLabel,
+        DeckTile,
+        HeaderBadge,
+        MetaLabel,
+        DeckTileState,
+        SurfacePadding,
+        SurfaceShape,
+        SurfaceColor,
+        ViewDeckSingleSheetController,
+        surfaceStyle,
+        Scaffold,
+        BackgroundImageSurface,
+        SurfaceBorder,
+        SurfaceShadow,
+        AppBar,
+        DateHelper,
+        FormField,
+        DecksDirectoryPaths,
+        ProfileRole,
+        ProfileService,
+        ToolBar,
+        ToolBarController,
+        showBottomSheet,
+        viewDeckSingleBottomNavBar;
+import 'package:flutter/material.dart'
+    hide AppBar, FormField, Scaffold, showBottomSheet;
+import 'package:flutter_hooks/flutter_hooks.dart' show useEffect, useMemoized;
+import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
+import 'package:go_router/go_router.dart';
+import 'package:signals_hooks/signals_hooks.dart';
+import 'package:theme_variants/theme_variants.dart'
+    show Surface, ThemeVariantsContext;
+
+Future<void> showViewDeckSingleSheet(BuildContext context, Deck deck) {
+  return showBottomSheet(
+    context: context,
+    enableDrag: false,
+    isDismissible: false,
+    builder: (_) => ViewDeckSingleSheet(deck: deck),
+  );
+}
+
+class ViewDeckSingleSheet extends SignalHookWidget {
+  const ViewDeckSingleSheet({super.key, required this.deck});
+
+  final Deck deck;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = context.themeTokens<AppTokens>();
+    // final decksController = context.read<ViewDecksLocalController>();
+    final controller = useMemoized(() {
+      return ViewDeckSingleSheetController(
+        initialDeck: deck,
+        coverImage: signal(null),
+      );
+    });
+    useEffect(() => controller.dispose, [controller]);
+    final toolBarController = useMemoized(() => ToolBarController());
+    useEffect(() => toolBarController.dispose, [toolBarController]);
+    final activeDeck = controller.deck.value;
+    final canDeleteDeck =
+        !activeDeck.isPremade ||
+        ProfileService.currentProfile.value.role == ProfileRole.appAdmin;
+    return PopScope<void>(
+      canPop: controller.canClose.value,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) return;
+        controller.requestClose(context);
+      },
+      child: DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: 1,
+        minChildSize: 0.4,
+        maxChildSize: 1,
+        shouldCloseOnMinExtent: false,
+        builder: (context, scrollController) {
+          return NotificationListener<DraggableScrollableNotification>(
+            onNotification: (notification) {
+              if (notification.extent > notification.minExtent) return false;
+
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (context.mounted) controller.requestClose(context);
+              });
+              return false;
+            },
+            child: Surface(
+              style: surfaceStyle
+                  .resolve(tokens, const [
+                    SurfacePadding.none,
+                    SurfaceColor.muted,
+                  ])
+                  .copyWith(clipBehavior: Clip.antiAlias),
+              child: Scaffold(
+                backgroundColor: Colors.transparent,
+                bottomNavBar: viewDeckSingleBottomNavBar(
+                  context: context,
+                  deck: activeDeck,
+                  controller: controller,
+                ),
+                scrollable: true,
+                shouldConstrainWidth: false,
+                inheritMainBottomNavBarHeight: false,
+                isFloatingAppBar: true,
+                scrollController: scrollController,
+                toolBar: activeDeck.isEditable
+                    ? ToolBar.withActions(
+                        controller: toolBarController,
+                        useAttachments: true,
+                        createAttachmentPath: (file) =>
+                            DecksDirectoryPaths.attachment(
+                              deckTitle: activeDeck.title,
+                              fileName: file.name,
+                            ),
+                      )
+                    : null,
+                appBar: AppBar(
+                  transparentBackground: true,
+                  onPop: () => controller.requestClose(context),
+                  actions: [
+                    Button.icon(
+                      tokens: tokens,
+                      icon: Icons.layers_outlined,
+                      onPressed: () => context.push(
+                        '/view-cards?deckId=${Uri.encodeQueryComponent(deck.id)}',
+                      ),
+                    ),
+                    if (canDeleteDeck)
+                      Button.icon(
+                        tokens: tokens,
+                        icon: Icons.delete_outline,
+                        color: ButtonColor.error,
+                        onPressed: () => controller.deleteDeck(context),
+                      ),
+                    if (controller.shouldShowSaveButton.value)
+                      Button(
+                        variants: const [
+                          ButtonColor.primary,
+                          ButtonSize.icon,
+                          ButtonPadding.none,
+                        ],
+                        onPressed: controller.canSave.value
+                            ? controller.onSavePressed
+                            : null,
+                        leading: controller.isLoading.value
+                            ? const SizedBox.square(
+                                dimension: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Icon(Icons.save),
+                      ),
+                    MenuAnchor(
+                      menuChildren: [
+                        MenuItemButton(
+                          leadingIcon: const Icon(Icons.list),
+                          onPressed: () =>
+                              controller.onCreateListingPressed(context),
+                          child: const Text('Create listing'),
+                        ),
+                        MenuItemButton(
+                          leadingIcon: const Icon(Icons.folder_outlined),
+                          onPressed: () => controller.showDeckPath(context),
+                          child: const Text('Show folder'),
+                        ),
+                      ],
+                      builder: (_, menuController, _) {
+                        return Button.iconOnly(
+                          icon: Icons.more_vert,
+                          onPressed: () {
+                            if (menuController.isOpen) {
+                              menuController.close();
+                              return;
+                            }
+
+                            menuController.open();
+                          },
+                        );
+                      },
+                    ),
+                  ],
+                  bottom: activeDeck.isPremade || !activeDeck.isEditable
+                      ? Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: tokens.spaceScaffoldPadding,
+                          ),
+                          child: Wrap(
+                            alignment: WrapAlignment.end,
+                            spacing: tokens.spaceLayoutGapSm,
+                            runSpacing: tokens.spaceLayoutGapSm,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              if (activeDeck.isPremade)
+                                const HeaderBadge(label: 'Premade'),
+                              if (!activeDeck.isEditable)
+                                const Chip(label: Text('Locked')),
+                            ],
+                          ),
+                        )
+                      : null,
+                ),
+                padding: EdgeInsets.zero,
+                body: activeDeck.isEditable
+                    ? Form(child: _Body(controller: controller))
+                    : _Body(controller: controller),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _Body extends SignalHookWidget {
+  const _Body({required this.controller});
+
+  final ViewDeckSingleSheetController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = context.themeTokens<AppTokens>();
+
+    final deckWidth = 160.w;
+    final headerHeight = 300.h;
+    final deckHeight = deckWidth / tokens.studyCardAspectRatio;
+    final deckFloatInset =
+        deckHeight - (tokens.radiusSurfaceLg - tokens.spaceLayoutPadding);
+
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Positioned(
+          left: 0,
+          right: 0,
+          top: 0,
+          height: headerHeight + tokens.radiusSurfaceLg,
+          child: BackgroundImageSurface(image: controller.coverImage.value),
+        ),
+        Column(
+          children: [
+            SizedBox(height: headerHeight - deckFloatInset),
+            _BodySubSection(
+              controller: controller,
+              deckWidth: deckWidth,
+              collapseDistance: headerHeight * 0.55,
+              floatingHitInset: deckFloatInset,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _BodySubSection extends SignalHookWidget {
+  const _BodySubSection({
+    required this.controller,
+    required this.deckWidth,
+    required this.collapseDistance,
+    required this.floatingHitInset,
+  });
+
+  final ViewDeckSingleSheetController controller;
+  final double deckWidth;
+  final double collapseDistance;
+  final double floatingHitInset;
+
+  @override
+  Widget build(BuildContext context) {
+    final deck = controller.deck;
+    final activeDeck = deck.value;
+    final tags = controller.tagNames.value;
+    final tokens = context.themeTokens<AppTokens>();
+
+    return SizedBox(
+      width: double.infinity,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Padding(
+            padding: EdgeInsets.only(top: floatingHitInset),
+            child: Surface(
+              style: surfaceStyle.resolve(tokens, const [
+                SurfaceShape.topRounded,
+                SurfaceColor.muted,
+                SurfaceBorder.top,
+                SurfaceShadow.none,
+                SurfacePadding.scaffold,
+              ]),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      DeckProfilesLabel(
+                        profileName: controller.profileName.value,
+                      ),
+                    ],
+                  ),
+                  DeckDetails(
+                    title: controller.title.value,
+                    shortDescription: controller.shortDescription.value,
+                    longDescription: controller.longDescription.value,
+                    onTitleChanged: controller.setTitle,
+                    onShortDescriptionChanged: controller.setShortDescription,
+                    onLongDescriptionChanged: controller.setLongDescription,
+                    tags: tags,
+                    onTagsChanged: controller.setTags,
+                    areTagsEditable: controller.deck.value.isEditable,
+                    isEditable: controller.deck.value.isEditable,
+                    tagsPlaceholder: controller.deck.value.isEditable
+                        ? 'Add tags'
+                        : 'No tags yet',
+                    tagsTone: ChipTone.ghost,
+                    metaLabels: Wrap(
+                      spacing: tokens.spaceLayoutGapMd,
+                      runSpacing: tokens.spaceLayoutGapSm,
+                      children: [
+                        MetaLabel(
+                          icon: Icons.visibility_outlined,
+                          label: controller.visibilityLabel.value,
+                        ),
+                        MetaLabel(
+                          icon: Icons.style_outlined,
+                          label: '${controller.studyCardCount.value} cards',
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Positioned(
+            left: tokens.spaceLayoutPadding,
+            top: 0,
+            child: controller.deck.value.isEditable
+                ? FormField<String?>(
+                    value: controller.coverImagePath.value,
+                    validator: DeckFormValidator.optionalImage,
+                    builder: (_, _) => DeckTile(
+                      deck: activeDeck,
+                      width: deckWidth,
+                      state: DeckTileState.bare,
+                      isImageEditable: true,
+                      canPickImage: controller.canPickCoverImage,
+                      onImagePicked: controller.onCoverImagePicked,
+                    ),
+                  )
+                : DeckTile(
+                    deck: activeDeck,
+                    width: deckWidth,
+                    state: DeckTileState.bare,
+                  ),
+          ),
+          Positioned(
+            right: tokens.spaceLayoutPadding,
+            top:
+                floatingHitInset -
+                tokens.radiusSurfaceLg -
+                tokens.spaceLayoutPadding,
+            child: Column(
+              spacing: tokens.spaceLayoutGapSm,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                MetaLabel(
+                  icon: Icons.new_releases_outlined,
+                  label: 'v${activeDeck.version}+${activeDeck.buildNumber}',
+                  tooltip: 'Deck version and build number',
+                ),
+                MetaLabel(
+                  icon: Icons.calendar_today_outlined,
+                  label: DateHelper.formatDateYyyyMmDd(activeDeck.createdAt),
+                  tooltip:
+                      'Created ${DateHelper.formatDateYyyyMmDd(activeDeck.createdAt)}',
+                ),
+                MetaLabel(
+                  icon: Icons.update_outlined,
+                  label: DateHelper.formatDateYyyyMmDd(activeDeck.updatedAt),
+                  tooltip:
+                      'Updated ${DateHelper.formatDateYyyyMmDd(activeDeck.updatedAt)}',
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

@@ -1,0 +1,603 @@
+{
+    "type": "Deck",
+    "title": "Japanese Set A — Mixed Formats",
+    "templates": [
+        {
+            "type": "identification",
+            "prompt_text": "What does みんなさん [Minnasan] mean?",
+            "answers": [
+                {
+                    "answer": "everyone",
+                    "casing_type": "any"
+                }
+            ]
+        },
+        {
+            "type": "flashcard",
+            "frontText": "ほん [hon]",
+            "backText": "book",
+            "direction": "both"
+        },
+        {
+            "type": "match_madness",
+            "pairs": [
+                {
+                    "term": "ここ [koko]",
+                    "match": "here"
+                },
+                {
+                    "term": "みず [mizu]",
+                    "match": "water"
+                },
+                {
+                    "term": "あげます [agemasu]",
+                    "match": "give"
+                }
+            ]
+        },
+        {
+            "type": "fill_in_the_blanks",
+            "prompt_text": "Ima wa gogo sanji desu. Complete the sentence to mean: It is three o’clock in the afternoon now.",
+            "answer_keys": [
+                {
+                    "value": "ima",
+                    "casing_type": "any"
+                }
+            ]
+        },
+        {
+            "type": "word_scramble",
+            "sentenceToScramble": "Watashi wa gakkou e ikimasu"
+        },
+        {
+            "type": "multiple_choice",
+            "questionPrompt": "What does みず [mizu] mean?",
+            "options": [
+                {
+                    "optionText": "water",
+                    "isCorrect": true
+                },
+                {
+                    "optionText": "tea",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "coffee",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "milk",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "type": "multiple_choice",
+            "questionPrompt": "What does あげます [agemasu] mean?",
+            "options": [
+                {
+                    "optionText": "receive",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "give",
+                    "isCorrect": true
+                },
+                {
+                    "optionText": "sell",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "buy",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "type": "multiple_choice",
+            "questionPrompt": "What does おおきい [ookii] mean?",
+            "options": [
+                {
+                    "optionText": "small",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "big",
+                    "isCorrect": true
+                },
+                {
+                    "optionText": "new",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "old",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "type": "multiple_choice",
+            "questionPrompt": "What does わかります [wakarimasu] mean?",
+            "options": [
+                {
+                    "optionText": "forget",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "know",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "understand",
+                    "isCorrect": true
+                },
+                {
+                    "optionText": "think",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "type": "multiple_choice",
+            "questionPrompt": "What does いぬ [inu] mean?",
+            "options": [
+                {
+                    "optionText": "bird",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "cat",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "dog",
+                    "isCorrect": true
+                },
+                {
+                    "optionText": "fish",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "type": "multiple_choice",
+            "questionPrompt": "Which Japanese word means “umbrella”?",
+            "options": [
+                {
+                    "optionText": "かばん",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "かさ",
+                    "isCorrect": true
+                },
+                {
+                    "optionText": "ぼうし",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "とけい",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "type": "multiple_choice",
+            "questionPrompt": "Which Japanese word means “sushi”?",
+            "options": [
+                {
+                    "optionText": "さかな",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "にく",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "すし",
+                    "isCorrect": true
+                },
+                {
+                    "optionText": "やさい",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "type": "multiple_choice",
+            "questionPrompt": "Which Japanese word means “sugar”?",
+            "options": [
+                {
+                    "optionText": "しお",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "しょうゆ",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "さとう",
+                    "isCorrect": true
+                },
+                {
+                    "optionText": "こしょう",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "type": "multiple_choice",
+            "questionPrompt": "Which Japanese word means “apple”?",
+            "options": [
+                {
+                    "optionText": "りんご",
+                    "isCorrect": true
+                },
+                {
+                    "optionText": "みかん",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "ぶどう",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "すいか",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "type": "multiple_choice",
+            "questionPrompt": "Which Japanese word means “cat”?",
+            "options": [
+                {
+                    "optionText": "いぬ",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "ねこ",
+                    "isCorrect": true
+                },
+                {
+                    "optionText": "とり",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "さかな",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "type": "multiple_choice",
+            "questionPrompt": "Which Japanese word means “bicycle”?",
+            "options": [
+                {
+                    "optionText": "くるま",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "バス",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "じてんしゃ",
+                    "isCorrect": true
+                },
+                {
+                    "optionText": "でんしゃ",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "type": "multiple_choice",
+            "questionPrompt": "Which Japanese word means “chair”?",
+            "options": [
+                {
+                    "optionText": "つくえ",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "テーブル",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "いす",
+                    "isCorrect": true
+                },
+                {
+                    "optionText": "ベッド",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "type": "multiple_choice",
+            "questionPrompt": "Which Japanese word means “clock”?",
+            "options": [
+                {
+                    "optionText": "とけい",
+                    "isCorrect": true
+                },
+                {
+                    "optionText": "めがね",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "かぎ",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "さいふ",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "type": "multiple_choice",
+            "questionPrompt": "Which Japanese word means “bag”?",
+            "options": [
+                {
+                    "optionText": "かばん",
+                    "isCorrect": true
+                },
+                {
+                    "optionText": "かさ",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "ぼうし",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "とけい",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "type": "multiple_choice",
+            "questionPrompt": "Which Japanese word means “pencil”?",
+            "options": [
+                {
+                    "optionText": "ペン",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "えんぴつ",
+                    "isCorrect": true
+                },
+                {
+                    "optionText": "けしごむ",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "ノート",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "type": "multiple_choice",
+            "questionPrompt": "What does くるま [kuruma] mean?",
+            "options": [
+                {
+                    "optionText": "Car",
+                    "isCorrect": true
+                },
+                {
+                    "optionText": "Bicycle",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "Bus",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "Train",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "type": "multiple_choice",
+            "questionPrompt": "What does でんわ [denwa] mean?",
+            "options": [
+                {
+                    "optionText": "Telephone",
+                    "isCorrect": true
+                },
+                {
+                    "optionText": "Letter",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "Newspaper",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "Radio",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "type": "multiple_choice",
+            "questionPrompt": "What does しんぶん [shinbun] mean?",
+            "options": [
+                {
+                    "optionText": "Magazine",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "Newspaper",
+                    "isCorrect": true
+                },
+                {
+                    "optionText": "Book",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "Letter",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "type": "multiple_choice",
+            "questionPrompt": "What does がっこう [gakkou] mean?",
+            "options": [
+                {
+                    "optionText": "University",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "School",
+                    "isCorrect": true
+                },
+                {
+                    "optionText": "Hospital",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "Company",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "type": "multiple_choice",
+            "questionPrompt": "What does たべもの [tabemono] mean?",
+            "options": [
+                {
+                    "optionText": "Food",
+                    "isCorrect": true
+                },
+                {
+                    "optionText": "Drink",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "Fruit",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "Vegetable",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "type": "multiple_choice",
+            "questionPrompt": "What does のみもの [nomimono] mean?",
+            "options": [
+                {
+                    "optionText": "Food",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "Water",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "Drink",
+                    "isCorrect": true
+                },
+                {
+                    "optionText": "Tea",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "type": "multiple_choice",
+            "questionPrompt": "What does くつ [kutsu] mean?",
+            "options": [
+                {
+                    "optionText": "Hat",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "Bag",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "Shoes",
+                    "isCorrect": true
+                },
+                {
+                    "optionText": "Glasses",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "type": "multiple_choice",
+            "questionPrompt": "What does とり [tori] mean?",
+            "options": [
+                {
+                    "optionText": "Dog",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "Cat",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "Bird",
+                    "isCorrect": true
+                },
+                {
+                    "optionText": "Fish",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "type": "multiple_choice",
+            "questionPrompt": "What does さかな [sakana] mean?",
+            "options": [
+                {
+                    "optionText": "Meat",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "Vegetable",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "Fish",
+                    "isCorrect": true
+                },
+                {
+                    "optionText": "Bird",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "type": "multiple_choice",
+            "questionPrompt": "What does でんしゃ [densha] mean?",
+            "options": [
+                {
+                    "optionText": "Car",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "Bus",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "Bicycle",
+                    "isCorrect": false
+                },
+                {
+                    "optionText": "Train",
+                    "isCorrect": true
+                }
+            ]
+        }
+    ]
+}

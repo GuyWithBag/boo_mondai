@@ -1,0 +1,30 @@
+[
+  {
+    "type": "fill_in_the_blanks",
+    "prompt_text": "Je parle francais.",
+    "answer_keys": [{"value": "francais", "casing_type": "any"}]
+  },
+  {
+    "type": "fill_in_the_blanks",
+    "prompt_text": "Nous allons au marche.",
+    "answer_keys": [{"value": "marche", "casing_type": "any"}]
+  },
+  {
+    "type": "fill_in_the_blanks",
+    "prompt_text": "Elle boit de l'eau.",
+    "answer_keys": [{"value": "eau", "casing_type": "any"}]
+  },
+  {
+    "type": "fill_in_the_blanks",
+    "prompt_text": "Le chat dort sur la chaise.",
+    "answer_keys": [
+      {"value": "chat", "casing_type": "any"},
+      {"value": "chaise", "casing_type": "any"}
+    ]
+  },
+  {
+    "type": "fill_in_the_blanks",
+    "prompt_text": "Je voudrais un cafe.",
+    "answer_keys": [{"value": "cafe", "casing_type": "any"}]
+  }
+]

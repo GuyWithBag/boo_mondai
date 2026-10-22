@@ -1,0 +1,109 @@
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:boo_mondai/lib.barrel.dart' show MediaHelper;
+import 'package:file_picker/file_picker.dart';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
+
+abstract class FileSystemHandler {
+  static Future<PlatformFile?> pickSupportedFile() async {
+    return FilePicker.pickFile(
+      type: FileType.custom,
+      allowedExtensions: MediaHelper.supportedExtensions,
+    );
+  }
+
+  static Future<File?> getCachedRemoteFile({
+    required String remoteFileUrl,
+    required String destinationFilePath,
+  }) async {
+    final cachedFile = File(destinationFilePath);
+    if (await cachedFile.exists()) {
+      return cachedFile;
+    }
+
+    final remoteToCacheFile = await storeRemoteAsFile(
+      remoteFileUrl: remoteFileUrl,
+      destinationFilePath: destinationFilePath,
+    );
+
+    return remoteToCacheFile;
+  }
+
+  static Future<File?> storeFile({
+    required String path,
+    required PlatformFile file,
+  }) async {
+    final bytes = await file.readAsBytes();
+    if (bytes.isEmpty) return null;
+
+    return storeBytes(path: path, bytes: bytes);
+  }
+
+  // ToDo: Should throw an error
+  static Future<File> storeRemoteAsFile({
+    required String remoteFileUrl,
+    required String destinationFilePath,
+  }) async {
+    // if (!MediaHelper.isRemoteUrl(remoteFileUrl)) return null;
+
+    final response = await http.get(Uri.parse(remoteFileUrl));
+    // if (response.statusCode < 200 || response.statusCode >= 300) return null;
+
+    final file = await storeBytes(
+      path: destinationFilePath,
+      bytes: response.bodyBytes,
+    );
+    return file;
+  }
+
+  static Future<File> storeBytes({
+    required String path,
+    required Uint8List bytes,
+  }) async {
+    final inputFile = File(path);
+    final resolvedPath = inputFile.isAbsolute
+        ? path
+        : await getAbsolutePathOfRelativePath(path);
+    final file = File(resolvedPath);
+    await file.parent.create(recursive: true);
+    await file.writeAsBytes(bytes, flush: true);
+
+    return file;
+  }
+
+  static Future<bool> doesFileExistsByRelativePath(String relativePath) async {
+    final absolutePath = await getAbsolutePathOfRelativePath(relativePath);
+    final file = File(absolutePath);
+    return await file.exists();
+  }
+
+  static Future<File?> getFileByRelativePath(String relativePath) async {
+    final absolutePath = await getAbsolutePathOfRelativePath(relativePath);
+    final file = File(absolutePath);
+    return await file.exists() ? file : null;
+  }
+
+  static File? getFileByPath(String path) {
+    final file = File(path);
+    return file.existsSync() ? file : null;
+  }
+
+  // ToDo: Currently decks uses the ApplicationDocumentsDirectory but that should be configurable in the future
+  static Future<bool> doesDirectoryExistRelatively(String relativePath) async {
+    return Directory(
+      await getAbsolutePathOfRelativePath(relativePath),
+    ).exists();
+  }
+
+  static Future<String> getAbsolutePathOfRelativePath(String? suffix) async {
+    final documentsPath = await getApplicationDocumentsDirectory();
+    if (suffix == null) return documentsPath.path;
+    var resolvedSuffix = suffix;
+    if (suffix[0] == '/') {
+      resolvedSuffix = suffix.substring(1);
+    }
+    return '${documentsPath.path}/$resolvedSuffix';
+  }
+}

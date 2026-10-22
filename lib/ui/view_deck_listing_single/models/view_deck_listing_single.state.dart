@@ -1,0 +1,1 @@
+enum DeckListingSheetState { editor, preview }

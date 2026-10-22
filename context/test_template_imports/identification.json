@@ -1,0 +1,56 @@
+[
+  {
+    "type": "identification",
+    "promptText": "Translate: hello",
+    "answers": [
+      {
+        "answer": "bonjour",
+        "casingType": "any"
+      }
+    ]
+  },
+  {
+    "type": "identification",
+    "promptText": "Translate: good night",
+    "answers": [
+      {
+        "answer": "bonne nuit",
+        "casingType": "any"
+      }
+    ]
+  },
+  {
+    "type": "identification",
+    "promptText": "Type the language name exactly: French",
+    "answers": [
+      {
+        "answer": "French",
+        "casingType": "exact"
+      }
+    ]
+  },
+  {
+    "type": "identification",
+    "promptText": "Translate: thank you",
+    "answers": [
+      {
+        "answer": "merci",
+        "casingType": "any"
+      },
+      {
+        "answer": "merci beaucoup",
+        "casingType": "any"
+      }
+    ]
+  },
+  {
+    "type": "identification",
+    "promptText": "Translate: see you tomorrow",
+    "answers": [
+      {
+        "answer": "a demain",
+        "casingType": "any"
+      }
+    ]
+  }
+]

@@ -1,0 +1,87 @@
+[
+  {
+    "type": "match_madness",
+    "pairs": [
+      {
+        "term": "bonjour",
+        "match": "hello"
+      },
+      {
+        "term": "merci",
+        "match": "thank you"
+      },
+      {
+        "term": "eau",
+        "match": "water"
+      }
+    ]
+  },
+  {
+    "type": "match_madness",
+    "pairs": [
+      {
+        "term": "rouge",
+        "match": "red"
+      },
+      {
+        "term": "bleu",
+        "match": "blue"
+      },
+      {
+        "term": "vert",
+        "match": "green"
+      }
+    ]
+  },
+  {
+    "type": "match_madness",
+    "pairs": [
+      {
+        "term": "lundi",
+        "match": "Monday"
+      },
+      {
+        "term": "mardi",
+        "match": "Tuesday"
+      },
+      {
+        "term": "mercredi",
+        "match": "Wednesday"
+      }
+    ]
+  },
+  {
+    "type": "match_madness",
+    "pairs": [
+      {
+        "term": "chat",
+        "match": "cat"
+      },
+      {
+        "term": "chien",
+        "match": "dog"
+      },
+      {
+        "term": "oiseau",
+        "match": "bird"
+      }
+    ]
+  },
+  {
+    "type": "match_madness",
+    "pairs": [
+      {
+        "term": "un",
+        "match": "one"
+      },
+      {
+        "term": "deux",
+        "match": "two"
+      },
+      {
+        "term": "trois",
+        "match": "three"
+      }
+    ]
+  }
+]

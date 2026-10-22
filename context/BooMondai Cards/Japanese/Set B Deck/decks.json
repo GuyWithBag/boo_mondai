@@ -1,0 +1,626 @@
+{
+  "type": "Deck",
+  "title": "Set B Deck",
+  "templates": [
+    {
+      "type": "multiple_choice",
+      "question_prompt": "What does あさ [asa] mean?",
+      "options": [
+        {
+          "option_text": "Evening",
+          "is_correct": false
+        },
+        {
+          "option_text": "Morning",
+          "is_correct": true
+        },
+        {
+          "option_text": "Noon",
+          "is_correct": false
+        },
+        {
+          "option_text": "Night",
+          "is_correct": false
+        }
+      ]
+    },
+    {
+      "type": "multiple_choice",
+      "question_prompt": "What does ひる [hiru] mean?",
+      "options": [
+        {
+          "option_text": "Morning",
+          "is_correct": false
+        },
+        {
+          "option_text": "Evening",
+          "is_correct": false
+        },
+        {
+          "option_text": "Noon",
+          "is_correct": true
+        },
+        {
+          "option_text": "Night",
+          "is_correct": false
+        }
+      ]
+    },
+    {
+      "type": "multiple_choice",
+      "question_prompt": "What does ばん [ban] mean?",
+      "options": [
+        {
+          "option_text": "Morning",
+          "is_correct": false
+        },
+        {
+          "option_text": "Evening",
+          "is_correct": true
+        },
+        {
+          "option_text": "Noon",
+          "is_correct": false
+        },
+        {
+          "option_text": "Night",
+          "is_correct": false
+        }
+      ]
+    },
+    {
+      "type": "multiple_choice",
+      "question_prompt": "What does よる [yoru] mean?",
+      "options": [
+        {
+          "option_text": "Morning",
+          "is_correct": false
+        },
+        {
+          "option_text": "Evening",
+          "is_correct": false
+        },
+        {
+          "option_text": "Today",
+          "is_correct": false
+        },
+        {
+          "option_text": "Night",
+          "is_correct": true
+        }
+      ]
+    },
+    {
+      "type": "multiple_choice",
+      "question_prompt": "What does きょう [kyou] mean?",
+      "options": [
+        {
+          "option_text": "Today",
+          "is_correct": true
+        },
+        {
+          "option_text": "Tomorrow",
+          "is_correct": false
+        },
+        {
+          "option_text": "Yesterday",
+          "is_correct": false
+        },
+        {
+          "option_text": "Every day",
+          "is_correct": false
+        }
+      ]
+    },
+    {
+      "type": "identification",
+      "prompt_text": "What does あした [ashita] mean?",
+      "answers": [
+        {
+          "value": "Tomorrow",
+          "casing_type": "any"
+        }
+      ]
+    },
+    {
+      "type": "identification",
+      "prompt_text": "What does きのう [kinou] mean?",
+      "answers": [
+        {
+          "value": "Yesterday",
+          "casing_type": "any"
+        }
+      ]
+    },
+    {
+      "type": "identification",
+      "prompt_text": "What does まいにち [mainichi] mean?",
+      "answers": [
+        {
+          "value": "Every day",
+          "casing_type": "any"
+        }
+      ]
+    },
+    {
+      "type": "identification",
+      "prompt_text": "What does まいあさ [maiasa] mean?",
+      "answers": [
+        {
+          "value": "Every morning",
+          "casing_type": "any"
+        }
+      ]
+    },
+    {
+      "type": "identification",
+      "prompt_text": "What does こんばん [konban] mean?",
+      "answers": [
+        {
+          "value": "Tonight",
+          "casing_type": "any"
+        }
+      ]
+    },
+    {
+      "type": "flashcard",
+      "front_text": "![Image](egg.webp)",
+      "back_text": "たまご\ntamago\negg",
+      "direction": "both"
+    },
+    {
+      "type": "flashcard",
+      "front_text": "![Image](bread.webp)",
+      "back_text": "パン\npan\nbread",
+      "direction": "both"
+    },
+    {
+      "type": "flashcard",
+      "front_text": "![Image](coffee.webp)",
+      "back_text": "コーヒー\nkoohii\ncoffee",
+      "direction": "both"
+    },
+    {
+      "type": "flashcard",
+      "front_text": "![Image](cake.webp)",
+      "back_text": "ケーキ\nkeeki\ncake",
+      "direction": "both"
+    },
+    {
+      "type": "flashcard",
+      "front_text": "![Image](camera.webp)",
+      "back_text": "カメラ\nkamera\ncamera",
+      "direction": "both"
+    },
+    {
+      "type": "matching_type",
+      "values": [
+        {
+          "text": "![Image](tv.webp)",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "match_position": {
+            "x": 1,
+            "y": 0
+          }
+        },
+        {
+          "text": "テレビ\nterebi\ntelevision",
+          "position": {
+            "x": 1,
+            "y": 0
+          },
+          "match_position": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        {
+          "text": "![Image](socks.webp)",
+          "position": {
+            "x": 0,
+            "y": 1
+          },
+          "match_position": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        {
+          "text": "くつした\nkutsushita\nsocks",
+          "position": {
+            "x": 1,
+            "y": 1
+          },
+          "match_position": {
+            "x": 0,
+            "y": 1
+          }
+        },
+        {
+          "text": "![Image](glasses.webp)",
+          "position": {
+            "x": 0,
+            "y": 2
+          },
+          "match_position": {
+            "x": 1,
+            "y": 2
+          }
+        },
+        {
+          "text": "めがね\nmegane\nglasses",
+          "position": {
+            "x": 1,
+            "y": 2
+          },
+          "match_position": {
+            "x": 0,
+            "y": 2
+          }
+        }
+      ]
+    },
+    {
+      "type": "matching_type",
+      "values": [
+        {
+          "text": "![Image](socks.webp)",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "match_position": {
+            "x": 1,
+            "y": 0
+          }
+        },
+        {
+          "text": "くつした\nkutsushita\nsocks",
+          "position": {
+            "x": 1,
+            "y": 0
+          },
+          "match_position": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        {
+          "text": "![Image](glasses.webp)",
+          "position": {
+            "x": 0,
+            "y": 1
+          },
+          "match_position": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        {
+          "text": "めがね\nmegane\nglasses",
+          "position": {
+            "x": 1,
+            "y": 1
+          },
+          "match_position": {
+            "x": 0,
+            "y": 1
+          }
+        },
+        {
+          "text": "![Image](radio.webp)",
+          "position": {
+            "x": 0,
+            "y": 2
+          },
+          "match_position": {
+            "x": 1,
+            "y": 2
+          }
+        },
+        {
+          "text": "ラジオ\nrajio\nradio",
+          "position": {
+            "x": 1,
+            "y": 2
+          },
+          "match_position": {
+            "x": 0,
+            "y": 2
+          }
+        }
+      ]
+    },
+    {
+      "type": "matching_type",
+      "values": [
+        {
+          "text": "![Image](glasses.webp)",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "match_position": {
+            "x": 1,
+            "y": 0
+          }
+        },
+        {
+          "text": "めがね\nmegane\nglasses",
+          "position": {
+            "x": 1,
+            "y": 0
+          },
+          "match_position": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        {
+          "text": "![Image](radio.webp)",
+          "position": {
+            "x": 0,
+            "y": 1
+          },
+          "match_position": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        {
+          "text": "ラジオ\nrajio\nradio",
+          "position": {
+            "x": 1,
+            "y": 1
+          },
+          "match_position": {
+            "x": 0,
+            "y": 1
+          }
+        },
+        {
+          "text": "![Image](pencil.webp)",
+          "position": {
+            "x": 0,
+            "y": 2
+          },
+          "match_position": {
+            "x": 1,
+            "y": 2
+          }
+        },
+        {
+          "text": "えんぴつ\nenpitsu\npencil",
+          "position": {
+            "x": 1,
+            "y": 2
+          },
+          "match_position": {
+            "x": 0,
+            "y": 2
+          }
+        }
+      ]
+    },
+    {
+      "type": "matching_type",
+      "values": [
+        {
+          "text": "![Image](radio.webp)",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "match_position": {
+            "x": 1,
+            "y": 0
+          }
+        },
+        {
+          "text": "ラジオ\nrajio\nradio",
+          "position": {
+            "x": 1,
+            "y": 0
+          },
+          "match_position": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        {
+          "text": "![Image](pencil.webp)",
+          "position": {
+            "x": 0,
+            "y": 1
+          },
+          "match_position": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        {
+          "text": "えんぴつ\nenpitsu\npencil",
+          "position": {
+            "x": 1,
+            "y": 1
+          },
+          "match_position": {
+            "x": 0,
+            "y": 1
+          }
+        },
+        {
+          "text": "あさ [asa]",
+          "position": {
+            "x": 0,
+            "y": 2
+          },
+          "match_position": {
+            "x": 1,
+            "y": 2
+          }
+        },
+        {
+          "text": "Morning",
+          "position": {
+            "x": 1,
+            "y": 2
+          },
+          "match_position": {
+            "x": 0,
+            "y": 2
+          }
+        }
+      ]
+    },
+    {
+      "type": "matching_type",
+      "values": [
+        {
+          "text": "![Image](pencil.webp)",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "match_position": {
+            "x": 1,
+            "y": 0
+          }
+        },
+        {
+          "text": "えんぴつ\nenpitsu\npencil",
+          "position": {
+            "x": 1,
+            "y": 0
+          },
+          "match_position": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        {
+          "text": "あさ [asa]",
+          "position": {
+            "x": 0,
+            "y": 1
+          },
+          "match_position": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        {
+          "text": "Morning",
+          "position": {
+            "x": 1,
+            "y": 1
+          },
+          "match_position": {
+            "x": 0,
+            "y": 1
+          }
+        },
+        {
+          "text": "ひる [hiru]",
+          "position": {
+            "x": 0,
+            "y": 2
+          },
+          "match_position": {
+            "x": 1,
+            "y": 2
+          }
+        },
+        {
+          "text": "Noon",
+          "position": {
+            "x": 1,
+            "y": 2
+          },
+          "match_position": {
+            "x": 0,
+            "y": 2
+          }
+        }
+      ]
+    },
+    {
+      "type": "fill_in_the_blanks",
+      "prompt_text": "![Audio](buy.mp3)\nWatashi wa hon o kaimasu.\nMeaning: I buy a book.",
+      "answer_keys": [
+        {
+          "value": "kaimasu",
+          "casing_type": "any",
+          "order": 0
+        }
+      ]
+    },
+    {
+      "type": "fill_in_the_blanks",
+      "prompt_text": "![Audio](sell.mp3)\nWatashi wa hon o urimasu.\nMeaning: I sell a book.",
+      "answer_keys": [
+        {
+          "value": "urimasu",
+          "casing_type": "any",
+          "order": 0
+        }
+      ]
+    },
+    {
+      "type": "fill_in_the_blanks",
+      "prompt_text": "![Audio](mother.mp3)\nKono hito wa watashi no okaasan desu.\nMeaning: This person is my mother.",
+      "answer_keys": [
+        {
+          "value": "okaasan",
+          "casing_type": "any",
+          "order": 0
+        }
+      ]
+    },
+    {
+      "type": "fill_in_the_blanks",
+      "prompt_text": "![Audio](father.mp3)\nKono hito wa watashi no otousan desu.\nMeaning: This person is my father.",
+      "answer_keys": [
+        {
+          "value": "otousan",
+          "casing_type": "any",
+          "order": 0
+        }
+      ]
+    },
+    {
+      "type": "fill_in_the_blanks",
+      "prompt_text": "![Audio](big.mp3)\nKono inu wa ookii desu.\nMeaning: This dog is big.",
+      "answer_keys": [
+        {
+          "value": "ookii",
+          "casing_type": "any",
+          "order": 0
+        }
+      ]
+    },
+    {
+      "type": "word_scramble",
+      "sentence_to_scramble": "Kono inu wa chiisai desu"
+    },
+    {
+      "type": "word_scramble",
+      "sentence_to_scramble": "Kono heya wa shizuka desu"
+    },
+    {
+      "type": "word_scramble",
+      "sentence_to_scramble": "Kono machi wa nigiyaka desu"
+    },
+    {
+      "type": "word_scramble",
+      "sentence_to_scramble": "Kono mondai wa yasashii desu"
+    },
+    {
+      "type": "word_scramble",
+      "sentence_to_scramble": "Kono mondai wa muzukashii desu"
+    }
+  ]
+}

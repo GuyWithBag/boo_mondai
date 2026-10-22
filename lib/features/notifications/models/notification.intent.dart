@@ -1,0 +1,91 @@
+import 'package:boo_mondai/features/notifications/models/notification.intent.type.dart';
+import 'package:dart_mappable/dart_mappable.dart';
+
+part 'notification.intent.mapper.dart';
+
+@MappableClass()
+class NotificationIntent with NotificationIntentMappable {
+  const NotificationIntent({
+    required this.id,
+    required this.profileId,
+    required this.type,
+    required this.title,
+    required this.shortDescription,
+    required this.body,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.purgeAt,
+    this.route,
+    this.ifRouteNullPushToView = false,
+    this.persistInInbox = false,
+    this.showSystemNotification = true,
+    this.showAsBubble = false,
+    this.shown = false,
+    this.readAt,
+    this.deletedAt,
+    this.purgeAfterDays = 30,
+  });
+
+  factory NotificationIntent.create({
+    required int id,
+    required String profileId,
+    required NotificationIntentType type,
+    required String title,
+    required String shortDescription,
+    required String body,
+    String? route,
+    bool ifRouteNullPushToView = false,
+    bool persistInInbox = false,
+    bool showSystemNotification = true,
+    bool showAsBubble = false,
+    bool shown = false,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    DateTime? readAt,
+    DateTime? deletedAt,
+    DateTime? purgeAt,
+    int purgeAfterDays = 30,
+  }) {
+    final now = DateTime.now();
+    final resolvedCreatedAt = createdAt ?? now;
+    return NotificationIntent(
+      id: id,
+      profileId: profileId,
+      type: type,
+      title: title,
+      shortDescription: shortDescription,
+      body: body,
+      route: route,
+      ifRouteNullPushToView: ifRouteNullPushToView,
+      persistInInbox: persistInInbox,
+      showSystemNotification: showSystemNotification,
+      showAsBubble: showAsBubble,
+      shown: shown,
+      createdAt: resolvedCreatedAt,
+      updatedAt: updatedAt ?? now,
+      readAt: readAt,
+      deletedAt: deletedAt,
+      purgeAfterDays: purgeAfterDays,
+      purgeAt: purgeAt ?? resolvedCreatedAt.add(Duration(days: purgeAfterDays)),
+    );
+  }
+
+  final int id;
+  final String profileId;
+  final NotificationIntentType type;
+  final String title;
+  final String shortDescription;
+  final String body;
+  final String? route;
+  final bool ifRouteNullPushToView;
+  final bool persistInInbox;
+  final bool showSystemNotification;
+  final bool showAsBubble;
+  final bool shown;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? readAt;
+  final DateTime? deletedAt;
+  final DateTime purgeAt;
+  final int purgeAfterDays;
+}

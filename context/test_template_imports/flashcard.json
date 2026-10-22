@@ -1,0 +1,32 @@
+[
+  {
+    "type": "flashcard",
+    "frontText": "bonjour",
+    "backText": "hello",
+    "direction": "normal"
+  },
+  {
+    "type": "flashcard",
+    "frontText": "merci",
+    "backText": "thank you, thanks",
+    "direction": "normal"
+  },
+  {
+    "type": "flashcard",
+    "frontText": "water",
+    "backText": "eau",
+    "direction": "reversed"
+  },
+  {
+    "type": "flashcard",
+    "frontText": "manger",
+    "backText": "to eat",
+    "direction": "both"
+  },
+  {
+    "type": "flashcard",
+    "frontText": "Where is the station?",
+    "backText": "Ou est la gare?",
+    "direction": "both"
+  }
+]

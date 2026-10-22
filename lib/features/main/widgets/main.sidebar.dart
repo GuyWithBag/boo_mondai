@@ -1,0 +1,71 @@
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// PATH: lib/widgets/sidebar.dart (or your specific path)
+// PURPOSE: SideBar navigation using a ListView and custom Buttons
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+import 'package:boo_mondai/lib.barrel.dart'
+    show
+        Button,
+        ButtonColor,
+        ButtonVariant,
+        Pages,
+        AppTokens,
+        surfaceStyle,
+        SurfaceShape,
+        SurfaceBorder;
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart' show GoRouterHelper;
+import 'package:theme_variants/theme_variants.dart';
+
+class SideBar extends StatelessWidget {
+  final int currentPageIndex;
+
+  const SideBar({super.key, required this.currentPageIndex});
+
+  @override
+  Widget build(BuildContext context) {
+    final pages = Pages.shell;
+    final tokens = context.themeTokens<AppTokens>();
+    return SizedBox(
+      width: 280,
+      child: Container(
+        decoration: BoxDecoration(
+          border: BorderDirectional(
+            end: BorderSide(
+              color: tokens.colorBorderNeutralSubtle,
+              width: tokens.borderWidthDefault,
+            ),
+          ),
+        ),
+        child: Surface(
+          style: surfaceStyle.resolve(tokens, const [
+            SurfaceShape.sharp,
+            SurfaceBorder.none,
+          ]),
+          child: ListView.separated(
+            itemCount: pages.length,
+            separatorBuilder: (_, _) =>
+                SizedBox(height: tokens.spaceLayoutGapSm),
+            itemBuilder: (context, index) {
+              final page = pages[index];
+              final isSelected = index == currentPageIndex;
+
+              return Button(
+                leading: Icon(
+                  isSelected && page.selectedIcon != null
+                      ? page.selectedIcon!
+                      : page.icon!,
+                ),
+                selected: isSelected,
+                variants: const [ButtonVariant.text, ButtonColor.baseline],
+                mainAxisAlignment: MainAxisAlignment.start,
+                onPressed: () => context.go(page.url),
+                child: Text(page.name),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}

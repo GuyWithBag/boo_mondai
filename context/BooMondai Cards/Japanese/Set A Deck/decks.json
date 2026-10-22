@@ -1,0 +1,626 @@
+{
+  "type": "Deck",
+  "title": "Set A Deck",
+  "templates": [
+    {
+      "type": "multiple_choice",
+      "question_prompt": "What does みんなさん [Minnasan] mean?",
+      "options": [
+        {
+          "option_text": "you",
+          "is_correct": false
+        },
+        {
+          "option_text": "that person",
+          "is_correct": false
+        },
+        {
+          "option_text": "everyone",
+          "is_correct": true
+        },
+        {
+          "option_text": "us",
+          "is_correct": false
+        }
+      ]
+    },
+    {
+      "type": "multiple_choice",
+      "question_prompt": "What does ほん [hon] mean?",
+      "options": [
+        {
+          "option_text": "book",
+          "is_correct": true
+        },
+        {
+          "option_text": "magazine",
+          "is_correct": false
+        },
+        {
+          "option_text": "notebook",
+          "is_correct": false
+        },
+        {
+          "option_text": "newspaper",
+          "is_correct": false
+        }
+      ]
+    },
+    {
+      "type": "multiple_choice",
+      "question_prompt": "What does ここ [koko] mean?",
+      "options": [
+        {
+          "option_text": "there",
+          "is_correct": false
+        },
+        {
+          "option_text": "here",
+          "is_correct": true
+        },
+        {
+          "option_text": "where",
+          "is_correct": false
+        },
+        {
+          "option_text": "over there",
+          "is_correct": false
+        }
+      ]
+    },
+    {
+      "type": "multiple_choice",
+      "question_prompt": "What does いま [ima] mean?",
+      "options": [
+        {
+          "option_text": "today",
+          "is_correct": false
+        },
+        {
+          "option_text": "now",
+          "is_correct": true
+        },
+        {
+          "option_text": "tomorrow",
+          "is_correct": false
+        },
+        {
+          "option_text": "yesterday",
+          "is_correct": false
+        }
+      ]
+    },
+    {
+      "type": "multiple_choice",
+      "question_prompt": "What does いきます [ikimasu] mean?",
+      "options": [
+        {
+          "option_text": "return",
+          "is_correct": false
+        },
+        {
+          "option_text": "come",
+          "is_correct": false
+        },
+        {
+          "option_text": "go",
+          "is_correct": true
+        },
+        {
+          "option_text": "eat",
+          "is_correct": false
+        }
+      ]
+    },
+    {
+      "type": "identification",
+      "prompt_text": "What does みず [mizu] mean?",
+      "answers": [
+        {
+          "value": "water",
+          "casing_type": "any"
+        }
+      ]
+    },
+    {
+      "type": "identification",
+      "prompt_text": "What does あげます [agemasu] mean?",
+      "answers": [
+        {
+          "value": "give",
+          "casing_type": "any"
+        }
+      ]
+    },
+    {
+      "type": "identification",
+      "prompt_text": "What does おおきい [ookii] mean?",
+      "answers": [
+        {
+          "value": "big",
+          "casing_type": "any"
+        }
+      ]
+    },
+    {
+      "type": "identification",
+      "prompt_text": "What does わかります [wakarimasu] mean?",
+      "answers": [
+        {
+          "value": "understand",
+          "casing_type": "any"
+        }
+      ]
+    },
+    {
+      "type": "identification",
+      "prompt_text": "What does いぬ [inu] mean?",
+      "answers": [
+        {
+          "value": "dog",
+          "casing_type": "any"
+        }
+      ]
+    },
+    {
+      "type": "flashcard",
+      "front_text": "![Image](umbrella.webp)",
+      "back_text": "かさ\nkasa\numbrella",
+      "direction": "both"
+    },
+    {
+      "type": "flashcard",
+      "front_text": "![Image](sushi.webp)",
+      "back_text": "すし\nsushi\nsushi",
+      "direction": "both"
+    },
+    {
+      "type": "flashcard",
+      "front_text": "![Image](sugar.webp)",
+      "back_text": "さとう\nsatou\nsugar",
+      "direction": "both"
+    },
+    {
+      "type": "flashcard",
+      "front_text": "![Image](apple.webp)",
+      "back_text": "りんご\nringo\napple",
+      "direction": "both"
+    },
+    {
+      "type": "flashcard",
+      "front_text": "![Image](cat.webp)",
+      "back_text": "ねこ\nneko\ncat",
+      "direction": "both"
+    },
+    {
+      "type": "matching_type",
+      "values": [
+        {
+          "text": "![Image](bicycle.webp)",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "match_position": {
+            "x": 1,
+            "y": 0
+          }
+        },
+        {
+          "text": "じてんしゃ\njitensha\nbicycle",
+          "position": {
+            "x": 1,
+            "y": 0
+          },
+          "match_position": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        {
+          "text": "![Image](chair.webp)",
+          "position": {
+            "x": 0,
+            "y": 1
+          },
+          "match_position": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        {
+          "text": "いす\nisu\nchair",
+          "position": {
+            "x": 1,
+            "y": 1
+          },
+          "match_position": {
+            "x": 0,
+            "y": 1
+          }
+        },
+        {
+          "text": "![Image](clock.webp)",
+          "position": {
+            "x": 0,
+            "y": 2
+          },
+          "match_position": {
+            "x": 1,
+            "y": 2
+          }
+        },
+        {
+          "text": "とけい\ntokei\nclock",
+          "position": {
+            "x": 1,
+            "y": 2
+          },
+          "match_position": {
+            "x": 0,
+            "y": 2
+          }
+        }
+      ]
+    },
+    {
+      "type": "matching_type",
+      "values": [
+        {
+          "text": "![Image](chair.webp)",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "match_position": {
+            "x": 1,
+            "y": 0
+          }
+        },
+        {
+          "text": "いす\nisu\nchair",
+          "position": {
+            "x": 1,
+            "y": 0
+          },
+          "match_position": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        {
+          "text": "![Image](clock.webp)",
+          "position": {
+            "x": 0,
+            "y": 1
+          },
+          "match_position": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        {
+          "text": "とけい\ntokei\nclock",
+          "position": {
+            "x": 1,
+            "y": 1
+          },
+          "match_position": {
+            "x": 0,
+            "y": 1
+          }
+        },
+        {
+          "text": "![Image](bag.webp)",
+          "position": {
+            "x": 0,
+            "y": 2
+          },
+          "match_position": {
+            "x": 1,
+            "y": 2
+          }
+        },
+        {
+          "text": "かばん\nkaban\nbag",
+          "position": {
+            "x": 1,
+            "y": 2
+          },
+          "match_position": {
+            "x": 0,
+            "y": 2
+          }
+        }
+      ]
+    },
+    {
+      "type": "matching_type",
+      "values": [
+        {
+          "text": "![Image](clock.webp)",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "match_position": {
+            "x": 1,
+            "y": 0
+          }
+        },
+        {
+          "text": "とけい\ntokei\nclock",
+          "position": {
+            "x": 1,
+            "y": 0
+          },
+          "match_position": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        {
+          "text": "![Image](bag.webp)",
+          "position": {
+            "x": 0,
+            "y": 1
+          },
+          "match_position": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        {
+          "text": "かばん\nkaban\nbag",
+          "position": {
+            "x": 1,
+            "y": 1
+          },
+          "match_position": {
+            "x": 0,
+            "y": 1
+          }
+        },
+        {
+          "text": "![Image](pencil.webp)",
+          "position": {
+            "x": 0,
+            "y": 2
+          },
+          "match_position": {
+            "x": 1,
+            "y": 2
+          }
+        },
+        {
+          "text": "えんぴつ\nenpitsu\npencil",
+          "position": {
+            "x": 1,
+            "y": 2
+          },
+          "match_position": {
+            "x": 0,
+            "y": 2
+          }
+        }
+      ]
+    },
+    {
+      "type": "matching_type",
+      "values": [
+        {
+          "text": "![Image](bag.webp)",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "match_position": {
+            "x": 1,
+            "y": 0
+          }
+        },
+        {
+          "text": "かばん\nkaban\nbag",
+          "position": {
+            "x": 1,
+            "y": 0
+          },
+          "match_position": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        {
+          "text": "![Image](pencil.webp)",
+          "position": {
+            "x": 0,
+            "y": 1
+          },
+          "match_position": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        {
+          "text": "えんぴつ\nenpitsu\npencil",
+          "position": {
+            "x": 1,
+            "y": 1
+          },
+          "match_position": {
+            "x": 0,
+            "y": 1
+          }
+        },
+        {
+          "text": "みんなさん [Minnasan]",
+          "position": {
+            "x": 0,
+            "y": 2
+          },
+          "match_position": {
+            "x": 1,
+            "y": 2
+          }
+        },
+        {
+          "text": "everyone",
+          "position": {
+            "x": 1,
+            "y": 2
+          },
+          "match_position": {
+            "x": 0,
+            "y": 2
+          }
+        }
+      ]
+    },
+    {
+      "type": "matching_type",
+      "values": [
+        {
+          "text": "![Image](pencil.webp)",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "match_position": {
+            "x": 1,
+            "y": 0
+          }
+        },
+        {
+          "text": "えんぴつ\nenpitsu\npencil",
+          "position": {
+            "x": 1,
+            "y": 0
+          },
+          "match_position": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        {
+          "text": "みんなさん [Minnasan]",
+          "position": {
+            "x": 0,
+            "y": 1
+          },
+          "match_position": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        {
+          "text": "everyone",
+          "position": {
+            "x": 1,
+            "y": 1
+          },
+          "match_position": {
+            "x": 0,
+            "y": 1
+          }
+        },
+        {
+          "text": "ほん [hon]",
+          "position": {
+            "x": 0,
+            "y": 2
+          },
+          "match_position": {
+            "x": 1,
+            "y": 2
+          }
+        },
+        {
+          "text": "book",
+          "position": {
+            "x": 1,
+            "y": 2
+          },
+          "match_position": {
+            "x": 0,
+            "y": 2
+          }
+        }
+      ]
+    },
+    {
+      "type": "fill_in_the_blanks",
+      "prompt_text": "![Audio](car.mp3)\nWatashi wa kuruma ni norimasu.\nMeaning: I ride in a car.",
+      "answer_keys": [
+        {
+          "value": "kuruma",
+          "casing_type": "any",
+          "order": 0
+        }
+      ]
+    },
+    {
+      "type": "fill_in_the_blanks",
+      "prompt_text": "![Audio](telephone.mp3)\nKore wa denwa desu.\nMeaning: This is a telephone.",
+      "answer_keys": [
+        {
+          "value": "denwa",
+          "casing_type": "any",
+          "order": 0
+        }
+      ]
+    },
+    {
+      "type": "fill_in_the_blanks",
+      "prompt_text": "![Audio](newspaper.mp3)\nWatashi wa shinbun o yomimasu.\nMeaning: I read a newspaper.",
+      "answer_keys": [
+        {
+          "value": "shinbun",
+          "casing_type": "any",
+          "order": 0
+        }
+      ]
+    },
+    {
+      "type": "fill_in_the_blanks",
+      "prompt_text": "![Audio](school.mp3)\nWatashi wa gakkou e ikimasu.\nMeaning: I go to school.",
+      "answer_keys": [
+        {
+          "value": "gakkou",
+          "casing_type": "any",
+          "order": 0
+        }
+      ]
+    },
+    {
+      "type": "fill_in_the_blanks",
+      "prompt_text": "![Audio](food.mp3)\nKore wa tabemono desu.\nMeaning: This is food.",
+      "answer_keys": [
+        {
+          "value": "tabemono",
+          "casing_type": "any",
+          "order": 0
+        }
+      ]
+    },
+    {
+      "type": "word_scramble",
+      "sentence_to_scramble": "Kore wa nomimono desu"
+    },
+    {
+      "type": "word_scramble",
+      "sentence_to_scramble": "Watashi wa kutsu o hakimasu"
+    },
+    {
+      "type": "word_scramble",
+      "sentence_to_scramble": "Tori wa sora o tobimasu"
+    },
+    {
+      "type": "word_scramble",
+      "sentence_to_scramble": "Watashi wa sakana o tabemasu"
+    },
+    {
+      "type": "word_scramble",
+      "sentence_to_scramble": "Watashi wa densha ni norimasu"
+    }
+  ]
+}

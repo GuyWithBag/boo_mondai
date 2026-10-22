@@ -1,167 +1,149 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PATH: lib/routes.dart
 // PURPOSE: go_router configuration with shell navigation (no login gate)
-// PROVIDERS: AuthProvider
+// PROVIDERS: AuthController
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import 'package:boo_mondai/lib.barrel.dart'
+    show
+        AuthController,
+        ErrorPage,
+        RouteException,
+        Pages,
+        MainScaffold,
+        AuthService,
+        SettingPath,
+        SettingsStore,
+        TextContextMenuNavigatorObserver;
+import 'package:flutter/widgets.dart' show GlobalKey, NavigatorState;
 import 'package:go_router/go_router.dart';
-import 'package:boo_mondai/pages/pages.dart';
-import 'package:boo_mondai/providers/providers.dart';
-import 'package:boo_mondai/widgets/widgets.dart';
 
-GoRouter createRouter(AuthProvider authProvider) {
+final rootNavigatorKey = GlobalKey<NavigatorState>();
+final intialLocation = Pages.decksLocal.url;
+
+GoRouter createRouter(AuthController authController) {
   return GoRouter(
-    refreshListenable: authProvider,
-    initialLocation: '/',
+    navigatorKey: rootNavigatorKey,
+    observers: [TextContextMenuNavigatorObserver()],
+    initialLocation: intialLocation,
+    refreshListenable: authController.routerRefresh,
+    errorBuilder: (context, state) {
+      final exception = RouteException(
+        'Error 404: The requested page could not be found.',
+        code: 'ROUTE_NOT_FOUND',
+        originalError: state.error,
+      );
+      return ErrorPage(exception: exception);
+    },
     redirect: (context, state) {
-      final isAuth = authProvider.isAuthenticated;
-      final loc = state.matchedLocation;
-
-      // Authenticated users landing on /login or /register → go home
-      if (isAuth && (loc == '/login' || loc == '/register')) return '/';
-
-      // Auth-required routes: redirect to /account if not logged in
-      if (!isAuth) {
-        final requiresAuth = loc.startsWith('/decks') ||
-            loc.startsWith('/quiz') ||
-            loc.startsWith('/review') ||
-            loc.startsWith('/leaderboard') ||
-            loc.startsWith('/research');
-        if (requiresAuth) return '/account';
-      }
-
-      // Group B guard — redirect to code entry for non-allowed routes
-      if (isAuth && authProvider.role == 'group_b_participant') {
-        final allowed = ['/', '/research/code', '/account'];
-        if (!allowed.contains(loc) &&
-            !loc.startsWith('/research/survey') &&
-            !loc.startsWith('/research/test')) {
-          return '/research/code';
+      if (state.pathParameters.isNotEmpty) {
+        for (final entry in state.pathParameters.entries) {
+          final value = entry.value;
+          if (value.isEmpty || value == 'null') {
+            throw Exception("Missing required parameter: ${entry.key}");
+          }
         }
       }
+
+      final auth = authController;
+      // final isAnonymous = !auth.currentProfile.isAnonymous;
+      final loc = state.matchedLocation;
+      final hasCompletedOnboarding = SettingsStore.instance.get<bool>(
+        SettingPath.onboardingCompleted,
+      );
+
+      if (!hasCompletedOnboarding && loc != Pages.onboarding.url) {
+        return Pages.onboarding.url;
+      }
+
+      if (hasCompletedOnboarding && loc == Pages.onboarding.url) {
+        return Pages.home.url;
+      }
+
+      if (AuthService.isAuthenticatedRemote &&
+          (loc == Pages.login.url || loc == Pages.register.url)) {
+        return Pages.home.url;
+      }
+
+      if (loc.startsWith(Pages.researcherDashboard.url) &&
+          !auth.currentProfile.value.isResearcher) {
+        return Pages.home.url;
+      }
+
+      // if (!isAnonymous && auth.currentProfile.role == ProfileRole.participantJapaneseB) {
+      //   final allowed = [
+      //     Pages.home.url,
+      //     Pages.researchCode.url,
+      //     Pages.account.url,
+      //   ];
+      //   if (!allowed.contains(loc) &&
+      //       !loc.startsWith('/research/survey') &&
+      //       !loc.startsWith('/research/test')) {
+      //     return Pages.researchCode.url;
+      //   }
+      // }
 
       return null;
     },
     routes: [
-      // ── Shell routes (with bottom nav / rail) ─────────
       ShellRoute(
         builder: (context, state, child) {
           final index = _shellIndex(state.matchedLocation);
-          return ResponsiveScaffold(
-            currentIndex: index,
-            child: child,
-          );
+          return MainScaffold(currentIndex: index, child: child);
         },
         routes: [
-          GoRoute(
-            path: '/',
-            builder: (context, state) {
-              if (authProvider.role == 'group_b_participant') {
-                return const ResearchCodeEntryPage();
-              }
-              return const HomePage();
-            },
-          ),
-          GoRoute(
-            path: '/decks',
-            builder: (context, state) => const DeckListPage(),
-          ),
-          GoRoute(
-            path: '/review',
-            builder: (context, state) => const ReviewPage(),
-          ),
-          GoRoute(
-            path: '/leaderboard',
-            builder: (context, state) => const LeaderboardPage(),
-          ),
-          GoRoute(
-            path: '/account',
-            builder: (context, state) => const AccountPage(),
-          ),
+          for (final page in Pages.shell)
+            GoRoute(
+              path: page.url,
+              builder: (context, state) => page.builder(
+                context,
+                pathParameters: state.pathParameters,
+                queryParameters: state.uri.queryParameters,
+                extra: state.extra,
+              ),
+            ),
         ],
       ),
-
-      // ── Auth routes (no shell) ────────────────────────
-      GoRoute(
-        path: '/login',
-        builder: (context, state) => const LoginPage(),
-      ),
-      GoRoute(
-        path: '/register',
-        builder: (context, state) => const RegisterPage(),
-      ),
-
-      // ── Non-shell routes ──────────────────────────────
-      GoRoute(
-        path: '/decks/create',
-        builder: (context, state) => const DeckCreatorPage(),
-      ),
-      GoRoute(
-        path: '/decks/:deckId',
-        builder: (context, state) =>
-            DeckDetailPage(deckId: state.pathParameters['deckId']!),
-      ),
-      GoRoute(
-        path: '/decks/:deckId/edit',
-        builder: (context, state) =>
-            DeckCreatorPage(deckId: state.pathParameters['deckId']),
-      ),
-      GoRoute(
-        path: '/decks/:deckId/cards/add',
-        builder: (context, state) =>
-            CardEditorPage(deckId: state.pathParameters['deckId']!),
-      ),
-      GoRoute(
-        path: '/decks/:deckId/cards/:cardId/edit',
-        builder: (context, state) => CardEditorPage(
-          deckId: state.pathParameters['deckId']!,
-          cardId: state.pathParameters['cardId'],
+      for (final page in Pages.auth)
+        GoRoute(
+          path: page.url,
+          builder: (context, state) => page.builder(
+            context,
+            pathParameters: state.pathParameters,
+            queryParameters: state.uri.queryParameters,
+            extra: state.extra,
+          ),
         ),
-      ),
-      GoRoute(
-        path: '/quiz/:deckId/preview',
-        builder: (context, state) =>
-            QuizPreviewPage(deckId: state.pathParameters['deckId']!),
-      ),
-      GoRoute(
-        path: '/quiz/:deckId/session',
-        builder: (context, state) =>
-            QuizSessionPage(deckId: state.pathParameters['deckId']!),
-      ),
-      GoRoute(
-        path: '/quiz/:sessionId/result',
-        builder: (context, state) =>
-            QuizResultPage(sessionId: state.pathParameters['sessionId']!),
-      ),
-      GoRoute(
-        path: '/research',
-        builder: (context, state) => const ResearcherDashboardPage(),
-      ),
-      GoRoute(
-        path: '/research/code',
-        builder: (context, state) => const ResearchCodeEntryPage(),
-      ),
-      GoRoute(
-        path: '/research/survey/:surveyType',
-        builder: (context, state) => SurveyPage(
-          surveyType: state.pathParameters['surveyType']!,
-          timePoint: state.uri.queryParameters['timePoint'],
+      for (final page in Pages.appDetails)
+        GoRoute(
+          path: page.url,
+          builder: (context, state) => page.builder(
+            context,
+            pathParameters: state.pathParameters,
+            queryParameters: state.uri.queryParameters,
+            extra: state.extra,
+          ),
         ),
-      ),
-      GoRoute(
-        path: '/research/test/:testSet',
-        builder: (context, state) =>
-            VocabularyTestPage(testSet: state.pathParameters['testSet']!),
-      ),
+      for (final page in Pages.nonShell)
+        GoRoute(
+          path: page.url,
+          builder: (context, state) => page.builder(
+            context,
+            pathParameters: state.pathParameters,
+            queryParameters: state.uri.queryParameters,
+            extra: state.extra,
+          ),
+        ),
     ],
   );
 }
 
 int _shellIndex(String location) {
-  if (location.startsWith('/decks')) return 1;
-  if (location.startsWith('/review')) return 2;
-  if (location.startsWith('/leaderboard')) return 3;
-  if (location.startsWith('/account')) return 4;
-  return 0; // home
+  for (var i = 0; i < Pages.shell.length; i++) {
+    final page = Pages.shell[i];
+    if (page.url == Pages.home.url) continue;
+    if (location.startsWith(page.url)) return i;
+  }
+  return 0;
 }

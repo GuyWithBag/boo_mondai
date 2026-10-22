@@ -40,7 +40,7 @@ flowchart TD
     Consistency"]
     ME3["Initial FSRS
     Stability seeded
-    from quiz"]
+    from drill"]
   end
 
   subgraph DV["  DEPENDENT VARIABLES  "]

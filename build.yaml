@@ -1,0 +1,7 @@
+global_options:
+  dart_mappable_builder:
+    options:
+      # The case style for the map keys, defaults to 'none'
+      caseStyle: snakeCase # or 'camelCase', 'snakeCase', etc.
+      # The case style for stringified enum values, defaults to 'none'
+      enumCaseStyle: snakeCase # or 'camelCase', 'snakeCase', etc.

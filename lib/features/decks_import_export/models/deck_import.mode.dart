@@ -1,0 +1,1 @@
+enum DeckImportMode { decks, cardTemplates }

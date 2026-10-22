@@ -1,96 +1,94 @@
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// PATH: lib/main.dart
-// PURPOSE: Entry point — Hive init, Supabase init, provider registration, runApp
-// PROVIDERS: all
-// HOOKS: none
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
+import 'dart:developer' as developer;
+import 'package:app_links/app_links.dart';
+import 'package:boo_mondai/core/hive/hive_registrar.g.dart' show HiveRegistrar;
+import 'package:boo_mondai/env.dart' show Env;
+import 'package:boo_mondai/features/ui_sounds/ui_sounds.barrel.dart';
+import 'package:boo_mondai/lib.barrel.dart'
+    show
+        RemoteDB,
+        LocalDB,
+        Services,
+        AuthController,
+        ChangeTrackerController,
+        ChangeTrackerService,
+        ViewDecksLocalController,
+        ViewDeckListingsController,
+        StreakController,
+        SettingsStore,
+        NotificationsController,
+        ResearchPariticipantPortalStore,
+        SyncController,
+        SyncDeckService,
+        ChangeTrackerRouteArgs,
+        BooMondaiApp;
 import 'package:flutter/material.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:signals/signals_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:boo_mondai/app.dart';
-import 'package:boo_mondai/controllers/controllers.dart';
-import 'package:boo_mondai/providers/providers.dart';
-import 'package:boo_mondai/services/services.dart';
-import 'package:boo_mondai/shared/shared.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // ── Hive ────────────────────────────────────────────
-  await Hive.initFlutter();
-  final hiveService = HiveService();
-  await hiveService.init();
-
+  await Hive.initFlutter('boo_mondai');
+  Hive.registerAdapters();
   // ── Supabase ────────────────────────────────────────
   await Supabase.initialize(
     url: Env.supabaseUrl,
-    anonKey: Env.supabaseAnonKey,
+    publishableKey: Env.supabaseAnonKey,
   );
-  final supabaseService = SupabaseService();
+  await RemoteDB.init();
+  await LocalDB.init();
+  Services.init();
+  // ── Settings (must come before notifications) ───────
+  final settingsStore = SettingsStore.instance;
+  await settingsStore.init();
+  await UiSoundsService.init();
 
-  // ── Other services ──────────────────────────────────
-  final fsrsService = FsrsService();
-  final notificationService = NotificationService();
-  await notificationService.init();
-
+  try {
+    await NotificationsController.instance.init();
+  } catch (error, stackTrace) {
+    developer.log(
+      'Notifications failed to initialize.',
+      error: error,
+      stackTrace: stackTrace,
+    );
+  }
+  ResearchPariticipantPortalStore.instance.init();
   // ── Restore session ─────────────────────────────────
-  final authProvider = AuthProvider(
-    supabaseService: supabaseService,
-    hiveService: hiveService,
+  final authController = AuthController();
+  // ── App-level sync ──────────────────────────────────
+  final viewDecksLocalController = ViewDecksLocalController();
+  final syncChangeTrackerController = ChangeTrackerController(
+    service: ChangeTrackerService(inboundLabel: 'pull', outboundLabel: 'push'),
+    pageArgs: signal(const ChangeTrackerRouteArgs.missing(entryId: '')),
   );
-  await authProvider.restoreSession();
-
+  final syncController = SyncController(
+    title: 'Sync decks',
+    profileId: () => LocalDB.currentProfile.getOrCreate().id,
+    getTables: SyncDeckService.getTables,
+    onSynced: viewDecksLocalController.load,
+  );
+  // ── Deep links ──────────────────────────────────────
+  final appLinks = AppLinks();
+  appLinks.uriLinkStream.listen((uri) {
+    developer.log('Received deep link: $uri');
+  });
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider.value(value: authProvider),
-        ChangeNotifierProvider(
-          create: (_) => DeckProvider(
-            supabaseService: supabaseService,
-            hiveService: hiveService,
-          ),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => CardProvider(
-            supabaseService: supabaseService,
-            hiveService: hiveService,
-          ),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => QuizProvider(
-            supabaseService: supabaseService,
-            hiveService: hiveService,
-            fsrsService: fsrsService,
-            queueController: QuizQueueController(),
-          ),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => FsrsProvider(
-            fsrsService: fsrsService,
-            hiveService: hiveService,
-            supabaseService: supabaseService,
-          ),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => LeaderboardProvider(
-            supabaseService: supabaseService,
-          ),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => StreakProvider(
-            supabaseService: supabaseService,
-            hiveService: hiveService,
-          ),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => ResearchProvider(
-            supabaseService: supabaseService,
-          ),
-        ),
+        Provider.value(value: authController),
+        Provider.value(value: syncChangeTrackerController),
+        Provider.value(value: syncController),
+        Provider.value(value: viewDecksLocalController),
+        Provider(create: (_) => ViewDeckListingsController()),
+        ChangeNotifierProvider(create: (_) => StreakController()),
       ],
-      child: const BooMondaiApp(),
+      child: BooMondaiApp(authController: authController),
     ),
   );
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    authController.startRemoteSessionRestoreListener();
+  });
 }

@@ -1,0 +1,22 @@
+[
+  {
+    "type": "word_scramble",
+    "sentenceToScramble": "Je parle francais"
+  },
+  {
+    "type": "word_scramble",
+    "sentenceToScramble": "Nous aimons apprendre"
+  },
+  {
+    "type": "word_scramble",
+    "sentenceToScramble": "Elle va au marche"
+  },
+  {
+    "type": "word_scramble",
+    "sentenceToScramble": "Le livre est rouge"
+  },
+  {
+    "type": "word_scramble",
+    "sentenceToScramble": "Ou est la gare"
+  }
+]

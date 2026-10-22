@@ -1,36 +1,35 @@
 name: boo_mondai
 description: "BooMondai — Gamified language learning with FSRS spaced repetition."
-publish_to: 'none'
-version: 1.0.0+1
+publish_to: "none"
+version: 1.0.0+14
 
 environment:
-  sdk: ^3.10.8
+  sdk: ">=3.11.8"
 
 dependencies:
   flutter:
     sdk: flutter
 
+  theme_variants:
+    path: /run/media/loejee/1-tb-drive/github-repositories/theme_variants/
+
   # ── State & UI ──────────────────────────────────────────
   provider: ^6.1.2
   flutter_hooks: ^0.20.5
 
-  # ── Code generation ─────────────────────────────────────
-  barrel_annotation: 1.0.0
-
   # ── Local persistence ────────────────────────────────────
-  hive_ce: 2.19.3
-  hive_ce_flutter: 2.3.4
+  hive_ce: ^2.20.1
+  hive_ce_flutter: ^2.4.0
 
   # ── Input & pickers ─────────────────────────────────────
-  flutter_picker_plus: 1.5.6
-  flutter_colorpicker: 1.1.0
-  file_picker: 10.3.10
+  flutter_picker_plus: ^1.5.6
+  flutter_colorpicker: ^1.1.0
 
   # ── Notifications ────────────────────────────────────────
-  flutter_local_notifications: ^21.0.0
+  flutter_local_notifications: ^22.3.1
 
   # ── Loading states ───────────────────────────────────────
-  skeletonizer: 2.1.3
+  skeletonizer: ^2.1.3
 
   # ── Utilities ────────────────────────────────────────────
   url_launcher: ^6.3.2
@@ -40,21 +39,68 @@ dependencies:
   supabase_flutter: ^2.12.2
 
   # ── Navigation ───────────────────────────────────────────
-  go_router: 17.0.1
+  go_router: ^17.0.1
 
   # ── Project-specific ─────────────────────────────────────
-  fsrs: ^1.1.0                 # FSRS spaced repetition algorithm
-  uuid: ^4.5.1                 # client-side UUID generation for offline-first
+  fsrs: ^2.0.1 # FSRS spaced repetition algorithm
+  uuid: ^4.5.1 # client-side UUID generation for offline-first
+  dart_mappable: ^4.7.0
+  app_links: ^7.0.0
+  connectivity_plus: ^7.3.2
+  google_sign_in: ^7.2.0
+  fuzzywuzzy: ^1.2.0
+  vector_math: ^2.2.0
+  flutter_markdown_plus: ^1.0.7
+  markdown: ^7.3.1
+  file_picker: ^13.1.0
+  flutter_timezone: ^5.1.0
+  timezone: ^0.11.0
+  flutter_animate: ^4.5.2
+  archive: ^4.0.9
+  path: ^1.9.1
+  path_provider: ^2.1.6
+  http: ^1.6.0
+  just_audio: ^0.10.6
+  signals: ^7.1.0
+  flutter_soloud: ^3.5.4
+  fl_chart: ^1.2.0
+  signals_hooks: ^7.1.0
+  cross_file: ^0.3.5+5
+  csv: ^8.0.0
+  flutter_image_compress: ^2.5.1
+  flutter_launcher_icons: ^0.14.4
+  flutter_svg: ^2.3.0
+  package_info_plus: ^10.2.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
-  mockito: ^5.4.4
-  build_runner: ^2.4.13
-  barrel_generator: ^1.0.4
-  hive_ce_generator: ^1.0.0
-  flutter_launcher_icons: "^0.14.4"
+  mockito: ^5.8.1
+  build_runner: ^2.13.1
+  hive_ce_generator: ^1.11.3
+  dart_mappable_builder: ^4.10.0
+
+dependency_overrides:
+  dbus: ^0.8.0
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/icon/
+    - assets/ui/button_up/
+    - assets/ui/button_down/
+    - assets/ui/modal_showed/
+    - assets/ui/popped_modal/
+    - assets/ui/segment_selector_pressed/
+    - assets/temporary/chinese_set_a_attachments/
+    - assets/temporary/chinese_set_b_attachments/
+    - assets/temporary/japanese_set_a_attachments/
+    - assets/temporary/japanese_set_b_attachments/
+
+fonts:
+  - family: Noto Sans
+    fonts:
+      - asset: fonts/noto_sans/NotoSans-VariableFont_wdth,wght.ttf
+      - asset: fonts/noto_sans/NotoSans-Italic-VariableFont_wdth,wght.ttf
+        style: italic
