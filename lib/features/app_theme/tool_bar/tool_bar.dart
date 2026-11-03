@@ -8,7 +8,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         ToolBarController,
         AttachmentToolBarAction,
         defaultToolBarActions,
-        ToolBarActionButton;
+        ToolBarActionButton,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart' show PlatformFile;
 import 'package:theme_variants/theme_variants.dart';
@@ -62,7 +63,7 @@ class ToolBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     // FocusManager.instance.primaryFocus?.unfocus
     return Surface(
       style: surfaceStyle.resolve(tokens, [

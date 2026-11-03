@@ -6,9 +6,8 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, TextColor, textStyle;
+    show AppTokens, TextColor, textStyle, ThemeController;
 import 'package:flutter/material.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class ErrorText extends StatelessWidget {
   const ErrorText(this.message, {super.key});
@@ -25,7 +24,7 @@ class ErrorText extends StatelessWidget {
     if (message == null) {
       return SizedBox.shrink();
     }
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     return SelectableText(
       message,

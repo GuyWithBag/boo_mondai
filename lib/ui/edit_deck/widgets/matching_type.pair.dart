@@ -4,9 +4,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         MarkdownText,
         MarkdownTextMode,
         TextFieldSize,
-        TextFieldFrame;
+        TextFieldFrame,
+        ThemeController;
 import 'package:flutter/material.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class MatchPair extends StatelessWidget {
   const MatchPair({
@@ -28,7 +28,7 @@ class MatchPair extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     return Row(
       spacing: tokens.spaceLayoutGapSm,

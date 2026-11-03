@@ -10,13 +10,13 @@ import 'package:boo_mondai/lib.barrel.dart'
         ResearcherDashboardController,
         ResearcherSurveySummary,
         ResearcherSurveyTile,
-        Scaffold;
+        Scaffold,
+        ThemeController;
 import 'package:boo_mondai/features/researcher_dashboard/researcher_dashboard.search.dart';
 import 'package:flutter/material.dart' hide AppBar, Scaffold;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:signals_hooks/signals_hooks.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class ResearcherDashboardPage extends SignalHookWidget {
   const ResearcherDashboardPage({super.key});
@@ -24,7 +24,7 @@ class ResearcherDashboardPage extends SignalHookWidget {
   @override
   Widget build(BuildContext context) {
     final controller = useMemoized(ResearcherDashboardController.new);
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final summaries = controller.summaries;
     final searchController = useMemoized(
       () => FilteredSearchBarController<ResearcherSurveySummary>(

@@ -10,10 +10,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         textStyle,
         AppTokens,
         TextSize,
-        ButtonVariant;
+        ButtonVariant,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:signals/signals_hooks.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class ViewReviewsTile extends SignalHookWidget {
   const ViewReviewsTile({
@@ -30,7 +30,7 @@ class ViewReviewsTile extends SignalHookWidget {
   @override
   Widget build(BuildContext context) {
     final showComments = useSignal(false);
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     late final exception = useSignal<Exception?>(null);
     late final isLoading = useSignal(false);

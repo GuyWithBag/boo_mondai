@@ -1,7 +1,6 @@
-import 'package:boo_mondai/lib.barrel.dart' show AppTokens;
+import 'package:boo_mondai/lib.barrel.dart' show AppTokens, ThemeController;
 import 'package:flutter/material.dart';
 import 'package:signals_hooks/signals_hooks.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class PageDots extends SignalWidget {
   const PageDots({super.key, required this.index, required this.count});
@@ -11,7 +10,7 @@ class PageDots extends SignalWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       spacing: tokens.spaceLayoutGapSm,

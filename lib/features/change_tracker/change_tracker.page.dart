@@ -17,11 +17,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         ServiceRegistry,
         MetaLabel,
         ButtonColor,
-        ChangeTrackerController;
+        ChangeTrackerController,
+        ThemeController;
 import 'package:flutter/material.dart' hide Scaffold, AppBar;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 /// Route data required to review a tracked change entry.
 ///
@@ -57,7 +57,7 @@ class ChangeTrackerPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     // final service = args.serviceId == null
     //     ? null
     //     : ServiceRegistry.maybeById<ChangeTrackerService>(args.serviceId!);

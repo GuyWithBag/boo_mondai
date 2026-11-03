@@ -7,4 +7,3 @@ export 'user_settings.local.db.dart';
 export 'settings.helper.dart';
 export 'user_settings.remote.db.dart';
 export 'settings.store.dart';
-export 'user_settings.theme_bridge.dart';

@@ -8,11 +8,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextFieldSize,
         TextSize,
         TextWeight,
-        textStyle;
+        textStyle,
+        ThemeController;
 import 'package:flutter/material.dart' hide TextField;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 /// Displays or edits markdown content according to [mode].
 ///
@@ -87,7 +87,7 @@ class MarkdownText extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final resolvedTextStyle =
         baseTextStyle ??
         textStyle.resolve(tokens, const [

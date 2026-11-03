@@ -13,7 +13,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextSize,
         TextWeight,
         surfaceStyle,
-        textStyle;
+        textStyle,
+        ThemeController;
 import 'package:flutter/material.dart' hide AppBar;
 import 'package:go_router/go_router.dart';
 import 'package:signals_hooks/signals_hooks.dart';
@@ -92,7 +93,7 @@ class AppBar<TSelectedType> extends SignalHookWidget
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final route = ModalRoute.of(context);
     final canPop =
         automaticallyImplyPopButton &&

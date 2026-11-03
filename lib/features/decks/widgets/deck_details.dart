@@ -10,7 +10,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         SectionEyebrow,
         TextSize,
         textStyle,
-        TextWeight;
+        TextWeight,
+        ThemeController;
 import 'package:flutter/material.dart' hide FormField;
 import 'package:theme_variants/theme_variants.dart';
 
@@ -48,7 +49,7 @@ class DeckDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

@@ -10,9 +10,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextColor,
         TextSize,
         TextWeight,
-        textStyle;
+        textStyle,
+        ThemeController;
 import 'package:flutter/material.dart' hide AppBar, Scaffold;
-import 'package:theme_variants/theme_variants.dart';
 
 class ViewNotificationIntentPage extends StatelessWidget {
   const ViewNotificationIntentPage({super.key, required this.id});
@@ -21,7 +21,7 @@ class ViewNotificationIntentPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final notification = LocalDB.notifications.selectByPk({'id': id});
 
     return Scaffold(

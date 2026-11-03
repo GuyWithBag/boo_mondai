@@ -16,7 +16,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextWeight,
         surfaceStyle,
         textStyle,
-        SurfacePadding;
+        SurfacePadding,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -28,7 +29,7 @@ class ViewNotificationsTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final route =
         notification.route ??
         (notification.ifRouteNullPushToView

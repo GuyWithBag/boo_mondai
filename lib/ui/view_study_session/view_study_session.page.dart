@@ -18,13 +18,13 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextWeight,
         ViewMessageSessionStepPage,
         ViewStudySessionController,
-        textStyle;
+        textStyle,
+        ThemeController;
 import 'package:boo_mondai/ui/view_study_session/view_study_session.bottom_nav_bar_body.dart';
 import 'package:flutter/material.dart' hide AppBar, Scaffold;
 import 'package:flutter_hooks/flutter_hooks.dart' show useEffect, useMemoized;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:signals_hooks/signals_hooks.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class ViewStudySessionPage extends SignalHookWidget {
   const ViewStudySessionPage({
@@ -60,7 +60,7 @@ class ViewStudySessionPage extends SignalHookWidget {
     );
     useEffect(() => ratingStatsController.dispose, [ratingStatsController]);
 
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final studySessionController = controller.sessionController;
     final step = studySessionController.currentStep.value;
     final template = studySessionController.currentTemplate.value;

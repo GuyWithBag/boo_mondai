@@ -1,5 +1,5 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, PhysicalCardController;
+    show AppTokens, PhysicalCardController, ThemeController;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:theme_variants/theme_variants.dart' show ThemeVariantsContext;
@@ -18,8 +18,7 @@ PhysicalCardController usePhysicalCardController(
   Duration animationDuration = const Duration(milliseconds: 260),
   Curve animationCurve = Curves.easeOutCubic,
 }) {
-  final resolvedWidth =
-      width ?? context.themeTokens<AppTokens>().studyCardWidth;
+  final resolvedWidth = width ?? ThemeController.tokens.studyCardWidth;
 
   final controller = useMemoized(
     () => PhysicalCardController(

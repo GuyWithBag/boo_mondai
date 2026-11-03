@@ -1,5 +1,5 @@
 import 'package:boo_mondai/features/features.barrel.dart';
-import 'package:boo_mondai/lib.barrel.dart' show AppTokens;
+import 'package:boo_mondai/lib.barrel.dart' show AppTokens, ThemeController;
 import 'package:flutter/material.dart'
     show
         StatelessWidget,
@@ -10,7 +10,6 @@ import 'package:flutter/material.dart'
         Divider,
         Padding,
         Row;
-import 'package:theme_variants/theme_variants.dart';
 
 class LabeledDivider extends StatelessWidget {
   const LabeledDivider({super.key, required this.label});
@@ -19,7 +18,7 @@ class LabeledDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     return Row(
       children: [
         Expanded(child: Divider(thickness: tokens.borderWidthDefault)),

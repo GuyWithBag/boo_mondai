@@ -18,7 +18,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextSize,
         TextWeight,
         surfaceStyle,
-        textStyle;
+        textStyle,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -49,7 +50,7 @@ class PhysicalDeck extends SignalHookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final effectiveTextScaleBaseWidth =
         textScaleBaseWidth ?? tokens.studyCardWidth;
     final textScale = ScaleHelper.getClampedSizeRatio(

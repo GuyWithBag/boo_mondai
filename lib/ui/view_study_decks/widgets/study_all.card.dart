@@ -11,7 +11,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextSize,
         TextWeight,
         surfaceStyle,
-        textStyle;
+        textStyle,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -56,7 +57,7 @@ class StudyAllDecks extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final canReview = dueCount > 0;
     final phrase =
         motivationalPhrases[Random().nextInt(motivationalPhrases.length)];

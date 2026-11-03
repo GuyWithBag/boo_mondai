@@ -1,7 +1,7 @@
-import 'package:boo_mondai/lib.barrel.dart' show AppTokens, BackButton;
+import 'package:boo_mondai/lib.barrel.dart'
+    show AppTokens, BackButton, ThemeController;
 import 'package:flutter/material.dart' as material hide BackButton;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 /// Shared sliver app bar with fixed custom back button and flexible background.
 class SliverAppBar extends material.StatelessWidget {
@@ -40,7 +40,7 @@ class SliverAppBar extends material.StatelessWidget {
 
   @override
   material.Widget build(material.BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final hasFlexibleContent =
         flexibleBackground != null || flexibleGradient != null;
 

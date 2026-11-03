@@ -13,11 +13,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         ToolBarController,
         EditDeckController,
         editDeckBottomNavBar,
-        buildEditDeckAppBar;
+        buildEditDeckAppBar,
+        ThemeController;
 import 'package:flutter/material.dart' hide Scaffold;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:signals_hooks/signals_hooks.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class EditDeckPage extends SignalHookWidget {
   const EditDeckPage({
@@ -42,7 +42,7 @@ class EditDeckPage extends SignalHookWidget {
     final toolBarController = useMemoized(() => ToolBarController());
     useEffect(() => toolBarController.dispose, [toolBarController]);
 
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     return Scaffold(
       isFloatingSideBar: true,

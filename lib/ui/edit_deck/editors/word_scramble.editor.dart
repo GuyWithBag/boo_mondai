@@ -6,11 +6,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         EditDeckFormValidator,
         FormField,
         TextFieldCard,
-        WordScrambleEditorController;
+        WordScrambleEditorController,
+        ThemeController;
 import 'package:flutter/material.dart' hide FormField;
 import 'package:flutter_hooks/flutter_hooks.dart' show useEffect, useMemoized;
 import 'package:signals_hooks/signals_hooks.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 // ToDo: Add functionality to add extra words, and more functionality to be able to add submit or not even when not all words are used.
 class WordScrambleEditor extends SignalHookWidget {
@@ -20,7 +20,7 @@ class WordScrambleEditor extends SignalHookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final editor = useMemoized(
       () =>
           WordScrambleEditorController(editDeckController: editDeckController),

@@ -10,12 +10,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         ViewStudySessionDrillOnboardingController,
         ButtonColor,
-        textStyle;
+        textStyle,
+        ThemeController;
 import 'package:flutter/material.dart' hide Scaffold;
 import 'package:flutter_hooks/flutter_hooks.dart' show useEffect, useMemoized;
 import 'package:go_router/go_router.dart';
 import 'package:signals_hooks/signals_hooks.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class ViewStudySessionDrillOnboardingPage extends SignalHookWidget {
   const ViewStudySessionDrillOnboardingPage({super.key, required this.deckId});
@@ -30,7 +30,7 @@ class ViewStudySessionDrillOnboardingPage extends SignalHookWidget {
     );
     useEffect(() => controller.dispose, [controller]);
 
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final canContinue = controller.cardsController.templates.value.isNotEmpty;
 
     return Scaffold(

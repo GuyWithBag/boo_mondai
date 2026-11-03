@@ -27,7 +27,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         SettingsStore,
         StatusLayoutState,
         ViewDeckListingsController,
-        showViewDeckListingSingleSheet;
+        showViewDeckListingSingleSheet,
+        ThemeController;
 import 'package:boo_mondai/ui/view_deck_listing_single/controllers/controllers.barrel.dart';
 import 'package:boo_mondai/ui/view_deck_listings/view_deck_listings.search.dart';
 import 'package:flutter/material.dart'
@@ -36,7 +37,6 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:signals_hooks/signals_hooks.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class ViewDeckListingsPage extends StatelessWidget {
   const ViewDeckListingsPage({super.key});
@@ -92,7 +92,7 @@ class _ViewDeckListingsView extends SignalHookWidget {
 
     final visibleDecks = searchController.results.value;
     final hasSearchQuery = searchController.hasText.value;
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final searchBar = FilteredSearchBar<DeckWithListingContent>(
       controller: searchController,
       placeholder: 'Search public decks',

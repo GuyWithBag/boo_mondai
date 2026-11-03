@@ -18,7 +18,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         MarkdownText,
         Button,
         SegmentOption,
-        SegmentedControl;
+        SegmentedControl,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:signals/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -55,7 +56,7 @@ class AnswerKeyTile extends SignalHookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     return Surface(
       style: surfaceStyle

@@ -7,11 +7,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         MultipleChoiceEditorController,
         MultipleChoiceOptionsPanel,
         TextFieldCard,
-        AppTokens;
+        AppTokens,
+        ThemeController;
 import 'package:flutter/material.dart' hide FormField;
 import 'package:flutter_hooks/flutter_hooks.dart' show useEffect, useMemoized;
 import 'package:signals_hooks/signals_hooks.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class MultipleChoiceEditor extends SignalHookWidget {
   const MultipleChoiceEditor({required this.editDeckController, super.key});
@@ -28,7 +28,7 @@ class MultipleChoiceEditor extends SignalHookWidget {
     );
     useEffect(() => editor.dispose, [editor]);
     final options = editor.options.value;
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     return Column(
       spacing: tokens.spaceLayoutGapMd,

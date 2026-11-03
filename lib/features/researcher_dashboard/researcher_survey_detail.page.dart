@@ -21,7 +21,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         textStyle,
         TextColor,
         TextSize,
-        TextWeight;
+        TextWeight,
+        ThemeController;
 import 'package:boo_mondai/features/researcher_dashboard/researcher_dashboard.search.dart';
 import 'package:flutter/material.dart' hide AppBar, Scaffold;
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -37,7 +38,7 @@ class ResearcherSurveyDetailPage extends SignalHookWidget {
   @override
   Widget build(BuildContext context) {
     final controller = useMemoized(ResearcherDashboardController.new);
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final searchController = useMemoized(
       () => FilteredSearchBarController<SurveyResponse>(
         tokenShapes: ResearcherSurveyResponseSearch.tokenShapes,

@@ -1,5 +1,10 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, SnackbarColor, SnackbarVariant, snackbarStyle;
+    show
+        AppTokens,
+        SnackbarColor,
+        SnackbarVariant,
+        snackbarStyle,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -28,7 +33,7 @@ class Snackbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final resolvedStyle = snackbarStyle.resolve(tokens, [
       color,
       variant,

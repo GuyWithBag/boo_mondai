@@ -150,7 +150,7 @@ final buttonStyle = VariantStyle.buttonParts<AppTokens>(
 Resolve it inside a widget:
 
 ```dart
-final tokens = context.themeTokens<AppTokens>();
+final tokens = ThemeController.tokens;
 
 FilledButton(
   style: buttonStyle.resolve(tokens, const [
@@ -289,7 +289,7 @@ final controller = ThemeVariantsController<AppTokens>(
   registry: registry,
   lightThemeId: 'clean',
   darkThemeId: 'forest',
-  themeMode: ThemeMode.system,
+  themeBrightness: ThemeMode.system,
 );
 ```
 
@@ -322,7 +322,7 @@ ThemeVariantsProvider<AppTokens>(
       return MaterialApp(
         theme: controller.getCurrentLightTheme().themeData,
         darkTheme: controller.getCurrentDarkTheme().themeData,
-        themeMode: controller.themeMode,
+        themeBrightness: controller.themeBrightness,
         home: const HomePage(),
       );
     },
@@ -334,7 +334,7 @@ Inside widgets:
 
 ```dart
 final controller = context.themeVariantsController<AppTokens>();
-final tokens = context.themeTokens<AppTokens>();
+final tokens = ThemeController.tokens;
 final activeVariant = context.activeThemeVariant<AppTokens>();
 final activePreset = context.activeThemePreset<AppTokens>();
 ```
@@ -347,12 +347,12 @@ Use `ThemeVariantsOverride` when a subtree should use a different preset.
 ThemeVariantsOverride<AppTokens>(
   lightThemeId: 'forest',
   darkThemeId: 'forest',
-  themeMode: ThemeMode.light,
+  themeBrightness: ThemeMode.light,
   child: const FlashcardPreview(),
 );
 ```
 
-Omit `themeMode` to inherit the parent light/dark mode. Set `enabled: false`
+Omit `themeBrightness` to inherit the parent light/dark mode. Set `enabled: false`
 when the subtree should fall back to the parent provider.
 
 ## User Customization

@@ -8,9 +8,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         SurveyResponse,
         TextColor,
         TextSize,
-        textStyle;
+        textStyle,
+        ThemeController;
 import 'package:flutter/material.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class ResearcherSurveyPreview extends StatelessWidget {
   const ResearcherSurveyPreview({
@@ -24,7 +24,7 @@ class ResearcherSurveyPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     return Column(
       spacing: tokens.spaceLayoutGapLg,

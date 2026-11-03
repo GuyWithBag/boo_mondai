@@ -7,9 +7,9 @@ import 'package:boo_mondai/features/search/models/search_tokens.dart';
 import 'package:boo_mondai/features/search_filter.modal/search_filter.modal_field_shell.dart';
 import 'package:boo_mondai/features/search_filter.modal/search_filter.modal_editors.dart';
 import 'package:boo_mondai/features/search_filter.modal/search_filter.modal_field.dart';
+import 'package:boo_mondai/lib.barrel.dart' show ThemeController;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 Future<String?> showSearchFilterModal({
   required BuildContext context,
@@ -85,7 +85,7 @@ class _SearchFilterBody extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final currentFreeText = useListenable(freeText);
     final currentTokenValues = useListenable(tokenValues);
     final modalFields = _fieldsFor(tokenShapes, fields)

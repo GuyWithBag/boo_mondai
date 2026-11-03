@@ -17,7 +17,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         surfaceStyle,
         textStyle,
         BackgroundImageSurface,
-        DeckListingTileController;
+        DeckListingTileController,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart' show useEffect;
 import 'package:signals_hooks/signals_hooks.dart';
@@ -32,7 +33,7 @@ class DeckListingTile extends SignalHookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     useEffect(() {
       final error = controller.error;
@@ -271,7 +272,7 @@ class _FavoriteButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final color = isSelected ? tokens.colorPrimary : tokens.colorTextBaseline;
 
     return Row(
@@ -306,7 +307,7 @@ class _InlineMetric extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     return Row(
       mainAxisSize: MainAxisSize.min,

@@ -1,12 +1,15 @@
 import 'package:boo_mondai/features/cards/models/card.template.dto.dart';
 import 'package:boo_mondai/features/cards/models/word_scramble.template.dart';
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, ViewStudySessionController, WordScrambleController;
+    show
+        AppTokens,
+        ViewStudySessionController,
+        WordScrambleController,
+        ThemeController;
 import 'package:boo_mondai/ui/study_session.card_stage/widgets/rating_area.dart';
 import 'package:boo_mondai/ui/study_session.card_stage/stages/word_scramble/widgets/word_bank.dart';
 import 'package:flutter/material.dart';
 import 'package:signals_hooks/signals_hooks.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class ViewStudySessionBottomNavBarBody extends SignalHookWidget {
   const ViewStudySessionBottomNavBarBody({required this.controller, super.key});
@@ -31,7 +34,7 @@ class ViewStudySessionBottomNavBarBody extends SignalHookWidget {
         cardStageController.cardController is WordScrambleController
         ? cardStageController.cardController! as WordScrambleController
         : null;
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       spacing: tokens.spaceLayoutGapSm,

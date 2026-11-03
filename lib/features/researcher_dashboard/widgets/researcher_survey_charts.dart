@@ -9,10 +9,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextColor,
         TextSize,
         TextWeight,
-        textStyle;
+        textStyle,
+        ThemeController;
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class ResearcherSurveyCharts extends StatelessWidget {
   const ResearcherSurveyCharts({required this.aggregates, super.key});
@@ -21,7 +21,7 @@ class ResearcherSurveyCharts extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     if (aggregates.isEmpty) {
       return const Text('This survey has no input questions.');
@@ -45,7 +45,7 @@ class _AggregateBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     return Column(
       spacing: tokens.spaceLayoutGapSm,
@@ -101,7 +101,7 @@ class _AggregateBarChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final entries = optionCounts.entries.toList();
     final maxCount = entries.fold<int>(
       0,

@@ -7,12 +7,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         ButtonColor,
         RatingButton,
         SubmissionStyle,
-        ViewStudySessionController;
+        ViewStudySessionController,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:signals_hooks/signals_hooks.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 // Custom intents for the keyboard shortcuts
 class RateIntent extends Intent {
@@ -29,7 +29,7 @@ class RatingArea extends SignalHookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final studySessionController = controller.sessionController;
     final cardStageController = controller.cardStageController;
 

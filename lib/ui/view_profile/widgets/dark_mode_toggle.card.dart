@@ -11,7 +11,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextWeight,
         surfaceStyle,
         textStyle,
-        TextSize;
+        TextSize,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart'
     show HookWidget, useEffect, useRef, useState;
@@ -26,7 +27,7 @@ class DarkModeToggleCard extends HookWidget {
   Widget build(BuildContext context) {
     final controller = context.themeVariantsController<AppTokens>();
     final platformBrightness = MediaQuery.platformBrightnessOf(context);
-    final isDark = switch (controller.themeMode) {
+    final isDark = switch (ThemeController.instance.themeMode) {
       ThemeMode.dark => true,
       ThemeMode.light => false,
       ThemeMode.system => platformBrightness == Brightness.dark,
@@ -41,7 +42,7 @@ class DarkModeToggleCard extends HookWidget {
       return null;
     }, [isDark]);
 
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     final contrastTextPaint = Paint()
       ..color = Colors.white

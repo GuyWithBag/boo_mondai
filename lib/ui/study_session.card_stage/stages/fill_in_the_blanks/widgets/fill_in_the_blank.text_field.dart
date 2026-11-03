@@ -12,7 +12,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         SurfaceColor,
         SurfacePadding,
         SurfaceShadow,
-        SurfaceShape;
+        SurfaceShape,
+        ThemeController;
 import 'package:boo_mondai/ui/study_session.card_stage/widgets/scaled_surface_style.dart';
 import 'package:flutter/material.dart' hide TextField;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -42,7 +43,7 @@ class FillInTheBlankTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final width = ScaleHelper.getScaledValue(70.w, contentScale);
 
     if (!revealed) {

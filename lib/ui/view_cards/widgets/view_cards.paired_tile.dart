@@ -1,7 +1,11 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, CardTemplate, ViewCardsTile, ViewCardsTileSide;
+    show
+        AppTokens,
+        CardTemplate,
+        ViewCardsTile,
+        ViewCardsTileSide,
+        ThemeController;
 import 'package:flutter/material.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class ViewCardsPairedTile extends StatelessWidget {
   const ViewCardsPairedTile.template({
@@ -15,7 +19,7 @@ class ViewCardsPairedTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     return Container(
       width: double.infinity,

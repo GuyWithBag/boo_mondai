@@ -52,7 +52,7 @@ Recommended fields:
 
 - `id`: stable settings row ID, probably profile ID or `settings:<profileId>`.
 - `profileId`: owner profile.
-- `themeMode`: `system`, `light`, or `dark`.
+- `themeBrightness`: `system`, `light`, or `dark`.
 - `lightThemePresetId`: selected light preset.
 - `darkThemePresetId`: selected dark preset.
 - `themeOverrides`: nullable user override object.

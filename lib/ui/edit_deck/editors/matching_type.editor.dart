@@ -19,7 +19,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextSize,
         TextWeight,
         textStyle,
-        surfaceStyle;
+        surfaceStyle,
+        ThemeController;
 import 'package:flutter/material.dart' hide FormField;
 import 'package:flutter_hooks/flutter_hooks.dart' show useEffect, useMemoized;
 import 'package:signals_hooks/signals_hooks.dart';
@@ -32,7 +33,7 @@ class MatchingTypeEditor extends SignalHookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final controller = useMemoized(
       () =>
           MatchingTypeEditorController(editDeckController: editDeckController),
@@ -72,7 +73,7 @@ class _MatchingTypeValuesPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final values = controller.values.value;
     final rowCount = controller.rowCount.value;
 
@@ -145,7 +146,7 @@ class _ColumnLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     return Text(
       label.toUpperCase(),
       style: textStyle.resolve(tokens, const [
@@ -172,7 +173,7 @@ class _MatchingTypeRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     return Row(
       spacing: tokens.spaceLayoutGapSm,
@@ -228,7 +229,7 @@ class _MatchingTypeCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final value = this.value;
 
     final child = DragTarget<_MatchingTypeDragData>(

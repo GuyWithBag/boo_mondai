@@ -8,11 +8,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         MarkdownAlignedText,
         MarkdownImageElementBuilder,
-        MarkdownMedia;
+        MarkdownMedia,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:markdown/markdown.dart' as md;
-import 'package:theme_variants/theme_variants.dart';
+
 import 'package:url_launcher/url_launcher.dart';
 
 class MarkdownTextBody extends StatelessWidget {
@@ -41,7 +42,7 @@ class MarkdownTextBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     final styleSheet = MarkdownAlignmentHelper.copyStyleSheetWithAlignment(
       MarkdownHelper.getMarkdownStyleSheet(tokens, resolvedTextStyle),

@@ -1,3 +1,7 @@
+import 'package:boo_mondai/features/decks_import_export/decks.importer.service.dart'
+    show DecksImporterService;
+import 'package:boo_mondai/features/decks_import_export/decks_import_export.barrel.dart'
+    show DeckMapNormalizer;
 import 'package:boo_mondai/lib.barrel.dart';
 import 'package:flutter_test/flutter_test.dart';
 

@@ -9,7 +9,7 @@ class MultipleChoiceOptionsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final options = controller.options.value;
 
     return Surface(

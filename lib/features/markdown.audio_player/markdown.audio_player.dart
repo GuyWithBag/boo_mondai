@@ -15,7 +15,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextSize,
         TextWeight,
         surfaceStyle,
-        textStyle;
+        textStyle,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -109,7 +110,7 @@ class MarkdownAudioPlayer extends SignalHookWidget {
 
     useEffect(() => player.dispose, [player]);
 
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final titleStyle = ScaleHelper.getTextStyleWithScaledFontSize(
       textStyle.resolve(tokens, const [
         TextSize.label,

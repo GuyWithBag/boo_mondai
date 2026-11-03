@@ -9,10 +9,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextSize,
         TextWeight,
         showModal,
-        textStyle;
+        textStyle,
+        ThemeController;
 import 'package:boo_mondai/ui/view_notifications/view_notifications.debug.dart';
 import 'package:flutter/material.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 Future<void> showNotificationsModal(BuildContext context) {
   return showModal<void>(
@@ -29,7 +29,7 @@ class NotificationsModalBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final controller = NotificationsController.instance;
 
     Widget getBody() {

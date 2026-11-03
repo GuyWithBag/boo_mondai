@@ -5,10 +5,10 @@
 // HOOKS: none
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import 'package:boo_mondai/lib.barrel.dart' show ProfileLabel, AppTokens;
+import 'package:boo_mondai/lib.barrel.dart'
+    show ProfileLabel, AppTokens, ThemeController;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class DeckProfilesLabel extends StatelessWidget {
   const DeckProfilesLabel({
@@ -28,7 +28,7 @@ class DeckProfilesLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     final hasSourceProfile =
         sourceProfileName != null && sourceProfileName!.trim().isNotEmpty;
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     return Row(
       spacing: tokens.spaceLayoutGapMd.w,

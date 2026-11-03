@@ -4,7 +4,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         Content,
         SectionEyebrow,
         ViewCommentsSection,
-        ViewReviewsSection;
+        ViewReviewsSection,
+        ThemeController;
 import 'package:flutter/material.dart'
     show Widget, BuildContext, SizedBox, CrossAxisAlignment, Column;
 import 'package:signals_hooks/signals_hooks.dart';
@@ -18,7 +19,7 @@ class ViewDiscussionSection extends SignalHookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

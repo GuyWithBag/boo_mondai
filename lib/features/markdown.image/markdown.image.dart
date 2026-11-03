@@ -5,12 +5,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         MarkdownAttachmentUrlResolver,
         MarkdownHelper,
         MarkdownImageOptions,
-        ScaleHelper;
+        ScaleHelper,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:signals_hooks/signals_hooks.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 // It is kept separate from MarkdownImageElementBuilder because it needs to support regular flutter_markdown_plus image and the configurable image
 class MarkdownImage extends SignalHookWidget {
@@ -35,7 +35,7 @@ class MarkdownImage extends SignalHookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final imageSignal = useFutureSignal(() async {
       final imageUrl =
           await resolveAttachmentUrl?.call(uri) ??

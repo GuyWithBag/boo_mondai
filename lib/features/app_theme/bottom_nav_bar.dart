@@ -1,5 +1,5 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, SurfaceBorder, surfaceStyle;
+    show AppTokens, SurfaceBorder, surfaceStyle, ThemeController;
 import 'package:flutter/material.dart';
 import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -25,7 +25,7 @@ class BottomNavBar extends SignalHookWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     return Surface(
       style: surfaceStyle
           .resolve(tokens, [...variants, SurfaceBorder.top])

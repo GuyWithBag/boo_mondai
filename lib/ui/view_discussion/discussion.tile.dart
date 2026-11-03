@@ -17,7 +17,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         SurfacePadding,
         SurfaceShape,
         surfaceStyle,
-        DateHelper;
+        DateHelper,
+        ThemeController;
 import 'package:flutter/material.dart' hide FormField;
 import 'package:flutter_hooks/flutter_hooks.dart' show HookWidget;
 import 'package:theme_variants/theme_variants.dart'
@@ -30,7 +31,7 @@ class DiscussionTile extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final item = controller.item;
     final content = item.content;
 

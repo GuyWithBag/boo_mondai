@@ -6,7 +6,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         SurfaceColor,
         textStyle,
         TextSize,
-        TextWeight;
+        TextWeight,
+        ThemeController;
 import 'package:flutter/material.dart'
     show StatelessWidget, Widget, BuildContext, Text, Expanded, Row;
 import 'package:theme_variants/theme_variants.dart'
@@ -20,7 +21,7 @@ class PanelHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     return Surface(
       style: surfaceStyle.resolve(tokens, const [

@@ -14,12 +14,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         FilteredSearchBar,
         FilteredSearchBarController,
         Scaffold,
-        AppTokens;
+        AppTokens,
+        ThemeController;
 import 'package:boo_mondai/ui/view_study_decks/view_study_decks.search.dart';
 import 'package:flutter/material.dart' hide Scaffold, AppBar;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:signals_hooks/signals_hooks.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class ViewStudyDecksPage extends SignalHookWidget {
   const ViewStudyDecksPage({super.key});
@@ -27,7 +27,7 @@ class ViewStudyDecksPage extends SignalHookWidget {
   @override
   Widget build(BuildContext context) {
     final controller = useMemoized(() => ViewStudyDecksController());
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final deckEntries = controller.deckEntries.value;
     final searchController = useMemoized(
       () => FilteredSearchBarController<StudyDeckEntry>(

@@ -17,13 +17,13 @@ import 'package:boo_mondai/lib.barrel.dart'
         Button,
         AlignedScrollView,
         usePhysicalCardController,
-        PhysicalCardController;
+        PhysicalCardController,
+        ThemeController;
 import 'package:boo_mondai/ui/study_session.card_stage/stages/matching_type/controllers/matching_type.controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:signals_hooks/signals_hooks.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class MatchingTypeCard extends SignalHookWidget {
   const MatchingTypeCard({
@@ -45,7 +45,7 @@ class MatchingTypeCard extends SignalHookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final matchingTypeController = useMemoized(
       () => MatchingTypeController(
         template: template,

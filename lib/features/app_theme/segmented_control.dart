@@ -9,7 +9,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         SurfaceShape,
         segmentControlOptionStyle,
         surfaceStyle,
-        SelectionController;
+        SelectionController,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -45,7 +46,7 @@ class SegmentedControl<T> extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     // Todo: Make the constructor accept a controller instead.
     final selection = useMemoized(
       () => SelectionController<T>(
@@ -170,7 +171,7 @@ class _SegmentedControlOption<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final state = !enabled
         ? SegmentControlOptionState.disabled
         : selected

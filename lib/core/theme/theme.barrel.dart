@@ -11,3 +11,4 @@ export 'default_light.tokens.dart';
 export 'default_light.theme.dart';
 export 'theme_variant.registry.dart';
 export 'default.theme_preset.dart';
+export 'theme.controller.dart';

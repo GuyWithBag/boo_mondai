@@ -30,7 +30,6 @@ import 'package:flutter/material.dart'
         Flexible;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
-import 'package:theme_variants/theme_variants.dart';
 
 class EditableTextValue extends HookWidget {
   const EditableTextValue({
@@ -64,7 +63,7 @@ class EditableTextValue extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final isEditing = useState(false);
     final isSaving = useState(false);
     final controller = useTextEditingController(text: value);

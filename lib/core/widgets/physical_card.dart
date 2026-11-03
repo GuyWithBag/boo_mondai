@@ -5,7 +5,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         ScaleHelper,
         surfaceStyle,
-        usePhysicalCardController;
+        usePhysicalCardController,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:signals_hooks/signals_hooks.dart';
@@ -43,7 +44,7 @@ class PhysicalCard extends SignalHookWidget {
       () => controller ?? fallbackController,
       [controller, fallbackController],
     );
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final radius = ScaleHelper.getScaledRadiusFromBase(
       radius: tokens.studyCardRadius,
       current: effectiveController.width.value,

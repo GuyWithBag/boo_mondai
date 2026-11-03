@@ -18,7 +18,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         chipStyle,
         surfaceStyle,
         textStyle,
-        SurfaceShape;
+        SurfaceShape,
+        ThemeController;
 import 'package:flutter/material.dart' hide FormField, TextField;
 import 'package:flutter_hooks/flutter_hooks.dart'
     show useEffect, useListenable, useMemoized;
@@ -32,7 +33,7 @@ class FillInTheBlanksEditor extends SignalHookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final editor = useMemoized(
       () => FillInTheBlanksEditorController(
         editDeckController: editDeckController,
@@ -179,7 +180,7 @@ class _BlankChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     return ChipTheme(
       data: chipStyle.resolve(tokens, [ChipTone.ghost]),
       child: InputChip(label: Text(value), onDeleted: onDeleted),

@@ -5,10 +5,9 @@
 
 import 'package:boo_mondai/features/app_theme/app_theme.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, StudyRating, ThemeHelper;
+    show AppTokens, StudyRating, ThemeHelper, ThemeController;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class StudyRatingBreakdown extends StatelessWidget {
   const StudyRatingBreakdown({
@@ -24,7 +23,7 @@ class StudyRatingBreakdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final labelStyle = textStyle.resolve(tokens, const [
       TextSize.label,
       TextWeight.strong,

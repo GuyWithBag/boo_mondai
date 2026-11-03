@@ -6,7 +6,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         ChangedPropertyBlock,
         surfaceStyle,
         MetaLabel,
-        ChangeTrackerHelper;
+        ChangeTrackerHelper,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -30,7 +31,7 @@ class ChangedEntitySection<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     return Column(
       spacing: tokens.spaceLayoutGapMd,

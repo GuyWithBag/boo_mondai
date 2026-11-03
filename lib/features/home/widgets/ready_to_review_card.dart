@@ -9,7 +9,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         SurfaceColor,
         SurfaceShadow,
         surfaceStyle,
-        SurfaceShape;
+        SurfaceShape,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -26,7 +27,7 @@ class ReadyToReviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final canStart = dueCount > 0;
 
     return Elevated(

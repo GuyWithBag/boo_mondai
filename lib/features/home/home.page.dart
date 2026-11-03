@@ -17,7 +17,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         StreaksCard,
         NotificationsButton,
         ViewLeaderboardController,
-        ViewStudyDecksController;
+        ViewStudyDecksController,
+        ThemeController;
 import 'package:flutter/material.dart' hide Scaffold, AppBar;
 import 'package:flutter_hooks/flutter_hooks.dart' show useEffect, useMemoized;
 import 'package:flutter_svg/flutter_svg.dart';
@@ -34,7 +35,7 @@ class HomePage extends SignalHookWidget {
     final auth = context.read<AuthController>();
     final reviewDashboard = useMemoized(() => ViewStudyDecksController());
     final leaderboard = useMemoized(() => ViewLeaderboardController());
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final totalDue = reviewDashboard.totalDue.value;
 
     useEffect(() {

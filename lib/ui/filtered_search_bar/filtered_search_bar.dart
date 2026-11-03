@@ -1,13 +1,12 @@
 import 'package:boo_mondai/core/theme/app_tokens.model.dart';
 import 'package:boo_mondai/features/app_theme/app_theme.barrel.dart'
     show Button, TextField;
+import 'package:boo_mondai/lib.barrel.dart' show ThemeController;
 import 'package:boo_mondai/ui/filtered_search_bar/filtered_search.result_tile.dart';
 import 'package:boo_mondai/ui/filtered_search_bar/filtered_search_bar.controller.dart';
 import 'package:flutter/material.dart' hide TextField;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:signals_hooks/signals_hooks.dart';
-
-import 'package:theme_variants/theme_variants.dart';
 
 typedef SearchResultBuilder<TObject> =
     Widget Function(BuildContext context, TObject result, int index);
@@ -44,7 +43,7 @@ class FilteredSearchBar<TObject> extends SignalHookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final layerLink = useMemoized(LayerLink.new);
     final overlayEntry = useRef<OverlayEntry?>(null);
     final dropdownUpdateId = useRef(0);

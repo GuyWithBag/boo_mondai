@@ -15,7 +15,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextWeight,
         TextColor,
         SegmentedControl,
-        SegmentOption;
+        SegmentOption,
+        ThemeController;
 import 'package:flutter/material.dart' hide FormField;
 import 'package:flutter_hooks/flutter_hooks.dart' show useEffect, useMemoized;
 import 'package:signals_hooks/signals_hooks.dart';
@@ -34,7 +35,7 @@ class FlashcardEditor extends SignalHookWidget {
       [editDeckController.selectedTemplateKey.value],
     );
     useEffect(() => editor.dispose, [editor]);
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     const options = [
       SegmentOption(value: CardTemplateDirection.normal, label: 'Normal'),
       SegmentOption(value: CardTemplateDirection.reversed, label: 'Reversed'),

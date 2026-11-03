@@ -6,11 +6,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextSize,
         TextWeight,
         ThemeHelper,
-        textStyle;
+        textStyle,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:signals/signals.dart';
 import 'package:signals_hooks/signals_hooks.dart' hide signal;
-import 'package:theme_variants/theme_variants.dart';
 
 enum SessionRatingStatsMode { due, ratingStats }
 
@@ -73,7 +73,7 @@ class SessionRatingStatsBlock extends SignalWidget {
     DeckReviewStats stats,
     SessionRatingStatsMode mode,
   ) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final easyColorSet = ThemeHelper.getStudyRatingColorSet(
       tokens,
       StudyRating.easy,
@@ -149,7 +149,7 @@ class _SessionRatingStatsText extends SignalWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final labelStyle = textStyle.resolve(tokens, const [
       TextSize.labelSmall,
       TextWeight.strong,
@@ -192,7 +192,7 @@ class _SessionRatingStatsDots extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final labelStyle = textStyle.resolve(tokens, const [
       TextSize.labelSmall,
       TextWeight.strong,

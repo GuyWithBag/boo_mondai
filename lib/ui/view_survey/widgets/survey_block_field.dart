@@ -14,11 +14,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         SurveyNumberInputBlock,
         SurveyTextInputBlock,
         TextField,
-        ViewSurveyController;
+        ViewSurveyController,
+        ThemeController;
 import 'package:flutter/material.dart' hide TextField;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class SurveyBlockField extends StatelessWidget {
   const SurveyBlockField({
@@ -177,7 +177,7 @@ class _MultipleChoiceInputBlock extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = readOnly ? null : context.watch<ViewSurveyController>();
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final selected = List<String>.from(
       _answerValue(context, answers, block.key) as List? ?? const [],
     );
@@ -232,7 +232,7 @@ class _LikertInputBlock extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = readOnly ? null : context.watch<ViewSurveyController>();
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final selectedValue = _answerValue(context, answers, block.key);
     final selected = selectedValue is num ? selectedValue.toInt() : null;
 
@@ -288,7 +288,7 @@ class _BooleanInputBlock extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = readOnly ? null : context.watch<ViewSurveyController>();
     final value = _answerValue(context, answers, block.key) as bool?;
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     final field = _PromptedField(
       prompt: block.prompt,
@@ -342,7 +342,7 @@ class _PromptedField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: tokens.spaceLayoutGapSm,

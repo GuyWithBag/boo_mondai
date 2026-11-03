@@ -23,11 +23,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextColor,
         TextSize,
         TextWeight,
-        textStyle;
+        textStyle,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:signals_hooks/signals_hooks.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class StudySessionCardStage extends SignalHookWidget {
   const StudySessionCardStage({
@@ -51,7 +51,7 @@ class StudySessionCardStage extends SignalHookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final template = studySessionController.currentTemplate.value;
     final studyCard = studySessionController.currentStudyCard.value;
     final stepId = studySessionController.currentStep.value?.id;

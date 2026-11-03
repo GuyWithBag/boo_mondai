@@ -1,8 +1,12 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, ChangeTrackerEntry, ChangeType, ChangeTrackerHelper;
+    show
+        AppTokens,
+        ChangeTrackerEntry,
+        ChangeType,
+        ChangeTrackerHelper,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 /// Compact added/modified/removed counts for a tracked entry.
 ///
@@ -44,7 +48,7 @@ class _SummaryChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final colors = ChangeTrackerHelper.getTypeChipColors(tokens, type);
     final prefix = ChangeTrackerHelper.getTypePrefix(type);
     final label = ChangeTrackerHelper.getTypeLabel(type);

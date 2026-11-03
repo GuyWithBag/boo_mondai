@@ -10,17 +10,17 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextFieldSize,
         ButtonSize,
         EditDeckController,
-        AppTokens;
+        AppTokens,
+        ThemeController;
 import 'package:flutter/material.dart' hide AppBar;
 import 'package:go_router/go_router.dart' show GoRouterHelper;
-import 'package:theme_variants/theme_variants.dart';
 
 AppBar buildEditDeckAppBar({
   required BuildContext context,
   required EditDeckController controller,
 }) {
   final selectedTemplate = controller.selectedTemplate.value;
-  final tokens = context.themeTokens<AppTokens>();
+  final tokens = ThemeController.tokens;
 
   return AppBar(
     onPop: () => controller.onPop(context),

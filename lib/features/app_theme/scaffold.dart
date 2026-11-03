@@ -11,13 +11,13 @@ import 'package:boo_mondai/lib.barrel.dart'
         ToolBar,
         ToolBarScope,
         ViewPaddingSizedBox,
-        Side;
+        Side,
+        ThemeController;
 import 'package:flutter/material.dart' hide Scaffold;
 import 'package:flutter/material.dart' as material show Scaffold;
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:signals_hooks/signals_hooks.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class Scaffold extends SignalHookWidget {
   const Scaffold({
@@ -104,7 +104,7 @@ class Scaffold extends SignalHookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final mediaQuery = MediaQuery.of(context);
     final mainController = MainController.instance;
     final toolBarController = toolBar is ToolBar

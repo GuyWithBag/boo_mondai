@@ -14,7 +14,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         surfaceStyle,
         TextFieldFrame,
         TextFieldColor,
-        DiscussionComposerController;
+        DiscussionComposerController,
+        ThemeController;
 import 'package:flutter/material.dart' hide FormField, TextField;
 import 'package:signals_hooks/signals_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -26,7 +27,7 @@ class DiscussionComposerTile<T extends Comment> extends SignalHookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     return Form(
       key: controller.formKey,

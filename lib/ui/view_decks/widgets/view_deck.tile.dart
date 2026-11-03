@@ -19,11 +19,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         PhysicalCardController,
         PhysicalCard,
         PhysicalDeck,
-        ViewCardsTile;
+        ViewCardsTile,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:signals_hooks/signals_hooks.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 enum DeckTileState { defaultView, bare, spread }
 
@@ -75,7 +75,7 @@ class DeckTile extends SignalHookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     const stackedCardCount = 3;
     final studyCardAspectRatio = tokens.studyCardAspectRatio;
     final cardWidth = width ?? tokens.studyCardWidth;

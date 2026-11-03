@@ -6,7 +6,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         DateHelper,
         EditableTextValue,
         ViewProfileController,
-        ProfileAvatar;
+        ProfileAvatar,
+        ThemeController;
 import 'package:flutter/material.dart'
     show
         BuildContext,
@@ -31,7 +32,7 @@ class ProfileCard extends SignalWidget {
   Widget build(BuildContext context) {
     final auth = context.read<AuthController>();
 
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     final profile = controller.profile.value;
     final email = auth.currentEmail.value;

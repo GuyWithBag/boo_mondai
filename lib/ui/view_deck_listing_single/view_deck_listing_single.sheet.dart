@@ -35,7 +35,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         ViewDeckListingSinglePreviewController,
         ViewPaddingSizedBox,
         showBottomSheet,
-        surfaceStyle;
+        surfaceStyle,
+        ThemeController;
 import 'package:boo_mondai/ui/view_deck_listing_single/view_deck_listing_single.barrel.dart';
 import 'package:flutter/material.dart'
     hide FormField, Scaffold, AppBar, showBottomSheet;
@@ -66,7 +67,7 @@ class ViewDeckListingSingleSheet<T extends ViewDeckListingSingleController>
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     final helper = useMemoized(ViewDeckListingSingleHelper.new);
 
@@ -253,7 +254,7 @@ class _Body<T extends ViewDeckListingSingleController>
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final headerHeight = 370.h;
 
     final tags = controller.deck.value.tags

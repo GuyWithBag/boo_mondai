@@ -5,9 +5,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         ChangeType,
         ChangedProperty,
         textStyle,
-        TextSize;
+        TextSize,
+        ThemeController;
 import 'package:flutter/material.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 /// Renders a field-level before/after diff.
 ///
@@ -27,7 +27,7 @@ class ChangedPropertyBlock extends StatelessWidget {
     if (type == ChangeType.skipped) {
       return SizedBox.shrink();
     }
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     final propertyTextStyle = textStyle.resolve(tokens);
 

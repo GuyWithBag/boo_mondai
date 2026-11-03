@@ -6,9 +6,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         BackgroundImageSurface,
         SurfaceShape,
         TextSize,
-        textStyle;
+        textStyle,
+        ThemeController;
 import 'package:flutter/material.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class ProfileAvatar extends StatelessWidget {
   const ProfileAvatar({
@@ -31,7 +31,7 @@ class ProfileAvatar extends StatelessWidget {
     final name = displayName.trim().isEmpty ? '...' : displayName.trim();
     final initials = name.isNotEmpty ? name[0].toUpperCase() : '?';
 
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     return Stack(
       clipBehavior: Clip.none,

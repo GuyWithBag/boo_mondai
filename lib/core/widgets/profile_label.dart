@@ -7,9 +7,8 @@
 
 import 'package:boo_mondai/core/theme/app_tokens.model.dart';
 import 'package:boo_mondai/lib.barrel.dart'
-    show ProfileAvatar, TextColor, TextSize, textStyle;
+    show ProfileAvatar, TextColor, TextSize, textStyle, ThemeController;
 import 'package:flutter/material.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class ProfileLabel extends StatelessWidget {
   const ProfileLabel({
@@ -30,7 +29,7 @@ class ProfileLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final name = displayName.trim().isEmpty ? '...' : displayName.trim();
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     return Row(
       textDirection: facingLeft ? TextDirection.rtl : TextDirection.ltr,

@@ -4,16 +4,16 @@ import 'package:boo_mondai/lib.barrel.dart'
         Button,
         LocalDB,
         NotificationsController,
-        showNotificationsModal;
+        showNotificationsModal,
+        ThemeController;
 import 'package:flutter/material.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class NotificationsButton extends StatelessWidget {
   const NotificationsButton({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final controller = NotificationsController.instance;
 
     return StreamBuilder(

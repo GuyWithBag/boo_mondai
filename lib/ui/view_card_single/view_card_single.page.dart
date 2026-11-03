@@ -23,11 +23,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         StudySessionCardStageController,
         ViewCardSingleController,
         WordScrambleCard,
-        WordScrambleTemplate;
+        WordScrambleTemplate,
+        ThemeController;
 import 'package:flutter/material.dart' hide AppBar, Scaffold;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:signals_hooks/signals_hooks.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class ViewCardSinglePage extends SignalHookWidget {
   const ViewCardSinglePage({
@@ -50,7 +50,7 @@ class ViewCardSinglePage extends SignalHookWidget {
     );
     useEffect(() => controller.dispose, [controller]);
 
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final template = controller.template.value;
     final cardStageController = controller.cardStageController.value;
     final previewStudyCard = controller.previewStudyCard.value;

@@ -6,7 +6,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         SurfaceShadow,
         SurfaceShape,
         surfaceStyle,
-        WordScrambleDragPayload;
+        WordScrambleDragPayload,
+        ThemeController;
 import 'package:boo_mondai/ui/study_session.card_stage/widgets/scaled_surface_style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -29,7 +30,7 @@ class WordInsertTarget extends SignalWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     return DragTarget<WordScrambleDragPayload>(
       onWillAcceptWithDetails: (_) => !locked,
       onAcceptWithDetails: (details) => onAccept(details.data),

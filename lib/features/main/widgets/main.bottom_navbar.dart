@@ -16,10 +16,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         NotificationsController,
         Pages,
         SurfaceShape,
-        SurfacePadding;
+        SurfacePadding,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart' show GoRouterHelper;
-import 'package:theme_variants/theme_variants.dart';
 
 class MainBottomNavBar extends StatelessWidget implements PreferredSizeWidget {
   final int currentPageIndex;
@@ -32,7 +32,7 @@ class MainBottomNavBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final pages = Pages.shell;
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     return BottomNavBar(
       variants: [SurfaceShape.sharp, SurfacePadding.sm],

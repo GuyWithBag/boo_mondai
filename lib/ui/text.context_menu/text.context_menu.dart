@@ -11,7 +11,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         SurfacePadding,
         SurfaceShadow,
         SurfaceShape,
-        surfaceStyle;
+        surfaceStyle,
+        ThemeController;
 import 'package:boo_mondai/ui/text.context_menu/text.context_menu.controller.dart';
 import 'package:flutter/material.dart';
 import 'package:signals_hooks/signals_hooks.dart';
@@ -48,7 +49,7 @@ class _TextContextMenuBody extends SignalHookWidget {
   @override
   Widget build(BuildContext context) {
     final controller = TextContextMenuController.instance;
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final quickItems = controller.quickItems.value;
     final dropdownItems = controller.dropdownItems.value;
     final isDropdownOpen = controller.isDropdownOpen.value;

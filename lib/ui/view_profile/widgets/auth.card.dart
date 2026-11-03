@@ -13,7 +13,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextSize,
         SurfaceBorder,
         SurfaceShape,
-        SurfaceShadow;
+        SurfaceShadow,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart' show GoRouterHelper;
 import 'package:provider/provider.dart' show ReadContext;
@@ -26,7 +27,7 @@ class AuthCard extends SignalWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final auth = context.read<AuthController>();
     final isLoading = auth.isLoading.value;
     // final viewProfile = context.watch<ViewProfileController>();

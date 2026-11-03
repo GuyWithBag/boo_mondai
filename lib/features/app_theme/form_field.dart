@@ -1,9 +1,9 @@
 import 'package:boo_mondai/core/theme/app_tokens.model.dart';
-import 'package:boo_mondai/lib.barrel.dart' show TextSize, textStyle, TextColor;
+import 'package:boo_mondai/lib.barrel.dart'
+    show TextSize, textStyle, TextColor, ThemeController;
 import 'package:flutter/material.dart' as material;
 import 'package:flutter/material.dart' hide FormField;
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 typedef FormFieldBuilder<T> =
     Widget Function(BuildContext context, material.FormFieldState<T> field);
@@ -30,7 +30,7 @@ class FormField<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     return material.FormField<T>(
       initialValue: value,

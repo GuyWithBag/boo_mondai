@@ -8,7 +8,7 @@
 //         appThemeRegistry,
 //         buildAppThemeData;
 // import 'package:flutter/material.dart' show Brightness, Color;
-// import 'package:theme_variants/theme_variants.dart';
+//
 
 // /// Builds runtime theme registry and controller from persisted user settings.
 // class UserSettingsThemeBridge {
@@ -29,7 +29,7 @@
 //         registry: registry,
 //         requestedId: settings.darkThemePresetId,
 //       ),
-//       themeMode: settings.themeMode,
+//       themeBrightness: settings.themeBrightness,
 //       transform: (theme) => _applyOverrides(theme, settings.themeOverride),
 //     );
 //   }

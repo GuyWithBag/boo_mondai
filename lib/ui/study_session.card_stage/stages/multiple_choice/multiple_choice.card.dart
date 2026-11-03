@@ -21,11 +21,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         MarkdownTextMode,
         usePhysicalCardController,
         PhysicalCardController,
-        MarkdownHelper;
+        MarkdownHelper,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:signals_hooks/signals_hooks.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class MultipleChoiceCard extends SignalHookWidget {
   const MultipleChoiceCard({
@@ -47,7 +47,7 @@ class MultipleChoiceCard extends SignalHookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final eyebrowStyle = ScaleHelper.getTextStyleWithScaledFontSize(
       textStyle.resolve(tokens, const [
         TextSize.labelSmall,

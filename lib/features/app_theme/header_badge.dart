@@ -1,7 +1,6 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show HeaderBadgeTone, headerBadgeStyle, AppTokens;
+    show HeaderBadgeTone, headerBadgeStyle, AppTokens, ThemeController;
 import 'package:flutter/material.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class HeaderBadge extends StatelessWidget {
   const HeaderBadge({
@@ -15,7 +14,7 @@ class HeaderBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final style = headerBadgeStyle.resolve(tokens, [tone]);
 
     return ChipTheme(

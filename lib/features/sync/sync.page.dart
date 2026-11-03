@@ -15,7 +15,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         StatusLayoutState,
         SyncController,
         Scaffold,
-        showModal;
+        showModal,
+        ThemeController;
 import 'package:flutter/material.dart' hide Scaffold;
 import 'package:go_router/go_router.dart';
 import 'package:signals/signals_flutter.dart';
@@ -69,7 +70,7 @@ class SyncPage extends SignalWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final error = syncController.error.value;
     final progress = (entry.progress ?? 0).clamp(0.0, 1.0);
 

@@ -10,7 +10,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextSize,
         TextWeight,
         surfaceStyle,
-        textStyle;
+        textStyle,
+        ThemeController;
 import 'package:boo_mondai/ui/study_session.card_stage/stages/word_scramble/controllers/word_scramble.controller.dart';
 import 'package:boo_mondai/ui/study_session.card_stage/widgets/scaled_surface_style.dart';
 import 'package:flutter/material.dart';
@@ -37,7 +38,7 @@ class WordScrambleChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final color = switch (correct) {
       true => SurfaceColor.success,
       false => SurfaceColor.error,

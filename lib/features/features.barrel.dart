@@ -29,7 +29,6 @@ export 'register/register.barrel.dart';
 export 'ui_sounds/ui_sounds.barrel.dart';
 export 'surveys/surveys.barrel.dart';
 export 'researcher_dashboard/researcher_dashboard.barrel.dart';
-export 'decks_import_export/decks_import_export.barrel.dart';
 export 'deck_favorites/deck_favorites.barrel.dart';
 export 'votes/votes.barrel.dart';
 export 'content/content.barrel.dart';
@@ -47,4 +46,5 @@ export 'markdown.media/markdown.media.barrel.dart';
 export 'markdown_text/markdown_text.barrel.dart';
 export 'notifications/notifications.barrel.dart';
 export 'search_filter.modal/search_filter.modal.barrel.dart';
+
 // Other files

@@ -7,7 +7,7 @@
 
 import 'package:boo_mondai/features/app_theme/app_theme.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
-    show StudyRating, AppTokens, ThemeHelper;
+    show StudyRating, AppTokens, ThemeHelper, ThemeController;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -28,7 +28,7 @@ class AnswerResultTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final ratingColorSet = ThemeHelper.getStudyRatingColorSet(tokens, type);
 
     return Surface(

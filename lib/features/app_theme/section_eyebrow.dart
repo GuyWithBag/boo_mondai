@@ -1,7 +1,6 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show SectionEyebrowTone, AppTokens, sectionEyebrowStyle;
+    show SectionEyebrowTone, AppTokens, sectionEyebrowStyle, ThemeController;
 import 'package:flutter/material.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class SectionEyebrow extends StatelessWidget {
   const SectionEyebrow(
@@ -17,7 +16,7 @@ class SectionEyebrow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     return Text(
       isUpperCase ? label.toUpperCase() : label,

@@ -7,7 +7,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         SurfaceShape,
         TextFieldFrame,
         TextFieldSize,
-        surfaceStyle;
+        surfaceStyle,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:signals_hooks/signals_hooks.dart';
@@ -33,7 +34,7 @@ class TextFieldCard extends SignalHookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final focusNode = useFocusNode();
     final resolvedSurfaceStyle = surfaceStyle
         .resolve(tokens, const [SurfaceShape.roundedSm])

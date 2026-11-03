@@ -14,13 +14,13 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppBar,
         TextFieldFrame,
         TextFieldSize,
-        TextField;
+        TextField,
+        ThemeController;
 import 'package:flutter/material.dart'
     hide FormField, TextField, Scaffold, AppBar;
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart' show ReadContext;
 import 'package:signals_hooks/signals_hooks.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class LoginPage extends SignalHookWidget {
   const LoginPage({super.key});
@@ -30,7 +30,7 @@ class LoginPage extends SignalHookWidget {
     final login = useLoginController(
       authController: context.read<AuthController>(),
     );
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final error = login.error.value;
     final isLoading = login.isLoading.value;
 

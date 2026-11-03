@@ -17,9 +17,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextSize,
         TextWeight,
         buttonStyle,
-        textStyle;
+        textStyle,
+        ThemeController;
 import 'package:flutter/material.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class RatingButton extends StatelessWidget {
   final StudyRating type;
@@ -61,7 +61,7 @@ class RatingButton extends StatelessWidget {
         color = ButtonColor.easy;
     }
 
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final variants = [color, ButtonPadding.sm];
     final resolvedButtonStyle = buttonStyle.resolve(tokens, variants);
 

@@ -1,8 +1,8 @@
-import 'package:boo_mondai/lib.barrel.dart' show AppTokens, ScaleHelper;
+import 'package:boo_mondai/lib.barrel.dart'
+    show AppTokens, ScaleHelper, ThemeController;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class MarkdownAudioPlayerProgress extends StatelessWidget {
   const MarkdownAudioPlayerProgress({
@@ -20,7 +20,7 @@ class MarkdownAudioPlayerProgress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     return StreamBuilder<Duration?>(
       stream: player.durationStream,

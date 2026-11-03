@@ -7,7 +7,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         textStyle,
         TextSize,
         TextWeight,
-        Button;
+        Button,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -69,7 +70,7 @@ class Modal<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     final hasActions =
         actions.isNotEmpty || (actionsCustom?.isNotEmpty ?? false);

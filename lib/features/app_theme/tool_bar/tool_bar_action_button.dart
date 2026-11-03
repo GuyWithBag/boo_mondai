@@ -1,8 +1,7 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show ToolBarController, ToolBarAction, AppTokens, Button;
+    show ToolBarController, ToolBarAction, AppTokens, Button, ThemeController;
 import 'package:flutter/material.dart';
 import 'package:signals_hooks/signals_hooks.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class ToolBarActionButton extends SignalHookWidget {
   const ToolBarActionButton({
@@ -16,7 +15,7 @@ class ToolBarActionButton extends SignalHookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final onPressed = controller.canPerform(action)
         ? () => controller.perform(action)
         : null;

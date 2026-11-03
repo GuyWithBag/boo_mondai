@@ -17,7 +17,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextWeight,
         surfaceStyle,
         textStyle,
-        SurfaceShape;
+        SurfaceShape,
+        ThemeController;
 import 'package:flutter/material.dart' hide FormField;
 import 'package:flutter_hooks/flutter_hooks.dart' show useEffect, useMemoized;
 import 'package:signals_hooks/signals_hooks.dart';
@@ -30,7 +31,7 @@ class IdentificationEditor extends SignalHookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final controller = useMemoized(
       () => IdentificationEditorController(
         editDeckController: editDeckController,

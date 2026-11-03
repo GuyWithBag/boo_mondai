@@ -10,9 +10,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         ContentType,
         Content,
         Profile,
-        DeckListingTileController;
+        DeckListingTileController,
+        ThemeController;
 import 'package:flutter/material.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class DeckListingListView extends StatelessWidget {
   const DeckListingListView({
@@ -34,7 +34,7 @@ class DeckListingListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     return ListingStatesWrapper<DeckWithListingContent>.list(
       isLoading: isLoading,

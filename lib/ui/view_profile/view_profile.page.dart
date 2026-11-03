@@ -19,7 +19,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         SettingsStore,
         AuthCard,
         ViewProfileController,
-        showFeatureDisabledModal;
+        showFeatureDisabledModal,
+        ThemeController;
 import 'package:boo_mondai/features/app_theme/app_theme.barrel.dart'
     show SnackbarColor, showSnackbar;
 import 'package:flutter/material.dart' hide Scaffold;
@@ -28,14 +29,13 @@ import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart' show ReadContext;
 import 'package:signals_hooks/signals_hooks.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class ViewProfilePage extends SignalHookWidget {
   const ViewProfilePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final auth = context.read<AuthController>();
     final pages = Pages.appDetails;
     final isAppDemo = SettingsStore.instance.get<bool>(SettingPath.isAppDemo);

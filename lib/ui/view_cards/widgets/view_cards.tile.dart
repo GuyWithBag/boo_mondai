@@ -10,12 +10,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         usePhysicalCardController,
         chipStyle,
         ViewCardsTileSide,
-        ViewCardsHelper;
+        ViewCardsHelper,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:signals_hooks/signals_hooks.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class ViewCardsTile extends SignalHookWidget {
   const ViewCardsTile.template({
@@ -37,7 +37,7 @@ class ViewCardsTile extends SignalHookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final fallbackController = usePhysicalCardController(
       context,
       width: width,

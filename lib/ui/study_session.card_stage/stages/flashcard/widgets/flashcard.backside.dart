@@ -11,9 +11,9 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextColor,
         TextSize,
         TextWeight,
-        MarkdownHelper;
+        MarkdownHelper,
+        ThemeController;
 import 'package:flutter/material.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class FlashcardBackSide extends StatelessWidget {
   const FlashcardBackSide({
@@ -31,7 +31,7 @@ class FlashcardBackSide extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final markdownTextStyle = ScaleHelper.getTextStyleWithScaledFontSize(
       textStyle.resolve(tokens, const [
         TextSize.label,

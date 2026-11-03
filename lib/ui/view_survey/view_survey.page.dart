@@ -12,12 +12,12 @@ import 'package:boo_mondai/lib.barrel.dart'
         ProgressBar,
         Scaffold,
         ViewSurveyController,
-        SurveyBlockField;
+        SurveyBlockField,
+        ThemeController;
 import 'package:flutter/material.dart' hide AppBar, Scaffold;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class ViewSurveyPage extends HookWidget {
   const ViewSurveyPage({super.key, required this.surveyId});
@@ -27,7 +27,7 @@ class ViewSurveyPage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final controller = useMemoized(ViewSurveyController.new);
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     useEffect(() {
       controller.load(surveyId);

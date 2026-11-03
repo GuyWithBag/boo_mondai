@@ -38,7 +38,7 @@ class SettingsRegistry {
       disabled: true,
       description: 'Notify when cards from a studied deck become available.',
     ),
-    SettingPath.themeMode: Setting<String>(
+    SettingPath.themeBrightness: Setting<String>(
       defaultValue: 'system',
       description: 'Use the system theme, light theme, or dark theme.',
     ),

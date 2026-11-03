@@ -1,3 +1,5 @@
+import 'package:boo_mondai/features/decks_import_export/models/models.barrel.dart'
+    show DeckImportResult;
 import 'package:boo_mondai/lib.barrel.dart'
     show
         DeckImportResult,

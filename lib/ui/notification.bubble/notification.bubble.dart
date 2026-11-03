@@ -10,7 +10,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextSize,
         TextWeight,
         notificationBubbleStyle,
-        textStyle;
+        textStyle,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
@@ -35,7 +36,7 @@ class NotificationBubble extends SignalHookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final controller = NotificationBubbleController.instance;
     final notifications = controller.activeNotifications.value;
     final resolvedStyle = notificationBubbleStyle.resolve(tokens, [
@@ -87,7 +88,7 @@ class _NotificationBubbleItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final controller = NotificationBubbleController.instance;
 
     final route = controller.routeFor(notification);

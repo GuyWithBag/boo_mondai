@@ -13,10 +13,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         StudySessionStepHelper,
         StudySessionController,
         ViewStudySessionController,
-        UiSoundsService;
+        UiSoundsService,
+        ThemeController;
 import 'package:flutter/material.dart' hide Scaffold, AppBar;
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class ViewMessageSessionStepPage extends HookWidget {
   const ViewMessageSessionStepPage({
@@ -32,7 +32,7 @@ class ViewMessageSessionStepPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final messageStepSound = StudySessionStepHelper.getMessageStepSound(step);
 
     useEffect(() {

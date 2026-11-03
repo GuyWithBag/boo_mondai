@@ -1,6 +1,5 @@
-import 'package:boo_mondai/lib.barrel.dart' show AppTokens;
+import 'package:boo_mondai/lib.barrel.dart' show AppTokens, ThemeController;
 import 'package:flutter/material.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class Elevated extends StatelessWidget {
   const Elevated({
@@ -16,7 +15,7 @@ class Elevated extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     return Container(
       decoration: BoxDecoration(
         boxShadow: [

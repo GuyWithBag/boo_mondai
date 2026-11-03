@@ -14,7 +14,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         surfaceStyle,
         textStyle,
         TextSize,
-        TextWeight;
+        TextWeight,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -53,7 +54,7 @@ class EditMultipleChoiceOption extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final controller = useTextEditingController(text: value);
     useEffect(() {
       if (controller.text != value) {
@@ -216,7 +217,7 @@ class _RadioIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     final outerStyle = surfaceStyle
         .resolve(tokens, const [

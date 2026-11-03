@@ -1,5 +1,12 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, ChangeType, Deck, DeckTile, DeckTileState, surfaceStyle;
+    show
+        AppTokens,
+        ChangeType,
+        Deck,
+        DeckTile,
+        DeckTileState,
+        surfaceStyle,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -10,7 +17,7 @@ class NewDeckBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final icon = switch (type) {
       ChangeType.added => Icons.add,
       ChangeType.removed => Icons.remove,

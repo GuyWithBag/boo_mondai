@@ -8,7 +8,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         ViewCardsTile,
         surfaceStyle,
         SurfaceShape,
-        SurfaceBorder;
+        SurfaceBorder,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -28,7 +29,7 @@ class EditableFeaturedCardsColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final canAddCard =
         isEditable &&
         onAddPressed != null &&

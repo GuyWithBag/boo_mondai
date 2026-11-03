@@ -20,7 +20,6 @@ import 'package:flutter/material.dart' hide AppBar, Scaffold;
 import 'package:flutter_hooks/flutter_hooks.dart'
     show useAnimationController, useEffect, useMemoized;
 import 'package:signals_hooks/signals_hooks.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class ViewStudySessionResultPage extends SignalHookWidget {
   const ViewStudySessionResultPage({super.key, required this.sessionId});
@@ -34,7 +33,7 @@ class ViewStudySessionResultPage extends SignalHookWidget {
       [sessionId],
     );
     useEffect(() => controller.dispose, [controller]);
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final hasPrimaryAction = controller.hasPrimaryAction.value;
     final cardAnswers = controller.cardAnswers.value;
 

@@ -50,11 +50,11 @@
 //   /// Updates the selected theme mode for [userId].
 //   static Future<UserSettings> updateThemeMode({
 //     required String profileId,
-//     required ThemeMode themeMode,
+//     required ThemeMode themeBrightness,
 //   }) async {
 //     final current = await getOrCreateForUser(profileId);
 //     final updated = current.copyWith(
-//       themeModeName: themeMode.name,
+//       themeModeName: themeBrightness.name,
 //       updatedAt: DateTime.now(),
 //     );
 //     await LocalDB.userSettings.upsert(updated);

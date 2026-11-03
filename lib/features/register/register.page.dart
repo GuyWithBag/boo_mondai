@@ -20,20 +20,20 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppBar,
         TextFieldFrame,
         TextFieldSize,
-        TextField;
+        TextField,
+        ThemeController;
 import 'package:flutter/material.dart'
     hide BackButton, FormField, TextField, Scaffold, AppBar;
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart' show ReadContext;
 import 'package:signals_hooks/signals_hooks.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class RegisterPage extends SignalHookWidget {
   const RegisterPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     final register = useRegisterController(
       authController: context.read<AuthController>(),

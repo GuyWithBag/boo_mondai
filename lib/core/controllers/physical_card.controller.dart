@@ -1,8 +1,7 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, ScaleHelper, CubeController;
+    show AppTokens, ScaleHelper, CubeController, ThemeController;
 import 'package:flutter/material.dart' show BuildContext, Offset, Curve, Curves;
 import 'package:signals/signals_flutter.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class PhysicalCardController {
   PhysicalCardController(
@@ -41,7 +40,7 @@ class PhysicalCardController {
   static const double defaultAspectRatio = 5 / 7;
 
   static double resolveWidth(BuildContext context, double? width) {
-    return width ?? context.themeTokens<AppTokens>().studyCardWidth;
+    return width ?? ThemeController.tokens.studyCardWidth;
   }
 
   final Signal<double> aspectRatio;

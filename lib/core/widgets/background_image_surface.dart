@@ -1,7 +1,13 @@
 import 'dart:async' show FutureOr;
 
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, Button, SurfaceShape, surfaceStyle, SurfaceBorder;
+    show
+        AppTokens,
+        Button,
+        SurfaceShape,
+        surfaceStyle,
+        SurfaceBorder,
+        ThemeController;
 import 'package:file_picker/file_picker.dart'
     show FilePicker, FileType, PlatformFile;
 import 'package:flutter/material.dart'
@@ -79,7 +85,7 @@ class BackgroundImageSurface extends SignalWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final resolvedStyle =
         style ?? surfaceStyle.resolve(tokens, [shape, border]);
     final childPadding = resolvedStyle.padding ?? EdgeInsets.zero;

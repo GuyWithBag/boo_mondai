@@ -7,7 +7,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         Deck,
         LocalDB,
         StudySessionConfig,
-        ViewDeckSingleSheetController;
+        ViewDeckSingleSheetController,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart' show GoRouterHelper;
 import 'package:theme_variants/theme_variants.dart' show ThemeVariantsContext;
@@ -17,7 +18,7 @@ BottomNavBar viewDeckSingleBottomNavBar({
   required Deck deck,
   required ViewDeckSingleSheetController controller,
 }) {
-  final tokens = context.themeTokens<AppTokens>();
+  final tokens = ThemeController.tokens;
 
   final profileId = LocalDB.currentProfile.getOrCreate().id;
   final eligibleCards = LocalDB.studyCard.getEligibleDrillCards(

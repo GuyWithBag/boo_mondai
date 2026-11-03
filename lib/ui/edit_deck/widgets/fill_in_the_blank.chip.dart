@@ -1,5 +1,5 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show InlineSpanEntry, AppTokens, chipStyle, ChipTone;
+    show InlineSpanEntry, AppTokens, chipStyle, ChipTone, ThemeController;
 import 'package:flutter/material.dart'
     show
         BuildContext,
@@ -21,7 +21,7 @@ class BlankChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final theme = chipStyle.resolve(tokens, [ChipTone.ghost]);
     return ChipTheme(
       data: theme,

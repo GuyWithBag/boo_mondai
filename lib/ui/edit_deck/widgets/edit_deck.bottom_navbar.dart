@@ -4,15 +4,15 @@ import 'package:boo_mondai/lib.barrel.dart'
         BottomNavBar,
         Button,
         EditDeckController,
-        EditDeckQuestionTypeHelper;
+        EditDeckQuestionTypeHelper,
+        ThemeController;
 import 'package:flutter/material.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 BottomNavBar editDeckBottomNavBar({
   required BuildContext context,
   required EditDeckController editor,
 }) {
-  final tokens = context.themeTokens<AppTokens>();
+  final tokens = ThemeController.tokens;
   final formats = EditDeckQuestionTypeHelper.visibleQuestionTypes;
   final selectedType = editor.selectedCardTemplateType.value;
 

@@ -32,7 +32,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         ToolBar,
         ToolBarController,
         showBottomSheet,
-        viewDeckSingleBottomNavBar;
+        viewDeckSingleBottomNavBar,
+        ThemeController;
 import 'package:flutter/material.dart'
     hide AppBar, FormField, Scaffold, showBottomSheet;
 import 'package:flutter_hooks/flutter_hooks.dart' show useEffect, useMemoized;
@@ -58,7 +59,7 @@ class ViewDeckSingleSheet extends SignalHookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     // final decksController = context.read<ViewDecksLocalController>();
     final controller = useMemoized(() {
       return ViewDeckSingleSheetController(
@@ -231,7 +232,7 @@ class _Body extends SignalHookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     final deckWidth = 160.w;
     final headerHeight = 300.h;
@@ -283,7 +284,7 @@ class _BodySubSection extends SignalHookWidget {
     final deck = controller.deck;
     final activeDeck = deck.value;
     final tags = controller.tagNames.value;
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     return SizedBox(
       width: double.infinity,

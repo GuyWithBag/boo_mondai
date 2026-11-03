@@ -12,7 +12,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         surfaceStyle,
         SurfaceShape,
-        SurfaceBorder;
+        SurfaceBorder,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart' show GoRouterHelper;
 import 'package:theme_variants/theme_variants.dart';
@@ -25,7 +26,7 @@ class SideBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pages = Pages.shell;
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     return SizedBox(
       width: 280,
       child: Container(

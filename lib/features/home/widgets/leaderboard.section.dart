@@ -20,7 +20,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextColor,
         surfaceStyle,
         textStyle,
-        JoinedLeaderboardEntry;
+        JoinedLeaderboardEntry,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -41,7 +42,7 @@ class LeaderboardSection extends SignalHookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final isAppDemo = SettingsStore.instance.get<bool>(SettingPath.isAppDemo);
 
     return Surface(

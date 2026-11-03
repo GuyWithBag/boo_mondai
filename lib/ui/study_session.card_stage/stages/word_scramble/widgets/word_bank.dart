@@ -1,10 +1,16 @@
 import 'package:boo_mondai/lib.barrel.dart'
-    show AppTokens, ScaleHelper, TextColor, TextSize, TextWeight, textStyle;
+    show
+        AppTokens,
+        ScaleHelper,
+        TextColor,
+        TextSize,
+        TextWeight,
+        textStyle,
+        ThemeController;
 import 'package:boo_mondai/ui/study_session.card_stage/stages/word_scramble/controllers/word_scramble.controller.dart';
 import 'package:boo_mondai/ui/study_session.card_stage/stages/word_scramble/widgets/word_scramble.chip.dart';
 import 'package:flutter/material.dart';
 import 'package:signals_hooks/signals_hooks.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class WordBank extends SignalWidget {
   const WordBank({required this.controller, super.key, this.contentScale = 1});
@@ -16,7 +22,7 @@ class WordBank extends SignalWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final words = controller.wordBank.value;
     final isLocked = controller.isLocked;
     final gap = ScaleHelper.getScaledValue(

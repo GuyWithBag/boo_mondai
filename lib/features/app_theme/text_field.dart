@@ -1,6 +1,7 @@
 import 'dart:ui' show BoxHeightStyle, BoxWidthStyle;
 
-import 'package:boo_mondai/lib.barrel.dart' show AppTokens, textFieldStyle;
+import 'package:boo_mondai/lib.barrel.dart'
+    show AppTokens, textFieldStyle, ThemeController;
 import 'package:boo_mondai/ui/text.context_menu/text.context_menu.controller.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart'
@@ -9,7 +10,6 @@ import 'package:flutter/material.dart'
 import 'package:flutter/material.dart'
     hide TextField, InputDecoration, InputCounterWidgetBuilder;
 import 'package:flutter/services.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 /// A drop-in replacement for [material.TextField] that resolves its visual
 /// style from [textFieldStyle] based on [variants], while exposing every
@@ -347,7 +347,7 @@ class TextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final resolvedStyle = textFieldStyle.resolve(tokens, variants);
     final baseDecoration = material.InputDecoration(
       hintText: placeholder,

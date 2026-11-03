@@ -10,11 +10,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         AppTokens,
         Button,
         PanelHeader,
-        EditDeckController;
+        EditDeckController,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:signals_hooks/signals_hooks.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class EditDeckSideBar extends SignalWidget {
   const EditDeckSideBar({super.key, required this.controller});
@@ -52,7 +52,7 @@ class EditDeckSideBar extends SignalWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final templates = controller.templates.value;
     final selectedTemplateId = controller.selectedTemplateId.value;
 

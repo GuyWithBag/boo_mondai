@@ -11,7 +11,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextSize,
         TextWeight,
         surfaceStyle,
-        textStyle;
+        textStyle,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart'
     show Surface, ThemeVariantsContext;
@@ -32,7 +33,7 @@ class ChangedEntityBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final headerStyle = surfaceStyle.resolve(tokens, const [
       SurfaceColor.muted,
       SurfaceBorder.none,

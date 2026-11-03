@@ -5,10 +5,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         ListingStatesWrapper,
         ViewCardsController,
         ViewCardsTile,
-        ViewCardsListTile;
+        ViewCardsListTile,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:signals_hooks/signals_hooks.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class ViewCardsListView extends SignalWidget {
   const ViewCardsListView({super.key, required this.controller});
@@ -17,7 +17,7 @@ class ViewCardsListView extends SignalWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     return ListingStatesWrapper.list(
       useParentScroll: true,

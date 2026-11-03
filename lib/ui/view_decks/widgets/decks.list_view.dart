@@ -10,10 +10,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         Button,
         CreateDeckTile,
         DeckTileState,
-        InteractionHandler;
+        InteractionHandler,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:signals_hooks/signals_hooks.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class DeckListView extends SignalHookWidget {
   const DeckListView({
@@ -39,7 +39,7 @@ class DeckListView extends SignalHookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     const spacing = 16.0;
 
     return ListingStatesWrapper<Deck>.grid(

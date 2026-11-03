@@ -42,7 +42,7 @@
 //   final List<CustomThemePreset> customThemePresets;
 
 //   /// Decodes `themeModeName` into Flutter `ThemeMode`.
-//   ThemeMode get themeMode {
+//   ThemeMode get themeBrightness {
 //     return switch (themeModeName) {
 //       'light' => ThemeMode.light,
 //       'dark' => ThemeMode.dark,

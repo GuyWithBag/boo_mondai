@@ -1,4 +1,6 @@
 import 'package:boo_mondai/core/theme/app_tokens.model.dart';
+import 'package:boo_mondai/features/decks_import_export/models/models.barrel.dart'
+    show DeckImportMode;
 import 'package:boo_mondai/features/features.barrel.dart';
 import 'package:boo_mondai/lib.barrel.dart'
     show
@@ -6,11 +8,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         LoadingIndicator,
         SegmentOption,
         SegmentedControl,
-        ViewImportController;
+        ViewImportController,
+        ThemeController;
 import 'package:flutter/material.dart' hide TextField;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:signals_hooks/signals_hooks.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 Future<bool?> showViewImportModal(BuildContext context) {
   return showModal<bool>(
@@ -28,7 +30,7 @@ class ViewImportModal extends SignalHookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final controller = useMemoized(ViewImportController.new);
     final importMode = controller.importMode.value;
     final isDeckImport = importMode == DeckImportMode.decks;

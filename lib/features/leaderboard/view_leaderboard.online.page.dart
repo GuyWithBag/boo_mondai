@@ -14,7 +14,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         SurfaceShape,
         SurfaceColor,
         ViewLeaderboardController,
-        surfaceStyle;
+        surfaceStyle,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart' show ReadContext;
@@ -29,7 +30,7 @@ class ViewLeaderboardPage extends SignalHookWidget {
   Widget build(BuildContext context) {
     final leaderboard = useMemoized(() => ViewLeaderboardController());
     final auth = context.read<AuthController>();
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final scrollController = useScrollController();
 
     useEffect(() {

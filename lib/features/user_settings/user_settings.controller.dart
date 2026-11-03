@@ -38,7 +38,7 @@
 //     try {
 //       settings = await UserSettingsService.updateThemeMode(
 //         profileId: current.profileId,
-//         themeMode: mode,
+//         themeBrightness: mode,
 //       );
 //       latestFailures = const [];
 //     } on Exception catch (e) {

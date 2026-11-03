@@ -14,13 +14,13 @@ import 'package:boo_mondai/lib.barrel.dart'
         StudySessionController,
         TextSize,
         TextWeight,
-        textStyle;
+        textStyle,
+        ThemeController;
 import 'package:boo_mondai/ui/view_onboarding/view_onboarding.controller.dart';
 import 'package:boo_mondai/ui/view_onboarding/widgets/page_dots.dart';
 import 'package:flutter/material.dart' hide Scaffold;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:signals_hooks/signals_hooks.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class ViewOnboardingPage extends SignalHookWidget {
   const ViewOnboardingPage({super.key});
@@ -30,7 +30,7 @@ class ViewOnboardingPage extends SignalHookWidget {
     final controller = useMemoized(() => ViewOnboardingController());
     useEffect(() => controller.dispose, [controller]);
 
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final ratingDemoController = useMemoized(
       () => StudySessionController(
         config: const StudySessionConfig.spacedRepitition(),
@@ -130,7 +130,7 @@ Widget _buildMarkdownStatusPage({
   required String title,
   required String markdown,
 }) {
-  final tokens = context.themeTokens<AppTokens>();
+  final tokens = ThemeController.tokens;
 
   return Center(
     child: SingleChildScrollView(
@@ -168,7 +168,7 @@ Widget _buildRatingTooltipPage({
   required BuildContext context,
   required StudySessionController ratingDemoController,
 }) {
-  final tokens = context.themeTokens<AppTokens>();
+  final tokens = ThemeController.tokens;
 
   return Center(
     child: SingleChildScrollView(

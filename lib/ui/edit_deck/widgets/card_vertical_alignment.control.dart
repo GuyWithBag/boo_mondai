@@ -9,7 +9,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextWeight,
         surfaceStyle,
         textStyle,
-        SurfaceShape;
+        SurfaceShape,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -25,7 +26,7 @@ class CardVerticalAlignmentControl extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     return Surface(
       style: surfaceStyle

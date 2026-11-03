@@ -7,7 +7,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextWeight,
         surfaceStyle,
         textStyle,
-        Elevated;
+        Elevated,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:theme_variants/theme_variants.dart';
@@ -19,7 +20,7 @@ class StreaksCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     return Elevated(
       child: Surface(

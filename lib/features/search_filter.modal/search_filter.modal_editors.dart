@@ -7,10 +7,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextField,
         TextFieldFrame,
         TextFieldSize,
-        textFieldStyle;
+        textFieldStyle,
+        ThemeController;
 import 'package:flutter/material.dart' hide TextField;
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class SearchFilterTextEditor extends HookWidget {
   const SearchFilterTextEditor({
@@ -28,7 +28,7 @@ class SearchFilterTextEditor extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final controller = useTextEditingController(text: value);
 
     useEffect(() {
@@ -144,7 +144,7 @@ class SearchFilterSliderEditor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final label = labelBuilder?.call(value) ?? value.toString();
 
     return Column(

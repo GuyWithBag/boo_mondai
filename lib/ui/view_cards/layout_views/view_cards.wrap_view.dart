@@ -4,10 +4,10 @@ import 'package:boo_mondai/lib.barrel.dart'
         FlashcardTemplate,
         ListingStatesWrapper,
         ViewCardsController,
-        ViewCardsTile;
+        ViewCardsTile,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:signals_hooks/signals_hooks.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class ViewCardsWrapView extends SignalWidget {
   const ViewCardsWrapView({super.key, required this.controller});
@@ -16,7 +16,7 @@ class ViewCardsWrapView extends SignalWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     return ListingStatesWrapper.wrap(
       isLoading: controller.isLoading.value,

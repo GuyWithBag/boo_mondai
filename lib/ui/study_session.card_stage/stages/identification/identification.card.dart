@@ -23,7 +23,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         TextWeight,
         surfaceStyle,
         textStyle,
-        usePhysicalCardController;
+        usePhysicalCardController,
+        ThemeController;
 import 'package:boo_mondai/ui/study_session.card_stage/stages/identification/controllers/identification.controller.dart';
 import 'package:flutter/material.dart' hide TextField;
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -51,7 +52,7 @@ class IdentificationCard extends SignalHookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final identificationController = useMemoized(
       () => IdentificationController(
         template: template,
@@ -191,7 +192,7 @@ class _AcceptedAnswersPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final resolvedAnswerStyle = surfaceStyle.resolve(tokens, [
       controller.answerSurfaceColor,
       SurfacePadding.xsm,
@@ -254,7 +255,7 @@ class _WrongAnswerInsight extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
 
     return Container(
       width: double.infinity,

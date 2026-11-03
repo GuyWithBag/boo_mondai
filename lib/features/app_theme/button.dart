@@ -12,7 +12,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         ButtonColor,
         Elevated,
         MediaSelector,
-        ScaleHelper;
+        ScaleHelper,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -212,7 +213,7 @@ class Button extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final state = useState(getState());
     useEffect(() {
       state.value = getState();

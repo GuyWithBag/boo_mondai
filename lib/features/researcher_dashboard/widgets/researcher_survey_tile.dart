@@ -11,7 +11,8 @@ import 'package:boo_mondai/lib.barrel.dart'
         textStyle,
         TextColor,
         TextSize,
-        TextWeight;
+        TextWeight,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
@@ -27,7 +28,7 @@ class ResearcherSurveyTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final lastSubmittedAt = summary.lastSubmittedAt;
 
     return Surface(

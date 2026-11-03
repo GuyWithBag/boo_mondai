@@ -4,11 +4,11 @@ import 'package:boo_mondai/lib.barrel.dart'
         Content,
         ListingStatesWrapper,
         ViewCommentsController,
-        ViewCommentsTile;
+        ViewCommentsTile,
+        ThemeController;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:signals_hooks/signals_hooks.dart';
-import 'package:theme_variants/theme_variants.dart';
 
 class ViewCommentsSection extends SignalHookWidget {
   const ViewCommentsSection({super.key, required this.rootContent});
@@ -17,7 +17,7 @@ class ViewCommentsSection extends SignalHookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.themeTokens<AppTokens>();
+    final tokens = ThemeController.tokens;
     final controller = useMemoized(() => ViewCommentsController(rootContent));
 
     useEffect(() {
