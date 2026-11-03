@@ -6,18 +6,9 @@ part 'profile.role.dto.mapper.dart';
 enum ProfileRole {
   @MappableValue('user')
   user('user'),
-  @MappableValue('researcher')
-  researcher('researcher'),
+
   @MappableValue('appAdmin')
-  appAdmin('appAdmin'),
-  @MappableValue('participant_chinese_a')
-  participantChineseA('participant_chinese_a'),
-  @MappableValue('participant_chinese_b')
-  participantChineseB('participant_chinese_b'),
-  @MappableValue('participant_japanese_a')
-  participantJapaneseA('participant_japanese_a'),
-  @MappableValue('participant_japanese_b')
-  participantJapaneseB('participant_japanese_b');
+  appAdmin('appAdmin');
 
   const ProfileRole(this.value);
 
@@ -30,9 +21,5 @@ enum ProfileRole {
       (role) => role.value == normalized,
       orElse: () => ProfileRole.user,
     );
-  }
-
-  static bool isParticipant(ProfileRole role) {
-    return role.value.startsWith('participant');
   }
 }

@@ -55,7 +55,6 @@ Future<void> main() async {
       stackTrace: stackTrace,
     );
   }
-  ResearchPariticipantPortalStore.instance.init();
   // ── Restore session ─────────────────────────────────
   final authController = AuthController();
   // ── App-level sync ──────────────────────────────────

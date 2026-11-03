@@ -70,14 +70,7 @@ class ViewProfilePage extends SignalHookWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           ProfileCard(controller: controller),
-          const ResearchParticipantPortal(),
-          if (auth.currentProfile.value.isResearcher)
-            Button(
-              leading: const Icon(Icons.science_outlined),
-              onPressed: () => context.push(Pages.researcherDashboard.url),
-              mainAxisAlignment: MainAxisAlignment.start,
-              child: const Text('Researcher Dashboard'),
-            ),
+
           const DarkModeToggleCard(),
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,

@@ -66,11 +66,6 @@ GoRouter createRouter(AuthController authController) {
         return Pages.home.url;
       }
 
-      if (loc.startsWith(Pages.researcherDashboard.url) &&
-          !auth.currentProfile.value.isResearcher) {
-        return Pages.home.url;
-      }
-
       // if (!isAnonymous && auth.currentProfile.role == ProfileRole.participantJapaneseB) {
       //   final allowed = [
       //     Pages.home.url,

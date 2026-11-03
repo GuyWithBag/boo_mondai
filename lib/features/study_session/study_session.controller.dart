@@ -473,25 +473,6 @@ final class StudySessionController {
         deckId: deck.id,
       );
     }
-    await showResearcherStudySessionCompleteNotification(active);
-  }
-
-  Future<void> showResearcherStudySessionCompleteNotification(
-    StudySession active,
-  ) async {
-    final profile = LocalDB.currentProfile.getOrCreate();
-    if (!profile.isResearcher) return;
-    if (active.deckId != ResearchParticipantChineseSetAData.dataDeckId &&
-        active.deckId != ResearchParticipantChineseSetBData.dataDeckId &&
-        active.deckId != ResearchParticipantJapaneseSetAData.dataDeckId &&
-        active.deckId != ResearchParticipantJapaneseSetBData.dataDeckId) {
-      return;
-    }
-
-    await notificationsController.notify(
-      Notifications.researcherStudySessionComplete(),
-      const ImmediateSchedule.now(),
-    );
   }
 
   Future<void> saveSessionProgress() async {

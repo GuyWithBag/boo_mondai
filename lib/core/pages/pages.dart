@@ -330,52 +330,6 @@ class Pages {
         }) => ViewSurveyPage(surveyId: pathParameters['surveyId']!),
   );
 
-  static final researcherDashboard = AppPage(
-    url: '/researcher-dashboard',
-    icon: Icons.science_outlined,
-    name: 'Researcher Dashboard',
-    builder:
-        (
-          context, {
-          pathParameters = const {},
-          queryParameters = const {},
-          extra,
-        }) => const ResearcherDashboardPage(),
-  );
-
-  static final researcherSurvey = AppPage(
-    url: '/researcher-dashboard/surveys/:surveyId',
-    icon: Icons.analytics_outlined,
-    name: 'Survey Data',
-    builder:
-        (
-          context, {
-          pathParameters = const {},
-          queryParameters = const {},
-          extra,
-        }) => ResearcherSurveyDetailPage(surveyId: pathParameters['surveyId']!),
-  );
-
-  static final researcherSurveyResponse = AppPage(
-    url: '/researcher-dashboard/surveys/:surveyId/responses/:responseId',
-    icon: Icons.assignment_turned_in_outlined,
-    name: 'Survey Response',
-    builder:
-        (
-          context, {
-          pathParameters = const {},
-          queryParameters = const {},
-          extra,
-        }) => ResearcherSurveyResponsePage(
-          surveyId: pathParameters['surveyId']!,
-          responseId: pathParameters['responseId']!,
-        ),
-  );
-
-  static String researcherSurveyUrl(String surveyId) {
-    return '/researcher-dashboard/surveys/$surveyId';
-  }
-
   static String researcherSurveyResponseUrl(
     String surveyId,
     String responseId,
@@ -491,9 +445,6 @@ class Pages {
     changeReview,
     viewNotificationIntent,
     viewSurvey,
-    researcherDashboard,
-    researcherSurveyResponse,
-    researcherSurvey,
     leaderboard,
     downloads,
   ];

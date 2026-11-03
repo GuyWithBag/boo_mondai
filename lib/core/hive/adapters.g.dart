@@ -2704,18 +2704,8 @@ class ProfileRoleAdapter extends TypeAdapter<ProfileRole> {
     switch (reader.readByte()) {
       case 0:
         return ProfileRole.user;
-      case 1:
-        return ProfileRole.researcher;
       case 5:
         return ProfileRole.appAdmin;
-      case 6:
-        return ProfileRole.participantChineseA;
-      case 7:
-        return ProfileRole.participantChineseB;
-      case 8:
-        return ProfileRole.participantJapaneseA;
-      case 9:
-        return ProfileRole.participantJapaneseB;
       default:
         return ProfileRole.user;
     }
@@ -2726,18 +2716,8 @@ class ProfileRoleAdapter extends TypeAdapter<ProfileRole> {
     switch (obj) {
       case ProfileRole.user:
         writer.writeByte(0);
-      case ProfileRole.researcher:
-        writer.writeByte(1);
       case ProfileRole.appAdmin:
         writer.writeByte(5);
-      case ProfileRole.participantChineseA:
-        writer.writeByte(6);
-      case ProfileRole.participantChineseB:
-        writer.writeByte(7);
-      case ProfileRole.participantJapaneseA:
-        writer.writeByte(8);
-      case ProfileRole.participantJapaneseB:
-        writer.writeByte(9);
     }
   }
 

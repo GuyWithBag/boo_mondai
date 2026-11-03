@@ -29,18 +29,8 @@ class ProfileRoleMapper extends EnumMapper<ProfileRole> {
     switch (value) {
       case 'user':
         return ProfileRole.user;
-      case 'researcher':
-        return ProfileRole.researcher;
       case 'appAdmin':
         return ProfileRole.appAdmin;
-      case 'participant_chinese_a':
-        return ProfileRole.participantChineseA;
-      case 'participant_chinese_b':
-        return ProfileRole.participantChineseB;
-      case 'participant_japanese_a':
-        return ProfileRole.participantJapaneseA;
-      case 'participant_japanese_b':
-        return ProfileRole.participantJapaneseB;
       default:
         throw MapperException.unknownEnumValue(value);
     }
@@ -51,18 +41,8 @@ class ProfileRoleMapper extends EnumMapper<ProfileRole> {
     switch (self) {
       case ProfileRole.user:
         return 'user';
-      case ProfileRole.researcher:
-        return 'researcher';
       case ProfileRole.appAdmin:
         return 'appAdmin';
-      case ProfileRole.participantChineseA:
-        return 'participant_chinese_a';
-      case ProfileRole.participantChineseB:
-        return 'participant_chinese_b';
-      case ProfileRole.participantJapaneseA:
-        return 'participant_japanese_a';
-      case ProfileRole.participantJapaneseB:
-        return 'participant_japanese_b';
     }
   }
 }
