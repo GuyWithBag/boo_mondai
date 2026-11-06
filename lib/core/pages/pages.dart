@@ -6,6 +6,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         ViewDecksPage,
         ViewStudyDecksPage,
         ViewProfilePage,
+        ViewReviewUsagePage,
         LoginPage,
         RegisterPage,
         RegisterResultPage,
@@ -113,6 +114,18 @@ class Pages {
           queryParameters = const {},
           extra,
         }) => const ViewProfilePage(),
+  );
+
+  static final reviewUsage = AppPage(
+    url: '/account/review-usage',
+    name: 'Review Usage',
+    builder:
+        (
+          context, {
+          pathParameters = const {},
+          queryParameters = const {},
+          extra,
+        }) => const ViewReviewUsagePage(),
   );
 
   static final login = AppPage(
@@ -496,5 +509,6 @@ class Pages {
     researcherSurvey,
     leaderboard,
     downloads,
+    reviewUsage,
   ];
 }

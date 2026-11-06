@@ -78,6 +78,12 @@ class ViewProfilePage extends SignalHookWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               child: const Text('Researcher Dashboard'),
             ),
+          Button(
+            leading: const Icon(Icons.insights_outlined),
+            onPressed: () => context.push(Pages.reviewUsage.url),
+            mainAxisAlignment: MainAxisAlignment.start,
+            child: const Text('Review Usage'),
+          ),
           const DarkModeToggleCard(),
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
