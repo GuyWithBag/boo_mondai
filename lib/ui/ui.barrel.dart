@@ -11,6 +11,7 @@ export 'view_discussion/view_discussion.barrel.dart';
 export 'view_profile/view_profile.barrel.dart';
 export 'view_settings/view_settings.barrel.dart';
 export 'view_study_decks/view_study_decks.barrel.dart';
+export 'view_review_detail/view_review_detail.barrel.dart';
 export 'view_study_session/view_study_session.barrel.dart';
 export 'view_study_session.result/view_study_session.result.barrel.dart';
 export 'view_message_session_step/view_message_session_step.barrel.dart';
@@ -29,4 +30,5 @@ export 'research_participant.portal/research_participant.portal.barrel.dart';
 export 'study_session.card_stage/study_session.card_stage.barrel.dart';
 export 'text.context_menu/text.context_menu.barrel.dart';
 export 'notification.bubble/notification.bubble.barrel.dart';
+
 // Other files

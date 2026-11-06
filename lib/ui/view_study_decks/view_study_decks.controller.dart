@@ -5,6 +5,7 @@
 import 'package:boo_mondai/lib.barrel.dart'
     show
         DeckReviewStats,
+        DeckDueStats,
         DeckRatingStats,
         LocalDB,
         StudyDeckEntry,
@@ -54,8 +55,7 @@ class ViewStudyDecksController {
       final combinedEntries = <StudyDeckEntry>[];
 
       for (final deck in allDecks) {
-        final dueStats = dueMap[deck.id];
-        if (dueStats == null || dueStats.totalDue == 0) continue;
+        final dueStats = dueMap[deck.id] ?? const DeckDueStats();
 
         final stats = DeckReviewStats(
           deck: deck,
@@ -67,7 +67,12 @@ class ViewStudyDecksController {
         combinedEntries.add(StudyDeckEntry(deck: deck, stats: stats));
       }
 
-      combinedEntries.sort((a, b) => b.totalDue.compareTo(a.totalDue));
+      combinedEntries.sort((a, b) {
+        final dueComparison = b.totalDue.compareTo(a.totalDue);
+        return dueComparison == 0
+            ? a.deck.title.toLowerCase().compareTo(b.deck.title.toLowerCase())
+            : dueComparison;
+      });
       deckEntries.value = List.unmodifiable(combinedEntries);
     } on Exception catch (e) {
       error.value = e;

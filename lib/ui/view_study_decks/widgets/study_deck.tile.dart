@@ -159,7 +159,9 @@ class StudyDeckTile extends SignalHookWidget {
                   children: [
                     Expanded(
                       child: Button(
-                        onPressed: () {},
+                        onPressed: deck == null
+                            ? null
+                            : () => context.push('/review/${deck!.id}/details'),
                         leading: const Text('View Details'),
                       ),
                     ),

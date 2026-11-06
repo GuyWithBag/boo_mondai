@@ -5,6 +5,7 @@ import 'package:boo_mondai/lib.barrel.dart'
         ViewDeckListingsPage,
         ViewDecksPage,
         ViewStudyDecksPage,
+        ViewReviewDetailPage,
         ViewProfilePage,
         LoginPage,
         RegisterPage,
@@ -292,6 +293,18 @@ class Pages {
         ),
   );
 
+  static final reviewDetail = AppPage(
+    url: '/review/:deckId/details',
+    name: 'Review Details',
+    builder:
+        (
+          context, {
+          pathParameters = const {},
+          queryParameters = const {},
+          extra,
+        }) => ViewReviewDetailPage(deckId: pathParameters['deckId']!),
+  );
+
   static final changeReview = AppPage(
     url: '/change-review/:serviceId/:entryId',
     name: 'Change Review',
@@ -488,6 +501,7 @@ class Pages {
     reviewSession,
     reviewResult,
     reviewDeckSession,
+    reviewDetail,
     changeReview,
     viewNotificationIntent,
     viewSurvey,
