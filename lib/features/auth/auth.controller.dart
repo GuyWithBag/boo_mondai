@@ -42,7 +42,6 @@ class AuthController {
     () => (
       profileId: currentProfile.value.id,
       role: currentProfile.value.role,
-      isResearcher: currentProfile.value.isResearcher,
       isAnonymous: currentProfile.value.isAnonymous,
       currentEmail: currentEmail.value,
       isAuthenticatedRemote: isAuthenticatedRemote.value,

@@ -25,8 +25,8 @@ export 'view_notification_intent/view_notification_intent.barrel.dart';
 export 'view_onboarding/view_onboarding.barrel.dart';
 export 'view_study_session.drill_onboarding/view_study_session.drill_onboarding.barrel.dart';
 export 'filtered_search_bar/filtered_search_bar.barrel.dart';
-export 'research_participant.portal/research_participant.portal.barrel.dart';
 export 'study_session.card_stage/study_session.card_stage.barrel.dart';
 export 'text.context_menu/text.context_menu.barrel.dart';
 export 'notification.bubble/notification.bubble.barrel.dart';
+
 // Other files
