@@ -2461,6 +2461,9 @@ class NotificationIntentAdapter extends TypeAdapter<NotificationIntent> {
       createdAt: fields[7] as DateTime,
       updatedAt: fields[8] as DateTime,
       purgeAt: fields[10] as DateTime,
+      tone: fields[18] == null
+          ? NotificationIntentTone.inherit
+          : fields[18] as NotificationIntentTone,
       route: fields[4] as String?,
       ifRouteNullPushToView: fields[14] == null ? false : fields[14] as bool,
       persistInInbox: fields[5] == null ? false : fields[5] as bool,
@@ -2476,7 +2479,7 @@ class NotificationIntentAdapter extends TypeAdapter<NotificationIntent> {
   @override
   void write(BinaryWriter writer, NotificationIntent obj) {
     writer
-      ..writeByte(18)
+      ..writeByte(19)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -2512,7 +2515,9 @@ class NotificationIntentAdapter extends TypeAdapter<NotificationIntent> {
       ..writeByte(16)
       ..write(obj.shown)
       ..writeByte(17)
-      ..write(obj.shortDescription);
+      ..write(obj.shortDescription)
+      ..writeByte(18)
+      ..write(obj.tone);
   }
 
   @override
@@ -2554,6 +2559,8 @@ class NotificationIntentTypeAdapter
         return NotificationIntentType.finalDrillBatchSurvey;
       case 11:
         return NotificationIntentType.finalDrillBatchReviewNow;
+      case 12:
+        return NotificationIntentType.reviewFsrsWarning;
       default:
         return NotificationIntentType.reviewReminder;
     }
@@ -2582,6 +2589,8 @@ class NotificationIntentTypeAdapter
         writer.writeByte(10);
       case NotificationIntentType.finalDrillBatchReviewNow:
         writer.writeByte(11);
+      case NotificationIntentType.reviewFsrsWarning:
+        writer.writeByte(12);
     }
   }
 

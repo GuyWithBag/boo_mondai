@@ -835,7 +835,7 @@ types:
         index: 1
   NotificationIntent:
     typeId: 47
-    nextIndex: 18
+    nextIndex: 19
     fields:
       id:
         index: 0
@@ -873,9 +873,11 @@ types:
         index: 16
       shortDescription:
         index: 17
+      tone:
+        index: 18
   NotificationIntentType:
     typeId: 48
-    nextIndex: 12
+    nextIndex: 13
     fields:
       reviewReminder:
         index: 0
@@ -897,6 +899,8 @@ types:
         index: 10
       finalDrillBatchReviewNow:
         index: 11
+      reviewFsrsWarning:
+        index: 12
   StudySessionCompletedResults:
     typeId: 49
     nextIndex: 10

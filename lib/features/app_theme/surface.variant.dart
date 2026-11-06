@@ -11,6 +11,8 @@ enum SurfaceColor {
   streak,
   success,
   error,
+  hard,
+  easy,
   primarySoft,
   invisible,
 }
@@ -256,6 +258,18 @@ VariantStyle<AppTokens, SurfaceStyle> createSurfaceStyle() =>
           border: tokens.colorActionErrorBorder,
           shadow: tokens.colorActionErrorBorder,
           foreground: tokens.colorActionError,
+        ),
+        SurfaceColor.hard: (tokens) => _surfacePalette(
+          background: tokens.colorRatingHardBackground,
+          border: tokens.colorRatingHardBorder,
+          shadow: tokens.colorRatingHardBorder,
+          foreground: tokens.colorRatingHardText,
+        ),
+        SurfaceColor.easy: (tokens) => _surfacePalette(
+          background: tokens.colorRatingEasyBackground,
+          border: tokens.colorRatingEasyBorder,
+          shadow: tokens.colorRatingEasyBorder,
+          foreground: tokens.colorRatingEasyText,
         ),
         SurfaceColor.baseline: (tokens) => _surfacePalette(
           background: tokens.colorSurfaceBackground,

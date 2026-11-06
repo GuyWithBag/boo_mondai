@@ -36,8 +36,8 @@ extension NotificationIntentPresentation on NotificationIntent {
       NotificationIntentTone.inherit => SurfaceColor.baseline,
       NotificationIntentTone.success => SurfaceColor.success,
       NotificationIntentTone.danger => SurfaceColor.error,
-      NotificationIntentTone.warning => SurfaceColor.streak,
-      NotificationIntentTone.announcement => SurfaceColor.primarySoft,
+      NotificationIntentTone.warning => SurfaceColor.hard,
+      NotificationIntentTone.announcement => SurfaceColor.easy,
     };
   }
 
